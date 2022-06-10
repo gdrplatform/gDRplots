@@ -38,6 +38,25 @@ plot_SA_byCLs = function(SE, CL_names = NULL, Row_names = NULL, sel_normalizatio
 }
 
 
+plot_SA_1CL = function(SE, sel_normalization = 'GR', 
+    colormap = NULL, plot_averaged = T, plot_fit = T) {
+  
+  stopifnot(ncol(SE) == 1)
+
+  
+  grob_SA(
+        convert_se_assay_to_dt(SE, 'Metrics'), 
+        grouping = 'DrugName',
+        df_average = convert_se_assay_to_dt(SE, 'Averaged'), 
+        sel_normalization = sel_normalization,
+        colormap = colormap,
+        plot_averaged = plot_averaged,
+        plot_fit = plot_fit
+      ) 
+  
+}
+
+
 grob_SA = function(df_metrics, grouping, df_average = NULL, group_names = NULL, sel_normalization = 'GR', 
     colormap = NULL, plot_averaged = !is.null(df_average), plot_fit = T) {
 
@@ -45,8 +64,10 @@ grob_SA = function(df_metrics, grouping, df_average = NULL, group_names = NULL, 
   df_average$NormData = if(sel_normalization == 'GR') {df_average$GRvalue} else {df_average$RelativeViability}
 
   data_range = c( min(min(df_average$NormData),0) -.05, max(max(df_average$NormData), 1) +.05 )
-  conc_range = .5*c(floor(2*log10(min(df_average$Concentration))-.5), ceiling(2*log10(max(df_average$Concentration))+.3) )    
+  min_conc = min(df_average$Concentration[df_average$Concentration>0])
+  conc_range = .5*c(floor(2*log10(min_conc)-.5), ceiling(2*log10(max(df_average$Concentration))+.3) )    
   sel_conc = 10**(seq(conc_range[1], conc_range[2], .05))
+  df_average$Concentration[df_average$Concentration==0] = min_conc/10
 
   if (is.null(group_names)) group_names = unique(df_metrics[[grouping]])
 
@@ -63,7 +84,7 @@ grob_SA = function(df_metrics, grouping, df_average = NULL, group_names = NULL, 
   }
 
   if (is.null(colormap)) {
-    colormap = colorRampPalette(c("red", "yellow", "blue"))(length(group_names))
+    colormap = colorRampPalette(c("#dd0000", "#bbdd33", "#0000dd"))(length(group_names))
     names(colormap) = group_names
   }
 
@@ -82,7 +103,7 @@ grob_SA = function(df_metrics, grouping, df_average = NULL, group_names = NULL, 
     geom_vline(xintercept = 0, color = '#555555') +
     geom_point(data = df_avg) +
     geom_line(data = df_fit) +
-    scale_color_manual(values = colormap[unique(df_fit$grouping)]) +
+    scale_color_manual(values = colormap[names(colormap) %in% unique(df_fit$grouping)]) +
     coord_cartesian(xlim = conc_range, ylim = data_range) +
     scale_x_continuous(breaks = -5:2, labels = c('1e-5', '1e-4', 10**(-3:2))) +
     xlab('Concentration (µM)') +
