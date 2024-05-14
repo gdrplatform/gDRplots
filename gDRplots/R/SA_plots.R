@@ -21,8 +21,8 @@
 #' SE <- mae[[1]]
 #' iR <-  rownames(SE)[1]
 #' grouping <- "cId"
-#' dt_metrics = gDRutils::convert_se_assay_to_dt(SE[iR], "Metrics")
-#' dt_average = gDRutils::convert_se_assay_to_dt(SE[iR], "Averaged")
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[iR], "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(SE[iR], "Averaged")
 #' group_names <- colnames(SE)[2:5]
 #' 
 #' grob_SA(dt_metrics = dt_metrics, 
@@ -69,7 +69,7 @@ grob_SA <- function(dt_metrics,
   data_range <- c(min(min(dt_avg_norm$x), 0) - 0.05, max(max(dt_avg_norm$x), 1) + 0.05)
   min_conc <- min(dt_avg_norm[dt_avg_norm$Concentration > 0, ]$Concentration)
   max_conc <- max(dt_avg_norm$Concentration)
-  conc_range = 0.5 * c(floor( 2 * log10(min_conc) - 0.5), ceiling( 2 * log10(max(max_conc)) + 0.3)) 
+  conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3)) 
   # remove conc = 0
   dt_avg_norm$Concentration[dt_avg_norm$Concentration == 0] <- min_conc / 10
   
@@ -114,8 +114,8 @@ grob_SA <- function(dt_metrics,
   }
   
   # levels
-  dt_avg$grouping = factor(dt_avg[[grouping]], levels = group_names)
-  dt_fit$grouping = factor(dt_fit[[grouping]], levels = group_names)
+  dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
+  dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
   
   # final plot
   plt <- 
@@ -186,12 +186,12 @@ plot_SA_byCLs <-  function(SE,
     drug_name <- drug_name[drug_name  %in% rownames(SE)]
   }  
   
-  plt_list = list()
+  plt_list <- list()
   for (iR in drug_name) {
     
     if (is.null(cellline_name) || all(!cellline_name %in% colnames(SE))) {
       cellline_name <- colnames(SE)
-    } else if(!all(cellline_name  %in% colnames(SE))) {
+    } else if (!all(cellline_name  %in% colnames(SE))) {
       cellline_name <- cellline_name[cellline_name  %in% colnames(SE)]
     }  
     
@@ -230,11 +230,11 @@ plot_SA_byCLs <-  function(SE,
 #' plot_SA_1CL(SE = SE[,colnames(SE)[1]], colormap = c("cadetblue", "orange", "darkblue"))
 #' 
 #' @keywords internal
-plot_SA_1CL = function(SE, 
-                       normalization_type = "GR", 
-                       colormap = NULL, 
-                       plot_averaged_flag = TRUE, 
-                       plot_fit_flag = TRUE) {
+plot_SA_1CL <- function(SE, 
+                        normalization_type = "GR", 
+                        colormap = NULL, 
+                        plot_averaged_flag = TRUE, 
+                        plot_fit_flag = TRUE) {
   
   stopifnot(NCOL(SE) == 1) # plot for 1 cell line
   
