@@ -116,13 +116,14 @@ plts <- lapply(mx_names, function(mx_name) {
         name = gDRutils::get_combo_excess_field_names()[[mx_name]],
         oob = scales::squish)
   }
-  
-  for (iso in all_iso) {
-    plt <- plt +
-      ggplot2::geom_path(data = dt_iso[iso_level == iso, ], 
-                         color = iso_colors[iso], show.legend = TRUE)
-  }
 
+    plt <- plt +
+      ggplot2::geom_path(data = dt_iso, size = 0.8,
+                         ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) + 
+      ggplot2::scale_color_manual(values = iso_colors[all_iso]) +
+      ggplot2::labs(color = "Iso levels")
+
+  
   return(plt)
 })
 
