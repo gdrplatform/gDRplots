@@ -75,8 +75,8 @@ plts <- lapply(mx_names, function(mx_name) {
   plt <- 
     ggplot2::ggplot(df_, ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = y_gap, width = x_gap) +
-    ggplot2::labs(x = expression(paste(drug2_name, " [", mu, "M]")),
-                  y = expression(paste(drug1_name, " [", mu, "M]")),
+    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu*M ~ "]"),
+                  y = bquote(.(drug1_name) ~ "[" ~ mu*M ~ "]"),
                   fill = gDRutils::get_combo_excess_field_names()[[mx_name]],
                   title = plt_title) +
     ggplot2::theme_bw() + 
@@ -88,7 +88,6 @@ plts <- lapply(mx_names, function(mx_name) {
     ggplot2::scale_y_continuous(breaks = df_$pos_y, labels = df_$marks_y,
                                 expand = c(0, 0)) +
     ggplot2::scale_shape_discrete(name = paste0(ifelse(norm_type == "GR", "GR", "IC"), "50"))
-  
   
   # add color scale
   if (!(mx_name %in% c("hsa_excess", "bliss_excess"))) { # heatmaps with readout values
@@ -123,7 +122,7 @@ plts <- lapply(mx_names, function(mx_name) {
       ggplot2::geom_path(data = dt_iso[iso_level == iso, ], 
                          color = iso_colors[iso], show.legend = TRUE)
   }
-  
+
   return(plt)
 })
 
