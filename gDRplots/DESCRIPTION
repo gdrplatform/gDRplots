@@ -1,5 +1,5 @@
-Package: gDRplot
-Title: 'gDRplot'
+Package: gDRplots
+Title: 'gDRplots'
 Version: 0.0.1
 Date: 2024-05-15
 Authors@R: c(
