@@ -144,14 +144,15 @@ grob_SA <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams grob_SA
-#' @param SE \code{SummarizedExperiment} object holding raw and/or processed dose-response 
-#'    data in its assays for one cell line
+#' @param SE single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+#'    dose-response data in its assays for one cell line
 #' @param cellline_name character vector with cell line to be plotted (colnames of SE)
 #' @param drug_name character vector with cell line to be plotted (rownames of SE)
 #'    
 #' @return list of plots with dose-response curves
 #' 
 #' @examples
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' SE <- mae[[1]]
 #' cellline_name <- colnames(SE)[2:5]
@@ -162,6 +163,7 @@ grob_SA <- function(dt_metrics,
 #'               drug_name = drug_name, 
 #'               normalization_type = "RV", 
 #'               colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#' }
 #' 
 #' @keywords internal
 plot_SA_byCLs <-  function(SE, 
@@ -218,16 +220,18 @@ plot_SA_byCLs <-  function(SE,
 #' Plot drug response curves for single-agent data for one selected cell line
 #' 
 #' @inheritParams grob_SA
-#' @param SE \code{SummarizedExperiment} object holding raw and/or processed dose-response 
-#'    data in its assays for one cell line
+#' @param SE single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+#'    dose-response data in its assays for one cell line
 #'    
 #' @return plot with dose-response curves
 #' 
 #' @examples
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' SE <- mae[[1]]
 #' 
 #' plot_SA_1CL(SE = SE[,colnames(SE)[1]], colormap = c("cadetblue", "orange", "darkblue"))
+#' }
 #' 
 #' @keywords internal
 plot_SA_1CL <- function(SE, 
