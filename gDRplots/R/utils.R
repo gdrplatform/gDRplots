@@ -1,10 +1,26 @@
-swap_drugs_1_2 <- function(df_) {
+#' Help function to change column suffix
+#'
+#' @param dt_ data.table with data
+#'
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' mae <- gDRutils::get_synthetic_data("small")
+#' SE <- mae[[1]]
+#' dt_ <- gDRutils::convert_se_assay_to_dt(SE, assay_name = "Metrics", wide_structure = TRUE)
+#' 
+#' swapped_dt_ <- swap_drugs_1_2(dt_)
+#' }
+#' 
+#' @return swapped data.table
+#' 
+swap_drugs_1_2 <- function(dt_) {
 
-  for (dr_var in intersect(c("DrugName", "Gnumber", "drug_moa", "Concentration"), colnames(df_))) {
-    df_[[paste0("temp_", dr_var)]] <- df_[[paste0(dr_var, "_2")]]
-    df_[[paste0(dr_var, "_2")]] <- df_[[dr_var]] 
-    df_[[dr_var]] <- df_[[paste0("temp_", dr_var)]]
-    df_[[paste0("temp_", dr_var)]] <- NULL
+  for (dr_var in intersect(c("DrugName", "Gnumber", "drug_moa", "Concentration"), colnames(dt_))) {
+    dt_[[paste0("temp_", dr_var)]] <- dt_[[paste0(dr_var, "_2")]]
+    dt_[[paste0(dr_var, "_2")]] <- dt_[[dr_var]] 
+    dt_[[dr_var]] <- dt_[[paste0("temp_", dr_var)]]
+    dt_[[paste0("temp_", dr_var)]] <- NULL
   }
-  df_
+  dt_
 }
