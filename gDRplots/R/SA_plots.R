@@ -108,26 +108,30 @@ grob_SA <- function(dt_metrics,
   color_values <- colormap[names(colormap) %in% unique(dt_fit[[grouping]])]
   
   # prep averaged data
-  dt_avg <- if (is.null(group_names)) {
-    dt_avg_norm
-  } else {
-    dt_avg_norm[get(grouping) %in% group_names, ]
-  }
+  dt_avg <- dt_avg_norm[get(grouping) %in% group_names, ]
   
   # levels
   dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
+  
+  plt_title <- 
+    sprintf("Drug dose response for %s: %s",
+            ifelse(grouping == "cId", "Drug", "Cell Line"),
+            ifelse(grouping == "cId", unique(dt_metrics[["rId"]]), unique(dt_metrics[["cId"]]))
+    )
   
   # final plot
   plt <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(Concentration), y = x, color = grouping, group = grouping)) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::geom_vline(xintercept = 0, color = "#555555") +
-    ggplot2::scale_color_manual(values = color_values) +
+    ggplot2::scale_color_manual(values = color_values,
+                                name = ifelse(grouping == "cId", "Cell line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ** (-3:2))) +
     ggplot2::xlab(expression(paste("Concentration [", mu, "M]"))) +
     ggplot2::ylab(paste(normalization_type, "values")) +
+    ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
   
   if (plot_averaged_flag) {
