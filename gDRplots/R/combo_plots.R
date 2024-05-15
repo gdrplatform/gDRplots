@@ -10,12 +10,12 @@
 #'
 #' @return list of heatmaps with value for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
-#'
+#'    
+#' @keywords combo_plots
 #' @examples
-#' cellline_name <- "cellline_AA"
+#' cellline_name <- "cellline_MC"
 #' drug1_name <- "drug_001"
 #' drug2_name <- "drug_026"
-#' norm_type <- "RV"
 #' 
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' SE <- mae[["combination"]]
@@ -110,7 +110,8 @@ gDR_combo_plot <- function(SE,
           ggplot2::scale_fill_gradientn(
             colors = c("black", "#b06000", "#c07700", "white"),
             values = c(0, 0.59 / 1.7, 0.61 / 1.7, 1), 
-            limits = c(-0.6, 1.1), name = "GR val",
+            limits = c(-0.6, 1.1),
+            name = "GR",
             oob = scales::squish)
       } else {
         plt <- plt +
