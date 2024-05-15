@@ -55,15 +55,26 @@ test_that("plot_SA_byCLs works as expected", {
   normalization_type <- "RV"
   
   plts <- plot_SA_byCLs(SE = SE,
-                       cellline_name = cellline_name,
-                       drug_name = drug_name,
-                       normalization_type = normalization_type,
-                       colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
-
+                        cellline_name = cellline_name,
+                        drug_name = drug_name,
+                        normalization_type = normalization_type,
+                        colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
   expect_is(plts, "list")
   expect_equal(names(plts), drug_name)
   expect_true(all(vapply(seq_along(plts), 
                          function(i) grepl(normalization_type, plts[[i]]$labels$y), logical(1))))
+  
+  cellline_name_2 <- c(colnames(SE)[2:3], "CL00014_cellline_XX_tissue_x_38")
+  drug_name_2 <- c(rownames(SE)[5:6], "G00008_drug_100_moa_A_72")
+  
+  plts <- plot_SA_byCLs(SE = SE,
+                        cellline_name = cellline_name_2,
+                        drug_name = drug_name_2)
+  expect_is(plts, "list")
+  expect_equal(names(plts), intersect(drug_name_2, rownames(SE)))
+  plotted <- intersect(cellline_name_2, colnames(SE))
+  expect_true(all(vapply(seq_along(plts), 
+                         function(i) all(plts[[i]]$plot_env$group_names == plotted), logical(1))))
 })
 
 test_that("plot_SA_1CL works as expected", {
