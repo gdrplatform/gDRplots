@@ -13,8 +13,8 @@ plot_SA_1CL(
 )
 }
 \arguments{
-\item{SE}{\code{SummarizedExperiment} object holding raw and/or processed dose-response 
-data in its assays for one cell line}
+\item{SE}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+dose-response data in its assays for one cell line}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -32,10 +32,12 @@ plot with dose-response curves
 Plot drug response curves for single-agent data for one selected cell line
 }
 \examples{
+\dontrun{
 mae <- gDRutils::get_synthetic_data("small")
 SE <- mae[[1]]
 
 plot_SA_1CL(SE = SE[,colnames(SE)[1]], colormap = c("cadetblue", "orange", "darkblue"))
+}
 
 }
 \keyword{internal}
