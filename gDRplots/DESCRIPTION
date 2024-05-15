@@ -10,13 +10,17 @@ Description: gDRplot is a package that stores functions for all gDR visualisatio
 License: Artistic-2.0
 Imports:
     checkmate,
+    BumpyMatrix,
     data.table,
     ggplot2,
     gDRcomponents (>= 1.1.70),
-    gDRutils (>= 1.1.12)
+    gDRutils (>= 1.1.12),
+    scales,
+    SummarizedExperiment
 Suggests:
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.4),
+    gDRcore (>= 1.1.20),
     jsonlite,
     knitr,
     testthat
