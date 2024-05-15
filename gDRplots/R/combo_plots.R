@@ -20,10 +20,10 @@
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' SE <- mae[["combination"]]
 #' 
-#' gDR_matrix_plot(SE, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
+#' gDR_combo_plot(SE, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
 #'
 #' @export
-gDR_matrix_plot <- function(SE,
+gDR_combo_plot <- function(SE,
                             drug1_name,
                             drug2_name,
                             cellline_name,
