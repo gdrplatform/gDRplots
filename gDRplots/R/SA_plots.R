@@ -198,7 +198,7 @@ plot_SA_byCLs <-  function(SE,
     
     if (is.null(cellline_name) || all(!cellline_name %in% colnames(SE))) {
       cellline_name <- colnames(SE)
-    } else if (!all(cellline_name  %in% colnames(SE))) {
+    } else if (!all(cellline_name %in% colnames(SE))) {
       cellline_name <- cellline_name[cellline_name  %in% colnames(SE)]
     }  
     
