@@ -16,6 +16,7 @@
 #'
 #' @return plot with dose-response curves
 #'
+#' @keywords single-agent_plots
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' SE <- mae[[1]]
