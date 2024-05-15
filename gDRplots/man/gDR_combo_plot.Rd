@@ -33,10 +33,9 @@ list of heatmaps with value for excess assays for selected drugs and cell line w
 Plot averaged values heatmaps for combo data
 }
 \examples{
-cellline_name <- "cellline_AA"
+cellline_name <- "cellline_MC"
 drug1_name <- "drug_001"
 drug2_name <- "drug_026"
-norm_type <- "RV"
 
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 SE <- mae[["combination"]]
@@ -44,3 +43,4 @@ SE <- mae[["combination"]]
 gDR_combo_plot(SE, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
 
 }
+\keyword{combo_plots}
