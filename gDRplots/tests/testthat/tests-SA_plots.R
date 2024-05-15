@@ -18,8 +18,8 @@ test_that("prepareCurves works as expected", {
   
   grouping <- "rId"
   iC <- colnames(SE)[1]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[,iC], "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(SE[,iC], "Averaged")
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[, iC], "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(SE[, iC], "Averaged")
   normalization_type <- "RV"
   
   plt <- grob_SA(dt_metrics = dt_metrics,
