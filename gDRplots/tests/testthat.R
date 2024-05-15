@@ -1,4 +1,4 @@
 library(testthat)
-library(gDRplot)
+library(gDRplots)
 
 test_check("gDRplots")
