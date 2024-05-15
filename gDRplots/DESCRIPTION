@@ -19,7 +19,7 @@ Imports:
     SummarizedExperiment
 Suggests:
     gDRtestData (>= 1.1.10),
-    gDRstyle (>= 1.1.4),
+    gDRstyle (>= 1.1.5),
     gDRcore (>= 1.1.20),
     jsonlite,
     knitr,
