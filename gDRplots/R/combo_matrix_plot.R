@@ -11,7 +11,7 @@ selected_col <-
   SummarizedExperiment::colData(SE)[SummarizedExperiment::colData(SE)$CellLineName == cell_line, ]
 selected_row <- 
   SummarizedExperiment::rowData(SE)[SummarizedExperiment::rowData(SE)$DrugName == drug1_name & 
-                                      rowData(SE)$DrugName_2 == drug2_name, ]
+                                      SummarizedExperiment::rowData(SE)$DrugName_2 == drug2_name, ]
 se1 <- SE[rownames(selected_row), rownames(selected_col)]
 
 # prep data source ----
@@ -75,8 +75,8 @@ plts <- lapply(mx_names, function(mx_name) {
   plt <- 
     ggplot2::ggplot(df_, ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = y_gap, width = x_gap) +
-    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu*M ~ "]"),
-                  y = bquote(.(drug1_name) ~ "[" ~ mu*M ~ "]"),
+    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                  y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                   fill = gDRutils::get_combo_excess_field_names()[[mx_name]],
                   title = plt_title) +
     ggplot2::theme_bw() + 
@@ -118,10 +118,10 @@ plts <- lapply(mx_names, function(mx_name) {
   }
 
     plt <- plt +
-      ggplot2::geom_path(data = dt_iso, size = 0.8,
+      ggplot2::geom_path(data = dt_iso, linewidth = 0.8,
                          ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) + 
-      ggplot2::scale_color_manual(values = iso_colors[all_iso]) +
-      ggplot2::labs(color = "Iso levels")
+      ggplot2::scale_color_manual(values = iso_colors[all_iso],
+                                  name = "Iso levels")
 
   
   return(plt)
