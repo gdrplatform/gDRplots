@@ -32,7 +32,6 @@ gDR_combo_plot <- function(se,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-
   
   checkmate::assert_class(se, "SummarizedExperiment")
   checkmate::assert_string(drug1_name)
@@ -80,7 +79,7 @@ gDR_combo_plot <- function(se,
     dt_$pos_y <- log10(dt_[[conc]])
     dt_$pos_x <- log10(dt_[[conc_2]])
     
-    ls_axes <- gDRcore:::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+    ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
     drug1_axis <- ls_axes$axis_1
     drug2_axis <- ls_axes$axis_2
     tile_height <- diff(drug1_axis$pos_y[3:4])
