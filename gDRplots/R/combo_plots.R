@@ -61,16 +61,21 @@ gDR_combo_plot <- function(se,
   all_iso <- unique(dt_isobolograms$iso_level)
   iso_colors <- gDRutils::get_iso_colors()[all_iso]
   
+  # variables
+  conc <- gDRutils::get_env_identifiers("concentration")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  duration <- gDRutils::get_env_identifiers("duration")
+  clid <- gDRutils::get_env_identifiers("cellline")
   mx_names <- names(gDRutils::get_combo_excess_field_names())
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
-    dt_ <- dt_excess[, c("Concentration", "Concentration_2", mx_name), with = FALSE]
+    dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-    dt_$pos_y <- log10(dt_$Concentration)
-    dt_$pos_x <- log10(dt_$Concentration_2)
+    dt_$pos_y <- log10(dt_[[conc]])
+    dt_$pos_x <- log10(dt_[[conc_2]])
     
-    ls_axes <- gDRcore:::define_matrix_grid_positions(dt_$Concentration, dt_$Concentration_2)
+    ls_axes <- gDRcore:::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
     drug1_axis <- ls_axes$axis_1
     drug2_axis <- ls_axes$axis_2
     tile_height <- diff(drug1_axis$pos_y[3:4])
@@ -78,10 +83,10 @@ gDR_combo_plot <- function(se,
     
     plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
                          cellline_name,
-                         selected_col$clid, 
+                         selected_col[[clid]], 
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
                          normalization_type,
-                         selected_row$Duration)
+                         selected_row[[duration]])
     
     # base plot
     plt <- 
@@ -160,10 +165,10 @@ gDR_combo_plot <- function(se,
   # isobolograms across range of concentration ratios
   plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
                        cellline_name,
-                       selected_col$clid, 
+                       selected_col[[clid]], 
                        gDRutils::get_combo_excess_field_names()[["smooth"]],
                        normalization_type,
-                       selected_row$Duration) 
+                       selected_row[[duration]]) 
   # base plot
   plt_iso_compare <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
