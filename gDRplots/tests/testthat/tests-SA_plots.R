@@ -2,12 +2,12 @@ context("Test SA_plots")
 
 test_that("grob_SA works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
-  SE <- mae[[1]]
+  se <- mae[[1]]
   
   grouping <- "cId"
-  iR <- rownames(SE)[1]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[iR], "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(SE[iR], "Averaged")
+  iR <- rownames(se)[1]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
   
   plt <- grob_SA(dt_metrics = dt_metrics,
                  dt_average = dt_average,
@@ -17,9 +17,9 @@ test_that("grob_SA works as expected", {
   expect_length(plt[["layers"]], 4)
   
   grouping <- "rId"
-  iC <- colnames(SE)[1]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[, iC], "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(SE[, iC], "Averaged")
+  iC <- colnames(se)[1]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
   normalization_type <- "RV"
   
   plt <- grob_SA(dt_metrics = dt_metrics,
@@ -44,17 +44,17 @@ test_that("grob_SA works as expected", {
 
 test_that("plot_SA_byCLs works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
-  SE <- mae[[1]]
-  cellline_name <- colnames(SE)[2:5]
-  drug_name <- rownames(SE)[5:7]
+  se <- mae[[1]]
+  cellline_name <- colnames(se)[2:5]
+  drug_name <- rownames(se)[5:7]
   
-  plts <- plot_SA_byCLs(SE = SE)
+  plts <- plot_SA_byCLs(se = se)
   expect_is(plts, "list")
-  expect_equal(names(plts), rownames(SE))
+  expect_equal(names(plts), rownames(se))
   
   normalization_type <- "RV"
   
-  plts <- plot_SA_byCLs(SE = SE,
+  plts <- plot_SA_byCLs(se = se,
                         cellline_name = cellline_name,
                         drug_name = drug_name,
                         normalization_type = normalization_type,
@@ -64,25 +64,25 @@ test_that("plot_SA_byCLs works as expected", {
   expect_true(all(vapply(seq_along(plts), 
                          function(i) grepl(normalization_type, plts[[i]]$labels$y), logical(1))))
   
-  cellline_name_2 <- c(colnames(SE)[2:3], "CL00014_cellline_XX_tissue_x_38")
-  drug_name_2 <- c(rownames(SE)[5:6], "G00008_drug_100_moa_A_72")
+  cellline_name_2 <- c(colnames(se)[2:3], "CL00014_cellline_XX_tissue_x_38")
+  drug_name_2 <- c(rownames(se)[5:6], "G00008_drug_100_moa_A_72")
   
-  plts <- plot_SA_byCLs(SE = SE,
+  plts <- plot_SA_byCLs(se = se,
                         cellline_name = cellline_name_2,
                         drug_name = drug_name_2)
   expect_is(plts, "list")
-  expect_equal(names(plts), intersect(drug_name_2, rownames(SE)))
-  plotted <- intersect(cellline_name_2, colnames(SE))
+  expect_equal(names(plts), intersect(drug_name_2, rownames(se)))
+  plotted <- intersect(cellline_name_2, colnames(se))
   expect_true(all(vapply(seq_along(plts), 
                          function(i) all(plts[[i]]$plot_env$group_names == plotted), logical(1))))
 })
 
 test_that("plot_SA_1CL works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
-  SE <- mae[[1]]
-  iC <- colnames(SE)[1]
+  se <- mae[[1]]
+  iC <- colnames(se)[1]
   
-  plt <- plot_SA_1CL(SE = SE[, iC], 
+  plt <- plot_SA_1CL(se = se[, iC], 
                      colormap = c("cadetblue", "orange", "darkblue"))
   expect_is(plt, "gg")
   expect_true(grepl("GR", plt[["labels"]][["y"]]))
@@ -90,7 +90,7 @@ test_that("plot_SA_1CL works as expected", {
   
   normalization_type <- "RV"
   
-  plt <- plot_SA_1CL(SE = SE[, iC], 
+  plt <- plot_SA_1CL(se = se[, iC], 
                      normalization_type = normalization_type,
                      plot_averaged_flag = FALSE)
   expect_is(plt, "gg")

@@ -1,6 +1,6 @@
 #' Plot averaged values heatmaps for combo data
 #'
-#' @param SE combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
+#' @param se combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 #'    data in its assays for one cell line
 #' @param drug1_name string with cell line to be plotted (identifiers DrugName)
 #' @param drug2_name string with cell line to be plotted (identifiers DrugName_2)
@@ -18,44 +18,44 @@
 #' drug2_name <- "drug_026"
 #' 
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
-#' SE <- mae[["combination"]]
+#' se <- mae[["combination"]]
 #' 
-#' gDR_combo_plot(SE, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
+#' gDR_combo_plot(se, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
 #'
 #' @export
-gDR_combo_plot <- function(SE,
+gDR_combo_plot <- function(se,
                            drug1_name,
                            drug2_name,
                            cellline_name,
                            normalization_type = "GR") {
   
-  checkmate::assert_class(SE, "SummarizedExperiment")
+  checkmate::assert_class(se, "SummarizedExperiment")
   checkmate::assert_string(drug1_name)
-  checkmate::assert_choice(drug1_name, choices = SummarizedExperiment::rowData(SE)$DrugName)
+  checkmate::assert_choice(drug1_name, choices = SummarizedExperiment::rowData(se)$DrugName)
   checkmate::assert_string(drug2_name)
-  checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(SE)$DrugName_2)
+  checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(se)$DrugName_2)
   checkmate::assert_string(cellline_name)
-  checkmate::assert_choice(cellline_name, choices = SummarizedExperiment::colData(SE)$CellLineName)
+  checkmate::assert_choice(cellline_name, choices = SummarizedExperiment::colData(se)$CellLineName)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   selected_col <- 
-    SummarizedExperiment::colData(SE)[SummarizedExperiment::colData(SE)$CellLineName == cellline_name, ]
+    SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cellline_name, ]
   selected_row <- 
-    SummarizedExperiment::rowData(SE)[SummarizedExperiment::rowData(SE)$DrugName == drug1_name & 
-                                        SummarizedExperiment::rowData(SE)$DrugName_2 == drug2_name, ]
-  sel_SE <- SE[rownames(selected_row), rownames(selected_col)]
+    SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name & 
+                                        SummarizedExperiment::rowData(se)$DrugName_2 == drug2_name, ]
+  sel_se <- se[rownames(selected_row), rownames(selected_col)]
   
-  stopifnot("SE has to by filterd to one drug and one cell line" = 
-              (NCOL(sel_SE) == 1 && NROW(sel_SE) == 1)) 
+  stopifnot("`se` has to by filterd to one drug and one cell line" = 
+              (NCOL(sel_se) == 1 && NROW(sel_se) == 1)) 
   
   dt_excess <- data.table::as.data.table(
-    BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_SE, "excess")))
+    BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "excess")))
   data.table::setkeyv(dt_excess, "normalization_type")
   dt_excess <- dt_excess[normalization_type]
   data.table::setkey(dt_excess, NULL)
   
   dt_isobolograms <- data.table::as.data.table(
-    BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_SE, "isobolograms")))
+    BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "isobolograms")))
   data.table::setkeyv(dt_isobolograms, "normalization_type")
   dt_isobolograms <- dt_isobolograms[normalization_type]
   all_iso <- unique(dt_isobolograms$iso_level)

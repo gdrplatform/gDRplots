@@ -5,7 +5,7 @@
 \title{Plot drug response curves for single-agent data for one selected cell line}
 \usage{
 plot_SA_1CL(
-  SE,
+  se,
   normalization_type = "GR",
   colormap = NULL,
   plot_averaged_flag = TRUE,
@@ -13,7 +13,7 @@ plot_SA_1CL(
 )
 }
 \arguments{
-\item{SE}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+\item{se}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 dose-response data in its assays for one cell line}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -34,9 +34,9 @@ Plot drug response curves for single-agent data for one selected cell line
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("small")
-SE <- mae[[1]]
+se <- mae[[1]]
 
-plot_SA_1CL(SE = SE[,colnames(SE)[1]], colormap = c("cadetblue", "orange", "darkblue"))
+plot_SA_1CL(se = se[,colnames(se)[1]], colormap = c("cadetblue", "orange", "darkblue"))
 }
 
 }

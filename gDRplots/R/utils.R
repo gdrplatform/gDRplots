@@ -6,8 +6,8 @@
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
-#' SE <- mae[[1]]
-#' dt_ <- gDRutils::convert_se_assay_to_dt(SE, assay_name = "Metrics", wide_structure = TRUE)
+#' se <- mae[[1]]
+#' dt_ <- gDRutils::convert_se_assay_to_dt(se, assay_name = "Metrics", wide_structure = TRUE)
 #' 
 #' swapped_dt_ <- swap_drugs_1_2(dt_)
 #' }

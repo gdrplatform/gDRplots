@@ -1,12 +1,12 @@
 #' Plot drug response curves for single-agent data
 #'
 #' @param dt_metrics data.table representation of the data in \code{Metrics} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(SE, "Metrics")}
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #' @param dt_average data.table representation of the data in \code{Averaged} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(SE, "Averaged")}
-#' @param grouping string name of dim of SE to plot; it has to be opppsoite to this used to filter SE
-#'    (that is when rownames(SE) == 1 it has to be "cId", otherwise - "rId")
-#' @param group_names character vector with names to subset from SE (the same dim as \code{grouping});
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#' @param grouping string name of dim of se to plot; it has to be opppsoite to this used to filter se
+#'    (that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")
+#' @param group_names character vector with names to subset from se (the same dim as \code{grouping});
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -19,12 +19,12 @@
 #' @keywords single-agent_plots
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
-#' SE <- mae[[1]]
-#' iR <-  rownames(SE)[1]
+#' se <- mae[[1]]
+#' iR <-  rownames(se)[1]
 #' grouping <- "cId"
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[iR], "Metrics")
-#' dt_average <- gDRutils::convert_se_assay_to_dt(SE[iR], "Averaged")
-#' group_names <- colnames(SE)[2:5]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
+#' group_names <- colnames(se)[2:5]
 #' 
 #' grob_SA(dt_metrics = dt_metrics, 
 #'         dt_average = dt_average, 
@@ -149,21 +149,21 @@ grob_SA <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams grob_SA
-#' @param SE single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+#' @param se single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 #'    dose-response data in its assays for one cell line
-#' @param cellline_name character vector with cell line to be plotted (colnames of SE)
-#' @param drug_name character vector with cell line to be plotted (rownames of SE)
+#' @param cellline_name character vector with cell line to be plotted (colnames of se)
+#' @param drug_name character vector with cell line to be plotted (rownames of se)
 #'    
 #' @return list of plots with dose-response curves
 #' 
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
-#' SE <- mae[[1]]
-#' cellline_name <- colnames(SE)[2:5]
-#' drug_name <- rownames(SE)[5:7]
+#' se <- mae[[1]]
+#' cellline_name <- colnames(se)[2:5]
+#' drug_name <- rownames(se)[5:7]
 #' 
-#' plot_SA_byCLs(SE = SE, 
+#' plot_SA_byCLs(se = se, 
 #'               cellline_name = cellline_name, 
 #'               drug_name = drug_name, 
 #'               normalization_type = "RV", 
@@ -171,7 +171,7 @@ grob_SA <- function(dt_metrics,
 #' }
 #' 
 #' @keywords internal
-plot_SA_byCLs <-  function(SE, 
+plot_SA_byCLs <-  function(se, 
                            cellline_name = NULL, 
                            drug_name = NULL,
                            normalization_type = "GR", 
@@ -179,7 +179,7 @@ plot_SA_byCLs <-  function(SE,
                            plot_averaged_flag = TRUE, 
                            plot_fit_flag = TRUE) {
   
-  checkmate::assert_class(SE, "SummarizedExperiment")
+  checkmate::assert_class(se, "SummarizedExperiment")
   checkmate::expect_character(cellline_name, null.ok = TRUE)
   checkmate::expect_character(drug_name, null.ok = TRUE)
   checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
@@ -187,26 +187,26 @@ plot_SA_byCLs <-  function(SE,
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
   
-  if (is.null(drug_name) || all(!drug_name %in% rownames(SE))) {
-    drug_name  <- rownames(SE)
-  } else if (!all(drug_name  %in% rownames(SE))) {
-    drug_name <- drug_name[drug_name  %in% rownames(SE)]
+  if (is.null(drug_name) || all(!drug_name %in% rownames(se))) {
+    drug_name  <- rownames(se)
+  } else if (!all(drug_name  %in% rownames(se))) {
+    drug_name <- drug_name[drug_name  %in% rownames(se)]
   }  
   
   plt_list <- list()
   for (iR in drug_name) {
     
-    if (is.null(cellline_name) || all(!cellline_name %in% colnames(SE))) {
-      cellline_name <- colnames(SE)
-    } else if (!all(cellline_name %in% colnames(SE))) {
-      cellline_name <- cellline_name[cellline_name  %in% colnames(SE)]
+    if (is.null(cellline_name) || all(!cellline_name %in% colnames(se))) {
+      cellline_name <- colnames(se)
+    } else if (!all(cellline_name %in% colnames(se))) {
+      cellline_name <- cellline_name[cellline_name  %in% colnames(se)]
     }  
     
-    subset_SE <- SE[iR, cellline_name]
+    subset_se <- se[iR, cellline_name]
     
     plt <- 
-      grob_SA(dt_metrics = gDRutils::convert_se_assay_to_dt(subset_SE, "Metrics"), 
-              dt_average = gDRutils::convert_se_assay_to_dt(subset_SE, "Averaged"), 
+      grob_SA(dt_metrics = gDRutils::convert_se_assay_to_dt(subset_se, "Metrics"), 
+              dt_average = gDRutils::convert_se_assay_to_dt(subset_se, "Averaged"), 
               grouping = "cId",
               group_names = cellline_name,
               normalization_type = normalization_type,
@@ -225,7 +225,7 @@ plot_SA_byCLs <-  function(SE,
 #' Plot drug response curves for single-agent data for one selected cell line
 #' 
 #' @inheritParams grob_SA
-#' @param SE single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+#' @param se single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 #'    dose-response data in its assays for one cell line
 #'    
 #' @return plot with dose-response curves
@@ -233,29 +233,29 @@ plot_SA_byCLs <-  function(SE,
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
-#' SE <- mae[[1]]
+#' se <- mae[[1]]
 #' 
-#' plot_SA_1CL(SE = SE[,colnames(SE)[1]], colormap = c("cadetblue", "orange", "darkblue"))
+#' plot_SA_1CL(se = se[,colnames(se)[1]], colormap = c("cadetblue", "orange", "darkblue"))
 #' }
 #' 
 #' @keywords internal
-plot_SA_1CL <- function(SE, 
+plot_SA_1CL <- function(se, 
                         normalization_type = "GR", 
                         colormap = NULL, 
                         plot_averaged_flag = TRUE, 
                         plot_fit_flag = TRUE) {
   
-  stopifnot(NCOL(SE) == 1) # plot for 1 cell line
+  stopifnot(NCOL(se) == 1) # plot for 1 cell line
   
-  checkmate::assert_class(SE, "SummarizedExperiment")
+  checkmate::assert_class(se, "SummarizedExperiment")
   checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
   
   grob_SA(
-    dt_metrics = gDRutils::convert_se_assay_to_dt(SE, "Metrics"), 
-    dt_average = gDRutils::convert_se_assay_to_dt(SE, "Averaged"), 
+    dt_metrics = gDRutils::convert_se_assay_to_dt(se, "Metrics"), 
+    dt_average = gDRutils::convert_se_assay_to_dt(se, "Averaged"), 
     grouping = "rId",
     normalization_type = normalization_type,
     colormap = colormap,

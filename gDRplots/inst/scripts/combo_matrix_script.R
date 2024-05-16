@@ -5,14 +5,14 @@ drug2_name <- "drug_026"
 norm_type <- "RV"
 
 mae <- gDRutils::get_synthetic_data("combo_matrix")
-SE <- mae[["combination"]]
+se <- mae[["combination"]]
 
 selected_col <- 
-  SummarizedExperiment::colData(SE)[SummarizedExperiment::colData(SE)$CellLineName == cell_line, ]
+  SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cell_line, ]
 selected_row <- 
-  SummarizedExperiment::rowData(SE)[SummarizedExperiment::rowData(SE)$DrugName == drug1_name & 
-                                      SummarizedExperiment::rowData(SE)$DrugName_2 == drug2_name, ]
-se1 <- SE[rownames(selected_row), rownames(selected_col)]
+  SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name & 
+                                      SummarizedExperiment::rowData(se)$DrugName_2 == drug2_name, ]
+se1 <- se[rownames(selected_row), rownames(selected_col)]
 
 # prep data source ----
 dt_mx <- data.table::as.data.table(

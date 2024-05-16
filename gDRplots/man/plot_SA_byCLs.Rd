@@ -5,7 +5,7 @@
 \title{Plot drug response curves for single-agent data for selected call lines and drugs}
 \usage{
 plot_SA_byCLs(
-  SE,
+  se,
   cellline_name = NULL,
   drug_name = NULL,
   normalization_type = "GR",
@@ -15,12 +15,12 @@ plot_SA_byCLs(
 )
 }
 \arguments{
-\item{SE}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+\item{se}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 dose-response data in its assays for one cell line}
 
-\item{cellline_name}{character vector with cell line to be plotted (colnames of SE)}
+\item{cellline_name}{character vector with cell line to be plotted (colnames of se)}
 
-\item{drug_name}{character vector with cell line to be plotted (rownames of SE)}
+\item{drug_name}{character vector with cell line to be plotted (rownames of se)}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -40,11 +40,11 @@ Plot drug response curves for single-agent data for selected call lines and drug
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("small")
-SE <- mae[[1]]
-cellline_name <- colnames(SE)[2:5]
-drug_name <- rownames(SE)[5:7]
+se <- mae[[1]]
+cellline_name <- colnames(se)[2:5]
+drug_name <- rownames(se)[5:7]
 
-plot_SA_byCLs(SE = SE, 
+plot_SA_byCLs(se = se, 
               cellline_name = cellline_name, 
               drug_name = drug_name, 
               normalization_type = "RV", 

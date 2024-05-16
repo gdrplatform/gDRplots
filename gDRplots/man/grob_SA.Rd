@@ -17,15 +17,15 @@ grob_SA(
 }
 \arguments{
 \item{dt_metrics}{data.table representation of the data in \code{Metrics} assay
-output from \code{gDRutils::convert_se_assay_to_dt(SE, "Metrics")}}
+output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
 \item{dt_average}{data.table representation of the data in \code{Averaged} assay
-output from \code{gDRutils::convert_se_assay_to_dt(SE, "Averaged")}}
+output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
-\item{grouping}{string name of dim of SE to plot; it has to be opppsoite to this used to filter SE
-(that is when rownames(SE) == 1 it has to be "cId", otherwise - "rId")}
+\item{grouping}{string name of dim of se to plot; it has to be opppsoite to this used to filter se
+(that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")}
 
-\item{group_names}{character vector with names to subset from SE (the same dim as \code{grouping});
+\item{group_names}{character vector with names to subset from se (the same dim as \code{grouping});
 if \code{NULL} then all values will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -45,12 +45,12 @@ Plot drug response curves for single-agent data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
-SE <- mae[[1]]
-iR <-  rownames(SE)[1]
+se <- mae[[1]]
+iR <-  rownames(se)[1]
 grouping <- "cId"
-dt_metrics <- gDRutils::convert_se_assay_to_dt(SE[iR], "Metrics")
-dt_average <- gDRutils::convert_se_assay_to_dt(SE[iR], "Averaged")
-group_names <- colnames(SE)[2:5]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
+dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
+group_names <- colnames(se)[2:5]
 
 grob_SA(dt_metrics = dt_metrics, 
         dt_average = dt_average, 

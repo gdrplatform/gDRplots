@@ -5,7 +5,7 @@
 \title{Plot averaged values heatmaps for combo data}
 \usage{
 gDR_combo_plot(
-  SE,
+  se,
   drug1_name,
   drug2_name,
   cellline_name,
@@ -13,7 +13,7 @@ gDR_combo_plot(
 )
 }
 \arguments{
-\item{SE}{combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
+\item{se}{combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 data in its assays for one cell line}
 
 \item{drug1_name}{string with cell line to be plotted (identifiers DrugName)}
@@ -38,9 +38,9 @@ drug1_name <- "drug_001"
 drug2_name <- "drug_026"
 
 mae <- gDRutils::get_synthetic_data("combo_matrix")
-SE <- mae[["combination"]]
+se <- mae[["combination"]]
 
-gDR_combo_plot(SE, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
+gDR_combo_plot(se, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
 
 }
 \keyword{combo_plots}
