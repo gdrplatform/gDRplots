@@ -24,10 +24,10 @@
 #'
 #' @export
 gDR_combo_plot <- function(SE,
-                            drug1_name,
-                            drug2_name,
-                            cellline_name,
-                            normalization_type = "GR") {
+                           drug1_name,
+                           drug2_name,
+                           cellline_name,
+                           normalization_type = "GR") {
   
   checkmate::assert_class(SE, "SummarizedExperiment")
   checkmate::assert_string(drug1_name)
@@ -140,9 +140,9 @@ gDR_combo_plot <- function(SE,
       select_iso <- all_iso[
         sort(unique(c(max(1, which(all_iso == "0.5")),
                       which(all_iso %in% ifelse(normalization_type[c(1, 1, 1)] == "GR",
-                                                       c(0.5, 0.25, 0), c(0.75, 0.5, 0.25)))
+                                                c(0.5, 0.25, 0), c(0.75, 0.5, 0.25)))
         )), TRUE)]
-
+      
       plt <- plt +
         ggplot2::geom_path(data = dt_isobolograms[iso_level %in% select_iso, ], 
                            linewidth = 0.5,
