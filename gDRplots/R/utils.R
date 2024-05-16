@@ -15,8 +15,15 @@
 #' @return swapped data.table
 #' 
 swap_drugs_1_2 <- function(dt_) {
+  
+  checkmate::assert_data_table(dt_)
+  
+  conc <- gDRutils::get_env_identifiers("concentration")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug <- gDRutils::get_env_identifiers("drug")
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
 
-  for (dr_var in intersect(c("DrugName", "Gnumber", "drug_moa", "Concentration"), colnames(dt_))) {
+  for (dr_var in intersect(c(drug_name, drug, drug_moa, conc), colnames(dt_))) {
     dt_[[paste0("temp_", dr_var)]] <- dt_[[paste0(dr_var, "_2")]]
     dt_[[paste0(dr_var, "_2")]] <- dt_[[dr_var]] 
     dt_[[dr_var]] <- dt_[[paste0("temp_", dr_var)]]
