@@ -66,13 +66,16 @@ grob_sa <- function(dt_metrics,
   data.table::setkeyv(dt_average, "normalization_type")
   dt_avg_norm <- dt_average[normalization_type]
   
+  # variables
+  conc <- gDRutils::get_env_identifiers("concentration")
+  
   # prep value ranges for plot
   data_range <- c(min(min(dt_avg_norm$x), 0) - 0.05, max(max(dt_avg_norm$x), 1) + 0.05)
-  min_conc <- min(dt_avg_norm[dt_avg_norm$Concentration > 0, ]$Concentration)
-  max_conc <- max(dt_avg_norm$Concentration)
+  min_conc <- min(dt_avg_norm[dt_avg_norm[[conc]] > 0, ][[conc]])
+  max_conc <- max(dt_avg_norm[[conc]])
   conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3)) 
   # remove conc = 0
-  dt_avg_norm$Concentration[dt_avg_norm$Concentration == 0] <- min_conc / 10
+  dt_avg_norm[[conc]][dt_avg_norm[[conc]] == 0] <- min_conc / 10
   
   # group
   if (is.null(group_names)) group_names <- unique(dt_met_norm[[grouping]])
@@ -86,7 +89,7 @@ grob_sa <- function(dt_metrics,
     dt_fit <- rbind(dt_fit, 
                     cbind(sel_metrics[, grouping, with = FALSE],
                           data.table::data.table(
-                            Concentration = sel_conc,
+                            conc_col = sel_conc,
                             x = gDRutils::predict_efficacy_from_conc(sel_conc, 
                                                                      sel_metrics$x_inf, 
                                                                      sel_metrics$x_0, 
@@ -96,6 +99,8 @@ grob_sa <- function(dt_metrics,
                     )
     )
   }
+  data.table::setnames(dt_fit, "conc_col", conc)
+  
   
   # colors
   if (is.null(colormap) || !all(vapply(colormap, gDRcomponents::isValidColor, logical(1)))) {
@@ -122,14 +127,14 @@ grob_sa <- function(dt_metrics,
   
   # final plot
   plt <- 
-    ggplot2::ggplot(mapping = ggplot2::aes(x = log10(Concentration), y = x, color = grouping, group = grouping)) +
+    ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::geom_vline(xintercept = 0, color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == "cId", "Cell line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
-    ggplot2::xlab(expression(paste("Concentration [", mu, "M]"))) +
+    ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(paste(normalization_type, "values")) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
