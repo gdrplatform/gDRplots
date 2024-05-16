@@ -26,13 +26,13 @@
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
 #' group_names <- colnames(se)[2:5]
 #' 
-#' grob_SA(dt_metrics = dt_metrics, 
+#' grob_sa(dt_metrics = dt_metrics, 
 #'         dt_average = dt_average, 
 #'         grouping = grouping,
 #'         group_names = group_names)
 #' 
 #' @export
-grob_SA <- function(dt_metrics, 
+grob_sa <- function(dt_metrics, 
                     dt_average, 
                     grouping, 
                     group_names = NULL, 
@@ -148,7 +148,7 @@ grob_SA <- function(dt_metrics,
 
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
-#' @inheritParams grob_SA
+#' @inheritParams grob_sa
 #' @param se single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 #'    dose-response data in its assays for one cell line
 #' @param cellline_name character vector with cell line to be plotted (colnames of se)
@@ -163,7 +163,7 @@ grob_SA <- function(dt_metrics,
 #' cellline_name <- colnames(se)[2:5]
 #' drug_name <- rownames(se)[5:7]
 #' 
-#' plot_SA_byCLs(se = se, 
+#' plot_sa_byCLs(se = se, 
 #'               cellline_name = cellline_name, 
 #'               drug_name = drug_name, 
 #'               normalization_type = "RV", 
@@ -171,7 +171,7 @@ grob_SA <- function(dt_metrics,
 #' }
 #' 
 #' @keywords internal
-plot_SA_byCLs <-  function(se, 
+plot_sa_byCLs <-  function(se, 
                            cellline_name = NULL, 
                            drug_name = NULL,
                            normalization_type = "GR", 
@@ -205,7 +205,7 @@ plot_SA_byCLs <-  function(se,
     subset_se <- se[iR, cellline_name]
     
     plt <- 
-      grob_SA(dt_metrics = gDRutils::convert_se_assay_to_dt(subset_se, "Metrics"), 
+      grob_sa(dt_metrics = gDRutils::convert_se_assay_to_dt(subset_se, "Metrics"), 
               dt_average = gDRutils::convert_se_assay_to_dt(subset_se, "Averaged"), 
               grouping = "cId",
               group_names = cellline_name,
@@ -224,7 +224,7 @@ plot_SA_byCLs <-  function(se,
 
 #' Plot drug response curves for single-agent data for one selected cell line
 #' 
-#' @inheritParams grob_SA
+#' @inheritParams grob_sa
 #' @param se single-agent \code{SummarizedExperiment} object holding raw and/or processed 
 #'    dose-response data in its assays for one cell line
 #'    
@@ -235,11 +235,11 @@ plot_SA_byCLs <-  function(se,
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[1]]
 #' 
-#' plot_SA_1CL(se = se[,colnames(se)[1]], colormap = c("cadetblue", "orange", "darkblue"))
+#' plot_sa_1CL(se = se[,colnames(se)[1]], colormap = c("cadetblue", "orange", "darkblue"))
 #' }
 #' 
 #' @keywords internal
-plot_SA_1CL <- function(se, 
+plot_sa_1CL <- function(se, 
                         normalization_type = "GR", 
                         colormap = NULL, 
                         plot_averaged_flag = TRUE, 
@@ -253,7 +253,7 @@ plot_SA_1CL <- function(se,
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
   
-  grob_SA(
+  grob_sa(
     dt_metrics = gDRutils::convert_se_assay_to_dt(se, "Metrics"), 
     dt_average = gDRutils::convert_se_assay_to_dt(se, "Averaged"), 
     grouping = "rId",
