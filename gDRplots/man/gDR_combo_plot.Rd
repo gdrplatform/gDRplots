@@ -4,23 +4,17 @@
 \alias{gDR_combo_plot}
 \title{Plot averaged values heatmaps for combo data}
 \usage{
-gDR_combo_plot(
-  se,
-  drug1_name,
-  drug2_name,
-  cellline_name,
-  normalization_type = "GR"
-)
+gDR_combo_plot(se, drug1_name, drug2_name, cl_name, normalization_type = "GR")
 }
 \arguments{
 \item{se}{combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 data in its assays for one cell line}
 
-\item{drug1_name}{string with cell line to be plotted (identifiers DrugName)}
+\item{drug1_name}{string with cell line to be plotted (identifiers \code{DrugName})}
 
-\item{drug2_name}{string with cell line to be plotted (identifiers DrugName_2)}
+\item{drug2_name}{string with cell line to be plotted (identifiers \code{DrugName_2})}
 
-\item{cellline_name}{string with cell line to be plotted (identifiers CellLineName)}
+\item{cl_name}{string with cell line to be plotted (identifiers \code{CellLineName})}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -33,14 +27,14 @@ list of heatmaps with value for excess assays for selected drugs and cell line w
 Plot averaged values heatmaps for combo data
 }
 \examples{
-cellline_name <- "cellline_MC"
+cl_name <- "cellline_BC"
 drug1_name <- "drug_001"
 drug2_name <- "drug_026"
 
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[["combination"]]
 
-gDR_combo_plot(se, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
+gDR_combo_plot(se, drug1_name, drug2_name, cl_name, normalization_type = "GR")
 
 }
 \keyword{combo_plots}

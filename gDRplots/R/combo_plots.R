@@ -2,9 +2,9 @@
 #'
 #' @param se combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 #'    data in its assays for one cell line
-#' @param drug1_name string with cell line to be plotted (identifiers DrugName)
-#' @param drug2_name string with cell line to be plotted (identifiers DrugName_2)
-#' @param cellline_name string with cell line to be plotted (identifiers CellLineName) 
+#' @param drug1_name string with cell line to be plotted (identifiers \code{DrugName})
+#' @param drug2_name string with cell line to be plotted (identifiers \code{DrugName_2})
+#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
@@ -13,33 +13,38 @@
 #'    
 #' @keywords combo_plots
 #' @examples
-#' cellline_name <- "cellline_MC"
+#' cl_name <- "cellline_BC"
 #' drug1_name <- "drug_001"
 #' drug2_name <- "drug_026"
 #' 
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[["combination"]]
 #' 
-#' gDR_combo_plot(se, drug1_name, drug2_name, cellline_name, normalization_type = "GR")
+#' gDR_combo_plot(se, drug1_name, drug2_name, cl_name, normalization_type = "GR")
 #'
 #' @export
 gDR_combo_plot <- function(se,
                            drug1_name,
                            drug2_name,
-                           cellline_name,
+                           cl_name,
                            normalization_type = "GR") {
+  
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name2 <- gDRutils::get_env_identifiers("drug_name2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+
   
   checkmate::assert_class(se, "SummarizedExperiment")
   checkmate::assert_string(drug1_name)
-  checkmate::assert_choice(drug1_name, choices = SummarizedExperiment::rowData(se)$DrugName)
+  checkmate::assert_choice(drug1_name, choices = SummarizedExperiment::rowData(se)[[drug_name]])
   checkmate::assert_string(drug2_name)
-  checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(se)$DrugName_2)
-  checkmate::assert_string(cellline_name)
-  checkmate::assert_choice(cellline_name, choices = SummarizedExperiment::colData(se)$CellLineName)
+  checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(se)[[drug_name2]])
+  checkmate::assert_string(cl_name)
+  checkmate::assert_choice(cl_name, choices = SummarizedExperiment::colData(se)[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   selected_col <- 
-    SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cellline_name, ]
+    SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cl_name, ]
   selected_row <- 
     SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name & 
                                         SummarizedExperiment::rowData(se)$DrugName_2 == drug2_name, ]
@@ -82,7 +87,7 @@ gDR_combo_plot <- function(se,
     tile_width <- diff(drug2_axis$pos_x[3:4])
     
     plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
-                         cellline_name,
+                         cl_name,
                          selected_col[[clid]], 
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
                          normalization_type,
@@ -164,7 +169,7 @@ gDR_combo_plot <- function(se,
   
   # isobolograms across range of concentration ratios
   plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
-                       cellline_name,
+                       cl_name,
                        selected_col[[clid]], 
                        gDRutils::get_combo_excess_field_names()[["smooth"]],
                        normalization_type,
