@@ -78,7 +78,7 @@ grob_SA <- function(dt_metrics,
   if (is.null(group_names)) group_names <- unique(dt_met_norm[[grouping]])
   
   # prep fitted data
-  sel_conc <- 10 ** (seq(conc_range[1], conc_range[2], 0.05))
+  sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
   dt_fit <- data.table::data.table()
   
   for (icol in group_names) {
@@ -128,7 +128,7 @@ grob_SA <- function(dt_metrics,
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == "cId", "Cell line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
-    ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ** (-3:2))) +
+    ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(expression(paste("Concentration [", mu, "M]"))) +
     ggplot2::ylab(paste(normalization_type, "values")) +
     ggplot2::ggtitle(plt_title) +

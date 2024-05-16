@@ -178,8 +178,8 @@ gDR_combo_plot <- function(SE,
     ggplot2::scale_color_manual(values = iso_colors[all_iso],
                                 name = ifelse(normalization_type == "GR", "GR", "IC")) +
     ggplot2::labs(color = "Iso levels") +
-    ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ** (5:1)), 2 ** (0:4))) +
-    ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ** (3:1)), 10 ** (0:3))) +
+    ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+    ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
     ggplot2::coord_cartesian(ylim = c(-5, 4)) + 
     ggplot2::theme_bw() +
     ggplot2::labs(y = "CI",

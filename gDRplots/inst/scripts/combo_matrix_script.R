@@ -148,8 +148,8 @@ for (iso in all_iso) {
 }
 
 plt_iso_compare <- plt_iso_compare  +
-  ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ** (5:1)), 2 ** (0:4))) +
-  ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ** (3:1)), 10 ** (0:3))) +
+  ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+  ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
   ggplot2::coord_cartesian(ylim = c(-5, 4)) +
   ggplot2::ylab("CI") +
   ggplot2::xlab(paste(drug2_name, "/", drug1_name, "ratio")) +
