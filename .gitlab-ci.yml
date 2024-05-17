@@ -1,0 +1,7 @@
+variables:
+  PACKAGE_NAME: "gDRplots"
+
+include:
+  - project: gdr/gdrgenesis
+    file: /gitlab-templates/.gitlab-ci-template.yml
+    ref: main
