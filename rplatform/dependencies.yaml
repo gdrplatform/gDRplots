@@ -1,0 +1,28 @@
+pkgs:
+  gDRutils:
+    ver: '>= 1.1.14'
+    url: gdrplatform/gDRutils
+    ref: main
+    subdir: gDRutils
+    host: 'api.github.com'
+    source: GITHUB
+  gDRcomponents:
+    ver: '>= 1.4.70'
+    url: gdrplatform/gDRcomponents
+    ref: main
+    subdir: gDRcomponents
+    host: 'api.github.com'
+    source: GITHUB
+  gDRstyle:
+    ver: '>= 1.1.5'
+    url: gdrplatform/gDRstyle
+    ref: main
+    subdir: ~
+    host: 'api.github.com'
+    source: GITHUB
+  gDRtestData:
+    ver: '>=1.1.10'
+    url: gdrplatform/gDRtestData
+    ref: main
+    subdir: gDRtestData
+    source: GITHUB

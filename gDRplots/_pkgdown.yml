@@ -1,0 +1,13 @@
+url: ~
+template:
+  bootstrap: 5
+
+reference:
+- title: Single-agent plots
+  desc:  Function to plot drug response curves for single-agent data
+- contents:
+  - has_keyword("single-agent_plots")
+- title: Combo plots
+  desc:  Function to plot averaged values heatmaps for combo data
+- contents:
+  - has_keyword("combo_plots")

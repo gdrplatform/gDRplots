@@ -1,0 +1,30 @@
+Package: gDRplots
+Title: 'gDRplots'
+Version: 0.0.1
+Date: 2024-05-15
+Authors@R: c(
+             person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
+             person("GDR", "team", role=c("cre"), email = "gdr-support@gene.com")
+             )
+Description: gDRplot is a package that stores functions for all gDR visualisations and their dedicated helpers.
+License: Artistic-2.0
+Imports:
+    checkmate,
+    BumpyMatrix,
+    data.table,
+    ggplot2,
+    gDRcomponents (>= 1.1.70),
+    gDRutils (>= 1.1.14),
+    scales,
+    SummarizedExperiment
+Suggests:
+    gDRtestData (>= 1.1.10),
+    gDRstyle (>= 1.1.5),
+    jsonlite,
+    knitr,
+    testthat
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyLoad: yes
+RoxygenNote: 7.3.1
