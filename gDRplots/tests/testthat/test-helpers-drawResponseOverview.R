@@ -132,8 +132,8 @@ test_that("check output type for plotlyRCAll", {
   expect_equal(plt_all$height, 300)
   expect_equal(plt_all$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
   expect_equal(plt_all$x$layoutAttrs[[1]]$title$text,
-                         paste0("Dose response curves for Drug Name: ", 
-                                paste(drug_names, collapse = ", ")))
+               paste0("Dose response curves for Drug Name: ", 
+                      paste(drug_names, collapse = ", ")))
   
   plt_w <- 200
   plt_h <- 600
@@ -156,59 +156,24 @@ test_that("check output type for plotlyRCAll", {
   plt_all_2 <- plotlyRCAll(prepared_curves_2, var_y)
   expect_is(plt_all_2, "plotly")
   expect_equal(plt_all_2$x$layoutAttrs[[1]]$title$text,
-                         paste0("Dose response curves for Cell Line Name: ", 
-                                paste(selected_cl, collapse = ", ")))
+               paste0("Dose response curves for Cell Line Name: ", 
+                      paste(selected_cl, collapse = ", ")))
 })
 
 test_that("check output for wrong data for plotlyRCAll", {
   prepared_curves_out <- prepared_curves
   prepared_curves_out[[var_y]] <- prepared_curves_out[[var_y]] + 100
   
-  plotlyRCAll_app <- function(input_prepared_curves) {
-    ui <- shiny::shinyUI(
-      shiny::fluidPage(
-        shiny::actionButton("btn_plot", "Plot", class = "btn-info"),
-        plotly::plotlyOutput("curves_plot")
-      )
-    )
-    server <- function(input, output, session) { 
-      prepared_curves  <- shiny::eventReactive(input$btn_plot, {
-        input_prepared_curves
-      }) 
-      output$curves_plot <- plotly::renderPlotly({
-        plotlyRCAll(prepared_curves(), var_y =  "GR value")
-      })
-    }
-    shiny::shinyApp(ui, server)
-  }
+  plt <- plotlyRCAll(prepared_curves_out, var_y =  var_y)
+  plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
-  app <- shinytest2::AppDriver$new(plotlyRCAll_app(input_prepared_curves = prepared_curves_out), 
-                                   name = "test_plotlyRCAll", 
-                                   timeout = 1e+6) 
-  on.exit({
-    message(app$get_logs())
-    app$stop()
-    rm(app)
-  })
-  
-  # init status
-  app$wait_for_value(input = "btn_plot")
-  
-  app$click("btn_plot")
-  
-  pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
-  drug_name <- pidfs[["drug_name"]]
-  cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(prepared_curves_out[[cell_name]][1], " x ", prepared_curves_out[[drug_name]][1])
   exception_data <- gDRimport::get_exception_data(36)
-  expect_identical(app$get_js(script = "$('.sweet-alert').find('h2').text()"),
-                             exception_data$title)
-  expect_true(grepl(sprintf(exception_data$sprintf_text, comb_name),
-                              app$get_js(script = "$('.sweet-alert').find('p').text()")))
   
-  
-  plt <- jsonlite::fromJSON(app$get_value(output = "curves_plot"))
-  expect_equal(NROW(plt$x$data), 1) # basic info for empty plot
+  expect_equal(plt$x$attrs[[1]]$mode, "text")
+  expect_true(grepl(exception_data$title, plt_msg))
+  expect_true(grepl(comb_name, plt_msg))
+  expect_true(grepl(substr(exception_data$sprintf_text, 1, 63), plt_msg))
 })
 
 test_that("returns error with missing and wrong argument for plotlyRCAll", {
@@ -332,8 +297,8 @@ test_that("check output type for plotlyRCSelected", {
   
   expect_is(plt_sel_5, "plotly")
   expect_equal(plt_sel_5$x$layoutAttrs[[1]]$title$text,
-                         paste0("Drug dose response for Cell Line Name: ", 
-                                paste(selected_cl, collapse = ", ")))
+               paste0("Drug dose response for Cell Line Name: ", 
+                      paste(selected_cl, collapse = ", ")))
   
   # fast end - plotly_empty
   plt_sel_4 <- plotlyRCSelected(data = subset_data, 
@@ -371,7 +336,7 @@ test_that("check output type for plotlyRCSelected for combo", {
   expect_equal(plt_sel_1$height, 300)
   expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
   expect_equal(sort(plt_sel_1$x$attrs[[2]]$color), 
-                         sort(rep(combo_key_cells_drugs$`Cell Line Name`, 100)))
+               sort(rep(combo_key_cells_drugs$`Cell Line Name`, 100)))
   
 })
 
@@ -379,57 +344,21 @@ test_that("check output for wrong data for plotlyRCSelected", {
   subset_data_out <- subset_data
   subset_data_out[[var_y]] <- subset_data_out[[var_y]] + 100
   
-  plotlyRCSelected_app <- function(input_subset_data, input_subset_curves, input_subset_extras) {
-    ui <- shiny::shinyUI(
-      shiny::fluidPage(
-        shiny::actionButton("btn_plot", "Plot", class = "btn-warning"),
-        plotly::plotlyOutput("curves_plot")
-      )
-    )
-    server <- function(input, output, session) { 
-      subset_data  <- shiny::eventReactive(input$btn_plot, {
-        input_subset_data
-      }) 
-      output$curves_plot <- plotly::renderPlotly({
-        plotlyRCSelected(data = subset_data(), 
-                         var_y = "GR value", 
-                         layers = c("curve", "average", "error"),
-                         curves = subset_curves, 
-                         extras = subset_extras)
-      })
-    }
-    shiny::shinyApp(ui, server)
-  }
   
-  app <- shinytest2::AppDriver$new(plotlyRCSelected_app(input_subset_data = subset_data_out,
-                                                        input_subset_curves = subset_curves,
-                                                        input_subset_extras = subset_extras), 
-                                   name = "test_plotlyRCSelected", 
-                                   timeout = 1e+6) 
-  on.exit({
-    message(app$get_logs())
-    app$stop()
-    rm(app)
-  })
+  plt <- plotlyRCSelected(data = subset_data_out, 
+                   var_y = "GR value", 
+                   layers = c("curve", "average", "error"),
+                   curves = subset_curves, 
+                   extras = subset_extras)
+  plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
-  # init status
-  app$wait_for_value(input = "btn_plot")
-  
-  app$click("btn_plot")
-  
-  pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
-  drug_name <- pidfs[["drug_name"]]
-  cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(subset_data_out[[cell_name]][1], " x ", subset_data_out[[drug_name]][1])
   exception_data <- gDRimport::get_exception_data(36)
-  expect_identical(app$get_js(script = "$('.sweet-alert').find('h2').text()"),
-                             exception_data$title)
-  expect_true(grepl(sprintf(exception_data$sprintf_text, comb_name),
-                              app$get_js(script = "$('.sweet-alert').find('p').text()")))
   
-  
-  plt <- jsonlite::fromJSON(app$get_value(output = "curves_plot"))
-  expect_equal(NROW(plt$x$data), 1) # basic info for empty plot
+  expect_equal(plt$x$attrs[[1]]$mode, "text")
+  expect_true(grepl(exception_data$title, plt_msg))
+  expect_true(grepl(comb_name, plt_msg))
+  expect_true(grepl(substr(exception_data$sprintf_text, 1, 63), plt_msg))
 })
 
 test_that("expect error with wrong input", {

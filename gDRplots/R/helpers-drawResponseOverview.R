@@ -23,7 +23,7 @@
 prepareCurves <- function(metrics, 
                           range_x = c(1e-3, 50e+0), 
                           density = 100) {
-
+  
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   drug_id <- pidfs[["drug"]]
@@ -34,7 +34,7 @@ prepareCurves <- function(metrics,
   concentration2_name <- pidfs[["concentration2"]]
   duration <- pidfs[["duration"]]
   data_source <- pidfs[["data_source"]]
-
+  
   checkmate::assert_data_table(metrics)
   checkmate::assert_names(names(metrics), must.include = c(cell_name, drug_name))
   vars_fit_params <- c("GR Inf", "GR 0", "GEC50", "h GR", "E Inf", "E0", "EC50", "h RV")
@@ -49,7 +49,7 @@ prepareCurves <- function(metrics,
   
   # set concentration range
   concentrations <- logSeq(range_x[1], range_x[2], density)
-
+  
   # safety check 
   # we are expecting single row in 'data' for selected combination of vars  in (vars_id)
   if (NROW(metrics) != nrow(unique(metrics[, vars_id, with = FALSE]))) {
@@ -81,7 +81,7 @@ prepareCurves <- function(metrics,
   by = vars_id]
   
   data.table::setnames(prediction, "Concentration", concentration_name)
-
+  
   # this column will be used to separate curves of individual co-tratments
   if (all(is.element(vars_wish_list, names(prediction)))) {
     # TODO GDR-2513 # nolint start
@@ -119,7 +119,7 @@ prepareCurves <- function(metrics,
 #' @export
 #'
 prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
-
+  
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   drug_name <- pidfs[["drug_name"]]
@@ -139,7 +139,7 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
   checkmate::assert_numeric(range_x, len = 2)
   
   data <- data.table::as.data.table(metrics)
-
+  
   # extract columns of interest and find response for GR50 and IS50;
   points <-
     data[,
@@ -232,7 +232,7 @@ plotlyRCAll <- function(curve_data,
   # build plot title
   ## this assumes that either Cell Line or Drug has only one value!
   cols <- c(cell_name, drug_name)
-  var_long <- getLongest(curve_data[, cols, with = FALSE])
+  var_long <- gDRcomponents::getLongest(curve_data[, cols, with = FALSE])
   var_short <- if (var_long == cell_name) {
     drug_name
   } else if (var_long == drug_name) {
@@ -266,13 +266,25 @@ plotlyRCAll <- function(curve_data,
   # positions of axis ticks
   ticks_x <- 10 ^ (-10:10)
   ticks_y <- -2:4 / 2
-
+  
   # drop data points that would not fit in the plotting area
-  # throw shiny exception if all data has been dropped
+  # show exception_data if all data has been dropped
   curve_data <- curve_data[data.table::between(curve_data[["var_y"]], range_y[1], range_y[2]), ]
   if (!NROW(curve_data)) {
-    raise_shiny_exception_from_status_code(36, comb_name)
-    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    # tmp solution - start
+    exception_data <- gDRimport::get_exception_data(36)
+    txt_msg <- sprintf(exception_data$sprintf_text, comb_name)
+    txt_msg <- gsub("\\. |: ", "\n", txt_msg)
+    txt_msg <- gsub(" or ", " \nor ", txt_msg)
+    txt_msg <- paste(exception_data$title, "\n\n", txt_msg)
+    # tmp solution - end
+    plt_err <- plotly::layout(
+      p = plotly::plot_ly(mode = "text", type = "scatter"),
+      xaxis = list(visible = FALSE), yaxis = list(visible = FALSE),
+      annotations = list(text = txt_msg, align = "justify",
+                         showarrow = FALSE, font = list(size = 12, color = "darkred")))
+    
+    return(gDRcomponents::gDR_plotly_config(plt_err))
   }
   
   # add highlight key
@@ -303,9 +315,9 @@ plotlyRCAll <- function(curve_data,
     plot_laidout, on = "plotly_hover", off = "plotly_doubleclick",
     persistent = FALSE, color = "red", opacityDim = 0.4)
   # modify config
-  plot_final <- gDR_plotly_config(plot_highlighted,
-                                  edits = get_plotly_edits(),
-                                  showAxisRangeEntryBoxes = FALSE)
+  plot_final <- gDRcomponents::gDR_plotly_config(plot_highlighted,
+                                                 edits = get_plotly_edits(),
+                                                 showAxisRangeEntryBoxes = FALSE)
   
   return(plot_final)
 }
@@ -375,11 +387,11 @@ plotlyRCSelected <- function(data,
                              extras,
                              plot_width = 400L,
                              plot_height = 300L) {
- 
+  
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
   checkmate::assert_numeric(range_x, len = 2)
-
+  
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   drug_name <- pidfs[["drug_name"]]
@@ -408,7 +420,7 @@ plotlyRCSelected <- function(data,
   if (all(is.na(data[[var_y]]))) {
     return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
   }
-
+  
   # drug/cell line combination (for exception handling)
   comb_name <-
     paste0(data[[cell_name]][1], " x ", data[[drug_name]][1])
@@ -453,7 +465,7 @@ plotlyRCSelected <- function(data,
   
   # determine variable to color by
   cols <- c(cell_name, drug_name)
-  var_col <- getLongest(data[, cols, with = FALSE])
+  var_col <- gDRcomponents::getLongest(data[, cols, with = FALSE])
   var_not_col <- if (var_col == cell_name)  {
     drug_name
   } else if (var_col == drug_name)  {
@@ -467,16 +479,16 @@ plotlyRCSelected <- function(data,
                        new = c("var_y", "var_y.err", "var_col", "var_not_col"), skip_absent = TRUE)
   # add label column for tooltips
   data$label <- buildLabel(data, view = "curve")
-
+  
   # build plot title
   plot_title <- sprintf("Drug dose response for %s: %s", var_not_col, 
                         paste(unique(stats::na.omit(data)[["var_not_col"]]), collapse = ", "))
-
+  
   # determine limits of axes
   range_y <- switch(var_y,
                     "GR value" = c(-1, 1.1),
                     "Relative Viability" = c(0, 1.1))
-
+  
   # line properties
   lines <- NULL # reset
   line_horizontal_top <- list(
@@ -510,11 +522,23 @@ plotlyRCSelected <- function(data,
                          showgrid = FALSE, zeroline = FALSE, range = range_y, tickvals = ticks_y)
   
   # drop data points that would not fit in the plotting area
-  # throw shiny exception if all data has been dropped
+  # show exception_data if all data has been dropped
   data <- data[data.table::between(data[["var_y"]], range_y[1], range_y[2]), ]
   if (!NROW(data)) {
-    raise_shiny_exception_from_status_code(36, comb_name)
-    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    # tmp solution - start
+    exception_data <- gDRimport::get_exception_data(36)
+    txt_msg <- sprintf(exception_data$sprintf_text, comb_name)
+    txt_msg <- gsub("\\. |: ", "\n", txt_msg)
+    txt_msg <- gsub(" or ", " \nor ", txt_msg)
+    txt_msg <- paste(exception_data$title, "\n\n", txt_msg)
+    # tmp solution - end
+    plt_err <- plotly::layout(
+      p = plotly::plot_ly(mode = "text", type = "scatter"),
+      xaxis = list(visible = FALSE), yaxis = list(visible = FALSE),
+      annotations = list(text = txt_msg, align = "justify",
+                         showarrow = FALSE, font = list(size = 12, color = "darkred")))
+    
+    return(gDRcomponents::gDR_plotly_config(plt_err))
   }
   
   # format curve data
