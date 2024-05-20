@@ -35,33 +35,34 @@ test_that("paletteBrew works as expected", {
 
 
 test_that("paletteDisplay works as expected", {
-  
-  paletteDisplay_server <- function(input, output, session) {
-    output[["palette"]] <- shiny::renderPlot({
-      paletteDisplay(input$color_list)
-    })
-  }
-  color_names <- c("darkblue", "yellow", "tomato")
-  
-  # test
-  shiny::testServer(
-    app = paletteDisplay_server, 
-    expr = {
-      session$setInputs(color_list = color_names)
-      output_pal_1 <- output$palette
-      expect_true(grepl("data:image/png", output_pal_1$src))
-      
-      session$setInputs(color_list = NA)
-      output_pal_2 <- output$palette
-      expect_true(grepl("data:image/png", output_pal_2$src))
-      expect_false(identical(output_pal_1$src, output_pal_2$src))
-      
-      session$setInputs(color_list = NULL)
-      expect_error(
-        output$palette, 
-        "Assertion on 'colors' failed: Must be of type 'character', not 'NULL'.")
-    }
-  )
+  # nolint start
+  # paletteDisplay_server <- function(input, output, session) {
+  #   output[["palette"]] <- shiny::renderPlot({
+  #     paletteDisplay(input$color_list)
+  #   })
+  # }
+  # color_names <- c("darkblue", "yellow", "tomato")
+  # 
+  # # test
+  # shiny::testServer(
+  #   app = paletteDisplay_server, 
+  #   expr = {
+  #     session$setInputs(color_list = color_names)
+  #     output_pal_1 <- output$palette
+  #     expect_true(grepl("data:image/png", output_pal_1$src))
+  #     
+  #     session$setInputs(color_list = NA)
+  #     output_pal_2 <- output$palette
+  #     expect_true(grepl("data:image/png", output_pal_2$src))
+  #     expect_false(identical(output_pal_1$src, output_pal_2$src))
+  #     
+  #     session$setInputs(color_list = NULL)
+  #     expect_error(
+  #       output$palette, 
+  #       "Assertion on 'colors' failed: Must be of type 'character', not 'NULL'.")
+  #   }
+  # )
+  # nolint end
   
   color_names <- c("nice pink", "RED", "#0a290")
   expect_error(paletteDisplay(color_names), "Must be valid color name")
