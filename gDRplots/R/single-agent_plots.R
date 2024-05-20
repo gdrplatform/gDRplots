@@ -103,7 +103,7 @@ grob_sa <- function(dt_metrics,
   
   
   # colors
-  if (is.null(colormap) || !all(vapply(colormap, gDRcomponents::isValidColor, logical(1)))) {
+  if (is.null(colormap) || !all(vapply(colormap, isValidColor, logical(1)))) {
     colormap <- grDevices::colorRampPalette(c("#dd0000", "#bbdd33", "#0000dd"))(NROW(group_names))
     
   } else if (NROW(colormap) != NROW(group_names)) {
