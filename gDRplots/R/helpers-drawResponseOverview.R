@@ -8,7 +8,7 @@
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepareCurves(dt)
 #'
 #' @return A data.table with predicted response for the given concentration range.
@@ -105,7 +105,7 @@ prepareCurves <- function(metrics,
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepareExtras(dt)
 #' 
 #' @return
@@ -192,7 +192,7 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
 #' plotlyRCAll(prepared_curves, "GR value")
 #'
@@ -360,7 +360,7 @@ plotlyRCAll <- function(curve_data,
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
 #' plotlyRCSelected(
 #'   prepared_curves, 

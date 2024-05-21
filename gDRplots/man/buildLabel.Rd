@@ -19,7 +19,7 @@ Build labels for plotly tooltips
 }
 \examples{
 SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
+dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
 buildLabel(dt, "grid")
 
 }

@@ -25,7 +25,7 @@ Simulate and plot dose response curves for all existing combinations of Cell Lin
 }
 \examples{
 SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- convert_se_assay_to_custom_dt(SE, "Metrics")
+dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
 prepareCurves(dt)
 
 }
