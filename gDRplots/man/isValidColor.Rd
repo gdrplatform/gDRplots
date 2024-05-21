@@ -23,4 +23,4 @@ isValidColor("#FF8C00DC")
 isValidColor("RED")
 
 }
-\keyword{utils}
+\keyword{utils_color}

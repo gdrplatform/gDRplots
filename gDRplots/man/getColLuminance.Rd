@@ -23,4 +23,4 @@ getColLuminance("#906090")
 getColLuminance("#906090F2")
 
 }
-\keyword{utils}
+\keyword{utils_color}

@@ -21,4 +21,4 @@ colorToHex("indianred2")
 colorToHex("seagreen")
 
 }
-\keyword{utils}
+\keyword{utils_color}

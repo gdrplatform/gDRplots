@@ -21,4 +21,4 @@ isColDark("red")
 isColDark("#000000")
 
 }
-\keyword{utils}
+\keyword{utils_color}
