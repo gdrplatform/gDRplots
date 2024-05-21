@@ -346,10 +346,10 @@ test_that("check output for wrong data for plotlyRCSelected", {
   
   
   plt <- plotlyRCSelected(data = subset_data_out, 
-                   var_y = "GR value", 
-                   layers = c("curve", "average", "error"),
-                   curves = subset_curves, 
-                   extras = subset_extras)
+                          var_y = "GR value", 
+                          layers = c("curve", "average", "error"),
+                          curves = subset_curves, 
+                          extras = subset_extras)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
   comb_name <- paste0(subset_data_out[[cell_name]][1], " x ", subset_data_out[[drug_name]][1])
