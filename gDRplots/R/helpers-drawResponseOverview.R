@@ -316,7 +316,7 @@ plotlyRCAll <- function(curve_data,
     persistent = FALSE, color = "red", opacityDim = 0.4)
   # modify config
   plot_final <- gDRcomponents::gDR_plotly_config(plot_highlighted,
-                                                 edits = get_plotly_edits(),
+                                                 edits = gDRcomponents::get_plotly_edits(),
                                                  showAxisRangeEntryBoxes = FALSE)
   
   return(plot_final)
@@ -415,10 +415,10 @@ plotlyRCSelected <- function(data,
   
   # fast end due to lack of data
   if (is.null(layers)) {
-    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    return(gDRcomponents::gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
   }
   if (all(is.na(data[[var_y]]))) {
-    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    return(gDRcomponents::gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
   }
   
   # drug/cell line combination (for exception handling)
@@ -453,9 +453,9 @@ plotlyRCSelected <- function(data,
   #       plot_list, nrows = length(plot_list),
   #       margin = 0.05, titleY = TRUE, titleX = TRUE)
   #     plot_laidout <- plotly::layout(plot_sub, width = plot_width, height = plot_height)
-  #     plot_final <- gDR_plotly_config(plot_laidout,
-  #                                     edits = get_plotly_edits(),
-  #                                     showAxisRangeEntryBoxes = FALSE)
+  #     plot_final <- gDRcomponents::gDR_plotly_config(plot_laidout,
+  #                                                    edits = gDRcomponents::get_plotly_edits(),
+  #                                                    showAxisRangeEntryBoxes = FALSE)
   #     
   #     return(plot_final)
   #   }
@@ -614,9 +614,9 @@ plotlyRCSelected <- function(data,
                                  yaxis = axis_options_y,
                                  shapes = lines)
   # modify config
-  plot_final <- gDR_plotly_config(plot_laidout,
-                                  edits = get_plotly_edits(),
-                                  showAxisRangeEntryBoxes = FALSE)
+  plot_final <- gDRcomponents::gDR_plotly_config(plot_laidout,
+                                                 edits = gDRcomponents::get_plotly_edits(),
+                                                 showAxisRangeEntryBoxes = FALSE)
   
   return(plot_final)
 }

@@ -167,6 +167,9 @@ test_that("check output for wrong data for plotlyRCAll", {
   plt <- plotlyRCAll(prepared_curves_out, var_y =  var_y)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
+  pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
+  drug_name <- pidfs[["drug_name"]]
+  cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(prepared_curves_out[[cell_name]][1], " x ", prepared_curves_out[[drug_name]][1])
   exception_data <- gDRimport::get_exception_data(36)
   
@@ -260,7 +263,7 @@ test_that("check output type for plotlyRCSelected", {
   names(sub_ex) <- NULL
   expect_equal(plt_sel_2$x$layoutAttrs[[plt_id]]$shapes[[5]], sub_ex[[1]])
   expect_equal(plt_sel_2$x$layoutAttrs[[plt_id]]$shapes[[6]], sub_ex[[2]])
-  expect_equal(plt_sel_2$x$config$edits, get_plotly_edits())
+  expect_equal(plt_sel_2$x$config$edits, gDRcomponents::get_plotly_edits())
   
   plt_sel_3 <- plotlyRCSelected(data = subset_data, 
                                 var_y = var_y, 
@@ -352,6 +355,9 @@ test_that("check output for wrong data for plotlyRCSelected", {
                           extras = subset_extras)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
+  pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
+  drug_name <- pidfs[["drug_name"]]
+  cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(subset_data_out[[cell_name]][1], " x ", subset_data_out[[drug_name]][1])
   exception_data <- gDRimport::get_exception_data(36)
   
