@@ -15,7 +15,6 @@ Imports:
     ggplot2,
     gDRcomponents (>= 1.4.75),
     gDRutils (>= 1.1.14),
-    heatmaply,
     plotly,
     scales,
     SummarizedExperiment
@@ -23,6 +22,7 @@ Suggests:
     gDRimport (>= 1.1.10),
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.5),
+    heatmaply,
     jsonlite,
     knitr,
     matrixStats,
