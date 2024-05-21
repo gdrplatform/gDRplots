@@ -77,13 +77,13 @@ buildLabel <- function(data,
   concentration2_name <- pidfs[["concentration2"]]
   drug2_name <- pidfs[["drug_name2"]]
   
-  iso_level <- gDRcomponenst::get_isobologram_columns("iso_level")
-  pos_x <- gDRcomponenst::get_isobologram_columns("pos_x")
-  pos_x_ref <- gDRcomponenst::get_isobologram_columns("pos_x_ref")
-  pos_y <- gDRcomponenst::get_isobologram_columns("pos_y")
-  pos_y_ref <- gDRcomponenst::get_isobologram_columns("pos_y_ref")
-  log10_ratio <- gDRcomponenst::get_isobologram_columns("log10_ratio")
-  log2_CI <- gDRcomponenst::get_isobologram_columns("log2_CI")
+  iso_level <- gDRcomponents::get_isobologram_columns("iso_level")
+  pos_x <- gDRcomponents::get_isobologram_columns("pos_x")
+  pos_x_ref <- gDRcomponents::get_isobologram_columns("pos_x_ref")
+  pos_y <- gDRcomponents::get_isobologram_columns("pos_y")
+  pos_y_ref <- gDRcomponents::get_isobologram_columns("pos_y_ref")
+  log10_ratio <- gDRcomponents::get_isobologram_columns("log10_ratio")
+  log2_CI <- gDRcomponents::get_isobologram_columns("log2_CI")
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(view)
