@@ -61,69 +61,6 @@ reformat_untreated_cases <- function(label) {
 }
 
 
-#' Replace one value with one or more other values in a column of a data table.
-#'
-#' @param x a \code{data.table}
-#' @param column character string; name of column to do the replacement in
-#' @param replacee character string; value to be replaced
-#' @param replacement character vector of values to replace \code{replacee} with; see \code{Details}
-#' 
-#' @examples
-#' vals <- data.table::data.table(value = runif(10, 1, 2),
-#' group = rep(c("A", "B"), each = 10))
-#' nts <- data.table::data.table(
-#'   value = runif(2, 0, 0.1),
-#'   group = rep("nt", 2)
-#' )
-#' dt <- rbind(vals, nts)
-#' dtr <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
-#'                               
-#'
-#' @return A modified data table Keep in mind that if \code{replacement} has length of more than one,
-#'         the number of rows will be greater than that of \code{x}.
-#'
-#' The part of \code{x} where \code{column} is equal to \code{replacee} is removed.
-#' A copy of that part of the data is then appended where \code{replacee} has been substituted
-#' with a single item of \code{replacement} and this repeated for each item in \code{replacement}.
-#' The resulting data frame will be longer than \code{x} if \code{replacement} is longer than 1.
-#'
-#' @export
-#' @keywords utils
-#'
-#' @seealso \code{MetricRanking}, \code{plotlyMR}
-#'
-replaceValues <- function(x, column, replacee, replacement) {
-  checkmate::assert_data_table(x)
-  checkmate::assert_string(column)
-  checkmate::assert_choice(column, choices = names(x))
-  checkmate::assert_string(replacee)
-  checkmate::assert_choice(replacee, unique(as.character(x[[column]])))
-  checkmate::assert_character(replacement)
-  
-  # heavy lifting is done by this function
-  replacer <- function(x, column, replacee, replacement) {
-    x[[column]] <- ifelse(x[[column]] == replacee, replacement, x[[column]])
-    return(x)
-  }
-  
-  # isolate part of x where replacement occurs
-  data_replace <- x[x[[column]] == replacee, ]
-  # isolate part of x that remains unchanged
-  data_remain <- x[x[[column]] != replacee, ]
-  # perform replacement
-  data_replaced_list <- lapply(replacement, replacer, x = data_replace, column = column, replacee = replacee)
-  data_replaced <- do.call(rbind, data_replaced_list)
-  
-  ans <- rbind(data_remain, data_replaced)
-  # drop replaced factor level
-  if (is.factor(ans[[column]])) {
-    ans[[column]] <- factor(ans[[column]],
-                            levels = levels(ans[[column]])[-which(levels(ans[[column]]) == replacee)])
-  }
-  return(ans)
-}
-
-
 #' Compute distance between rows of a matrix.
 #'
 #' This function was lifted from the package \code{factoextra} and slightly adjusted.

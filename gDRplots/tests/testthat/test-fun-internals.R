@@ -57,60 +57,6 @@ test_that("reformat_untreated_cases works as expected", {
 })
 
 
-test_that("replaceValues works as expected", {
-  vals <- data.table::data.table(value = runif(10, 1, 2),
-                                 group = rep(c("A", "B"), each = 10))
-  nts <- data.table::data.table(value = runif(2, 0, 0.1),
-                                group = rep("nt", 2))
-  dt <- rbind(vals, nts)
-  dtr <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
-  
-  # replacee is absent
-  expect_false("nt" %in% unique(dtr$group))
-  # rows are not missing
-  expect_true(all(dt$value %in% dtr$value))
-  # number of observations per group checks out
-  expect_identical(tapply(dtr$value, dtr$group, length),
-                             tapply(vals$value, vals$group, length) + nrow(nts))
-  expect_identical(length(which(dtr$value == nts$value)),
-                             nrow(nts) * length(unique(vals$group)))
-  for (i in nts$value) {
-    expect_identical(sum(i == dtr), 2L)
-  }
-  
-  dt$group <- factor(dt$group)
-  dtr_2 <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
-  
-  # replacee is absent
-  expect_false("nt" %in% unique(dtr_2$group))
-  # rows are not missing
-  expect_true(all(dt$value %in% dtr_2$value))
-  # replaced level is absent in data
-  expect_false("nt" %in% levels(dtr_2$group))
-  expect_equal(levels(dtr_2$group), setdiff(levels(dt$group), "nt"))
-  
-  
-  expect_error(
-    replaceValues(x = as.list(dt), column = "group", replacee = "nt", replacement = c("A", "B")),
-    "Assertion on 'x' failed: Must be a data.table")
-  expect_error(
-    replaceValues(x = dt, column = 1L, replacee = "nt", replacement = c("A", "B")),
-    "Assertion on 'column' failed: Must be of type 'string'")
-  expect_error(
-    replaceValues(x = dt, column = "str", replacee = "nt", replacement = c("A", "B")),
-    "Assertion on 'column' failed: Must be element of set")
-  expect_error(
-    replaceValues(x = dt, column = "group", replacee = 1L, replacement = c("A", "B")),
-    "Assertion on 'replacee' failed: Must be of type 'string'")
-  expect_error(
-    replaceValues(x = dt, column = "group", replacee = "str", replacement = c("A", "B")),
-    "Assertion on 'replacee' failed: Must be element of set")
-  expect_error(
-    replaceValues(x = dt, column = "group", replacee = "nt", replacement = 1L),
-    "Assertion on 'replacement' failed: Must be of type 'character'")
-})
-
-
 test_that("computeDistances works as expected", {
   set.seed(1234)
   

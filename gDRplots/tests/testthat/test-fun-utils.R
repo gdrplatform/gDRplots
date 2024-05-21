@@ -125,6 +125,47 @@ test_that("get_legend_title works as expected", {
 })
 
 
+test_that("do_show_legend works as expected", {
+  data <-
+    data.table::data.table(
+      x = seq_len(10),
+      y = seq_len(10) + 0.5,
+      `Tissue` = c("lung", "brain"),
+      `Drug MOA` = c("DHFR", "DNA"),
+      `Concentration 2` = 0:1,
+      check.names = FALSE
+    )
+  
+  expect_true(do_show_legend("none", data))
+  expect_true(do_show_legend("Primary Tissue", data))
+  
+  data[["Concentration 2"]] <- 2
+  expect_false(do_show_legend("none", data))
+  expect_true(do_show_legend("Tissue", data))
+  
+  expect_true(do_show_legend("Drug MOA", data))
+  
+  data[["Concentration 2"]] <- NULL
+  expect_false(do_show_legend("none", data))
+  
+  data[["Drug MOA"]] <- "single value"
+  expect_true(do_show_legend("Drug MOA", data))
+  
+  expect_error(
+    do_show_legend(NULL, data),
+    "Assertion on 'var_col' failed: Must be of type 'string', not 'NULL'."
+  )
+  expect_error(
+    do_show_legend(c("none", "str"), data),
+    "Assertion on 'var_col' failed: Must have length 1."
+  )
+  expect_error(
+    do_show_legend("none", list(a = 2)),
+    "Assertion on 'data' failed: Must be a data.table, not list."
+  )
+})
+
+
 test_that("buildLabel works as expected", {
   dt1 <-
     data.table::data.table(
