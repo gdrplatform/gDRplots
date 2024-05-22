@@ -272,11 +272,11 @@ plotlyRCAll <- function(curve_data,
   curve_data <- curve_data[data.table::between(curve_data[["var_y"]], range_y[1], range_y[2]), ]
   if (!NROW(curve_data)) {
     # tmp solution - start
-    exception_data <- gDRimport::get_exception_data(36)
-    txt_msg <- sprintf(exception_data$sprintf_text, comb_name)
-    txt_msg <- gsub("\\. |: ", "\n", txt_msg)
-    txt_msg <- gsub(" or ", " \nor ", txt_msg)
-    txt_msg <- paste(exception_data$title, "\n\n", txt_msg)
+    txt_msg <- sprintf(
+      "Invalid averaged data\n\n
+      Averaged dose-response data for the selected cell line and drug: '%s' can be considered invalid.\n
+      Please check your data in the module 'Manage Data'
+      or contact gdrplatform team via 'gdr-support-d@gene.com'.", comb_name)
     # tmp solution - end
     plt_err <- plotly::layout(
       p = plotly::plot_ly(mode = "text", type = "scatter"),
@@ -526,11 +526,11 @@ plotlyRCSelected <- function(data,
   data <- data[data.table::between(data[["var_y"]], range_y[1], range_y[2]), ]
   if (!NROW(data)) {
     # tmp solution - start
-    exception_data <- gDRimport::get_exception_data(36)
-    txt_msg <- sprintf(exception_data$sprintf_text, comb_name)
-    txt_msg <- gsub("\\. |: ", "\n", txt_msg)
-    txt_msg <- gsub(" or ", " \nor ", txt_msg)
-    txt_msg <- paste(exception_data$title, "\n\n", txt_msg)
+    txt_msg <- sprintf(
+      "Invalid averaged data\n\n
+      Averaged dose-response data for the selected cell line and drug: '%s' can be considered invalid.\n
+      Please check your data in the module 'Manage Data'
+      or contact gdrplatform team via 'gdr-support-d@gene.com'.", comb_name)
     # tmp solution - end
     plt_err <- plotly::layout(
       p = plotly::plot_ly(mode = "text", type = "scatter"),

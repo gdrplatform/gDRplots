@@ -7,7 +7,7 @@ pkgs:
     host: 'api.github.com'
     source: GITHUB
   gDRcomponents:
-    ver: '>= 1.4.70'
+    ver: '>= 1.4.75'
     url: gdrplatform/gDRcomponents
     ref: main
     subdir: gDRcomponents

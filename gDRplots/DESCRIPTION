@@ -19,7 +19,6 @@ Imports:
     scales,
     SummarizedExperiment
 Suggests:
-    gDRimport (>= 1.1.10),
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.5),
     heatmaply,

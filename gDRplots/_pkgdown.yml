@@ -27,10 +27,6 @@ reference:
   desc:  Plot legend helpers
 - contents:
   - has_keyword("utils_legend")
-- title: Color helpers
-  desc:  Helpers for colors
-- contents:
-  - has_keyword("utils_color")
 - title: Utils
   desc:  Utils function
 - contents:

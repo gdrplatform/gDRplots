@@ -164,19 +164,18 @@ test_that("check output for wrong data for plotlyRCAll", {
   prepared_curves_out <- prepared_curves
   prepared_curves_out[[var_y]] <- prepared_curves_out[[var_y]] + 100
   
-  plt <- plotlyRCAll(prepared_curves_out, var_y =  var_y)
+  plt <- plotlyRCAll(prepared_curves_out, var_y = var_y)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   drug_name <- pidfs[["drug_name"]]
   cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(prepared_curves_out[[cell_name]][1], " x ", prepared_curves_out[[drug_name]][1])
-  exception_data <- gDRimport::get_exception_data(36)
   
   expect_equal(plt$x$attrs[[1]]$mode, "text")
-  expect_true(grepl(exception_data$title, plt_msg))
+  expect_true(grepl("Invalid averaged data", plt_msg))
   expect_true(grepl(comb_name, plt_msg))
-  expect_true(grepl(substr(exception_data$sprintf_text, 1, 63), plt_msg))
+  expect_true(grepl("contact gdrplatform team", plt_msg))
 })
 
 test_that("returns error with missing and wrong argument for plotlyRCAll", {
@@ -359,12 +358,11 @@ test_that("check output for wrong data for plotlyRCSelected", {
   drug_name <- pidfs[["drug_name"]]
   cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(subset_data_out[[cell_name]][1], " x ", subset_data_out[[drug_name]][1])
-  exception_data <- gDRimport::get_exception_data(36)
-  
+
   expect_equal(plt$x$attrs[[1]]$mode, "text")
-  expect_true(grepl(exception_data$title, plt_msg))
+  expect_true(grepl("Invalid averaged data", plt_msg))
   expect_true(grepl(comb_name, plt_msg))
-  expect_true(grepl(substr(exception_data$sprintf_text, 1, 63), plt_msg))
+  expect_true(grepl("contact gdrplatform team", plt_msg))
 })
 
 test_that("expect error with wrong input", {
