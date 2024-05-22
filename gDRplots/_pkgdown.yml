@@ -19,6 +19,10 @@ reference:
   desc:  Helpers for heatmaps
 - contents:
   - has_keyword("heatmaply")
+- title: Plotly helpers
+  desc:  Helpers for plotly
+- contents:
+  - has_keyword("plotly_config")
 - title: Plot label helpers
   desc:  Helpers for plot labels
 - contents:

@@ -13,7 +13,7 @@ Imports:
     BumpyMatrix,
     data.table,
     ggplot2,
-    gDRutils (>= 1.1.14),
+    gDRutils (>= 1.1.16),
     plotly,
     scales,
     SummarizedExperiment

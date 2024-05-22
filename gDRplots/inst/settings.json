@@ -1,0 +1,16 @@
+{
+    "VIS_RANGE": {
+        "GR AOC within set range": [
+            0,
+            1
+        ],
+        "RV AOC within set range": [
+            0,
+            1
+        ]
+    },
+    "PLOTLY_EDITS": {
+        "axisTitleText": true,
+        "titleText": true
+    }
+}

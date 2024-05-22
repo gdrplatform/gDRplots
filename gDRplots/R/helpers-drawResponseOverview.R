@@ -8,7 +8,7 @@
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepareCurves(dt)
 #'
 #' @return A data.table with predicted response for the given concentration range.
@@ -105,7 +105,7 @@ prepareCurves <- function(metrics,
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepareExtras(dt)
 #' 
 #' @return
@@ -192,7 +192,7 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
 #' plotlyRCAll(prepared_curves, "GR value")
 #'
@@ -232,7 +232,7 @@ plotlyRCAll <- function(curve_data,
   # build plot title
   ## this assumes that either Cell Line or Drug has only one value!
   cols <- c(cell_name, drug_name)
-  var_long <- gDRcomponents::getLongest(curve_data[, cols, with = FALSE])
+  var_long <- getLongest(curve_data[, cols, with = FALSE])
   var_short <- if (var_long == cell_name) {
     drug_name
   } else if (var_long == drug_name) {
@@ -284,7 +284,7 @@ plotlyRCAll <- function(curve_data,
       annotations = list(text = txt_msg, align = "justify",
                          showarrow = FALSE, font = list(size = 12, color = "darkred")))
     
-    return(gDRcomponents::gDR_plotly_config(plt_err))
+    return(gDR_plotly_config(plt_err))
   }
   
   # add highlight key
@@ -315,9 +315,9 @@ plotlyRCAll <- function(curve_data,
     plot_laidout, on = "plotly_hover", off = "plotly_doubleclick",
     persistent = FALSE, color = "red", opacityDim = 0.4)
   # modify config
-  plot_final <- gDRcomponents::gDR_plotly_config(plot_highlighted,
-                                                 edits = gDRcomponents::get_plotly_edits(),
-                                                 showAxisRangeEntryBoxes = FALSE)
+  plot_final <- gDR_plotly_config(plot_highlighted,
+                                  edits = get_plotly_edits(),
+                                  showAxisRangeEntryBoxes = FALSE)
   
   return(plot_final)
 }
@@ -360,7 +360,7 @@ plotlyRCAll <- function(curve_data,
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
 #' plotlyRCSelected(
 #'   prepared_curves, 
@@ -415,10 +415,10 @@ plotlyRCSelected <- function(data,
   
   # fast end due to lack of data
   if (is.null(layers)) {
-    return(gDRcomponents::gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
   }
   if (all(is.na(data[[var_y]]))) {
-    return(gDRcomponents::gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
+    return(gDR_plotly_config(plotly::plotly_empty(type = "scatter", mode = "markers")))
   }
   
   # drug/cell line combination (for exception handling)
@@ -453,9 +453,9 @@ plotlyRCSelected <- function(data,
   #       plot_list, nrows = length(plot_list),
   #       margin = 0.05, titleY = TRUE, titleX = TRUE)
   #     plot_laidout <- plotly::layout(plot_sub, width = plot_width, height = plot_height)
-  #     plot_final <- gDRcomponents::gDR_plotly_config(plot_laidout,
-  #                                                    edits = gDRcomponents::get_plotly_edits(),
-  #                                                    showAxisRangeEntryBoxes = FALSE)
+  #     plot_final <- gDR_plotly_config(plot_laidout,
+  #                                     edits = get_plotly_edits(),
+  #                                     showAxisRangeEntryBoxes = FALSE)
   #     
   #     return(plot_final)
   #   }
@@ -465,7 +465,7 @@ plotlyRCSelected <- function(data,
   
   # determine variable to color by
   cols <- c(cell_name, drug_name)
-  var_col <- gDRcomponents::getLongest(data[, cols, with = FALSE])
+  var_col <- getLongest(data[, cols, with = FALSE])
   var_not_col <- if (var_col == cell_name)  {
     drug_name
   } else if (var_col == drug_name)  {
@@ -538,7 +538,7 @@ plotlyRCSelected <- function(data,
       annotations = list(text = txt_msg, align = "justify",
                          showarrow = FALSE, font = list(size = 12, color = "darkred")))
     
-    return(gDRcomponents::gDR_plotly_config(plt_err))
+    return(gDR_plotly_config(plt_err))
   }
   
   # format curve data
@@ -614,9 +614,9 @@ plotlyRCSelected <- function(data,
                                  yaxis = axis_options_y,
                                  shapes = lines)
   # modify config
-  plot_final <- gDRcomponents::gDR_plotly_config(plot_laidout,
-                                                 edits = gDRcomponents::get_plotly_edits(),
-                                                 showAxisRangeEntryBoxes = FALSE)
+  plot_final <- gDR_plotly_config(plot_laidout,
+                                  edits = get_plotly_edits(),
+                                  showAxisRangeEntryBoxes = FALSE)
   
   return(plot_final)
 }
@@ -650,3 +650,44 @@ logSeq <- function(start, end, length) {
   return(sequence)
 }
 
+#' Find longest factor
+#'
+#' Given a list of vectors, return name of the one with the most unique values (levels for factors).
+#'
+#' @param x named list of atomic vectors or a data table (no list columns)
+#' @param default string or integer-like numeric; name or index of \code{x} that will 
+#'    be returned in case of ties
+#'    
+#' @examples
+#' factorList <- list("letters" = letters, "numbers" = seq_len(10))
+#' getLongest(factorList)
+#'
+#' @return A character string.
+#' @keywords internal
+#'
+#' @export
+getLongest <- function(x, 
+                       default = 1L) {
+  
+  checkmate::assert_multi_class(x, c("list", "data.table"))
+  checkmate::assert_named(x)
+  lapply(x, checkmate::assert_atomic_vector)
+  checkmate::assert_multi_class(default, classes = c("character", "integer", "numeric"))
+  if (checkmate::test_string(default)) checkmate::assert_choice(default, names(x))
+  if (checkmate::test_numeric(default)) checkmate::assert_number(default, lower = 1, upper = length(x))
+  
+  uniques <- lapply(x, unique)
+  lengths <- vapply(uniques, length, integer(1), USE.NAMES = TRUE)
+  longest <- names(which(lengths == max(lengths)))
+  longest_default <- which(longest == names(x)[default])
+  
+  if (length(longest) == 1) {
+    return(longest)
+  } else {
+    if (is.character(default)) {
+      return(default)
+    } else {
+      return(longest[longest_default])
+    }
+  }
+}

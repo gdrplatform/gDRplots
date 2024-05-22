@@ -200,3 +200,15 @@ create_color_palette <- function(colors_vec,
   unique(c(colors_below, colors_under))
 }
 
+#' Get visualization range for each metrics
+#' 
+#' @examples
+#' get_visualization_range()
+#' 
+#' @keywords heatmaply
+#' @return list of numeric vectors with visualization range
+#' @export
+get_visualization_range <- function() {
+  gDRutils::get_settings_from_json("VIS_RANGE",
+                                   system.file(package = "gDRplots", "settings.json"))
+}

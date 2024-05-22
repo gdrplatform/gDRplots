@@ -23,7 +23,7 @@ Prepare coordinates of extra features
 }
 \examples{
 SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 prepareExtras(dt)
 
 }

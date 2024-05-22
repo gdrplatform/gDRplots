@@ -64,7 +64,7 @@ so that data for each co-drug is plotted on a separate panel. Panel are arranged
 
 \examples{
 SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, "Metrics")
+dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
 prepared_curves <- prepareCurves(dt)
 plotlyRCSelected(
   prepared_curves, 

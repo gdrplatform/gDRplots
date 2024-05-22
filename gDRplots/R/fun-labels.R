@@ -58,7 +58,7 @@ adjustLabel <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
 #' 
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRcomponents::convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
 #' buildLabel(dt, "grid")
 #'
 #' @keywords utils_label
@@ -77,13 +77,13 @@ buildLabel <- function(data,
   concentration2_name <- pidfs[["concentration2"]]
   drug2_name <- pidfs[["drug_name2"]]
   
-  iso_level <- gDRcomponents::get_isobologram_columns("iso_level")
-  pos_x <- gDRcomponents::get_isobologram_columns("pos_x")
-  pos_x_ref <- gDRcomponents::get_isobologram_columns("pos_x_ref")
-  pos_y <- gDRcomponents::get_isobologram_columns("pos_y")
-  pos_y_ref <- gDRcomponents::get_isobologram_columns("pos_y_ref")
-  log10_ratio <- gDRcomponents::get_isobologram_columns("log10_ratio")
-  log2_CI <- gDRcomponents::get_isobologram_columns("log2_CI")
+  iso_level <- gDRutils::get_isobologram_columns("iso_level")
+  pos_x <- gDRutils::get_isobologram_columns("pos_x")
+  pos_x_ref <- gDRutils::get_isobologram_columns("pos_x_ref")
+  pos_y <- gDRutils::get_isobologram_columns("pos_y")
+  pos_y_ref <- gDRutils::get_isobologram_columns("pos_y_ref")
+  log10_ratio <- gDRutils::get_isobologram_columns("log10_ratio")
+  log2_CI <- gDRutils::get_isobologram_columns("log2_CI")
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(view)

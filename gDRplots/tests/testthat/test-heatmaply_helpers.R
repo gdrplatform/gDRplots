@@ -157,3 +157,11 @@ test_that("create color palette works correctly", {
   expect_error(create_color_palette(c("red", "blue"), c(0, 1), c(0, 1)), 
                          "Assertion on 'breaks' failed: Must have length 1.")
 })
+
+
+test_that("get_visualization_range works fine", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  expect_identical(get_visualization_range(), s$VIS_RANGE)
+})
+
