@@ -23,6 +23,10 @@ reference:
   desc:  Helpers for plot labels
 - contents:
   - has_keyword("utils_label")
+- title: Color helpers
+  desc:  Plot color helpers
+- contents:
+  - has_keyword("utils_color")
 - title: Legend helpers
   desc:  Plot legend helpers
 - contents:
