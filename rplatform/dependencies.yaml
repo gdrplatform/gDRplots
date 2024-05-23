@@ -1,16 +1,9 @@
 pkgs:
   gDRutils:
-    ver: '>= 1.1.14'
+    ver: '>= 1.1.16'
     url: gdrplatform/gDRutils
     ref: main
     subdir: gDRutils
-    host: 'api.github.com'
-    source: GITHUB
-  gDRcomponents:
-    ver: '>= 1.4.70'
-    url: gdrplatform/gDRcomponents
-    ref: main
-    subdir: gDRcomponents
     host: 'api.github.com'
     source: GITHUB
   gDRstyle:

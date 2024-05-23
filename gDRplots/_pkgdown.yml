@@ -11,3 +11,31 @@ reference:
   desc:  Function to plot averaged values heatmaps for combo data
 - contents:
   - has_keyword("combo_plots")
+- title: Response Overview plots
+  desc:  Functions to plot drug response curves with helpers
+- contents:
+  - has_keyword("drawResponseOverview")
+- title: Heatmaps helpers
+  desc:  Helpers for heatmaps
+- contents:
+  - has_keyword("heatmaply")
+- title: Plotly helpers
+  desc:  Helpers for plotly
+- contents:
+  - has_keyword("plotly_config")
+- title: Plot label helpers
+  desc:  Helpers for plot labels
+- contents:
+  - has_keyword("utils_label")
+- title: Color helpers
+  desc:  Plot color helpers
+- contents:
+  - has_keyword("utils_color")
+- title: Legend helpers
+  desc:  Plot legend helpers
+- contents:
+  - has_keyword("utils_legend")
+- title: Utils
+  desc:  Utils function
+- contents:
+  - has_keyword("utils")
