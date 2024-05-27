@@ -18,7 +18,7 @@
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named wit annotation name (columne names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with valid colour name for 
-#'   each value describe in \code{annotation_col})
+#'   each value describe in \code{annotation_col}). Not described elements will be colored in default.
 #'   more detail see \code{\link[pheatmap]{pheatmap}}
 #'
 #' @examples
@@ -26,7 +26,14 @@
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
 #' 
+#' annotation_manual <- data.table::data.table(
+#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+#'   mut_A = c(1, 1, 1, 0, 0),
+#'   mut_B = c("yes", "yes", "no", "no", "no")
+#' )
+#' 
 #' heatmap_QCS(tab_response = response_metrics)
+#' heatmap_QCS(tab_response = response_metrics, annotation_col = annotation_manual)
 #' 
 #' @return heatmap for selected metric wit annotation - if given
 #' @export 
@@ -34,7 +41,7 @@ heatmap_QCS <- function(tab_response,
                         metric_growth = "GR",
                         metric = "xc50",
                         fit_source = "gDR",
-                        dataset_name = NULL,
+                        dataset_name = NULL, # TODO change int plot_title
                         mapcolor = c("firebrick2", "white"),
                         no_breaks = 50,
                         annotation_col = NULL,
@@ -51,8 +58,12 @@ heatmap_QCS <- function(tab_response,
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
+  # prep data
   tab_response <- tab_response[normalization_type == metric_growth,]
-
+  
   if (fit_source %in% names(tab_response)) {
     data.table::setkeyv(tab_response, "fit_source")
     tab_response <- tab_response[fit_source]
@@ -66,22 +77,43 @@ heatmap_QCS <- function(tab_response,
   
   # select data for normalization type
   tab_plot <- data.table::dcast(
-    tab_response, 
-    factor(CellLineName, levels = unique(CellLineName)) ~  factor(DrugName), 
+    data = tab_response,
+    formula = get(cellline_name) ~  get(drug_name),
+    # TODO add DrugNamePlot
     value.var = metric)
+  data.table::setnames(tab_plot, "cellline_name", cellline_name)
   
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, -c("CellLineName")])
-  rownames(mat_cvd) <- tab_plot$CellLineName
+  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
+  rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[,i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i,])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[,rm_col]
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row,]
   mat_cvd[] <- vapply(mat_cvd, function(x) qmfun(x), numeric(1))
   
+  # check completeness of annotation - TODO wrap in separate function
+  if (!is.null(annotation_col)) {
+    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
+      tab_missing_ann <- data.table::data.table(
+        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
+      )
+      data.table::setnames(tab_missing_ann, "missing", cellline_name)
+      
+      annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
+      # data.table::nafill does not support character
+      cols <- names(annotation_col)[names(annotation_col) != cellline_name]
+      annotation_col[ , (cols) := lapply(.SD, change_NA_into_char), .SDcols = cols]
+    }
+  }
+  
+  if (!is.null(annotation_col) && !is.null(annotation_colors)) {
+    # TODO
+  }
+  
   # flip 
   t_mat_cvd <- t(mat_cvd)
-
+  
   # prep hmcolors
   breaks <- seq(from = min(na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hmcol <- grDevices::colorRampPalette(mapcolor)(no_breaks + 1)
@@ -104,4 +136,26 @@ heatmap_QCS <- function(tab_response,
                            annotation_col = annotation_col,
                            annotation_colors = annotation_colors
   )
+  return(hm)
 }
+
+
+# helpers ----
+#' Change NA into given string
+#'
+#' @param x vector with items suspected of being NA
+#' @param lbl_NA string - replacement for NA - as default "NA"
+#'
+#' @return character (for NA -> given string)
+#' @keywords internal
+#' @md
+
+change_NA_into_char <- function(x,
+                                lbl_NA = "NA") {
+  
+  checkmate::assert_string(lbl_NA)
+  
+  ifelse(is.na(x), lbl_NA, as.character(x))
+  
+}
+

@@ -43,7 +43,7 @@ Note that color schemes takes into account if variable is continuous or discrete
 \item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
 note list is named wit annotation name (columne names of \code{annotation_col} - 
 without \code{CellLineName}), each list item is named vector with valid colour name for 
-each value describe in \code{annotation_col})
+each value describe in \code{annotation_col}). Not described elements will be colored in default.
 more detail see \code{\link[pheatmap]{pheatmap}}}
 }
 \value{
@@ -57,6 +57,13 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
 
+annotation_manual <- data.table::data.table(
+  CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+  mut_A = c(1, 1, 1, 0, 0),
+  mut_B = c("yes", "yes", "no", "no", "no")
+)
+
 heatmap_QCS(tab_response = response_metrics)
+heatmap_QCS(tab_response = response_metrics, annotation_col = annotation_manual)
 
 }
