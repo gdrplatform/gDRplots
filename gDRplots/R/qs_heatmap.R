@@ -16,7 +16,7 @@
 #'   are matched using corresponding names from \code{CellLineName} column. 
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
-#'   note list is named wit annotation name (columne names of \code{annotation_col} - 
+#'   note list is named wit annotation name (column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with valid colour name for 
 #'   each value describe in \code{annotation_col}). Not described elements will be colored in default.
 #'   more detail see \code{\link[pheatmap]{pheatmap}}
@@ -103,13 +103,20 @@ heatmap_QCS <- function(tab_response,
       annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
       # data.table::nafill does not support character
       cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-      annotation_col[ , (cols) := lapply(.SD, change_NA_into_char), .SDcols = cols]
+      annotation_col[, (cols) := lapply(.SD, change_NA_into_char), .SDcols = cols]
     }
+    # order acc to matrix
+    annotation_col <- 
+      annotation_col[get(cellline_name) %in% rownames(mat_cvd),][
+        order(match(get(cellline_name), rownames(mat_cvd)))][, .SD, .SDcol = -cellline_name]
+    rownames(annotation_col) <- rownames(mat_cvd) # required by pheatmap::pheatmap
   }
   
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
     # TODO
   }
+  
+
   
   # flip 
   t_mat_cvd <- t(mat_cvd)
@@ -158,4 +165,3 @@ change_NA_into_char <- function(x,
   ifelse(is.na(x), lbl_NA, as.character(x))
   
 }
-

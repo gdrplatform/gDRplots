@@ -41,7 +41,7 @@ are matched using corresponding names from \code{CellLineName} column.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
-note list is named wit annotation name (columne names of \code{annotation_col} - 
+note list is named wit annotation name (column names of \code{annotation_col} - 
 without \code{CellLineName}), each list item is named vector with valid colour name for 
 each value describe in \code{annotation_col}). Not described elements will be colored in default.
 more detail see \code{\link[pheatmap]{pheatmap}}}
