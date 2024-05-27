@@ -1,38 +1,63 @@
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-
-se <- mae[[gDRutils::get_supported_experiments("sa")]]
-
-
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
-response_data <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-
-# groups <- c("normalization_type", "fit_source")
-# wide_cols <- gDRutils::get_header("response_metrics")
-# # dt_QCS_sa_metrics_0 <- gDRutils::flatten(dt_QCS_sa_metrics, groups = groups, wide_cols = wide_cols)
-# response_metrics_flat <- gDRutils::flatten(tbl = response_metrics, 
-#                                            groups = groups, 
-#                                            wide_cols = wide_cols)
-
-
-heatmap_QS <- function(tab_response,
-                       normalization_type = "GR",
-                       metric = "xc50",
-                       fit_source = "gDR",
-                       dataset_name = NULL,
-                       mapcolor = c("firebrick2", "white"),
-                       no_breaks = 50) {
+#' Plot QCS heatmap
+#'
+#' @param tab_response \code{data.table} containing drug response metrics
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}}
+#' @param metric_growth string with normalization_types to be selected
+#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of metric
+#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+#'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
+#' @param fit_source fit source name for new GDS metrics
+#' @param dataset_name string name of dataset to be shown in t
+#' @param mapcolor character representing a valid colour - name or hex
+#' @param no_breaks numeric number of breaks on scale
+#' @param annotation_col data.table that specifies the annotations shown above the heatmap.
+#'   Each row defines the features for a specific row. The rows in the data and in the annotation
+#'   are matched using corresponding names from \code{CellLineName} column. 
+#'   Note that color schemes takes into account if variable is continuous or discrete.
+#' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
+#'   note list is named wit annotation name (columne names of \code{annotation_col} - 
+#'   without \code{CellLineName}), each list item is named vector with valid colour name for 
+#'   each value describe in \code{annotation_col})
+#'   more detail see \code{\link[pheatmap]{pheatmap}}
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+#' 
+#' heatmap_QCS(tab_response = response_metrics)
+#' 
+#' @return heatmap for selected metric wit annotation - if given
+#' @export 
+heatmap_QCS <- function(tab_response,
+                        metric_growth = "GR",
+                        metric = "xc50",
+                        fit_source = "gDR",
+                        dataset_name = NULL,
+                        mapcolor = c("firebrick2", "white"),
+                        no_breaks = 50,
+                        annotation_col = NULL,
+                        annotation_colors = NULL) {
   
   checkmate::assert_data_table(tab_response)
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(dataset_name, null.ok = TRUE)
-  checkmate::assert_character(mapcolor) # check valid name
-  checkmate::assert_int(no_breaks, lower = 2) # check valid name
+  checkmate::assert_character(mapcolor)
+  stopifnot("Must be valid color name" = all(vapply(mapcolor, gDRplots::isValidColor, logical(1))))
+  checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_data_table(annotation_col, null.ok = TRUE)
+  checkmate::assert_list(annotation_colors, null.ok = TRUE)
   
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
+  tab_response <- tab_response[normalization_type == metric_growth,]
+
+  if (fit_source %in% names(tab_response)) {
+    data.table::setkeyv(tab_response, "fit_source")
+    tab_response <- tab_response[fit_source]
+    data.table::setkey(tab_response, NULL)
+  }
   
   qmfun <- switch(metric,
                   "xc50" = log10, 
@@ -46,7 +71,7 @@ heatmap_QS <- function(tab_response,
     value.var = metric)
   
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[,-c("CellLineName")])
+  mat_cvd <- as.matrix(tab_plot[, -c("CellLineName")])
   rownames(mat_cvd) <- tab_plot$CellLineName
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[,i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i,])), logical(1))
@@ -56,11 +81,11 @@ heatmap_QS <- function(tab_response,
   
   # flip 
   t_mat_cvd <- t(mat_cvd)
-  
+
   # prep hmcolors
   breaks <- seq(from = min(na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hmcol <- grDevices::colorRampPalette(mapcolor)(no_breaks + 1)
-
+  
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
                            display_numbers = TRUE, 
@@ -72,11 +97,11 @@ heatmap_QS <- function(tab_response,
                            fontsize = 6,
                            treeheight_row = 30, 
                            treeheight_col = 30,
-                           # TODO manual annotation
-                           # annotation_col = CL_ann_sa_ready,
-                           # annotation_colors = col_ann_sa, 
                            main = paste(metric, dataset_name),
                            cluster_rows = FALSE,
-                           cluster_cols = FALSE
+                           cluster_cols = FALSE,
+                           # manual annotation
+                           annotation_col = annotation_col,
+                           annotation_colors = annotation_colors
   )
 }
