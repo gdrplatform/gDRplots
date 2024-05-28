@@ -20,7 +20,7 @@ heatmap_QCS(
 \item{tab_response}{\code{data.table} containing drug response metrics
 output from \code{\link[gDRutils]{convert_se_assay_to_dt}}}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{metric_growth}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric

@@ -2,7 +2,7 @@
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}}
-#' @param metric_growth string with normalization_types to be selected
+#' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric
 #'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
@@ -62,7 +62,7 @@ heatmap_QCS <- function(tab_response,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # prep data
-  tab_response <- tab_response[normalization_type == metric_growth,]
+  tab_response <- tab_response[normalization_type == metric_growth, ]
   
   if (fit_source %in% names(tab_response)) {
     data.table::setkeyv(tab_response, "fit_source")
@@ -86,10 +86,10 @@ heatmap_QCS <- function(tab_response,
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[,i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i,])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[,rm_col]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row,]
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
   mat_cvd[] <- vapply(mat_cvd, function(x) qmfun(x), numeric(1))
   
   # check completeness of annotation - TODO wrap in separate function
@@ -107,7 +107,7 @@ heatmap_QCS <- function(tab_response,
     }
     # order acc to matrix
     annotation_col <- 
-      annotation_col[get(cellline_name) %in% rownames(mat_cvd),][
+      annotation_col[get(cellline_name) %in% rownames(mat_cvd), ][
         order(match(get(cellline_name), rownames(mat_cvd)))][, .SD, .SDcol = -cellline_name]
     rownames(annotation_col) <- rownames(mat_cvd) # required by pheatmap::pheatmap
   }
@@ -116,13 +116,13 @@ heatmap_QCS <- function(tab_response,
     # TODO
   }
   
-
+  
   
   # flip 
   t_mat_cvd <- t(mat_cvd)
   
   # prep hmcolors
-  breaks <- seq(from = min(na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
+  breaks <- seq(from = min(stats::na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hmcol <- grDevices::colorRampPalette(mapcolor)(no_breaks + 1)
   
   hm <- pheatmap::pheatmap(t_mat_cvd,
