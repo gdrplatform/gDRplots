@@ -11,6 +11,10 @@ reference:
   desc:  Function to plot averaged values heatmaps for combo data
 - contents:
   - has_keyword("combo_plots")
+- title: Quality checks plot for Processing Report
+  desc:  QCS plots for Processing Report with all helpers 
+- contents:
+  - has_keyword("QCS_plot")
 - title: Response Overview plots
   desc:  Functions to plot drug response curves with helpers
 - contents:
