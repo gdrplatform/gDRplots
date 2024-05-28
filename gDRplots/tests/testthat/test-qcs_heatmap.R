@@ -8,7 +8,7 @@ test_that("heatmap_QCS works as expected", {
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  plt_1 <-  heatmap_QCS(tab_response = response_metrics)
+  plt_1 <- heatmap_QCS(tab_response = response_metrics)
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, rdata[["DrugName"]])
