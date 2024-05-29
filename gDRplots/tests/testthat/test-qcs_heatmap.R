@@ -18,8 +18,11 @@ test_that("heatmap_QCS works as expected", {
 
 test_that("get_hm_title works as expected", {
   dataset_name <- "Dataset AB123"
-  metric <- "x_max"
+  metric <- "xc50"
   metric_growth <- "RV"
+  expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (IC50)")
   
-  expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (E_max)")
+  metric <- "hsa_score"
+  metric_growth <- "GR"
+  expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (HSA Score GR)")
 })
