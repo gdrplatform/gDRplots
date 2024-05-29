@@ -1,17 +1,18 @@
 #' Plot QCS heatmap for single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}}
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
+#'    and single-agent \code{SummarizedExperiment}
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric
+#' @param metric string name of metric;
 #'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #' @param no_breaks numeric number of breaks on scale
-#' @param annotation_col data.table that specifies the annotations shown above the heatmap.
+#' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from \code{CellLineName} column. 
 #'   Note that color schemes takes into account if variable is continuous or discrete.
@@ -40,6 +41,9 @@
 #' 
 #' heatmap_QCS(tab_response = response_metrics)
 #' heatmap_QCS(tab_response = response_metrics, 
+#'             metric_growth = "RV",
+#'             metric = "x_mean",
+#'             colors_vec = c("darkblue", "grey90"),
 #'             annotation_col = annotation_manual)
 #' heatmap_QCS(tab_response = response_metrics, 
 #'             annotation_col = annotation_manual,
@@ -169,11 +173,20 @@ heatmap_QCS <- function(
 
 #' Plot QCS heatmap for combo data
 #' 
+#' @param tab_response \code{data.table} containing drug response metrics
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
+#'    and combo \code{SummarizedExperiment}
+#' @param metric string name of combo metric;
+#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{metric_growth}), 
+#'    "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @inheritParams heatmap_QCS
+#' 
+#' @seealso \code{\link[pheatmap]{pheatmap}}
+#'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <-  gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
 #' 
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
@@ -189,6 +202,9 @@ heatmap_QCS <- function(
 #' 
 #' heatmap_QCS_combo(tab_response = response_metrics)
 #' heatmap_QCS_combo(tab_response = response_metrics, 
+#'                   metric_growth = "RV",
+#'                   metric = "bliss_score",
+#'                   colors_vec = c("darkblue", "grey90", "darkred"),
 #'                   annotation_col = annotation_manual)
 #' heatmap_QCS_combo(tab_response = response_metrics, 
 #'                   annotation_col = annotation_manual,
