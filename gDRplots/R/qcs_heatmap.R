@@ -351,9 +351,11 @@ get_hm_title <- function(dataset_name,
   
   checkmate::assert_string(dataset_name)
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
+  checkmate::assert_choice(metric, 
+                           choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
   
-  title_metric <- gDRutils::get_header("metrics_names")[metric_growth, metric]
+  title_metric <- 
+    gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, metric_growth), human_readable = TRUE)
   
   sprintf("%s (%s)", dataset_name, title_metric)
 }
