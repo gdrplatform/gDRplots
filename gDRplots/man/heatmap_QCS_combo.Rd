@@ -19,14 +19,15 @@ heatmap_QCS_combo(
 }
 \arguments{
 \item{tab_response}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}}}
+output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
+and combo \code{SummarizedExperiment}}
 
 \item{metric_growth}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of metric
-one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
-"x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
+\item{metric}{string name of combo metric;
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{metric_growth}), 
+"bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 
@@ -36,7 +37,7 @@ one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{annotation_col}{data.table that specifies the annotations shown above the heatmap.
+\item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from \code{CellLineName} column. 
 Note that color schemes takes into account if variable is continuous or discrete.}
@@ -55,7 +56,7 @@ Plot QCS heatmap for combo data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
-response_metrics <-  gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
 
 annotation_manual <- data.table::data.table(
   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
@@ -71,11 +72,17 @@ annotation_map <- list(
 
 heatmap_QCS_combo(tab_response = response_metrics)
 heatmap_QCS_combo(tab_response = response_metrics, 
+                  metric_growth = "RV",
+                  metric = "bliss_score",
+                  colors_vec = c("darkblue", "grey90", "darkred"),
                   annotation_col = annotation_manual)
 heatmap_QCS_combo(tab_response = response_metrics, 
                   annotation_col = annotation_manual,
                   annotation_colors = annotation_map,
                   hm_title = get_hm_title("Combo Matrix - combo data"))
             
+}
+\seealso{
+\code{\link[pheatmap]{pheatmap}}
 }
 \keyword{QCS_plot}

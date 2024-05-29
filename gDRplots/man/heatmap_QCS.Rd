@@ -18,12 +18,13 @@ heatmap_QCS(
 }
 \arguments{
 \item{tab_response}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}}}
+output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
+and single-agent \code{SummarizedExperiment}}
 
 \item{metric_growth}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of metric
+\item{metric}{string name of metric;
 one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
 "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
 
@@ -35,7 +36,7 @@ one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{annotation_col}{data.table that specifies the annotations shown above the heatmap.
+\item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from \code{CellLineName} column. 
 Note that color schemes takes into account if variable is continuous or discrete.}
@@ -69,6 +70,9 @@ annotation_map <- list(
 
 heatmap_QCS(tab_response = response_metrics)
 heatmap_QCS(tab_response = response_metrics, 
+            metric_growth = "RV",
+            metric = "x_mean",
+            colors_vec = c("darkblue", "grey90"),
             annotation_col = annotation_manual)
 heatmap_QCS(tab_response = response_metrics, 
             annotation_col = annotation_manual,
