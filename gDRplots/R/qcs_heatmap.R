@@ -123,11 +123,10 @@ heatmap_QCS <- function(
       cols <- names(annotation_col)[names(annotation_col) != cellline_name]
       annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
-    # order annotation acc to matrix
-    annotation_col <- 
-      annotation_col[get(cellline_name) %in% rownames(mat_cvd), ][
-        order(match(get(cellline_name), rownames(mat_cvd)))][, .SD, .SDcol = -cellline_name]
-    rownames(annotation_col) <- rownames(mat_cvd) # required by pheatmap::pheatmap
+    # select annotation acc to matrix
+    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
+    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
   }
   
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
@@ -279,11 +278,10 @@ heatmap_QCS_combo <- function(
       cols <- names(annotation_col)[names(annotation_col) != cellline_name]
       annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
-    # order annotation acc to matrix
-    annotation_col <- 
-      annotation_col[get(cellline_name) %in% rownames(mat_cvd), ][
-        order(match(get(cellline_name), rownames(mat_cvd)))][, .SD, .SDcol = -cellline_name]
-    rownames(annotation_col) <- rownames(mat_cvd) # required by pheatmap::pheatmap
+    # select annotation acc to matrix
+    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
+    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
   }
   
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
