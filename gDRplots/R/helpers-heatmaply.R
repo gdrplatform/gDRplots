@@ -4,7 +4,7 @@
 #' The default method was changed to "spearman" and an option was added to replace
 #' missing values in the resulting distance matrix with an arbitrary value.
 #' This option defaults to 0 so that the function can be called by
-#' \code{iheatmapr::add_row_clustering} and code{iheatmapr::add_col_clustering}.
+#' \code{iheatmapr::add_row_clustering} and \code{iheatmapr::add_col_clustering}.
 #'
 #' @section Control:
 #' The function offers different distance measures but since it is called internally,
