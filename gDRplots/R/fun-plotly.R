@@ -7,7 +7,7 @@
 #' @param ... other parameters that may be passed to \code{\link[plotly]{config}}
 #' 
 #' @examples
-#' plt <- plotly::plot_ly(mtcars, x = ~mpg)
+#' plt <- plotly::plot_ly(mtcars, x = ~mpg, type = "histogram")
 #' plt
 #' gDR_plotly_config(plt) 
 #'
