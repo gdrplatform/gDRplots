@@ -1,4 +1,4 @@
-#' Plot QCS heatmap for single-agent data
+#' Plot pretty heatmap with annotationsfor single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
@@ -39,22 +39,22 @@
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' heatmap_QCS(tab_response = response_metrics)
-#' heatmap_QCS(tab_response = response_metrics, 
-#'             metric_growth = "RV",
-#'             metric = "x_mean",
-#'             colors_vec = c("darkblue", "grey90"),
-#'             annotation_col = annotation_manual)
-#' heatmap_QCS(tab_response = response_metrics, 
-#'             annotation_col = annotation_manual,
-#'             annotation_colors = annotation_map,
-#'             hm_title = get_hm_title("Combo Matrix - single-agent data"))
+#' pheatmap_with_anno_sa(tab_response = response_metrics)
+#' pheatmap_with_anno_sa(tab_response = response_metrics, 
+#'                       metric_growth = "RV",
+#'                       metric = "x_mean",
+#'                       colors_vec = c("darkblue", "grey90"),
+#'                       annotation_col = annotation_manual)
+#' pheatmap_with_anno_sa(tab_response = response_metrics, 
+#'                       annotation_col = annotation_manual,
+#'                       annotation_colors = annotation_map,
+#'                       hm_title = get_hm_title("Combo Matrix - single-agent data"))
 #' 
 #' @keywords QCS_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
-heatmap_QCS <- function(
+pheatmap_with_anno_sa <- function(
     tab_response,
     metric_growth = "GR",
     metric = "xc50",
@@ -170,7 +170,7 @@ heatmap_QCS <- function(
 }
 
 
-#' Plot QCS heatmap for combo data
+#' Plot pretty heatmap with annotations for combo data
 #' 
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
@@ -178,7 +178,7 @@ heatmap_QCS <- function(
 #' @param metric string name of combo metric;
 #'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{metric_growth}), 
 #'    "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
-#' @inheritParams heatmap_QCS
+#' @inheritParams pheatmap_with_anno_sa
 #' 
 #' @seealso \code{\link[pheatmap]{pheatmap}}
 #'
@@ -199,22 +199,22 @@ heatmap_QCS <- function(
 #' )
 #' 
 #' 
-#' heatmap_QCS_combo(tab_response = response_metrics)
-#' heatmap_QCS_combo(tab_response = response_metrics, 
-#'                   metric_growth = "RV",
-#'                   metric = "bliss_score",
-#'                   colors_vec = c("darkblue", "grey90", "darkred"),
-#'                   annotation_col = annotation_manual)
-#' heatmap_QCS_combo(tab_response = response_metrics, 
-#'                   annotation_col = annotation_manual,
-#'                   annotation_colors = annotation_map,
-#'                   hm_title = get_hm_title("Combo Matrix - combo data"))
+#' pheatmap_with_anno_combo(tab_response = response_metrics)
+#' pheatmap_with_anno_combo(tab_response = response_metrics, 
+#'                          metric_growth = "RV",
+#'                          metric = "bliss_score",
+#'                          colors_vec = c("darkblue", "grey90", "darkred"),
+#'                          annotation_col = annotation_manual)
+#' pheatmap_with_anno_combo(tab_response = response_metrics, 
+#'                          annotation_col = annotation_manual,
+#'                          annotation_colors = annotation_map,
+#'                          hm_title = get_hm_title("Combo Matrix - combo data"))
 #'             
 #' @keywords QCS_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
-heatmap_QCS_combo <- function(
+pheatmap_with_anno_combo <- function(
     tab_response,
     metric_growth = "GR",
     metric = "hsa_score",

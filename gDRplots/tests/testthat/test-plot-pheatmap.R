@@ -1,6 +1,6 @@
 context("Test qcs_heatmap")
 
-test_that("heatmap_QCS works as expected", {
+test_that("pheatmap_with_anno_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
@@ -8,7 +8,7 @@ test_that("heatmap_QCS works as expected", {
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  plt_1 <- heatmap_QCS(tab_response = response_metrics)
+  plt_1 <- pheatmap_with_anno_sa(tab_response = response_metrics)
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, rdata[["DrugName"]])
@@ -17,7 +17,7 @@ test_that("heatmap_QCS works as expected", {
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
   
-  plt_2 <- heatmap_QCS(tab_response = response_metrics_na, metric = "x_max")
+  plt_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, metric = "x_max")
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, unique(response_metrics_na[!is.na(x_max)]$DrugName))
   
@@ -26,12 +26,12 @@ test_that("heatmap_QCS works as expected", {
     mut_A = c(1, 0),
     mut_B = c("yes", "no")
   )
-  plt_3 <- heatmap_QCS(tab_response = response_metrics, annotation_col = annotation_manual)
+  plt_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, annotation_col = annotation_manual)
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
 })
 
-test_that("heatmap_QCS_combo works as expected", {
+test_that("pheatmap_with_anno_combo works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
@@ -39,7 +39,7 @@ test_that("heatmap_QCS_combo works as expected", {
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  plt_1 <- heatmap_QCS_combo(tab_response = response_metrics)
+  plt_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2))
@@ -51,7 +51,7 @@ test_that("heatmap_QCS_combo works as expected", {
                                response_metrics_na[!is.na(bliss_score)]$DrugName, 
                                response_metrics_na[!is.na(bliss_score)]$DrugName_2))
   
-  plt_2 <- heatmap_QCS_combo(tab_response = response_metrics_na, metric = "bliss_score")
+  plt_2 <- pheatmap_with_anno_combo(tab_response = response_metrics_na, metric = "bliss_score")
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, drug_combo)
   
@@ -60,7 +60,7 @@ test_that("heatmap_QCS_combo works as expected", {
     mut_A = c(1, 0),
     mut_B = c("yes", "no")
   )
-  plt_3 <- heatmap_QCS_combo(tab_response = response_metrics, annotation_col = annotation_manual)
+  plt_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, annotation_col = annotation_manual)
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
 })
@@ -76,7 +76,7 @@ test_that("get_hm_title works as expected", {
   expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (HSA Score GR)")
 })
 
-test_that("change_NA_into_char() works", {
+test_that("change_NA_into_char works", {
   test_vec <- list(11, " ", NA, "A", NULL)
   
   expect_equal(change_NA_into_char(test_vec),
