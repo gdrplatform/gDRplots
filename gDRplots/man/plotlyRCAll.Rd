@@ -30,10 +30,10 @@ The app will tracks clicks and create a secondary plot with a more detailed view
 Plot all curves in a given data set on a reactive plot.
 }
 \examples{
-SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
+dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 prepared_curves <- prepareCurves(dt)
-plotlyRCAll(prepared_curves, "GR value")
+plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
 
 }
 \keyword{drawResponseOverview}
