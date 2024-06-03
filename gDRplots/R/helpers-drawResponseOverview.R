@@ -7,8 +7,8 @@
 #' @param density number of concentrations for which to predict response; single numeric
 #' 
 #' @examples
-#' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' se <- gDRutils::get_synthetic_data("small")[[1]]
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepareCurves(dt)
 #'
 #' @return A data.table with predicted response for the given concentration range.
@@ -104,8 +104,8 @@ prepareCurves <- function(metrics,
 #' @inheritParams prepareCurves
 #' 
 #' @examples
-#' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' se <- gDRutils::get_synthetic_data("small")[[1]]
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepareExtras(dt)
 #' 
 #' @return
@@ -191,10 +191,10 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' @param plot_width,plot_height numeric; dimensions of plot
 #' 
 #' @examples
-#' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
-#' plotlyRCAll(prepared_curves, "GR value")
+#' plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
 #'
 #' @return A plotly object with highlights. The plot contains only response curves.
 #'
@@ -359,12 +359,12 @@ plotlyRCAll <- function(curve_data,
 #' @param plot_width,plot_height numeric; dimensions of plot
 #' 
 #' @examples
-#' SE <- gDRutils::get_synthetic_data("small")[[1]]
-#' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+#' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:6]
+#' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepared_curves <- prepareCurves(dt)
 #' plotlyRCSelected(
-#'   prepared_curves, 
-#'   "GR value",
+#'   data = prepared_curves,
+#'   var_y = "GR value",
 #'   layers = c("curve", "average", "error"),
 #'   curves = prepared_curves,
 #'   extras = prepareExtras(dt)

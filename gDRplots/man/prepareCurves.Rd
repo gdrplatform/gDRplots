@@ -24,8 +24,8 @@ The concentrations are generated with \code{logSeq}.
 Simulate and plot dose response curves for all existing combinations of Cell Line and Drug.
 }
 \examples{
-SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+se <- gDRutils::get_synthetic_data("small")[[1]]
+dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 prepareCurves(dt)
 
 }

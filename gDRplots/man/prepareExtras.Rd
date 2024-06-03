@@ -22,8 +22,8 @@ passed the \code{shapes} argument of \code{plotly::layout}.
 Prepare coordinates of extra features
 }
 \examples{
-SE <- gDRutils::get_synthetic_data("small")[[1]]
-dt <- gDRutils::convert_se_assay_to_custom_dt(SE, "Metrics")
+se <- gDRutils::get_synthetic_data("small")[[1]]
+dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 prepareExtras(dt)
 
 }

@@ -20,7 +20,7 @@ plotly plot with gDR config
 see: https://github.com/plotly/plotly.js/blob/master/src/plot_api/plot_config.js
 }
 \examples{
-plt <- plotly::plot_ly(mtcars, x = ~mpg)
+plt <- plotly::plot_ly(mtcars, x = ~mpg, type = "histogram")
 plt
 gDR_plotly_config(plt) 
 

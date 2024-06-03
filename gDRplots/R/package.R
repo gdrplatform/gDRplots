@@ -10,6 +10,7 @@ utils::globalVariables(
   c(
     ".",
     ".N",
+    ".SD",
     "E Inf",
     "E Max",
     "E0",
