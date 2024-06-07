@@ -50,7 +50,7 @@ test_that("plot_sa_byCLs works as expected", {
   
   plts <- plot_sa_byCLs(se = se)
   expect_is(plts, "list")
-  expect_equal(names(plts), rownames(se))
+  expect_equal(names(plts), paste("GR", rownames(se)))
   
   normalization_type <- "RV"
   
@@ -60,7 +60,7 @@ test_that("plot_sa_byCLs works as expected", {
                         normalization_type = normalization_type,
                         colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
   expect_is(plts, "list")
-  expect_equal(names(plts), drug_name)
+  expect_equal(names(plts), paste("RV", drug_name))
   expect_true(all(vapply(seq_along(plts), 
                          function(i) grepl(normalization_type, plts[[i]]$labels$y), logical(1))))
   
@@ -71,7 +71,7 @@ test_that("plot_sa_byCLs works as expected", {
                         cellline_name = cellline_name_2,
                         drug_name = drug_name_2)
   expect_is(plts, "list")
-  expect_equal(names(plts), intersect(drug_name_2, rownames(se)))
+  expect_equal(names(plts), paste("GR", intersect(drug_name_2, rownames(se))))
   plotted <- intersect(cellline_name_2, colnames(se))
   expect_true(all(vapply(seq_along(plts), 
                          function(i) all(plts[[i]]$plot_env$group_names == plotted), logical(1))))
