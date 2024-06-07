@@ -104,7 +104,7 @@ grob_sa <- function(dt_metrics,
   
   # colors
   if (is.null(colormap) || !all(vapply(colormap, isValidColor, logical(1)))) {
-    colormap <- grDevices::colorRampPalette(c("#dd0000", "#bbdd33", "#0000dd"))(NROW(group_names))
+    colormap <- grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
     
   } else if (NROW(colormap) != NROW(group_names)) {
     colormap <- grDevices::colorRampPalette(colormap)(NROW(group_names))
@@ -120,7 +120,8 @@ grob_sa <- function(dt_metrics,
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
   
   plt_title <- 
-    sprintf("Drug dose response for %s: %s",
+    sprintf("%s Drug dose response for %s: %s",
+            normalization_type,
             ifelse(grouping == "cId", "Drug", "Cell Line"),
             ifelse(grouping == "cId", unique(dt_metrics[["rId"]]), unique(dt_metrics[["cId"]]))
     )
@@ -161,6 +162,7 @@ grob_sa <- function(dt_metrics,
 #'    
 #' @return list of plots with dose-response curves
 #' 
+#' @keywords single-agent_plots
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
@@ -175,7 +177,7 @@ grob_sa <- function(dt_metrics,
 #'               colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' }
 #' 
-#' @keywords internal
+#' @export
 plot_sa_byCLs <-  function(se, 
                            cellline_name = NULL, 
                            drug_name = NULL,
@@ -209,6 +211,8 @@ plot_sa_byCLs <-  function(se,
     
     subset_se <- se[iR, cellline_name]
     
+    plt_title <- paste(normalization_type, iR)
+    
     plt <- 
       grob_sa(dt_metrics = gDRutils::convert_se_assay_to_dt(subset_se, "Metrics"), 
               dt_average = gDRutils::convert_se_assay_to_dt(subset_se, "Averaged"), 
@@ -218,9 +222,9 @@ plot_sa_byCLs <-  function(se,
               colormap = colormap,
               plot_averaged_flag = plot_averaged_flag,
               plot_fit_flag = plot_fit_flag) +
-      ggplot2::ggtitle(iR) 
+      ggplot2::ggtitle(plt_title) 
     
-    plt_list[[iR]] <- plt
+    plt_list[[plt_title]] <- plt
     
   }
   

@@ -52,4 +52,4 @@ plot_sa_byCLs(se = se,
 }
 
 }
-\keyword{internal}
+\keyword{single-agent_plots}

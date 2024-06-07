@@ -67,7 +67,7 @@ pheatmap_with_anno_sa <- function(
   
   checkmate::assert_data_table(tab_response)
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
+  checkmate::assert_choice(metric, choices = c("x", "xc50", "x_max", "x_mean"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
@@ -89,6 +89,7 @@ pheatmap_with_anno_sa <- function(
   }
   
   qmfun <- switch(metric,
+                  "x" = identity,
                   "xc50" = log10, 
                   "x_max" = identity, 
                   "x_mean" = identity)
@@ -153,12 +154,10 @@ pheatmap_with_anno_sa <- function(
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
                            display_numbers = TRUE, 
-                           fontsize_number = 6,
                            number_color = "black", 
                            color = hm_color_palette,
                            breaks = breaks, 
                            angle_col = 90, 
-                           fontsize = 6,
                            main = hm_title,
                            cluster_rows = FALSE,
                            cluster_cols = FALSE,
@@ -307,13 +306,11 @@ pheatmap_with_anno_combo <- function(
   
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
-                           display_numbers = TRUE, 
-                           fontsize_number = 6,
+                           display_numbers = TRUE,
                            number_color = "black", 
                            color = hm_color_palette,
                            breaks = breaks, 
-                           angle_col = 90, 
-                           fontsize = 6,
+                           angle_col = 90,
                            main = hm_title,
                            cluster_rows = FALSE,
                            cluster_cols = FALSE,
