@@ -6,8 +6,8 @@
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
-#'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
+#'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
@@ -79,7 +79,7 @@ pheatmap_with_anno_sa <- function(
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
-  # prep data
+  # select data for normalization type
   tab_response <- tab_response[normalization_type == metric_growth, ]
   
   if (fit_source %in% names(tab_response)) {
@@ -89,12 +89,11 @@ pheatmap_with_anno_sa <- function(
   }
   
   qmfun <- switch(metric,
-                  "x" = identity,
                   "xc50" = log10, 
                   "x_max" = identity, 
                   "x_mean" = identity)
   
-  # select data for normalization type
+  # prep data
   tab_plot <- data.table::dcast(
     data = tab_response,
     formula = get(cellline_name) ~  get(drug_name),
@@ -151,7 +150,7 @@ pheatmap_with_anno_sa <- function(
   breaks <- seq(from = min(stats::na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
-  hm <- pheatmap::pheatmap(t_mat_cvd,
+  hm <- pheatmap::pheatmap(mat = t_mat_cvd,
                            scale = "none",
                            display_numbers = TRUE, 
                            number_color = "black", 
