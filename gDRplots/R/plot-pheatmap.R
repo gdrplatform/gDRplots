@@ -36,7 +36,7 @@
 #'              
 #' pheatmap_qcs(tab_response = response_metrics,
 #'              metric = "x_std",
-#'              colors_vec = c("lightblue", "black"),
+#'              colors_vec = c("#C0CAD6", "black"),
 #'              cluster_rows = FALSE)
 #' 
 #' @keywords QCS_plot
@@ -180,8 +180,8 @@ pheatmap_qcs <- function(
   
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
-  # by Luca
   hm <- pheatmap::pheatmap(
     mat = mat_cvd, 
     scale = "none", 
