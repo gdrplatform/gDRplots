@@ -137,8 +137,7 @@ pheatmap_qcs <- function(
     value.var = conc
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
-  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
-  # drug_annotation <- drug_annotation[order(c(colnames(drug_annotation)))]
+  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name] # TODO order
   drug_annotation <- log10(drug_annotation)
   drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
   
@@ -146,7 +145,7 @@ pheatmap_qcs <- function(
   drug_to_colored <- names(drug_annotation)
   sel_palette <- "Dark2"
   ls_col <- RColorBrewer::brewer.pal(
-    n = RColorBrewer::brewer.pal.info[sel_palette,]$maxcolors, name = sel_palette)
+    n = RColorBrewer::brewer.pal.info[sel_palette, ]$maxcolors, name = sel_palette)
   drug_annotation_colors <- 
     lapply(seq_along(drug_to_colored), function(i) c("white", ls_col[i]))
   names(drug_annotation_colors) <- drug_to_colored
@@ -170,9 +169,9 @@ pheatmap_qcs <- function(
     col_lbls <- rbind(col_lbls, col_lbls_2)
     # re-label
     colnames(drug_annotation) <- 
-      col_lbls[get(gnumber) %in% colnames(drug_annotation),][order(colnames(drug_annotation))][[drug_name]]
+      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][order(colnames(drug_annotation))][[drug_name]]
     names(drug_annotation_colors) <- 
-      col_lbls[get(gnumber) %in% names(drug_annotation_colors) ,][order(names(drug_annotation_colors))][[drug_name]]
+      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
   # prep hm color palette
