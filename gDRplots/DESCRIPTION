@@ -18,6 +18,7 @@ Imports:
     gDRutils (>= 1.1.16),
     pheatmap,
     plotly,
+    RColorBrewer,
     scales,
     SummarizedExperiment
 Suggests:
@@ -28,6 +29,7 @@ Suggests:
     knitr,
     matrixStats,
     purrr,
+    qs,
     testthat
 VignetteBuilder: 
     knitr

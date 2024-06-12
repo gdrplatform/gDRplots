@@ -5,6 +5,9 @@
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of metric;
+#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{metric_growth}), 
+#'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap 
@@ -194,6 +197,7 @@ pheatmap_qcs <- function(
     fontsize = 10, 
     show_colnames = FALSE,
     main = hm_title,
+    na_col = "red",
     # dendogram
     treeheight_row = 70, 
     treeheight_col = 70, 
