@@ -25,6 +25,10 @@ and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 \item{metric_growth}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
+\item{metric}{string name of metric;
+one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{metric_growth}), 
+or "x_std" (standard deviation)}
+
 \item{fit_source}{string source name for metrics}
 
 \item{hm_title}{string plot title}
