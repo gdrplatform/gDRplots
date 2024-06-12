@@ -38,7 +38,6 @@ list of plots with dose-response curves
 Plot drug response curves for single-agent data for selected call lines and drugs
 }
 \examples{
-\dontrun{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[1]]
 cellline_name <- colnames(se)[2:5]
@@ -49,7 +48,6 @@ plot_sa_byCLs(se = se,
               drug_name = drug_name, 
               normalization_type = "RV", 
               colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
-}
 
 }
 \keyword{single-agent_plots}

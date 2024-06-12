@@ -25,7 +25,7 @@ plotlist <- lapply(unique(iris$Species), function(iris_name) {
 })
 names(plotlist) <- unique(iris$Species)
 
-prep_plot_chunk(plotlist, "iris")#'  
+prep_plot_chunk(plotlist, "iris")  
 
 }
 \seealso{

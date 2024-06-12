@@ -164,7 +164,6 @@ grob_sa <- function(dt_metrics,
 #' 
 #' @keywords single-agent_plots
 #' @examples
-#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[1]]
 #' cellline_name <- colnames(se)[2:5]
@@ -175,7 +174,6 @@ grob_sa <- function(dt_metrics,
 #'               drug_name = drug_name, 
 #'               normalization_type = "RV", 
 #'               colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
-#' }
 #' 
 #' @export
 plot_sa_byCLs <-  function(se, 
