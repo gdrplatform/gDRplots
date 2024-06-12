@@ -39,7 +39,6 @@
 #'              
 #' pheatmap_qcs(tab_response = response_metrics,
 #'              metric = "x_std",
-#'              colors_vec = c("#C0CAD6", "black"),
 #'              cluster_rows = FALSE)
 #' 
 #' @keywords QCS_plot
