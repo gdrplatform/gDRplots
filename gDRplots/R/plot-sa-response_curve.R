@@ -101,7 +101,6 @@ grob_sa <- function(dt_metrics,
   }
   data.table::setnames(dt_fit, "conc_col", conc)
   
-  
   # colors
   if (is.null(colormap) || !all(vapply(colormap, isValidColor, logical(1)))) {
     colormap <- grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
@@ -176,7 +175,7 @@ grob_sa <- function(dt_metrics,
 #'                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' 
 #' @export
-plot_sa_by_CLs <-  function(se, 
+plot_sa_by_CLs <- function(se, 
                            cellline_name = NULL, 
                            drug_name = NULL,
                            normalization_type = "GR", 
