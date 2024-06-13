@@ -637,6 +637,7 @@ plotlyRCSelected <- function(data,
 #'
 #' @seealso \code{\link{prepareCurves}}
 #'
+#' @export
 logSeq <- function(start, end, length) {
   
   checkmate::assert_number(start, lower = 0, finite = TRUE)

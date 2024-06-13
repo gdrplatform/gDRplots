@@ -24,28 +24,28 @@
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 #' 
-#' pheatmap_qcs(tab_response = response_metrics)
-#' pheatmap_qcs(tab_response = response_metrics, 
-#'              metric_growth = "RV",
-#'              colors_vec = c("darkblue", "grey90"),
-#'              lbl_by_CellLineName = TRUE,
-#'              lbl_by_DrugName = TRUE)
+#' pheatmap_qc(tab_response = response_metrics)
+#' pheatmap_qc(tab_response = response_metrics, 
+#'             metric_growth = "RV",
+#'             colors_vec = c("darkblue", "grey90"),
+#'             lbl_by_CellLineName = TRUE,
+#'             lbl_by_DrugName = TRUE)
 #'              
 #'              
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-#' pheatmap_qcs(tab_response = response_metrics,
-#'              cluster_rows = FALSE)
+#' pheatmap_qc(tab_response = response_metrics,
+#'            cluster_rows = FALSE)
 #'              
-#' pheatmap_qcs(tab_response = response_metrics,
-#'              metric = "x_std",
-#'              cluster_rows = FALSE)
+#' pheatmap_qc(tab_response = response_metrics,
+#'             metric = "x_std",
+#'             cluster_rows = FALSE)
 #' 
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
-pheatmap_qcs <- function(
+pheatmap_qc <- function(
     tab_response,
     metric_growth = "GR",
     metric = "x",
@@ -267,7 +267,7 @@ pheatmap_qcs <- function(
 #'                       annotation_colors = annotation_map,
 #'                       hm_title = get_hm_title("Combo Matrix - single-agent data"))
 #' 
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -425,7 +425,7 @@ pheatmap_with_anno_sa <- function(
 #'                          annotation_colors = annotation_map,
 #'                          hm_title = get_hm_title("Combo Matrix - combo data"))
 #'             
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -552,7 +552,7 @@ pheatmap_with_anno_combo <- function(
 #'              metric = "x_mean", 
 #'              metric_growth = "GR")
 #' 
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return character title for heatmap
 #' @export 

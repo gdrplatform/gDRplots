@@ -28,4 +28,4 @@ get_hm_title(dataset_name = "Dateset DX123",
              metric_growth = "GR")
 
 }
-\keyword{QCS_plot}
+\keyword{QC_plot}
