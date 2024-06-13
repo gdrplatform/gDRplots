@@ -14,8 +14,8 @@
 #'   (first colour for min value, last colour - for max value)
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether ows should be clustered
-#' @param lbl_by_CellLineName logical flag whether heatmap should be describe by CellLineNames instead of clid
-#' @param lbl_by_DrugName logical flag whether heatmap should be describe by DrugName instead of Gnumber
+#' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
+#' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
 #' @seealso \code{\link[pheatmap]{pheatmap}}
 #'
@@ -90,6 +90,11 @@ pheatmap_qcs <- function(
   }
   
   # fill column
+  if (conc_2 %in% names(tab_response)) {
+    tab_response <- tab_response[(!is.na(get(conc)) & !is.na(get(conc_2))), ]
+  } else {
+    tab_response <- tab_response[!is.na(get(conc)), ]
+  }
   required_column <- c(gnumber_2, conc_2, drug_name_2, drug_moa_2)
   fill_val <- c(gnumber_2 = "untreated",
                 conc_2 = 0.0,

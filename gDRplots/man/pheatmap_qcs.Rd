@@ -40,9 +40,9 @@ or "x_std" (standard deviation)}
 
 \item{cluster_rows}{logical flag whether ows should be clustered}
 
-\item{lbl_by_CellLineName}{logical flag whether heatmap should be describe by CellLineNames instead of clid}
+\item{lbl_by_CellLineName}{logical flag whether heatmap should be described by CellLineNames instead of clid}
 
-\item{lbl_by_DrugName}{logical flag whether heatmap should be describe by DrugName instead of Gnumber}
+\item{lbl_by_DrugName}{logical flag whether heatmap should be described by DrugName instead of Gnumber}
 }
 \value{
 heatmap for selected metric with annotation - if given
