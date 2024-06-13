@@ -169,14 +169,14 @@ grob_sa <- function(dt_metrics,
 #' cellline_name <- colnames(se)[2:5]
 #' drug_name <- rownames(se)[5:7]
 #' 
-#' plot_sa_byCLs(se = se, 
-#'               cellline_name = cellline_name, 
-#'               drug_name = drug_name, 
-#'               normalization_type = "RV", 
-#'               colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#' plot_sa_by_CLs(se = se, 
+#'                cellline_name = cellline_name, 
+#'                drug_name = drug_name, 
+#'                normalization_type = "RV", 
+#'                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' 
 #' @export
-plot_sa_byCLs <-  function(se, 
+plot_sa_by_CLs <-  function(se, 
                            cellline_name = NULL, 
                            drug_name = NULL,
                            normalization_type = "GR", 
