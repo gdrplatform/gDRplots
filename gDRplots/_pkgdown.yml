@@ -12,7 +12,7 @@ reference:
 - contents:
   - has_keyword("combo_plots")
 - title: Quality checks plot for Processing Report
-  desc:  QCS plots for Processing Report with all helpers 
+  desc:  QC plots for Processing Report with all helpers 
 - contents:
   - has_keyword("QC_plot")
 - title: Response Overview plots
