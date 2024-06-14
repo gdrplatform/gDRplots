@@ -201,26 +201,6 @@ plotlyMD <- function(data,
   return(plot_final)
 }
 
-# Get the 'Group by' options based on what the chosen x-axis variable is
-#' @keywords internal
-MDGetGroupOptions <- function(choices, xvar) {
-  choices_remove <- c()
-  
-  pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
-  DRUG_ID <- pidfs[["drug_name"]]
-  CELL_ID <- pidfs[["cellline_name"]]
-  
-  if (xvar == DRUG_ID) {
-    choices_remove <- c(CELL_ID)
-  } else if (xvar == CELL_ID) {
-    choices_remove <- c(DRUG_ID)
-  }
-  
-  choices_remove <- c(xvar, choices_remove)
-  choices <- c("none", setdiff(choices, choices_remove))
-  choices
-}
-
 #' get min value for the axis based on the data to be visualized
 #'
 #' get min value for the axis based on the data to be visualized
