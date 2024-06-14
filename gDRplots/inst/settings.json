@@ -12,5 +12,10 @@
     "PLOTLY_EDITS": {
         "axisTitleText": true,
         "titleText": true
-    }
+    },
+        "METRICS_TRANSFORMED": [
+        "GR50",
+        "IC50",
+        "EC50"
+    ]
 }

@@ -1,4 +1,8 @@
-## gDRplots 0.0.3 - 2024-06-07
+## gDRplots 0.0.5 - 2024-06-14
+* move plot function from `metricClustering` package
+* move `get_metrics_to_transform` from `gDRcomponents` package
+
+## gDRplots 0.0.4 - 2024-06-07
 * update plot functions for `processingReport` package
 
 ## gDRplots 0.0.3 - 2024-05-27
