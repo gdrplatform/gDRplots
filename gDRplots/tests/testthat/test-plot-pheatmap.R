@@ -1,4 +1,4 @@
-context("Test qcs_heatmap")
+context("Test qc_heatmap")
 
 test_that("pheatmap_with_anno_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
