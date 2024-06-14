@@ -25,8 +25,8 @@ and single-agent \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric;
-one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
-"x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
 
@@ -83,4 +83,4 @@ pheatmap_with_anno_sa(tab_response = response_metrics,
 \seealso{
 \code{\link[pheatmap]{pheatmap}}
 }
-\keyword{QCS_plot}
+\keyword{QC_plot}

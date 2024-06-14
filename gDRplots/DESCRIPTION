@@ -1,11 +1,12 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.3
-Date: 2024-05-27
+Version: 0.0.4
+Date: 2024-06-07
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
-             person("GDR", "team", role=c("cre"), email = "gdr-support@gene.com")
+             person("gDR", "team", email = "gdr-support-d@gene.com", role = "cre",
+             comment = c(ORCID = "0009-0006-9310-1135"))
              )
 Description: gDRplot is a package that stores functions for all gDR visualisations and their dedicated helpers.
 License: Artistic-2.0
@@ -17,6 +18,7 @@ Imports:
     gDRutils (>= 1.1.16),
     pheatmap,
     plotly,
+    RColorBrewer,
     scales,
     SummarizedExperiment
 Suggests:
@@ -27,6 +29,7 @@ Suggests:
     knitr,
     matrixStats,
     purrr,
+    qs,
     testthat
 VignetteBuilder: 
     knitr

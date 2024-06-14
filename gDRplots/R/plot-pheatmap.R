@@ -1,3 +1,220 @@
+#' Plot pretty heatmap for single-agent or combo data to check quality of data
+#'
+#' @param tab_response \code{data.table} containing drug response metrics
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
+#'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
+#' @param metric_growth string with normalization types to be selected
+#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of metric;
+#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{metric_growth}), 
+#'    or "x_std" (standard deviation)
+#' @param fit_source string source name for metrics
+#' @param hm_title string plot title
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap 
+#'   (first colour for min value, last colour - for max value)
+#' @param no_breaks numeric number of breaks on scale
+#' @param cluster_rows logical flag whether ows should be clustered
+#' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
+#' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
+#' 
+#' @seealso \code{\link[pheatmap]{pheatmap}}
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' 
+#' pheatmap_qc(tab_response = response_metrics)
+#' pheatmap_qc(tab_response = response_metrics, 
+#'             metric_growth = "RV",
+#'             colors_vec = c("darkblue", "grey90"),
+#'             lbl_by_CellLineName = TRUE,
+#'             lbl_by_DrugName = TRUE)
+#'              
+#'              
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' pheatmap_qc(tab_response = response_metrics,
+#'            cluster_rows = FALSE)
+#'              
+#' pheatmap_qc(tab_response = response_metrics,
+#'             metric = "x_std",
+#'             cluster_rows = FALSE)
+#' 
+#' @keywords QC_plot
+#' 
+#' @return heatmap for selected metric with annotation - if given
+#' @export 
+pheatmap_qc <- function(
+    tab_response,
+    metric_growth = "GR",
+    metric = "x",
+    fit_source = "gDR",
+    hm_title = NA,
+    colors_vec = c("black", "grey99"),
+    no_breaks = 50,
+    cluster_rows = TRUE,
+    lbl_by_CellLineName = FALSE,
+    lbl_by_DrugName = FALSE) {
+  
+  checkmate::assert_data_table(tab_response)
+  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric, choices = c("x", "x_std"))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_string(hm_title, na.ok = TRUE)
+  checkmate::assert_character(colors_vec)
+  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::isValidColor, logical(1))))
+  checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(cluster_rows)
+  checkmate::assert_flag(lbl_by_CellLineName)
+  checkmate::assert_flag(lbl_by_DrugName)
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
+  
+  # select data for normalization type
+  tab_response <- tab_response[normalization_type == metric_growth, ]
+  
+  if (fit_source %in% names(tab_response)) {
+    data.table::setkeyv(tab_response, "fit_source")
+    tab_response <- tab_response[fit_source]
+    data.table::setkey(tab_response, NULL)
+  }
+  
+  # fill column
+  if (conc_2 %in% names(tab_response)) {
+    tab_response <- tab_response[(!is.na(get(conc)) & !is.na(get(conc_2))), ]
+  } else {
+    tab_response <- tab_response[!is.na(get(conc)), ]
+  }
+  required_column <- c(gnumber_2, conc_2, drug_name_2, drug_moa_2)
+  fill_val <- c(gnumber_2 = "untreated",
+                conc_2 = 0.0,
+                drug_name_2 = "untreated",
+                drug_moa_2 = "untreated")
+  names(fill_val) <- required_column
+  need_to_be_filled <- required_column[!required_column %in% names(tab_response)]
+  
+  if (NROW(need_to_be_filled) > 0) {
+    for (nm in need_to_be_filled) {
+      tab_response[[nm]] <- fill_val[nm]
+      if (nm == conc_2) tab_response[[conc_2]] <- as.numeric(tab_response[[conc_2]])
+    }
+  }
+  
+  # prep pivot data
+  tab_response <- data.table::setorderv(tab_response, c(gnumber, gnumber_2, conc, conc_2))
+  tab_response$col_pivot_name <- sprintf("%s_%s_%s_%s",
+                                         tab_response[[gnumber]],
+                                         tab_response[[gnumber_2]],
+                                         tab_response[[conc]],
+                                         tab_response[[conc_2]])
+  col_pivot_name <- "col_pivot_name"
+  tab_plot <- data.table::dcast(
+    data = tab_response,
+    formula = clid ~ col_pivot_name,
+    value.var = metric
+  )
+  
+  # prep matrix
+  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -clid])
+  rownames(mat_cvd) <- tab_plot[[clid]]
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  if (metric == "x_std") mat_cvd <- mat_cvd ^ 2
+  
+  # annotation
+  info_drug <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber, conc)])
+  info_drug_2 <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber_2, conc_2)])
+  data.table::setnames(info_drug_2, old = c(gnumber_2, conc_2), new = c(gnumber, conc))
+  info_drug <- rbind(info_drug, info_drug_2)[get(gnumber) != "untreated"]
+  drug_annotation <- data.table::dcast(
+    data = info_drug,
+    formula = col_pivot_name ~ get(gnumber), 
+    value.var = conc
+  )
+  rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
+  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name] # TODO order
+  drug_annotation <- log10(drug_annotation)
+  drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
+  
+  # annotation colouring  
+  drug_to_colored <- names(drug_annotation)
+  sel_palette <- "Dark2"
+  ls_col <- RColorBrewer::brewer.pal(
+    n = RColorBrewer::brewer.pal.info[sel_palette, ]$maxcolors, name = sel_palette)
+  drug_annotation_colors <- 
+    lapply(seq_along(drug_to_colored), function(i) c("white", ls_col[i]))
+  names(drug_annotation_colors) <- drug_to_colored
+  
+  # dendogram
+  if (cluster_rows) {
+    cluster_rows <- stats::hclust(stats::dist(mat_cvd))
+  }
+  
+  # heatmap labels
+  if (lbl_by_CellLineName) {
+    row_lbls <- tab_response[, unique(.SD), .SDcols = c(cellline_name, clid)][order(rownames(mat_cvd))]
+    # re-label
+    rownames(mat_cvd) <- row_lbls[[cellline_name]]
+  }
+  
+  if (lbl_by_DrugName) {
+    col_lbls <- tab_response[, unique(.SD), .SDcols = c(drug_name, gnumber)]
+    col_lbls_2 <- tab_response[, unique(.SD), .SDcols = c(drug_name_2, gnumber_2)]
+    data.table::setnames(col_lbls_2, old = c(drug_name_2, gnumber_2), new = c(drug_name, gnumber))
+    col_lbls <- rbind(col_lbls, col_lbls_2)
+    # re-label
+    colnames(drug_annotation) <- 
+      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][order(colnames(drug_annotation))][[drug_name]]
+    names(drug_annotation_colors) <- 
+      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
+  }
+  
+  # prep hm color palette
+  maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
+  minval <- min(c(0, round(min(stats::na.omit(mat_cvd)), digits = 2)))
+  
+  breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
+  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
+  
+  hm <- pheatmap::pheatmap(
+    mat = mat_cvd, 
+    scale = "none", 
+    display_numbers = FALSE, 
+    number_color = "black",
+    fontsize_number = 16, 
+    color = hm_color_palette, 
+    breaks = breaks, 
+    angle_col = 45, 
+    fontsize = 10, 
+    show_colnames = FALSE,
+    main = hm_title,
+    na_col = "red",
+    # dendogram
+    treeheight_row = 70, 
+    treeheight_col = 70, 
+    cluster_cols = FALSE, 
+    cluster_rows = cluster_rows,
+    # manual annotation
+    annotation_col = drug_annotation, 
+    annotation_colors = drug_annotation_colors 
+  )
+  return(hm)
+}
+
+
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
@@ -6,8 +223,8 @@
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
-#'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
+#'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
@@ -50,7 +267,7 @@
 #'                       annotation_colors = annotation_map,
 #'                       hm_title = get_hm_title("Combo Matrix - single-agent data"))
 #' 
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -67,7 +284,7 @@ pheatmap_with_anno_sa <- function(
   
   checkmate::assert_data_table(tab_response)
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
+  checkmate::assert_choice(metric, choices = c("x", "xc50", "x_max", "x_mean"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
@@ -79,7 +296,7 @@ pheatmap_with_anno_sa <- function(
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
-  # prep data
+  # select data for normalization type
   tab_response <- tab_response[normalization_type == metric_growth, ]
   
   if (fit_source %in% names(tab_response)) {
@@ -93,7 +310,7 @@ pheatmap_with_anno_sa <- function(
                   "x_max" = identity, 
                   "x_mean" = identity)
   
-  # select data for normalization type
+  # prep data
   tab_plot <- data.table::dcast(
     data = tab_response,
     formula = get(cellline_name) ~  get(drug_name),
@@ -150,15 +367,13 @@ pheatmap_with_anno_sa <- function(
   breaks <- seq(from = min(stats::na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
-  hm <- pheatmap::pheatmap(t_mat_cvd,
+  hm <- pheatmap::pheatmap(mat = t_mat_cvd,
                            scale = "none",
                            display_numbers = TRUE, 
-                           fontsize_number = 6,
                            number_color = "black", 
                            color = hm_color_palette,
                            breaks = breaks, 
                            angle_col = 90, 
-                           fontsize = 6,
                            main = hm_title,
                            cluster_rows = FALSE,
                            cluster_cols = FALSE,
@@ -210,7 +425,7 @@ pheatmap_with_anno_sa <- function(
 #'                          annotation_colors = annotation_map,
 #'                          hm_title = get_hm_title("Combo Matrix - combo data"))
 #'             
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -307,13 +522,11 @@ pheatmap_with_anno_combo <- function(
   
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
-                           display_numbers = TRUE, 
-                           fontsize_number = 6,
+                           display_numbers = TRUE,
                            number_color = "black", 
                            color = hm_color_palette,
                            breaks = breaks, 
-                           angle_col = 90, 
-                           fontsize = 6,
+                           angle_col = 90,
                            main = hm_title,
                            cluster_rows = FALSE,
                            cluster_cols = FALSE,
@@ -339,7 +552,7 @@ pheatmap_with_anno_combo <- function(
 #'              metric = "x_mean", 
 #'              metric_growth = "GR")
 #' 
-#' @keywords QCS_plot
+#' @keywords QC_plot
 #' 
 #' @return character title for heatmap
 #' @export 

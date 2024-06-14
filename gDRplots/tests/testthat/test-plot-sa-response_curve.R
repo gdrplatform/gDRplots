@@ -42,36 +42,36 @@ test_that("grob_sa works as expected", {
                "Check on 'grouping' failed: Must be element of set")
 })
 
-test_that("plot_sa_byCLs works as expected", {
+test_that("plot_sa_by_CLs works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[1]]
   cellline_name <- colnames(se)[2:5]
   drug_name <- rownames(se)[5:7]
   
-  plts <- plot_sa_byCLs(se = se)
+  plts <- plot_sa_by_CLs(se = se)
   expect_is(plts, "list")
-  expect_equal(names(plts), rownames(se))
+  expect_equal(names(plts), paste("GR", rownames(se)))
   
   normalization_type <- "RV"
   
-  plts <- plot_sa_byCLs(se = se,
-                        cellline_name = cellline_name,
-                        drug_name = drug_name,
-                        normalization_type = normalization_type,
-                        colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+  plts <- plot_sa_by_CLs(se = se,
+                         cellline_name = cellline_name,
+                         drug_name = drug_name,
+                         normalization_type = normalization_type,
+                         colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
   expect_is(plts, "list")
-  expect_equal(names(plts), drug_name)
+  expect_equal(names(plts), paste("RV", drug_name))
   expect_true(all(vapply(seq_along(plts), 
                          function(i) grepl(normalization_type, plts[[i]]$labels$y), logical(1))))
   
   cellline_name_2 <- c(colnames(se)[2:3], "CL00014_cellline_XX_tissue_x_38")
   drug_name_2 <- c(rownames(se)[5:6], "G00008_drug_100_moa_A_72")
   
-  plts <- plot_sa_byCLs(se = se,
-                        cellline_name = cellline_name_2,
-                        drug_name = drug_name_2)
+  plts <- plot_sa_by_CLs(se = se,
+                         cellline_name = cellline_name_2,
+                         drug_name = drug_name_2)
   expect_is(plts, "list")
-  expect_equal(names(plts), intersect(drug_name_2, rownames(se)))
+  expect_equal(names(plts), paste("GR", intersect(drug_name_2, rownames(se))))
   plotted <- intersect(cellline_name_2, colnames(se))
   expect_true(all(vapply(seq_along(plts), 
                          function(i) all(plts[[i]]$plot_env$group_names == plotted), logical(1))))
