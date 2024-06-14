@@ -1,5 +1,5 @@
 ## gDRplots 0.0.5 - 2024-06-14
-* move plot function from `metricClustering` package
+* move plot function from `metricClustering`, `responseGrid` packages
 * move `get_metrics_to_transform` from `gDRcomponents` package
 
 ## gDRplots 0.0.4 - 2024-06-07
