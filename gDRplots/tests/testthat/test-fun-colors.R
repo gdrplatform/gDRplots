@@ -1,5 +1,39 @@
 context("Test fun colors")
 
+test_that("paletteBrew works as expected", {
+  pal_name <- sample(
+    x = c("Accent", "Dark2", "Paired", "Pastel1", "Pastel2", "Set1", "Set2", "Set3"), size = 1)
+  pal_col <- RColorBrewer::brewer.pal(RColorBrewer::brewer.pal.info[pal_name, ]$maxcolors, pal_name)
+  
+  n_s <- 2
+  small_pal <- paletteBrew(n_s, pal_name)
+  expect_equal(small_pal, pal_col[1:n_s])
+  
+  n_n <- NROW(pal_col) - 1
+  normal_pal <- paletteBrew(n_n, pal_name)
+  expect_equal(normal_pal, pal_col[1:n_n])
+  
+  n_l <- ceiling(NROW(pal_col) * 1.5)
+  long_pal <- paletteBrew(n_l, pal_name)
+  expect_equal(long_pal, rep(pal_col, length.out = n_l))
+  
+  shuffled_normal_pal <- paletteBrew(n_n, pal_name, shuffle = TRUE)
+  expect_false(identical(normal_pal, shuffled_normal_pal))
+  expect_identical(sort(normal_pal), sort(shuffled_normal_pal))
+  
+  expect_error(paletteBrew(n = "str", name = "Accent"), 
+               "Assertion on 'n' failed: Must be of type 'number', not 'character'.")
+  expect_error(paletteBrew(n = 0, name = "Accent"),
+               "Assertion on 'n' failed: Element 1 is not >= 1.")
+  expect_error(paletteBrew(n = 3, name = 1),
+               "Assertion on 'name' failed: Must be of type 'string', not 'double'")
+  expect_error(paletteBrew(n = 3, name = "str"),
+               "Assertion on 'name' failed: Must be element of set")
+  expect_error(paletteBrew(n = 3, name = "Accent", shuffle = 1),
+               "Assertion on 'shuffle' failed: Must be of type 'logical', not 'double'.")
+})
+
+
 test_that("isColDark works as expected", {
   color_names <- c("#33cc33", "#d6f5d6", "#0a290a")
   expect_false(isColDark(color_names[1]))

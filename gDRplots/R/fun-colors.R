@@ -1,4 +1,58 @@
-
+#' Produce a color palette
+#'
+#' Build a color palette of any length from RColorBrewer templates.
+#'
+#' @param n number of colors
+#' @param name name of a qualitative RColorBrewer palette
+#' @param shuffle whether or not to shuffle the colors in the provided palette
+#' 
+#' @examples
+#' paletteBrew(8, "Accent")
+#' paletteBrew(20, "Accent")
+#' paletteBrew(10, "Set1")
+#'
+#' @return A character vector of hex codes of length \code{n}.
+#'
+#' The chosen palette is passed through \code{colorRampPalette}.
+#' Unless \code{n} is higher than the maximum length of the given palette,
+#' the return value depends on the palette itself and the rules
+#' set up in \code{RColorBrewer::brewer.pal}.
+#' Otherwise it is extended and includes intermediate colors.
+#' Visual properties of the palette are likely to be suffer.
+#'
+#' @keywords utils_color
+#'
+#' @seealso \code{RColorBrewer}, \code{colorRampPalette}
+#'
+#' @export
+paletteBrew <- function(n, 
+                        name,
+                        shuffle = FALSE) {
+  
+  checkmate::assert_number(n, lower = 1)
+  checkmate::assert_string(name)
+  checkmate::assert_choice(name, choices = c("Accent", "Dark2", "Paired", "Pastel1",
+                                             "Pastel2", "Set1", "Set2", "Set3"))
+  checkmate::assert_logical(shuffle)
+  
+  # brewer.pal throws warnings if minimum/maximum palette lengths are exceeded
+  # let's avoid these warnings
+  b_pals <- if (n < 3) {
+    RColorBrewer::brewer.pal(3, name)[seq(n)]
+  } else {
+    bpi <-
+      data.table::data.table(RColorBrewer::brewer.pal.info, keep.rownames = TRUE)
+    n_max <- bpi[bpi$rn == name, "maxcolors"][[1]]
+    rep(RColorBrewer::brewer.pal(n_max, name), length.out = n)
+  } 
+  
+  ans <- grDevices::colorRampPalette(b_pals)(n)
+  
+  if (shuffle) {
+    ans <- sample(ans)
+  }
+  return(ans)
+}
 
 #' Determine whether or not a colour is dark
 #' 
