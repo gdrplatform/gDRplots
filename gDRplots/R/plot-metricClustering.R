@@ -69,7 +69,7 @@ prepareDataMH <- function(data, variable) {
   drug_annotation <- unique(
     data[, .SD, .SDcols = c(DRUG_ID, DRUG_METADATA, COTRT_DRUG_IDS, COTRT_DRUG_METADATA)])
   # TODO: This can be called outside of a specific module in the management of the data.
-  drug_annotation <- gDRcomponents::convert_factor_to_character(drug_annotation)
+  drug_annotation <- convert_factor_to_character(drug_annotation)
   identifiers <- wide[, .SD, .SDcols = row_ids, drop = FALSE]
   row_annotation <- map_annotations(identifiers, drug_annotation, row_ids)
 
@@ -107,6 +107,9 @@ prepareDataMH <- function(data, variable) {
 #' @param annotations list of of length 2,
 #'                    containing row and column annotations as \code{data.table}s
 #' @param transpose logical; whether or not to transpose the matrix
+#' @param colors named list with colors for heatmap itself, rows and columns clusterings;
+#'.   names: \code{heatmap}, \code{row} and \cose{col}
+#' 
 #' @param dendrogram character string indicating whether to compute 'none',
 #'    'row', 'column' or 'both' dendrograms. Defaults to 'both'.
 #'
@@ -331,4 +334,33 @@ create_formula <- function(cell_id, drug_id, cotrt_drug_ids) {
 #' @keywords internal
 calc_duplicate_freq <- function(x) {
   sum(duplicated(x)) / length(x)
+}
+
+#' Convert data.table factor columns to character
+#'
+#' @param tbl data.table
+#' 
+#' @examples
+#' dt <- data.table::data.table(
+#'   col1 = c("1","2","3"), 
+#'   col2 = c("a", "b", "a"), 
+#'   stringsAsFactors = TRUE)
+#' dt
+#' convert_factor_to_character(dt)
+#' 
+#' @return data.table with converted columns
+#' @keywords internal
+#' 
+#' @export
+convert_factor_to_character <- function(tbl) {
+  checkmate::assert_data_table(tbl)
+  for (col in colnames(tbl)) {
+    x <- tbl[[col]]
+    out <- x
+    if (is.factor(x)) {
+      out <- as.character(x)
+    }
+    tbl[[col]] <- out
+  }
+  tbl
 }

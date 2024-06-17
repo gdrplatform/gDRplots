@@ -50,3 +50,25 @@ test_that("create_formula works as expected", {
 
 test_that("calc_duplicate_freq works as expected", {
 })
+
+
+test_that("convert_factor_to_character works as expected", {
+  dt <- data.table::data.table(a = LETTERS, b = as.factor(LETTERS))
+  
+  expect_equal(unname(unlist(lapply(dt, class))), c("character", "factor"))
+  obs <- convert_factor_to_character(dt)
+  expect_equal(dim(obs), dim(dt))
+  expect_equal(names(obs), names(dt))
+  expect_equal(class(obs), class(dt))
+  expect_equal(unname(unlist(lapply(obs, class))), c("character", "character"))
+  
+  dt_2 <- data.table::data.table(
+    a = LETTERS[1:5], b = factor(LETTERS[1:5], levels = LETTERS)
+  )
+  obs_2 <- convert_factor_to_character(dt_2)
+  expect_equal(dim(obs_2), dim(dt_2))
+  expect_equal(names(obs_2), names(dt_2))
+  expect_equal(unname(unlist(lapply(obs_2, class))), c("character", "character"))
+  
+  expect_error(convert_factor_to_character(as.list(dt)))
+})

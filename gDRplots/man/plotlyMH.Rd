@@ -23,6 +23,9 @@ containing row and column annotations as \code{data.table}s}
 
 \item{transpose}{logical; whether or not to transpose the matrix}
 
+\item{colors}{named list with colors for heatmap itself, rows and columns clusterings;
+.   names: \code{heatmap}, \code{row} and \cose{col}}
+
 \item{dendrogram}{character string indicating whether to compute 'none',
 'row', 'column' or 'both' dendrograms. Defaults to 'both'.}
 }
