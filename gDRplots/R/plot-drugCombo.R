@@ -942,7 +942,6 @@ plotlyDCRatio <- function(data,
   )
   
   if (NROW(data_iso) == 0) { # Use NROW for cases with data_iso == NULL
-    futile.logger::flog.trace("No isobologram data found.", name = "trace.logger")
     return(NULL)
   }
   
@@ -978,8 +977,8 @@ plotlyDCRatio <- function(data,
                           x0 = range_x[1], x1 = range_x[2], y0 = 0, y1 = 0)
   # color bar properties
   title_colorbar <- switch(normalization_type, "GR" = "GR", "RV" = "IC")
-  tickvals_colorbar <- quantile(as.numeric(names(iso_colors)), seq(0, 1, .25))
-  ticktext_colorbar <- 100 - round(100 * (quantile(as.numeric(names(iso_colors)), seq(0, 1, .25))))
+  tickvals_colorbar <- stats::quantile(as.numeric(names(iso_colors)), seq(0, 1, .25))
+  ticktext_colorbar <- 100 - round(100 * (stats::quantile(as.numeric(names(iso_colors)), seq(0, 1, .25))))
   
   # build tooltips
   data_iso[["label"]] <- buildLabel(data_iso, "combo-ratios")
