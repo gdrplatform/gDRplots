@@ -95,7 +95,7 @@ prepareDataMH <- function(data, variable) {
   list(data_matrix = mat, annotations = annotations)
 }
 
-#' Draw interactive Metric Clustering plot
+#' Draw interactive Metric Clustering heatmap
 #'
 #' Plot metric heat map with clustering
 #'
