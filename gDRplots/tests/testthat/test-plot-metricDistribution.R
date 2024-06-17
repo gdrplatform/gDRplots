@@ -17,7 +17,6 @@ var_col <- "none"
 var_x <- "Cell Line Name"
 var_y <- "GR_AOC"
 
-context("\t get_axis_[min/max]")
 test_that("'get_axis_min'", {
   my_data <- c(0.11, 0.01, -0.08)
   expect_error(get_axis_min(list()),
