@@ -82,11 +82,13 @@ prepareDataMC <- function(data,
   # reshape data so that primary variable is split and secondary variable is kept together
   data_wide <- data.table::dcast(data_long, form, value.var = variable)
   # check output
-  assertthat::assert_that(
-    inherits(data_long, "data.table"),
-    !is.element(choices$primary, names(data_wide)),
-    is.element(choices$secondary, names(data_wide)),
-    all(is.element(choices[[choices$primary]], names(data_wide)))
+  checkmate::assert(
+    checkmate::check_data_table(data_long),
+    checkmate::check_false(choices$primary %in% names(data_wide)),
+    checkmate::check_choice(choices$secondary, choices = names(data_wide)),
+    all(vapply(choices[[choices$primary]], 
+               function(x) checkmate::check_choice(x, names(data_wide)), logical(1))),
+    combine = "and"
   )
   
   return(data_wide)
