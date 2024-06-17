@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-metricClustering.R
 \name{prepareDataMH}
 \alias{prepareDataMH}
-\title{prepare data for heat map construction}
+\title{Prepare matrix for clustering and heat map construction.}
 \usage{
 prepareDataMH(data, variable)
 }
@@ -15,9 +15,6 @@ prepareDataMH(data, variable)
 A named numeric matrix with drugs in rows and cell lines in columns.
 }
 \description{
-Prepare matrix for clustering and heat map construction.
-}
-\details{
 The function calls \code{dcast} to reshape the data.table.
 \code{variable} is averaged at this stage if there are replicates.
 }

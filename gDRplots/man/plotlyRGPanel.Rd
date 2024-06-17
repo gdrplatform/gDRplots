@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-responseGrid.R
 \name{plotlyRGPanel}
 \alias{plotlyRGPanel}
-\title{plot a panel for the grid view}
+\title{Draw interactive Response Grid panel}
 \usage{
 plotlyRGPanel(data, var_y, range_x = c(0.001, 50), title = NA)
 }

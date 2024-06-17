@@ -22,8 +22,6 @@ buildLabelClustering <- function(data) {
 }
 
 
-#' prepare data for heat map construction
-#'
 #' Prepare matrix for clustering and heat map construction.
 #'
 #' The function calls \code{dcast} to reshape the data.table.
@@ -97,8 +95,9 @@ prepareDataMH <- function(data, variable) {
   list(data_matrix = mat, annotations = annotations)
 }
 
-
-#' plot metric heat map
+#' Draw interactive Metric Clustering plot
+#'
+#' Plot metric heat map with clustering
 #'
 #' Generate a heat map of a selected metric, clustering cell lines and drugs.
 #' Distances are computed with \code{\link[gDRplots]{computeDistances}}.

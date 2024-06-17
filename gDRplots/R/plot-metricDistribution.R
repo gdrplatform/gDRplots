@@ -1,4 +1,4 @@
-#' draw interactive Metric Distribution plot
+#' Draw interactive Metric Distribution plot
 #'
 #' Build an interactive plot of metrics distribution.
 #'

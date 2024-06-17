@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-metricRanking.R
 \name{plotlyMR}
 \alias{plotlyMR}
-\title{Create ranking plot}
+\title{Draw interactive Metric Ranking plot}
 \usage{
 plotlyMR(
   data,

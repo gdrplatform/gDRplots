@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-metricClustering.R
 \name{plotlyMH}
 \alias{plotlyMH}
-\title{plot metric heat map}
+\title{Draw interactive Metric Clustering plot}
 \usage{
 plotlyMH(
   data,
@@ -30,6 +30,9 @@ containing row and column annotations as \code{data.table}s}
 An interactive plot created by \code{iheatmapr}.
 }
 \description{
+Plot metric heat map with clustering
+}
+\details{
 Generate a heat map of a selected metric, clustering cell lines and drugs.
 Distances are computed with \code{\link[gDRplots]{computeDistances}}.
 }

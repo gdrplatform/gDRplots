@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-metricDistribution.R
 \name{plotlyMD}
 \alias{plotlyMD}
-\title{draw interactive Metric Distribution plot}
+\title{Draw interactive Metric Distribution plot}
 \usage{
 plotlyMD(
   data,

@@ -1,4 +1,4 @@
-#' Create ranking plot
+#' Draw interactive Metric Ranking plot
 #'
 #' Create a barplot that ranks drugs or cell lines across a growth metric.
 #'

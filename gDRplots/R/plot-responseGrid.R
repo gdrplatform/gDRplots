@@ -1,4 +1,4 @@
-#' plot a panel for the grid view
+#' Draw interactive Response Grid panel
 #'
 #' Build a panel for the drug response grid.
 #'
