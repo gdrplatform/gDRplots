@@ -18,6 +18,7 @@ Imports:
     gDRutils (>= 1.1.16),
     pheatmap,
     plotly,
+    plotlyLabelR (>= 0.1.1),
     RColorBrewer,
     S4Vectors,
     scales,

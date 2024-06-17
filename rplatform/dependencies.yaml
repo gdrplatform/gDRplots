@@ -19,3 +19,9 @@ pkgs:
     ref: main
     subdir: gDRtestData
     source: GITHUB
+  plotlyLabelR:
+    ver: '>=0.1.1'
+    url: gdrplatform/plotlyLabelR
+    ref: develop
+    source: GITHUB
+    
