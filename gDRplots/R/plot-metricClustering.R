@@ -354,13 +354,9 @@ calc_duplicate_freq <- function(x) {
 #' @export
 convert_factor_to_character <- function(tbl) {
   checkmate::assert_data_table(tbl)
-  for (col in colnames(tbl)) {
-    x <- tbl[[col]]
-    out <- x
-    if (is.factor(x)) {
-      out <- as.character(x)
-    }
-    tbl[[col]] <- out
-  }
+
+  factor_cols <- names(tbl)[vapply(tbl, is.factor, logical(1))]
+  tbl[, (factor_cols) := lapply(.SD, as.character), .SDcols = factor_cols]
+  
   tbl
 }
