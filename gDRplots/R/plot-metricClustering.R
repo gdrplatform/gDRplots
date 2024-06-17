@@ -108,7 +108,7 @@ prepareDataMH <- function(data, variable) {
 #'                    containing row and column annotations as \code{data.table}s
 #' @param transpose logical; whether or not to transpose the matrix
 #' @param colors named list with colors for heatmap itself, rows and columns clusterings;
-#'.   names: \code{heatmap}, \code{row} and \cose{col}
+#'.   names: \code{heatmap}, \code{row} and \code{col}
 #' 
 #' @param dendrogram character string indicating whether to compute 'none',
 #'    'row', 'column' or 'both' dendrograms. Defaults to 'both'.
