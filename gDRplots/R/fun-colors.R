@@ -2,9 +2,9 @@
 #'
 #' Build a color palette of any length from RColorBrewer templates.
 #'
-#' @param n number of colors
-#' @param name name of a qualitative RColorBrewer palette
-#' @param shuffle whether or not to shuffle the colors in the provided palette
+#' @param n numeric representing number of colors
+#' @param name string representing name of a qualitative RColorBrewer palette
+#' @param shuffle logical representing whether or not to shuffle the colors in the provided palette
 #' 
 #' @examples
 #' paletteBrew(8, "Accent")

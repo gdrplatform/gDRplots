@@ -7,11 +7,11 @@
 paletteBrew(n, name, shuffle = FALSE)
 }
 \arguments{
-\item{n}{number of colors}
+\item{n}{numeric representing number of colors}
 
-\item{name}{name of a qualitative RColorBrewer palette}
+\item{name}{string representing name of a qualitative RColorBrewer palette}
 
-\item{shuffle}{whether or not to shuffle the colors in the provided palette}
+\item{shuffle}{logical representing whether or not to shuffle the colors in the provided palette}
 }
 \value{
 A character vector of hex codes of length \code{n}.

@@ -2,7 +2,7 @@
 #'
 #' Build a panel for the drug response grid.
 #'
-#' @param data data frame of curve coordinates
+#' @param data a data.table of curve coordinates
 #' @param var_y name of metric to plot: GR value or Relative Viability, given as character string
 #' @param range_x numeric vector of length 2 that specifies the limits of the X axis
 #' @param title character string defining the column, whose content will form the panel's title;

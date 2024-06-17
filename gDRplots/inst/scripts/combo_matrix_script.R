@@ -139,7 +139,7 @@ iso_colors <- gDRutils::get_iso_colors()[all_iso]
 # base plot
 plt_iso_compare <- 
   ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
-  ggplot2::geom_line(data = data.frame(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
+  ggplot2::geom_line(data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
   ggplot2::geom_hline(yintercept = 0)
 
 for (iso in all_iso) {

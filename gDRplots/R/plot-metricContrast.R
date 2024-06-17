@@ -124,14 +124,14 @@ prepareDataMC <- function(data,
 #' @param var_x,var_y character strings assigning variables to axes
 #' @param var_txt character string assigning variable to tooltip
 #' @param var_col character string assigning variable to coloring
-#' @param metric name of growth metric that is plotted
+#' @param metric character string representing name of growth metric that is plotted
 #' @param identity logical flag specifying whether to add an identity line
 #' @param correlation logical flag specifying whether to print statistics
 #'                    of a Spearman correlation test; a linear fit is also added for
 #'                    the metrics that are plotted on linear axes
 #' @param axis_limits character string; fix or release limits of Y axis, see \code{Details}
-#' @param source Match the value of this string with the source argument in \code{event_data()}
-#'               to retrieve the event data corresponding to a specific plot
+#' @param source character string representing a match of this string's value 
+#'     with the source argument in \code{event_data()}
 #' @param with_labelR logical flag whether to enabale \code{plotlyLabelR} functionality
 #'
 #' @return a plotly object

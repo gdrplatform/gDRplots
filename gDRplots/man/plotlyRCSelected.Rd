@@ -54,7 +54,7 @@ passed to \code{plotly::add_markers},
 and the second being a list of line descriptions
 passed the \code{shapes} argument of \code{plotly::layout}.
 
-Curve data is supplied in a separate data frame.
+Curve data is supplied in a separate data.table.
 }
 \section{Recursive plotting}{
 

@@ -85,7 +85,7 @@ reformat_untreated_cases <- function(label) {
 #' The part of \code{x} where \code{column} is equal to \code{replacee} is removed.
 #' A copy of that part of the data is then appended where \code{replacee} has been substituted
 #' with a single item of \code{replacement} and this repeated for each item in \code{replacement}.
-#' The resulting data frame will be longer than \code{x} if \code{replacement} is longer than 1.
+#' The resulting data.table will be longer than \code{x} if \code{replacement} is longer than 1.
 #'
 #' @export
 #' @keywords utils

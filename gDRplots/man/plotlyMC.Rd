@@ -28,7 +28,7 @@ plotlyMC(
 
 \item{var_txt}{character string assigning variable to tooltip}
 
-\item{metric}{name of growth metric that is plotted}
+\item{metric}{character string representing name of growth metric that is plotted}
 
 \item{identity}{logical flag specifying whether to add an identity line}
 
@@ -38,8 +38,8 @@ the metrics that are plotted on linear axes}
 
 \item{axis_limits}{character string; fix or release limits of Y axis, see \code{Details}}
 
-\item{source}{Match the value of this string with the source argument in \code{event_data()}
-to retrieve the event data corresponding to a specific plot}
+\item{source}{character string representing a match of this string's value 
+with the source argument in \code{event_data()}}
 
 \item{with_labelR}{logical flag whether to enabale \code{plotlyLabelR} functionality}
 }

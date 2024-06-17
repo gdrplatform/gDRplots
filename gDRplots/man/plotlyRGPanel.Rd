@@ -7,7 +7,7 @@
 plotlyRGPanel(data, var_y, range_x = c(0.001, 50), title = NA)
 }
 \arguments{
-\item{data}{data frame of curve coordinates}
+\item{data}{a data.table of curve coordinates}
 
 \item{var_y}{name of metric to plot: GR value or Relative Viability, given as character string}
 
