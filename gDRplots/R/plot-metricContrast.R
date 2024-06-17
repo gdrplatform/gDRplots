@@ -23,7 +23,10 @@
 #'
 #' @export
 #'
-prepareDataMC <- function(data, choices, variable, var_col) {
+prepareDataMC <- function(data, 
+                          choices, 
+                          variable, 
+                          var_col) {
   
   # get prettified versions of selected identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -118,6 +121,7 @@ prepareDataMC <- function(data, choices, variable, var_col) {
 #'             (cell lines treated with drugs)
 #' @param var_x,var_y character strings assigning variables to axes
 #' @param var_txt character string assigning variable to tooltip
+#' @param var_col character string assigning variable to coloring
 #' @param metric name of growth metric that is plotted
 #' @param identity logical flag specifying whether to add an identity line
 #' @param correlation logical flag specifying whether to print statistics
@@ -327,7 +331,8 @@ plotlyMC <- function(data,
     # add statistics
     test_dummy <- list(method = "Spearman's rank correlation rho", estimate = NA, p.value = NA)
     cor_test <- tryCatch(
-      cor.test(stats::reformulate(sprintf("`%s` + `%s`", var_y, var_x)), data, method = "spearman"),
+      stats::cor.test(formula = stats::reformulate(sprintf("`%s` + `%s`", var_y, var_x)), 
+                      data = data, method = "spearman"),
       error = function(e) return(test_dummy))
     test_info1 <- cor_test$method
     padding_x <- if (nchar(var_x) > 15) {

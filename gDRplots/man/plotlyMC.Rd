@@ -24,6 +24,8 @@ plotlyMC(
 
 \item{var_x, var_y}{character strings assigning variables to axes}
 
+\item{var_col}{character string assigning variable to coloring}
+
 \item{var_txt}{character string assigning variable to tooltip}
 
 \item{metric}{name of growth metric that is plotted}
