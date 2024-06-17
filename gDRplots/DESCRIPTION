@@ -19,6 +19,7 @@ Imports:
     pheatmap,
     plotly,
     RColorBrewer,
+    S4Vectors,
     scales,
     SummarizedExperiment
 Suggests:

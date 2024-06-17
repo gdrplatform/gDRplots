@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-metricClustering.R
 \name{plotlyMH}
 \alias{plotlyMH}
-\title{Draw interactive Metric Clustering plot}
+\title{Draw interactive Metric Clustering heatmap}
 \usage{
 plotlyMH(
   data,
