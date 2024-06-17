@@ -1,4 +1,4 @@
-library(testthat)
+context("Test metricDistribution plot")
 
 m <- 9
 n <- 5
