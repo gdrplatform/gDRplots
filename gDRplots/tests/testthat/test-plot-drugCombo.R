@@ -16,7 +16,7 @@ test_that("get_combo_score_matrix", {
   )
 })
 
-test_that("plotlyDCmother", {
+test_that("plolty_drug_combo_heatmap", {
   
   # data
   score_field <- "hsa_score"
@@ -27,7 +27,7 @@ test_that("plotlyDCmother", {
                             "RV" = "Relative Viability")
   
   # plot
-  pl1 <- plotlyDCMother(test_exp, score_field, metric_growth)
+  pl1 <- plolty_drug_combo_heatmap(test_exp, score_field, metric_growth)
   checkmate::expect_class(pl1, "plotly")
   
   ref_data <- data.table::data.table(get_combo_score_matrix(test_exp, score_field, metric_growth))
@@ -44,19 +44,19 @@ test_that("plotlyDCmother", {
   
   # errors
   expect_error(
-    plotlyDCMother(list(a = 1)),
+    plolty_drug_combo_heatmap(list(a = 1)),
     "Assertion on 'data[[1]]' failed: Must be a data.table, not double.",
     fixed = TRUE
   )
   err_msg <- "Assertion on 'metric_combo' failed: Must be element of set "
   err_msg2 <- "{'hsa_score','bliss_score','CIScore_50','CIScore_80'}, but is 'dummy'."
   expect_error(
-    plotlyDCMother(test_exp, metric_combo = "dummy", metric_growth = "RV"),
+    plolty_drug_combo_heatmap(test_exp, metric_combo = "dummy", metric_growth = "RV"),
     sprintf("%s%s", err_msg, err_msg2),
     fixed = TRUE
   )
   expect_error(
-    plotlyDCMother(test_exp, metric_combo = names(gDRutils::get_combo_assay_names())[1], metric_growth = "relval"),
+    plolty_drug_combo_heatmap(test_exp, metric_combo = names(gDRutils::get_combo_assay_names())[1], metric_growth = "relval"),
     "Assertion on 'metric_growth' failed: Must be element of set {'GR','RV'}, but is 'relval'.",
     fixed = TRUE
   )

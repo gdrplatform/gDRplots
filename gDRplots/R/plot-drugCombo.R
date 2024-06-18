@@ -18,21 +18,21 @@
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
 #' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
-#' plotlyDCMother(data = combo_data_l, 
-#'                metric_combo = "hsa_score", 
-#'                metric_growth = "RV")
+#' plolty_drug_combo_heatmap(data = combo_data_l, 
+#'                           metric_combo = "hsa_score", 
+#'                           metric_growth = "RV")
 #'
-#' plotlyDCMother(data = combo_data_l, 
-#'                metric_combo = "CIScore_50", 
-#'                metric_growth = "GR")
+#' plolty_drug_combo_heatmap(data = combo_data_l, 
+#'                           metric_combo = "CIScore_50", 
+#'                           metric_growth = "GR")
 #' }
 #' 
 #' @keywords plugin_plot
 #' @export
 #'
-plotlyDCMother <- function(data, 
-                           metric_combo, 
-                           metric_growth) {
+plolty_drug_combo_heatmap <- function(data, 
+                                      metric_combo, 
+                                      metric_growth) {
   
   checkmate::assert_list(data)
   checkmate::assert_data_table(data[[1]])
