@@ -135,9 +135,9 @@ test_that("test missing data", {
   )
 })
 
-# plotlyMC tests
+# plotly_metric_contrast tests
 test_that("check output type and data",  {
-  plt_0 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric)
+  plt_0 <- plotly_metric_contrast(dt_prep, var_x, var_y, var_col, var_txt, metric)
   checkmate::expect_class(plt_0, "plotly")
   expect_identical(plt_0$x$attrs[[1]]$type, "scatter")
   expect_identical(plt_0$x$attrs[[1]]$x, dt_prep[[var_x]])
@@ -145,7 +145,7 @@ test_that("check output type and data",  {
   expect_identical(plt_0$x$layoutAttrs[[1]]$xaxis$type, "linear")
   expect_identical(plt_0$x$layoutAttrs[[1]]$yaxis$type, "linear")
   
-  plt_1 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, "IC50")
+  plt_1 <- plotly_metric_contrast(dt_prep, var_x, var_y, var_col, var_txt, "IC50")
   checkmate::expect_class(plt_1, "plotly")
   expect_identical(plt_1$x$attrs[[1]]$type, "scatter")
   expect_identical(plt_1$x$attrs[[1]]$x, dt_prep[[var_x]])
@@ -154,13 +154,13 @@ test_that("check output type and data",  {
   expect_identical(plt_1$x$layoutAttrs[[1]]$yaxis$type, "log")
   expect_true(grepl("IC", plt_1$x$layoutAttrs[[1]]$title$text))
   
-  plt_2 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric, identity = TRUE)
+  plt_2 <- plotly_metric_contrast(dt_prep, var_x, var_y, var_col, var_txt, metric, identity = TRUE)
   checkmate::expect_class(plt_2, "plotly")
   expect_identical(plt_2$x$attrs[[1]]$mode, "markers")
   checkmate::expect_class(plt_2$x$attrs[[2]], "plotly_segment") # identity line
   expect_identical(plt_2$x$attrs[[2]]$mode, "lines")
   
-  plt_3 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric, correlation = TRUE)
+  plt_3 <- plotly_metric_contrast(dt_prep, var_x, var_y, var_col, var_txt, metric, correlation = TRUE)
   checkmate::expect_class(plt_3, "plotly")
   expect_identical(plt_3$x$attrs[[1]]$mode, "markers")
   checkmate::expect_class(plt_3$x$attrs[[2]], "plotly_line") # correlation line
@@ -168,7 +168,7 @@ test_that("check output type and data",  {
   expect_true(grepl("correlation", plt_3$x$attrs[[3]]$text)) # correlation text
   
   dt_tissue <- data.table::copy(dt_prep)[, Tissue := c("tissue_x", "tissue_x", "tissue_y", "tissue_y", "tissue_z")]
-  plt_4 <- plotlyMC(dt_tissue, var_x, var_y, var_col = "Tissue", var_txt,
+  plt_4 <- plotly_metric_contrast(dt_tissue, var_x, var_y, var_col = "Tissue", var_txt,
                     metric, identity = TRUE, correlation = TRUE)
   checkmate::expect_class(plt_4, "plotly")
   expect_identical(plt_4$x$attrs[[1]]$mode, "markers")
@@ -186,7 +186,7 @@ test_that("check output type and data",  {
     `Concentration 2` = c(0.0022, 0.0458, 0.0007, 0.6173, 1.6122, 4.1234))
   dt_conc_2[[var_x]] <- dt[["GR_AOC"]][1:NROW(dt_conc_2)] * 0.50
   dt_conc_2[[var_y]] <- dt[["GR_AOC"]][1:NROW(dt_conc_2)] * 1.25
-  plt_5 <- plotlyMC(dt_conc_2, var_x, var_y, var_col, var_txt,
+  plt_5 <- plotly_metric_contrast(dt_conc_2, var_x, var_y, var_col, var_txt,
                     metric, identity = TRUE, correlation = TRUE)
   checkmate::expect_class(plt_5, "plotly")
   expect_identical(plt_5$x$attrs[[1]]$mode, "markers")
@@ -206,7 +206,7 @@ test_that("check output type and data",  {
   dt_conc_2_tiss$drug_002 <- dt[["GR_AOC"]][1:NROW(dt_conc_2_tiss)] * 0.50
   dt_conc_2_tiss$drug_003 <- dt[["GR_AOC"]][1:NROW(dt_conc_2_tiss)] * 2.25
   dt_conc_2_tiss <- na.omit(dt_conc_2_tiss)
-  plt_6 <- plotlyMC(dt_conc_2_tiss,
+  plt_6 <- plotly_metric_contrast(dt_conc_2_tiss,
                     var_x, var_y, var_col = "Tissue", var_txt,
                     metric, identity = TRUE, correlation = TRUE)
   checkmate::expect_class(plt_6, "plotly")
@@ -227,26 +227,26 @@ test_that("check output type and data",  {
 
 test_that("check input arguments ", {
   expect_error(
-    plotlyMC(n, var_x, var_y, var_col, var_txt),
+    plotly_metric_contrast(n, var_x, var_y, var_col, var_txt),
     "Assertion on 'data' failed: Must be a data.table, not double."
   )
   expect_error(
-    plotlyMC(dt_prep, n, var_y, var_col, var_txt),
+    plotly_metric_contrast(dt_prep, n, var_y, var_col, var_txt),
     "Assertion on 'var_x' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMC(dt_prep, var_x, n, var_col, var_txt),
+    plotly_metric_contrast(dt_prep, var_x, n, var_col, var_txt),
     "Assertion on 'var_y' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMC(dt_prep, var_x, var_y, n, var_txt),
+    plotly_metric_contrast(dt_prep, var_x, var_y, n, var_txt),
     paste0("Assertion on 'var_col' failed: Must be element of set ",
            "{'Cell Line Name','drug_002','drug_003','none'}, but types do not match ",
            "(numeric != character)."),
     fixed = TRUE
   )
   expect_error(
-    plotlyMC(dt_prep, var_x, var_y, var_col, n),
+    plotly_metric_contrast(dt_prep, var_x, var_y, var_col, n),
     "Assertion on 'var_txt' failed: Must be of type 'string', not 'double'."
   )
 })

@@ -1,6 +1,6 @@
 #' Prepare data for plotting Metric Contrast
 #'
-#' Select columns and reshape data, bringing it to a format expected by \code{plotlyMC}.
+#' Select columns and reshape data, bringing it to a format expected by \code{plotly_metric_contrast}.
 #'
 #' If \code{variable} is one of the \code{transformed_metrics} (stored in global variable),
 #' it will be log transformed. Infinite values that arise here will be changed to NAs,
@@ -19,7 +19,7 @@
 #'         If \code{data} contains co-treatment information, it will be preserved.
 #'
 #' @keywords plugin_plot
-#' @seealso \code{plotlyMC} \code{MetricContrast}
+#' @seealso \code{plotly_metric_contrast} \code{MetricContrast}
 #'
 #' @export
 #'
@@ -141,17 +141,17 @@ prepareDataMC <- function(data,
 #'
 #' @export
 #'
-plotlyMC <- function(data, 
-                     var_x, 
-                     var_y, 
-                     var_col, 
-                     var_txt,
-                     metric = "growth metric", 
-                     identity = FALSE, 
-                     correlation = FALSE,
-                     axis_limits = c("fixed", "upper", "lower", "free"),
-                     source = "metricContrast",
-                     with_labelR = FALSE) {
+plotly_metric_contrast <- function(data, 
+                                   var_x, 
+                                   var_y, 
+                                   var_col, 
+                                   var_txt,
+                                   metric = "growth metric", 
+                                   identity = FALSE, 
+                                   correlation = FALSE,
+                                   axis_limits = c("fixed", "upper", "lower", "free"),
+                                   source = "metricContrast",
+                                   with_labelR = FALSE) {
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(var_x)
@@ -226,7 +226,7 @@ plotlyMC <- function(data,
                       symbol = val_for_symbols,
                       symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
                       marker = list(color = "#5A5A5A", size = 11))
-
+    
   } else if (has_codrug_data && var_col != "none") {
     val_for_symbols <- as.factor(data[[concentration2_name]])
     

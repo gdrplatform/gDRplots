@@ -23,7 +23,7 @@ A \code{data.table} where the column containing the two primary variable values
         If \code{data} contains co-treatment information, it will be preserved.
 }
 \description{
-Select columns and reshape data, bringing it to a format expected by \code{plotlyMC}.
+Select columns and reshape data, bringing it to a format expected by \code{plotly_metric_contrast}.
 }
 \details{
 If \code{variable} is one of the \code{transformed_metrics} (stored in global variable),
@@ -32,6 +32,6 @@ which will be dropped in the app server before plotting. The app will display a 
 if that happens
 }
 \seealso{
-\code{plotlyMC} \code{MetricContrast}
+\code{plotly_metric_contrast} \code{MetricContrast}
 }
 \keyword{plugin_plot}
