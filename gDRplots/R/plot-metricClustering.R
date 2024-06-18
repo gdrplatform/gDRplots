@@ -1,4 +1,10 @@
-#' @keywords plugin_plot
+#' Build labels for plotly tooltips for Metric Clustering heatmap
+#'
+#' @param data a data table in which the labels are to be constructed
+#' 
+#' @return A character vector with labels
+#' 
+#' @keywords utils_label
 build_label_clustering <- function(data) {
   checkmate::assert_data_table(data)
   
