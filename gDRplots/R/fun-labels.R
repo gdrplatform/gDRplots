@@ -59,13 +59,13 @@ adjust_label <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
-#' buildLabel(dt, "grid")
+#' build_label(dt, "grid")
 #'
 #' @keywords utils_label
 #' @return A character vector the same length as the row number of \code{data}.
 #'
 #' @export
-buildLabel <- function(data, 
+build_label <- function(data, 
                        view) {
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)

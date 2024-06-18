@@ -2,7 +2,7 @@
 
 export(adjust_label)
 export(brew_palette)
-export(buildLabel)
+export(build_label)
 export(coerce_cotreatment_data)
 export(colorToHex)
 export(computeDistances)

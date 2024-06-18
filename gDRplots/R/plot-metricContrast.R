@@ -206,7 +206,7 @@ plotlyMC <- function(data,
   }
   
   # prepare label for tooltips
-  data$label <- buildLabel(data, "contrast")
+  data$label <- build_label(data, "contrast")
   
   # adding info about color variable
   if (var_col != "none") {

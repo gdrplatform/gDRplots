@@ -26,7 +26,7 @@ plotlyRGPanel <- function(data, var_y, range_x = c(1e-3, 50e+0), title = NA) {
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   # add a label column
-  data$label <- buildLabel(data, "grid")
+  data$label <- build_label(data, "grid")
   # determine plot title
   plot_title <- unique(data[[title]])
   # rename column of interest

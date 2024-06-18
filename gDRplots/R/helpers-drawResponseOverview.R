@@ -228,7 +228,7 @@ plotlyRCAll <- function(curve_data,
   comb_name <- paste0(curve_data[[cell_name]][1], " x ", curve_data[[drug_name]][1])
   
   # add a label column
-  curve_data$label <- buildLabel(curve_data, view = "grid")
+  curve_data$label <- build_label(curve_data, view = "grid")
   # build plot title
   ## this assumes that either Cell Line or Drug has only one value!
   cols <- c(cell_name, drug_name)
@@ -478,7 +478,7 @@ plotlyRCSelected <- function(data,
   data.table::setnames(data, old = c(var_y, var_std, var_col, var_not_col),
                        new = c("var_y", "var_y.err", "var_col", "var_not_col"), skip_absent = TRUE)
   # add label column for tooltips
-  data$label <- buildLabel(data, view = "curve")
+  data$label <- build_label(data, view = "curve")
   
   # build plot title
   plot_title <- sprintf("Drug dose response for %s: %s", var_not_col, 
@@ -547,7 +547,7 @@ plotlyRCSelected <- function(data,
     data.table::setnames(data_curves, old = c(var_y, var_col, var_not_col),
                          new = c("var_y", "var_col", "var_not_col"))
     # add column for tooltips
-    data_curves$label <- buildLabel(data_curves, view = "curve")
+    data_curves$label <- build_label(data_curves, view = "curve")
   }
   
   # initialize plot

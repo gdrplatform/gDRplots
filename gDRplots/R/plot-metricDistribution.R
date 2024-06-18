@@ -89,7 +89,7 @@ plotlyMD <- function(data,
                           x0 = 0, x1 = 1, xref = "paper", y0 = horizontal, y1 = horizontal)
   
   # add labels
-  data$label <- buildLabel(data, "distribution")
+  data$label <- build_label(data, "distribution")
   
   # initialize plot
   plot_base <- plotly::plot_ly()

@@ -152,7 +152,7 @@ plotlyMR <- function(data, var_x, var_y, var_col, var_grp, title, show_tick_labe
   data[[var_x]] <- factor(data[[var_x]], levels = unique(data[[var_x]]))
   
   # add label column
-  data$label <- buildLabel(data, "ranking")
+  data$label <- build_label(data, "ranking")
   # modify column Concentration_2 for proper sorting of bars
   if (is.element(concentration2, names(data))) {
     data[[concentration2]] <- as.character(data[[concentration2]])

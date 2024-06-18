@@ -327,7 +327,7 @@ plotlyDC1 <- function(data,
   pos_y_ref <- gDRutils::get_isobologram_columns("pos_y_ref")
   iso_level <- gDRutils::get_isobologram_columns("iso_level")
   # build tooltips
-  data_long[["label"]] <- buildLabel(data_long, "combo1-heatmap")
+  data_long[["label"]] <- build_label(data_long, "combo1-heatmap")
   # build plot
   plot_base <- plotly::plot_ly(type = "heatmap",
                                x = data_long[[pos_x]], y = data_long[[pos_y]],
@@ -346,7 +346,7 @@ plotlyDC1 <- function(data,
   ## add points of the isobologram at GR/IC50
   if (with_iso_points && any("0.5" %in% data_iso[[iso_level]])) {
     data <- data_iso[data_iso[[iso_level]] == "0.5", ]
-    data[["label"]] <- buildLabel(data, "combo1-points")
+    data[["label"]] <- build_label(data, "combo1-points")
     plot_base <- plotly::add_markers(plot_base, inherit = FALSE,
                                      x = data[[pos_x]], y = data[[pos_y]],
                                      text = data[["label"]], color = I("black"),
@@ -358,8 +358,8 @@ plotlyDC1 <- function(data,
   if (NROW(data_iso) > 0) {
     metric <- switch(normalization_type, "GR" = "GR", "RV" = "IC")
     data_iso[["name"]] <- sprintf("%s%i", metric, 100 - 100 * as.numeric(data_iso[[iso_level]]))
-    data_iso[["label_ref"]] <- buildLabel(data_iso, "combo1-lines_ref")
-    data_iso[["label"]] <- buildLabel(data_iso, "combo1-lines")
+    data_iso[["label_ref"]] <- build_label(data_iso, "combo1-lines_ref")
+    data_iso[["label"]] <- build_label(data_iso, "combo1-lines")
     
     # add lines
     for (i in seq_along(unique(data_iso[[iso_level]]))) {
@@ -981,7 +981,7 @@ plotlyDCRatio <- function(data,
   ticktext_colorbar <- 100 - round(100 * (stats::quantile(as.numeric(names(iso_colors)), seq(0, 1, .25))))
   
   # build tooltips
-  data_iso[["label"]] <- buildLabel(data_iso, "combo-ratios")
+  data_iso[["label"]] <- build_label(data_iso, "combo-ratios")
   
   data.table::setorderv(data_iso, c(log10_ratio, log2_CI))
   # build plot
