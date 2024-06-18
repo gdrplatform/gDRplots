@@ -81,13 +81,13 @@ test_that("isValidColor works as expected", {
   expect_error(isValidColor(NA), "Assertion on 'col_name' failed: May not be NA.")
 })
 
-test_that("colorToHex works as expected", {
+test_that("change_color_to_hex works as expected", {
   color_names <- c("orange", "darkblue", "green", "lavenderblush", "gray66", "slategray2", "tomato")
   expect_identical(
-    vapply(color_names, colorToHex, character(1), USE.NAMES = FALSE),
+    vapply(color_names, change_color_to_hex, character(1), USE.NAMES = FALSE),
     c("#FFA500", "#00008B", "#00FF00", "#FFF0F5", "#A8A8A8", "#B9D3EE", "#FF6347"))
   
-  expect_error(colorToHex(1), "Must be of type 'string'")
-  expect_error(colorToHex(NULL), "Must be of type 'string'")
-  expect_error(colorToHex("pinki"), "Must be valid color name")
+  expect_error(change_color_to_hex(1), "Must be of type 'string'")
+  expect_error(change_color_to_hex(NULL), "Must be of type 'string'")
+  expect_error(change_color_to_hex("pinki"), "Must be valid color name")
 })

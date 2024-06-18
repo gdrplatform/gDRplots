@@ -143,12 +143,12 @@ isValidColor <- function(col_name) {
 #' @return hexadecimal string representing color
 #' 
 #' @examples
-#' colorToHex("darkblue")
-#' colorToHex("indianred2")
-#' colorToHex("seagreen")
+#' change_color_to_hex("darkblue")
+#' change_color_to_hex("indianred2")
+#' change_color_to_hex("seagreen")
 #' 
 #' @export
-colorToHex <- function(col_name) {
+change_color_to_hex <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be valid color name" = col_name %in% grDevices::colors())
   
