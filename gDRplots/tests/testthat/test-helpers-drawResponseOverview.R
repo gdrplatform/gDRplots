@@ -216,13 +216,13 @@ test_that("returns error with missing and wrong argument for plotly_response_cur
   )
 })
 
-# plotlyRCSelected tests ----
-test_that("check output type for plotlyRCSelected", {
-  plt_sel_1 <- plotlyRCSelected(data = subset_data, 
-                                var_y = var_y, 
-                                layers = c("curve", "average", "error"),
-                                curves = subset_curves, 
-                                extras = subset_extras)
+# plotly_response_curve_selected tests ----
+test_that("check output type for plotly_response_curve_selected", {
+  plt_sel_1 <- plotly_response_curve_selected(data = subset_data, 
+                                              var_y = var_y, 
+                                              layers = c("curve", "average", "error"),
+                                              curves = subset_curves, 
+                                              extras = subset_extras)
   
   expect_is(plt_sel_1, "plotly")
   expect_equal(plt_sel_1$x$attrs[[2]]$type, "scatter")
@@ -234,13 +234,13 @@ test_that("check output type for plotlyRCSelected", {
   
   plt_w <- 200
   plt_h <- 600
-  plt_sel_2 <- plotlyRCSelected(data = subset_data, 
-                                var_y = var_y, 
-                                layers = c("curve", "extras"),
-                                curves = subset_curves, 
-                                extras = subset_extras,
-                                plot_width = plt_w,
-                                plot_height = plt_h)
+  plt_sel_2 <- plotly_response_curve_selected(data = subset_data, 
+                                              var_y = var_y, 
+                                              layers = c("curve", "extras"),
+                                              curves = subset_curves, 
+                                              extras = subset_extras,
+                                              plot_width = plt_w,
+                                              plot_height = plt_h)
   
   plt_id <- names(plt_sel_2$x$visdat)
   expect_is(plt_sel_2, "plotly")
@@ -264,11 +264,11 @@ test_that("check output type for plotlyRCSelected", {
   expect_equal(plt_sel_2$x$layoutAttrs[[plt_id]]$shapes[[6]], sub_ex[[2]])
   expect_equal(plt_sel_2$x$config$edits, get_plotly_edits())
   
-  plt_sel_3 <- plotlyRCSelected(data = subset_data, 
-                                var_y = var_y, 
-                                layers = c("observations", "error"),
-                                curves = subset_curves, 
-                                extras = subset_extras)
+  plt_sel_3 <- plotly_response_curve_selected(data = subset_data, 
+                                              var_y = var_y, 
+                                              layers = c("observations", "error"),
+                                              curves = subset_curves, 
+                                              extras = subset_extras)
   
   expect_is(plt_sel_3, "plotly")
   expect_equal(plt_sel_3$width, 400)
@@ -280,22 +280,22 @@ test_that("check output type for plotlyRCSelected", {
   expect_equal(plt_sel_3$x$attrs[[2]]$y, subset_data[[var_y]])
   
   r_x <- c(3.8e-2, 4e+0)
-  plt_sel_4 <- plotlyRCSelected(data = subset_data, 
-                                var_y = var_y, 
-                                layers = c("observations", "error"),
-                                curves = subset_curves, 
-                                range_x = r_x,
-                                extras = subset_extras)
+  plt_sel_4 <- plotly_response_curve_selected(data = subset_data, 
+                                              var_y = var_y, 
+                                              layers = c("observations", "error"),
+                                              curves = subset_curves, 
+                                              range_x = r_x,
+                                              extras = subset_extras)
   
   expect_is(plt_sel_4, "plotly")
   expect_equal(plt_sel_4$x$layoutAttrs[[1]]$xaxis$range, log10(r_x))
   
   selected_cl <- cell_names[1:3]
-  plt_sel_5 <- plotlyRCSelected(data = dt[`Cell Line Name` %in% selected_cl, ], 
-                                var_y = var_y, 
-                                layers = c("observations", "error"),
-                                curves = prepared_curves[`Cell Line Name` %in% selected_cl, ],
-                                extras = subset_extras)
+  plt_sel_5 <- plotly_response_curve_selected(data = dt[`Cell Line Name` %in% selected_cl, ], 
+                                              var_y = var_y, 
+                                              layers = c("observations", "error"),
+                                              curves = prepared_curves[`Cell Line Name` %in% selected_cl, ],
+                                              extras = subset_extras)
   
   expect_is(plt_sel_5, "plotly")
   expect_equal(plt_sel_5$x$layoutAttrs[[1]]$title$text,
@@ -303,33 +303,33 @@ test_that("check output type for plotlyRCSelected", {
                       paste(selected_cl, collapse = ", ")))
   
   # fast end - plotly_empty
-  plt_sel_4 <- plotlyRCSelected(data = subset_data, 
-                                var_y = var_y, 
-                                layers = NULL,
-                                curves = subset_curves, 
-                                extras = subset_extras)
+  plt_sel_4 <- plotly_response_curve_selected(data = subset_data, 
+                                              var_y = var_y, 
+                                              layers = NULL,
+                                              curves = subset_curves, 
+                                              extras = subset_extras)
   expect_is(plt_sel_4, "plotly")
   expect_equal(plt_sel_4$x$attrs[[1]]$mode, "markers")
   expect_equal(plt_sel_4$x$attrs[[1]]$x, NULL)
   
   subset_data_na <- data.table::copy(subset_data)
   subset_data_na[[var_y]] <- NA
-  plt_sel_5 <- plotlyRCSelected(data = subset_data_na, 
-                                var_y = var_y, 
-                                layers = c("observations", "error"),
-                                curves = subset_curves, 
-                                extras = subset_extras)
+  plt_sel_5 <- plotly_response_curve_selected(data = subset_data_na, 
+                                              var_y = var_y, 
+                                              layers = c("observations", "error"),
+                                              curves = subset_curves, 
+                                              extras = subset_extras)
   expect_is(plt_sel_5, "plotly")
   expect_equal(plt_sel_5$x$attrs[[1]]$mode, "markers")
   expect_equal(plt_sel_5$x$attrs[[1]]$x, NULL)
 })
 
-test_that("check output type for plotlyRCSelected for combo", {
-  plt_sel_1 <- plotlyRCSelected(data = combo_subset_data, 
-                                var_y = var_y, 
-                                layers = c("curve", "average", "error"),
-                                curves = combo_subset_curves, 
-                                extras = combo_subset_extras)
+test_that("check output type for plotly_response_curve_selected for combo", {
+  plt_sel_1 <- plotly_response_curve_selected(data = combo_subset_data, 
+                                              var_y = var_y, 
+                                              layers = c("curve", "average", "error"),
+                                              curves = combo_subset_curves, 
+                                              extras = combo_subset_extras)
   
   expect_is(plt_sel_1, "plotly")
   expect_equal(plt_sel_1$x$attrs[[2]]$type, "scatter")
@@ -342,16 +342,16 @@ test_that("check output type for plotlyRCSelected for combo", {
   
 })
 
-test_that("check output for wrong data for plotlyRCSelected", {
+test_that("check output for wrong data for plotly_response_curve_selected", {
   subset_data_out <- subset_data
   subset_data_out[[var_y]] <- subset_data_out[[var_y]] + 100
   
   
-  plt <- plotlyRCSelected(data = subset_data_out, 
-                          var_y = "GR value", 
-                          layers = c("curve", "average", "error"),
-                          curves = subset_curves, 
-                          extras = subset_extras)
+  plt <- plotly_response_curve_selected(data = subset_data_out, 
+                                        var_y = "GR value", 
+                                        layers = c("curve", "average", "error"),
+                                        curves = subset_curves, 
+                                        extras = subset_extras)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -367,56 +367,56 @@ test_that("check output for wrong data for plotlyRCSelected", {
 
 test_that("expect error with wrong input", {
   expect_error(
-    plotlyRCSelected(5, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras),
+    plotly_response_curve_selected(5, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras),
     "Assertion on 'data' failed: Must be a data.table, not double."
   )
   expect_error(
-    plotlyRCSelected(subset_data, 5, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras),
+    plotly_response_curve_selected(subset_data, 5, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras),
     "Assertion on 'var_y' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = 5,
-                     subset_curves, extras = subset_extras),
+    plotly_response_curve_selected(subset_data, var_y, layers = 5,
+                                   subset_curves, extras = subset_extras),
     "Assertion on 'layers' failed: Must be of type 'character' (or 'NULL'), not 'double'.",
     fixed = TRUE
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = "curves",
-                     subset_curves, extras = subset_extras),
+    plotly_response_curve_selected(subset_data, var_y, layers = "curves",
+                                   subset_curves, extras = subset_extras),
     paste0("Assertion on 'X[[i]]' failed: Must be element of set {'curve',",
            "'average','error','observations','extras'}, but is 'curves'."),
     fixed = TRUE
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     5, extras = subset_extras),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   5, extras = subset_extras),
     "Assertion on 'curves' failed: Must be a data.table, not double."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = 5),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = 5),
     "Assertion on 'extras' failed: Must be of type 'list', not 'double'."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras, range = 1),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras, range = 1),
     "Assertion on 'range_x' failed: Must have length 2, but has length 1."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras, range = "str"),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras, range = "str"),
     "Assertion on 'range_x' failed: Must be of type 'numeric', not 'character'."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras, plot_width = "str"),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras, plot_width = "str"),
     "Assertion on 'plot_width' failed: Must be of type 'numeric', not 'character'."
   )
   expect_error(
-    plotlyRCSelected(subset_data, var_y, layers = c("curve", "average", "error"),
-                     subset_curves, extras = subset_extras, plot_height = "str"),
+    plotly_response_curve_selected(subset_data, var_y, layers = c("curve", "average", "error"),
+                                   subset_curves, extras = subset_extras, plot_height = "str"),
     "Assertion on 'plot_height' failed: Must be of type 'numeric', not 'character'."
   )
 })

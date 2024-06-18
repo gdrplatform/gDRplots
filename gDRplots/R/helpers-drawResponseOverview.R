@@ -363,7 +363,7 @@ plotly_response_curve_all <- function(curve_data,
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:6]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepared_curves <- prepare_curves(dt)
-#' plotlyRCSelected(
+#' plotly_response_curve_selected(
 #'   data = prepared_curves,
 #'   var_y = "GR value",
 #'   layers = c("curve", "average", "error"),
@@ -380,14 +380,14 @@ plotly_response_curve_all <- function(curve_data,
 #' @keywords drawResponseOverview
 #' @export
 #'
-plotlyRCSelected <- function(data,
-                             var_y,
-                             layers,
-                             curves,
-                             range_x = c(1e-3, 50e+0),
-                             extras,
-                             plot_width = 400L,
-                             plot_height = 300L) {
+plotly_response_curve_selected <- function(data,
+                                           var_y,
+                                           layers,
+                                           curves,
+                                           range_x = c(1e-3, 50e+0),
+                                           extras,
+                                           plot_width = 400L,
+                                           plot_height = 300L) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
@@ -443,7 +443,7 @@ plotlyRCSelected <- function(data,
   #     data_split <- split(data, data[[drug2_name]])
   #     curves_split <- split(curves, curves[[drug2_name]])
   #     # plot each subset
-  #     plot_list <- mapply(FUN = plotlyRCSelected, data = data_split, curves = curves_split,
+  #     plot_list <- mapply(FUN = plotly_response_curve_selected, data = data_split, curves = curves_split,
   #                         MoreArgs = list(var_y = var_y, layers = layers, range_x = range_x, extras = extras),
   #                         SIMPLIFY = FALSE, USE.NAMES = FALSE)
   #     # determine final plot dimensions (all panels in one column)
