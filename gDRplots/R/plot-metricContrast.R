@@ -214,7 +214,7 @@ plotlyMC <- function(data,
   }
   
   # build plot
-  if (has_codrug_data & var_col == "none") {
+  if (has_codrug_data && var_col == "none") {
     
     val_for_symbols <- as.factor(data[[concentration2_name]])
     # Plot symbols for "Concentration_2
@@ -227,12 +227,12 @@ plotlyMC <- function(data,
                       symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
                       marker = list(color = "#5A5A5A", size = 11))
 
-  } else if (has_codrug_data & var_col != "none") {
+  } else if (has_codrug_data && var_col != "none") {
     val_for_symbols <- as.factor(data[[concentration2_name]])
     
     plot_base <- 
       plotly::plot_ly(source = source, customdata = data[[var_txt]], colors = "Set1", 
-                      type = "scatter", mode = "markers",)
+                      type = "scatter", mode = "markers")
     # Add legend for "Concentration_2"
     plot_base <- 
       plotly::add_trace(plot_base,
