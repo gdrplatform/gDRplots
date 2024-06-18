@@ -16,7 +16,10 @@
 #'
 #' @export
 #'
-plotlyRGPanel <- function(data, var_y, range_x = c(1e-3, 50e+0), title = NA) {
+plotly_response_grid <- function(data, 
+                                 var_y, 
+                                 range_x = c(1e-3, 50e+0), 
+                                 title = NA) {
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(var_y)
