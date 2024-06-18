@@ -1,6 +1,6 @@
 context("Test metricClustering plot")
 
-test_that("buildLabelClustering works as expected", {
+test_that("build_label_clustering works as expected", {
 })
 
 test_that("prepareDataMH works as expected", {

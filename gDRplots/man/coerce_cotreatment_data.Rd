@@ -26,6 +26,6 @@ dt
 
 }
 \seealso{
-\code{MetricClustering}, \code{buildLabelClustering}
+\code{MetricClustering}, \code{build_label_clustering}
 }
 \keyword{utils}

@@ -1,5 +1,5 @@
 #' @keywords plugin_plot
-buildLabelClustering <- function(data) {
+build_label_clustering <- function(data) {
   checkmate::assert_data_table(data)
   
   if (nrow(data) != nrow(unique(data))) {
@@ -74,7 +74,7 @@ prepareDataMH <- function(data, variable) {
   row_annotation <- map_annotations(identifiers, drug_annotation, row_ids)
 
   mat <- as.matrix(wide[, .SD, .SDcols = !row_ids]) # Enable coercion to matrix 
-  rownames(mat) <- buildLabelClustering(identifiers)
+  rownames(mat) <- build_label_clustering(identifiers)
   
   if (variable %in% get_metrics_to_transform()) {
     mat <- log10(mat)

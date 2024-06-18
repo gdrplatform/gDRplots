@@ -15,7 +15,7 @@
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricClustering}, \code{buildLabelClustering}
+#' @seealso \code{MetricClustering}, \code{build_label_clustering}
 #'
 coerce_cotreatment_data <- function(data) {
   checkmate::assert_data_table(data)
@@ -52,7 +52,7 @@ coerce_cotreatment_data <- function(data) {
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricClustering}, \code{buildLabelClustering}
+#' @seealso \code{MetricClustering}, \code{build_label_clustering}
 #' 
 reformat_untreated_cases <- function(label) {
   
