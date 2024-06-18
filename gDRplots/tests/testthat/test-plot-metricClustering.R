@@ -3,7 +3,7 @@ context("Test metricClustering plot")
 test_that("build_label_clustering works as expected", {
 })
 
-test_that("prepareDataMH works as expected", {
+test_that("prepare_data_metric_clustering works as expected", {
   
   test_mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
   test_exp <- gDRutils::convert_combo_data_to_dt(test_mae[[gDRutils::get_supported_experiments("combo")]]
@@ -12,10 +12,13 @@ test_that("prepareDataMH works as expected", {
   expected_length <-
     length(unique(test_exp$Concentration)) * length(unique(test_exp$`r Id`)) * length(unique(test_exp$`c Id`))
   
-  expect_error(prepareDataMH(NULL), "Assertion on 'data' failed: Must be a data.table, not 'NULL'.")
-  expect_error(prepareDataMH(test_exp), "argument \"variable\" is missing, with no default")
-  expect_error(prepareDataMH(test_exp, NULL), "Assertion on 'variable' failed: Must be of type 'string'")
-  res <- prepareDataMH(test_exp, "Smooth")
+  expect_error(prepare_data_metric_clustering(NULL), 
+               "Assertion on 'data' failed: Must be a data.table, not 'NULL'.")
+  expect_error(prepare_data_metric_clustering(test_exp), 
+               "argument \"variable\" is missing, with no default")
+  expect_error(prepare_data_metric_clustering(test_exp, NULL), 
+               "Assertion on 'variable' failed: Must be of type 'string'")
+  res <- prepare_data_metric_clustering(test_exp, "Smooth")
   expect_length(res, 2)
   expect_equal(names(res), c("data_matrix", "annotations"))
   expect_length(res$data_matrix, expected_length)
@@ -30,7 +33,7 @@ test_that("prepareDataMH works as expected", {
     `Drug MOA` = ("moa1"),
     IC50 = ic50
   )
-  res <- prepareDataMH(dt, "IC50")
+  res <- prepare_data_metric_clustering(dt, "IC50")
   expect_equal(length(res), 2)
   expect_equal(c(t(res$data_matrix)), log10(ic50))
   

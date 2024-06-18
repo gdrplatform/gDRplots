@@ -44,7 +44,8 @@ build_label_clustering <- function(data) {
 #'
 #' @export
 #'
-prepareDataMH <- function(data, variable) {
+prepare_data_metric_clustering <- function(data, 
+                                           variable) {
   checkmate::assert_data_table(data)
   checkmate::assert_string(variable)
   
@@ -123,7 +124,7 @@ prepareDataMH <- function(data, variable) {
 #'
 #' @keywords plugin_plot
 #'
-#' @seealso \code{prepareDataMH} \code{MetricClustering}, \code{\link[gDRplots]{computeDistances}}
+#' @seealso \code{prepare_data_metric_clustering} \code{MetricClustering}, \code{\link[gDRplots]{computeDistances}}
 #'
 #' @export
 #'
