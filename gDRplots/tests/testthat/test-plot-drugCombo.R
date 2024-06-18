@@ -56,7 +56,9 @@ test_that("plolty_drug_combo_heatmap", {
     fixed = TRUE
   )
   expect_error(
-    plolty_drug_combo_heatmap(test_exp, metric_combo = names(gDRutils::get_combo_assay_names())[1], metric_growth = "relval"),
+    plolty_drug_combo_heatmap(test_exp, 
+                              metric_combo = names(gDRutils::get_combo_assay_names())[1], 
+                              metric_growth = "relval"),
     "Assertion on 'metric_growth' failed: Must be element of set {'GR','RV'}, but is 'relval'.",
     fixed = TRUE
   )
