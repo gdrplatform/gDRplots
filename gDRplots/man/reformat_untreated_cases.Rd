@@ -27,6 +27,6 @@ reformat_untreated_cases(c(
 
 }
 \seealso{
-\code{MetricClustering}, \code{buildLabelClustering}
+\code{MetricClustering}, \code{build_label_clustering}
 }
 \keyword{utils}

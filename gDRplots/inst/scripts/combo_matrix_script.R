@@ -139,7 +139,7 @@ iso_colors <- gDRutils::get_iso_colors()[all_iso]
 # base plot
 plt_iso_compare <- 
   ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
-  ggplot2::geom_line(data = data.frame(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
+  ggplot2::geom_line(data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
   ggplot2::geom_hline(yintercept = 0)
 
 for (iso in all_iso) {
@@ -160,7 +160,7 @@ if (length(all_iso) > 1) {
     ggplot2::scale_color_gradientn(
       colors = iso_colors,
       values = scales::rescale(as.numeric(names(iso_colors))),
-      breaks = quantile(as.numeric(names(iso_colors)), seq(0, 1, 0.25)),
-      labels = 100 - round(100 * (quantile(as.numeric(names(iso_colors)), seq(0, 1, 0.25)))),
+      breaks = stats::quantile(as.numeric(names(iso_colors)), seq(0, 1, 0.25)),
+      labels = 100 - round(100 * (stats::quantile(as.numeric(names(iso_colors)), seq(0, 1, 0.25)))),
       name = ifelse(norm_type == "GR", "GR", "IC"))
 }

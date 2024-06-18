@@ -15,7 +15,7 @@
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricClustering}, \code{buildLabelClustering}
+#' @seealso \code{MetricClustering}, \code{build_label_clustering}
 #'
 coerce_cotreatment_data <- function(data) {
   checkmate::assert_data_table(data)
@@ -52,7 +52,7 @@ coerce_cotreatment_data <- function(data) {
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricClustering}, \code{buildLabelClustering}
+#' @seealso \code{MetricClustering}, \code{build_label_clustering}
 #' 
 reformat_untreated_cases <- function(label) {
   
@@ -76,7 +76,7 @@ reformat_untreated_cases <- function(label) {
 #'   group = rep("nt", 2)
 #' )
 #' dt <- rbind(vals, nts)
-#' dtr <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
+#' dtr <- replace_values(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
 #'                               
 #'
 #' @return A modified data table Keep in mind that if \code{replacement} has length of more than one,
@@ -85,14 +85,17 @@ reformat_untreated_cases <- function(label) {
 #' The part of \code{x} where \code{column} is equal to \code{replacee} is removed.
 #' A copy of that part of the data is then appended where \code{replacee} has been substituted
 #' with a single item of \code{replacement} and this repeated for each item in \code{replacement}.
-#' The resulting data frame will be longer than \code{x} if \code{replacement} is longer than 1.
+#' The resulting data.table will be longer than \code{x} if \code{replacement} is longer than 1.
 #'
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricRanking}, \code{plotlyMR}
+#' @seealso \code{MetricRanking}, \code{plotly_metric_ranking}
 #'
-replaceValues <- function(x, column, replacee, replacement) {
+replace_values <- function(x, 
+                           column, 
+                           replacee, 
+                           replacement) {
   checkmate::assert_data_table(x)
   checkmate::assert_string(column)
   checkmate::assert_choice(column, choices = names(x))

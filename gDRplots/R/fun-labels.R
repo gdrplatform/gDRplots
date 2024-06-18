@@ -4,7 +4,7 @@
 #' @param pattern character string specifying the places in which to intervene; see \code{Details}
 #' 
 #' @examples
-#' adjustLabel("Cell Line Name: X Drug Name: A (untreated at 0 &mu;M) Title: 1.00")
+#' adjust_label("Cell Line Name: X Drug Name: A (untreated at 0 &mu;M) Title: 1.00")
 #' # Cell Line Name: X Drug Name: A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(untreated at 0 &mu;M) Title: 1.00
 #'
 #' @return A modified character vector.
@@ -24,9 +24,9 @@
 #' @export
 #' @keywords utils_label
 #'
-#' @seealso \code{MetricClustering}, \code{plotlyMH}
+#' @seealso \code{MetricClustering}, \code{plotly_metric_clustering}
 #'
-adjustLabel <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
+adjust_label <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
   
   checkmate::assert_character(x)
   checkmate::assert_character(pattern, pattern = "^\\(.*?\\)\\(.*?\\)$")
@@ -59,14 +59,14 @@ adjustLabel <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
 #' @examples
 #' SE <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(SE, assay_name = "Metrics")
-#' buildLabel(dt, "grid")
+#' build_label(dt, "grid")
 #'
 #' @keywords utils_label
 #' @return A character vector the same length as the row number of \code{data}.
 #'
 #' @export
-buildLabel <- function(data, 
-                       view) {
+build_label <- function(data, 
+                        view) {
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   cell_name <- pidfs[["cellline_name"]]

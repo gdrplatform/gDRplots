@@ -9,20 +9,20 @@
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepareCurves(dt)
+#' prepare_curves(dt)
 #'
 #' @return A data.table with predicted response for the given concentration range.
 #'
 #' Prediction is made for both GR value and Relative Viability,
 #' across a \code{density}-long sequence of concentrations within \code{range_x}.
-#' The concentrations are generated with \code{logSeq}.
+#' The concentrations are generated with \code{create_log_seq}.
 #'
 #' @keywords drawResponseOverview
 #' @export
 #'
-prepareCurves <- function(metrics, 
-                          range_x = c(1e-3, 50e+0), 
-                          density = 100) {
+prepare_curves <- function(metrics, 
+                           range_x = c(1e-3, 50e+0), 
+                           density = 100) {
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -48,7 +48,7 @@ prepareCurves <- function(metrics,
   vars_id <- intersect(vars_wish_list, names(metrics))
   
   # set concentration range
-  concentrations <- logSeq(range_x[1], range_x[2], density)
+  concentrations <- create_log_seq(range_x[1], range_x[2], density)
   
   # safety check 
   # we are expecting single row in 'data' for selected combination of vars  in (vars_id)
@@ -101,12 +101,12 @@ prepareCurves <- function(metrics,
 
 #' Prepare coordinates of extra features
 #'
-#' @inheritParams prepareCurves
+#' @inheritParams prepare_curves
 #' 
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepareExtras(dt)
+#' prepare_extras(dt)
 #' 
 #' @return
 #' List of length 2.
@@ -118,7 +118,8 @@ prepareCurves <- function(metrics,
 #' @keywords drawResponseOverview
 #' @export
 #'
-prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
+prepare_extras <- function(metrics, 
+                           range_x = c(1e-3, 50e+0)) {
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -193,8 +194,8 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepared_curves <- prepareCurves(dt)
-#' plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
+#' prepared_curves <- prepare_curves(dt)
+#' plotly_response_curve_all(curve_data = prepared_curves, var_y = "GR value")
 #'
 #' @return A plotly object with highlights. The plot contains only response curves.
 #'
@@ -203,11 +204,11 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' @keywords drawResponseOverview
 #' @export
 #'
-plotlyRCAll <- function(curve_data, 
-                        var_y, 
-                        range_x = c(1e-3, 50e+0),
-                        plot_width = 400L,
-                        plot_height = 300L) {
+plotly_response_curve_all <- function(curve_data, 
+                                      var_y, 
+                                      range_x = c(1e-3, 50e+0),
+                                      plot_width = 400L,
+                                      plot_height = 300L) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
@@ -228,11 +229,11 @@ plotlyRCAll <- function(curve_data,
   comb_name <- paste0(curve_data[[cell_name]][1], " x ", curve_data[[drug_name]][1])
   
   # add a label column
-  curve_data$label <- buildLabel(curve_data, view = "grid")
+  curve_data$label <- build_label(curve_data, view = "grid")
   # build plot title
   ## this assumes that either Cell Line or Drug has only one value!
   cols <- c(cell_name, drug_name)
-  var_long <- getLongest(curve_data[, cols, with = FALSE])
+  var_long <- get_longest_factor(curve_data[, cols, with = FALSE])
   var_short <- if (var_long == cell_name) {
     drug_name
   } else if (var_long == drug_name) {
@@ -337,14 +338,14 @@ plotlyRCAll <- function(curve_data,
 #' This quasi-layer is composed of points, which are a trace, lines, which are shapes,
 #' and labels, which are also a trace. The labels serve as axis ticks for the vertical and horizontal lines.
 #' The information necessary to draw the layer is supplied by the \code{extras} argument,
-#' see \code{\link{prepareExtras}}.
+#' see \code{\link{prepare_extras}}.
 #' It is a list of length 2,
 #' the first item being a \code{data.table} with coordinates of points
 #' passed to \code{plotly::add_markers},
 #' and the second being a list of line descriptions
 #' passed the \code{shapes} argument of \code{plotly::layout}.
 #'
-#' Curve data is supplied in a separate data frame.
+#' Curve data is supplied in a separate data.table.
 #'
 #' @section Recursive plotting:
 #' If the data set contains multiple co-drugs, this function is called recursively
@@ -361,32 +362,32 @@ plotlyRCAll <- function(curve_data,
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:6]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepared_curves <- prepareCurves(dt)
-#' plotlyRCSelected(
+#' prepared_curves <- prepare_curves(dt)
+#' plotly_response_curve_selected(
 #'   data = prepared_curves,
 #'   var_y = "GR value",
 #'   layers = c("curve", "average", "error"),
 #'   curves = prepared_curves,
-#'   extras = prepareExtras(dt)
+#'   extras = prepare_extras(dt)
 #' )
 #' 
 #'
 #' @return a plotly object
 #'
 #' @keywords internal
-#' @seealso \code{replaceValues}
+#' @seealso \code{replace_values}
 #'
 #' @keywords drawResponseOverview
 #' @export
 #'
-plotlyRCSelected <- function(data,
-                             var_y,
-                             layers,
-                             curves,
-                             range_x = c(1e-3, 50e+0),
-                             extras,
-                             plot_width = 400L,
-                             plot_height = 300L) {
+plotly_response_curve_selected <- function(data,
+                                           var_y,
+                                           layers,
+                                           curves,
+                                           range_x = c(1e-3, 50e+0),
+                                           extras,
+                                           plot_width = 400L,
+                                           plot_height = 300L) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
@@ -434,15 +435,15 @@ plotlyRCSelected <- function(data,
   #     # replace "untreated" with respective co-drug name
   #     base_untreated_tag <- intersect(untreated_tag, data[[drug2_name]])
   #     data <-
-  #       replaceValues(data, drug2_name, base_untreated_tag, co_drugs)
+  #       replace_values(data, drug2_name, base_untreated_tag, co_drugs)
   #     curves <-
-  #       replaceValues(curves, drug2_name, base_untreated_tag, co_drugs)
+  #       replace_values(curves, drug2_name, base_untreated_tag, co_drugs)
   #     
   #     # split data on co-drugs
   #     data_split <- split(data, data[[drug2_name]])
   #     curves_split <- split(curves, curves[[drug2_name]])
   #     # plot each subset
-  #     plot_list <- mapply(FUN = plotlyRCSelected, data = data_split, curves = curves_split,
+  #     plot_list <- mapply(FUN = plotly_response_curve_selected, data = data_split, curves = curves_split,
   #                         MoreArgs = list(var_y = var_y, layers = layers, range_x = range_x, extras = extras),
   #                         SIMPLIFY = FALSE, USE.NAMES = FALSE)
   #     # determine final plot dimensions (all panels in one column)
@@ -465,7 +466,7 @@ plotlyRCSelected <- function(data,
   
   # determine variable to color by
   cols <- c(cell_name, drug_name)
-  var_col <- getLongest(data[, cols, with = FALSE])
+  var_col <- get_longest_factor(data[, cols, with = FALSE])
   var_not_col <- if (var_col == cell_name)  {
     drug_name
   } else if (var_col == drug_name)  {
@@ -478,7 +479,7 @@ plotlyRCSelected <- function(data,
   data.table::setnames(data, old = c(var_y, var_std, var_col, var_not_col),
                        new = c("var_y", "var_y.err", "var_col", "var_not_col"), skip_absent = TRUE)
   # add label column for tooltips
-  data$label <- buildLabel(data, view = "curve")
+  data$label <- build_label(data, view = "curve")
   
   # build plot title
   plot_title <- sprintf("Drug dose response for %s: %s", var_not_col, 
@@ -547,7 +548,7 @@ plotlyRCSelected <- function(data,
     data.table::setnames(data_curves, old = c(var_y, var_col, var_not_col),
                          new = c("var_y", "var_col", "var_not_col"))
     # add column for tooltips
-    data_curves$label <- buildLabel(data_curves, view = "curve")
+    data_curves$label <- build_label(data_curves, view = "curve")
   }
   
   # initialize plot
@@ -635,10 +636,10 @@ plotlyRCSelected <- function(data,
 #' @keywords internal
 #' @return A numeric vector, see \code{Details}.
 #'
-#' @seealso \code{\link{prepareCurves}}
+#' @seealso \code{\link{prepare_curves}}
 #'
 #' @export
-logSeq <- function(start, end, length) {
+create_log_seq <- function(start, end, length) {
   
   checkmate::assert_number(start, lower = 0, finite = TRUE)
   checkmate::assert_number(end, lower = 0, finite = TRUE)
@@ -661,14 +662,14 @@ logSeq <- function(start, end, length) {
 #'    
 #' @examples
 #' factorList <- list("letters" = letters, "numbers" = seq_len(10))
-#' getLongest(factorList)
+#' get_longest_factor(factorList)
 #'
 #' @return A character string.
 #' @keywords internal
 #'
 #' @export
-getLongest <- function(x, 
-                       default = 1L) {
+get_longest_factor <- function(x, 
+                               default = 1L) {
   
   checkmate::assert_multi_class(x, c("list", "data.table"))
   checkmate::assert_named(x)

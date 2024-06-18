@@ -57,13 +57,13 @@ test_that("reformat_untreated_cases works as expected", {
 })
 
 
-test_that("replaceValues works as expected", {
+test_that("replace_values works as expected", {
   vals <- data.table::data.table(value = runif(10, 1, 2),
                                  group = rep(c("A", "B"), each = 10))
   nts <- data.table::data.table(value = runif(2, 0, 0.1),
                                 group = rep("nt", 2))
   dt <- rbind(vals, nts)
-  dtr <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
+  dtr <- replace_values(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
   
   # replacee is absent
   expect_false("nt" %in% unique(dtr$group))
@@ -79,7 +79,7 @@ test_that("replaceValues works as expected", {
   }
   
   dt$group <- factor(dt$group)
-  dtr_2 <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
+  dtr_2 <- replace_values(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
   
   # replacee is absent
   expect_false("nt" %in% unique(dtr_2$group))
@@ -91,21 +91,21 @@ test_that("replaceValues works as expected", {
   
   
   expect_error(
-    replaceValues(x = as.list(dt), column = "group", replacee = "nt", replacement = c("A", "B")),
+    replace_values(x = as.list(dt), column = "group", replacee = "nt", replacement = c("A", "B")),
     "Assertion on 'x' failed: Must be a data.table")
   expect_error(
-    replaceValues(x = dt, column = 1L, replacee = "nt", replacement = c("A", "B")),
+    replace_values(x = dt, column = 1L, replacee = "nt", replacement = c("A", "B")),
     "Assertion on 'column' failed: Must be of type 'string'")
   expect_error(
-    replaceValues(x = dt, column = "str", replacee = "nt", replacement = c("A", "B")),
+    replace_values(x = dt, column = "str", replacee = "nt", replacement = c("A", "B")),
     "Assertion on 'column' failed: Must be element of set")
   expect_error(
-    replaceValues(x = dt, column = "group", replacee = 1L, replacement = c("A", "B")),
+    replace_values(x = dt, column = "group", replacee = 1L, replacement = c("A", "B")),
     "Assertion on 'replacee' failed: Must be of type 'string'")
   expect_error(
-    replaceValues(x = dt, column = "group", replacee = "str", replacement = c("A", "B")),
+    replace_values(x = dt, column = "group", replacee = "str", replacement = c("A", "B")),
     "Assertion on 'replacee' failed: Must be element of set")
   expect_error(
-    replaceValues(x = dt, column = "group", replacee = "nt", replacement = 1L),
+    replace_values(x = dt, column = "group", replacee = "nt", replacement = 1L),
     "Assertion on 'replacement' failed: Must be of type 'character'")
 })

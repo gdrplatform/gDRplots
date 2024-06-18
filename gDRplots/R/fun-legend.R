@@ -48,7 +48,7 @@ get_legend_title <-
 #' (2) there is a codrug data with at least two unique values
 #' 
 #' @param var_col name of column used for coloring dots
-#' @param data \code{data.table} prepared by \code{prepareDataMC}
+#' @param data \code{data.table} prepared by \code{prepare_data_metric_contrast}
 #' 
 #' @examples
 #' dt <- data.table::data.table(

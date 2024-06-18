@@ -102,7 +102,7 @@ grob_sa <- function(dt_metrics,
   data.table::setnames(dt_fit, "conc_col", conc)
   
   # colors
-  if (is.null(colormap) || !all(vapply(colormap, isValidColor, logical(1)))) {
+  if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
     colormap <- grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
     
   } else if (NROW(colormap) != NROW(group_names)) {

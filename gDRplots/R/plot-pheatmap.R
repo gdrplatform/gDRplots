@@ -63,7 +63,7 @@ pheatmap_qc <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::isValidColor, logical(1))))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
@@ -265,7 +265,9 @@ pheatmap_qc <- function(
 #' pheatmap_with_anno_sa(tab_response = response_metrics, 
 #'                       annotation_col = annotation_manual,
 #'                       annotation_colors = annotation_map,
-#'                       hm_title = get_hm_title("Combo Matrix - single-agent data"))
+#'                       hm_title = get_hm_title(metric_growth = "GR",
+#'                                               metric = "hsa_score",
+#'                                               dataset_name = "Combo Matrix - combo data"))
 #' 
 #' @keywords QC_plot
 #' 
@@ -288,7 +290,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::isValidColor, logical(1))))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -423,7 +425,9 @@ pheatmap_with_anno_sa <- function(
 #' pheatmap_with_anno_combo(tab_response = response_metrics, 
 #'                          annotation_col = annotation_manual,
 #'                          annotation_colors = annotation_map,
-#'                          hm_title = get_hm_title("Combo Matrix - combo data"))
+#'                          hm_title = get_hm_title(metric_growth = "GR",
+#'                                                  metric = "hsa_score",
+#'                                                  dataset_name = "Combo Matrix - combo data"))
 #'             
 #' @keywords QC_plot
 #' 
@@ -446,7 +450,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::isValidColor, logical(1))))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -540,27 +544,30 @@ pheatmap_with_anno_combo <- function(
 # helpers ----
 #' Get Legend Title
 #' 
-#' @param dataset_name string name of dataset
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric
 #'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
+#' @param dataset_name string name of dataset
 #'
 #' @examples
 #' get_hm_title(dataset_name = "Dateset DX123",
 #'              metric = "x_mean", 
 #'              metric_growth = "GR")
 #' 
+#' get_hm_title(metric = "xc50", 
+#'              metric_growth = "GR")
+#'              
 #' @keywords QC_plot
 #' 
 #' @return character title for heatmap
 #' @export 
-get_hm_title <- function(dataset_name,
-                         metric = "xc50", 
-                         metric_growth = "GR") {
+get_hm_title <- function(metric = "xc50", 
+                         metric_growth = "GR",
+                         dataset_name = NULL) {
   
-  checkmate::assert_string(dataset_name)
+  checkmate::assert_string(dataset_name, null.ok = TRUE)
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, 
                            choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
@@ -568,7 +575,14 @@ get_hm_title <- function(dataset_name,
   title_metric <- 
     gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, metric_growth), human_readable = TRUE)
   
-  sprintf("%s (%s)", dataset_name, title_metric)
+  if (metric == "xc50") title_metric <- sprintf("log10(%s)", title_metric)
+  
+  hm_title <- if (!is.null(dataset_name))  {
+    sprintf("%s (%s)", dataset_name, title_metric)
+  } else {
+    title_metric
+  }
+  return(hm_title)
 }
 
 #' Change NA into given string

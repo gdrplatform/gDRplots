@@ -12,7 +12,9 @@
 #' anything other than compute Spearman correlation distance and replace NAs with 0,
 #' you must edit this function definition accordingly. At the moment (December 2020)
 #' this is sufficient. If the control were to be given to the user,
-#' remove defaults for this definition and create a wrapper within \code{plotlyMH}.
+#' remove defaults for this definition and create a wrapper within \code{plotly_metric_clustering}.
+#' 
+#' The function was originally named \code{computeDistances}
 #'
 #' @param x numeric matrix
 #' @param method character string specifying the distance measure to be used;
@@ -30,7 +32,7 @@
 #' @examples
 #' x <- matrix(1:9, nrow = 3, ncol = 3)
 #' rownames(x) <- letters[seq(nrow(x))]
-#' computeDistances(x)
+#' compute_distances(x)
 #'
 #' @return Object of class \code{dist}. NA and NaN are substituted by the value of \code{dummy}.
 #'
@@ -42,11 +44,11 @@
 #'
 #' @export
 #'
-computeDistances <- function(x, 
-                             method = "spearman", 
-                             use = "pairwise.complete.obs", 
-                             stand = FALSE, 
-                             dummy = 0, ...) {
+compute_distances <- function(x, 
+                              method = "spearman", 
+                              use = "pairwise.complete.obs", 
+                              stand = FALSE, 
+                              dummy = 0, ...) {
   
   # row names are required to properly handle x matrices with non-variance rows
   checkmate::assert_matrix(x, row.names = "unique")

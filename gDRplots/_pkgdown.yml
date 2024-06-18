@@ -23,6 +23,10 @@ reference:
   desc:  Helpers for heatmaps
 - contents:
   - has_keyword("heatmaply")
+- title: Plugins plot
+  desc:  Functions for plugin plots with helpers
+- contents:
+  - has_keyword("plugin_plot")
 - title: Plotly helpers
   desc:  Helpers for plotly
 - contents:
