@@ -47,7 +47,7 @@ The fifth layer, "extras", highlights points corresponding to GR50/IC50 and GR m
 This quasi-layer is composed of points, which are a trace, lines, which are shapes,
 and labels, which are also a trace. The labels serve as axis ticks for the vertical and horizontal lines.
 The information necessary to draw the layer is supplied by the \code{extras} argument,
-see \code{\link{prepareExtras}}.
+see \code{\link{prepare_extras}}.
 It is a list of length 2,
 the first item being a \code{data.table} with coordinates of points
 passed to \code{plotly::add_markers},
@@ -71,7 +71,7 @@ plotlyRCSelected(
   var_y = "GR value",
   layers = c("curve", "average", "error"),
   curves = prepared_curves,
-  extras = prepareExtras(dt)
+  extras = prepare_extras(dt)
 )
 
 

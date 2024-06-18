@@ -13,7 +13,7 @@ key_cells_drugs <- data.table::data.table(
   "Drug Name" = drug_names[1]
 )
 
-prepared_extras <- prepareExtras(dt)
+prepared_extras <- prepare_extras(dt)
 subset_data <- dt[key_cells_drugs, on = intersect(names(dt), names(key_cells_drugs))]
 subset_curves <- prepared_curves[key_cells_drugs, on = intersect(names(prepared_curves),
                                                                  names(key_cells_drugs))]
@@ -38,7 +38,7 @@ combo_key_cells_drugs <- data.table::data.table(
   "Drug Name" = combo_drug_names[2:4]
 )
 
-combo_prepared_extras <- prepareExtras(combo_dt)
+combo_prepared_extras <- prepare_extras(combo_dt)
 combo_subset_data <- 
   combo_dt[combo_key_cells_drugs, on = intersect(names(combo_dt), names(combo_key_cells_drugs))]
 combo_subset_curves <- 
@@ -79,9 +79,9 @@ test_that("prepare_curves works as expected", {
   expect_error(prepare_curves(dt, density = "str"))
 })
 
-# prepareExtras tests ----
-test_that("check output type, data, values for prepareExtras", {
-  ext_1 <- prepareExtras(dt)
+# prepare_extras tests ----
+test_that("check output type, data, values for prepare_extras", {
+  ext_1 <- prepare_extras(dt)
   
   expect_type(ext_1, "list")
   expect_identical(names(ext_1), c("points", "lines"))
@@ -91,7 +91,7 @@ test_that("check output type, data, values for prepareExtras", {
   expect_identical(ext_1$lines[[1]]$type, "line")
   
   r_x <- c(3.8e-2, 4e+0)
-  ext_2 <- prepareExtras(dt, range_x = r_x)
+  ext_2 <- prepare_extras(dt, range_x = r_x)
   
   expect_type(ext_2, "list")
   expect_identical(names(ext_2), c("points", "lines"))
@@ -102,21 +102,21 @@ test_that("check output type, data, values for prepareExtras", {
   expect_identical(ext_2$lines[[horizontal_1st]]$x1, r_x[2])
 })
 
-test_that("returns error with wrong argument for prepareExtras", {
+test_that("returns error with wrong argument for prepare_extras", {
   expect_error(
-    prepareExtras(),
+    prepare_extras(),
     "argument \"metrics\" is missing, with no default"
   )
   expect_error(
-    prepareExtras(5),
+    prepare_extras(5),
     "Assertion on 'metrics' failed: Must be a data.table, not double."
   )
   expect_error(
-    prepareExtras(dt, 1),
+    prepare_extras(dt, 1),
     "Assertion on 'range_x' failed: Must have length 2, but has length 1."
   )
   expect_error(
-    prepareExtras(dt, "str"),
+    prepare_extras(dt, "str"),
     "Assertion on 'range_x' failed: Must be of type 'numeric', not 'character'."
   )
 })

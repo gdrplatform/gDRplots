@@ -106,7 +106,7 @@ prepare_curves <- function(metrics,
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepareExtras(dt)
+#' prepare_extras(dt)
 #' 
 #' @return
 #' List of length 2.
@@ -118,7 +118,8 @@ prepare_curves <- function(metrics,
 #' @keywords drawResponseOverview
 #' @export
 #'
-prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
+prepare_extras <- function(metrics, 
+                           range_x = c(1e-3, 50e+0)) {
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -337,7 +338,7 @@ plotlyRCAll <- function(curve_data,
 #' This quasi-layer is composed of points, which are a trace, lines, which are shapes,
 #' and labels, which are also a trace. The labels serve as axis ticks for the vertical and horizontal lines.
 #' The information necessary to draw the layer is supplied by the \code{extras} argument,
-#' see \code{\link{prepareExtras}}.
+#' see \code{\link{prepare_extras}}.
 #' It is a list of length 2,
 #' the first item being a \code{data.table} with coordinates of points
 #' passed to \code{plotly::add_markers},
@@ -367,7 +368,7 @@ plotlyRCAll <- function(curve_data,
 #'   var_y = "GR value",
 #'   layers = c("curve", "average", "error"),
 #'   curves = prepared_curves,
-#'   extras = prepareExtras(dt)
+#'   extras = prepare_extras(dt)
 #' )
 #' 
 #'
