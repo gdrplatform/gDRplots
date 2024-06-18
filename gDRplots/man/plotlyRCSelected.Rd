@@ -77,7 +77,7 @@ plotlyRCSelected(
 
 }
 \seealso{
-\code{replaceValues}
+\code{replace_values}
 }
 \keyword{drawResponseOverview}
 \keyword{internal}

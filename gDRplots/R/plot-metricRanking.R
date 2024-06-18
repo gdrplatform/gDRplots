@@ -72,14 +72,14 @@ plotly_metric_ranking <- function(data,
   if (has_codrug_data)  {
     co_drugs <- setdiff(unique(data[[drug_name2]]), untreated_tags)
     #  if co-drugs contains both one of `untreated_tags` and codrugs not being `untreated_tags`
-    # replace former with the latter using `gDRplots::replaceValues`
+    # replace former with the latter using `gDRplots::replace_values`
     # TODO: propose a more robust approach to handle more than two untreated tags
     if (length(co_drugs) > 1 && any(untreated_tags %in% data[[drug_name2]])) {
       data <-
         if (untreated_tags[1] %in% data[[drug_name2]]) {
-          replaceValues(data, drug_name2, untreated_tags[1], co_drugs)
+          replace_values(data, drug_name2, untreated_tags[1], co_drugs)
         } else if (untreated_tags[2] %in% data[[drug_name2]]) {
-          replaceValues(data, drug_name2, untreated_tags[2], co_drugs)
+          replace_values(data, drug_name2, untreated_tags[2], co_drugs)
         } else {
           stop(sprintf("unsupported value for 'untreated_tags:%s", untreated_tags))
         }

@@ -374,7 +374,7 @@ plotlyRCAll <- function(curve_data,
 #' @return a plotly object
 #'
 #' @keywords internal
-#' @seealso \code{replaceValues}
+#' @seealso \code{replace_values}
 #'
 #' @keywords drawResponseOverview
 #' @export
@@ -434,9 +434,9 @@ plotlyRCSelected <- function(data,
   #     # replace "untreated" with respective co-drug name
   #     base_untreated_tag <- intersect(untreated_tag, data[[drug2_name]])
   #     data <-
-  #       replaceValues(data, drug2_name, base_untreated_tag, co_drugs)
+  #       replace_values(data, drug2_name, base_untreated_tag, co_drugs)
   #     curves <-
-  #       replaceValues(curves, drug2_name, base_untreated_tag, co_drugs)
+  #       replace_values(curves, drug2_name, base_untreated_tag, co_drugs)
   #     
   #     # split data on co-drugs
   #     data_split <- split(data, data[[drug2_name]])

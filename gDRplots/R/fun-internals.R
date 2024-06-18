@@ -76,7 +76,7 @@ reformat_untreated_cases <- function(label) {
 #'   group = rep("nt", 2)
 #' )
 #' dt <- rbind(vals, nts)
-#' dtr <- replaceValues(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
+#' dtr <- replace_values(x = dt, column = "group", replacee = "nt", replacement = c("A", "B"))
 #'                               
 #'
 #' @return A modified data table Keep in mind that if \code{replacement} has length of more than one,
@@ -90,9 +90,12 @@ reformat_untreated_cases <- function(label) {
 #' @export
 #' @keywords utils
 #'
-#' @seealso \code{MetricRanking}, \code{plotlyMR}
+#' @seealso \code{MetricRanking}, \code{plotly_metric_ranking}
 #'
-replaceValues <- function(x, column, replacee, replacement) {
+replace_values <- function(x, 
+                           column, 
+                           replacee, 
+                           replacement) {
   checkmate::assert_data_table(x)
   checkmate::assert_string(column)
   checkmate::assert_choice(column, choices = names(x))
