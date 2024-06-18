@@ -18,7 +18,7 @@ A data.table with predicted response for the given concentration range.
 
 Prediction is made for both GR value and Relative Viability,
 across a \code{density}-long sequence of concentrations within \code{range_x}.
-The concentrations are generated with \code{logSeq}.
+The concentrations are generated with \code{create_log_seq}.
 }
 \description{
 Simulate and plot dose response curves for all existing combinations of Cell Line and Drug.

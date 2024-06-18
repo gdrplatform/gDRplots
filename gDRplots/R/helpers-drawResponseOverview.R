@@ -15,7 +15,7 @@
 #'
 #' Prediction is made for both GR value and Relative Viability,
 #' across a \code{density}-long sequence of concentrations within \code{range_x}.
-#' The concentrations are generated with \code{logSeq}.
+#' The concentrations are generated with \code{create_log_seq}.
 #'
 #' @keywords drawResponseOverview
 #' @export
@@ -48,7 +48,7 @@ prepare_curves <- function(metrics,
   vars_id <- intersect(vars_wish_list, names(metrics))
   
   # set concentration range
-  concentrations <- logSeq(range_x[1], range_x[2], density)
+  concentrations <- create_log_seq(range_x[1], range_x[2], density)
   
   # safety check 
   # we are expecting single row in 'data' for selected combination of vars  in (vars_id)
@@ -639,7 +639,7 @@ plotlyRCSelected <- function(data,
 #' @seealso \code{\link{prepare_curves}}
 #'
 #' @export
-logSeq <- function(start, end, length) {
+create_log_seq <- function(start, end, length) {
   
   checkmate::assert_number(start, lower = 0, finite = TRUE)
   checkmate::assert_number(end, lower = 0, finite = TRUE)
