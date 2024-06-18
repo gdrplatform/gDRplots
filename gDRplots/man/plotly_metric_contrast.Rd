@@ -41,7 +41,7 @@ the metrics that are plotted on linear axes}
 \item{source}{character string representing a match of this string's value 
 with the source argument in \code{event_data()}}
 
-\item{with_labelR}{logical flag whether to enabale \code{plotlyLabelR} functionality}
+\item{with_labelR}{logical flag whether to enable \code{plotlyLabelR} functionality}
 }
 \value{
 a plotly object
@@ -70,6 +70,6 @@ printed on the plot. Unless \code{metric} is one of the *50s, a linear fit will 
 The plot is generated with \code{\link[plotly]{plot_ly}} and has some interactivity.
 }
 \seealso{
-\code{prepareDataMC} \code{MetricContrast}
+\code{prepare_data_metric_contrast} \code{MetricContrast}
 }
 \keyword{plugin_plot}

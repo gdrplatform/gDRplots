@@ -23,10 +23,10 @@
 #'
 #' @export
 #'
-prepareDataMC <- function(data, 
-                          choices, 
-                          variable, 
-                          var_col) {
+prepare_data_metric_contrast <- function(data, 
+                                         choices, 
+                                         variable, 
+                                         var_col) {
   
   # get prettified versions of selected identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -132,12 +132,12 @@ prepareDataMC <- function(data,
 #' @param axis_limits character string; fix or release limits of Y axis, see \code{Details}
 #' @param source character string representing a match of this string's value 
 #'     with the source argument in \code{event_data()}
-#' @param with_labelR logical flag whether to enabale \code{plotlyLabelR} functionality
+#' @param with_labelR logical flag whether to enable \code{plotlyLabelR} functionality
 #'
 #' @return a plotly object
 #'
 #' @keywords plugin_plot
-#' @seealso \code{prepareDataMC} \code{MetricContrast}
+#' @seealso \code{prepare_data_metric_contrast} \code{MetricContrast}
 #'
 #' @export
 #'

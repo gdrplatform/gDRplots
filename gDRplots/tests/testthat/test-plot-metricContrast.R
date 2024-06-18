@@ -52,28 +52,28 @@ choicesMissingDrug$`Drug Name` <- NULL
 choicesMissingCellLine <- choices
 choicesMissingCellLine$`Cell Line Name` <- NULL
 
-# prepareDataMC tests
+# prepare_data_metric_contrast tests
 test_that("testing output", {
-  prepared_dt <- prepareDataMC(dt, choices, variable, var_col)
+  prepared_dt <- prepare_data_metric_contrast(dt, choices, variable, var_col)
   data.table::setkey(prepared_dt, NULL)
   expect_equal(prepared_dt, dt_prep)
 })
 
-test_that("prepareDataMC returns error with wrong argument", {
+test_that("prepare_data_metric_contrast returns error with wrong argument", {
   expect_error(
-    prepareDataMC(n, choices, variable, var_col),
+    prepare_data_metric_contrast(n, choices, variable, var_col),
     "Assertion on 'data' failed: Must be a data.table, not double."
   )
   expect_error(
-    prepareDataMC(dt, n, variable, var_col),
+    prepare_data_metric_contrast(dt, n, variable, var_col),
     "Assertion on 'choices' failed: Must be of type 'list', not 'double'."
   )
   expect_error(
-    prepareDataMC(dt, choices, n, var_col),
+    prepare_data_metric_contrast(dt, choices, n, var_col),
     "Assertion on 'variable' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    prepareDataMC(dt, choices, variable, n),
+    prepare_data_metric_contrast(dt, choices, variable, n),
     paste0("Assertion on 'var_col' failed: Must be element of set {'Drug Name',",
            "'Drug MOA','Cell Line Name','Tissue','GR_AOC','GR Inf','GR 0','GEC50',",
            "'h GR','E Inf','E0','EC50','h RV','GR50','IC50','GR Max','E Max','GR value',",
@@ -84,29 +84,29 @@ test_that("prepareDataMC returns error with wrong argument", {
 
 test_that("test missing data", {
   expect_error(
-    prepareDataMC(dtMissingDrug, choices, variable, var_col),
+    prepare_data_metric_contrast(dtMissingDrug, choices, variable, var_col),
     paste0("Assertion on 'choices[[\"primary\"]]' failed: Must be element of ",
            "set {'Drug MOA','Cell Line Name','Tissue','GR_AOC','GR Inf','GR 0',",
            "'GEC50','h GR','E Inf','E0','EC50','h RV','GR50','IC50','GR Max','E Max',",
            "'GR value','Concentration'}, but is 'Drug Name'."),
     fixed = TRUE
   )
-  prepared_dt_1 <- prepareDataMC(dtMissingDrugMOA, choices, variable, var_col)
+  prepared_dt_1 <- prepare_data_metric_contrast(dtMissingDrugMOA, choices, variable, var_col)
   data.table::setkey(prepared_dt_1, NULL)
   expect_identical(prepared_dt_1, dt_prep)
   expect_error(
-    prepareDataMC(dtMissingCellLine, choices, variable, var_col),
+    prepare_data_metric_contrast(dtMissingCellLine, choices, variable, var_col),
     paste0("Assertion on 'choices[[\"secondary\"]]' failed: Must be element of ",
            "set {'Drug Name','Drug MOA','Tissue','GR_AOC','GR Inf','GR 0','GEC50',",
            "'h GR','E Inf','E0','EC50','h RV','GR50','IC50','GR Max','E Max','GR value',",
            "'Concentration'}, but is 'Cell Line Name'."),
     fixed = TRUE
   )
-  prepared_dt_2 <- prepareDataMC(dtMissingPrimaryTissue, choices, variable, var_col)
+  prepared_dt_2 <- prepare_data_metric_contrast(dtMissingPrimaryTissue, choices, variable, var_col)
   data.table::setkey(prepared_dt_2, NULL)
   expect_identical(prepared_dt_2, dt_prep)
   expect_error(
-    prepareDataMC(dtMissingGR_AOC, choices, variable, var_col),
+    prepare_data_metric_contrast(dtMissingGR_AOC, choices, variable, var_col),
     paste0("Assertion on 'variable' failed: Must be element of set {'Drug Name',",
            "'Drug MOA','Cell Line Name','Tissue','GR Inf','GR 0','GEC50','h GR',",
            "'E Inf','E0','EC50','h RV','GR50','IC50','GR Max','E Max','GR value',",
@@ -114,22 +114,22 @@ test_that("test missing data", {
     fixed = TRUE
   )
   expect_error(
-    prepareDataMC(dt, choicesMissingPrimary, variable, var_col),
+    prepare_data_metric_contrast(dt, choicesMissingPrimary, variable, var_col),
     "Assertion on 'length(choices) == 4' failed: Must be TRUE.",
     fixed = TRUE
   )
   expect_error(
-    prepareDataMC(dt, choicesMissingSecondary, variable, var_col),
+    prepare_data_metric_contrast(dt, choicesMissingSecondary, variable, var_col),
     "Assertion on 'length(choices) == 4' failed: Must be TRUE.",
     fixed = TRUE
   )
   expect_error(
-    prepareDataMC(dt, choicesMissingDrug, variable, var_col),
+    prepare_data_metric_contrast(dt, choicesMissingDrug, variable, var_col),
     "Assertion on 'length(choices) == 4' failed: Must be TRUE.",
     fixed = TRUE
   )
   expect_error(
-    prepareDataMC(dt, choicesMissingCellLine, variable, var_col),
+    prepare_data_metric_contrast(dt, choicesMissingCellLine, variable, var_col),
     "Assertion on 'length(choices) == 4' failed: Must be TRUE.",
     fixed = TRUE
   )

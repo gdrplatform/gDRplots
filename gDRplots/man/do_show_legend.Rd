@@ -9,7 +9,7 @@ do_show_legend(var_col, data)
 \arguments{
 \item{var_col}{name of column used for coloring dots}
 
-\item{data}{\code{data.table} prepared by \code{prepareDataMC}}
+\item{data}{\code{data.table} prepared by \code{prepare_data_metric_contrast}}
 }
 \value{
 logical value
