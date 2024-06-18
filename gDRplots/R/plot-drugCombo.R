@@ -823,7 +823,7 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
 #' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #'
-#' plotlyDCRatio(
+#' plolty_drug_combo_ratio(
 #'   data = combo_data_l,
 #'   drug1_name = "drug_005",
 #'   drug2_name = "drug_021",
@@ -832,7 +832,7 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 #'   c_assay = "hsa_excess"
 #' )
 #'
-#' plotlyDCRatio(
+#' plolty_drug_combo_ratio(
 #'   data = combo_data_l,
 #'   drug1_name = "drug_005",
 #'   drug2_name = "drug_021",
@@ -841,7 +841,7 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 #'   c_assay = "smooth"
 #' )
 #'
-#' plotlyDCRatio(
+#' plolty_drug_combo_ratio(
 #'   data = combo_data_l,
 #'   drug1_name = "drug_005",
 #'   drug2_name = "drug_021",
@@ -855,15 +855,15 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 #' @keywords plugin_plot
 #' @export
 #'
-plotlyDCRatio <- function(data,
-                          drug1_name,
-                          drug2_name,
-                          cell_line,
-                          c_assay = names(gDRutils::get_combo_excess_field_names())[[1]],
-                          normalization_type = "RV",
-                          iso_levels =  c("0.5", "0.75"),
-                          height = 325,
-                          width = 425) {
+plolty_drug_combo_ratio <- function(data,
+                                    drug1_name,
+                                    drug2_name,
+                                    cell_line,
+                                    c_assay = names(gDRutils::get_combo_excess_field_names())[[1]],
+                                    normalization_type = "RV",
+                                    iso_levels =  c("0.5", "0.75"),
+                                    height = 325,
+                                    width = 425) {
   
   
   # argument checks

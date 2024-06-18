@@ -273,7 +273,7 @@ test_that("get_isobologram_data", {
   )
 })
 
-test_that("plotlyDCRatio", {
+test_that("plolty_drug_combo_ratio", {
   assay_type <- "excess"
   a_name <- gDRutils::get_assay_names(type = assay_type, prettify = TRUE)
   metric_growth <- "GR"
@@ -284,7 +284,7 @@ test_that("plotlyDCRatio", {
   normalization_type <- "GR"
   assay_name <- "smooth"
   
-  pl1 <- plotlyDCRatio(
+  pl1 <- plolty_drug_combo_ratio(
     data = test_exp,
     drug1_name = drug1,
     drug2_name = drug2,
@@ -319,51 +319,51 @@ test_that("plotlyDCRatio", {
   
   # errors
   expect_error(
-    plotlyDCRatio(data = data.table::data.table(a = 1), drug1, drug2, cl_name),
+    plolty_drug_combo_ratio(data = data.table::data.table(a = 1), drug1, drug2, cl_name),
     "Assertion on 'data' failed: Must be of type 'list', not 'data.table/data.frame'.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDCRatio(data = list(a = 1), drug1, drug2, cl_name),
+    plolty_drug_combo_ratio(data = list(a = 1), drug1, drug2, cl_name),
     "Assertion on 'data[[1]]' failed: Must be a data.table, not double.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1 = 1, drug2, cl_name),
+    plolty_drug_combo_ratio(data = test_exp, drug1 = 1, drug2, cl_name),
     "Assertion on 'drug1_name' failed: Must be of type 'string', not 'double'.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2 = c("01", "02"), cl_name),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2 = c("01", "02"), cl_name),
     "Assertion on 'drug2_name' failed: Must have length 1.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2, cell_line = list(c = "cl2")),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2, cell_line = list(c = "cl2")),
     "Assertion on 'cell_line' failed: Must be of type 'string', not 'list'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2, cl_name, c_assay = "dummy"),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2, cl_name, c_assay = "dummy"),
     "Assertion on 'c_assay' failed: Must be element of set {'smooth','hsa_excess','bliss_excess'}, but is 'dummy'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2, cl_name, normalization_type = "GRvalue"),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2, cl_name, normalization_type = "GRvalue"),
     "Assertion on 'normalization_type' failed: Must be element of set {'GR','RV'}, but is 'GRvalue'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2, cl_name, iso_levels = c(50, 75)),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2, cl_name, iso_levels = c(50, 75)),
     "Assertion on 'iso_levels' failed: Must be of type 'character', not 'double'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDCRatio(data = test_exp, drug1, drug2, cl_name, iso_levels = c("0.223", "0.33")),
+    plolty_drug_combo_ratio(data = test_exp, drug1, drug2, cl_name, iso_levels = c("0.223", "0.33")),
     "Assertion on '0.223' failed. "
   )
   
