@@ -195,7 +195,7 @@ prepare_extras <- function(metrics,
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
 #' prepared_curves <- prepare_curves(dt)
-#' plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
+#' plotly_response_curve_all(curve_data = prepared_curves, var_y = "GR value")
 #'
 #' @return A plotly object with highlights. The plot contains only response curves.
 #'
@@ -204,11 +204,11 @@ prepare_extras <- function(metrics,
 #' @keywords drawResponseOverview
 #' @export
 #'
-plotlyRCAll <- function(curve_data, 
-                        var_y, 
-                        range_x = c(1e-3, 50e+0),
-                        plot_width = 400L,
-                        plot_height = 300L) {
+plotly_response_curve_all <- function(curve_data, 
+                                      var_y, 
+                                      range_x = c(1e-3, 50e+0),
+                                      plot_width = 400L,
+                                      plot_height = 300L) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)

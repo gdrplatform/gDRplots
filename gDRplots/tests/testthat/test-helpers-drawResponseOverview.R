@@ -121,9 +121,9 @@ test_that("returns error with wrong argument for prepare_extras", {
   )
 })
 
-# plotlyRCAll tests ----
-test_that("check output type for plotlyRCAll", {
-  plt_all <- plotlyRCAll(prepared_curves, var_y) # default
+# plotly_response_curve_all tests ----
+test_that("check output type for plotly_response_curve_all", {
+  plt_all <- plotly_response_curve_all(prepared_curves, var_y) # default
   
   expect_type(plt_all, "list")
   expect_is(plt_all, "plotly")
@@ -137,14 +137,14 @@ test_that("check output type for plotlyRCAll", {
   
   plt_w <- 200
   plt_h <- 600
-  plt <- plotlyRCAll(prepared_curves, var_y, plot_width = plt_w, plot_height = plt_h)
+  plt <- plotly_response_curve_all(prepared_curves, var_y, plot_width = plt_w, plot_height = plt_h)
   expect_type(plt, "list")
   expect_is(plt, "plotly")
   expect_equal(plt$width, plt_w)
   expect_equal(plt$height, plt_h)
   
   r_x <- c(3.8e-2, 4e+0)
-  plt <- plotlyRCAll(prepared_curves, var_y, range_x = r_x)
+  plt <- plotly_response_curve_all(prepared_curves, var_y, range_x = r_x)
   expect_type(plt, "list")
   expect_is(plt, "plotly")
   expect_equal(plt$x$layoutAttrs[[1]]$xaxis$range, log10(r_x))
@@ -153,18 +153,18 @@ test_that("check output type for plotlyRCAll", {
   dt2 <- dt[`Cell Line Name` %in% selected_cl]
   prepared_curves_2 <- prepare_curves(dt2)
   
-  plt_all_2 <- plotlyRCAll(prepared_curves_2, var_y)
+  plt_all_2 <- plotly_response_curve_all(prepared_curves_2, var_y)
   expect_is(plt_all_2, "plotly")
   expect_equal(plt_all_2$x$layoutAttrs[[1]]$title$text,
                paste0("Dose response curves for Cell Line Name: ", 
                       paste(selected_cl, collapse = ", ")))
 })
 
-test_that("check output for wrong data for plotlyRCAll", {
+test_that("check output for wrong data for plotly_response_curve_all", {
   prepared_curves_out <- prepared_curves
   prepared_curves_out[[var_y]] <- prepared_curves_out[[var_y]] + 100
   
-  plt <- plotlyRCAll(prepared_curves_out, var_y = var_y)
+  plt <- plotly_response_curve_all(prepared_curves_out, var_y = var_y)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -178,40 +178,40 @@ test_that("check output for wrong data for plotlyRCAll", {
   expect_true(grepl("contact gdrplatform team", plt_msg))
 })
 
-test_that("returns error with missing and wrong argument for plotlyRCAll", {
+test_that("returns error with missing and wrong argument for plotly_response_curve_all", {
   expect_error(
-    plotlyRCAll(dt, var_y),
+    plotly_response_curve_all(dt, var_y),
     paste0("Assertion on 'names\\(curve_data\\)' failed:")
   )
   expect_error(
-    plotlyRCAll(5, var_y),
+    plotly_response_curve_all(5, var_y),
     paste0("Assertion on 'curve_data' failed: Must be a data.table, not double.")
   )
   expect_error(
-    plotlyRCAll(prepared_curves, 5),
+    plotly_response_curve_all(prepared_curves, 5),
     "Assertion on 'var_y' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyRCAll(prepared_curves, var_y, range_x = 1),
+    plotly_response_curve_all(prepared_curves, var_y, range_x = 1),
     "Assertion on 'range_x' failed: Must have length 2, but has length 1."
   )
   expect_error(
-    plotlyRCAll(prepared_curves, var_y, range_x = "str"),
+    plotly_response_curve_all(prepared_curves, var_y, range_x = "str"),
     "Assertion on 'range_x' failed: Must be of type 'numeric', not 'character'."
   )
   expect_error(
-    plotlyRCAll(prepared_curves, var_y, plot_width = "str"),
+    plotly_response_curve_all(prepared_curves, var_y, plot_width = "str"),
     "Assertion on 'plot_width' failed: Must be of type 'numeric', not 'character'."
   )
   expect_error(
-    plotlyRCAll(prepared_curves, var_y, plot_height = "str"),
+    plotly_response_curve_all(prepared_curves, var_y, plot_height = "str"),
     "Assertion on 'plot_height' failed: Must be of type 'numeric', not 'character'."
   )
   
   prepared_curves_2 <- data.table::copy(prepared_curves)
   data.table::setnames(prepared_curves_2, "Drug Name", "Bad Name")
   expect_error(
-    plotlyRCAll(prepared_curves_2, var_y),
+    plotly_response_curve_all(prepared_curves_2, var_y),
     "failed: Names must include the elements"
   )
 })
