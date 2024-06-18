@@ -271,13 +271,16 @@ plotlyMC <- function(data,
   
   # adding plotlyLabelR functionality # nolint start
   if (with_labelR) {
-    plot_base <- plot_base |>
-      plotlyLabelR::enable_adjustable_labels() |> ## enable adjustable labels
-      ## register events with the plot
-      plotly::event_register("plotly_click") |>
-      plotlyLabelR::lbr_event_register("plotly_metaclick") |> # meta + click or alt + click
-      plotlyLabelR::lbr_event_register("plotly_removemetaclick") |> # meta + click on label
-      plotlyLabelR::lbr_event_register("plotly_doublemetaclick") # meta + doubleclick
+    ## enable adjustable labels
+    plot_base <- plotlyLabelR::enable_adjustable_labels(plot_base)
+    ## register events with the plot
+    plot_base <- plotly::event_register(plot_base, event = "plotly_click")
+    # meta + click or alt + click
+    plot_base <- plotlyLabelR::lbr_event_register(plot_base, event = "plotly_metaclick")
+    # meta + click on label
+    plot_base <- plotlyLabelR::lbr_event_register(plot_base, event = "plotly_removemetaclick") 
+    # meta + doubleclick
+    plot_base <- plotlyLabelR::lbr_event_register(plot_base, event = "plotly_doublemetaclick") 
   } # nolint end
   
   # options for correlation information
