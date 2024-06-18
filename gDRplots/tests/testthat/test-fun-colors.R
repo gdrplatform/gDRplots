@@ -66,19 +66,19 @@ test_that("get_col_luminance works as expected", {
 })
 
 
-test_that("isValidColor works as expected", {
+test_that("is_valid_color works as expected", {
   color_names <- c("#33cc33", "#d6f5d6", "#0a290a", "#F9B42DFF", "#714D6932", "#C2F970DC")
-  expect_true(all(vapply(color_names, isValidColor, logical(1))))
+  expect_true(all(vapply(color_names, is_valid_color, logical(1))))
   
   color_names <- c("darkblue", "yellow", "tomato")
-  expect_true(all(vapply(color_names, isValidColor, logical(1))))
+  expect_true(all(vapply(color_names, is_valid_color, logical(1))))
   
   color_names <- c("nice pink", "RED", "#0a290", "#C2F970D")
-  expect_false(all(vapply(color_names, isValidColor, logical(1))))
+  expect_false(all(vapply(color_names, is_valid_color, logical(1))))
   
-  expect_error(isValidColor(1), "Must be of type 'string'")
-  expect_error(isValidColor(NULL), "Must be of type 'string'")
-  expect_error(isValidColor(NA), "Assertion on 'col_name' failed: May not be NA.")
+  expect_error(is_valid_color(1), "Must be of type 'string'")
+  expect_error(is_valid_color(NULL), "Must be of type 'string'")
+  expect_error(is_valid_color(NA), "Assertion on 'col_name' failed: May not be NA.")
 })
 
 test_that("change_color_to_hex works as expected", {

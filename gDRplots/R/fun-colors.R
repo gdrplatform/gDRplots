@@ -69,7 +69,7 @@ brew_palette <- function(n,
 #' @export
 is_color_dark <- function(col_name) {
   checkmate::assert_string(col_name)
-  stopifnot("Must be valid color name" = isValidColor(col_name))
+  stopifnot("Must be valid color name" = is_valid_color(col_name))
   
   get_col_luminance(col_name) <= 0.22
 }
@@ -92,7 +92,7 @@ is_color_dark <- function(col_name) {
 #' @export
 get_col_luminance <- function(col_name) {
   checkmate::assert_string(col_name)
-  stopifnot("Must be valid color name" = isValidColor(col_name))
+  stopifnot("Must be valid color name" = is_valid_color(col_name))
   
   colrgb <- grDevices::col2rgb(col_name)
   lum <- lapply(colrgb, function(x) {
@@ -119,13 +119,13 @@ get_col_luminance <- function(col_name) {
 #' @return logical flag
 #' 
 #' @examples
-#' isValidColor("darkblue")
-#' isValidColor("#FF8C00")
-#' isValidColor("#FF8C00DC")
-#' isValidColor("RED")
+#' is_valid_color("darkblue")
+#' is_valid_color("#FF8C00")
+#' is_valid_color("#FF8C00DC")
+#' is_valid_color("RED")
 #' 
 #' @export
-isValidColor <- function(col_name) {
+is_valid_color <- function(col_name) {
   checkmate::assert_string(col_name)
   
   if (grepl("#", col_name)) {

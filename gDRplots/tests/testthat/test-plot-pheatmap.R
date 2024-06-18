@@ -12,7 +12,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, rdata[["DrugName"]])
-  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, isValidColor, logical(1))))
+  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
@@ -43,7 +43,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2))
-  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, isValidColor, logical(1))))
+  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName == "drug_004"]$bliss_score <- NA
