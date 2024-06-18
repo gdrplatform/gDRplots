@@ -138,7 +138,7 @@ test_that("test missing data", {
 # plotlyMC tests
 test_that("check output type and data",  {
   plt_0 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric)
-  expect_class(plt_0, "plotly")
+  checkmate::expect_class(plt_0, "plotly")
   expect_identical(plt_0$x$attrs[[1]]$type, "scatter")
   expect_identical(plt_0$x$attrs[[1]]$x, dt_prep[[var_x]])
   expect_identical(plt_0$x$attrs[[1]]$y, dt_prep[[var_y]])
@@ -146,7 +146,7 @@ test_that("check output type and data",  {
   expect_identical(plt_0$x$layoutAttrs[[1]]$yaxis$type, "linear")
   
   plt_1 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, "IC50")
-  expect_class(plt_1, "plotly")
+  checkmate::expect_class(plt_1, "plotly")
   expect_identical(plt_1$x$attrs[[1]]$type, "scatter")
   expect_identical(plt_1$x$attrs[[1]]$x, dt_prep[[var_x]])
   expect_identical(plt_1$x$attrs[[1]]$y, dt_prep[[var_y]])
@@ -155,30 +155,30 @@ test_that("check output type and data",  {
   expect_true(grepl("IC", plt_1$x$layoutAttrs[[1]]$title$text))
   
   plt_2 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric, identity = TRUE)
-  expect_class(plt_2, "plotly")
+  checkmate::expect_class(plt_2, "plotly")
   expect_identical(plt_2$x$attrs[[1]]$mode, "markers")
-  expect_class(plt_2$x$attrs[[2]], "plotly_segment") # identity line
+  checkmate::expect_class(plt_2$x$attrs[[2]], "plotly_segment") # identity line
   expect_identical(plt_2$x$attrs[[2]]$mode, "lines")
   
   plt_3 <- plotlyMC(dt_prep, var_x, var_y, var_col, var_txt, metric, correlation = TRUE)
-  expect_class(plt_3, "plotly")
+  checkmate::expect_class(plt_3, "plotly")
   expect_identical(plt_3$x$attrs[[1]]$mode, "markers")
-  expect_class(plt_3$x$attrs[[2]], "plotly_line") # correlation line
+  checkmate::expect_class(plt_3$x$attrs[[2]], "plotly_line") # correlation line
   expect_identical(plt_3$x$attrs[[2]]$mode, "lines")
   expect_true(grepl("correlation", plt_3$x$attrs[[3]]$text)) # correlation text
   
   dt_tissue <- data.table::copy(dt_prep)[, Tissue := c("tissue_x", "tissue_x", "tissue_y", "tissue_y", "tissue_z")]
   plt_4 <- plotlyMC(dt_tissue, var_x, var_y, var_col = "Tissue", var_txt,
                     metric, identity = TRUE, correlation = TRUE)
-  expect_class(plt_4, "plotly")
+  checkmate::expect_class(plt_4, "plotly")
   expect_identical(plt_4$x$attrs[[1]]$mode, "markers")
   expect_identical(plt_4$x$attrs[[1]]$color, dt_tissue$Tissue)
   expect_true(plt_4$x$attrs[[1]]$showlegend)
   expect_true(all(grepl("Tissue", plt_4$x$attrs[[1]]$text))) # color info in hover
-  expect_class(plt_4$x$attrs[[2]], "plotly_line") # correlation line
+  checkmate::expect_class(plt_4$x$attrs[[2]], "plotly_line") # correlation line
   expect_identical(plt_4$x$attrs[[2]]$mode, "lines")
   expect_true(grepl("correlation", plt_4$x$attrs[[3]]$text)) # correlation text
-  expect_class(plt_4$x$attrs[[4]], "plotly_segment") # identity line
+  checkmate::expect_class(plt_4$x$attrs[[4]], "plotly_segment") # identity line
   
   dt_conc_2 <- data.table::CJ(
     `Drug Name 2` = "drug_AB",
@@ -188,15 +188,15 @@ test_that("check output type and data",  {
   dt_conc_2[[var_y]] <- dt[["GR_AOC"]][1:NROW(dt_conc_2)] * 1.25
   plt_5 <- plotlyMC(dt_conc_2, var_x, var_y, var_col, var_txt,
                     metric, identity = TRUE, correlation = TRUE)
-  expect_class(plt_5, "plotly")
-  expect_identical(plt_5$x$attrs[[2]]$mode, "markers")
-  expect_true(plt_5$x$attrs[[2]]$showlegend)
-  expect_true(all(grepl("drug_AB at ", plt_5$x$attrs[[2]]$text))) # add concentration info
-  expect_true(all(unique(plt_5$x$attrs[[2]]$symbol) %in% unique(dt_conc_2$`Concentration 2`)))
-  expect_class(plt_5$x$attrs[[3]], "plotly_line") # correlation line
-  expect_identical(plt_5$x$attrs[[3]]$mode, "lines")
-  expect_true(grepl("correlation", plt_5$x$attrs[[4]]$text)) # correlation text
-  expect_class(plt_5$x$attrs[[5]], "plotly_segment") # identity line
+  checkmate::expect_class(plt_5, "plotly")
+  expect_identical(plt_5$x$attrs[[1]]$mode, "markers")
+  expect_true(plt_5$x$attrs[[1]]$showlegend)
+  expect_true(all(grepl("drug_AB at ", plt_5$x$attrs[[1]]$text))) # add concentration info
+  expect_true(all(unique(plt_5$x$attrs[[1]]$symbol) %in% unique(dt_conc_2$`Concentration 2`)))
+  checkmate::expect_class(plt_5$x$attrs[[2]], "plotly_line") # correlation line
+  expect_identical(plt_5$x$attrs[[2]]$mode, "lines")
+  expect_true(grepl("correlation", plt_5$x$attrs[[3]]$text)) # correlation text
+  checkmate::expect_class(plt_5$x$attrs[[4]], "plotly_segment") # identity line
   
   dt_conc_2_tiss <- data.table::CJ(
     `Drug Name 2` = "drug_001",
@@ -209,7 +209,7 @@ test_that("check output type and data",  {
   plt_6 <- plotlyMC(dt_conc_2_tiss,
                     var_x, var_y, var_col = "Tissue", var_txt,
                     metric, identity = TRUE, correlation = TRUE)
-  expect_class(plt_6, "plotly")
+  checkmate::expect_class(plt_6, "plotly")
   expect_identical(plt_6$x$attrs[[2]]$mode, "markers")
   expect_true(all(unique(plt_6$x$attrs[[2]]$symbol) %in% unique(dt_conc_2_tiss$`Concentration 2`)))
   expect_true(plt_6$x$attrs[[2]]$showlegend)
@@ -219,10 +219,10 @@ test_that("check output type and data",  {
   expect_true(all(unique(plt_6$x$attrs[[4]]$symbol) %in% unique(dt_conc_2_tiss$`Concentration 2`)))
   expect_false(plt_6$x$attrs[[4]]$showlegend)
   expect_true(all(grepl("Tissue", plt_6$x$attrs[[4]]$text))) # color info in hover
-  expect_class(plt_6$x$attrs[[5]], "plotly_line") # correlation line
+  checkmate::expect_class(plt_6$x$attrs[[5]], "plotly_line") # correlation line
   expect_identical(plt_6$x$attrs[[5]]$mode, "lines")
   expect_true(grepl("correlation", plt_6$x$attrs[[6]]$text)) # correlation text
-  expect_class(plt_6$x$attrs[[7]], "plotly_segment") # identity line
+  checkmate::expect_class(plt_6$x$attrs[[7]], "plotly_segment") # identity line
 })
 
 test_that("check input arguments ", {
