@@ -27,7 +27,7 @@ test_that("check output type and data",  {
     "drug_011"
   )
   
-  plt <- plotlyMR(dt, var_x, var_y, var_col, var_grp, title, show_tick_labels)
+  plt <- plotly_metric_ranking(dt, var_x, var_y, var_col, var_grp, title, show_tick_labels)
   expect_type(plt, "list")
   expect_identical(plt$x$attrs[[1]]$type, "bar")
   expect_identical(sort(plt$x$attrs[[1]]$y), sort(dt$x_AOC))
@@ -54,7 +54,7 @@ test_that("check output type and data",  {
   var_x <- "Drug Name"
   var_y <- "GR_AOC"
   
-  plt <- plotlyMR(dt, var_x, var_y, var_col, var_grp, title, show_tick_labels)
+  plt <- plotly_metric_ranking(dt, var_x, var_y, var_col, var_grp, title, show_tick_labels)
   expect_type(plt, "list")
   expect_identical(plt$x$attrs[[1]]$type, "bar")
   expect_identical(plt$x$attrs[[1]]$y, dt$GR_AOC)
@@ -63,27 +63,27 @@ test_that("check output type and data",  {
 
   
   expect_error(
-    plotlyMR(n, var_x, var_y, var_col, var_grp, title, show_tick_labels),
+    plotly_metric_ranking(n, var_x, var_y, var_col, var_grp, title, show_tick_labels),
     "Assertion on 'data' failed: Must be a data.table, not double."
   )
   expect_error(
-    plotlyMR(dt, n, var_y, var_col, var_grp, title, show_tick_labels),
+    plotly_metric_ranking(dt, n, var_y, var_col, var_grp, title, show_tick_labels),
     "Assertion on 'var_x' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMR(dt, var_x, n, var_col, var_grp, title, show_tick_labels),
+    plotly_metric_ranking(dt, var_x, n, var_col, var_grp, title, show_tick_labels),
     "Assertion on 'var_y' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMR(dt, var_x, var_y, n, var_grp, title, show_tick_labels),
+    plotly_metric_ranking(dt, var_x, var_y, n, var_grp, title, show_tick_labels),
     "Assertion on 'var_col' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMR(dt, var_x, var_y, var_col, n, title, show_tick_labels),
+    plotly_metric_ranking(dt, var_x, var_y, var_col, n, title, show_tick_labels),
     "Assertion on 'var_grp' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMR(dt, var_x, var_y, var_col, var_grp, n, show_tick_labels),
+    plotly_metric_ranking(dt, var_x, var_y, var_col, var_grp, n, show_tick_labels),
     "Assertion on 'title' failed: Must be of type 'string', not 'double'."
   )
 })

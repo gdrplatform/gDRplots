@@ -25,8 +25,14 @@
 #'
 #' @export
 #'
-plotlyMR <- function(data, var_x, var_y, var_col, var_grp, title, show_tick_labels,
-                     axis_limits = c("fixed", "upper", "lower", "free")) {
+plotly_metric_ranking <- function(data, 
+                                  var_x, 
+                                  var_y, 
+                                  var_col, 
+                                  var_grp, 
+                                  title, 
+                                  show_tick_labels,
+                                  axis_limits = c("fixed", "upper", "lower", "free")) {
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(var_x)
