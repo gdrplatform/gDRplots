@@ -9,7 +9,7 @@
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepareCurves(dt)
+#' prepare_curves(dt)
 #'
 #' @return A data.table with predicted response for the given concentration range.
 #'
@@ -20,9 +20,9 @@
 #' @keywords drawResponseOverview
 #' @export
 #'
-prepareCurves <- function(metrics, 
-                          range_x = c(1e-3, 50e+0), 
-                          density = 100) {
+prepare_curves <- function(metrics, 
+                           range_x = c(1e-3, 50e+0), 
+                           density = 100) {
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -101,7 +101,7 @@ prepareCurves <- function(metrics,
 
 #' Prepare coordinates of extra features
 #'
-#' @inheritParams prepareCurves
+#' @inheritParams prepare_curves
 #' 
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]]
@@ -193,7 +193,7 @@ prepareExtras <- function(metrics, range_x = c(1e-3, 50e+0)) {
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepared_curves <- prepareCurves(dt)
+#' prepared_curves <- prepare_curves(dt)
 #' plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
 #'
 #' @return A plotly object with highlights. The plot contains only response curves.
@@ -361,7 +361,7 @@ plotlyRCAll <- function(curve_data,
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:6]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-#' prepared_curves <- prepareCurves(dt)
+#' prepared_curves <- prepare_curves(dt)
 #' plotlyRCSelected(
 #'   data = prepared_curves,
 #'   var_y = "GR value",
@@ -635,7 +635,7 @@ plotlyRCSelected <- function(data,
 #' @keywords internal
 #' @return A numeric vector, see \code{Details}.
 #'
-#' @seealso \code{\link{prepareCurves}}
+#' @seealso \code{\link{prepare_curves}}
 #'
 #' @export
 logSeq <- function(start, end, length) {

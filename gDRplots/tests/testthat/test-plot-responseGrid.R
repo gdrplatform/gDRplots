@@ -10,7 +10,7 @@ dt <- synthetic_data$dt
 
 var_y <- "GR value"
 
-prepared_curves <- prepareCurves(dt)
+prepared_curves <- prepare_curves(dt)
 logarithmic_sequence <- rep(exp(seq(log(1e-3), log(50e+0), length.out = 100)), 19)
 
 # plotly_response_grid tests

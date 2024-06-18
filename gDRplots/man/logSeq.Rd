@@ -23,6 +23,6 @@ Differences between items are constant in logarithmic domain
 and therefore geometrically increase in linear domain.
 }
 \seealso{
-\code{\link{prepareCurves}}
+\code{\link{prepare_curves}}
 }
 \keyword{internal}

@@ -32,7 +32,7 @@ Plot all curves in a given data set on a reactive plot.
 \examples{
 se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
 dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
-prepared_curves <- prepareCurves(dt)
+prepared_curves <- prepare_curves(dt)
 plotlyRCAll(curve_data = prepared_curves, var_y = "GR value")
 
 }

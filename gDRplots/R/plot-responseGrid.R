@@ -12,7 +12,7 @@
 #'
 #' @keywords plugin_plot
 #'
-#' @seealso \code{\link[gDRplots]{prepareCurves}}
+#' @seealso \code{\link[gDRplots]{prepare_curves}}
 #'
 #' @export
 #'
@@ -56,7 +56,7 @@ plotly_response_grid <- function(data,
   data <- data[data.table::between(data[["var_y"]], range_y[1], range_y[2]), ]
   
   # build plots
-  # 'Treatment' is not and identifier, it's a column defined in `gDRplots::prepareCurves`
+  # 'Treatment' is not and identifier, it's a column defined in `gDRplots::prepare_curves`
   plot_base <- plotly::plot_ly(x = data[[pidfs[["concentration"]]]],
                                y = data[["var_y"]], 
                                split = data[["Treatment"]],

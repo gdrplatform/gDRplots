@@ -6,7 +6,7 @@ drug_names <- synthetic_data$drug_names
 cell_names <- synthetic_data$cell_line_names
 dt <- synthetic_data$dt
 
-prepared_curves <- prepareCurves(dt)
+prepared_curves <- prepare_curves(dt)
 var_y <- "GR value"
 key_cells_drugs <- data.table::data.table(
   "Cell Line Name" = cell_names[1],
@@ -32,7 +32,7 @@ combo_drug_names <- combo_synthetic_data$drug_names
 combo_cell_names <- combo_synthetic_data$cell_line_names
 combo_dt <- combo_synthetic_data$dt
 
-combo_prepared_curves <- prepareCurves(combo_dt)
+combo_prepared_curves <- prepare_curves(combo_dt)
 combo_key_cells_drugs <- data.table::data.table(
   "Cell Line Name" = combo_cell_names[2:4],
   "Drug Name" = combo_drug_names[2:4]
@@ -55,28 +55,28 @@ combo_subset_extras_lines <-
 combo_subset_extras <- list(points = combo_subset_extras_points,
                             lines = combo_subset_extras_lines)
 
-# prepareCurves tests ----
-test_that("prepareCurves works as expected", {
-  prepared_curves <- prepareCurves(dt)
+# prepare_curves tests ----
+test_that("prepare_curves works as expected", {
+  prepared_curves <- prepare_curves(dt)
   expect_is(prepared_curves, "data.table")
   expect_equal(NROW(prepared_curves), 100 * NROW(dt))
   expect_equal(min(unique(prepared_curves$Concentration)), 1e-3)
   expect_equal(max(unique(prepared_curves$Concentration)), 50e+0)
   
   n_density <- 200
-  expect_equal(NROW(prepareCurves(dt, density = n_density)), n_density * NROW(dt))
+  expect_equal(NROW(prepare_curves(dt, density = n_density)), n_density * NROW(dt))
   
   con_range <- c(1e-2, 5)
-  expect_equal(range(prepareCurves(dt, range_x = con_range)$Concentration), con_range)
-  expect_equal(unique(prepareCurves(dt, range_x = c(2, 2), density = 1)$Concentration), 2)
-  expect_equal(NROW(prepareCurves(dt, range_x = c(2, 2), density = 1)), NROW(dt))
+  expect_equal(range(prepare_curves(dt, range_x = con_range)$Concentration), con_range)
+  expect_equal(unique(prepare_curves(dt, range_x = c(2, 2), density = 1)$Concentration), 2)
+  expect_equal(NROW(prepare_curves(dt, range_x = c(2, 2), density = 1)), NROW(dt))
   
   dt2 <- dt
   dt2[2, ]$`Drug Name` <- dt2[1, `Drug Name`] # duplicated Drug Name
-  expect_error(prepareCurves(dt2), "sth wrong with the data model")
-  expect_error(prepareCurves(as.list(dt)))
-  expect_error(prepareCurves(dt, range_x = 1))
-  expect_error(prepareCurves(dt, density = "str"))
+  expect_error(prepare_curves(dt2), "sth wrong with the data model")
+  expect_error(prepare_curves(as.list(dt)))
+  expect_error(prepare_curves(dt, range_x = 1))
+  expect_error(prepare_curves(dt, density = "str"))
 })
 
 # prepareExtras tests ----
@@ -151,7 +151,7 @@ test_that("check output type for plotlyRCAll", {
   
   selected_cl <- cell_names[1:5]
   dt2 <- dt[`Cell Line Name` %in% selected_cl]
-  prepared_curves_2 <- prepareCurves(dt2)
+  prepared_curves_2 <- prepare_curves(dt2)
   
   plt_all_2 <- plotlyRCAll(prepared_curves_2, var_y)
   expect_is(plt_all_2, "plotly")
@@ -358,7 +358,7 @@ test_that("check output for wrong data for plotlyRCSelected", {
   drug_name <- pidfs[["drug_name"]]
   cell_name <- pidfs[["cellline_name"]]
   comb_name <- paste0(subset_data_out[[cell_name]][1], " x ", subset_data_out[[drug_name]][1])
-
+  
   expect_equal(plt$x$attrs[[1]]$mode, "text")
   expect_true(grepl("Invalid averaged data", plt_msg))
   expect_true(grepl(comb_name, plt_msg))

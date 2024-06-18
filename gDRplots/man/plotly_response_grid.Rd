@@ -23,6 +23,6 @@ A \code{plotly} object.
 Build a panel for the drug response grid.
 }
 \seealso{
-\code{\link[gDRplots]{prepareCurves}}
+\code{\link[gDRplots]{prepare_curves}}
 }
 \keyword{plugin_plot}
