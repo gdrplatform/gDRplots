@@ -88,7 +88,7 @@ plotly_metric_ranking <- function(data,
       # plot each subset
       plot_list <- lapply(
         data_split,
-        plotlyMR,
+        plotly_metric_ranking,
         var_x = var_x, var_y = var_y, var_col = var_col, var_grp = var_grp,
         title = title,
         show_tick_labels = show_tick_labels
