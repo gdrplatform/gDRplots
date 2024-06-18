@@ -37,9 +37,9 @@ Plot metric heat map with clustering
 }
 \details{
 Generate a heat map of a selected metric, clustering cell lines and drugs.
-Distances are computed with \code{\link[gDRplots]{computeDistances}}.
+Distances are computed with \code{\link[gDRplots]{compute_distances}}.
 }
 \seealso{
-\code{prepare_data_metric_clustering} \code{MetricClustering}, \code{\link[gDRplots]{computeDistances}}
+\code{prepare_data_metric_clustering} \code{MetricClustering}, \code{compute_distances}
 }
 \keyword{plugin_plot}

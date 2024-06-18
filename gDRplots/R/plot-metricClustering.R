@@ -107,7 +107,7 @@ prepare_data_metric_clustering <- function(data,
 #' Plot metric heat map with clustering
 #'
 #' Generate a heat map of a selected metric, clustering cell lines and drugs.
-#' Distances are computed with \code{\link[gDRplots]{computeDistances}}.
+#' Distances are computed with \code{\link[gDRplots]{compute_distances}}.
 #'
 #' @param data a numeric matrix with dimnames
 #' @param variable character string, naming metric to analyze
@@ -124,7 +124,7 @@ prepare_data_metric_clustering <- function(data,
 #'
 #' @keywords plugin_plot
 #'
-#' @seealso \code{prepare_data_metric_clustering} \code{MetricClustering}, \code{\link[gDRplots]{computeDistances}}
+#' @seealso \code{prepare_data_metric_clustering} \code{MetricClustering}, \code{compute_distances}
 #'
 #' @export
 #'
@@ -241,7 +241,7 @@ plotly_metric_clustering <- function(data,
     col_side_palette = colors$col,
     column_text_angle = 90,
     fontsize_col = font_size,
-    distfun = gDRplots::computeDistances,
+    distfun = gDRplots::compute_distances,
     dend_hoverinfo = FALSE,
     margins = c(margin_bottom, margin_left, NA, 0),
     seriate = "mean", # matrix sorting

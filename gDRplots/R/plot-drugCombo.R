@@ -119,7 +119,7 @@ plolty_drug_combo_heatmap <- function(data,
     fontsize_row = font_size,
     column_text_angle = 90,
     fontsize_col = font_size,
-    distfun = gDRplots::computeDistances,
+    distfun = gDRplots::compute_distances,
     dend_hoverinfo = FALSE,
     margins = c(margin_bottom, margin_left, NA, 0),
     seriate = "mean", # matrix sorting
