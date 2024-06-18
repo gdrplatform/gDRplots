@@ -540,27 +540,30 @@ pheatmap_with_anno_combo <- function(
 # helpers ----
 #' Get Legend Title
 #' 
-#' @param dataset_name string name of dataset
 #' @param metric_growth string with normalization types to be selected
 #'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric
 #'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
+#' @param dataset_name string name of dataset
 #'
 #' @examples
 #' get_hm_title(dataset_name = "Dateset DX123",
 #'              metric = "x_mean", 
 #'              metric_growth = "GR")
 #' 
+#' get_hm_title(metric = "xc50", 
+#'              metric_growth = "GR")
+#'              
 #' @keywords QC_plot
 #' 
 #' @return character title for heatmap
 #' @export 
-get_hm_title <- function(dataset_name,
-                         metric = "xc50", 
-                         metric_growth = "GR") {
+get_hm_title <- function(metric = "xc50", 
+                         metric_growth = "GR",
+                         dataset_name = NULL) {
   
-  checkmate::assert_string(dataset_name)
+  checkmate::assert_string(dataset_name, null.ok = TRUE)
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, 
                            choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
@@ -568,7 +571,14 @@ get_hm_title <- function(dataset_name,
   title_metric <- 
     gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, metric_growth), human_readable = TRUE)
   
-  sprintf("%s (%s)", dataset_name, title_metric)
+  if (metric == "xc50") title_metric <- sprintf("log10(%s)", title_metric)
+  
+  hm_title <- if (!is.null(dataset_name))  {
+    sprintf("%s (%s)", dataset_name, title_metric)
+  } else {
+    title_metric
+  }
+  return(hm_title)
 }
 
 #' Change NA into given string

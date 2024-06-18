@@ -66,14 +66,22 @@ test_that("pheatmap_with_anno_combo works as expected", {
 })
 
 test_that("get_hm_title works as expected", {
+  metric <- "xc50"
+  metric_growth <- "GR"
+  expect_equal(get_hm_title(metric, metric_growth), "log10(GR50)")
+  
+  metric <- "bliss_score"
+  metric_growth <- "RV"
+  expect_equal(get_hm_title(metric, metric_growth), "Bliss Score RV")
+  
   dataset_name <- "Dataset AB123"
   metric <- "xc50"
   metric_growth <- "RV"
-  expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (IC50)")
+  expect_equal(get_hm_title(metric, metric_growth, dataset_name), "Dataset AB123 (log10(IC50))")
   
   metric <- "hsa_score"
   metric_growth <- "GR"
-  expect_equal(get_hm_title(dataset_name, metric, metric_growth), "Dataset AB123 (HSA Score GR)")
+  expect_equal(get_hm_title(metric, metric_growth, dataset_name), "Dataset AB123 (HSA Score GR)")
 })
 
 test_that("change_NA_into_char works", {
