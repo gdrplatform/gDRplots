@@ -12,7 +12,7 @@
 #' anything other than compute Spearman correlation distance and replace NAs with 0,
 #' you must edit this function definition accordingly. At the moment (December 2020)
 #' this is sufficient. If the control were to be given to the user,
-#' remove defaults for this definition and create a wrapper within \code{plotlyMH}.
+#' remove defaults for this definition and create a wrapper within \code{plotly_metric_clustering}.
 #'
 #' @param x numeric matrix
 #' @param method character string specifying the distance measure to be used;

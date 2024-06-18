@@ -35,6 +35,6 @@ adjust_label("Cell Line Name: X Drug Name: A (untreated at 0 &mu;M) Title: 1.00"
 
 }
 \seealso{
-\code{MetricClustering}, \code{plotlyMH}
+\code{MetricClustering}, \code{plotly_metric_clustering}
 }
 \keyword{utils_label}

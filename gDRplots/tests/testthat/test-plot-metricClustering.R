@@ -36,7 +36,7 @@ test_that("prepareDataMH works as expected", {
   
 })
 
-test_that("plotlyMH works as expected", {
+test_that("plotly_metric_clustering works as expected", {
 })
 
 test_that("map_annotations works as expected", {

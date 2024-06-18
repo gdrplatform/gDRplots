@@ -24,7 +24,7 @@
 #' @export
 #' @keywords utils_label
 #'
-#' @seealso \code{MetricClustering}, \code{plotlyMH}
+#' @seealso \code{MetricClustering}, \code{plotly_metric_clustering}
 #'
 adjust_label <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
   

@@ -40,7 +40,7 @@ build_label_clustering <- function(data) {
 #'
 #' @keywords plugin_plot
 #'
-#' @seealso \code{plotlyMH}, \code{MetricClustering}
+#' @seealso \code{plotly_metric_clustering}, \code{MetricClustering}
 #'
 #' @export
 #'
@@ -78,7 +78,7 @@ prepareDataMH <- function(data, variable) {
   drug_annotation <- convert_factor_to_character(drug_annotation)
   identifiers <- wide[, .SD, .SDcols = row_ids, drop = FALSE]
   row_annotation <- map_annotations(identifiers, drug_annotation, row_ids)
-
+  
   mat <- as.matrix(wide[, .SD, .SDcols = !row_ids]) # Enable coercion to matrix 
   rownames(mat) <- build_label_clustering(identifiers)
   
@@ -127,12 +127,12 @@ prepareDataMH <- function(data, variable) {
 #'
 #' @export
 #'
-plotlyMH <- function(data, 
-                     variable, 
-                     annotations, 
-                     transpose = FALSE, 
-                     colors, 
-                     dendrogram = "both") {
+plotly_metric_clustering <- function(data, 
+                                     variable, 
+                                     annotations, 
+                                     transpose = FALSE, 
+                                     colors, 
+                                     dendrogram = "both") {
   
   checkmate::assert_matrix(data)
   checkmate::assert_numeric(data, finite = TRUE)
@@ -360,7 +360,7 @@ calc_duplicate_freq <- function(x) {
 #' @export
 convert_factor_to_character <- function(tbl) {
   checkmate::assert_data_table(tbl)
-
+  
   factor_cols <- names(tbl)[vapply(tbl, is.factor, logical(1))]
   tbl[, (factor_cols) := lapply(.SD, as.character), .SDcols = factor_cols]
   

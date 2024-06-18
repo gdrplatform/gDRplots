@@ -19,6 +19,6 @@ The function calls \code{dcast} to reshape the data.table.
 \code{variable} is averaged at this stage if there are replicates.
 }
 \seealso{
-\code{plotlyMH}, \code{MetricClustering}
+\code{plotly_metric_clustering}, \code{MetricClustering}
 }
 \keyword{plugin_plot}
