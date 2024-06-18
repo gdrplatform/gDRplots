@@ -62,7 +62,7 @@ test_that("plolty_drug_combo_heatmap", {
   )
 })
 
-test_that("plotlyDC1", {
+test_that("plolty_drug_combo_conc_heatmap", {
   
   # data
   field_type <- "hsa_excess"
@@ -76,13 +76,13 @@ test_that("plotlyDC1", {
   metric_growth <- "GR"
   
   # plot
-  pl1 <- plotlyDC1(data = test_exp,
-                   drug1,
-                   drug2,
-                   cl_name,
-                   normalization_type = "GR",
-                   c_assay = field_type,
-                   iso_levels = i_levels
+  pl1 <- plolty_drug_combo_conc_heatmap(data = test_exp,
+                                        drug1,
+                                        drug2,
+                                        cl_name,
+                                        normalization_type = "GR",
+                                        c_assay = field_type,
+                                        iso_levels = i_levels
   )
   checkmate::expect_class(pl1, "plotly")
   
@@ -106,51 +106,51 @@ test_that("plotlyDC1", {
   
   # errors
   expect_error(
-    plotlyDC1(data = data.table::data.table(a = 1), drug1, drug2, cl_name),
+    plolty_drug_combo_conc_heatmap(data = data.table::data.table(a = 1), drug1, drug2, cl_name),
     "Assertion on 'data' failed: Must be of type 'list', not 'data.table/data.frame'.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDC1(data = list(a = 1), drug1, drug2, cl_name),
+    plolty_drug_combo_conc_heatmap(data = list(a = 1), drug1, drug2, cl_name),
     "Assertion on 'data[[1]]' failed: Must be a data.table, not double.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDC1(data = test_exp, drug1 = 1, drug2, cl_name),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1 = 1, drug2, cl_name),
     "Assertion on 'drug1_name' failed: Must be of type 'string', not 'double'.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2 = c("01", "02"), cl_name),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2 = c("01", "02"), cl_name),
     "Assertion on 'drug2_name' failed: Must have length 1.",
     fixed = TRUE
   )
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2, cell_line = list(c = "cl2")),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2, cell_line = list(c = "cl2")),
     "Assertion on 'cell_line' failed: Must be of type 'string', not 'list'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2, cl_name, c_assay = "dummy"),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2, cl_name, c_assay = "dummy"),
     "Assertion on 'c_assay' failed: Must be element of set {'smooth','hsa_excess','bliss_excess'}, but is 'dummy'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2, cl_name, normalization_type = "GRvalue"),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2, cl_name, normalization_type = "GRvalue"),
     "Assertion on 'normalization_type' failed: Must be element of set {'GR','RV'}, but is 'GRvalue'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2, cl_name, iso_levels = c(50, 75)),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2, cl_name, iso_levels = c(50, 75)),
     "Assertion on 'iso_levels' failed: Must be of type 'character', not 'double'.",
     fixed = TRUE
   )
   
   expect_error(
-    plotlyDC1(data = test_exp, drug1, drug2, cl_name, iso_levels = c("0.223", "0.33")),
+    plolty_drug_combo_conc_heatmap(data = test_exp, drug1, drug2, cl_name, iso_levels = c("0.223", "0.33")),
     "Assertion on '0.223' failed. "
   )
   
@@ -159,7 +159,7 @@ test_that("plotlyDC1", {
   test_exp$isobolograms$`Pos y` <- NA
   
   
-  pl1_NA <- plotlyDC1(
+  pl1_NA <- plolty_drug_combo_conc_heatmap(
     data = test_exp_NA,
     drug1,
     drug2,

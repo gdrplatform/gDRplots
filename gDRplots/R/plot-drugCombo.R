@@ -157,7 +157,7 @@ plolty_drug_combo_heatmap <- function(data,
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
 #' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #'
-#'plotlyDC1(
+#'plolty_drug_combo_conc_heatmap(
 #'  data = combo_data_l,
 #'  drug1_name = "drug_005",
 #'  drug2_name = "drug_021",
@@ -166,7 +166,7 @@ plolty_drug_combo_heatmap <- function(data,
 #'  c_assay = "hsa_excess"
 #')
 #'
-#' plotlyDC1(
+#' plolty_drug_combo_conc_heatmap(
 #'   data = combo_data_l,
 #'   drug1_name = "drug_005",
 #'   drug2_name = "drug_021",
@@ -175,7 +175,7 @@ plolty_drug_combo_heatmap <- function(data,
 #'   c_assay = "smooth"
 #' )
 #'
-#' plotlyDC1(
+#' plolty_drug_combo_conc_heatmap(
 #'   data = combo_data_l,
 #'   drug1_name = "drug_005",
 #'   drug2_name = "drug_021",
@@ -189,16 +189,16 @@ plolty_drug_combo_heatmap <- function(data,
 #' @keywords plugin_plot
 #' @export
 #'
-plotlyDC1 <- function(data,
-                      drug1_name,
-                      drug2_name,
-                      cell_line,
-                      c_assay = names(gDRutils::get_combo_excess_field_names())[1],
-                      normalization_type = "RV",
-                      iso_levels =  c("0.5", "0.75"),
-                      with_iso_points = FALSE,
-                      height = 325L,
-                      width = 425L) {
+plolty_drug_combo_conc_heatmap <- function(data,
+                                           drug1_name,
+                                           drug2_name,
+                                           cell_line,
+                                           c_assay = names(gDRutils::get_combo_excess_field_names())[1],
+                                           normalization_type = "RV",
+                                           iso_levels =  c("0.5", "0.75"),
+                                           with_iso_points = FALSE,
+                                           height = 325L,
+                                           width = 425L) {
   # argument checks
   checkmate::assert_list(data)
   checkmate::assert_data_table(data[[1]])
@@ -435,7 +435,7 @@ plotlyDC1 <- function(data,
 #'  c_assay = "bliss_excess"
 #' )
 #' }
-#' @inheritParams plotlyDC1
+#' @inheritParams plolty_drug_combo_conc_heatmap
 #'
 #' @author Arkadiusz Gładki \email{arkadiusz.gladki@@contractors.roche.com}
 #'
@@ -599,7 +599,7 @@ get_drug_axes <- function(dt, value_col = "smooth") {
 #' get_combo_score_matrix(combo_data_l, "bliss_score")
 #' }
 #'
-#' @inheritParams plotlyDC1
+#' @inheritParams plolty_drug_combo_conc_heatmap
 #' @param c_assay character string specifying the combo score assay to be selected,
 #'        any from \code{names(gDRutils::get_combo_score_field_names())} will do
 #'
@@ -648,7 +648,7 @@ get_combo_score_matrix <-
 
 #' get isobologram combo data for given filters
 #'
-#' @inheritParams plotlyDC1
+#' @inheritParams plolty_drug_combo_conc_heatmap
 #' @param c_assay character string specifying the combo iso assay to be selected,
 #'        any from \code{gDRutils::get_combo_assay_names(group = "combo_iso")} will do
 #' @param drug1_axis data.table with drug1 data from \code{get_combo_base_data}
@@ -814,7 +814,7 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 
 #' Draw interactive Drug Combo plot with drug ratios
 #' 
-#' @inheritParams plotlyDC1
+#' @inheritParams plolty_drug_combo_conc_heatmap
 #' 
 #' @returns plotly object - line chart with lines for different ration of drugs on isolevels
 #' 
