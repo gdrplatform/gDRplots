@@ -29,15 +29,15 @@
 #' @keywords plugin_plot
 #' @export
 #'
-plotlyMD <- function(data, 
-                     var_x, 
-                     var_y, 
-                     var_grp, 
-                     var_col, 
-                     type, 
-                     points = "off",
-                     axis_limits = c("fixed", "upper", "lower", "free"),
-                     show_tick_labels) {
+plotly_metric_distribution <- function(data, 
+                                       var_x, 
+                                       var_y, 
+                                       var_grp, 
+                                       var_col, 
+                                       type, 
+                                       points = "off",
+                                       axis_limits = c("fixed", "upper", "lower", "free"),
+                                       show_tick_labels) {
   
   checkmate::assert_data_table(data)
   checkmate::assert_string(var_x)

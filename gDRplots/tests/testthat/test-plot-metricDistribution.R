@@ -36,9 +36,9 @@ test_that("'get_axis_min'", {
   expect_identical(get_axis_max(my_data, nearest_shift = 0.5), 0.5)
 })
 
-# plotlyMD tests
+# plotly_metric_distribution tests
 test_that("check output type and data",  {
-  p <- plotlyMD(dt, var_x, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels)
+  p <- plotly_metric_distribution(dt, var_x, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels)
   expect_type(p, "list")
   expect_identical(p$x$attrs[[1]]$type,
                    "box")
@@ -50,35 +50,35 @@ test_that("check output type and data",  {
 
 test_that("check input arguments", {
   expect_error(
-    plotlyMD(n, var_x, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(n, var_x, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels),
     "Assertion on 'data' failed: Must be a data.table, not double."
   )
   expect_error(
-    plotlyMD(dt, n, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, n, var_y, var_grp, var_col, type, points, axis_limits, show_tick_labels),
     "Assertion on 'var_x' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, n, var_grp, var_col, type, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, n, var_grp, var_col, type, points, axis_limits, show_tick_labels),
     "Assertion on 'var_y' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, var_y, n, var_col, type, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, var_y, n, var_col, type, points, axis_limits, show_tick_labels),
     "Assertion on 'var_grp' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, var_y, var_grp, n, type, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, var_y, var_grp, n, type, points, axis_limits, show_tick_labels),
     "Assertion on 'var_col' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, var_y, var_grp, var_col, n, points, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, var_y, var_grp, var_col, n, points, axis_limits, show_tick_labels),
     "Assertion on 'type' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, var_y, var_grp, var_col, type, n, axis_limits, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, var_y, var_grp, var_col, type, n, axis_limits, show_tick_labels),
     "Assertion on 'points' failed: Must be of type 'string', not 'double'."
   )
   expect_error(
-    plotlyMD(dt, var_x, var_y, var_grp, var_col, type, points, n, show_tick_labels),
+    plotly_metric_distribution(dt, var_x, var_y, var_grp, var_col, type, points, n, show_tick_labels),
     "'arg' must be NULL or a character vector"
   )
 })
