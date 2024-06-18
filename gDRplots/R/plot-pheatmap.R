@@ -424,7 +424,7 @@ pheatmap_with_anno_sa <- function(
 #'                          annotation_col = annotation_manual,
 #'                          annotation_colors = annotation_map,
 #'                          hm_title = get_hm_title(metric_growth = "GR",
-#                                                   metric = "hsa_score",
+#'                                                  metric = "hsa_score",
 #'                                                  dataset_name = "Combo Matrix - combo data"))
 #'             
 #' @keywords QC_plot
