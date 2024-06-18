@@ -448,37 +448,37 @@ test_that("create_log_seq works as expected", {
 })
 
 
-test_that("getLongest works as expected", {
+test_that("get_longest_factor works as expected", {
   factorList <- list("letters" = letters, "numbers" = seq_len(10))
-  expect_identical(getLongest(factorList), "letters")
-  expect_identical(getLongest(factorList, "letters"), "letters")
+  expect_identical(get_longest_factor(factorList), "letters")
+  expect_identical(get_longest_factor(factorList, "letters"), "letters")
   
   factorList <- c(factorList, list("LETTERS" = LETTERS))
-  expect_identical(getLongest(factorList, "letters"), "letters")
-  expect_identical(getLongest(factorList, 3), names(factorList)[3])
-  expect_identical(getLongest(factorList, "LETTERS"), "LETTERS")
+  expect_identical(get_longest_factor(factorList, "letters"), "letters")
+  expect_identical(get_longest_factor(factorList, 3), names(factorList)[3])
+  expect_identical(get_longest_factor(factorList, "LETTERS"), "LETTERS")
   
   factorDatatable <- data.table::data.table(
     "letters" = letters,
     "numbers" = rep(seq_len(10), length.out = NROW(letters))
   )
-  expect_identical(getLongest(factorDatatable), "letters")
+  expect_identical(get_longest_factor(factorDatatable), "letters")
   
   factorDatatable <- data.table::data.table(
     "letters" = letters,
     "numbers" = seq_len(NROW(letters))
   )
-  expect_identical(getLongest(factorDatatable), "letters")
-  expect_identical(getLongest(factorDatatable, "letters"), "letters")
-  expect_identical(getLongest(factorDatatable, 2L), names(factorDatatable)[2L])
+  expect_identical(get_longest_factor(factorDatatable), "letters")
+  expect_identical(get_longest_factor(factorDatatable, "letters"), "letters")
+  expect_identical(get_longest_factor(factorDatatable, 2L), names(factorDatatable)[2L])
   
-  expect_error(getLongest(letters), "Must inherit from class")
-  expect_error(getLongest(unname(factorList)), "Must have Object")
-  expect_error(getLongest(list(f = factorList, i = iris)), 
+  expect_error(get_longest_factor(letters), "Must inherit from class")
+  expect_error(get_longest_factor(unname(factorList)), "Must have Object")
+  expect_error(get_longest_factor(list(f = factorList, i = iris)), 
                "Must be of type 'atomic vector'")
-  expect_error(getLongest(factorDatatable, TRUE),
+  expect_error(get_longest_factor(factorDatatable, TRUE),
                "Must inherit from class 'character'/'integer'/'numeric'")
-  expect_error(getLongest(factorDatatable, "str"), "Must be element of set")
-  expect_error(getLongest(factorDatatable, 5), "Assertion on 'default' failed")
+  expect_error(get_longest_factor(factorDatatable, "str"), "Must be element of set")
+  expect_error(get_longest_factor(factorDatatable, 5), "Assertion on 'default' failed")
 })
 

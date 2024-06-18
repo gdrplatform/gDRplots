@@ -233,7 +233,7 @@ plotlyRCAll <- function(curve_data,
   # build plot title
   ## this assumes that either Cell Line or Drug has only one value!
   cols <- c(cell_name, drug_name)
-  var_long <- getLongest(curve_data[, cols, with = FALSE])
+  var_long <- get_longest_factor(curve_data[, cols, with = FALSE])
   var_short <- if (var_long == cell_name) {
     drug_name
   } else if (var_long == drug_name) {
@@ -466,7 +466,7 @@ plotlyRCSelected <- function(data,
   
   # determine variable to color by
   cols <- c(cell_name, drug_name)
-  var_col <- getLongest(data[, cols, with = FALSE])
+  var_col <- get_longest_factor(data[, cols, with = FALSE])
   var_not_col <- if (var_col == cell_name)  {
     drug_name
   } else if (var_col == drug_name)  {
@@ -662,14 +662,14 @@ create_log_seq <- function(start, end, length) {
 #'    
 #' @examples
 #' factorList <- list("letters" = letters, "numbers" = seq_len(10))
-#' getLongest(factorList)
+#' get_longest_factor(factorList)
 #'
 #' @return A character string.
 #' @keywords internal
 #'
 #' @export
-getLongest <- function(x, 
-                       default = 1L) {
+get_longest_factor <- function(x, 
+                               default = 1L) {
   
   checkmate::assert_multi_class(x, c("list", "data.table"))
   checkmate::assert_named(x)
