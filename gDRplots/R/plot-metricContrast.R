@@ -239,7 +239,7 @@ plotlyMC <- function(data,
                         x = data[[var_x]], y = data[[var_y]],
                         symbol = val_for_symbols,
                         symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
-                        hoverinfo = "none", showlegend = TRUE, legendgroup = "Concentration_2",
+                        hoverinfo = "none", showlegend = TRUE, legendgroup = concentration2_name,
                         marker = list(color = "#5A5A5A", size = 0.01))
     # Add legend for var_col
     plot_base <- 
