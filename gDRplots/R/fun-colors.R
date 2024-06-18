@@ -7,9 +7,9 @@
 #' @param shuffle logical representing whether or not to shuffle the colors in the provided palette
 #' 
 #' @examples
-#' paletteBrew(8, "Accent")
-#' paletteBrew(20, "Accent")
-#' paletteBrew(10, "Set1")
+#' brew_palette(8, "Accent")
+#' brew_palette(20, "Accent")
+#' brew_palette(10, "Set1")
 #'
 #' @return A character vector of hex codes of length \code{n}.
 #'
@@ -25,7 +25,7 @@
 #' @seealso \code{RColorBrewer}, \code{colorRampPalette}
 #'
 #' @export
-paletteBrew <- function(n, 
+brew_palette <- function(n, 
                         name,
                         shuffle = FALSE) {
   

@@ -125,7 +125,7 @@ plotlyMD <- function(data,
     # unique values of coloring variables
     colors <- unique(data[[var_col]])
     # prepare an ad hoc color palette TODO this is a temporary solution
-    color_palette <- paletteBrew(length(colors), "Accent")
+    color_palette <- brew_palette(length(colors), "Accent")
     # add traces
     for (col in seq_along(colors)) {
       # subset data of one color
