@@ -34,19 +34,19 @@ test_that("brew_palette works as expected", {
 })
 
 
-test_that("isColDark works as expected", {
+test_that("is_color_dark works as expected", {
   color_names <- c("#33cc33", "#d6f5d6", "#0a290a")
-  expect_false(isColDark(color_names[1]))
-  expect_false(isColDark(color_names[2]))
-  expect_true(isColDark(color_names[3]))
+  expect_false(is_color_dark(color_names[1]))
+  expect_false(is_color_dark(color_names[2]))
+  expect_true(is_color_dark(color_names[3]))
   
   color_names <- c("darkblue", "yellow", "tomato")
-  expect_true(isColDark(color_names[1]))
-  expect_false(isColDark(color_names[2]))
-  expect_false(isColDark(color_names[3]))
+  expect_true(is_color_dark(color_names[1]))
+  expect_false(is_color_dark(color_names[2]))
+  expect_false(is_color_dark(color_names[3]))
   
-  expect_error(isColDark(1), "Must be of type 'string'")
-  expect_error(isColDark("nice pink"), "Must be valid color name")
+  expect_error(is_color_dark(1), "Must be of type 'string'")
+  expect_error(is_color_dark("nice pink"), "Must be valid color name")
 })
 
 

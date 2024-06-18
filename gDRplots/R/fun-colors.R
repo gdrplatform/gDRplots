@@ -59,15 +59,15 @@ brew_palette <- function(n,
 #' @param col_name string representing a valid colour
 #' 
 #' @examples
-#' isColDark("blue")
-#' isColDark("red")
-#' isColDark("#000000")
+#' is_color_dark("blue")
+#' is_color_dark("red")
+#' is_color_dark("#000000")
 #' 
 #' @keywords utils_color
 #' @return logical flag
 #' 
 #' @export
-isColDark <- function(col_name) {
+is_color_dark <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be valid color name" = isValidColor(col_name))
   
