@@ -4,7 +4,7 @@
 #' @param pattern character string specifying the places in which to intervene; see \code{Details}
 #' 
 #' @examples
-#' adjustLabel("Cell Line Name: X Drug Name: A (untreated at 0 &mu;M) Title: 1.00")
+#' adjust_label("Cell Line Name: X Drug Name: A (untreated at 0 &mu;M) Title: 1.00")
 #' # Cell Line Name: X Drug Name: A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(untreated at 0 &mu;M) Title: 1.00
 #'
 #' @return A modified character vector.
@@ -26,7 +26,7 @@
 #'
 #' @seealso \code{MetricClustering}, \code{plotlyMH}
 #'
-adjustLabel <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
+adjust_label <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
   
   checkmate::assert_character(x)
   checkmate::assert_character(pattern, pattern = "^\\(.*?\\)\\(.*?\\)$")

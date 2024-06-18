@@ -183,8 +183,8 @@ plotlyMH <- function(data,
   margin_left <- longest_row_name * font_size / 2
   margin_bottom <- longest_col_name * font_size / 2
   # adjust alignment of row/column labels
-  row_labels <- adjustLabel(rownames(data))
-  col_labels <- adjustLabel(colnames(data))
+  row_labels <- adjust_label(rownames(data))
+  col_labels <- adjust_label(colnames(data))
   
   # get heatmap range for specific variables, for others return min and max value from data
   heatmap_range_list <- get_visualization_range()

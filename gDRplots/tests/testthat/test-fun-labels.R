@@ -1,6 +1,6 @@
 context("Test fun labels")
 
-test_that("adjustLabel works as expected", {
+test_that("adjust_label works as expected", {
   ls_lbl <- c(
     "G03405395 (G03642866 at 0.0007621 &mu;M)", 
     "G03580756 (G03642866 at 0.0007621 &mu;M)",
@@ -10,17 +10,17 @@ test_that("adjustLabel works as expected", {
     "G03580756 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(G03642866 at 0.0007621 &mu;M)",
     "G03405395 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(G03642866 at 0.002286 &mu;M)"
   )
-  expect_equal(unname(adjustLabel(ls_lbl)), ls_lbl_res) 
+  expect_equal(unname(adjust_label(ls_lbl)), ls_lbl_res) 
   
   ls_lbl_2 <- c(
     "G03405395\n(G03642866 at 0.0007621 &mu;M)", 
     "G03580756\n(G03642866 at 0.0007621 &mu;M)",
     "G03405395\n(G03642866 at 0.002286 &mu;M)")
-  expect_equal(adjustLabel(ls_lbl_2), ls_lbl_2) 
+  expect_equal(adjust_label(ls_lbl_2), ls_lbl_2) 
   
-  expect_error(adjustLabel(1:5),
+  expect_error(adjust_label(1:5),
                "Assertion on 'x' failed: Must be of type 'character'")
-  expect_error(adjustLabel(ls_lbl, pattern = "[0-9]{2}"),
+  expect_error(adjust_label(ls_lbl, pattern = "[0-9]{2}"),
                "Assertion on 'pattern' failed: Must comply to pattern")
 })
 
