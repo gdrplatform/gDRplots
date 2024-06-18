@@ -66,7 +66,7 @@ adjust_label <- function(x, pattern = "(.*? )(\\(.*? at .*?\\))") {
 #'
 #' @export
 build_label <- function(data, 
-                       view) {
+                        view) {
   
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
   cell_name <- pidfs[["cellline_name"]]
