@@ -214,53 +214,60 @@ plotlyMC <- function(data,
   }
   
   # build plot
-  if (has_codrug_data) {
+  if (has_codrug_data & var_col == "none") {
     
     val_for_symbols <- as.factor(data[[concentration2_name]])
+    # Plot symbols for "Concentration_2
+    plot_base <- 
+      plotly::plot_ly(source = source, customdata = data[[var_txt]],
+                      x = data[[var_x]], y = data[[var_y]], text = data[["label"]],
+                      type = "scatter", mode = "markers",
+                      hoverinfo = "text", showlegend = do_show_legend,
+                      symbol = val_for_symbols,
+                      symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
+                      marker = list(color = "#5A5A5A", size = 11))
+
+  } else if (has_codrug_data & var_col != "none") {
+    val_for_symbols <- as.factor(data[[concentration2_name]])
     
-    plot_base <- plotly::plot_ly(source = source, customdata = data[[var_txt]]) |>
-      # Plot symbols for "Concentration_2
-      plotly::add_trace(x = data[[var_x]], y = data[[var_y]], text = data[["label"]],
-                        type = "scatter", mode = "markers",
-                        hoverinfo = "text", showlegend = do_show_legend,
+    plot_base <- 
+      plotly::plot_ly(source = source, customdata = data[[var_txt]], colors = "Set1", 
+                      type = "scatter", mode = "markers",)
+    # Add legend for "Concentration_2"
+    plot_base <- 
+      plotly::add_trace(plot_base,
+                        x = data[[var_x]], y = data[[var_y]],
                         symbol = val_for_symbols,
                         symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
-                        marker = list(color = "#5A5A5A", size = 11)) |>
-      plotly::layout(showlegend = do_show_legend,
-                     legend = list(orientation = "v",
-                                   title = get_legend_title(var_col, has_codrug_data = has_codrug_data))
+                        hoverinfo = "none", showlegend = TRUE, legendgroup = "Concentration_2",
+                        marker = list(color = "#5A5A5A", size = 0.01))
+    # Add legend for var_col
+    plot_base <- 
+      plotly::add_trace(plot_base,
+                        x = data[[var_x]], y = data[[var_y]],
+                        color = data[[var_col]],
+                        hoverinfo = "none", showlegend = TRUE, legendgroup = var_col,
+                        marker = list(size = 0.01))
+    # Plot symbols for "Concentration_2"
+    plot_base <- 
+      plotly::add_trace(plot_base,
+                        x = data[[var_x]], y = data[[var_y]], text = data[["label"]],
+                        color = data[[var_col]],
+                        hoverinfo = "text", showlegend = FALSE,
+                        symbol = val_for_symbols,
+                        symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
+                        marker = list(size = 11))
+    # Add double legend
+    plot_base <- 
+      plotly::layout(plot_base,
+                     showlegend = do_show_legend,
+                     legend = list(
+                       orientation = "v",
+                       itemsizing = "constant", itemclick = FALSE, tracegroupgap = 30,
+                       title = get_legend_title(var_col,
+                                                has_codrug_data = has_codrug_data))
       )
-    if (var_col != "none") {
-      plot_base <- plotly::plot_ly(
-        source = source, customdata = data[[var_txt]], colors = "Set1") |>
-        # Plot symbols for "Concentration_2
-        plotly::add_trace(x = data[[var_x]], y = data[[var_y]],
-                          type = "scatter", mode = "markers",
-                          symbol = val_for_symbols,
-                          symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
-                          hoverinfo = "none", showlegend = TRUE, legendgroup = "Concentration_2",
-                          marker = list(color = "#5A5A5A", size = 0.01)) |>
-        plotly::add_trace(x = data[[var_x]], y = data[[var_y]],
-                          type = "scatter", mode = "markers",
-                          color = data[[var_col]],
-                          hoverinfo = "none", showlegend = TRUE, legendgroup = var_col,
-                          marker = list(size = 0.01)) |>
-        plotly::add_trace(x = data[[var_x]], y = data[[var_y]], text = data[["label"]],
-                          type = "scatter", mode = "markers",
-                          color = data[[var_col]],
-                          hoverinfo = "text", showlegend = FALSE,
-                          symbol = val_for_symbols,
-                          symbols = .get_symbol_list()[seq_along(levels(val_for_symbols))],
-                          marker = list(size = 11)) |>
-        plotly::layout(
-          showlegend = do_show_legend,
-          legend = list(
-            orientation = "v",
-            itemsizing = "constant", itemclick = FALSE, tracegroupgap = 30,
-            title = get_legend_title(var_col,
-                                     has_codrug_data = has_codrug_data))
-        )
-    }
+    
   } else {
     plot_base <- plotly::plot_ly(x = data[[var_x]], y = data[[var_y]], text = data[["label"]],
                                  color = data[[var_col]], colors = "Set1",
@@ -323,14 +330,13 @@ plotlyMC <- function(data,
     
     # add prediction to plot
     plot_base <-
-      plotly::add_lines(
-        plot_base,
-        inherit = FALSE,
-        x = predicted[[var_x]],
-        y = predicted[[var_y]],
-        color = I("black"),
-        showlegend = FALSE,
-        hoverinfo = "none"
+      plotly::add_lines(plot_base,
+                        inherit = FALSE,
+                        x = predicted[[var_x]],
+                        y = predicted[[var_y]],
+                        color = I("black"),
+                        showlegend = FALSE,
+                        hoverinfo = "none"
       )
     # PART TWO
     # add statistics
