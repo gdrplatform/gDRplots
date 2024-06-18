@@ -71,7 +71,7 @@ isColDark <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be valid color name" = isValidColor(col_name))
   
-  getColLuminance(col_name) <= 0.22
+  get_col_luminance(col_name) <= 0.22
 }
 
 
@@ -80,17 +80,17 @@ isColDark <- function(col_name) {
 #' @param col_name string representing a valid colour
 #' 
 #' @examples
-#' getColLuminance("blue")
-#' getColLuminance("red")
-#' getColLuminance("#000000")
-#' getColLuminance("#906090")
-#' getColLuminance("#906090F2")
+#' get_col_luminance("blue")
+#' get_col_luminance("red")
+#' get_col_luminance("#000000")
+#' get_col_luminance("#906090")
+#' get_col_luminance("#906090F2")
 #'
 #' @keywords utils_color
 #' @return single element numeric vector
 #' 
 #' @export
-getColLuminance <- function(col_name) {
+get_col_luminance <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be valid color name" = isValidColor(col_name))
   

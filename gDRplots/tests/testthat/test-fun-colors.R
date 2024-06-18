@@ -50,19 +50,19 @@ test_that("isColDark works as expected", {
 })
 
 
-test_that("getColLuminance works as expected", {
+test_that("get_col_luminance works as expected", {
   color_names <- c("#33cc33", "#d6f5d6", "#0a290a")
-  expect_equal(getColLuminance(color_names[1]), 0.429871, tolerance = 1e-5)
-  expect_equal(getColLuminance(color_names[2]), 0.839746, tolerance = 1e-5)
-  expect_equal(getColLuminance(color_names[3]), 0.016340, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[1]), 0.429871, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[2]), 0.839746, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[3]), 0.016340, tolerance = 1e-5)
   
   color_names <- c("darkblue", "yellow", "tomato")
-  expect_equal(getColLuminance(color_names[1]), 0.0186408, tolerance = 1e-5)
-  expect_equal(getColLuminance(color_names[2]), 0.9278000, tolerance = 1e-5)
-  expect_equal(getColLuminance(color_names[3]), 0.3238907, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[1]), 0.0186408, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[2]), 0.9278000, tolerance = 1e-5)
+  expect_equal(get_col_luminance(color_names[3]), 0.3238907, tolerance = 1e-5)
   
-  expect_error(getColLuminance(1), "Must be of type 'string'")
-  expect_error(getColLuminance("nice pink"), "Must be valid color name")
+  expect_error(get_col_luminance(1), "Must be of type 'string'")
+  expect_error(get_col_luminance("nice pink"), "Must be valid color name")
 })
 
 
