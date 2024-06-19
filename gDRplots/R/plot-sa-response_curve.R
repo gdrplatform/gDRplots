@@ -104,6 +104,7 @@ grob_sa <- function(dt_metrics,
                     )
     )
   }
+  dt_fit <- dt_fit[!is.na(x)]
   data.table::setnames(dt_fit, "conc_col", conc)
   
   # colors
@@ -124,7 +125,7 @@ grob_sa <- function(dt_metrics,
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
   
   plt_title <- sprintf(
-    "%s Drug dose response for %s: %s (%s)",
+    "%s Drug dose response for %s: \n%s (%s)",
     normalization_type,
     ifelse(grouping == "cId", "Drug", "Cell Line"),
     ifelse(grouping == "cId", unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
@@ -155,7 +156,7 @@ grob_sa <- function(dt_metrics,
   
   # define legend
   plt <- plt + 
-    ggplot2::guides(colour = ggplot2::guide_legend(nrow = NROW(group_names)))
+    ggplot2::guides(colour = ggplot2::guide_legend(position = "left"))
   
   return(plt)
 }
@@ -228,8 +229,7 @@ plot_sa_by_CLs <- function(se,
               normalization_type = normalization_type,
               colormap = colormap,
               plot_averaged_flag = plot_averaged_flag,
-              plot_fit_flag = plot_fit_flag) +
-      ggplot2::ggtitle(plt_title) 
+              plot_fit_flag = plot_fit_flag)
     
     plt_list[[plt_title]] <- plt
     
