@@ -145,7 +145,7 @@ pheatmap_qc <- function(
     value.var = conc
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
-  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name] # TODO order
+  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   drug_annotation <- log10(drug_annotation)
   drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
   
@@ -182,6 +182,8 @@ pheatmap_qc <- function(
       col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
+  annotation_legend_flag <- ifelse(NROW(drug_to_colored) > 3, FALSE, TRUE) # TODO Find better solution
+  
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
   minval <- min(c(0, round(min(stats::na.omit(mat_cvd)), digits = 2)))
@@ -203,6 +205,7 @@ pheatmap_qc <- function(
     show_colnames = FALSE,
     main = hm_title,
     na_col = "red",
+    annotation_legend = annotation_legend_flag,
     # dendogram
     treeheight_row = 70, 
     treeheight_col = 70, 
