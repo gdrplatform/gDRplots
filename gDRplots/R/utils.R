@@ -31,3 +31,37 @@ swap_drugs_1_2 <- function(dt_) {
   }
   dt_
 }
+
+
+#' Estimate the optimal plot size (either ggplot or pheatmap) for saving plots
+#'
+#' @param plot a ggplot or pheatmap object
+#' @param base_width an integer with default base_width
+#' @param base_height an integer with default base_height
+#' @param scale_factor an integer with default scale_factor
+#'
+#' @return named vector with optimal width and height used in ggsave function
+#' @export
+estimate_plot_size <- function(plot,
+                               base_width = 10,
+                               base_height = 6,
+                               scale_factor = 0.5) {
+  if (inherits(plot, "ggplot")) {
+    # For ggplot2 objects
+    plot_data <- ggplot2::ggplot_build(plot)$data
+    num_elements <- length(unique(plot_data[[1]]$group))
+    estimated_width <- base_width + num_elements * scale_factor
+    estimated_height <- base_height + num_elements * scale_factor
+  } else if (inherits(plot, "pheatmap")) {
+    # For pheatmap objects
+    heatmap_matrix <- plot$gtable
+    num_rows <- length(plot$gtable$grobs[[4]]$label)
+    num_cols <- length(plot$gtable$grobs[[6]]$label)
+    estimated_width <- base_width + num_cols * scale_factor
+    estimated_height <- base_height + num_rows * scale_factor
+  } else {
+    stop("Unsupported plot type. Only ggplot2 and pheatmap objects are supported.")
+  }
+  return(c(width = estimated_width, height = estimated_height))
+}
+
