@@ -24,6 +24,7 @@ Imports:
     scales,
     SummarizedExperiment
 Suggests:
+    colorspace,
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.5),
     heatmaply,
