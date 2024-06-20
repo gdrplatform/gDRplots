@@ -16,10 +16,12 @@ vector with hex colors from qualitative palettes
 Create list of qualitative colors
 }
 \examples{
+\dontrun{
 get_qual_colors()
 get_qual_colors(0)
 get_qual_colors(5)
 get_qual_colors(35) 
+}
 
 }
 \keyword{internal}

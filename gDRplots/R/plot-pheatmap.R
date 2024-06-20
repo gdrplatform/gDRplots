@@ -184,7 +184,7 @@ pheatmap_qc <- function(
       col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
-  annotation_legend_flag <- ifelse(NROW(drug_to_colored) > 3, FALSE, TRUE) # TODO Find better solution
+  annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
   
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
@@ -616,10 +616,12 @@ change_NA_into_char <- function(x,
 #' @return vector with hex colors from qualitative palettes
 #' 
 #' @examples
+#' \dontrun{
 #' get_qual_colors()
 #' get_qual_colors(0)
 #' get_qual_colors(5)
 #' get_qual_colors(35) 
+#' }
 #' 
 #' @keywords internal
 #' 
@@ -639,7 +641,7 @@ get_qual_colors <- function(n = NULL) {
   if (n > length(all_colors)) {
     ls_light <- colorspace::lighten(all_colors, 0.3)
     ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
-    all_colors <- append(colors, values = c(ls_light, ls_dark))
+    all_colors <- append(all_colors, values = c(ls_light, ls_dark))
   }
   
   rep(all_colors, length.out = n)
