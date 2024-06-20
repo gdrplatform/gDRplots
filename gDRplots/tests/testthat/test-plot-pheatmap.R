@@ -113,4 +113,13 @@ test_that("get_qual_colors works", {
   expect_equal(get_qual_colors(5), c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
   expect_equal(NROW(get_qual_colors(42)), 42)
   expect_equal(NROW(unique(get_qual_colors(42))), 42)
+  
+  expect_error(get_qual_colors("one"),
+               "Assertion on 'n' failed: Must be of type 'single integerish value'")
+  expect_error(get_qual_colors(c(2, 3)),
+               "Assertion on 'n' failed: Must have length 1.")
+  expect_error(get_qual_colors(2.3),
+               "Assertion on 'n' failed: Must be of type 'single integerish value'")
+  expect_error(get_qual_colors(-1),
+               "Assertion on 'n' failed: Element 1 is not >= 0.")
 })

@@ -626,7 +626,7 @@ change_NA_into_char <- function(x,
 #' @keywords internal
 #' 
 get_qual_colors <- function(n = NULL) {
-  checkmate::assert_int(n, null.ok = TRUE)
+  checkmate::assert_int(n, null.ok = TRUE, lower = 0)
   
   if (!is.null(n) && n == 0) return("#000000")
   
