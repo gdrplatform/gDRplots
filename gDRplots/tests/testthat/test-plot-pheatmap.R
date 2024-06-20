@@ -110,7 +110,7 @@ test_that("get_qual_colors works", {
   expect_equal(NROW(get_qual_colors()), max_len)
   expect_equal(NROW(unique(get_qual_colors())), max_len)
   expect_equal(get_qual_colors(0), "#000000")
-  expect_equal(get_qual_colors(5), c( "#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
+  expect_equal(get_qual_colors(5), c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
   expect_equal(NROW(get_qual_colors(42)), 42)
   expect_equal(NROW(unique(get_qual_colors(42))), 42)
 })

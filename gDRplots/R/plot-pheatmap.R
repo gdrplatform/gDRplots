@@ -154,8 +154,10 @@ pheatmap_qc <- function(
   ls_col <- get_qual_colors(NROW(drug_to_colored))
   drug_annotation_colors <- 
     lapply(seq_along(drug_to_colored), 
-           function(i) c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"),
-                         colorspace::darken(ls_col[i], 0.1, space = "HLS")))
+           function(i) { 
+             c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"), 
+               colorspace::darken(ls_col[i], 0.1, space = "HLS"))
+           }) 
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
@@ -639,6 +641,6 @@ get_qual_colors <- function(n = NULL) {
     ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
     all_colors <- append(colors, values = c(ls_light, ls_dark))
   }
-
+  
   rep(all_colors, length.out = n)
 }
