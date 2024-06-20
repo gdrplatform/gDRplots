@@ -46,6 +46,14 @@ estimate_plot_size <- function(plot,
                                base_width = 10,
                                base_height = 6,
                                scale_factor = 0.5) {
+  
+  # Assert inputs
+  checkmate::assert_multi_class(plot, c("ggplot", "pheatmap"))
+  checkmate::assert_numeric(base_width, lower = 0, finite = TRUE)
+  checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
+  checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
+  
+  
   if (inherits(plot, "ggplot")) {
     # For ggplot2 objects
     plot_data <- ggplot2::ggplot_build(plot)$data
@@ -54,9 +62,10 @@ estimate_plot_size <- function(plot,
     estimated_height <- base_height + num_elements * scale_factor
   } else if (inherits(plot, "pheatmap")) {
     # For pheatmap objects
-    heatmap_matrix <- plot$gtable
-    num_rows <- length(plot$gtable$grobs[[4]]$label)
-    num_cols <- length(plot$gtable$grobs[[6]]$label)
+    matrix_position <- which(plot$gtable$layout$name == "matrix")
+    matrix_dim <- dim(plot$gtable$grobs[[matrix_position]]$children[[1]]$gp$fill)
+    num_rows <- matrix_dim[[1]]
+    num_cols <- matrix_dim[[2]]
     estimated_width <- base_width + num_cols * scale_factor
     estimated_height <- base_height + num_rows * scale_factor
   } else {
