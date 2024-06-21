@@ -628,7 +628,7 @@ change_NA_into_char <- function(x,
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)
   
-  if (identical(n, 0)) return("#000000")
+  if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
   
   # list of colors: qualitative and friendly for user with color vision deficiency
   qual_col_pals <- RColorBrewer::brewer.pal.info[
@@ -638,6 +638,7 @@ get_qual_colors <- function(n = NULL) {
   
   if (is.null(n)) return(all_colors)
   
+  # make all_colors longer
   if (n > length(all_colors)) {
     ls_light <- colorspace::lighten(all_colors, 0.3)
     ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
