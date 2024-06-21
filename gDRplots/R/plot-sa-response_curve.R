@@ -50,6 +50,11 @@ grob_sa <- function(dt_metrics,
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  
   # check input data
   if (grouping == "cId") {
     stopifnot("grouping` does not fit to `dt_metrics` and `dt_average`" =
@@ -99,6 +104,7 @@ grob_sa <- function(dt_metrics,
                     )
     )
   }
+  dt_fit <- dt_fit[!is.na(x)]
   data.table::setnames(dt_fit, "conc_col", conc)
   
   # colors
@@ -118,12 +124,13 @@ grob_sa <- function(dt_metrics,
   dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
   
-  plt_title <- 
-    sprintf("%s Drug dose response for %s: %s",
-            normalization_type,
-            ifelse(grouping == "cId", "Drug", "Cell Line"),
-            ifelse(grouping == "cId", unique(dt_metrics[["rId"]]), unique(dt_metrics[["cId"]]))
-    )
+  plt_title <- sprintf(
+    "%s Drug dose response for %s: \n%s (%s)",
+    normalization_type,
+    ifelse(grouping == "cId", "Drug", "Cell Line"),
+    ifelse(grouping == "cId", unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
+    ifelse(grouping == "cId", unique(dt_metrics[[gnumber]]), unique(dt_metrics[[clid]]))
+  )
   
   # final plot
   plt <- 
@@ -131,7 +138,7 @@ grob_sa <- function(dt_metrics,
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::geom_vline(xintercept = 0, color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
-                                name = ifelse(grouping == "cId", "Cell line", "Drug")) +
+                                name = ifelse(grouping == "cId", "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -146,6 +153,10 @@ grob_sa <- function(dt_metrics,
   if (plot_fit_flag) {
     plt <- plt + ggplot2::geom_line(data = dt_fit)
   }
+  
+  # define legend
+  plt <- plt + 
+    ggplot2::guides(colour = ggplot2::guide_legend(position = "left"))
   
   return(plt)
 }
@@ -218,8 +229,7 @@ plot_sa_by_CLs <- function(se,
               normalization_type = normalization_type,
               colormap = colormap,
               plot_averaged_flag = plot_averaged_flag,
-              plot_fit_flag = plot_fit_flag) +
-      ggplot2::ggtitle(plt_title) 
+              plot_fit_flag = plot_fit_flag)
     
     plt_list[[plt_title]] <- plt
     

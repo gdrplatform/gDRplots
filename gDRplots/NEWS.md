@@ -1,3 +1,6 @@
+## gDRplots 0.0.6 - 2024-06-19
+* update plot function for `processingReport` package
+
 ## gDRplots 0.0.5 - 2024-06-14
 * move plot function from `metricClustering`, `responseGrid` and `metricDistribution` packages
 * move `get_metrics_to_transform`, `convert_factor_to_character` and `paletteBrew` from `gDRcomponents` package

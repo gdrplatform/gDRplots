@@ -123,6 +123,7 @@ pheatmap_qc <- function(
     formula = clid ~ col_pivot_name,
     value.var = metric
   )
+  data.table::setcolorder(tab_plot, c(clid, unique(tab_response$col_pivot_name)))
   
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -clid])
@@ -144,17 +145,19 @@ pheatmap_qc <- function(
     value.var = conc
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
-  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name] # TODO order
+  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   drug_annotation <- log10(drug_annotation)
   drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
   
   # annotation colouring  
   drug_to_colored <- names(drug_annotation)
-  sel_palette <- "Dark2"
-  ls_col <- RColorBrewer::brewer.pal(
-    n = RColorBrewer::brewer.pal.info[sel_palette, ]$maxcolors, name = sel_palette)
+  ls_col <- get_qual_colors(NROW(drug_to_colored))
   drug_annotation_colors <- 
-    lapply(seq_along(drug_to_colored), function(i) c("white", ls_col[i]))
+    lapply(seq_along(drug_to_colored), 
+           function(i) { 
+             c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"), 
+               colorspace::darken(ls_col[i], 0.1, space = "HLS"))
+           }) 
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
@@ -181,6 +184,8 @@ pheatmap_qc <- function(
       col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
+  annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
+  
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
   minval <- min(c(0, round(min(stats::na.omit(mat_cvd)), digits = 2)))
@@ -202,6 +207,7 @@ pheatmap_qc <- function(
     show_colnames = FALSE,
     main = hm_title,
     na_col = "red",
+    annotation_legend = annotation_legend_flag,
     # dendogram
     treeheight_row = 70, 
     treeheight_col = 70, 
@@ -600,4 +606,44 @@ change_NA_into_char <- function(x,
   
   ifelse(is.na(x), lbl_NA, as.character(x))
   
+}
+
+
+#' Create list of qualitative colors
+#'
+#' @param n number of required colors
+#'
+#' @return vector with hex colors from qualitative palettes
+#' 
+#' @examples
+#' \dontrun{
+#' get_qual_colors()
+#' get_qual_colors(0)
+#' get_qual_colors(5)
+#' get_qual_colors(35) 
+#' }
+#' 
+#' @keywords internal
+#' 
+get_qual_colors <- function(n = NULL) {
+  checkmate::assert_int(n, null.ok = TRUE, lower = 0)
+  
+  if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
+  
+  # list of colors: qualitative and friendly for user with color vision deficiency
+  qual_col_pals <- RColorBrewer::brewer.pal.info[
+    RColorBrewer::brewer.pal.info$category == "qual" & 
+      RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
+  all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+  
+  if (is.null(n)) return(all_colors)
+  
+  # make all_colors longer
+  if (n > length(all_colors)) {
+    ls_light <- colorspace::lighten(all_colors, 0.3)
+    ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
+    all_colors <- append(all_colors, values = c(ls_light, ls_dark))
+  }
+  
+  rep(all_colors, length.out = n)
 }
