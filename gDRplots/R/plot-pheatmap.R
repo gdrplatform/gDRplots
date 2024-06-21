@@ -275,7 +275,7 @@ pheatmap_qc <- function(
 #'                                               metric = "hsa_score",
 #'                                               dataset_name = "Combo Matrix - combo data"))
 #' 
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -435,7 +435,7 @@ pheatmap_with_anno_sa <- function(
 #'                                                  metric = "hsa_score",
 #'                                                  dataset_name = "Combo Matrix - combo data"))
 #'             
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -565,7 +565,7 @@ pheatmap_with_anno_combo <- function(
 #' get_hm_title(metric = "xc50", 
 #'              metric_growth = "GR")
 #'              
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return character title for heatmap
 #' @export 

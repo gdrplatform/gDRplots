@@ -15,6 +15,10 @@ reference:
   desc:  QC plots for Processing Report with all helpers 
 - contents:
   - has_keyword("QC_plot")
+- title: Pretty heatmap with annotation
+  desc:  Functions to plot annotated heatmap with helpers
+- contents:
+  - has_keyword("pheat_ann")
 - title: Response Overview plots
   desc:  Functions to plot drug response curves with helpers
 - contents:

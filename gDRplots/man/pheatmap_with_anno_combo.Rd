@@ -87,4 +87,4 @@ pheatmap_with_anno_combo(tab_response = response_metrics,
 \seealso{
 \code{\link[pheatmap]{pheatmap}}
 }
-\keyword{QC_plot}
+\keyword{pheat_ann}
