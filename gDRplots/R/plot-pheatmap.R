@@ -628,7 +628,7 @@ change_NA_into_char <- function(x,
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)
   
-  if (!is.null(n) && n == 0) return("#000000")
+  if (identical(n, 0)) return("#000000")
   
   # list of colors: qualitative and friendly for user with color vision deficiency
   qual_col_pals <- RColorBrewer::brewer.pal.info[
