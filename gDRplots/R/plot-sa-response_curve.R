@@ -204,7 +204,7 @@ plot_sa_by_CLs <- function(se,
   
   if (is.null(drug_name) || all(!drug_name %in% rownames(se))) {
     drug_name  <- rownames(se)
-  } else if (!all(drug_name  %in% rownames(se))) {
+  } else if (!all(drug_name %in% rownames(se))) {
     drug_name <- drug_name[drug_name  %in% rownames(se)]
   }  
   
@@ -279,4 +279,142 @@ plot_sa_1CL <- function(se,
     plot_fit_flag = plot_fit_flag
   ) 
   
+}
+
+#' Plot drug response curves for single-agent data to check quality of data
+#'
+#' @param dt_metrics data.table representation of the data in \code{Metrics} assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_average data.table representation of the data in \code{Averaged} assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#' @param cl_name string cell line to be plotted (Cell Line Name)
+#' @param d_name string vector with cell line to be plotted (Drug Name)
+#' @param metric_growth string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param fit_source string source name for metrics
+#'
+#' @return plot with dose-response curves
+#'
+#' @keywords QC_plot
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[1]]
+#'
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+#' cl_name <- dt_metrics[["CellLineName"]][1]
+#' d_name <- dt_metrics[["DrugName"]][1]
+#' 
+#' 
+#' plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+#'                          dt_average = dt_average,
+#'                          cl_name = cl_name,
+#'                          d_name = d_name)
+#' 
+#' @export
+plot_dose_response_sa_qc <- function(dt_metrics, 
+                                     dt_average, 
+                                     cl_name, 
+                                     d_name,
+                                     metric_growth = "GR",
+                                     fit_source = "gDR") {
+  
+  checkmate::expect_data_table(dt_metrics)
+  checkmate::expect_data_table(dt_average)
+  checkmate::expect_string(cl_name)
+  checkmate::expect_string(d_name)
+  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  
+  checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
+  checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
+  checkmate::expect_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::expect_choice(d_name, choices = dt_average[[drug_name]])
+  
+  # filter data for metric_growth
+  dt_metrics <- dt_metrics[normalization_type == metric_growth, ][
+    , .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
+  dt_average <- dt_average[normalization_type == metric_growth, ][
+    , .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
+  
+  selected_combination <- data.table::data.table(cellline_name = cl_name,
+                                                 drug_name = d_name)
+  data.table::setnames(selected_combination, c("cellline_name", "drug_name"), c(cellline_name, drug_name))
+  
+  # tab_plots
+  dt_average_plot <- dt_average[selected_combination, on = c(cellline_name, drug_name)]
+  dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name)]
+  
+  if (NROW(dt_metrics_plot) > 0) {
+    min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
+    max_conc <- max(dt_average_plot[[conc]])
+    sampled_conc <- gDRplots::create_log_seq(min_conc, max_conc, 50) 
+    fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
+                                                                 dt_metrics_plot$x_inf,
+                                                                 dt_metrics_plot$x_0,
+                                                                 dt_metrics_plot$ec50,
+                                                                 dt_metrics_plot$h)
+    dt_reconstructed_fit <- data.table::data.table(
+      Concentration = sampled_conc,
+      x = fitted_curve_sampled
+    )
+    
+    # set min and max values for y 
+    ymin <- min(c(0, min(dt_average_plot$x)))
+    ymax <- max(c(1.2, max(dt_average_plot$x)))
+    
+    plt_title <- sprintf("Dose Response Curve \nfor Drug Name: %s (%s) and CellLine: %s (%s)",
+                         dt_metrics_plot[[drug_name]], 
+                         dt_metrics_plot[[gnumber]], 
+                         dt_metrics_plot[[cellline_name]], 
+                         dt_metrics_plot[[clid]])
+    # plot
+    plt <- 
+      ggplot2::ggplot() +
+      ggplot2::geom_errorbar(
+        data = dt_average_plot, 
+        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std), 
+        width = 0.1, color = "#A9A9A9") + 
+      ggplot2::geom_line(
+        data = dt_average_plot, 
+        ggplot2::aes(x = get(conc), y = x), color = "black", linetype = "dashed") +
+      ggplot2::geom_line(
+        data = dt_reconstructed_fit, 
+        ggplot2::aes(x = get(conc), y = x), color = "red") +
+      ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
+      ggplot2::scale_x_continuous(trans = "log10") +
+      ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
+      ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
+      ggplot2::ylab(sprintf("log10(%s)", metric_growth)) + 
+      ggplot2::ggtitle(plt_title) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        panel.grid.minor = ggplot2::element_blank(),
+        legend.position = "none"
+        # ,
+        # aspect.ratio = 1/1
+      ) #+ 
+      # ggplot2::coord_fixed()
+  } else {
+    txt_err <- sprintf(
+      "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
+      dt_metrics_plot[[drug_name]], 
+      dt_metrics_plot[[gnumber]], 
+      dt_metrics_plot[[cellline_name]], 
+      dt_metrics_plot[[clid]])
+    plt <- 
+      ggplot2::ggplot() +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = 0, label = txt_err),
+                         color = "darkred", size = 5) + 
+      ggplot2::theme_void()
+    
+  }
+  
+  return(plt)
 }
