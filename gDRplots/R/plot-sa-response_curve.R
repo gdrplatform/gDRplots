@@ -287,8 +287,8 @@ plot_sa_1CL <- function(se,
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #' @param dt_average data.table representation of the data in \code{Averaged} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
-#' @param cl_name string cell line to be plotted (Cell Line Name)
-#' @param d_name string vector with cell line to be plotted (Drug Name)
+#' @param cl_name string cell line name to be plotted (Cell Line Name)
+#' @param d_name string vector with drug name to be plotted (Drug Name)
 #' @param metric_growth string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param fit_source string source name for metrics
@@ -304,7 +304,6 @@ plot_sa_1CL <- function(se,
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 #' cl_name <- dt_metrics[["CellLineName"]][1]
 #' d_name <- dt_metrics[["DrugName"]][1]
-#' 
 #' 
 #' plot_dose_response_sa_qc(dt_metrics = dt_metrics,
 #'                          dt_average = dt_average,
@@ -369,11 +368,8 @@ plot_dose_response_sa_qc <- function(dt_metrics,
     ymin <- min(c(0, min(dt_average_plot$x)))
     ymax <- max(c(1.2, max(dt_average_plot$x)))
     
-    plt_title <- sprintf("Dose Response Curve \nfor Drug Name: %s (%s) and CellLine: %s (%s)",
-                         dt_metrics_plot[[drug_name]], 
-                         dt_metrics_plot[[gnumber]], 
-                         dt_metrics_plot[[cellline_name]], 
-                         dt_metrics_plot[[clid]])
+    plt_title <- sprintf("%s (%s)", dt_metrics_plot[[drug_name]], dt_metrics_plot[[gnumber]])
+    
     # plot
     plt <- 
       ggplot2::ggplot() +
@@ -397,10 +393,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::theme(
         panel.grid.minor = ggplot2::element_blank(),
         legend.position = "none"
-        # ,
-        # aspect.ratio = 1/1
-      ) #+ 
-      # ggplot2::coord_fixed()
+      )
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
@@ -413,8 +406,80 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_text(ggplot2::aes(x = 0, y = 0, label = txt_err),
                          color = "darkred", size = 5) + 
       ggplot2::theme_void()
-    
   }
   
   return(plt)
+}
+
+#' Plot panel with drug response curves for single-agent data to check quality of data
+#'
+#' @inheritParams plot_dose_response_sa_qc
+#' @param d_names character vector with drug names to be plotted (Drug Name); 
+#'    if NULL - all available drugs will be plotted
+#'
+#' @return panle with plot with dose-response curves for selected cell line by drugs
+#'
+#' @keywords QC_plot
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[1]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+#' cl_name <- dt_metrics[["CellLineName"]][1]
+#' d_names <- unique(dt_metrics[["DrugName"]])[1:3]
+#' 
+#' plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+#'                                dt_average = dt_average,
+#'                                cl_name = cl_name)
+#' 
+#' plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+#'                                dt_average = dt_average,
+#'                                cl_name = cl_name,
+#'                                d_names = d_names)
+#' 
+#' @export
+plot_dose_response_sa_qc_panel <- function(dt_metrics, 
+                                           dt_average, 
+                                           cl_name, 
+                                           d_names = NULL,
+                                           metric_growth = "GR",
+                                           fit_source = "gDR") {
+  
+  checkmate::expect_data_table(dt_metrics)
+  checkmate::expect_data_table(dt_average)
+  checkmate::expect_string(cl_name)
+  checkmate::expect_character(d_names, null.ok = TRUE)
+  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  
+  checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
+  checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
+  
+  available_drugs <- unique(dt_metrics[[drug_name]])
+  if (is.null(d_names) || all(!d_names %in% available_drugs)) {
+    d_names  <- available_drugs
+  } else if (!all(d_names %in% available_drugs)) {
+    d_names <- drug_name[drug_name  %in% available_drugs]
+  } 
+  
+  ls_drug <- list(d_name = d_names)
+  
+  # list of plots for each drug
+  ls_plt <- purrr::pmap(ls_drug, gDRplots::plot_dose_response_sa_qc,
+                        dt_metrics = dt_metrics,
+                        dt_average = dt_average,
+                        cl_name = cl_name)
+  
+  grid_title <- sprintf("Dose Response Curve for CellLine: %s (%s)",
+                        unique(dt_metrics[[cellline_name]]),
+                        unique(dt_metrics[[clid]]))
+  # final panel
+  cowplot::plot_grid(plotlist = ls_plt)
 }
