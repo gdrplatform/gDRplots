@@ -5,24 +5,28 @@
 \title{Plot drug response curves for single-agent data for selected call lines and drugs}
 \usage{
 plot_sa_by_CLs(
-  se,
-  cellline_name = NULL,
-  drug_name = NULL,
-  normalization_type = "GR",
+  dt_metrics,
+  dt_average,
+  cellline_name_vec = NULL,
+  drug_name_vec = NULL,
+  metric_growth = "GR",
   colormap = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE
 )
 }
 \arguments{
-\item{se}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
-dose-response data in its assays for one cell line}
+\item{dt_metrics}{data.table representation of the data in \code{Metrics} assay
+output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
-\item{cellline_name}{character vector with cell line to be plotted (colnames of se)}
+\item{dt_average}{data.table representation of the data in \code{Averaged} assay
+output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
-\item{drug_name}{character vector with cell line to be plotted (rownames of se)}
+\item{cellline_name_vec}{character vector with cell line to be plotted (Cell Line Name)}
 
-\item{normalization_type}{string with normalization_types to be selected
+\item{drug_name_vec}{character vector with cell line to be plotted (Drug Name)}
+
+\item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}
@@ -30,6 +34,9 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 
 \item{plot_fit_flag}{logical flag whether plot points with fitted values}
+
+\item{se}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
+dose-response data in its assays for one cell line}
 }
 \value{
 list of plots with dose-response curves
@@ -39,14 +46,17 @@ Plot drug response curves for single-agent data for selected call lines and drug
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
-se <- mae[[1]]
-cellline_name <- colnames(se)[2:5]
-drug_name <- rownames(se)[5:7]
+se <- mae[[gDRutils::get_supported_experiments("sa")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+cellline_name_vec <- dt_metrics[["CellLineName"]][2:5]
+drug_name_vec <- dt_metrics[["DrugName"]][5:7]
 
-plot_sa_by_CLs(se = se, 
-               cellline_name = cellline_name, 
-               drug_name = drug_name, 
-               normalization_type = "RV", 
+plot_sa_by_CLs(dt_metrics = dt_metrics, 
+               dt_average = dt_average, 
+               cellline_name_vec = cellline_name_vec, 
+               drug_name_vec = drug_name_vec, 
+               metric_growth = "RV", 
                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 
 }

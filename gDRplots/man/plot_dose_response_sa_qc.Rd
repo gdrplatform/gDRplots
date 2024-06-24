@@ -37,7 +37,7 @@ Plot drug response curves for single-agent data to check quality of data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
-se <- mae[[1]]
+se <- mae[[gDRutils::get_supported_experiments("sa")]]
 
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
