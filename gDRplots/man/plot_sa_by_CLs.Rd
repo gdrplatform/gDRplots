@@ -46,8 +46,8 @@ mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-cellline_name_vec <- dt_metrics[["CellLineName"]][2:5]
-drug_name_vec <- dt_metrics[["DrugName"]][5:7]
+cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
+drug_name_vec <- unique(dt_metrics[["DrugName"]])[5:7]
 
 plot_sa_by_CLs(dt_metrics = dt_metrics, 
                dt_average = dt_average, 
