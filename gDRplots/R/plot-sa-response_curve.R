@@ -174,8 +174,6 @@ plot_dose_response_sa <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams plot_dose_response_sa
-#' @param se single-agent \code{SummarizedExperiment} object holding raw and/or processed 
-#'    dose-response data in its assays for one cell line
 #' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
 #' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
 #'    

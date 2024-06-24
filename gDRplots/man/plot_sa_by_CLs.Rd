@@ -34,9 +34,6 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 
 \item{plot_fit_flag}{logical flag whether plot points with fitted values}
-
-\item{se}{single-agent \code{SummarizedExperiment} object holding raw and/or processed 
-dose-response data in its assays for one cell line}
 }
 \value{
 list of plots with dose-response curves
