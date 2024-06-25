@@ -188,22 +188,22 @@ plot_dose_response_sa <- function(dt_metrics,
 #' cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
 #' drug_name_vec <- unique(dt_metrics[["DrugName"]])[5:7]
 #' 
-#' plot_sa_by_CLs(dt_metrics = dt_metrics, 
-#'                dt_average = dt_average, 
-#'                cellline_name_vec = cellline_name_vec, 
-#'                drug_name_vec = drug_name_vec, 
-#'                metric_growth = "RV", 
-#'                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#' plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
+#'                              dt_average = dt_average, 
+#'                              cellline_name_vec = cellline_name_vec, 
+#'                              drug_name_vec = drug_name_vec, 
+#'                              metric_growth = "RV", 
+#'                              colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' 
 #' @export
-plot_sa_by_CLs <- function(dt_metrics, 
-                           dt_average,
-                           cellline_name_vec = NULL, 
-                           drug_name_vec = NULL,
-                           metric_growth = "GR", 
-                           colormap = NULL, 
-                           plot_averaged_flag = TRUE, 
-                           plot_fit_flag = TRUE) {
+plot_dose_response_sa_by_CLs <- function(dt_metrics, 
+                                         dt_average,
+                                         cellline_name_vec = NULL, 
+                                         drug_name_vec = NULL,
+                                         metric_growth = "GR", 
+                                         colormap = NULL, 
+                                         plot_averaged_flag = TRUE, 
+                                         plot_fit_flag = TRUE) {
   
   checkmate::expect_data_table(dt_metrics)
   checkmate::expect_data_table(dt_average)
@@ -241,6 +241,94 @@ plot_sa_by_CLs <- function(dt_metrics,
     dt_average_subset <- dt_average[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
     
     plt_title <- paste(metric_growth, iR) # TODO add gnumber
+    
+    plt <- 
+      plot_dose_response_sa(dt_metrics = dt_metrics_subset, 
+                            dt_average = dt_average_subset, 
+                            grouping = cellline_name,
+                            group_names = cellline_name_vec,
+                            metric_growth = metric_growth,
+                            colormap = colormap,
+                            plot_averaged_flag = plot_averaged_flag,
+                            plot_fit_flag = plot_fit_flag)
+    
+    plt_list[[plt_title]] <- plt
+    
+  }
+  
+  return(plt_list)
+}
+
+#' Plot drug response curves for single-agent data for selected call lines and drugs
+#' 
+#' @inheritParams plot_dose_response_sa
+#' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
+#' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
+#'    
+#' @return list of plots with dose-response curves
+#' 
+#' @keywords single-agent_plots
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+#' cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
+#' drug_name_vec <- unique(dt_metrics[["DrugName"]])[5:7]
+#' 
+#' plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+#'                                dt_average = dt_average, 
+#'                                cellline_name_vec = cellline_name_vec, 
+#'                                drug_name_vec = drug_name_vec, 
+#'                                metric_growth = "RV", 
+#'                                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#' 
+#' @export
+plot_dose_response_sa_by_drugs <- function(dt_metrics, 
+                                           dt_average,
+                                           cellline_name_vec = NULL, 
+                                           drug_name_vec = NULL,
+                                           metric_growth = "GR", 
+                                           colormap = NULL, 
+                                           plot_averaged_flag = TRUE, 
+                                           plot_fit_flag = TRUE) {
+  
+  checkmate::expect_data_table(dt_metrics)
+  checkmate::expect_data_table(dt_average)
+  checkmate::expect_character(cellline_name_vec, null.ok = TRUE)
+  checkmate::expect_character(drug_name_vec, null.ok = TRUE)
+  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_character(colormap, null.ok = TRUE)
+  checkmate::expect_flag(plot_averaged_flag)
+  checkmate::expect_flag(plot_fit_flag)
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  
+  available_cellline <- unique(dt_metrics[[cellline_name]])
+  if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
+    cellline_name_vec <- available_cellline
+  } else if (!all(cellline_name_vec %in% available_cellline)) {
+    cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
+  }  
+  
+  plt_list <- list()
+  for (iC in cellline_name_vec) {
+    
+    available_drugs <- unique(dt_metrics[[drug_name]])
+    if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
+      drug_name_vec  <- available_drugs
+    } else if (!all(drug_name_vec %in% available_drugs)) {
+      drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+    }  
+    
+    # subset data
+    dt_metrics_subset <- dt_metrics[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
+    dt_average_subset <- dt_average[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
+    
+    plt_title <- paste(metric_growth, iC) # TODO add gnumber
     
     plt <- 
       plot_dose_response_sa(dt_metrics = dt_metrics_subset, 
