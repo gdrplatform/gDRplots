@@ -623,7 +623,8 @@ change_NA_into_char <- function(x,
 #' get_qual_colors(35) 
 #' }
 #' 
-#' @keywords internal
+#' @keywords utils_color
+#' @export 
 #' 
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)
