@@ -235,7 +235,7 @@ plot_sa_by_CLs <- function(dt_metrics,
     } else if (!all(cellline_name_vec %in% available_cellline)) {
       cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
     }  
-
+    
     # subset data
     dt_metrics_subset <- dt_metrics[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
     dt_average_subset <- dt_average[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
@@ -365,13 +365,11 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-      ggplot2::ylab(sprintf("log10(%s)", metric_growth)) + 
+      ggplot2::ylab(metric_growth) + 
       ggplot2::ggtitle(plt_title) +
-      ggplot2::theme_minimal() +
-      ggplot2::theme(
-        panel.grid.minor = ggplot2::element_blank(),
-        legend.position = "none"
-      )
+      ggplot2::theme_bw() +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     legend.position = "none")
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
@@ -453,7 +451,8 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   ls_plt <- purrr::pmap(ls_drug, gDRplots::plot_dose_response_sa_qc,
                         dt_metrics = dt_metrics,
                         dt_average = dt_average,
-                        cl_name = cl_name)
+                        cl_name = cl_name,
+                        metric_growth = metric_growth)
   
   grid_title <- sprintf("Dose Response Curve for CellLine: %s (%s)",
                         unique(dt_metrics[[cellline_name]]),

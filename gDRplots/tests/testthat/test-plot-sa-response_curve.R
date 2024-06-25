@@ -86,3 +86,54 @@ test_that("plot_sa_by_CLs works as expected", {
                          function(i) all(plts[[i]]$plot_env$group_names == plotted), logical(1))))
 })
 
+test_that("plot_dose_response_sa_qc works as expected", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+  cl_name <- dt_metrics[["CellLineName"]][1]
+  d_name <- dt_metrics[["DrugName"]][1]
+  
+  plt_1 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                    dt_average = dt_average,
+                                    cl_name = cl_name,
+                                    d_name = d_name)
+  expect_is(plt_1, "gg")
+  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_true(grepl(d_name, plt_1[["labels"]][["title"]]))
+  expect_length(plt_1[["layers"]], 4)
+  
+  metric_growth <- "RV"
+  plt_2 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                    dt_average = dt_average,
+                                    cl_name = cl_name,
+                                    d_name = d_name, 
+                                    metric_growth = metric_growth)
+  expect_is(plt_2, "gg")
+  expect_true(grepl(metric_growth, plt_2[["labels"]][["y"]]))
+})
+
+test_that("plot_dose_response_sa_qc works as expected", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[1]]
+  
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+  cl_name <- dt_metrics[["CellLineName"]][1]
+  d_names <- unique(dt_metrics[["DrugName"]])[1:3]
+  
+  plt_1 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                          dt_average = dt_average,
+                                          cl_name = cl_name)
+  expect_is(plt_1, "gg")
+  expect_equal(as.character(plt_1[["layers"]][[1]][["constructor"]][[1]]), "draw_grob")
+  
+  metric_growth <- "RV"
+  plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                          dt_average = dt_average,
+                                          cl_name = cl_name,
+                                          d_names = d_names,
+                                          metric_growth = metric_growth)
+  expect_is(plt_2, "gg")
+})
