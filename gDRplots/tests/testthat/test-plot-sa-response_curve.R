@@ -42,7 +42,7 @@ test_that("plot_dose_response_sa works as expected", {
                "Check on 'grouping' failed: Must be element of set")
 })
 
-test_that("plot_sa_by_CLs works as expected", {
+test_that("plot_dose_response_sa_by_CLs works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
@@ -54,13 +54,13 @@ test_that("plot_sa_by_CLs works as expected", {
   cellline_name_vec <- unique(dt_metrics[[cellline_name]])[2:5]
   drug_name_vec <- unique(dt_metrics[[drug_name]])[5:7]
   
-  plts <- plot_sa_by_CLs(dt_metrics = dt_metrics, 
+  plts <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                          dt_average = dt_average)
   expect_is(plts, "list")
   expect_equal(names(plts), paste("GR", unique(dt_metrics[[drug_name]])))
   
   metric_growth <- "RV"
-  plts <- plot_sa_by_CLs(dt_metrics = dt_metrics, 
+  plts <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                          dt_average = dt_average,
                          cellline_name_vec = cellline_name_vec,
                          drug_name_vec = drug_name_vec,
@@ -74,7 +74,7 @@ test_that("plot_sa_by_CLs works as expected", {
   cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
   drug_name_vec_2 <- c(drug_name_vec, "drug_100")
   
-  plts <- plot_sa_by_CLs(dt_metrics = dt_metrics, 
+  plts <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                          dt_average = dt_average,
                          cellline_name_vec = cellline_name_vec_2,
                          drug_name_vec = drug_name_vec_2)
