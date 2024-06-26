@@ -134,9 +134,7 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
   
   plt_title <- sprintf(
-    "%s Drug dose response for %s: \n%s (%s)",
-    metric_growth,
-    ifelse(grouping == cellline_name, "Drug", "Cell Line"),
+    "%s (%s)",
     ifelse(grouping == cellline_name, unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
     ifelse(grouping == cellline_name, unique(dt_metrics[[gnumber]]), unique(dt_metrics[[clid]]))
   )
@@ -151,7 +149,7 @@ plot_dose_response_sa <- function(dt_metrics,
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(paste(metric_growth, "values")) +
+    ggplot2::ylab(metric_growth) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
   
@@ -240,7 +238,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
     dt_metrics_subset <- dt_metrics[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
     dt_average_subset <- dt_average[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
     
-    plt_title <- paste(metric_growth, iR) # TODO add gnumber
+    plt_title <- sprintf("%s (%s)", iR, unique(dt_metrics[get(drug_name) == iR, ][[gnumber]]))
     
     plt <- 
       plot_dose_response_sa(dt_metrics = dt_metrics_subset, 
@@ -327,7 +325,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
     dt_metrics_subset <- dt_metrics[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
     dt_average_subset <- dt_average[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
     
-    plt_title <- paste(metric_growth, iC) # TODO add gnumber
+    plt_title <- sprintf("%s (%s)", iC, unique(dt_metrics[get(cellline_name) == iC, ][[clid]]))
     
     plt <- 
       plot_dose_response_sa(dt_metrics = dt_metrics_subset, 
@@ -539,10 +537,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                         dt_average = dt_average,
                         cl_name = cl_name,
                         metric_growth = metric_growth)
-  
-  grid_title <- sprintf("Dose Response Curve for CellLine: %s (%s)",
-                        unique(dt_metrics[[cellline_name]]),
-                        unique(dt_metrics[[clid]]))
+
   # final panel
   cowplot::plot_grid(plotlist = ls_plt)
 }
