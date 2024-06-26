@@ -54,7 +54,8 @@ plot_var_distribution_qc <- function(dt_assay,
   
   plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
-    ggplot2::geom_violin(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), alpha = 0.25) +
+    ggplot2::geom_violin(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
+                         alpha = 0.25, na.rm = TRUE, drop = FALSE) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#2c3e50") +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
@@ -62,8 +63,8 @@ plot_var_distribution_qc <- function(dt_assay,
     ggplot2::labs(y = metric_growth, x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
-  
-  return(plt)
+
+  return(suppressWarnings(plt))
 }
 
 #' Plot drug response curves for single-agent data to check quality of data
