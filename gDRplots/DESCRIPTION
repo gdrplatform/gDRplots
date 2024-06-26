@@ -25,9 +25,9 @@ Imports:
     SummarizedExperiment
 Suggests:
     colorspace,
-    cowplot,
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.5),
+    gridExtra,
     heatmaply,
     jsonlite,
     knitr,

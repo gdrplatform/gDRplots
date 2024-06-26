@@ -539,5 +539,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                         metric_growth = metric_growth)
 
   # final panel
-  cowplot::plot_grid(plotlist = ls_plt)
+  cl_clid <- unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]]) 
+  panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
+  gridExtra::grid.arrange(grobs = ls_plt, top = panel_title)
 }
