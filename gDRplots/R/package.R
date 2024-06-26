@@ -33,6 +33,8 @@ utils::globalVariables(
     "pos_y",
     "Response",
     "x",
-    "x_std"
+    "x_std",
+    "cId",
+    "rId"
   ),
   utils::packageName())

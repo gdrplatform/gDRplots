@@ -110,17 +110,19 @@ heatmap_control_mapping_qc <- function(dt_treat,
   # calculate frequency  
   frequency <- dt_controls[, .N, by = .(rId, cId)]
   result <- merge(unique(dt_treat[, c("rId", "cId")]), frequency, by = c("rId", "cId"), all.x = TRUE)
+  data.table::setnames(result, "N", "Count")
+  Count <- NULL # due to NSE notes in R CMD check
   
   # final plot
-  plt <- ggplot2::ggplot(result, ggplot2::aes(x = cId, y = rId)) + 
-    ggplot2::geom_tile(ggplot2::aes(fill = N, colour = "")) +
+  plt <- ggplot2::ggplot(result, 
+                         ggplot2::aes(x = cId, y = rId, fill = Count, colour = "")) +
+    ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#CEEFC8", high = "#76d364", na.value = "red") +
     ggplot2::scale_colour_manual(values = NA) +              
     ggplot2::guides(colour = ggplot2::guide_legend("No data", override.aes = list(fill = "red", colour = "black"))) +
     ggplot2::labs(title = "Mapping Counts Comparison between Treated and Control",
                   x = "col id",
-                  y = "row id",
-                  fill = "Count") +
+                  y = "row id") +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1),

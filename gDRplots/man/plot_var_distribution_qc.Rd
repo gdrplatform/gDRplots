@@ -8,9 +8,11 @@ plot_var_distribution_qc(dt_assay, cl_name, metric = "x", metric_growth = "GR")
 }
 \arguments{
 \item{dt_assay}{data.table representation of the data in assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, assya_name)}}
+output from \code{gDRutils::convert_se_assay_to_dt(se, <assya_name>)}}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
+
+\item{metric}{string with variable name to be plotted; it has to be in \code{dt_assay}}
 
 \item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}

@@ -33,6 +33,7 @@ Suggests:
     knitr,
     matrixStats,
     purrr,
+    rlang,
     qs,
     testthat
 VignetteBuilder: 
