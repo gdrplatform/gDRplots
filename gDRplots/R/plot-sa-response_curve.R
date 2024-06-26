@@ -226,15 +226,15 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
     drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
   }  
   
+  available_cellline <- unique(dt_metrics[[cellline_name]])
+  if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
+    cellline_name_vec <- available_cellline
+  } else if (!all(cellline_name_vec %in% available_cellline)) {
+    cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
+  } 
+  
   plt_list <- list()
   for (iR in drug_name_vec) {
-    
-    available_cellline <- unique(dt_metrics[[cellline_name]])
-    if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
-      cellline_name_vec <- available_cellline
-    } else if (!all(cellline_name_vec %in% available_cellline)) {
-      cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
-    }  
     
     # subset data
     dt_metrics_subset <- dt_metrics[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
@@ -253,7 +253,6 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                             plot_fit_flag = plot_fit_flag)
     
     plt_list[[plt_title]] <- plt
-    
   }
   
   return(plt_list)
@@ -314,15 +313,15 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
     cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
   }  
   
+  available_drugs <- unique(dt_metrics[[drug_name]])
+  if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
+    drug_name_vec  <- available_drugs
+  } else if (!all(drug_name_vec %in% available_drugs)) {
+    drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+  }  
+  
   plt_list <- list()
   for (iC in cellline_name_vec) {
-    
-    available_drugs <- unique(dt_metrics[[drug_name]])
-    if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
-      drug_name_vec  <- available_drugs
-    } else if (!all(drug_name_vec %in% available_drugs)) {
-      drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
-    }  
     
     # subset data
     dt_metrics_subset <- dt_metrics[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
@@ -333,15 +332,14 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
     plt <- 
       plot_dose_response_sa(dt_metrics = dt_metrics_subset, 
                             dt_average = dt_average_subset, 
-                            grouping = cellline_name,
-                            group_names = cellline_name_vec,
+                            grouping = drug_name,
+                            group_names = drug_name_vec,
                             metric_growth = metric_growth,
                             colormap = colormap,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
     
     plt_list[[plt_title]] <- plt
-    
   }
   
   return(plt_list)
