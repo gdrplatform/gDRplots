@@ -500,7 +500,7 @@ pheatmap_with_anno_combo <- function(
   
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  if (all(dim(mat_cvd) == c(0,0)) || all(is.na(mat_cvd))) return(NULL) # pheatmap does not handle <0 x 0 matrix>
+  if (all(dim(mat_cvd) == c(0,0)) || all(is.na(mat_cvd))) return("No data") # pheatmap does not handle <0 x 0 matrix>
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
