@@ -22,7 +22,8 @@
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                      assay_name = "Averaged")
 #' 
 #' pheatmap_qc(tab_response = response_metrics)
 #' pheatmap_qc(tab_response = response_metrics, 
@@ -33,7 +34,8 @@
 #'              
 #'              
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                      assay_name = "Averaged")
 #' pheatmap_qc(tab_response = response_metrics,
 #'             cluster_rows = FALSE)
 #'              
@@ -498,6 +500,7 @@ pheatmap_with_anno_combo <- function(
   
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
+  if (all(dim(mat_cvd) == c(0,0))) return(NULL) # pheatmap does not handle <0 x 0 matrix>
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
