@@ -16,7 +16,8 @@ Original string with \code{:}s escaped
 Escape colon
 }
 \examples{
-escape_special_characters("ABC:123", "AD_12")
+escape_special_characters("ABC:123")
+escape_special_characters("AD_12")
 
 }
 \keyword{internal}
