@@ -121,19 +121,22 @@ test_that("plot_dose_response_sa_qc works as expected", {
 })
 
 test_that("plot_dose_response_sa_qc works as expected", {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[1]]
   
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  cl_name <- dt_metrics[["CellLineName"]][1]
-  d_names <- unique(dt_metrics[["DrugName"]])[1:3]
+  cl_name <- dt_metrics[[cellline_name]][1]
+  d_names <- unique(dt_metrics[[drug_name]])[1:3]
   
   plt_1 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,
                                           cl_name = cl_name)
-  expect_is(plt_1, "gg")
-  expect_equal(as.character(plt_1[["layers"]][[1]][["constructor"]][[1]]), "draw_grob")
+  expect_is(plt_1, "gtable")
+  expect_length(plt_1$grobs, NROW(unique(dt_metrics[[drug_name]])) + 1)
   
   metric_growth <- "RV"
   plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
@@ -141,5 +144,6 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                           cl_name = cl_name,
                                           d_names = d_names,
                                           metric_growth = metric_growth)
-  expect_is(plt_2, "gg")
+  expect_is(plt_2, "gtable")
+  expect_length(plt_2$grobs, NROW(d_names) + 1)
 })
