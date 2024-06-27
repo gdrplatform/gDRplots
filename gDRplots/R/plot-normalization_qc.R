@@ -108,8 +108,9 @@ heatmap_control_mapping_qc <- function(dt_treat,
   checkmate::expect_data_table(dt_treat)
   checkmate::expect_data_table(dt_controls)
   
-  # calculate frequency  
+  # calculate the frequency of each (rID, cID) combination in Controls 
   frequency <- dt_controls[, .N, by = .(rId, cId)]
+  # merge the frequency with the Treated data.table
   result <- merge(unique(dt_treat[, c("rId", "cId")]), frequency, by = c("rId", "cId"), all.x = TRUE)
   data.table::setnames(result, "N", "Count")
   Count <- NULL # due to NSE notes in R CMD check
