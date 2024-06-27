@@ -24,4 +24,4 @@ get_qual_colors(35)
 }
 
 }
-\keyword{internal}
+\keyword{utils_color}

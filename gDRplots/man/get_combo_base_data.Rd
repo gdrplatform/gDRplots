@@ -34,7 +34,8 @@ get base combo data of given filters
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+combo_data_l <- 
+  gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 
 get_combo_base_data(
  data = combo_data_l,

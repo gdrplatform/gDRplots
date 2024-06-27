@@ -41,3 +41,20 @@ prep_plot_chunk <- function(plt_list,
     knitr::knit_expand(text = template)
   })
 }
+
+#' Escape colon
+#'
+#' @param x String
+#'
+#' @examples
+#' escape_special_characters("ABC:123")
+#' escape_special_characters("AD_12")
+#'
+#' @return Original string with \code{:}s escaped
+#' @keywords internal
+#'
+#' @export
+escape_special_characters <- function(x) {
+  checkmate::assert_string(x)
+  gsub(pattern = "\\:", replacement = "\\\\:", x = x)
+}

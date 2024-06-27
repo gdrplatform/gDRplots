@@ -55,34 +55,43 @@ Plot pretty heatmap with annotationsfor single-agent data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, 
+                                                     assay_name = "Metrics")
 
+pheatmap_with_anno_sa(tab_response = response_metrics)
+
+annotation_manual <-
+  unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+annotation_map <- get_ann_color_map(annotation_manual[,.SD, .SDcols = "Tissue"])
+
+pheatmap_with_anno_sa(tab_response = response_metrics,
+                      metric_growth = "RV",
+                      metric = "x_mean",
+                      colors_vec = c("darkblue", "grey90"),
+                      annotation_col = annotation_manual,
+                      annotation_colors = annotation_map)
+                      
 annotation_manual <- data.table::data.table(
-  CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+  CellLineName =
+    c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
   mut_A = c(1, 1, 1, 0, 0),
   mut_B = c("yes", "yes", "no", "no", "no")
 )
-
 annotation_map <- list(
   mut_A = c("1" = "coral", "0" = "cadetblue"),
   mut_B = c("yes" = "black", "no" = "grey90")
 )
 
-pheatmap_with_anno_sa(tab_response = response_metrics)
-pheatmap_with_anno_sa(tab_response = response_metrics, 
-                      metric_growth = "RV",
-                      metric = "x_mean",
-                      colors_vec = c("darkblue", "grey90"),
-                      annotation_col = annotation_manual)
-pheatmap_with_anno_sa(tab_response = response_metrics, 
+pheatmap_with_anno_sa(tab_response = response_metrics,
                       annotation_col = annotation_manual,
                       annotation_colors = annotation_map,
-                      hm_title = get_hm_title(metric_growth = "GR",
-                                              metric = "hsa_score",
-                                              dataset_name = "Combo Matrix - combo data"))
+                      hm_title = get_hm_title(
+                        metric_growth = "GR",
+                        metric = "hsa_score",
+                        dataset_name = "Combo Matrix - combo data"))
 
 }
 \seealso{
 \code{\link[pheatmap]{pheatmap}}
 }
-\keyword{QC_plot}
+\keyword{pheat_ann}

@@ -31,4 +31,4 @@ get_hm_title(metric = "xc50",
              metric_growth = "GR")
              
 }
-\keyword{QC_plot}
+\keyword{pheat_ann}
