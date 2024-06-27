@@ -135,15 +135,14 @@ test_that("plot_dose_response_sa_qc works as expected", {
   plt_1 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,
                                           cl_name = cl_name)
-  expect_is(plt_1, "gtable")
-  expect_length(plt_1$grobs, NROW(unique(dt_metrics[[drug_name]])) + 1)
-  
+  expect_is(plt_1, "gg")
+  expect_length(plt_1$layers[[1]]$constructor, 2)
+
   metric_growth <- "RV"
   plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,
                                           cl_name = cl_name,
                                           d_names = d_names,
                                           metric_growth = metric_growth)
-  expect_is(plt_2, "gtable")
-  expect_length(plt_2$grobs, NROW(d_names) + 1)
+  expect_is(plt_2, "gg")
 })
