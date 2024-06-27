@@ -53,7 +53,8 @@ Plot pretty heatmap for single-agent or combo data to check quality of data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                     assay_name = "Averaged")
 
 pheatmap_qc(tab_response = response_metrics)
 pheatmap_qc(tab_response = response_metrics, 
@@ -64,7 +65,8 @@ pheatmap_qc(tab_response = response_metrics,
              
              
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                     assay_name = "Averaged")
 pheatmap_qc(tab_response = response_metrics,
             cluster_rows = FALSE)
              
