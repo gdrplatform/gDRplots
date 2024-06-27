@@ -17,7 +17,8 @@
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-#' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+#' combo_data_l <- 
+#'   gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #' plolty_drug_combo_heatmap(data = combo_data_l, 
 #'                           metric_combo = "hsa_score", 
 #'                           metric_growth = "RV")
@@ -155,7 +156,8 @@ plolty_drug_combo_heatmap <- function(data,
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-#' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+#' combo_data_l <- 
+#'   gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #'
 #'plolty_drug_combo_conc_heatmap(
 #'  data = combo_data_l,
@@ -425,7 +427,8 @@ plolty_drug_combo_conc_heatmap <- function(data,
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-#' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+#' combo_data_l <- 
+#'   gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #'
 #' get_combo_base_data(
 #'  data = combo_data_l,
@@ -821,7 +824,8 @@ calc_up_limes <- function(x, cnames = c("ux", "ulx")) {
 #' @examples
 #' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-#' combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+#' combo_data_l <- 
+#'   gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 #'
 #' plolty_drug_combo_ratio(
 #'   data = combo_data_l,
