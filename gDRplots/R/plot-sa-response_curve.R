@@ -532,14 +532,19 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   ls_drug <- list(d_name = d_names)
   
   # list of plots for each drug
-  ls_plt <- purrr::pmap(ls_drug, gDRplots::plot_dose_response_sa_qc,
+  ls_plt <- purrr::pmap(ls_drug, 
+                        gDRplots::plot_dose_response_sa_qc,
                         dt_metrics = dt_metrics,
                         dt_average = dt_average,
                         cl_name = cl_name,
-                        metric_growth = metric_growth)
-
-  # final panel
+                        metric_growth = metric_growth,
+                        fit_source = fit_source)
+  
+  # panel title
   cl_clid <- unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]]) 
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
-  gridExtra::grid.arrange(grobs = ls_plt, top = panel_title)
+  
+  # final panel
+  ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt),
+                          top = panel_title)
 }
