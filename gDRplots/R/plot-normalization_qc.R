@@ -1,7 +1,8 @@
-#' Plot violin for normalized single-agent data to check quality of data
+#' Plot violin for normalized or averaged single-agent data to check quality of data
 #'
 #' @param dt_assay data.table representation of the data in assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, <assya_name>)}
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
+#'    for assay_name like "Normalized" and "Averaged"
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
 #' @param metric_growth string with normalization_types to be selected
@@ -24,12 +25,12 @@
 #' plot_var_distribution_qc(dt_assay = dt_average,
 #'                          cl_name = cl_name,
 #'                          metric_growth = "RV")
-#' 
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-#' plot_var_distribution_qc(dt_assay = dt_metrics,
+#'                          
+#' plot_var_distribution_qc(dt_assay = dt_average,
 #'                          cl_name = cl_name,
-#'                          metric = "r2")
-#'  
+#'                          metric = "x_std",
+#'                          metric_growth = "RV")
+#'                          
 #' @export
 plot_var_distribution_qc <- function(dt_assay,
                                      cl_name,
@@ -60,11 +61,78 @@ plot_var_distribution_qc <- function(dt_assay,
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
     ggplot2::scale_color_manual(values = color_palette) +
-    ggplot2::labs(y = metric_growth, x = drug_name, title = plt_title) +
+    ggplot2::labs(y = sprintf("%s for %s", metric, metric_growth), x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
+  
+  return(plt)
+}
 
-  return(suppressWarnings(plt))
+#' Plot barplot for metric single-agent data to check quality of data
+#'
+#' @param dt_assay data.table representation of the data in assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param cl_name string cell line name to be plotted (Cell Line Name)
+#' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
+#' @param metric_growth string with normalization_types to be selected
+#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'
+#' @return bar plot with sta value for each drug
+#'
+#' @keywords QC_plot
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' cl_name <- dt_metrics[["CellLineName"]][1]
+#' 
+#' plot_var_stat_qc(dt_assay = dt_metrics,
+#'                  cl_name = cl_name)
+#'                          
+#' plot_var_stat_qc(dt_assay = dt_metrics,
+#'                  cl_name = cl_name,
+#'                  metric = "r2",
+#'                  metric_growth = "RV")
+#'                          
+#' plot_var_stat_qc(dt_assay = dt_metrics,
+#'                  cl_name = cl_name,
+#'                  metric = "x_AOC",
+#'                  metric_growth = "RV")
+#'                          
+#' @export
+plot_var_stat_qc <- function(dt_assay,
+                             cl_name,
+                             metric = "r2",
+                             metric_growth = "GR") {
+  
+  checkmate::expect_data_table(dt_assay)
+  checkmate::expect_string(cl_name)
+  checkmate::expect_choice(metric, choices = names(dt_assay))
+  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, ][[clid]]) 
+  tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
+  
+  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
+  color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
+  
+  plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
+    ggplot2::geom_col(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), alpha = 0.50) +
+    ggplot2::theme_minimal() +
+    ggplot2::scale_fill_manual(values = color_palette) +
+    ggplot2::scale_color_manual(values = color_palette) +
+    ggplot2::labs(y = sprintf("%s for %s", metric, metric_growth), x = drug_name, title = plt_title) +
+    ggplot2::theme(legend.position = "none",
+                   axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
+  
+  return(plt)
 }
 
 #' Plot drug response curves for single-agent data to check quality of data

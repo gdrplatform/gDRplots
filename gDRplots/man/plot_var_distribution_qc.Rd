@@ -2,13 +2,14 @@
 % Please edit documentation in R/plot-normalization_qc.R
 \name{plot_var_distribution_qc}
 \alias{plot_var_distribution_qc}
-\title{Plot violin for normalized single-agent data to check quality of data}
+\title{Plot violin for normalized or averaged single-agent data to check quality of data}
 \usage{
 plot_var_distribution_qc(dt_assay, cl_name, metric = "x", metric_growth = "GR")
 }
 \arguments{
 \item{dt_assay}{data.table representation of the data in assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, <assya_name>)}}
+output from \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
+for assay_name like "Normalized" and "Averaged"}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
 
@@ -21,7 +22,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 plot with violin for each drug
 }
 \description{
-Plot violin for normalized single-agent data to check quality of data
+Plot violin for normalized or averaged single-agent data to check quality of data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
@@ -37,11 +38,11 @@ dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 plot_var_distribution_qc(dt_assay = dt_average,
                          cl_name = cl_name,
                          metric_growth = "RV")
-
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-plot_var_distribution_qc(dt_assay = dt_metrics,
+                         
+plot_var_distribution_qc(dt_assay = dt_average,
                          cl_name = cl_name,
-                         metric = "r2")
- 
+                         metric = "x_std",
+                         metric_growth = "RV")
+                         
 }
 \keyword{QC_plot}
