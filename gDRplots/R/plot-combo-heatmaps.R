@@ -5,8 +5,8 @@
 #' @param drug1_name string with cell line to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with cell line to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
-#' @param normalization_type string with normalization_types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric_growth string with normalization_types to be selected
+#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
 #' @return list of heatmaps with value for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
@@ -20,14 +20,15 @@
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[["combination"]]
 #' 
-#' gDR_combo_plot(se, drug1_name, drug2_name, cl_name, normalization_type = "GR")
+#' heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "GR")
+#' heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "RV")
 #'
 #' @export
-gDR_combo_plot <- function(se,
-                           drug1_name,
-                           drug2_name,
-                           cl_name,
-                           normalization_type = "GR") {
+heatmap_combo_metrics <- function(se,
+                                  drug1_name,
+                                  drug2_name,
+                                  cl_name,
+                                  metric_growth = "GR") {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name2 <- gDRutils::get_env_identifiers("drug_name2")
@@ -40,7 +41,7 @@ gDR_combo_plot <- function(se,
   checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(se)[[drug_name2]])
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = SummarizedExperiment::colData(se)[[cellline_name]])
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
   
   selected_col <- 
     SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cl_name, ]
@@ -54,14 +55,11 @@ gDR_combo_plot <- function(se,
   
   dt_excess <- data.table::as.data.table(
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "excess")))
-  data.table::setkeyv(dt_excess, "normalization_type")
-  dt_excess <- dt_excess[normalization_type]
-  data.table::setkey(dt_excess, NULL)
+  dt_excess <- dt_excess[normalization_type == metric_growth, ]
   
   dt_isobolograms <- data.table::as.data.table(
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "isobolograms")))
-  data.table::setkeyv(dt_isobolograms, "normalization_type")
-  dt_isobolograms <- dt_isobolograms[normalization_type]
+  dt_isobolograms <- dt_isobolograms[normalization_type == metric_growth, ]
   all_iso <- unique(dt_isobolograms$iso_level)
   iso_colors <- gDRutils::get_iso_colors()[all_iso]
   
@@ -89,7 +87,7 @@ gDR_combo_plot <- function(se,
                          cl_name,
                          selected_col[[clid]], 
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
-                         normalization_type,
+                         metric_growth,
                          selected_row[[duration]])
     
     # base plot
@@ -110,33 +108,33 @@ gDR_combo_plot <- function(se,
                                   expand = c(0, 0)) +
       ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y, labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
-      ggplot2::scale_shape_discrete(name = paste0(ifelse(normalization_type == "GR", "GR", "IC"), "50"))
+      ggplot2::scale_shape_discrete(name = paste0(ifelse(metric_growth == "GR", "GR", "IC"), "50"))
     
     # add color scale
-    if (!(mx_name %in% c("hsa_excess", "bliss_excess"))) { # heatmaps with readout values
-      if (normalization_type == "GR") {
-        plt <- plt +
-          ggplot2::scale_fill_gradientn(
-            colors = c("black", "#b06000", "#c07700", "white"),
-            values = c(0, 0.59 / 1.7, 0.61 / 1.7, 1), 
-            limits = c(-0.6, 1.1),
-            name = "GR",
-            oob = scales::squish)
-      } else {
-        plt <- plt +
-          ggplot2::scale_fill_gradientn(
-            colors = c("#440000", "#ff5500", "white"), values = c(0, 0.4, 1),
-            limits = c(0, 1.1), 
-            name = "RV")
-      }
-    } else { # bliss/hsa excess matrix
+    # if (!(mx_name %in% c("hsa_excess", "bliss_excess"))) { # heatmaps with readout values # nolint starts
+    if (metric_growth == "GR") {
       plt <- plt +
         ggplot2::scale_fill_gradientn(
-          colors = c("black", "#ffffaa", "white", "white", "#aaffff", "blue"),
-          values = c(0, 0.35, 0.48, 0.51, 0.65, 1), limits = c(-0.6, 0.6),
-          name = gDRutils::get_combo_excess_field_names()[[mx_name]],
+          colors = c("black", "#b06000", "#c07700", "white"),
+          values = c(0, 0.59 / 1.7, 0.61 / 1.7, 1), 
+          limits = c(-0.6, 1.1),
+          name = "GR",
           oob = scales::squish)
+    } else {
+      plt <- plt +
+        ggplot2::scale_fill_gradientn(
+          colors = c("#440000", "#ff5500", "white"), values = c(0, 0.4, 1),
+          limits = c(0, 1.1), 
+          name = "RV")
     }
+    # } else { # bliss/hsa excess matrix
+    #   plt <- plt +
+    #     ggplot2::scale_fill_gradientn(
+    #       colors = c("black", "#ffffaa", "white", "white", "#aaffff", "blue"),
+    #       values = c(0, 0.35, 0.48, 0.51, 0.65, 1), limits = c(-0.6, 0.6),
+    #       name = gDRutils::get_combo_excess_field_names()[[mx_name]],
+    #       oob = scales::squish)
+    # }
     
     # TODO add selected iso level
     # if ("0.5" %in% all_iso) { # points of the isobologram at GR/IC50
@@ -144,11 +142,12 @@ gDR_combo_plot <- function(se,
     #     all_iso[[max(1, which(all_iso == "0.5"))]]$dt_iso),
     #     ggplot2::aes(shape = fit_type), show.legend = FALSE)
     # }
+    # nolint end
     
     if (length(all_iso) > 0) { # three isobolograms as lines
       select_iso <- all_iso[
         sort(unique(c(max(1, which(all_iso == "0.5")),
-                      which(all_iso %in% ifelse(normalization_type[c(1, 1, 1)] == "GR",
+                      which(all_iso %in% ifelse(metric_growth[c(1, 1, 1)] == "GR",
                                                 c(0.5, 0.25, 0), c(0.75, 0.5, 0.25)))
         )), TRUE)]
       
@@ -158,7 +157,7 @@ gDR_combo_plot <- function(se,
                            ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
         ggplot2::scale_color_manual(values = iso_colors[select_iso],
                                     breaks = names(iso_colors[select_iso]),
-                                    labels = paste0(ifelse(normalization_type == "GR", "GR", "IC"),
+                                    labels = paste0(ifelse(metric_growth == "GR", "GR", "IC"),
                                                     100 - 100 * as.numeric(select_iso)),
                                     name = "Iso Levels")
     }
@@ -171,7 +170,7 @@ gDR_combo_plot <- function(se,
                        cl_name,
                        selected_col[[clid]], 
                        gDRutils::get_combo_excess_field_names()[["smooth"]],
-                       normalization_type,
+                       metric_growth,
                        selected_row[[duration]]) 
   # base plot
   plt_iso_compare <- 
@@ -185,7 +184,7 @@ gDR_combo_plot <- function(se,
     ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
                        ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) + 
     ggplot2::scale_color_manual(values = iso_colors[all_iso],
-                                name = ifelse(normalization_type == "GR", "GR", "IC")) +
+                                name = ifelse(metric_growth == "GR", "GR", "IC")) +
     ggplot2::labs(color = "Iso levels") +
     ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
     ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
@@ -194,7 +193,7 @@ gDR_combo_plot <- function(se,
     ggplot2::labs(y = "CI",
                   x = paste(drug2_name, "/", drug1_name, "ratio"),
                   title = plt_title,
-                  color = ifelse(normalization_type == "GR", "GR", "IC"))
+                  color = ifelse(metric_growth == "GR", "GR", "IC"))
   
   return(
     append(mx_plts, list(iso_compare = plt_iso_compare))
