@@ -7,8 +7,9 @@
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
 #' @param metric_growth string with normalization_types to be selected
 #'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param as_panel logical flag wheter return list of plot or panel
 #'
-#' @return list of heatmaps with value for excess assays for selected drugs and cell line with
+#' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
 #'    
 #' @keywords combo_plots
@@ -20,15 +21,24 @@
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[["combination"]]
 #' 
-#' heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "GR")
-#' heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "RV")
+#' heatmap_combo_metrics(se, 
+#'                       drug1_name, drug2_name, 
+#'                       cl_name, 
+#'                       metric_growth = "GR")
+#'                       
+#' heatmap_combo_metrics(se, 
+#'                       drug1_name, drug2_name, 
+#'                       cl_name, 
+#'                       metric_growth = "RV", 
+#'                       as_panel = FALSE)
 #'
 #' @export
 heatmap_combo_metrics <- function(se,
                                   drug1_name,
                                   drug2_name,
                                   cl_name,
-                                  metric_growth = "GR") {
+                                  metric_growth = "GR",
+                                  as_panel = TRUE) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name2 <- gDRutils::get_env_identifiers("drug_name2")
@@ -195,7 +205,13 @@ heatmap_combo_metrics <- function(se,
                   title = plt_title,
                   color = ifelse(metric_growth == "GR", "GR", "IC"))
   
-  return(
-    append(mx_plts, list(iso_compare = plt_iso_compare))
-  )
+  # final plots
+  ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
+  
+  final_plot <- if (as_panel) {
+    ggpubr::ggarrange(plotlist = ls_plts, nrow = 2, ncol = 2) 
+  } else{
+    ls_plts
+  }
+  return(final_plot)
 }

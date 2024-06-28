@@ -9,7 +9,8 @@ heatmap_combo_metrics(
   drug1_name,
   drug2_name,
   cl_name,
-  metric_growth = "GR"
+  metric_growth = "GR",
+  as_panel = TRUE
 )
 }
 \arguments{
@@ -24,9 +25,11 @@ data in its assays for one cell line}
 
 \item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
+
+\item{as_panel}{logical flag wheter return list of plot or panel}
 }
 \value{
-list of heatmaps with value for excess assays for selected drugs and cell line with
+list or panel with heatmaps with value for excess assays for selected drugs and cell line with
    selected isoline and comparison of iso levels
 }
 \description{
@@ -40,8 +43,16 @@ drug2_name <- "drug_026"
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[["combination"]]
 
-heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "GR")
-heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth = "RV")
+heatmap_combo_metrics(se, 
+                      drug1_name, drug2_name, 
+                      cl_name, 
+                      metric_growth = "GR")
+                      
+heatmap_combo_metrics(se, 
+                      drug1_name, drug2_name, 
+                      cl_name, 
+                      metric_growth = "RV", 
+                      as_panel = FALSE)
 
 }
 \keyword{combo_plots}

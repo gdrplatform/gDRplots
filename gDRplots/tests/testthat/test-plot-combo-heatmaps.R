@@ -9,13 +9,11 @@ test_that("heatmap_combo_metrics works as expected", {
   se <- mae[["combination"]]
   
   plts_1 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name)
-  expect_is(plts_1, "list")
-  expect_equal(names(plts_1), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
-  expect_true(all(vapply(seq_along(plts_1), 
-                         function(i) grepl("GR", plts_1[[i]]$labels$title), logical(1))))
-  
+  expect_is(plts_1, "gg")
+  expect_is(plts_1, "ggarrange")
+
   metric_growth <- "RV"
-  plts_2 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth)
+  plts_2 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth, as_panel = FALSE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
