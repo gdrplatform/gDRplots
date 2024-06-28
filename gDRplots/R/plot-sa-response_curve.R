@@ -142,7 +142,7 @@ plot_dose_response_sa <- function(dt_metrics,
   # final plot
   plt <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
+    ggplot2::geom_hline(yintercept = 0, color = "#555555") +
     ggplot2::geom_vline(xintercept = 0, color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == "cId", "Cell Line", "Drug")) +
@@ -545,6 +545,9 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # final panel
-  ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt),
-                          top = panel_title)
+  panel <- ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt),
+                                   top = panel_title) + 
+    ggpubr::bgcolor("white") + ggpubr::border("white")
+  
+  return(panel)
 }
