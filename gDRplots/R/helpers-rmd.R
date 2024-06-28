@@ -49,6 +49,7 @@ prep_plot_chunk <- function(plt_list,
 #' @examples
 #' escape_special_characters("ABC:123")
 #' escape_special_characters("AD_12")
+#' escape_special_characters("AD#12")
 #'
 #' @return Original string with \code{:}s escaped
 #' @keywords internal
@@ -56,5 +57,7 @@ prep_plot_chunk <- function(plt_list,
 #' @export
 escape_special_characters <- function(x) {
   checkmate::assert_string(x)
-  gsub(pattern = "\\:", replacement = "\\\\:", x = x)
+  if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
+  if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
+  x
 }
