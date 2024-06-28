@@ -210,7 +210,7 @@ heatmap_combo_metrics <- function(se,
   
   final_plot <- if (as_panel) {
     ggpubr::ggarrange(plotlist = ls_plts, nrow = 2, ncol = 2) 
-  } else{
+  } else {
     ls_plts
   }
   return(final_plot)
