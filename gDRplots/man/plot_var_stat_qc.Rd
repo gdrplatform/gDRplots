@@ -4,7 +4,13 @@
 \alias{plot_var_stat_qc}
 \title{Lollipop plot for metric single-agent data to check quality of data}
 \usage{
-plot_var_stat_qc(dt_assay, cl_name, metric = "r2", metric_growth = "GR")
+plot_var_stat_qc(
+  dt_assay,
+  cl_name,
+  metric = "r2",
+  metric_growth = "GR",
+  with_table = FALSE
+)
 }
 \arguments{
 \item{dt_assay}{data.table representation of the data in assay
@@ -16,6 +22,8 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
 \item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
+
+\item{with_table}{logical whether table with metric values should be shown next to the plot}
 }
 \value{
 lollipop plot with stat value for each drug
@@ -41,7 +49,8 @@ plot_var_stat_qc(dt_assay = dt_metrics,
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  metric = "x_AOC",
-                 metric_growth = "RV")
+                 metric_growth = "RV",
+                 with_table = TRUE)
                          
 }
 \keyword{QC_plot}
