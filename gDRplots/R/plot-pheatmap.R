@@ -374,6 +374,9 @@ pheatmap_with_anno_sa <- function(
     annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
+    # order matrix
+    data.table::setorder(annotation_col)
+    mat_cvd <- mat_cvd[rownames(annotation_col), ]
   }
   
   if (!is.null(annotation_row)) {
@@ -392,6 +395,9 @@ pheatmap_with_anno_sa <- function(
     annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
+    # order matrix
+    data.table::setorder(annotation_row)
+    mat_cvd <- mat_cvd[, rownames(annotation_row)]
   }
   
   # filling missing values
