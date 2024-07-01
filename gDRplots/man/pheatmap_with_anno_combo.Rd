@@ -100,7 +100,7 @@ pheatmap_with_anno_combo(tab_response = response_metrics,
                          hm_title = get_hm_title(
                            metric_growth = "GR",
                            metric = "hsa_score",
-                           dataset_name = "Combo Matrix - combo data"))                                                 
+                           dataset_name = "Combo Matrix - combo data"))
             
 }
 \seealso{
