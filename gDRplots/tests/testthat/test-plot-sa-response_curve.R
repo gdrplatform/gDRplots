@@ -14,7 +14,7 @@ test_that("plot_dose_response_sa works as expected", {
                                grouping = grouping)
   expect_is(plt, "gg")
   expect_true(grepl("GR", plt[["labels"]][["y"]]))
-  expect_length(plt[["layers"]], 4)
+  expect_length(plt[["layers"]], 3)
   
   grouping <- gDRutils::get_env_identifiers("drug_name")
   iC <- colnames(se)[1]
@@ -30,7 +30,7 @@ test_that("plot_dose_response_sa works as expected", {
                                plot_fit_flag = FALSE)
   expect_is(plt, "gg")
   expect_true(grepl(metric_growth, plt[["labels"]][["y"]]))
-  expect_length(plt[["layers"]], 3)
+  expect_length(plt[["layers"]], 2)
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
