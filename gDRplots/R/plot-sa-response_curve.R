@@ -548,8 +548,9 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # final panel
-  panel <- ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
-                                   top = panel_title) + 
+  panel <- ggpubr::annotate_figure(
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
+    top = panel_title) + 
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
   return(panel)

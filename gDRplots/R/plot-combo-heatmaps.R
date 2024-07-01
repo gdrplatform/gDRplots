@@ -70,8 +70,13 @@ heatmap_combo_metrics <- function(se,
   dt_isobolograms <- data.table::as.data.table(
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "isobolograms")))
   dt_isobolograms <- dt_isobolograms[normalization_type == metric_growth, ]
-  all_iso <- unique(dt_isobolograms$iso_level)
-  iso_colors <- gDRutils::get_iso_colors()[all_iso]
+
+  selected_iso <- c("0.25", "0.5", "0.75") # only three basic levels should be shown
+  iso_colors <- gDRutils::get_iso_colors()[selected_iso]
+  dt_isobolograms <- 
+    dt_isobolograms[iso_level %in% selected_iso, ]
+  avialable_iso <- unique(dt_isobolograms$iso_level)
+  
   
   # variables
   conc <- gDRutils::get_env_identifiers("concentration")
@@ -80,6 +85,9 @@ heatmap_combo_metrics <- function(se,
   clid <- gDRutils::get_env_identifiers("cellline")
   mx_names <- names(gDRutils::get_combo_excess_field_names())
   
+  main_title <- sprintf("%s (%s)",
+                        cl_name,
+                        selected_col[[clid]])
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
@@ -93,12 +101,11 @@ heatmap_combo_metrics <- function(se,
     tile_height <- diff(drug1_axis$pos_y[3:4])
     tile_width <- diff(drug2_axis$pos_x[3:4])
     
-    plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
-                         cl_name,
-                         selected_col[[clid]], 
+    plt_title <- sprintf("%s for %s, T=%sh",
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
                          metric_growth,
                          selected_row[[duration]])
+    if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
     
     # base plot
     plt <- 
@@ -121,7 +128,6 @@ heatmap_combo_metrics <- function(se,
       ggplot2::scale_shape_discrete(name = paste0(ifelse(metric_growth == "GR", "GR", "IC"), "50"))
     
     # add color scale
-    # if (!(mx_name %in% c("hsa_excess", "bliss_excess"))) { # heatmaps with readout values # nolint starts
     if (metric_growth == "GR") {
       plt <- plt +
         ggplot2::scale_fill_gradientn(
@@ -137,38 +143,15 @@ heatmap_combo_metrics <- function(se,
           limits = c(0, 1.1), 
           name = "RV")
     }
-    # } else { # bliss/hsa excess matrix
-    #   plt <- plt +
-    #     ggplot2::scale_fill_gradientn(
-    #       colors = c("black", "#ffffaa", "white", "white", "#aaffff", "blue"),
-    #       values = c(0, 0.35, 0.48, 0.51, 0.65, 1), limits = c(-0.6, 0.6),
-    #       name = gDRutils::get_combo_excess_field_names()[[mx_name]],
-    #       oob = scales::squish)
-    # }
-    
-    # TODO add selected iso level
-    # if ("0.5" %in% all_iso) { # points of the isobologram at GR/IC50
-    #   plt <- plt + ggplot2::geom_point(data = data.table::as.data.table(
-    #     all_iso[[max(1, which(all_iso == "0.5"))]]$dt_iso),
-    #     ggplot2::aes(shape = fit_type), show.legend = FALSE)
-    # }
-    # nolint end
-    
-    if (length(all_iso) > 0) { # three isobolograms as lines
-      select_iso <- all_iso[
-        sort(unique(c(max(1, which(all_iso == "0.5")),
-                      which(all_iso %in% ifelse(metric_growth[c(1, 1, 1)] == "GR",
-                                                c(0.5, 0.25, 0), c(0.75, 0.5, 0.25)))
-        )), TRUE)]
-      
+
+    if (length(avialable_iso) > 0) { # three isobolograms as lines avialable
       plt <- plt +
-        ggplot2::geom_path(data = dt_isobolograms[iso_level %in% select_iso, ], 
-                           linewidth = 0.5,
+        ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
                            ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
-        ggplot2::scale_color_manual(values = iso_colors[select_iso],
-                                    breaks = names(iso_colors[select_iso]),
+        ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
+                                    breaks = names(iso_colors[avialable_iso]),
                                     labels = paste0(ifelse(metric_growth == "GR", "GR", "IC"),
-                                                    100 - 100 * as.numeric(select_iso)),
+                                                    100 - 100 * as.numeric(avialable_iso)),
                                     name = "Iso Levels")
     }
     return(plt)
@@ -176,12 +159,11 @@ heatmap_combo_metrics <- function(se,
   names(mx_plts) <- mx_names
   
   # isobolograms across range of concentration ratios
-  plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
-                       cl_name,
-                       selected_col[[clid]], 
+  plt_title <- sprintf("%s for %s, T=%sh", 
                        gDRutils::get_combo_excess_field_names()[["smooth"]],
                        metric_growth,
                        selected_row[[duration]]) 
+  if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
   # base plot
   plt_iso_compare <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
@@ -193,7 +175,7 @@ heatmap_combo_metrics <- function(se,
   plt_iso_compare <- plt_iso_compare +
     ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
                        ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) + 
-    ggplot2::scale_color_manual(values = iso_colors[all_iso],
+    ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                 name = ifelse(metric_growth == "GR", "GR", "IC")) +
     ggplot2::labs(color = "Iso levels") +
     ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
@@ -209,7 +191,10 @@ heatmap_combo_metrics <- function(se,
   ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
   
   final_plot <- if (as_panel) {
-    ggpubr::ggarrange(plotlist = ls_plts, nrow = 2, ncol = 2) 
+    ggpubr::annotate_figure(
+      ggpubr::ggarrange(plotlist = ls_plts, nrow = 2, ncol = 2, 
+                        common.legend = TRUE, legend = "right"),
+      top = main_title)
   } else {
     ls_plts
   }

@@ -408,7 +408,8 @@ pheatmap_with_anno_sa <- function(
       avaialable_lvl <- names(annotation_colors[[ann]])
       missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = "black")
+        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
         annotation_colors[[ann]] <- NULL # allow default colouring
       }
@@ -422,7 +423,8 @@ pheatmap_with_anno_sa <- function(
       avaialable_lvl <- names(annotation_colors[[ann]])
       missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = "black")
+        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
         annotation_colors[[ann]] <- NULL # allow default colouring
       }
@@ -595,7 +597,7 @@ pheatmap_with_anno_combo <- function(
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     data.table::setorder(annotation_col)
-    mat_cvd <- mat_cvd[rownames(annotation_col), ]
+    mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
   }
   
   if (!is.null(annotation_row)) {
@@ -620,7 +622,7 @@ pheatmap_with_anno_combo <- function(
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
     # order matrix
     data.table::setorder(annotation_row)
-    mat_cvd <- mat_cvd[, rownames(annotation_row)]
+    mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
   
   # filling missing values
@@ -631,7 +633,8 @@ pheatmap_with_anno_combo <- function(
       avaialable_lvl <- names(annotation_colors[[ann]])
       missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = "black")
+        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
         annotation_colors[[ann]] <- NULL # allow default colouring
       }
@@ -645,7 +648,8 @@ pheatmap_with_anno_combo <- function(
       avaialable_lvl <- names(annotation_colors[[ann]])
       missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = "black")
+        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
         annotation_colors[[ann]] <- NULL # allow default colouring
       }
