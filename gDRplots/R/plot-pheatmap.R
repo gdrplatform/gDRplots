@@ -22,7 +22,8 @@
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                      assay_name = "Averaged")
 #' 
 #' pheatmap_qc(tab_response = response_metrics)
 #' pheatmap_qc(tab_response = response_metrics, 
@@ -33,9 +34,10 @@
 #'              
 #'              
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                      assay_name = "Averaged")
 #' pheatmap_qc(tab_response = response_metrics,
-#'            cluster_rows = FALSE)
+#'             cluster_rows = FALSE)
 #'              
 #' pheatmap_qc(tab_response = response_metrics,
 #'             metric = "x_std",
@@ -123,6 +125,7 @@ pheatmap_qc <- function(
     formula = clid ~ col_pivot_name,
     value.var = metric
   )
+  data.table::setcolorder(tab_plot, c(clid, unique(tab_response$col_pivot_name)))
   
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -clid])
@@ -144,17 +147,19 @@ pheatmap_qc <- function(
     value.var = conc
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
-  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name] # TODO order
+  drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   drug_annotation <- log10(drug_annotation)
   drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
   
   # annotation colouring  
   drug_to_colored <- names(drug_annotation)
-  sel_palette <- "Dark2"
-  ls_col <- RColorBrewer::brewer.pal(
-    n = RColorBrewer::brewer.pal.info[sel_palette, ]$maxcolors, name = sel_palette)
+  ls_col <- get_qual_colors(NROW(drug_to_colored))
   drug_annotation_colors <- 
-    lapply(seq_along(drug_to_colored), function(i) c("white", ls_col[i]))
+    lapply(seq_along(drug_to_colored), 
+           function(i) { 
+             c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"), 
+               colorspace::darken(ls_col[i], 0.1, space = "HLS"))
+           }) 
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
@@ -181,6 +186,8 @@ pheatmap_qc <- function(
       col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
+  annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
+  
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
   minval <- min(c(0, round(min(stats::na.omit(mat_cvd)), digits = 2)))
@@ -202,6 +209,7 @@ pheatmap_qc <- function(
     show_colnames = FALSE,
     main = hm_title,
     na_col = "red",
+    annotation_legend = annotation_legend_flag,
     # dendogram
     treeheight_row = 70, 
     treeheight_col = 70, 
@@ -243,33 +251,42 @@ pheatmap_qc <- function(
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, 
+#'                                                      assay_name = "Metrics")
 #' 
+#' pheatmap_with_anno_sa(tab_response = response_metrics)
+#' 
+#' annotation_manual <-
+#'   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+#' annotation_map <- get_ann_color_map(annotation_manual[,.SD, .SDcols = "Tissue"])
+#' 
+#' pheatmap_with_anno_sa(tab_response = response_metrics,
+#'                       metric_growth = "RV",
+#'                       metric = "x_mean",
+#'                       colors_vec = c("darkblue", "grey90"),
+#'                       annotation_col = annotation_manual,
+#'                       annotation_colors = annotation_map)
+#'                       
 #' annotation_manual <- data.table::data.table(
-#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+#'   CellLineName =
+#'     c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
 #'   mut_A = c(1, 1, 1, 0, 0),
 #'   mut_B = c("yes", "yes", "no", "no", "no")
 #' )
-#' 
 #' annotation_map <- list(
 #'   mut_A = c("1" = "coral", "0" = "cadetblue"),
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' pheatmap_with_anno_sa(tab_response = response_metrics)
-#' pheatmap_with_anno_sa(tab_response = response_metrics, 
-#'                       metric_growth = "RV",
-#'                       metric = "x_mean",
-#'                       colors_vec = c("darkblue", "grey90"),
-#'                       annotation_col = annotation_manual)
-#' pheatmap_with_anno_sa(tab_response = response_metrics, 
+#' pheatmap_with_anno_sa(tab_response = response_metrics,
 #'                       annotation_col = annotation_manual,
 #'                       annotation_colors = annotation_map,
-#'                       hm_title = get_hm_title(metric_growth = "GR",
-#'                                               metric = "hsa_score",
-#'                                               dataset_name = "Combo Matrix - combo data"))
+#'                       hm_title = get_hm_title(
+#'                         metric_growth = "GR",
+#'                         metric = "hsa_score",
+#'                         dataset_name = "Combo Matrix - combo data"))
 #' 
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -351,7 +368,7 @@ pheatmap_with_anno_sa <- function(
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
     ls_ann_with_colors <- names(annotation_col)[names(annotation_col) %in% names(annotation_colors)]
     for (ann in ls_ann_with_colors) {
-      reqired_lvl <- unique(annotation_col[[ann]])
+      reqired_lvl <- unique(as.character(annotation_col[[ann]]))
       avaialable_lvl <- names(annotation_colors[[ann]])
       missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
@@ -402,10 +419,12 @@ pheatmap_with_anno_sa <- function(
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                      assay_name = "scores")
 #' 
 #' annotation_manual <- data.table::data.table(
-#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+#'   CellLineName =
+#'     c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
 #'   mut_A = c(1, 1, 1, 0, 0),
 #'   mut_B = c("yes", "yes", "no", "no", "no")
 #' )
@@ -417,19 +436,22 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' 
 #' pheatmap_with_anno_combo(tab_response = response_metrics)
+#' 
 #' pheatmap_with_anno_combo(tab_response = response_metrics, 
 #'                          metric_growth = "RV",
 #'                          metric = "bliss_score",
 #'                          colors_vec = c("darkblue", "grey90", "darkred"),
 #'                          annotation_col = annotation_manual)
-#' pheatmap_with_anno_combo(tab_response = response_metrics, 
+#'                          
+#' pheatmap_with_anno_combo(tab_response = response_metrics,
 #'                          annotation_col = annotation_manual,
 #'                          annotation_colors = annotation_map,
-#'                          hm_title = get_hm_title(metric_growth = "GR",
-#'                                                  metric = "hsa_score",
-#'                                                  dataset_name = "Combo Matrix - combo data"))
+#'                          hm_title = get_hm_title(
+#'                            metric_growth = "GR",
+#'                            metric = "hsa_score",
+#'                            dataset_name = "Combo Matrix - combo data"))
 #'             
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
 #' @export 
@@ -478,6 +500,7 @@ pheatmap_with_anno_combo <- function(
   
   # prep matrix
   mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
+  if (all(dim(mat_cvd) == c(0, 0)) || all(is.na(mat_cvd))) return("No data") # pheatmap does not handle <0 x 0 matrix>
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
@@ -559,7 +582,7 @@ pheatmap_with_anno_combo <- function(
 #' get_hm_title(metric = "xc50", 
 #'              metric_growth = "GR")
 #'              
-#' @keywords QC_plot
+#' @keywords pheat_ann
 #' 
 #' @return character title for heatmap
 #' @export 
@@ -600,4 +623,84 @@ change_NA_into_char <- function(x,
   
   ifelse(is.na(x), lbl_NA, as.character(x))
   
+}
+
+
+#' Create list of qualitative colors
+#'
+#' @param n number of required colors
+#'
+#' @return vector with hex colors from qualitative palettes
+#' 
+#' @examples
+#' \dontrun{
+#' get_qual_colors()
+#' get_qual_colors(0)
+#' get_qual_colors(5)
+#' get_qual_colors(35) 
+#' }
+#' 
+#' @keywords utils_color
+#' @export 
+#' 
+get_qual_colors <- function(n = NULL) {
+  checkmate::assert_int(n, null.ok = TRUE, lower = 0)
+  
+  if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
+  
+  # list of colors: qualitative and friendly for user with color vision deficiency
+  qual_col_pals <- RColorBrewer::brewer.pal.info[
+    RColorBrewer::brewer.pal.info$category == "qual" & 
+      RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
+  all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+  
+  if (is.null(n)) return(all_colors)
+  
+  # make all_colors longer
+  if (n > length(all_colors)) {
+    ls_light <- colorspace::lighten(all_colors, 0.3)
+    ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
+    all_colors <- append(all_colors, values = c(ls_light, ls_dark))
+  }
+  
+  rep(all_colors, length.out = n)
+}
+
+
+#' Create color map for annotation
+#'
+#' @param dt_ann data.table with annotation
+#'
+#' @return list with color maping for annotation
+#' 
+#' @seealso \code{\link{pheatmap_qc}}
+#' 
+#' @examples
+#' \dontrun{
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
+#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' dt_ann <- response_metrics[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
+#' 
+#' get_ann_color_map(dt_ann)
+#' }
+#' 
+#' @keywords utils_color
+#' @export 
+#' 
+get_ann_color_map <- function(dt_ann) {
+  checkmate::assert_data_table(dt_ann)
+  
+  ls_colors <- get_qual_colors(NROW(unique(unlist(dt_ann))))
+  
+  annotation_colors <- list()
+  for (ann in names(dt_ann)) {
+    lvl <- as.character(unique(dt_ann[[ann]]))
+    col_map <- ls_colors[seq_along(lvl)]
+    names(col_map) <- lvl
+    
+    ls_colors <- ls_colors[-seq_along(lvl)]
+    annotation_colors[[ann]] <- col_map
+  }
+  annotation_colors
 }

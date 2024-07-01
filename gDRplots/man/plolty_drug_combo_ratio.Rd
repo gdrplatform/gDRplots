@@ -46,7 +46,8 @@ Draw interactive Drug Combo plot with drug ratios
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+combo_data_l <- 
+  gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 
 plolty_drug_combo_ratio(
   data = combo_data_l,

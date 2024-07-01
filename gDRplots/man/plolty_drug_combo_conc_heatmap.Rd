@@ -49,7 +49,8 @@ Functions for detailed visualization of combo drug treatments, i.e. 2-way concen
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+combo_data_l <- 
+  gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 
 plolty_drug_combo_conc_heatmap(
  data = combo_data_l,

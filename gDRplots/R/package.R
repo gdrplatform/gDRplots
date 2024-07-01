@@ -28,9 +28,13 @@ utils::globalVariables(
     "log2_CI",
     "MaxEffectiveness",
     "metric",
+    "normalization_type",
     "pos_x",
     "pos_y",
     "Response",
-    "x"
+    "x",
+    "x_std",
+    "cId",
+    "rId"
   ),
   utils::packageName())

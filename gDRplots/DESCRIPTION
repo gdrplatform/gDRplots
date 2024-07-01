@@ -1,7 +1,7 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.6
-Date: 2024-06-19
+Version: 0.0.8
+Date: 2024-07-01
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
@@ -25,13 +25,16 @@ Imports:
     scales,
     SummarizedExperiment
 Suggests:
+    colorspace,
     gDRtestData (>= 1.1.10),
     gDRstyle (>= 1.1.5),
+    ggpubr,
     heatmaply,
     jsonlite,
     knitr,
     matrixStats,
     purrr,
+    rlang,
     qs,
     testthat
 VignetteBuilder: 

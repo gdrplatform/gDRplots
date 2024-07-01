@@ -29,7 +29,8 @@ detailed exploration of the drug interaction.
 \examples{
 \dontrun{
 mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small")
-combo_data_l <- gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
+combo_data_l <- 
+  gDRutils::convert_combo_data_to_dt(mae[[gDRutils::get_supported_experiments("combo")]])
 plolty_drug_combo_heatmap(data = combo_data_l, 
                           metric_combo = "hsa_score", 
                           metric_growth = "RV")
