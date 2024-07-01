@@ -454,8 +454,9 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
       ggplot2::theme(panel.grid.minor = ggplot2::element_blank()) +
-      ggplot2::scale_color_manual(values = c("Averaged Data" = "black", "Fitted Curve"= "red", "Errors Bar" = "#A9A9A9"))
-    
+      ggplot2::scale_color_manual(values = c("Averaged Data" = "black", 
+                                             "Fitted Curve" = "red", 
+                                             "Errors Bar" = "#A9A9A9"))
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
