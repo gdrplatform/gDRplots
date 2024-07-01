@@ -142,8 +142,7 @@ plot_dose_response_sa <- function(dt_metrics,
   # final plot
   plt <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
-    ggplot2::geom_hline(yintercept = 0, color = "#555555") +
-    ggplot2::geom_vline(xintercept = 0, color = "#555555") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == "cId", "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
@@ -437,23 +436,26 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::ggplot() +
       ggplot2::geom_errorbar(
         data = dt_average_plot, 
-        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std), 
-        width = 0.1, color = "#A9A9A9") + 
+        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"), 
+        width = 0.1) + 
       ggplot2::geom_line(
         data = dt_average_plot, 
-        ggplot2::aes(x = get(conc), y = x), color = "black", linetype = "dashed") +
+        ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"), 
+        linetype = "dashed") +
       ggplot2::geom_line(
         data = dt_reconstructed_fit, 
-        ggplot2::aes(x = get(conc), y = x), color = "red") +
+        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
       ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
       ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
       ggplot2::ylab(metric_growth) + 
       ggplot2::ggtitle(plt_title) +
+      ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     legend.position = "none")
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank()) +
+      ggplot2::scale_color_manual(values = c("Averaged Data" = "black", "Fitted Curve"= "red", "Errors Bar" = "#A9A9A9"))
+    
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
@@ -545,7 +547,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # final panel
-  panel <- ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt),
+  panel <- ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
                                    top = panel_title) + 
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
