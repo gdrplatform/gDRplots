@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-normalization_qc.R
 \name{plot_var_stat_qc}
 \alias{plot_var_stat_qc}
-\title{Plot barplot for metric single-agent data to check quality of data}
+\title{Lollipop plot for metric single-agent data to check quality of data}
 \usage{
 plot_var_stat_qc(dt_assay, cl_name, metric = "r2", metric_growth = "GR")
 }
@@ -18,10 +18,10 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 }
 \value{
-bar plot with sta value for each drug
+lollipop plot with stat value for each drug
 }
 \description{
-Plot barplot for metric single-agent data to check quality of data
+Lollipop plot for metric single-agent data to check quality of data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")

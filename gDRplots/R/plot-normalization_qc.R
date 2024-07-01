@@ -68,7 +68,7 @@ plot_var_distribution_qc <- function(dt_assay,
   return(plt)
 }
 
-#' Plot barplot for metric single-agent data to check quality of data
+#' Lollipop plot for metric single-agent data to check quality of data
 #'
 #' @param dt_assay data.table representation of the data in assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -77,7 +77,7 @@ plot_var_distribution_qc <- function(dt_assay,
 #' @param metric_growth string with normalization_types to be selected
 #'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
-#' @return bar plot with sta value for each drug
+#' @return lollipop plot with stat value for each drug
 #'
 #' @keywords QC_plot
 #' @examples
@@ -124,7 +124,10 @@ plot_var_stat_qc <- function(dt_assay,
   
   plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
-    ggplot2::geom_col(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), alpha = 0.50) +
+    ggplot2::geom_segment(
+      ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
+    ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
+                        alpha = 0.75, size = 5, shape = 21, stroke = 1) +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
     ggplot2::scale_color_manual(values = color_palette) +
