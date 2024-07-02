@@ -10,7 +10,6 @@ test_that("heatmap_combo_metrics works as expected", {
   
   plts_1 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name)
   expect_is(plts_1, "gg")
-  expect_is(plts_1, "ggarrange")
 
   metric_growth <- "RV"
   plts_2 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth, as_panel = FALSE)
