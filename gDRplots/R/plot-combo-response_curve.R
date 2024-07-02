@@ -70,7 +70,7 @@ plot_dose_response_combo <- function(dt_average,
   
   # filter data for combinalion cell line (drug x drug2)
   selecteted_combination <- 
-    drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name,]
+    drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
   
   dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
