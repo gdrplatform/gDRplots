@@ -103,10 +103,10 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::scale_x_continuous(trans = "log10") +
     ggplot2::scale_colour_manual(values = colormap, labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
-    ggplot2::xlab(bquote(.(drug1_name) ~ ":" ~.(conc) ~ "[" ~ mu * M ~ "]")) +
+    ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(sprintf("log10(%s)", metric_growth)) +
     ggplot2::ggtitle(plt_title) +
-    ggplot2::labs(color = bquote(.(drug2_name) ~ ":" ~ .(conc) ~ "[" ~ mu * M ~ "]")) +
+    ggplot2::labs(color = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() + 
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), legend.position = "left")
   

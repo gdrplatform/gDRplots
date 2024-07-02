@@ -40,7 +40,8 @@ dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 cl_name <- "cellline_IB"
 
 plot_dose_response_combo_qc_panel(dt_average = dt_average,
-                                  cl_name = cl_name)
+                                  cl_name = cl_name,
+                                  as_panel = FALSE)
 
 d_names <- c("drug_001", "drug_002")
 plot_dose_response_combo_qc_panel(dt_average = dt_average,
