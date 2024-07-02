@@ -2,12 +2,12 @@
 #'
 #' @param se combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 #'    data in its assays for one cell line
-#' @param drug1_name string with cell line to be plotted (identifiers \code{DrugName})
-#' @param drug2_name string with cell line to be plotted (identifiers \code{DrugName_2})
+#' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
 #' @param metric_growth string with normalization_types to be selected
 #'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param as_panel logical flag wheter return list of plot or panel
+#' @param as_panel logical flag whether return list of plot or panel
 #'
 #' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
@@ -111,8 +111,6 @@ heatmap_combo_metrics <- function(se,
     plt <- 
       ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
       ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
-      # TODO
-      # ggplot2::geom_abline(slope = 1, intercept = log10(ref_x50["conc_1"]/ref_x50["conc_2"])) + 
       ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                     y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                     title = plt_title,

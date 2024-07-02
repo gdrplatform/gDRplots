@@ -17,16 +17,16 @@ heatmap_combo_metrics(
 \item{se}{combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
 data in its assays for one cell line}
 
-\item{drug1_name}{string with cell line to be plotted (identifiers \code{DrugName})}
+\item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
-\item{drug2_name}{string with cell line to be plotted (identifiers \code{DrugName_2})}
+\item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
 \item{cl_name}{string with cell line to be plotted (identifiers \code{CellLineName})}
 
 \item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{as_panel}{logical flag wheter return list of plot or panel}
+\item{as_panel}{logical flag whether return list of plot or panel}
 }
 \value{
 list or panel with heatmaps with value for excess assays for selected drugs and cell line with
