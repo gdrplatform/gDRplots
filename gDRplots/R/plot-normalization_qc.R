@@ -112,25 +112,28 @@ heatmap_control_mapping_qc <- function(dt_treat,
   frequency <- dt_controls[, .N, by = .(rId, cId)]
   # merge the frequency with the Treated data.table
   result <- merge(unique(dt_treat[, c("rId", "cId")]), frequency, by = c("rId", "cId"), all.x = TRUE)
-  data.table::setnames(result, "N", "Count")
-  Count <- NULL # due to NSE notes in R CMD check
   
-  # final plot
-  plt <- ggplot2::ggplot(result, 
-                         ggplot2::aes(x = cId, y = rId, fill = Count, colour = "")) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_gradient(low = "#CEEFC8", high = "#76d364", na.value = "red") +
-    ggplot2::scale_colour_manual(values = NA) +              
-    ggplot2::guides(colour = ggplot2::guide_legend("No data", override.aes = list(fill = "red", colour = "black"))) +
-    ggplot2::labs(title = "Mapping Counts Comparison between Treated and Control",
-                  x = "col id",
-                  y = "row id") +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1),
-      plot.title.position = "plot",
-      plot.title = ggplot2::element_text(hjust = 0)
-    )
+  # Convert the result to a matrix format suitable for pheatmap
+  result_matrix <- data.table::dcast(result, rId ~ cId, value.var = "N")
+  rownames <- result_matrix$rId
+  result_matrix <- as.matrix(result_matrix[, -1, with = FALSE], rownames = rownames)
   
-  return(plt)
+  # Replace 0 with NA to use na_col for red color
+  result_matrix[result_matrix == 0] <- NA
+  
+  # Generate the breaks for integers
+  max_count <- max(result_matrix, na.rm = TRUE)
+  breaks <- seq(1, max_count, by = 1)
+  unique_values <- unique(na.omit(as.vector(result_matrix)))
+  
+  # Generate the heatmap
+  pheatmap::pheatmap(result_matrix,
+                     color = grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(length(breaks) - 1),
+                     breaks = breaks,
+                     na_col = "red",
+                     main = "Mapping Counts Comparison between Treated and Control",
+                     cluster_cols = FALSE,
+                     angle_col = 45,
+                     legend_breaks = unique_values,
+                     legend_labels = unique_values)
 }
