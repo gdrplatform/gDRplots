@@ -148,7 +148,7 @@ plot_dose_response_sa <- function(dt_metrics,
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(metric_growth) +
+    ggplot2::ylab(sprintf("log10(%s)", metric_growth)) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
   
