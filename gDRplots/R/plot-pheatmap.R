@@ -149,7 +149,10 @@ pheatmap_qc <- function(
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   drug_annotation <- log10(drug_annotation)
-  drug_annotation[drug_annotation == -Inf] <- NA # Q: when conc = 0
+  # replace 0
+  min_val <- 
+    min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != -Inf])
+  drug_annotation[drug_annotation == -Inf] <- min_val - 0.1 * min_val
   
   # annotation colouring  
   drug_to_colored <- names(drug_annotation)
@@ -387,7 +390,7 @@ pheatmap_with_anno_sa <- function(
       data.table::setnames(tab_missing_ann, "missing", drug_name)
       
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
-      # # data.table::nafill does not support character
+      # data.table::nafill does not support character
       cols <- names(annotation_row)[names(annotation_row) != drug_name]
       annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
