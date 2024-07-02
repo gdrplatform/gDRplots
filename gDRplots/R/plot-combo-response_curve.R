@@ -75,7 +75,7 @@ plot_dose_response_combo <- function(dt_average,
   dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
   
-  min_conc <- min(dt_avg[dt_avg_[[conc]] > 0, ][[conc]])
+  min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
   dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
   
   # colors
