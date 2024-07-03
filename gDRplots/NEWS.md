@@ -1,5 +1,8 @@
-## gDRplots 0.0.8 - 2024-06-28
+## gDRplots 0.0.9 - 2024-07-03
 * add plot to quality check of distribution of normalized data and metric stat
+
+## gDRplots 0.0.8 - 2024-07-01
+* add function for plot size estimation
 
 ## gDRplots 0.0.7 - 2024-06-21
 * add plot to quality check of dose response
