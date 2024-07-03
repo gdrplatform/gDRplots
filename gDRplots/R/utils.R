@@ -47,7 +47,7 @@ estimate_plot_size <- function(plot,
                                base_width = 10,
                                base_height = 6,
                                scale_factor = 0.5,
-                               max_size = 50) {
+                               max_size = 49.9) {
   
   # Assert inputs
   checkmate::assert_multi_class(plot, c("ggplot", "pheatmap"))
