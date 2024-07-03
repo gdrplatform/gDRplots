@@ -25,7 +25,7 @@ test_that("estimate_plot_size works for pheatmap object", {
 test_that("estimate_plot_size handles invalid inputs", {
   invalid_plot <- list()
   expect_error(estimate_plot_size(invalid_plot),
-               "Assertion on 'plot' failed: Must inherit from class 'ggplot'/'pheatmap', but has class 'list'.")
+               "Assertion on 'plt' failed: Must inherit from class 'ggplot'/'pheatmap', but has class 'list'.")
   
   invalid_base_width <- -5
   expect_error(estimate_plot_size(p1, base_width = invalid_base_width),
