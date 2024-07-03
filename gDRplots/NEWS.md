@@ -1,3 +1,6 @@
+## gDRplots 0.0.8 - 2024-07-01
+* add function for plot size estimation
+
 ## gDRplots 0.0.7 - 2024-06-21
 * add plot to quality check of dose response
 
