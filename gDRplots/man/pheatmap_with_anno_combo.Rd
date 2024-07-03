@@ -27,8 +27,8 @@ and combo \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{normalization_type}), 
-"bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 

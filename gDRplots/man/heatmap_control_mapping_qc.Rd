@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-normalization_qc.R
 \name{heatmap_control_mapping_qc}
 \alias{heatmap_control_mapping_qc}
-\title{Plot drug response curves for single-agent data to check quality of data}
+\title{Plot drug response curves for single-agent data to control quality of the data}
 \usage{
 heatmap_control_mapping_qc(dt_treat, dt_controls)
 }
@@ -14,10 +14,10 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}}
 output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}}
 }
 \value{
-hetamap with check of mapping controls to treated
+hetamap of mapping controls to treated
 }
 \description{
-Plot drug response curves for single-agent data to check quality of data
+Plot drug response curves for single-agent data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")

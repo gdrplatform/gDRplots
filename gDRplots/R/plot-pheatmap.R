@@ -1,4 +1,4 @@
-#' Plot pretty heatmap for single-agent or combo data to check quality of data
+#' Plot pretty heatmap for single-agent or combo data to control quality of the data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
@@ -470,8 +470,8 @@ pheatmap_with_anno_sa <- function(
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
 #'    and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
-#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{normalization_type}), 
-#'    "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+#'    depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns. 

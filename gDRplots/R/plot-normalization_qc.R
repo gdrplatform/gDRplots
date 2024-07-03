@@ -1,4 +1,4 @@
-#' Plot violin for normalized or averaged single-agent data to check quality of data
+#' Plot violin for normalized or averaged single-agent data to control quality of the data
 #'
 #' @param dt_assay data.table representation of the data in assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
@@ -73,7 +73,7 @@ plot_var_distribution_qc <- function(dt_assay,
   return(plt)
 }
 
-#' Lollipop plot for metric single-agent data to check quality of data
+#' Lollipop plot for metric single-agent data to control quality of the data
 #'
 #' @param dt_assay data.table representation of the data in assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -160,14 +160,14 @@ plot_var_stat_qc <- function(dt_assay,
   return(plt)
 }
 
-#' Plot drug response curves for single-agent data to check quality of data
+#' Plot drug response curves for single-agent data to control quality of the data
 #'
 #' @param dt_treat data.table representation of the data in \code{RawTreated} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
 #' @param dt_controls data.table representation of the data in \code{Controls} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
 #'
-#' @return hetamap with check of mapping controls to treated
+#' @return hetamap of mapping controls to treated
 #'
 #' @keywords QC_plot
 #' @examples

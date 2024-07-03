@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{pheatmap_qc}
 \alias{pheatmap_qc}
-\title{Plot pretty heatmap for single-agent or combo data to check quality of data}
+\title{Plot pretty heatmap for single-agent or combo data to control quality of the data}
 \usage{
 pheatmap_qc(
   tab_response,
@@ -48,7 +48,7 @@ or "x_std" (standard deviation)}
 heatmap for selected metric with annotation - if given
 }
 \description{
-Plot pretty heatmap for single-agent or combo data to check quality of data
+Plot pretty heatmap for single-agent or combo data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")

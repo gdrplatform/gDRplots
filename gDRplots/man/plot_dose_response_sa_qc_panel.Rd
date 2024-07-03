@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-sa-response_curve.R
 \name{plot_dose_response_sa_qc_panel}
 \alias{plot_dose_response_sa_qc_panel}
-\title{Plot panel with drug response curves for single-agent data to check quality of data}
+\title{Plot panel with drug response curves for single-agent data to control quality of the data}
 \usage{
 plot_dose_response_sa_qc_panel(
   dt_metrics,
@@ -34,7 +34,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 panle with plot with dose-response curves for selected cell line by drugs
 }
 \description{
-Plot panel with drug response curves for single-agent data to check quality of data
+Plot panel with drug response curves for single-agent data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")

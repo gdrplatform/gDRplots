@@ -120,7 +120,7 @@ plot_dose_response_combo <- function(dt_average,
   return(plt)
 }
 
-#' Plot panel with drug response curves for single-agent data to check quality of data
+#' Plot panel with drug response curves for single-agent data to control quality of the data
 #'
 #' @inheritParams plot_dose_response_combo
 #' @param d_names character vector with drug names to be plotted (Drug Name); 

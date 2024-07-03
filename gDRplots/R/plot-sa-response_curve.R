@@ -347,7 +347,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   return(plt_list)
 }
 
-#' Plot drug response curves for single-agent data to check quality of data
+#' Plot drug response curves for single-agent data to control quality of the data
 #'
 #' @param dt_metrics data.table representation of the data in \code{Metrics} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -487,7 +487,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   return(plt)
 }
 
-#' Plot panel with drug response curves for single-agent data to check quality of data
+#' Plot panel with drug response curves for single-agent data to control quality of the data
 #'
 #' @inheritParams plot_dose_response_sa_qc
 #' @param d_names character vector with drug names to be plotted (Drug Name); 
