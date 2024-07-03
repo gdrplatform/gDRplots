@@ -8,7 +8,7 @@ plot_var_stat_qc(
   dt_assay,
   cl_name,
   metric = "r2",
-  metric_growth = "GR",
+  normalization_type = "GR",
   with_table = FALSE
 )
 }
@@ -20,7 +20,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
 \item{metric}{string with variable name to be plotted; it has to be in \code{dt_assay}}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{with_table}{logical whether table with metric values should be shown next to the plot}
@@ -44,12 +44,12 @@ plot_var_stat_qc(dt_assay = dt_metrics,
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  metric = "r2",
-                 metric_growth = "RV")
+                 normalization_type = "RV")
                          
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  metric = "x_AOC",
-                 metric_growth = "RV",
+                 normalization_type = "RV",
                  with_table = TRUE)
                          
 }

@@ -5,8 +5,8 @@
 #'    for assay_name like "Normalized" and "Averaged"
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
 #' @return plot with violin for each drug
 #'
@@ -24,29 +24,30 @@
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 #' plot_var_distribution_qc(dt_assay = dt_average,
 #'                          cl_name = cl_name,
-#'                          metric_growth = "RV")
+#'                          normalization_type = "RV")
 #'                          
 #' plot_var_distribution_qc(dt_assay = dt_average,
 #'                          cl_name = cl_name,
 #'                          metric = "x_std",
-#'                          metric_growth = "RV")
+#'                          normalization_type = "RV")
 #'                          
 #' @export
 plot_var_distribution_qc <- function(dt_assay,
                                      cl_name,
                                      metric = "x",
-                                     metric_growth = "GR") {
+                                     normalization_type = "GR") {
   
   checkmate::expect_data_table(dt_assay)
   checkmate::expect_string(cl_name)
   checkmate::expect_choice(metric, choices = names(dt_assay))
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   
+  # ----
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, ][[clid]]) 
   tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
   
@@ -61,7 +62,7 @@ plot_var_distribution_qc <- function(dt_assay,
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
     ggplot2::scale_color_manual(values = color_palette) +
-    ggplot2::labs(y = sprintf("%s for %s", metric, metric_growth), x = drug_name, title = plt_title) +
+    ggplot2::labs(y = sprintf("%s for %s", metric, normalization_type), x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
   
@@ -74,8 +75,8 @@ plot_var_distribution_qc <- function(dt_assay,
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param with_table logical whether table with metric values should be shown next to the plot
 #'
 #' @return lollipop plot with stat value for each drug
@@ -94,25 +95,25 @@ plot_var_distribution_qc <- function(dt_assay,
 #' plot_var_stat_qc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name,
 #'                  metric = "r2",
-#'                  metric_growth = "RV")
+#'                  normalization_type = "RV")
 #'                          
 #' plot_var_stat_qc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name,
 #'                  metric = "x_AOC",
-#'                  metric_growth = "RV",
+#'                  normalization_type = "RV",
 #'                  with_table = TRUE)
 #'                          
 #' @export
 plot_var_stat_qc <- function(dt_assay,
                              cl_name,
                              metric = "r2",
-                             metric_growth = "GR", 
+                             normalization_type = "GR", 
                              with_table = FALSE) {
   
   checkmate::expect_data_table(dt_assay)
   checkmate::expect_string(cl_name)
   checkmate::expect_choice(metric, choices = names(dt_assay))
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_flag(with_table)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -120,6 +121,7 @@ plot_var_stat_qc <- function(dt_assay,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   
+  # --- 
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
   tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
   
@@ -135,7 +137,7 @@ plot_var_stat_qc <- function(dt_assay,
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
     ggplot2::scale_color_manual(values = color_palette) +
-    ggplot2::labs(y = sprintf("%s for %s", metric, metric_growth), x = drug_name, title = plt_title) +
+    ggplot2::labs(y = sprintf("%s for %s", metric, normalization_type), x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
   
