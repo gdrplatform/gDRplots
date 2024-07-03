@@ -7,6 +7,7 @@
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
 #' @param metric_growth string with normalization_types to be selected
 #'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param iso_levels character vectore with  isobologram levels to be selected
 #' @param as_panel logical flag whether return list of plot or panel
 #'
 #' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
@@ -38,6 +39,7 @@ heatmap_combo_metrics <- function(se,
                                   drug2_name,
                                   cl_name,
                                   metric_growth = "GR",
+                                  iso_levels =  c("0.25", "0.5", "0.75"),
                                   as_panel = TRUE) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -51,6 +53,8 @@ heatmap_combo_metrics <- function(se,
   checkmate::assert_choice(drug2_name, choices = SummarizedExperiment::rowData(se)[[drug_name2]])
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = SummarizedExperiment::colData(se)[[cellline_name]])
+  checkmate::assert_character(iso_levels)
+  checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
   
   selected_col <- 
@@ -71,10 +75,9 @@ heatmap_combo_metrics <- function(se,
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "isobolograms")))
   dt_isobolograms <- dt_isobolograms[normalization_type == metric_growth, ]
 
-  selected_iso <- c("0.25", "0.5", "0.75") # only three basic levels should be shown
-  iso_colors <- gDRutils::get_iso_colors()[selected_iso]
+  iso_colors <- gDRutils::get_iso_colors()[iso_levels]
   dt_isobolograms <- 
-    dt_isobolograms[iso_level %in% selected_iso, ]
+    dt_isobolograms[iso_level %in% iso_levels, ]
   avialable_iso <- unique(dt_isobolograms$iso_level)
   
   

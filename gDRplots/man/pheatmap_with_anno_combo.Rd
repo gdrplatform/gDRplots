@@ -51,7 +51,7 @@ Note that color schemes takes into account if variable is continuous or discrete
 \item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
 note list is named with annotation name (column names of \code{annotation_row} - 
 without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with valid colour name for 
+without \code{CellLineName}), each list item is named vector with a valid color name for 
 each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 Not described elements will be colored in default.}
 }

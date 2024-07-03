@@ -10,6 +10,7 @@ heatmap_combo_metrics(
   drug2_name,
   cl_name,
   metric_growth = "GR",
+  iso_levels = c("0.25", "0.5", "0.75"),
   as_panel = TRUE
 )
 }
@@ -25,6 +26,8 @@ data in its assays for one cell line}
 
 \item{metric_growth}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
+
+\item{iso_levels}{character vectore with  isobologram levels to be selected}
 
 \item{as_panel}{logical flag whether return list of plot or panel}
 }

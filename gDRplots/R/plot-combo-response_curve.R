@@ -65,10 +65,10 @@ plot_dose_response_combo <- function(dt_average,
                   drug1_name %in% drugs_combination[[drug_name]]))
   
   
-  # filter data for normalization type
-  dt_avg <- dt_average[normalization_type == metric_growth, ][get(cellline_name) == cl_name, ]
+  # filter data for normalization type & selected cell line
+  dt_avg <- dt_average[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
   
-  # filter data for combinalion cell line (drug x drug2)
+  # filter data for combination cell line (drug x drug2)
   selecteted_combination <- 
     drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
   
@@ -105,7 +105,7 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::geom_line() + 
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::scale_x_continuous(trans = "log10") +
-    ggplot2::scale_colour_manual(values = colormap, labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
+    ggplot2::scale_color_manual(values = colormap, labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(sprintf("log10(%s)", metric_growth)) +
     ggplot2::ggtitle(plt_title) +
@@ -166,12 +166,12 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
-    d_names <- drug_name[drug_name  %in% available_drugs]
+    d_names <- drug_name[drug_name %in% available_drugs]
   } 
   
   # check input data
   drugs_combination <- 
-    unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
+    unique(dt_average[get(cellline_name) == cl_name, .(cellline_name, drug_name, drug_name_2)])
   stopifnot("combination of drugs and cell line does not exist" =
               any(d_names %in% drugs_combination[[drug_name]]))
   

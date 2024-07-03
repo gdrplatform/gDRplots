@@ -154,7 +154,7 @@ pheatmap_qc <- function(
     min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != -Inf])
   drug_annotation[drug_annotation == -Inf] <- min_val - 0.1 * min_val
   
-  # annotation colouring  
+  # annotation coloring  
   drug_to_colored <- names(drug_annotation)
   ls_col <- get_qual_colors(NROW(drug_to_colored))
   drug_annotation_colors <- 
@@ -251,7 +251,7 @@ pheatmap_qc <- function(
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and column names of \code{annotation_col} - 
-#'   without \code{CellLineName}), each list item is named vector with valid colour name for 
+#'   without \code{CellLineName}), each list item is named vector with valid color name for 
 #'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 #'   Not described elements will be colored in default.
 #' 
@@ -414,7 +414,7 @@ pheatmap_with_anno_sa <- function(
         col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
         annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default colouring
+        annotation_colors[[ann]] <- NULL # allow default coloring
       }
     }
   }
@@ -429,7 +429,7 @@ pheatmap_with_anno_sa <- function(
         col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
         annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default colouring
+        annotation_colors[[ann]] <- NULL # allow default coloring
       }
     }
   }
@@ -475,7 +475,7 @@ pheatmap_with_anno_sa <- function(
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
-#'   without \code{CellLineName}), each list item is named vector with valid colour name for 
+#'   without \code{CellLineName}), each list item is named vector with a valid color name for 
 #'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 #'   Not described elements will be colored in default.    
 #' @inheritParams pheatmap_with_anno_sa
@@ -639,7 +639,7 @@ pheatmap_with_anno_combo <- function(
         col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
         annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default colouring
+        annotation_colors[[ann]] <- NULL # allow default coloring
       }
     }
   }
@@ -654,7 +654,7 @@ pheatmap_with_anno_combo <- function(
         col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
         annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default colouring
+        annotation_colors[[ann]] <- NULL # allow default coloring
       }
     }
   }

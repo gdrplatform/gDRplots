@@ -120,7 +120,7 @@ plot_var_stat_qc <- function(dt_assay,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   
-  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, ][[clid]]) 
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
   tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
   
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
@@ -215,7 +215,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      color = grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(length(breaks) - 1),
                      breaks = breaks,
                      na_col = "red",
-                     main = "Counts Treated vs. Control",
+                     main = "Counts of mapped controls",
                      cluster_cols = FALSE,
                      cluster_rows = FALSE,
                      angle_col = 90,
