@@ -8,7 +8,7 @@ plot_dose_response_combo_qc_panel(
   dt_average,
   cl_name,
   d_names = NULL,
-  metric_growth = "GR",
+  normalization_type = "GR",
   as_panel = TRUE
 )
 }
@@ -21,7 +21,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 \item{d_names}{character vector with drug names to be plotted (Drug Name); 
 if NULL - all available drugs will be plotted}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{as_panel}{logical flag whether return list of plot or panel}

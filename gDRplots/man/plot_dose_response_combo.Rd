@@ -9,7 +9,7 @@ plot_dose_response_combo(
   drug1_name,
   drug2_name,
   cl_name,
-  metric_growth = "GR",
+  normalization_type = "GR",
   colormap = NULL
 )
 }
@@ -23,7 +23,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{cl_name}{string with cell line name to be plotted (identifiers \code{CellLineName})}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}
@@ -52,7 +52,7 @@ plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name,
-                         metric_growth = "RV",
+                         normalization_type = "RV",
                          colormap = c("orange", "darkred"))                       
                       
 }

@@ -5,8 +5,8 @@
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line name to be plotted (identifiers \code{CellLineName}) 
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param colormap character vector with colors for \code{group_names} - name or hex value
 #'
 #' @return plot with dose-response curves for combo data 
@@ -30,7 +30,7 @@
 #'                          drug1_name = drug1_name,
 #'                          drug2_name = drug2_name,
 #'                          cl_name = cl_name,
-#'                          metric_growth = "RV",
+#'                          normalization_type = "RV",
 #'                          colormap = c("orange", "darkred"))                       
 #'                       
 #' @export
@@ -38,7 +38,7 @@ plot_dose_response_combo <- function(dt_average,
                                      drug1_name,
                                      drug2_name,
                                      cl_name,
-                                     metric_growth = "GR", 
+                                     normalization_type = "GR", 
                                      colormap = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -54,7 +54,7 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_choice(drug1_name, choices = unique(dt_average[[drug_name]]))
   checkmate::assert_choice(drug2_name, choices = unique(dt_average[[drug_name_2]]))
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
   
   # check input data
@@ -65,8 +65,12 @@ plot_dose_response_combo <- function(dt_average,
                   drug1_name %in% drugs_combination[[drug_name]]))
   
   
-  # filter data for normalization type & selected cell line
-  dt_avg <- dt_average[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
+  # filter data for normalization type
+  data.table::setkeyv(dt_average, "normalization_type")
+  dt_avg <- dt_average[normalization_type]
+  data.table::setkey(dt_avg, NULL)
+  # and selected cell line
+  dt_avg <- dt_avg[get(cellline_name) == cl_name, ]
   
   # filter data for combination cell line (drug x drug2)
   selecteted_combination <- 
@@ -107,7 +111,7 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::scale_x_continuous(trans = "log10") +
     ggplot2::scale_color_manual(values = colormap, labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(sprintf("log10(%s)", metric_growth)) +
+    ggplot2::ylab(sprintf("log10(%s)", normalization_type)) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::labs(color = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() + 
@@ -146,7 +150,7 @@ plot_dose_response_combo <- function(dt_average,
 plot_dose_response_combo_qc_panel <- function(dt_average, 
                                               cl_name, 
                                               d_names = NULL,
-                                              metric_growth = "GR",
+                                              normalization_type = "GR",
                                               as_panel = TRUE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -159,7 +163,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::expect_character(d_names, null.ok = TRUE)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_flag(as_panel)
   
   available_drugs <- unique(dt_average[[drug_name]])
@@ -188,7 +192,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   ls_plts <- purrr::pmap(plt_tab, 
                          gDRplots::plot_dose_response_combo,
                          dt_average = dt_average,
-                         metric_growth = metric_growth)
+                         normalization_type = normalization_type)
   names(ls_plts) <- plt_name
   
   final_plot <- if (as_panel) {
