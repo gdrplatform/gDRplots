@@ -39,13 +39,15 @@ swap_drugs_1_2 <- function(dt_) {
 #' @param base_width an integer with default base_width
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
+#' @param max_size an integer with the maximum size of the plot (either width or height)
 #'
 #' @return named vector with optimal width and height used in ggsave function
 #' @export
 estimate_plot_size <- function(plot,
                                base_width = 10,
                                base_height = 6,
-                               scale_factor = 0.5) {
+                               scale_factor = 0.5,
+                               max_size = 50) {
   
   # Assert inputs
   checkmate::assert_multi_class(plot, c("ggplot", "pheatmap"))
@@ -71,6 +73,13 @@ estimate_plot_size <- function(plot,
   } else {
     stop("Unsupported plot type. Only ggplot2 and pheatmap objects are supported.")
   }
+  
+  # Cap the width and height at max_size
+  estimated_width <- min(estimated_width, max_size)
+  estimated_height <- min(estimated_height, max_size)
+  
+  return(c(width = estimated_width, height = estimated_height))
+  
   return(c(width = estimated_width, height = estimated_height))
 }
 
