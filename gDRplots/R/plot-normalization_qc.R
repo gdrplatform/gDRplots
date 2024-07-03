@@ -140,8 +140,9 @@ plot_var_stat_qc <- function(dt_assay,
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
   
   if (with_table) {
-    tab_metric <- ggpubr::ggtexttable(tab_subplot[, .SD, .SDcols = c(drug_name, metric)], 
-                                      rows = NULL, theme = ggpubr::ttheme("light")) 
+    tab_metric <- ggpubr::ggtexttable(
+      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))], 
+      rows = NULL, theme = ggpubr::ttheme("light")) 
     
     plt <- ggpubr::ggarrange(plt, tab_metric, nrow = 1, widths = c(2, 1))
   }
@@ -198,7 +199,8 @@ heatmap_control_mapping_qc <- function(dt_treat,
   # Convert the result to a matrix format suitable for pheatmap
   result_matrix <- data.table::dcast(result, rId ~ cId, value.var = "N")
   rownames <- result_matrix$rId
-  result_matrix <- as.matrix(result_matrix[, !("rId"), with = FALSE], rownames = rownames)
+  result_matrix <- as.matrix(result_matrix[, !("rId"), with = FALSE])
+  rownames(result_matrix) <- rownames
   
   # Replace 0 with NA to use na_col for red color
   result_matrix[result_matrix == 0] <- NA
@@ -213,9 +215,10 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      color = grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(length(breaks) - 1),
                      breaks = breaks,
                      na_col = "red",
-                     main = "Mapping Counts Comparison between Treated and Control",
+                     main = "Counts Treated vs. Control",
                      cluster_cols = FALSE,
-                     angle_col = 45,
+                     cluster_rows = FALSE,
+                     angle_col = 90,
                      legend_breaks = unique_values,
                      legend_labels = unique_values)
 }
