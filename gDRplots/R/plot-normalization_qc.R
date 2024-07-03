@@ -47,9 +47,13 @@ plot_var_distribution_qc <- function(dt_assay,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   
-  # ----
-  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, ][[clid]]) 
-  tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
+  # filter data for normalization type
+  data.table::setkeyv(dt_assay, "normalization_type")
+  dt_assay <- dt_assay[normalization_type]
+  data.table::setkey(dt_assay, NULL)
+  
+  tab_subplot <- dt_assay[get(cellline_name) == cl_name, ]
   
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
@@ -121,9 +125,13 @@ plot_var_stat_qc <- function(dt_assay,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   
-  # --- 
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
-  tab_subplot <- dt_assay[normalization_type == metric_growth & get(cellline_name) == cl_name, ]
+  # filter data for normalization type
+  data.table::setkeyv(dt_assay, "normalization_type")
+  dt_assay <- dt_assay[normalization_type]
+  data.table::setkey(dt_assay, NULL)
+  
+  tab_subplot <- dt_assay[get(cellline_name) == cl_name, ]
   
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
