@@ -175,7 +175,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   
   # check input data
   drugs_combination <- 
-    unique(dt_average[get(cellline_name) == cl_name, .(cellline_name, drug_name, drug_name_2)])
+    unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
   stopifnot("combination of drugs and cell line does not exist" =
               any(d_names %in% drugs_combination[[drug_name]]))
   
