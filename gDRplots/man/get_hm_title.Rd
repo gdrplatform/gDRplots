@@ -4,14 +4,14 @@
 \alias{get_hm_title}
 \title{Get Legend Title}
 \usage{
-get_hm_title(metric = "xc50", metric_growth = "GR", dataset_name = NULL)
+get_hm_title(metric = "xc50", normalization_type = "GR", dataset_name = NULL)
 }
 \arguments{
 \item{metric}{string name of metric
-one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
 
-\item{metric_growth}{string with normalization types to be selected
+\item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{dataset_name}{string name of dataset}
@@ -25,10 +25,10 @@ Get Legend Title
 \examples{
 get_hm_title(dataset_name = "Dateset DX123",
              metric = "x_mean", 
-             metric_growth = "GR")
+             normalization_type = "GR")
 
 get_hm_title(metric = "xc50", 
-             metric_growth = "GR")
+             normalization_type = "GR")
              
 }
 \keyword{pheat_ann}

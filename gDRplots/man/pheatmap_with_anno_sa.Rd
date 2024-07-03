@@ -6,7 +6,7 @@
 \usage{
 pheatmap_with_anno_sa(
   tab_response,
-  metric_growth = "GR",
+  normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
   hm_title = NA,
@@ -22,11 +22,11 @@ pheatmap_with_anno_sa(
 output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
 and single-agent \code{SummarizedExperiment}}
 
-\item{metric_growth}{string with normalization types to be selected
+\item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
@@ -76,7 +76,7 @@ annotation_map <-
   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 
 pheatmap_with_anno_sa(tab_response = response_metrics,
-                      metric_growth = "RV",
+                      normalization_type = "RV",
                       metric = "x_mean",
                       colors_vec = c("darkblue", "grey90"),
                       annotation_row = annotation_manual_row,
@@ -98,7 +98,7 @@ pheatmap_with_anno_sa(tab_response = response_metrics,
                       annotation_col = annotation_manual,
                       annotation_colors = annotation_map,
                       hm_title = get_hm_title(
-                        metric_growth = "GR",
+                        normalization_type = "GR",
                         metric = "hsa_score",
                         dataset_name = "Combo Matrix - combo data"))
 

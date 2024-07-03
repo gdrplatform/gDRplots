@@ -6,7 +6,7 @@
 \usage{
 pheatmap_with_anno_combo(
   tab_response,
-  metric_growth = "GR",
+  normalization_type = "GR",
   metric = "hsa_score",
   fit_source = "gDR",
   hm_title = NA,
@@ -23,11 +23,11 @@ pheatmap_with_anno_combo(
 output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
 and combo \code{SummarizedExperiment}}
 
-\item{metric_growth}{string with normalization types to be selected
+\item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{metric_growth}), 
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{normalization_type}), 
 "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
@@ -75,7 +75,7 @@ annotation_map <-
   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 
 pheatmap_with_anno_combo(tab_response = response_metrics,
-                         metric_growth = "RV",
+                         normalization_type = "RV",
                          metric = "bliss_score",
                          colors_vec = c("darkblue", "grey90", "darkred"),
                          annotation_row = annotation_manual_row,
@@ -98,7 +98,7 @@ pheatmap_with_anno_combo(tab_response = response_metrics,
                          annotation_col = annotation_manual,
                          annotation_colors = annotation_map,
                          hm_title = get_hm_title(
-                           metric_growth = "GR",
+                           normalization_type = "GR",
                            metric = "hsa_score",
                            dataset_name = "Combo Matrix - combo data"))
             

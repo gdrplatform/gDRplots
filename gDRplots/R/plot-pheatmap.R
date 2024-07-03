@@ -3,10 +3,10 @@
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
-#' @param metric_growth string with normalization types to be selected
-#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{metric_growth}), 
+#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}), 
 #'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
@@ -27,7 +27,7 @@
 #' 
 #' pheatmap_qc(tab_response = response_metrics)
 #' pheatmap_qc(tab_response = response_metrics, 
-#'             metric_growth = "RV",
+#'             normalization_type = "RV",
 #'             colors_vec = c("darkblue", "grey90"),
 #'             lbl_by_CellLineName = TRUE,
 #'             lbl_by_DrugName = TRUE)
@@ -49,7 +49,7 @@
 #' @export 
 pheatmap_qc <- function(
     tab_response,
-    metric_growth = "GR",
+    normalization_type = "GR",
     metric = "x",
     fit_source = "gDR",
     hm_title = NA,
@@ -60,7 +60,7 @@ pheatmap_qc <- function(
     lbl_by_DrugName = FALSE) {
   
   checkmate::assert_data_table(tab_response)
-  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("x", "x_std"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
@@ -83,7 +83,9 @@ pheatmap_qc <- function(
   drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
   
   # select data for normalization type
-  tab_response <- tab_response[normalization_type == metric_growth, ]
+  data.table::setkeyv(tab_response, "normalization_type")
+  tab_response <- tab_response[normalization_type]
+  data.table::setkey(tab_response, NULL)
   
   if (fit_source %in% names(tab_response)) {
     data.table::setkeyv(tab_response, "fit_source")
@@ -231,10 +233,10 @@ pheatmap_qc <- function(
 #' @param tab_response \code{data.table} containing drug response metrics
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
 #'    and single-agent \code{SummarizedExperiment}
-#' @param metric_growth string with normalization types to be selected
-#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+#'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
@@ -273,7 +275,7 @@ pheatmap_qc <- function(
 #'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 #' 
 #' pheatmap_with_anno_sa(tab_response = response_metrics,
-#'                       metric_growth = "RV",
+#'                       normalization_type = "RV",
 #'                       metric = "x_mean",
 #'                       colors_vec = c("darkblue", "grey90"),
 #'                       annotation_row = annotation_manual_row,
@@ -295,7 +297,7 @@ pheatmap_qc <- function(
 #'                       annotation_col = annotation_manual,
 #'                       annotation_colors = annotation_map,
 #'                       hm_title = get_hm_title(
-#'                         metric_growth = "GR",
+#'                         normalization_type = "GR",
 #'                         metric = "hsa_score",
 #'                         dataset_name = "Combo Matrix - combo data"))
 #' 
@@ -305,7 +307,7 @@ pheatmap_qc <- function(
 #' @export 
 pheatmap_with_anno_sa <- function(
     tab_response,
-    metric_growth = "GR",
+    normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
     hm_title = NA,
@@ -316,7 +318,7 @@ pheatmap_with_anno_sa <- function(
     annotation_colors = NULL) {
   
   checkmate::assert_data_table(tab_response)
-  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("x", "xc50", "x_max", "x_mean"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
@@ -330,7 +332,9 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # select data for normalization type
-  tab_response <- tab_response[normalization_type == metric_growth, ]
+  data.table::setkeyv(tab_response, "normalization_type")
+  tab_response <- tab_response[normalization_type]
+  data.table::setkey(tab_response, NULL)
   
   if (fit_source %in% names(tab_response)) {
     data.table::setkeyv(tab_response, "fit_source")
@@ -466,7 +470,7 @@ pheatmap_with_anno_sa <- function(
 #'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
 #'    and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
-#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{metric_growth}), 
+#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively depending on \code{normalization_type}), 
 #'    "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -496,7 +500,7 @@ pheatmap_with_anno_sa <- function(
 #'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 #' 
 #' pheatmap_with_anno_combo(tab_response = response_metrics,
-#'                          metric_growth = "RV",
+#'                          normalization_type = "RV",
 #'                          metric = "bliss_score",
 #'                          colors_vec = c("darkblue", "grey90", "darkred"),
 #'                          annotation_row = annotation_manual_row,
@@ -519,7 +523,7 @@ pheatmap_with_anno_sa <- function(
 #'                          annotation_col = annotation_manual,
 #'                          annotation_colors = annotation_map,
 #'                          hm_title = get_hm_title(
-#'                            metric_growth = "GR",
+#'                            normalization_type = "GR",
 #'                            metric = "hsa_score",
 #'                            dataset_name = "Combo Matrix - combo data"))
 #'             
@@ -529,7 +533,7 @@ pheatmap_with_anno_sa <- function(
 #' @export 
 pheatmap_with_anno_combo <- function(
     tab_response,
-    metric_growth = "GR",
+    normalization_type = "GR",
     metric = "hsa_score",
     fit_source = "gDR",
     hm_title = NA,
@@ -540,7 +544,7 @@ pheatmap_with_anno_combo <- function(
     annotation_colors = NULL) {
   
   checkmate::assert_data_table(tab_response)
-  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
@@ -556,7 +560,9 @@ pheatmap_with_anno_combo <- function(
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
   # prep data
-  tab_response <- tab_response[normalization_type == metric_growth, ]
+  data.table::setkeyv(tab_response, "normalization_type")
+  tab_response <- tab_response[normalization_type]
+  data.table::setkey(tab_response, NULL)
   
   if (fit_source %in% names(tab_response)) {
     data.table::setkeyv(tab_response, "fit_source")
@@ -687,36 +693,36 @@ pheatmap_with_anno_combo <- function(
 # helpers ----
 #' Get Legend Title
 #' 
-#' @param metric_growth string with normalization types to be selected
-#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric
-#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
 #' @param dataset_name string name of dataset
 #'
 #' @examples
 #' get_hm_title(dataset_name = "Dateset DX123",
 #'              metric = "x_mean", 
-#'              metric_growth = "GR")
+#'              normalization_type = "GR")
 #' 
 #' get_hm_title(metric = "xc50", 
-#'              metric_growth = "GR")
+#'              normalization_type = "GR")
 #'              
 #' @keywords pheat_ann
 #' 
 #' @return character title for heatmap
 #' @export 
 get_hm_title <- function(metric = "xc50", 
-                         metric_growth = "GR",
+                         normalization_type = "GR",
                          dataset_name = NULL) {
   
   checkmate::assert_string(dataset_name, null.ok = TRUE)
-  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, 
                            choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
   
   title_metric <- 
-    gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, metric_growth), human_readable = TRUE)
+    gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, normalization_type), human_readable = TRUE)
   
   if (metric == "xc50") title_metric <- sprintf("log10(%s)", title_metric)
   
