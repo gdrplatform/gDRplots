@@ -20,16 +20,16 @@ test_that("plot_dose_response_sa works as expected", {
   iC <- colnames(se)[1]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
-  metric_growth <- "RV"
+  normalization_type <- "RV"
   
   plt <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                dt_average = dt_average,
                                grouping = grouping,
-                               metric_growth = metric_growth,
+                               normalization_type = normalization_type,
                                colormap = c("cadetblue", "orange", "darkblue"),
                                plot_fit_flag = FALSE)
   expect_is(plt, "gg")
-  expect_true(grepl(metric_growth, plt[["labels"]][["y"]]))
+  expect_true(grepl(normalization_type, plt[["labels"]][["y"]]))
   expect_length(plt[["layers"]], 2)
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
@@ -62,19 +62,19 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
   expect_equal(names(plts), 
                sprintf("%s (%s)", unique(dt_metrics[[drug_name]]), unique(dt_metrics[[gnumber]])))
   
-  metric_growth <- "RV"
+  normalization_type <- "RV"
   plts <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                                        dt_average = dt_average,
                                        cellline_name_vec = cellline_name_vec,
                                        drug_name_vec = drug_name_vec,
-                                       metric_growth = metric_growth,
+                                       normalization_type = normalization_type,
                                        colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
   expect_is(plts, "list")
   plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
   expect_equal(names(plts), 
                sprintf("%s (%s)", plotted_, unique(dt_metrics[get(drug_name) %in% plotted_][[gnumber]])))
   expect_true(all(vapply(seq_along(plts), 
-                         function(i) grepl(metric_growth, plts[[i]]$labels$y), logical(1))))
+                         function(i) grepl(normalization_type, plts[[i]]$labels$y), logical(1))))
   
   cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
   drug_name_vec_2 <- c(drug_name_vec, "drug_100")
@@ -110,14 +110,14 @@ test_that("plot_dose_response_sa_qc works as expected", {
   expect_true(grepl(d_name, plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 4)
   
-  metric_growth <- "RV"
+  normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
                                     dt_average = dt_average,
                                     cl_name = cl_name,
                                     d_name = d_name, 
-                                    metric_growth = metric_growth)
+                                    normalization_type = normalization_type)
   expect_is(plt_2, "gg")
-  expect_true(grepl(metric_growth, plt_2[["labels"]][["y"]]))
+  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
 })
 
 test_that("plot_dose_response_sa_qc works as expected", {
@@ -138,11 +138,11 @@ test_that("plot_dose_response_sa_qc works as expected", {
   expect_is(plt_1, "gg")
   expect_length(plt_1$layers[[1]]$constructor, 2)
 
-  metric_growth <- "RV"
+  normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,
                                           cl_name = cl_name,
                                           d_names = d_names,
-                                          metric_growth = metric_growth)
+                                          normalization_type = normalization_type)
   expect_is(plt_2, "gg")
 })

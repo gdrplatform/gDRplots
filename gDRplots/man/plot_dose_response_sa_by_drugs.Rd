@@ -9,7 +9,7 @@ plot_dose_response_sa_by_drugs(
   dt_average,
   cellline_name_vec = NULL,
   drug_name_vec = NULL,
-  metric_growth = "GR",
+  normalization_type = "GR",
   colormap = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE
@@ -26,7 +26,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{drug_name_vec}{character vector with cell line to be plotted (Drug Name)}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}
@@ -44,6 +44,7 @@ Plot drug response curves for single-agent data for selected call lines and drug
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
+
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
@@ -53,7 +54,7 @@ plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics,
                                dt_average = dt_average, 
                                cellline_name_vec = cellline_name_vec, 
                                drug_name_vec = drug_name_vec, 
-                               metric_growth = "RV", 
+                               normalization_type = "RV", 
                                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 
 }

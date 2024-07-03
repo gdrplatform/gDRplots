@@ -9,7 +9,7 @@ plot_dose_response_sa_qc_panel(
   dt_average,
   cl_name,
   d_names = NULL,
-  metric_growth = "GR",
+  normalization_type = "GR",
   fit_source = "gDR"
 )
 }
@@ -25,7 +25,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 \item{d_names}{character vector with drug names to be plotted (Drug Name); 
 if NULL - all available drugs will be plotted}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{fit_source}{string source name for metrics}
