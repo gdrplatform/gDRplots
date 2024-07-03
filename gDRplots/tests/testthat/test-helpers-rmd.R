@@ -1,10 +1,8 @@
 context("Test utils")
 
-library(testthat)
-library(ggplot2)
 # Example ggplot object
 
-p1 <- ggplot(mpg, aes(displ, hwy, color = class)) + geom_point()
+p1 <- ggplot2::ggplot(ggplot2::mpg, ggplot2::aes(displ, hwy, color = class)) + ggplot2::geom_point()
 
 # Example pheatmap object
 mat <- matrix(rnorm(100), 10, 10)

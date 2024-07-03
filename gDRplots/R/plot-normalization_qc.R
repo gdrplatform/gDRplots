@@ -116,7 +116,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   # Convert the result to a matrix format suitable for pheatmap
   result_matrix <- data.table::dcast(result, rId ~ cId, value.var = "N")
   rownames <- result_matrix$rId
-  result_matrix <- as.matrix(result_matrix[, -1, with = FALSE], rownames = rownames)
+  result_matrix <- as.matrix(result_matrix[, !("rId"), with = FALSE], rownames = rownames)
   
   # Replace 0 with NA to use na_col for red color
   result_matrix[result_matrix == 0] <- NA
@@ -124,7 +124,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   # Generate the breaks for integers
   max_count <- max(result_matrix, na.rm = TRUE)
   breaks <- seq(1, max_count, by = 1)
-  unique_values <- unique(na.omit(as.vector(result_matrix)))
+  unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
   
   # Generate the heatmap
   pheatmap::pheatmap(result_matrix,
