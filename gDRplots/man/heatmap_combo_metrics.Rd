@@ -9,7 +9,7 @@ heatmap_combo_metrics(
   drug1_name,
   drug2_name,
   cl_name,
-  metric_growth = "GR",
+  normalization_type = "GR",
   iso_levels = c("0.25", "0.5", "0.75"),
   as_panel = TRUE
 )
@@ -24,7 +24,7 @@ data in its assays for one cell line}
 
 \item{cl_name}{string with cell line to be plotted (identifiers \code{CellLineName})}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vectore with  isobologram levels to be selected}
@@ -49,12 +49,12 @@ se <- mae[["combination"]]
 heatmap_combo_metrics(se, 
                       drug1_name, drug2_name, 
                       cl_name, 
-                      metric_growth = "GR")
+                      normalization_type = "GR")
                       
 heatmap_combo_metrics(se, 
                       drug1_name, drug2_name, 
                       cl_name, 
-                      metric_growth = "RV", 
+                      normalization_type = "RV", 
                       as_panel = FALSE)
 
 }

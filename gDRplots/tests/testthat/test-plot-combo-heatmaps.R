@@ -11,12 +11,12 @@ test_that("heatmap_combo_metrics works as expected", {
   plts_1 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name)
   expect_is(plts_1, "gg")
 
-  metric_growth <- "RV"
-  plts_2 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, metric_growth, as_panel = FALSE)
+  normalization_type <- "RV"
+  plts_2 <- heatmap_combo_metrics(se, drug1_name, drug2_name, cl_name, normalization_type, as_panel = FALSE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
-                         function(i) grepl(metric_growth, plts_2[[i]]$labels$title), logical(1))))
+                         function(i) grepl(normalization_type, plts_2[[i]]$labels$title), logical(1))))
   
   
   expect_error(heatmap_combo_metrics(se = mae,
@@ -33,6 +33,6 @@ test_that("heatmap_combo_metrics works as expected", {
                                      drug1_name = drug1_name,
                                      drug2_name = drug2_name, 
                                      cl_name = cl_name,
-                                     metric_growth = "AB"),
-               "Assertion on 'metric_growth' failed: Must be element of set")
+                                     normalization_type = "AB"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
 })

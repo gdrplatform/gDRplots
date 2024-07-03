@@ -5,8 +5,8 @@
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vectore with  isobologram levels to be selected
 #' @param as_panel logical flag whether return list of plot or panel
 #'
@@ -25,12 +25,12 @@
 #' heatmap_combo_metrics(se, 
 #'                       drug1_name, drug2_name, 
 #'                       cl_name, 
-#'                       metric_growth = "GR")
+#'                       normalization_type = "GR")
 #'                       
 #' heatmap_combo_metrics(se, 
 #'                       drug1_name, drug2_name, 
 #'                       cl_name, 
-#'                       metric_growth = "RV", 
+#'                       normalization_type = "RV", 
 #'                       as_panel = FALSE)
 #'
 #' @export
@@ -38,7 +38,7 @@ heatmap_combo_metrics <- function(se,
                                   drug1_name,
                                   drug2_name,
                                   cl_name,
-                                  metric_growth = "GR",
+                                  normalization_type = "GR",
                                   iso_levels =  c("0.25", "0.5", "0.75"),
                                   as_panel = TRUE) {
   
@@ -55,7 +55,7 @@ heatmap_combo_metrics <- function(se,
   checkmate::assert_choice(cl_name, choices = SummarizedExperiment::colData(se)[[cellline_name]])
   checkmate::assert_character(iso_levels)
   checkmate::assert_numeric(as.numeric(iso_levels))
-  checkmate::assert_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   selected_col <- 
     SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cl_name, ]
@@ -69,11 +69,15 @@ heatmap_combo_metrics <- function(se,
   
   dt_excess <- data.table::as.data.table(
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "excess")))
-  dt_excess <- dt_excess[normalization_type == metric_growth, ]
+  data.table::setkeyv(dt_excess, "normalization_type")
+  dt_excess <- dt_excess[normalization_type]
+  data.table::setkey(dt_excess, NULL)
   
   dt_isobolograms <- data.table::as.data.table(
     BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(sel_se, "isobolograms")))
-  dt_isobolograms <- dt_isobolograms[normalization_type == metric_growth, ]
+  data.table::setkeyv(dt_isobolograms, "normalization_type")
+  dt_isobolograms <- dt_isobolograms[normalization_type]
+  data.table::setkey(dt_isobolograms, NULL)
 
   iso_colors <- gDRutils::get_iso_colors()[iso_levels]
   dt_isobolograms <- 
@@ -106,7 +110,7 @@ heatmap_combo_metrics <- function(se,
     
     plt_title <- sprintf("%s for %s, T=%sh",
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
-                         metric_growth,
+                         normalization_type,
                          selected_row[[duration]])
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
     
@@ -126,10 +130,10 @@ heatmap_combo_metrics <- function(se,
                                   expand = c(0, 0)) +
       ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y, labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
-      ggplot2::scale_shape_discrete(name = paste0(ifelse(metric_growth == "GR", "GR", "IC"), "50"))
+      ggplot2::scale_shape_discrete(name = paste0(ifelse(normalization_type == "GR", "GR", "IC"), "50"))
     
     # add color scale
-    if (metric_growth == "GR") {
+    if (normalization_type == "GR") {
       plt <- plt +
         ggplot2::scale_fill_gradientn(
           colors = c("black", "#b06000", "#c07700", "white"),
@@ -151,7 +155,7 @@ heatmap_combo_metrics <- function(se,
                            ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
         ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                     breaks = names(iso_colors[avialable_iso]),
-                                    labels = paste0(ifelse(metric_growth == "GR", "GR", "IC"),
+                                    labels = paste0(ifelse(normalization_type == "GR", "GR", "IC"),
                                                     100 - 100 * as.numeric(avialable_iso)),
                                     name = "Iso Levels")
     }
@@ -162,7 +166,7 @@ heatmap_combo_metrics <- function(se,
   # isobolograms across range of concentration ratios
   plt_title <- sprintf("%s for %s, T=%sh", 
                        gDRutils::get_combo_excess_field_names()[["smooth"]],
-                       metric_growth,
+                       normalization_type,
                        selected_row[[duration]]) 
   if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
   # base plot
@@ -177,7 +181,7 @@ heatmap_combo_metrics <- function(se,
     ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
                        ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) + 
     ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
-                                name = ifelse(metric_growth == "GR", "GR", "IC")) +
+                                name = ifelse(normalization_type == "GR", "GR", "IC")) +
     ggplot2::labs(color = "Iso levels") +
     ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
     ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
@@ -186,7 +190,7 @@ heatmap_combo_metrics <- function(se,
     ggplot2::labs(y = "CI",
                   x = paste(drug2_name, "/", drug1_name, "ratio"),
                   title = plt_title,
-                  color = ifelse(metric_growth == "GR", "GR", "IC"))
+                  color = ifelse(normalization_type == "GR", "GR", "IC"))
   
   # final plots
   ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
