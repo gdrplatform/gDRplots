@@ -156,9 +156,11 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   conc <- gDRutils::get_env_identifiers("concentration")
   
   checkmate::expect_data_table(dt_average)
+  checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::expect_character(d_names, null.ok = TRUE)
   checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_flag(as_panel)
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
