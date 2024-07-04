@@ -2,14 +2,14 @@
 % Please edit documentation in R/plot-sa-response_curve.R
 \name{plot_dose_response_sa_qc}
 \alias{plot_dose_response_sa_qc}
-\title{Plot drug response curves for single-agent data to check quality of data}
+\title{Plot drug response curves for single-agent data to control quality of the data}
 \usage{
 plot_dose_response_sa_qc(
   dt_metrics,
   dt_average,
   cl_name,
   d_name,
-  metric_growth = "GR",
+  normalization_type = "GR",
   fit_source = "gDR"
 )
 }
@@ -24,7 +24,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{d_name}{string vector with drug name to be plotted (Drug Name)}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{fit_source}{string source name for metrics}
@@ -33,7 +33,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 plot with dose-response curves
 }
 \description{
-Plot drug response curves for single-agent data to check quality of data
+Plot drug response curves for single-agent data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")

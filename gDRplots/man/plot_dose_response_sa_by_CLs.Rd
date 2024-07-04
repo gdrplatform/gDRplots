@@ -9,7 +9,7 @@ plot_dose_response_sa_by_CLs(
   dt_average,
   cellline_name_vec = NULL,
   drug_name_vec = NULL,
-  metric_growth = "GR",
+  normalization_type = "GR",
   colormap = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE
@@ -26,7 +26,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{drug_name_vec}{character vector with cell line to be plotted (Drug Name)}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}
@@ -53,7 +53,7 @@ plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
                              dt_average = dt_average, 
                              cellline_name_vec = cellline_name_vec, 
                              drug_name_vec = drug_name_vec, 
-                             metric_growth = "RV", 
+                             normalization_type = "RV", 
                              colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 
 }

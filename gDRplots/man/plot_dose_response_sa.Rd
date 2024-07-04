@@ -9,7 +9,7 @@ plot_dose_response_sa(
   dt_average,
   grouping,
   group_names = NULL,
-  metric_growth = "GR",
+  normalization_type = "GR",
   colormap = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE
@@ -28,7 +28,7 @@ output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 \item{group_names}{character vector with names to subset from se (the same dim as \code{grouping});
 if \code{NULL} then all values will be plotted}
 
-\item{metric_growth}{string with normalization_types to be selected
+\item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}

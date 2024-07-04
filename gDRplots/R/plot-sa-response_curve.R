@@ -8,8 +8,8 @@
 #'    (that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")
 #' @param group_names character vector with names to subset from se (the same dim as \code{grouping});
 #'    if \code{NULL} then all values will be plotted
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param colormap character vector with colors for \code{group_names} - name or hex value
 #' @param plot_averaged_flag logical flag whether plot points with average values 
 #' @param plot_fit_flag logical flag whether plot points with fitted values 
@@ -47,7 +47,7 @@ plot_dose_response_sa <- function(dt_metrics,
                                   dt_average, 
                                   grouping, 
                                   group_names = NULL, 
-                                  metric_growth = "GR", 
+                                  normalization_type = "GR", 
                                   colormap = NULL, 
                                   plot_averaged_flag = TRUE, 
                                   plot_fit_flag = TRUE) {
@@ -61,7 +61,7 @@ plot_dose_response_sa <- function(dt_metrics,
   checkmate::expect_data_table(dt_average)
   checkmate::expect_choice(grouping, choices = c(cellline_name, drug_name))
   checkmate::expect_character(group_names, null.ok = TRUE)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
@@ -77,8 +77,12 @@ plot_dose_response_sa <- function(dt_metrics,
   stopifnot("empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
   
   # filter data for normalization type
-  dt_met_norm <- dt_metrics[normalization_type == metric_growth, ]
-  dt_avg_norm <- dt_average[normalization_type == metric_growth, ]
+  data.table::setkeyv(dt_metrics, "normalization_type")
+  dt_met_norm <- dt_metrics[normalization_type]
+  data.table::setkey(dt_met_norm, NULL)
+  data.table::setkeyv(dt_average, "normalization_type")
+  dt_avg_norm <- dt_average[normalization_type]
+  data.table::setkey(dt_avg_norm, NULL)
   
   # variables
   conc <- gDRutils::get_env_identifiers("concentration")
@@ -143,13 +147,12 @@ plot_dose_response_sa <- function(dt_metrics,
   plt <- 
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
-    ggplot2::geom_vline(xintercept = 0, color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == "cId", "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(metric_growth) +
+    ggplot2::ylab(sprintf("log10(%s)", normalization_type)) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
   
@@ -190,7 +193,7 @@ plot_dose_response_sa <- function(dt_metrics,
 #'                              dt_average = dt_average, 
 #'                              cellline_name_vec = cellline_name_vec, 
 #'                              drug_name_vec = drug_name_vec, 
-#'                              metric_growth = "RV", 
+#'                              normalization_type = "RV", 
 #'                              colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' 
 #' @export
@@ -198,7 +201,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                                          dt_average,
                                          cellline_name_vec = NULL, 
                                          drug_name_vec = NULL,
-                                         metric_growth = "GR", 
+                                         normalization_type = "GR", 
                                          colormap = NULL, 
                                          plot_averaged_flag = TRUE, 
                                          plot_fit_flag = TRUE) {
@@ -207,7 +210,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   checkmate::expect_data_table(dt_average)
   checkmate::expect_character(cellline_name_vec, null.ok = TRUE)
   checkmate::expect_character(drug_name_vec, null.ok = TRUE)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
@@ -245,7 +248,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                             dt_average = dt_average_subset, 
                             grouping = cellline_name,
                             group_names = cellline_name_vec,
-                            metric_growth = metric_growth,
+                            normalization_type = normalization_type,
                             colormap = colormap,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
@@ -268,6 +271,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 #' cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
@@ -277,7 +281,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #'                                dt_average = dt_average, 
 #'                                cellline_name_vec = cellline_name_vec, 
 #'                                drug_name_vec = drug_name_vec, 
-#'                                metric_growth = "RV", 
+#'                                normalization_type = "RV", 
 #'                                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 #' 
 #' @export
@@ -285,7 +289,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                                            dt_average,
                                            cellline_name_vec = NULL, 
                                            drug_name_vec = NULL,
-                                           metric_growth = "GR", 
+                                           normalization_type = "GR", 
                                            colormap = NULL, 
                                            plot_averaged_flag = TRUE, 
                                            plot_fit_flag = TRUE) {
@@ -294,7 +298,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   checkmate::expect_data_table(dt_average)
   checkmate::expect_character(cellline_name_vec, null.ok = TRUE)
   checkmate::expect_character(drug_name_vec, null.ok = TRUE)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
@@ -332,7 +336,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                             dt_average = dt_average_subset, 
                             grouping = drug_name,
                             group_names = drug_name_vec,
-                            metric_growth = metric_growth,
+                            normalization_type = normalization_type,
                             colormap = colormap,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
@@ -343,7 +347,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   return(plt_list)
 }
 
-#' Plot drug response curves for single-agent data to check quality of data
+#' Plot drug response curves for single-agent data to control quality of the data
 #'
 #' @param dt_metrics data.table representation of the data in \code{Metrics} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -351,8 +355,8 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param d_name string vector with drug name to be plotted (Drug Name)
-#' @param metric_growth string with normalization_types to be selected
-#'                      one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param fit_source string source name for metrics
 #'
 #' @return plot with dose-response curves
@@ -377,14 +381,14 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                                      dt_average, 
                                      cl_name, 
                                      d_name,
-                                     metric_growth = "GR",
+                                     normalization_type = "GR",
                                      fit_source = "gDR") {
   
   checkmate::expect_data_table(dt_metrics)
   checkmate::expect_data_table(dt_average)
   checkmate::expect_string(cl_name)
   checkmate::expect_string(d_name)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -397,12 +401,20 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
   checkmate::expect_choice(d_name, choices = dt_metrics[[drug_name]])
   checkmate::expect_choice(d_name, choices = dt_average[[drug_name]])
+
+  # filter data for normalization_type
+  data.table::setkeyv(dt_metrics, "normalization_type")
+  dt_metrics <- dt_metrics[normalization_type]
+  data.table::setkey(dt_metrics, NULL)
+  data.table::setkeyv(dt_average, "normalization_type")
+  dt_average <- dt_average[normalization_type]
+  data.table::setkey(dt_average, NULL)
   
-  # filter data for metric_growth
-  dt_metrics <- dt_metrics[normalization_type == metric_growth, ][
-    , .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
-  dt_average <- dt_average[normalization_type == metric_growth, ][
-    , .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
+  # filter data for min required data
+  dt_metrics <-
+    dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
+  dt_average <- 
+    dt_average[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
   
   selected_combination <- data.table::data.table(cellline_name = cl_name,
                                                  drug_name = d_name)
@@ -437,23 +449,27 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::ggplot() +
       ggplot2::geom_errorbar(
         data = dt_average_plot, 
-        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std), 
-        width = 0.1, color = "#A9A9A9") + 
+        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"), 
+        width = 0.1) + 
       ggplot2::geom_line(
         data = dt_average_plot, 
-        ggplot2::aes(x = get(conc), y = x), color = "black", linetype = "dashed") +
+        ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"), 
+        linetype = "dashed") +
       ggplot2::geom_line(
         data = dt_reconstructed_fit, 
-        ggplot2::aes(x = get(conc), y = x), color = "red") +
+        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
       ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
       ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-      ggplot2::ylab(metric_growth) + 
+      ggplot2::ylab(normalization_type) + 
       ggplot2::ggtitle(plt_title) +
+      ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     legend.position = "none")
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank()) +
+      ggplot2::scale_color_manual(values = c("Averaged Data" = "black", 
+                                             "Fitted Curve" = "red", 
+                                             "Errors Bar" = "#A9A9A9"))
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
@@ -471,7 +487,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   return(plt)
 }
 
-#' Plot panel with drug response curves for single-agent data to check quality of data
+#' Plot panel with drug response curves for single-agent data to control quality of the data
 #'
 #' @inheritParams plot_dose_response_sa_qc
 #' @param d_names character vector with drug names to be plotted (Drug Name); 
@@ -503,14 +519,14 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                                            dt_average, 
                                            cl_name, 
                                            d_names = NULL,
-                                           metric_growth = "GR",
+                                           normalization_type = "GR",
                                            fit_source = "gDR") {
   
   checkmate::expect_data_table(dt_metrics)
   checkmate::expect_data_table(dt_average)
   checkmate::expect_string(cl_name)
   checkmate::expect_character(d_names, null.ok = TRUE)
-  checkmate::expect_choice(metric_growth, choices = c("GR", "RV"))
+  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -537,7 +553,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                         dt_metrics = dt_metrics,
                         dt_average = dt_average,
                         cl_name = cl_name,
-                        metric_growth = metric_growth,
+                        normalization_type = normalization_type,
                         fit_source = fit_source)
   
   # panel title
@@ -545,6 +561,10 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # final panel
-  ggpubr::annotate_figure(ggpubr::ggarrange(plotlist = ls_plt),
-                          top = panel_title)
+  panel <- ggpubr::annotate_figure(
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
+    top = panel_title) + 
+    ggpubr::bgcolor("white") + ggpubr::border("white")
+  
+  return(panel)
 }

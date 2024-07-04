@@ -6,12 +6,13 @@
 \usage{
 pheatmap_with_anno_sa(
   tab_response,
-  metric_growth = "GR",
+  normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
   hm_title = NA,
   colors_vec = c("firebrick2", "white"),
   no_breaks = 50,
+  annotation_row = NULL,
   annotation_col = NULL,
   annotation_colors = NULL
 )
@@ -21,11 +22,11 @@ pheatmap_with_anno_sa(
 output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
 and single-agent \code{SummarizedExperiment}}
 
-\item{metric_growth}{string with normalization types to be selected
+\item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
@@ -36,15 +37,22 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{metric_growth
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
+\item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
+are matched using corresponding names from \code{DrugName} column. 
+Note that color schemes takes into account if variable is continuous or discrete.}
+
+\item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
+Each row defines the features for a specific column. The columns in the data and in the annotation
 are matched using corresponding names from \code{CellLineName} column. 
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
-note list is named wit annotation name (column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with valid colour name for 
-each value describe in \code{annotation_col}). Not described elements will be colored in default.}
+note list is named with annotation name (column names of \code{annotation_row} - 
+without \code{DrugName} and column names of \code{annotation_col} - 
+without \code{CellLineName}), each list item is named vector with valid color name for 
+each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
+Not described elements will be colored in default.}
 }
 \value{
 heatmap for selected metric with annotation - if given
@@ -55,20 +63,24 @@ Plot pretty heatmap with annotationsfor single-agent data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, 
+response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Metrics")
 
 pheatmap_with_anno_sa(tab_response = response_metrics)
 
-annotation_manual <-
+annotation_manual_col <-
   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
-annotation_map <- get_ann_color_map(annotation_manual[,.SD, .SDcols = "Tissue"])
+annotation_manual_row <-
+  unique(response_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
+annotation_map <-
+  get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 
 pheatmap_with_anno_sa(tab_response = response_metrics,
-                      metric_growth = "RV",
+                      normalization_type = "RV",
                       metric = "x_mean",
                       colors_vec = c("darkblue", "grey90"),
-                      annotation_col = annotation_manual,
+                      annotation_row = annotation_manual_row,
+                      annotation_col = annotation_manual_col,
                       annotation_colors = annotation_map)
                       
 annotation_manual <- data.table::data.table(
@@ -86,7 +98,7 @@ pheatmap_with_anno_sa(tab_response = response_metrics,
                       annotation_col = annotation_manual,
                       annotation_colors = annotation_map,
                       hm_title = get_hm_title(
-                        metric_growth = "GR",
+                        normalization_type = "GR",
                         metric = "hsa_score",
                         dataset_name = "Combo Matrix - combo data"))
 

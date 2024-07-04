@@ -11,7 +11,7 @@ reference:
   desc:  Function to plot averaged values heatmaps for combo data
 - contents:
   - has_keyword("combo_plots")
-- title: Quality checks plot for Processing Report
+- title: Quality control plots for Processing Report
   desc:  QC plots for Processing Report with all helpers 
 - contents:
   - has_keyword("QC_plot")

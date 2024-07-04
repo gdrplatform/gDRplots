@@ -2,11 +2,11 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{pheatmap_qc}
 \alias{pheatmap_qc}
-\title{Plot pretty heatmap for single-agent or combo data to check quality of data}
+\title{Plot pretty heatmap for single-agent or combo data to control quality of the data}
 \usage{
 pheatmap_qc(
   tab_response,
-  metric_growth = "GR",
+  normalization_type = "GR",
   metric = "x",
   fit_source = "gDR",
   hm_title = NA,
@@ -22,11 +22,11 @@ pheatmap_qc(
 output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
-\item{metric_growth}{string with normalization types to be selected
+\item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric;
-one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{metric_growth}), 
+one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}), 
 or "x_std" (standard deviation)}
 
 \item{fit_source}{string source name for metrics}
@@ -48,7 +48,7 @@ or "x_std" (standard deviation)}
 heatmap for selected metric with annotation - if given
 }
 \description{
-Plot pretty heatmap for single-agent or combo data to check quality of data
+Plot pretty heatmap for single-agent or combo data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -58,7 +58,7 @@ response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 
 pheatmap_qc(tab_response = response_metrics)
 pheatmap_qc(tab_response = response_metrics, 
-            metric_growth = "RV",
+            normalization_type = "RV",
             colors_vec = c("darkblue", "grey90"),
             lbl_by_CellLineName = TRUE,
             lbl_by_DrugName = TRUE)
