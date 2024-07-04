@@ -125,10 +125,14 @@ heatmap_combo_metrics <- function(
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
     
-    # prep hm color palette
+    # legend
+    legend_title <- "Iso Levels"
+    legend_lbl <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
+                         100 - 100 * as.numeric(avialable_iso))
     
+    # prep hm color palette
     hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
-
+    # prep limits
     min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
     max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
     limits <- c(min_, max_)
@@ -157,11 +161,7 @@ heatmap_combo_metrics <- function(
                                     name = mx_name)
     
     # add isoline
-    if (NROW(avialable_iso)) { # isobolograms as lines available
-      legend_title <- "Iso Levels"
-      legend_labels <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                              100 - 100 * as.numeric(avialable_iso))
-      
+    if (NROW(avialable_iso)) { # isobolograms as lines
       if (all(avialable_iso %in% c("0.25", "0.5", "0.75"))) {
         # friendly for user with color vision deficiency
         plt <- plt +
@@ -169,11 +169,11 @@ heatmap_combo_metrics <- function(
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                       breaks = avialable_iso,
-                                      labels = legend_labels,
+                                      labels = legend_lbl,
                                       name = legend_title) +
           ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                          breaks = avialable_iso,
-                                         labels = legend_labels,
+                                         labels = legend_lbl,
                                          name = legend_title) +
           ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
         
@@ -183,7 +183,7 @@ heatmap_combo_metrics <- function(
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                       breaks = avialable_iso,
-                                      labels = legend_labels,
+                                      labels = legend_lbl,
                                       name = legend_title)
       }
     }
@@ -224,7 +224,7 @@ heatmap_combo_metrics <- function(
                          ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level))
     ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                 breaks = avialable_iso,
-                                labels = legend_labels,
+                                labels = legend_lbl,
                                 name = ifelse(normalization_type == "GR", "GR", "IC"))
   }
   
@@ -257,7 +257,8 @@ heatmap_combo_metrics <- function(
           ),
           ncol = 2, common.legend = TRUE, legend = "right"),
         common.legend = TRUE, nrow = 2),
-      top = main_title)
+      top = main_title) +
+      ggpubr::bgcolor("white") + ggpubr::border("white")
   } else {
     ls_plts
   }
