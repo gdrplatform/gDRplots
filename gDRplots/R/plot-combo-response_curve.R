@@ -85,7 +85,9 @@ plot_dose_response_combo <- function(dt_average,
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
   if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
-    colormap <- rev(colorspace::sequential_hcl(NROW(ls_conc_2), palette = "viridis"))
+    number_of_color <- NROW(ls_conc_2)
+    colormap <- 
+      rev(colorspace::sequential_hcl(number_of_color + 1, palette = "viridis")[seq_along(ls_conc_2)])
   } else if (NROW(colormap) != NROW(ls_conc_2)) {
     colormap <- grDevices::colorRampPalette(colormap)(NROW(ls_conc_2))
   }
