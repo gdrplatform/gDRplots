@@ -102,6 +102,15 @@ heatmap_combo_metrics <- function(
   main_title <- sprintf("%s (%s)",
                         cl_name,
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
+  # legend
+  legend_title <- "Iso Levels"
+  legend_lbl <- NULL # due to NSE notes in R CMD check
+  legend_lbl <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
+                       100 - 100 * as.numeric(avialable_iso))
+  
+  # prep hm color palette
+  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
@@ -124,14 +133,7 @@ heatmap_combo_metrics <- function(
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
-    
-    # legend
-    legend_title <- "Iso Levels"
-    legend_lbl <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                         100 - 100 * as.numeric(avialable_iso))
-    
-    # prep hm color palette
-    hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  
     # prep limits
     min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
     max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
