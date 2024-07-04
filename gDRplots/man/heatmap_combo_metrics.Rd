@@ -5,18 +5,25 @@
 \title{Plot averaged values heatmaps for combo data}
 \usage{
 heatmap_combo_metrics(
-  se,
+  dt_excess,
+  dt_isobolograms,
   drug1_name,
   drug2_name,
   cl_name,
   normalization_type = "GR",
   iso_levels = c("0.25", "0.5", "0.75"),
+  colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1",
+    "firebrick3"),
+  no_breaks = 50,
   as_panel = TRUE
 )
 }
 \arguments{
-\item{se}{combination \code{SummarizedExperiment} object holding raw and/or processed dose-response 
-data in its assays for one cell line}
+\item{dt_excess}{data.table representation of the data in \code{excess} assay
+output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
+
+\item{dt_isobolograms}{data.table representation of the data in \code{isobolograms} assay
+output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
@@ -27,7 +34,11 @@ data in its assays for one cell line}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{iso_levels}{character vectore with  isobologram levels to be selected}
+\item{iso_levels}{character vector with  isobologram levels to be selected}
+
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+
+\item{no_breaks}{numeric number of breaks on scale}
 
 \item{as_panel}{logical flag whether return list of plot or panel}
 }
@@ -44,17 +55,21 @@ drug1_name <- "drug_001"
 drug2_name <- "drug_026"
 
 mae <- gDRutils::get_synthetic_data("combo_matrix")
-se <- mae[["combination"]]
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-heatmap_combo_metrics(se, 
+heatmap_combo_metrics(dt_excess, 
+                      dt_isobolograms,
                       drug1_name, drug2_name, 
                       cl_name, 
                       normalization_type = "GR")
                       
-heatmap_combo_metrics(se, 
+heatmap_combo_metrics(dt_excess, 
+                      dt_isobolograms, 
                       drug1_name, drug2_name, 
                       cl_name, 
-                      normalization_type = "RV", 
+                      normalization_type = "RV",
                       as_panel = FALSE)
 
 }
