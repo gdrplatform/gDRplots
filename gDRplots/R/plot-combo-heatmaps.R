@@ -391,7 +391,6 @@ heatmap_combo_with_isoref <- function(
   cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]]) 
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
-  
   # prep limits
   min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
   max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
@@ -524,7 +523,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
                          drug1_name,
                          unique(dt_excess[get(drug_name) == drug1_name, ][[gnumber]]),
                          drug2_name,
-                         unique(dt_excess[get(drug_name_2) == drug1_name, ][[gnumber_2]]))
+                         unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
   # list of plots for each drug
   ls_plt <- purrr::pmap(ls_celllines, 
@@ -540,7 +539,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right"),
     top = panel_title) + 
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
