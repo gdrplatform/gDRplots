@@ -542,7 +542,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
-    d_names <- drug_name[drug_name  %in% available_drugs]
+    d_names <- drug_name[drug_name %in% available_drugs]
   } 
   
   ls_drug <- list(d_name = d_names)

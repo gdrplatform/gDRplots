@@ -129,7 +129,7 @@ plot_dose_response_combo <- function(dt_average,
 #'    if NULL - all available drugs will be plotted
 #' @param as_panel logical flag whether return list of plot or panel
 #'
-#' @return panle with plot with dose-response curves for selected cell line by drugs
+#' @return panel with plot with dose-response curves for selected cell line by drugs
 #'
 #' @keywords QC_plot
 #' @examples
