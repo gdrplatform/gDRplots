@@ -27,7 +27,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{as_panel}{logical flag whether return list of plot or panel}
 }
 \value{
-panle with plot with dose-response curves for selected cell line by drugs
+panel with plot with dose-response curves for selected cell line by drugs
 }
 \description{
 Plot panel with drug response curves for single-agent data to control quality of the data
