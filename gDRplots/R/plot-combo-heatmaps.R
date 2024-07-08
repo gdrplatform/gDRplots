@@ -1,4 +1,4 @@
-#' Plot averaged values heatmaps for combo data
+#' Plot fitted values heatmaps for combo data for combo metrics
 #'
 #' @param dt_excess data.table representation of the data in \code{excess} assay
 #'    output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
@@ -76,6 +76,8 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels)
   checkmate::assert_numeric(as.numeric(iso_levels))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
   # filter data for normalization type
@@ -133,7 +135,7 @@ heatmap_combo_metrics <- function(
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
-  
+    
     # prep limits
     min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
     max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
@@ -160,7 +162,7 @@ heatmap_combo_metrics <- function(
                                   expand = c(0, 0)) + 
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limits,
-                                    name = mx_name)
+                                    name = tools::toTitleCase(mx_name))
     
     # add isoline
     if (NROW(avialable_iso)) { # isobolograms as lines
@@ -265,4 +267,282 @@ heatmap_combo_metrics <- function(
     ls_plts
   }
   return(final_plot)
+}
+
+#' Plot averaged values heatmaps for combo data
+#'
+#' @param dt_excess data.table representation of the data in \code{excess} assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+#' @param dt_isobolograms data.table representation of the data in \code{isobolograms} assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+#' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
+#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param iso_levels character vector with  isobologram levels to be selected
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
+#' @param no_breaks numeric number of breaks on scale
+#' @param as_panel logical flag whether return list of plot or panel
+#'
+#' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
+#'    selected isoline and comparison of iso levels
+#'    
+#' @keywords combo_plots
+#' @examples
+#' cl_name <- "cellline_BC"
+#' drug1_name <- "drug_001"
+#' drug2_name <- "drug_026"
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+#' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+#' 
+#' heatmap_combo_with_isoref(dt_excess, 
+#'                           dt_isobolograms,
+#'                           drug1_name, drug2_name, 
+#'                           cl_name, 
+#'                           normalization_type = "GR")
+#'                           
+#' heatmap_combo_with_isoref(dt_excess, 
+#'                           dt_isobolograms, 
+#'                           drug1_name, drug2_name, 
+#'                           cl_name, 
+#'                           normalization_type = "RV",
+#'                           colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))
+#'
+#' @export
+heatmap_combo_with_isoref <- function(
+    dt_excess,
+    dt_isobolograms,
+    drug1_name,
+    drug2_name,
+    cl_name,
+    normalization_type = "GR",
+    iso_levels = "0.5",
+    colors_vec = NULL,
+    no_breaks = 50) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::expect_data_table(dt_excess)
+  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_string(drug1_name)
+  checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
+  checkmate::assert_string(drug2_name)
+  checkmate::assert_choice(drug2_name, choices = dt_excess[[drug_name_2]])
+  checkmate::assert_string(cl_name)
+  checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(iso_levels)
+  checkmate::assert_numeric(as.numeric(iso_levels))
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  if (!is.null(colors_vec)) stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  checkmate::assert_int(no_breaks, lower = 2)
+  
+  # filter data for normalization type
+  data.table::setkeyv(dt_excess, "normalization_type")
+  dt_excess <- dt_excess[normalization_type]
+  data.table::setkey(dt_excess, NULL)
+  
+  data.table::setkeyv(dt_isobolograms, "normalization_type")
+  dt_isobolograms <- dt_isobolograms[normalization_type]
+  data.table::setkey(dt_isobolograms, NULL)
+  
+  # filter data for combination cell line (drug x drug2)
+  dt_excess <- 
+    dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
+  dt_isobolograms <- 
+    dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
+  
+  dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
+  available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+  
+  # prep hm color palette
+  hm_color_palette <- if (is.null(colors_vec)) {
+    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+  } else {
+    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  }
+  
+  # prep plot data
+  mx_name = "smooth"
+  dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
+  # correction of NA for conc = 0 ir conc_2 = 0
+  dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
+  
+  dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
+  dt_$pos_y <- log10(dt_[[conc]])
+  dt_$pos_x <- log10(dt_[[conc_2]])
+  
+  ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+  drug1_axis <- ls_axes$axis_1
+  drug2_axis <- ls_axes$axis_2
+  tile_height <- diff(drug1_axis$pos_y[3:4])
+  tile_width <- diff(drug2_axis$pos_x[3:4])
+
+  # panel title
+  cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]]) 
+  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
+  
+  
+  # prep limits
+  min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
+  max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
+  limits <- c(min_, max_)
+  
+  # base plot
+  plt <- 
+    ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), height = tile_height, width = tile_width) +
+    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                  y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+                  title = plt_title,
+                  fill = gDRutils::get_combo_excess_field_names()[[mx_name]]) +
+    ggplot2::scale_fill_gradientn(colors = hm_color_palette,
+                                  limit = limits,
+                                  name = tools::toTitleCase(mx_name))
+  
+  # plot isobologram
+  tab_measured <- dt_isobolograms[,.SD, .SDcols = -c("pos_x_ref","pos_y_ref")][, iso_source := "measured"][, id_n := .I]
+  tab_expected <- dt_isobolograms[,.SD, .SDcols = -c("pos_x","pos_y")][, iso_source := "expected"][, id_n := max(tab_measured$id_n) + rev(.I)]
+  data.table::setnames(tab_expected, old = c("pos_x_ref","pos_y_ref"), new = c("pos_x","pos_y"))
+  
+  tab_isoline <- rbind(tab_measured, tab_expected)
+  
+  if (NROW(available_iso_lvl) == 1){
+    plt <- plt +
+      ggplot2::geom_path(data = tab_isoline, 
+                         ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source), 
+                         linewidth = 1, color = "red") +
+      ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                     name = "Iso Source") 
+  } else {
+    iso_colors <- grDevices::colorRampPalette(c("darkorange", "darkred"))(NROW(available_iso_lvl))
+    plt <- plt +
+      ggplot2::geom_path(data = tab_isoline, 
+                         ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level), 
+                         linewidth = 1) +
+      ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                     name = "Iso Source") +
+      ggplot2::scale_color_manual(values = iso_colors,
+                                  breaks = available_iso_lvl,
+                                  name = "Iso Levels")
+  }
+  
+  # final plot
+  plt <- plt +
+    ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x, 
+                                labels = drug2_axis$marks_x,
+                                expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y, 
+                                labels = drug1_axis$marks_y,
+                                expand = c(0, 0)) + 
+    ggplot2::theme_bw() + 
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   legend.key.width = ggplot2::unit(2, "line"))
+  
+  
+  return(plt)
+}
+
+
+#' Plot panel with thefitted values heatmaps and references data for isolobograms 
+#' to control quality of the data
+#'
+#' @inheritParams heatmap_combo_with_isoref
+#' @param cl_names character vector with cell line names names to be plotted (Cell Line NAme); 
+#'    if NULL - all available cell liene will be plotted
+#'    
+#' @return panel with heatmaps for fitted values and references data for isolobograms 
+#'    for selected drug and co-drug by cell line names
+#'
+#' @keywords QC_plot
+#' @examples
+#' drug1_name <- "drug_001"
+#' drug2_name <- "drug_026"
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+#' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+#' 
+#' cl_names <- unique(dt_excess[["CellLineName"]])[1:4]
+#' 
+#' heatmap_combo_with_isoref_qc_panel(dt_excess,
+#'                                    dt_isobolograms,
+#'                                    drug1_name, drug2_name,
+#'                                    cl_names,
+#'                                    normalization_type = "GR")
+#' 
+#' @export
+heatmap_combo_with_isoref_qc_panel <- function(
+    dt_excess,
+    dt_isobolograms,
+    drug1_name,
+    drug2_name,
+    cl_names,
+    normalization_type = "GR",
+    iso_levels = "0.5") {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+
+  checkmate::expect_data_table(dt_excess)
+  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_string(drug1_name)
+  checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
+  checkmate::assert_string(drug2_name)
+  checkmate::assert_choice(drug2_name, choices = dt_excess[[drug_name_2]])
+  checkmate::assert_character(cl_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(iso_levels)
+  checkmate::assert_numeric(as.numeric(iso_levels))
+  
+  available_cls <- unique(dt_excess[[cellline_name]])
+  if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
+    cl_names  <- available_cls
+  } else if (!all(cl_names %in% available_cls)) {
+    cl_names <- cl_names[cl_names %in% available_cls]
+  } 
+  
+  ls_celllines <- list(cl_name = cl_names)
+  
+  # panel title
+  panel_title <- sprintf("%s (%s) x %s (%s)",
+                         drug1_name,
+                         unique(dt_excess[get(drug_name) == drug1_name, ][[gnumber]]),
+                         drug2_name,
+                         unique(dt_excess[get(drug_name_2) == drug1_name, ][[gnumber_2]]))
+  
+  # list of plots for each drug
+  ls_plt <- purrr::pmap(ls_celllines, 
+                        gDRplots::heatmap_combo_with_isoref,
+                        dt_excess = dt_excess,
+                        dt_isobolograms = dt_isobolograms,
+                        drug1_name = drug1_name,
+                        drug2_name = drug2_name,
+                        normalization_type = normalization_type,
+                        iso_levels = iso_levels)
+  
+  names(ls_plt) <- cl_names
+  
+  # final panel
+  panel <- ggpubr::annotate_figure(
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
+    top = panel_title) + 
+    ggpubr::bgcolor("white") + ggpubr::border("white")
+  
+  return(panel)
 }
