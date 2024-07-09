@@ -10,7 +10,10 @@
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
-#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
+#' @param colors_vec_smooth character vector of colors (valid name or hex) used in heatmap 
+#'    for smooth values; as default will be used viridis pallette
+#' @param colors_vec_excess character vector of colors (valid name or hex) used in heatmap 
+#'    for excess values; as default will be used blue - light grey - red color scale
 #' @param no_breaks numeric number of breaks on scale
 #' @param as_panel logical flag whether return list of plot or panel
 #'
@@ -39,6 +42,7 @@
 #'                       drug1_name, drug2_name, 
 #'                       cl_name, 
 #'                       normalization_type = "RV",
+#'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
 #'
 #' @export
@@ -50,7 +54,8 @@ heatmap_combo_metrics <- function(
     cl_name,
     normalization_type = "GR",
     iso_levels =  c("0.25", "0.5", "0.75"),
-    colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"),
+    colors_vec_smooth = NULL,
+    colors_vec_excess = NULL,
     no_breaks = 50,
     as_panel = TRUE) {
   
@@ -76,7 +81,8 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels)
   checkmate::assert_numeric(as.numeric(iso_levels))
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec_smooth, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be valid color name" = all(vapply(colors_vec_excess, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
@@ -105,13 +111,23 @@ heatmap_combo_metrics <- function(
                         cl_name,
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
-  legend_title <- "Iso Levels"
-  legend_lbl <- NULL # due to NSE notes in R CMD check
-  legend_lbl <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                       100 - 100 * as.numeric(avialable_iso))
+  legend_title_iso <- "Iso Levels"
+  legend_lbl_iso <- NULL # due to NSE notes in R CMD check
+  legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
+                           100 - 100 * as.numeric(avialable_iso))
   
   # prep hm color palette
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
+    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+  } else {
+    grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
+  }
+  
+  hm_color_palette_excess <- if (is.null(colors_vec_excess)) {
+    grDevices::colorRampPalette(c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
+  } else {
+    grDevices::colorRampPalette(colors_vec_excess)(no_breaks + 1)
+  }
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
@@ -129,12 +145,23 @@ heatmap_combo_metrics <- function(
     tile_height <- diff(drug1_axis$pos_y[3:4])
     tile_width <- diff(drug2_axis$pos_x[3:4])
     
+    # prep hm color palette
+    hm_color_palette <- if (mx_name == "smooth") {
+      hm_color_palette_smooth
+    } else {
+      hm_color_palette_excess
+    }
+    
     # plot title
     plt_title <- sprintf("%s for %s, T=%sh",
                          gDRutils::get_combo_excess_field_names()[[mx_name]],
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
+    
+    legend_title_fill <- sprintf("%s %s",
+                                 gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
+                                 normalization_type)
     
     # prep limits
     min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
@@ -148,7 +175,7 @@ heatmap_combo_metrics <- function(
       ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                     y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                     title = plt_title,
-                    fill = gDRutils::get_combo_excess_field_names()[[mx_name]]) +
+                    fill = legend_title_fill) +
       ggplot2::theme_bw() + 
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                      axis.text.y = ggplot2::element_text(size = 9),
@@ -172,12 +199,12 @@ heatmap_combo_metrics <- function(
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                       breaks = avialable_iso,
-                                      labels = legend_lbl,
-                                      name = legend_title) +
+                                      labels = legend_lbl_iso,
+                                      name = legend_title_iso) +
           ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                          breaks = avialable_iso,
-                                         labels = legend_lbl,
-                                         name = legend_title) +
+                                         labels = legend_lbl_iso,
+                                         name = legend_title_iso) +
           ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
         
       } else {
@@ -186,8 +213,8 @@ heatmap_combo_metrics <- function(
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                       breaks = avialable_iso,
-                                      labels = legend_lbl,
-                                      name = legend_title)
+                                      labels = legend_lbl_iso,
+                                      name = legend_title_iso)
       }
     }
     return(plt)
@@ -229,7 +256,7 @@ heatmap_combo_metrics <- function(
                          ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level))
     ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                 breaks = avialable_iso,
-                                labels = legend_lbl,
+                                labels = legend_lbl_iso,
                                 name = legend_title)
   }
   
@@ -313,7 +340,8 @@ heatmap_combo_metrics <- function(
 #'                           drug1_name, drug2_name, 
 #'                           cl_name, 
 #'                           normalization_type = "RV",
-#'                           colors_vec = c("royalblue1", "grey95", "firebrick1"))
+#'                            iso_levels = c("0.25", "0.75"),
+#'                           colors_vec = c("darkcyan", "snow", "darkorange"))
 #'
 #' @export
 heatmap_combo_with_isoref <- function(
@@ -324,7 +352,7 @@ heatmap_combo_with_isoref <- function(
     cl_name,
     normalization_type = "GR",
     iso_levels = "0.5",
-    colors_vec = NULL,
+    colors_vec = NULL, 
     no_breaks = 50) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -377,7 +405,7 @@ heatmap_combo_with_isoref <- function(
   }
   
   # prep plot data
-  mx_name <- "smooth"
+  mx_name <- "smooth" 
   dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 ir conc_2 = 0
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
@@ -396,10 +424,10 @@ heatmap_combo_with_isoref <- function(
   cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]]) 
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
-  legend_title_smooth <- sprintf("%s (%s)",
-                                 gDRutils::get_combo_excess_field_names()[[mx_name]],
-                                 normalization_type)
-  iso_label <- sprintf("%s%i", 
+  legend_title_fill <- sprintf("%s %s",
+                               gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
+                               normalization_type)
+  iso_label <- sprintf("%s%s", 
                        ifelse(normalization_type == "GR", "GR", "IC"), 
                        100 - 100 * as.numeric(available_iso_lvl))
   names(iso_label) <- available_iso_lvl
@@ -417,7 +445,7 @@ heatmap_combo_with_isoref <- function(
     ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                   y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                   title = plt_title,
-                  fill = legend_title_smooth) +
+                  fill = legend_title_fill) +
     ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                   limit = limits)
   
@@ -425,18 +453,18 @@ heatmap_combo_with_isoref <- function(
   if (NROW(dt_isobolograms)) { # add isolines - if there are such data
     iso_source <- NULL # due to NSE notes in R CMD check
     tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")][, iso_source := "measured"]
-    tab_reference <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")][, iso_source := "reference"]
-    data.table::setnames(tab_reference, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
+    tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")][, iso_source := "expected"]
+    data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
     
-    tab_isoline <- rbind(tab_measured, tab_reference)
+    tab_isoline <- rbind(tab_measured, tab_expected)
     
     if (NROW(available_iso_lvl) == 1) {
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline, 
                            ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source), 
                            linewidth = 1, color = "red") +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "reference" = "dashed"),
-                                       name = paste(iso_label, "Source")) 
+        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                       name = iso_label) 
     } else {
       iso_colors <- 
         grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[seq_along(available_iso_lvl) * 2]
@@ -445,8 +473,8 @@ heatmap_combo_with_isoref <- function(
         ggplot2::geom_path(data = tab_isoline, 
                            ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level), 
                            linewidth = 1) +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "reference" = "dashed"),
-                                       name = paste(normalization_type, "Source")) +
+        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                       name = normalization_type) +
         ggplot2::scale_color_manual(values = iso_colors,
                                     label = iso_label,
                                     breaks = available_iso_lvl,

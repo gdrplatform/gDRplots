@@ -12,8 +12,8 @@ heatmap_combo_metrics(
   cl_name,
   normalization_type = "GR",
   iso_levels = c("0.25", "0.5", "0.75"),
-  colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1",
-    "firebrick3"),
+  colors_vec_smooth = NULL,
+  colors_vec_excess = NULL,
   no_breaks = 50,
   as_panel = TRUE
 )
@@ -36,7 +36,11 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+\item{colors_vec_smooth}{character vector of colors (valid name or hex) used in heatmap 
+for smooth values; as default will be used viridis pallette}
+
+\item{colors_vec_excess}{character vector of colors (valid name or hex) used in heatmap 
+for excess values; as default will be used blue - light grey - red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
@@ -70,6 +74,7 @@ heatmap_combo_metrics(dt_excess,
                       drug1_name, drug2_name, 
                       cl_name, 
                       normalization_type = "RV",
+                      iso_levels = "0.5",
                       as_panel = FALSE)
 
 }
