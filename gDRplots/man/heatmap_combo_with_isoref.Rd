@@ -65,7 +65,7 @@ heatmap_combo_with_isoref(dt_excess,
                           drug1_name, drug2_name, 
                           cl_name, 
                           normalization_type = "RV",
-                          colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))
+                          colors_vec = c("royalblue1", "grey95", "firebrick1"))
 
 }
 \keyword{combo_plots}
