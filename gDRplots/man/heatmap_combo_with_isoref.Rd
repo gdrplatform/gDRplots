@@ -37,8 +37,6 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 
 \item{no_breaks}{numeric number of breaks on scale}
-
-\item{as_panel}{logical flag whether return list of plot or panel}
 }
 \value{
 list or panel with heatmaps with value for excess assays for selected drugs and cell line with
@@ -60,8 +58,7 @@ dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 heatmap_combo_with_isoref(dt_excess, 
                           dt_isobolograms,
                           drug1_name, drug2_name, 
-                          cl_name, 
-                          normalization_type = "GR")
+                          cl_name)
                           
 heatmap_combo_with_isoref(dt_excess, 
                           dt_isobolograms, 
