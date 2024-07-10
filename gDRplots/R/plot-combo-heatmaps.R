@@ -132,10 +132,8 @@ heatmap_combo_metrics <- function(
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
-    dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
-    # correction of NA for conc = 0 ir conc_2 = 0
-    dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
-    
+    dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE][!is.na(get(mx_name))]
+
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
     dt_$pos_y <- transform_log_conc(dt_[[conc]])
     dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
@@ -179,7 +177,7 @@ heatmap_combo_metrics <- function(
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                      axis.text.y = ggplot2::element_text(size = 9),
                      plot.title = ggplot2::element_text(size = 11),
-                     panel.grid.minor = ggplot2::element_blank()) +
+                     panel.grid = ggplot2::element_blank()) +
       ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
                                   labels = drug2_axis$marks_x,
                                   expand = c(0, 0)) +
