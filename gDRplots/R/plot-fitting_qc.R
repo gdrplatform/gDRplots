@@ -119,7 +119,8 @@ plot_fitting_acc <- function(dt_assay,
                          normalization_type = normalization_type, 
                          with_table = FALSE) +
     ggplot2::labs(x = NULL) +
-    ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                   axis.ticks.x = ggplot2::element_blank())
   
   r2 <- r2 +
     geom_text(data = subset(r2$data, p_value < 0.05),
