@@ -165,14 +165,12 @@ heatmap_combo_metrics <- function(
                                  normalization_type)
     
     # prep limits
-    min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
-    max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
-    limits <- c(min_, max_)
+    limits <- prep_hm_limits(dt_[[mx_name]])
     
     # base plot
     plt <- 
       ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
-      ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), height = tile_height, width = tile_width) +
+      ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
       ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                     y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                     title = plt_title,
@@ -438,9 +436,7 @@ heatmap_combo_with_isoref <- function(
                                normalization_type)
 
   # prep limits
-  min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
-  max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
-  limits <- c(min_, max_)
+  limits <- prep_hm_limits(dt_[[mx_name]])
   
   # base plot
   plt <- 
@@ -562,7 +558,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
     drug2_name,
     cl_names,
     normalization_type = "GR",
-    iso_levels = "0.5") {
+    iso_levels = "0.5",
+    colors_vec = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -581,6 +578,10 @@ heatmap_combo_with_isoref_qc_panel <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  if (!is.null(colors_vec)) {
+    stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  }
   
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
@@ -606,7 +607,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
                         drug1_name = drug1_name,
                         drug2_name = drug2_name,
                         normalization_type = normalization_type,
-                        iso_levels = iso_levels)
+                        iso_levels = iso_levels,
+                        colors_vec = colors_vec)
   
   names(ls_plt) <- cl_names
   
@@ -619,3 +621,36 @@ heatmap_combo_with_isoref_qc_panel <- function(
   return(panel)
 }
 
+
+
+
+#' Calculate limit 
+#'
+#' @param num_vec numeric vector
+#' @param lower_cap numeric lower capping value
+#' @param upper_cap numeric upper capping value
+#'
+#' @return limit for given numeric vector
+#'
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' vec <- c(-5, -0.3, 0, Inf, NA)
+#' prep_hm_limits(vec)
+#' }
+#' 
+prep_hm_limits <- function(num_vec,
+                           lower_cap = -0.25,
+                           upper_cap = 0.25
+) {
+  checkmate::assert_numeric(num_vec)
+  checkmate::assert_number(lower_cap)
+  checkmate::assert_number(upper_cap)
+  
+  vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
+  
+  min_ <- min(c(lower_cap, min(vec_range)))
+  max_ <- max(c(upper_cap, max(vec_range))) 
+
+  return(c(min_, max_))
+}

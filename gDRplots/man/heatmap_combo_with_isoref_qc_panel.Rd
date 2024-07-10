@@ -12,7 +12,8 @@ heatmap_combo_with_isoref_qc_panel(
   drug2_name,
   cl_names,
   normalization_type = "GR",
-  iso_levels = "0.5"
+  iso_levels = "0.5",
+  colors_vec = NULL
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ if NULL - all available cell liene will be plotted}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected}
+
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 }
 \value{
 panel with heatmaps for fitted values and references data for isolobograms 

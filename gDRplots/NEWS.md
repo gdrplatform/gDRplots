@@ -1,5 +1,5 @@
-## gDRplots 0.0.10 - 2024-07-08
-* add plots to quality control for combo data
+## gDRplots 0.0.10 - 2024-07-10
+* add plots to quality control for combo data - combo metrics and reference isoline
 
 ## gDRplots 0.0.9 - 2024-07-03
 * add plots to quality control of distribution of normalized data and metric stat
