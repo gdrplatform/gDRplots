@@ -35,6 +35,7 @@ utils::globalVariables(
     "x",
     "x_std",
     "cId",
-    "rId"
+    "rId",
+    "p_value"
   ),
   utils::packageName())
