@@ -14,7 +14,7 @@ prep_hm_limits(num_vec, lower_cap = -0.25, upper_cap = 0.25)
 \item{upper_cap}{numeric upper capping value}
 }
 \value{
-limit for given numeric vector
+capped limits (min and max) for given numeric vector
 }
 \description{
 Calculate limit

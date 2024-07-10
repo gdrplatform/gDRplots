@@ -137,8 +137,8 @@ heatmap_combo_metrics <- function(
     dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
     
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-    dt_$pos_y <- log10(dt_[[conc]])
-    dt_$pos_x <- log10(dt_[[conc_2]])
+    dt_$pos_y <- transform_log_conc(dt_[[conc]])
+    dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
     
     ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
     drug1_axis <- ls_axes$axis_1
@@ -175,17 +175,17 @@ heatmap_combo_metrics <- function(
                     y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                     title = plt_title,
                     fill = legend_title_fill) +
-      ggplot2::theme_bw() + 
+      ggplot2::theme_bw() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                      axis.text.y = ggplot2::element_text(size = 9),
                      plot.title = ggplot2::element_text(size = 11),
                      panel.grid.minor = ggplot2::element_blank()) +
-      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x, 
+      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
                                   labels = drug2_axis$marks_x,
                                   expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y, 
+      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
                                   labels = drug1_axis$marks_y,
-                                  expand = c(0, 0)) + 
+                                  expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limits)
     
@@ -418,8 +418,8 @@ heatmap_combo_with_isoref <- function(
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   
   dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-  dt_$pos_y <- log10(dt_[[conc]])
-  dt_$pos_x <- log10(dt_[[conc_2]])
+  dt_$pos_y <- transform_log_conc(dt_[[conc]])
+  dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
   
   ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
   drug1_axis <- ls_axes$axis_1
@@ -630,7 +630,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
 #' @param lower_cap numeric lower capping value
 #' @param upper_cap numeric upper capping value
 #'
-#' @return limit for given numeric vector
+#' @return capped limits (min and max) for given numeric vector
 #'
 #' @keywords internal
 #' @examples
@@ -653,4 +653,35 @@ prep_hm_limits <- function(num_vec,
   max_ <- max(c(upper_cap, max(vec_range))) 
 
   return(c(min_, max_))
+}
+
+#' Calculate limit 
+#'
+#' @param conc_vec numeric vector with concentration values
+#'
+#' @return numeric vector with log10 concentration values; log10 for concentration equal 0 (-Inf)
+#'    is replaced with one step less in the dose dilution 
+#'
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' vec <- c(0, 0.003, 0.01, 0.03)
+#' transform_log_conc(vec)
+#' }
+#' 
+transform_log_conc <- function(conc_vec) {
+  checkmate::assert_numeric(conc_vec, lower = 0, any.missing = FALSE, finite = TRUE)
+  
+  if (any(conc_vec == 0)) {
+    stopifnot("There are not enough values to handle 0." = NROW(unique(conc_vec[conc_vec != 0])) >= 2)
+  }
+  
+  log_values <- log10(conc_vec)
+  # replace the -Inf value coming from the 0 dose with one step less in the dose dilution 
+  idx_inf <- (conc_vec == 0)
+  doses <- sort(unique(log_values))
+  zero_replecement <- doses[2]  + (doses[2] - doses[3])
+  log_values[idx_inf] <- zero_replecement
+  
+  return(log_values)
 }
