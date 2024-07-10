@@ -141,12 +141,8 @@ plot_fitting_acc <- function(dt_assay,
   
   rss$layers <- rss$layers[-1]
   
-  
-  grob1 <- ggplot2::ggplotGrob(r2)
-  grob2 <- ggplot2::ggplotGrob(rss)
-  
   # Combine plots vertically (one on top of the other)
-  combined_plot <- gridExtra::grid.arrange(grob1, grob2, ncol = 1, heights = c(0.7, 0.7))
+  combined_plot <- ggpubr::ggarrange(r2, rss, ncol = 1, heights = c(0.7, 0.7))
   metric_cols <- c("r2", "rss")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
