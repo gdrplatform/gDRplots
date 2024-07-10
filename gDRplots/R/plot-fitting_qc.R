@@ -123,13 +123,13 @@ plot_fitting_acc <- function(dt_assay,
                    axis.ticks.x = ggplot2::element_blank())
   
   r2 <- r2 +
-    geom_text(data = subset(r2$data, p_value < 0.05),
-              aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
-                  y = 1.01),
-              position = position_dodge(0.5),
-              size = 4,
-              vjust = 0) +
-    labs(caption = "*** p < 0.001, ** p < 0.01, * p < 0.05")
+    ggplot2::geom_text(data = subset(r2$data, p_value < 0.05),
+                       ggplot2::aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
+                           y = 1.01),
+                       position = ggplot2::position_dodge(0.5),
+                       size = 4,
+                       vjust = 0) +
+    ggplot2::labs(caption = "*** p < 0.001, ** p < 0.01, * p < 0.05")
   
   
   rss <- plot_var_stat_qc(dt_assay,
@@ -148,7 +148,8 @@ plot_fitting_acc <- function(dt_assay,
   # Combine plots vertically (one on top of the other)
   combined_plot <- gridExtra::grid.arrange(grob1, grob2, ncol = 1, heights = c(0.7, 0.7))
   metric_cols <- c("r2", "rss")
-  data2table <- tab_subplot[, c(drug_name, metric_cols), with = FALSE]
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
   data.table::setorder(data2table, "rss")
   tab_metric <- ggpubr::ggtexttable(
     data2table, 
