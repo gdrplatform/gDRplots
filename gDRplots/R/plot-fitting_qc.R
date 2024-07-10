@@ -122,6 +122,7 @@ plot_fitting_acc <- function(dt_assay,
     ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                    axis.ticks.x = ggplot2::element_blank())
   
+  p_value <- "p_value"
   r2 <- r2 +
     ggplot2::geom_text(data = subset(r2$data, p_value < 0.05),
                        ggplot2::aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
