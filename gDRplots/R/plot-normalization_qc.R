@@ -137,7 +137,7 @@ plot_var_stat_qc <- function(dt_assay,
   color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
   
   plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 1, color = "#2c3e50", linetype = "dashed") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
     ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
@@ -159,6 +159,83 @@ plot_var_stat_qc <- function(dt_assay,
   
   return(plt)
 }
+
+
+#' Visualization for the quality control of the fitting for single-agent data
+#'
+#' @param dt_assay data.table representation of the data in assay
+#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param cl_name string cell line name to be plotted (Cell Line Name)
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'
+#' @return panel with lollipop plots with r2 and rss values for each drug
+#'
+#' @keywords QC_plot
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' cl_name <- dt_metrics[["CellLineName"]][1]
+#' 
+#' plot_fitting_acc(dt_assay = dt_metrics,
+#'                  cl_name = cl_name,
+#'                  normalization_type = "RV")
+#' @export
+plot_fitting_acc <- function(dt_assay,
+                             cl_name,
+                             normalization_type = "GR"
+                             ) {
+  
+  r2 <- plot_var_stat_qc(dt_assay,
+                         cl_name,
+                         metric = "r2",
+                         normalization_type = normalization_type, 
+                         with_table = FALSE) +
+    ggplot2::labs(x = NULL) +
+    ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  
+  r2 <- r2 +
+    geom_text(data = subset(r2$data, p_value < 0.05),
+              aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
+                  y = 1.01),
+              position = position_dodge(0.5),
+              size = 4,
+              vjust = 0) +
+    labs(caption = "*** p < 0.001, ** p < 0.01, * p < 0.05")
+  
+  
+  rss <- plot_var_stat_qc(dt_assay,
+                          cl_name,
+                          metric = "rss",
+                          normalization_type = normalization_type,
+                          with_table = FALSE) +
+    ggplot2::labs(title = NULL)
+  
+  rss$layers <- rss$layers[-1]
+  
+  
+  grob1 <- ggplot2::ggplotGrob(r2)
+  grob2 <- ggplot2::ggplotGrob(rss)
+  
+  # Combine plots vertically (one on top of the other)
+  combined_plot <- gridExtra::grid.arrange(grob1, grob2, ncol = 1, heights = c(0.7, 0.7))
+  metric_cols <- c("r2", "rss")
+  data2table <- tab_subplot[, c(drug_name, metric_cols), with = FALSE]
+  data.table::setorder(data2table, "rss")
+  tab_metric <- ggpubr::ggtexttable(
+    data2table, 
+    rows = NULL, theme = ggpubr::ttheme("light", base_size = 8)) 
+  
+  plt <- ggpubr::ggarrange(combined_plot,
+                           tab_metric,
+                           nrow = 1,
+                           widths = c(2, 1),
+                           heights = c(1, 1.2))
+  plt
+}
+
 
 #' Plot drug response curves for single-agent data to control quality of the data
 #'
