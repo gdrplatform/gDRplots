@@ -79,8 +79,8 @@ heatmap_combo_metrics <- function(
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(iso_levels)
-  checkmate::assert_numeric(as.numeric(iso_levels))
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   stopifnot("Must be valid color name" = all(vapply(colors_vec_smooth, gDRplots::is_valid_color, logical(1))))
   stopifnot("Must be valid color name" = all(vapply(colors_vec_excess, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
@@ -124,7 +124,8 @@ heatmap_combo_metrics <- function(
   }
   
   hm_color_palette_excess <- if (is.null(colors_vec_excess)) {
-    grDevices::colorRampPalette(c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
+    grDevices::colorRampPalette(
+      c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
   } else {
     grDevices::colorRampPalette(colors_vec_excess)(no_breaks + 1)
   }
@@ -154,7 +155,7 @@ heatmap_combo_metrics <- function(
     
     # plot title
     plt_title <- sprintf("%s for %s, T=%sh",
-                         gDRutils::get_combo_excess_field_names()[[mx_name]],
+                         gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
@@ -217,13 +218,13 @@ heatmap_combo_metrics <- function(
                                       name = legend_title_iso)
       }
     }
-    return(plt)
+    plt
   })
   names(mx_plts) <- mx_names
   
   # isobolograms across range of concentration ratios
-  plt_title <- sprintf("%s for %s, T=%sh", 
-                       gDRutils::get_combo_excess_field_names()[["smooth"]],
+  plt_title <- sprintf("%s for %s, T=%sh",
+                       gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
                        normalization_type,
                        unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
   legend_title <- ifelse(normalization_type == "GR", "GR", "IC")
@@ -244,10 +245,12 @@ heatmap_combo_metrics <- function(
                          ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)) +
       ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                   breaks = avialable_iso,
-                                  name = legend_title) +
+                                  labels = legend_lbl_iso,
+                                  name = legend_title_iso) +
       ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                      breaks = avialable_iso,
-                                     name = legend_title) +
+                                     labels = legend_lbl_iso,
+                                     name = legend_title_iso) +
       ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
     
   } else {
@@ -257,7 +260,7 @@ heatmap_combo_metrics <- function(
     ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
                                 breaks = avialable_iso,
                                 labels = legend_lbl_iso,
-                                name = legend_title)
+                                name = legend_title_iso)
   }
   
   # add x and y scales
@@ -336,12 +339,18 @@ heatmap_combo_metrics <- function(
 #'                           cl_name)
 #'                           
 #' heatmap_combo_with_isoref(dt_excess, 
+#'                           dt_isobolograms,
+#'                           drug1_name, drug2_name, 
+#'                           cl_name,
+#'                           iso_levels = NULL,
+#'                           colors_vec = c("darkcyan", "snow", "darkorange"))                        
+#'                           
+#' heatmap_combo_with_isoref(dt_excess, 
 #'                           dt_isobolograms, 
 #'                           drug1_name, drug2_name, 
 #'                           cl_name, 
 #'                           normalization_type = "RV",
-#'                            iso_levels = c("0.25", "0.75"),
-#'                           colors_vec = c("darkcyan", "snow", "darkorange"))
+#'                           iso_levels = c("0.25", "0.75"))
 #'
 #' @export
 heatmap_combo_with_isoref <- function(
@@ -371,8 +380,8 @@ heatmap_combo_with_isoref <- function(
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(iso_levels)
-  checkmate::assert_numeric(as.numeric(iso_levels))
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
     stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
@@ -427,11 +436,7 @@ heatmap_combo_with_isoref <- function(
   legend_title_fill <- sprintf("%s %s",
                                gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                                normalization_type)
-  iso_label <- sprintf("%s%s", 
-                       ifelse(normalization_type == "GR", "GR", "IC"), 
-                       100 - 100 * as.numeric(available_iso_lvl))
-  names(iso_label) <- available_iso_lvl
-  
+
   # prep limits
   min_ <- min(c(-0.5, min(stats::na.omit(dt_[[mx_name]]))))
   max_ <- max(c(0.5, max(stats::na.omit(dt_[[mx_name]])))) 
@@ -451,6 +456,11 @@ heatmap_combo_with_isoref <- function(
   
   # plot isobologram
   if (NROW(dt_isobolograms)) { # add isolines - if there are such data
+    iso_label <- sprintf("%s%s", 
+                         ifelse(normalization_type == "GR", "GR", "IC"), 
+                         100 - 100 * as.numeric(available_iso_lvl))
+    names(iso_label) <- available_iso_lvl
+    
     iso_source <- NULL # due to NSE notes in R CMD check
     tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")][, iso_source := "measured"]
     tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")][, iso_source := "expected"]
@@ -534,8 +544,15 @@ heatmap_combo_with_isoref <- function(
 #'                                    dt_isobolograms,
 #'                                    drug1_name, drug2_name,
 #'                                    cl_names,
-#'                                    normalization_type = "GR",
 #'                                    iso_levels = c("0.25", "0.5"))
+#'                                    
+#' heatmap_combo_with_isoref_qc_panel(dt_excess,
+#'                                    dt_isobolograms,
+#'                                    drug1_name, drug2_name,
+#'                                    cl_names,
+#'                                    normalization_type = "RV",
+#'                                    iso_levels = NULL,
+#'                                    colors_vec = c("darkcyan", "snow", "darkorange")) 
 #' 
 #' @export
 heatmap_combo_with_isoref_qc_panel <- function(
@@ -562,8 +579,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
   checkmate::assert_choice(drug2_name, choices = dt_excess[[drug_name_2]])
   checkmate::assert_character(cl_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(iso_levels)
-  checkmate::assert_numeric(as.numeric(iso_levels))
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {

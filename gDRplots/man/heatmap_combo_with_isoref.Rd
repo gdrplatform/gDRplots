@@ -61,12 +61,18 @@ heatmap_combo_with_isoref(dt_excess,
                           cl_name)
                           
 heatmap_combo_with_isoref(dt_excess, 
+                          dt_isobolograms,
+                          drug1_name, drug2_name, 
+                          cl_name,
+                          iso_levels = NULL,
+                          colors_vec = c("darkcyan", "snow", "darkorange"))                        
+                          
+heatmap_combo_with_isoref(dt_excess, 
                           dt_isobolograms, 
                           drug1_name, drug2_name, 
                           cl_name, 
                           normalization_type = "RV",
-                           iso_levels = c("0.25", "0.75"),
-                          colors_vec = c("darkcyan", "snow", "violet"))
+                          iso_levels = c("0.25", "0.75"))
 
 }
 \keyword{combo_plots}

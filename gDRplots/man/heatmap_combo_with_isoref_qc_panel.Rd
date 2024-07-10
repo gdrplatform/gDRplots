@@ -63,8 +63,15 @@ heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
                                    drug1_name, drug2_name,
                                    cl_names,
-                                   normalization_type = "GR",
                                    iso_levels = c("0.25", "0.5"))
+                                   
+heatmap_combo_with_isoref_qc_panel(dt_excess,
+                                   dt_isobolograms,
+                                   drug1_name, drug2_name,
+                                   cl_names,
+                                   normalization_type = "RV",
+                                   iso_levels = NULL,
+                                   colors_vec = c("darkcyan", "snow", "darkorange")) 
 
 }
 \keyword{QC_plot}
