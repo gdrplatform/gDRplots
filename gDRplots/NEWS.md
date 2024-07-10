@@ -8,7 +8,7 @@
 * add function for plot size estimation
 
 ## gDRplots 0.0.7 - 2024-06-21
-* add plot to quality controle of dose response
+* add plot to quality control of dose response
 
 ## gDRplots 0.0.6 - 2024-06-19
 * update plot function for `processingReport` package
