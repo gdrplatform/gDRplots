@@ -47,7 +47,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName == "drug_004"]$bliss_score <- NA
-  drug_combo <- unique(sprintf("%s x %s", 
+  drug_combo <- unique(sprintf("%s x %s",
                                response_metrics_na[!is.na(bliss_score)]$DrugName, 
                                response_metrics_na[!is.na(bliss_score)]$DrugName_2))
   
@@ -105,7 +105,7 @@ test_that("change_NA_into_char works", {
 test_that("get_qual_colors works", {
   
   max_len <- sum(RColorBrewer::brewer.pal.info[
-    RColorBrewer::brewer.pal.info$category == "qual" & 
+    RColorBrewer::brewer.pal.info$category == "qual" &
       RColorBrewer::brewer.pal.info$colorblind == TRUE, ]$maxcolors)
   expect_equal(NROW(get_qual_colors()), max_len)
   expect_equal(NROW(unique(get_qual_colors())), max_len)

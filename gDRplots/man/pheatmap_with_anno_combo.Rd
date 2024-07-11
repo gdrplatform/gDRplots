@@ -20,7 +20,7 @@ pheatmap_with_anno_combo(
 }
 \arguments{
 \item{tab_response}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
+output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
 and combo \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -40,7 +40,7 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns. 
+are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
@@ -66,7 +66,6 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "scores")
-                                                     
 annotation_manual_col <-
   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
 annotation_manual_row <-

@@ -1,16 +1,16 @@
 #' Plot pretty heatmap for single-agent or combo data to control quality of the data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
+#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Averaged" assay 
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}), 
+#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
 #'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
-#' @param colors_vec character vector of colors (valid name or hex) used in heatmap 
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #'   (first colour for min value, last colour - for max value)
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether ows should be clustered
@@ -26,12 +26,11 @@
 #'                                                      assay_name = "Averaged")
 #' 
 #' pheatmap_qc(tab_response = response_metrics)
-#' pheatmap_qc(tab_response = response_metrics, 
+#' pheatmap_qc(tab_response = response_metrics,
 #'             normalization_type = "RV",
 #'             colors_vec = c("darkblue", "grey90"),
 #'             lbl_by_CellLineName = TRUE,
 #'             lbl_by_DrugName = TRUE)
-#'              
 #'              
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -46,7 +45,7 @@
 #' @keywords QC_plot
 #' 
 #' @return heatmap for selected metric with annotation - if given
-#' @export 
+#' @export
 pheatmap_qc <- function(
     tab_response,
     normalization_type = "GR",
@@ -65,7 +64,7 @@ pheatmap_qc <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
@@ -75,7 +74,6 @@ pheatmap_qc <- function(
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
   conc <- gDRutils::get_env_identifiers("concentration")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   gnumber_2 <- gDRutils::get_env_identifiers("drug2")
@@ -145,26 +143,26 @@ pheatmap_qc <- function(
   info_drug <- rbind(info_drug, info_drug_2)[get(gnumber) != "untreated"]
   drug_annotation <- data.table::dcast(
     data = info_drug,
-    formula = col_pivot_name ~ get(gnumber), 
+    formula = col_pivot_name ~ get(gnumber),
     value.var = conc
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   drug_annotation <- log10(drug_annotation)
   # replace 0
-  min_val <- 
+  min_val <-
     min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != -Inf])
   drug_annotation[drug_annotation == -Inf] <- min_val - 0.1 * min_val
   
-  # annotation coloring  
+  # annotation coloring 
   drug_to_colored <- names(drug_annotation)
   ls_col <- get_qual_colors(NROW(drug_to_colored))
-  drug_annotation_colors <- 
-    lapply(seq_along(drug_to_colored), 
-           function(i) { 
-             c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"), 
+  drug_annotation_colors <-
+    lapply(seq_along(drug_to_colored),
+           function(i) {
+             c(colorspace::lighten(ls_col[i], 0.8, space = "HLS"),
                colorspace::darken(ls_col[i], 0.1, space = "HLS"))
-           }) 
+           })
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
@@ -185,9 +183,9 @@ pheatmap_qc <- function(
     data.table::setnames(col_lbls_2, old = c(drug_name_2, gnumber_2), new = c(drug_name, gnumber))
     col_lbls <- rbind(col_lbls, col_lbls_2)
     # re-label
-    colnames(drug_annotation) <- 
+    colnames(drug_annotation) <-
       col_lbls[get(gnumber) %in% colnames(drug_annotation), ][order(colnames(drug_annotation))][[drug_name]]
-    names(drug_annotation_colors) <- 
+    names(drug_annotation_colors) <-
       col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
   }
   
@@ -202,27 +200,27 @@ pheatmap_qc <- function(
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
   hm <- pheatmap::pheatmap(
-    mat = mat_cvd, 
-    scale = "none", 
-    display_numbers = FALSE, 
+    mat = mat_cvd,
+    scale = "none",
+    display_numbers = FALSE,
     number_color = "black",
-    fontsize_number = 16, 
-    color = hm_color_palette, 
-    breaks = breaks, 
-    angle_col = 45, 
-    fontsize = 10, 
+    fontsize_number = 16,
+    color = hm_color_palette,
+    breaks = breaks,
+    angle_col = 45,
+    fontsize = 10,
     show_colnames = FALSE,
     main = hm_title,
     na_col = "red",
     annotation_legend = annotation_legend_flag,
     # dendogram
-    treeheight_row = 70, 
-    treeheight_col = 70, 
-    cluster_cols = FALSE, 
+    treeheight_row = 70,
+    treeheight_col = 70,
+    cluster_cols = FALSE,
     cluster_rows = cluster_rows,
     # manual annotation
-    annotation_col = drug_annotation, 
-    annotation_colors = drug_annotation_colors 
+    annotation_col = drug_annotation,
+    annotation_colors = drug_annotation_colors
   )
   return(hm)
 }
@@ -231,7 +229,7 @@ pheatmap_qc <- function(
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
+#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
 #'    and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -304,7 +302,7 @@ pheatmap_qc <- function(
 #' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
-#' @export 
+#' @export
 pheatmap_with_anno_sa <- function(
     tab_response,
     normalization_type = "GR",
@@ -323,7 +321,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -343,8 +341,8 @@ pheatmap_with_anno_sa <- function(
   }
   
   qmfun <- switch(metric,
-                  "xc50" = log10, 
-                  "x_max" = identity, 
+                  "xc50" = log10,
+                  "x_max" = identity,
                   "x_mean" = identity)
   
   # prep data
@@ -438,7 +436,7 @@ pheatmap_with_anno_sa <- function(
     }
   }
   
-  # flip 
+  # flip
   t_mat_cvd <- t(mat_cvd)
   
   # prep hm color palette
@@ -447,11 +445,11 @@ pheatmap_with_anno_sa <- function(
   
   hm <- pheatmap::pheatmap(mat = t_mat_cvd,
                            scale = "none",
-                           display_numbers = TRUE, 
-                           number_color = "black", 
+                           display_numbers = TRUE,
+                           number_color = "black",
                            color = hm_color_palette,
-                           breaks = breaks, 
-                           angle_col = 90, 
+                           breaks = breaks,
+                           angle_col = 90,
                            main = hm_title,
                            cluster_rows = FALSE,
                            cluster_cols = FALSE,
@@ -467,21 +465,21 @@ pheatmap_with_anno_sa <- function(
 #' Plot pretty heatmap with annotations for combo data
 #' 
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
 #'    and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
 #'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'    depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
-#'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns. 
+#'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with a valid color name for 
 #'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
-#'   Not described elements will be colored in default.    
+#'   Not described elements will be colored in default.
 #' @inheritParams pheatmap_with_anno_sa
 #' 
 #' @seealso \code{\link[pheatmap]{pheatmap}}
@@ -491,7 +489,6 @@ pheatmap_with_anno_sa <- function(
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                      assay_name = "scores")
-#'                                                      
 #' annotation_manual_col <-
 #'   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
 #' annotation_manual_row <-
@@ -530,7 +527,7 @@ pheatmap_with_anno_sa <- function(
 #' @keywords pheat_ann
 #' 
 #' @return heatmap for selected metric with annotation - if given
-#' @export 
+#' @export
 pheatmap_with_anno_combo <- function(
     tab_response,
     normalization_type = "GR",
@@ -549,7 +546,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
@@ -611,7 +608,7 @@ pheatmap_with_anno_combo <- function(
   
   if (!is.null(annotation_row)) {
     DrugCombination <- NULL # due to NSE notes in R CMD check
-    annotation_row$DrugCombination <- 
+    annotation_row$DrugCombination <-
       paste(annotation_row[[drug_name]], "x", annotation_row[[drug_name_2]])
     
     if (!all(colnames(mat_cvd) %in% annotation_row[["DrugCombination"]])) {
@@ -665,7 +662,7 @@ pheatmap_with_anno_combo <- function(
     }
   }
   
-  # flip 
+  # flip
   t_mat_cvd <- t(mat_cvd)
   
   # prep hm color palette
@@ -675,9 +672,9 @@ pheatmap_with_anno_combo <- function(
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
                            display_numbers = TRUE,
-                           number_color = "black", 
+                           number_color = "black",
                            color = hm_color_palette,
-                           breaks = breaks, 
+                           breaks = breaks,
                            angle_col = 90,
                            main = hm_title,
                            cluster_rows = FALSE,
@@ -696,32 +693,32 @@ pheatmap_with_anno_combo <- function(
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric
-#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
 #' @param dataset_name string name of dataset
 #'
 #' @examples
 #' get_hm_title(dataset_name = "Dateset DX123",
-#'              metric = "x_mean", 
+#'              metric = "x_mean",
 #'              normalization_type = "GR")
 #' 
-#' get_hm_title(metric = "xc50", 
+#' get_hm_title(metric = "xc50",
 #'              normalization_type = "GR")
 #'              
 #' @keywords pheat_ann
 #' 
 #' @return character title for heatmap
-#' @export 
-get_hm_title <- function(metric = "xc50", 
+#' @export
+get_hm_title <- function(metric = "xc50",
                          normalization_type = "GR",
                          dataset_name = NULL) {
   
   checkmate::assert_string(dataset_name, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, 
+  checkmate::assert_choice(metric,
                            choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
   
-  title_metric <- 
+  title_metric <-
     gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, normalization_type), human_readable = TRUE)
   
   if (metric == "xc50") title_metric <- sprintf("log10(%s)", title_metric)
@@ -741,14 +738,12 @@ get_hm_title <- function(metric = "xc50",
 #'
 #' @return character (for NA -> given string)
 #' @keywords internal
-#' 
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
   
   checkmate::assert_string(lbl_NA)
   
   ifelse(is.na(x), lbl_NA, as.character(x))
-  
 }
 
 
@@ -763,12 +758,11 @@ change_NA_into_char <- function(x,
 #' get_qual_colors()
 #' get_qual_colors(0)
 #' get_qual_colors(5)
-#' get_qual_colors(35) 
+#' get_qual_colors(35)
 #' }
 #' 
 #' @keywords utils_color
 #' @export 
-#' 
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)
   
@@ -776,7 +770,7 @@ get_qual_colors <- function(n = NULL) {
   
   # list of colors: qualitative and friendly for user with color vision deficiency
   qual_col_pals <- RColorBrewer::brewer.pal.info[
-    RColorBrewer::brewer.pal.info$category == "qual" & 
+    RColorBrewer::brewer.pal.info$category == "qual" &
       RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
   all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
   
@@ -795,9 +789,9 @@ get_qual_colors <- function(n = NULL) {
 
 #' Create color map for annotation
 #'
-#' @param dt_ann data.table with annotation
+#' @param dt_ann data.table with the annotations
 #'
-#' @return list with color maping for annotation
+#' @return list with color maping for the annotations
 #' 
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
@@ -813,7 +807,6 @@ get_qual_colors <- function(n = NULL) {
 #' 
 #' @keywords utils_color
 #' @export 
-#' 
 get_ann_color_map <- function(dt_ann) {
   checkmate::assert_data_table(dt_ann)
   

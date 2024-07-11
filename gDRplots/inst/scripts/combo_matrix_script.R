@@ -7,10 +7,10 @@ norm_type <- "RV"
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[["combination"]]
 
-selected_col <- 
+selected_col <-
   SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cell_line, ]
-selected_row <- 
-  SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name & 
+selected_row <-
+  SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name &
                                       SummarizedExperiment::rowData(se)$DrugName_2 == drug2_name, ]
 se1 <- se[rownames(selected_row), rownames(selected_col)]
 
@@ -55,31 +55,31 @@ plts <- lapply(mx_names, function(mx_name) {
   
   x_conc <- sort(unique(df_$Concentration_2[df_$Concentration_2 > 0]))
   x_gap <- max(diff(log10(x_conc)))
-  df_$pos_x <- pmax(log10(df_$Concentration_2), 
+  df_$pos_x <- pmax(log10(df_$Concentration_2),
                     log10(min(df_$Concentration_2[df_$Concentration_2 > 0])) - x_gap) # - 0.1)
   df_$marks_x <- sprintf("%.2g", df_$Concentration_2)
   
   y_conc  <- sort(unique(df_$Concentration[df_$Concentration > 0]))
   y_gap <- max(diff(log10(y_conc)))
-  df_$pos_y <- pmax(log10(df_$Concentration), 
+  df_$pos_y <- pmax(log10(df_$Concentration),
                     log10(min(df_$Concentration[df_$Concentration > 0])) - y_gap) # - 0.1)
   df_$marks_y <- sprintf("%.2g", df_$Concentration)
   
   plt_title <- sprintf("%s (%s) : %s for %s, T=%sh",
                        cell_line,
-                       selected_col$clid, 
+                       selected_col$clid,
                        gDRutils::get_combo_excess_field_names()[[mx_name]],
                        norm_type,
                        selected_row$Duration)
   # base plot
-  plt <- 
+  plt <-
     ggplot2::ggplot(df_, ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = y_gap, width = x_gap) +
     ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                   y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                   fill = gDRutils::get_combo_excess_field_names()[[mx_name]],
                   title = plt_title) +
-    ggplot2::theme_bw() + 
+    ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 9),
                    plot.title = ggplot2::element_text(size = 11)) +
@@ -95,14 +95,14 @@ plts <- lapply(mx_names, function(mx_name) {
       plt <- plt +
         ggplot2::scale_fill_gradientn(
           colors = c("black", "#b06000", "#c07700", "white"),
-          values = c(0, 0.59 / 1.7, 0.61 / 1.7, 1), 
-          limits = c(-0.6, 1.1), 
+          values = c(0, 0.59 / 1.7, 0.61 / 1.7, 1),
+          limits = c(-0.6, 1.1),
           name = "GR val",
           oob = scales::squish)
     } else {
       plt <- plt +
         ggplot2::scale_fill_gradientn(
-          colors = c("#440000", "#ff5500", "white"), 
+          colors = c("#440000", "#ff5500", "white"),
           values = c(0, 0.4, 1),
           name = "RV",
           limits = c(0, 1.1), )
@@ -111,18 +111,17 @@ plts <- lapply(mx_names, function(mx_name) {
     plt <- plt +
       ggplot2::scale_fill_gradientn(
         colors = c("black", "#ffffaa", "white", "white", "#aaffff", "blue"),
-        values = c(0, 0.35, 0.48, 0.51, 0.65, 1), 
-        limits = c(-0.6, 0.6), 
+        values = c(0, 0.35, 0.48, 0.51, 0.65, 1),
+        limits = c(-0.6, 0.6),
         name = gDRutils::get_combo_excess_field_names()[[mx_name]],
         oob = scales::squish)
   }
-
-    plt <- plt +
-      ggplot2::geom_path(data = dt_iso, linewidth = 0.8,
-                         ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) + 
-      ggplot2::scale_color_manual(values = iso_colors[all_iso],
-                                  name = "Iso levels")
-
+  
+  plt <- plt +
+    ggplot2::geom_path(data = dt_iso, linewidth = 0.8,
+                       ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
+    ggplot2::scale_color_manual(values = iso_colors[all_iso],
+                                name = "Iso levels")
   
   return(plt)
 })

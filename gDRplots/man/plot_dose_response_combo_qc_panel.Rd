@@ -13,12 +13,12 @@ plot_dose_response_combo_qc_panel(
 )
 }
 \arguments{
-\item{dt_average}{data.table representation of the data in \code{Averaged} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+\item{dt_average}{data.table representing data from the \code{Averaged} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{cl_name}{string with cell line name to be plotted (identifiers \code{CellLineName})}
 
-\item{d_names}{character vector with drug names to be plotted (Drug Name); 
+\item{d_names}{character vector with drug names to be plotted (Drug Name);
 if NULL - all available drugs will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -27,7 +27,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{as_panel}{logical flag whether return list of plot or panel}
 }
 \value{
-panle with plot with dose-response curves for selected cell line by drugs
+panel with plot with dose-response curves for selected cell line by drugs
 }
 \description{
 Plot panel with drug response curves for single-agent data to control quality of the data

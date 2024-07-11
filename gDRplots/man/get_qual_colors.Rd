@@ -20,7 +20,7 @@ Create list of qualitative colors
 get_qual_colors()
 get_qual_colors(0)
 get_qual_colors(5)
-get_qual_colors(35) 
+get_qual_colors(35)
 }
 
 }

@@ -12,7 +12,7 @@
 #' })
 #' names(plotlist) <- unique(iris$Species)
 #' 
-#' prep_plot_chunk(plotlist, "iris")  
+#' prep_plot_chunk(plotlist, "iris")
 #'
 #' @return list of character vector - input for \code{knitr::knit}
 #' @keywords internal
@@ -20,7 +20,7 @@
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
-prep_plot_chunk <- function(plt_list, 
+prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             header_level = 3) {
   checkmate::assert_list(plt_list)
@@ -84,7 +84,6 @@ estimate_plot_size <- function(plt,
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
   checkmate::assert_numeric(max_size, lower = 0, finite = TRUE)
-  
   
   if (inherits(plt, "ggplot")) {
     # For ggplot2 objects

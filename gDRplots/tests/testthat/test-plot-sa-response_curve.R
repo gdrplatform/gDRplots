@@ -68,7 +68,7 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                                        cellline_name_vec = cellline_name_vec,
                                        drug_name_vec = drug_name_vec,
                                        normalization_type = normalization_type,
-                                       colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+                                       colormap = c("#00008B", "#FF6347", "#4CBB17"))
   expect_is(plts, "list")
   plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
   expect_equal(names(plts), 

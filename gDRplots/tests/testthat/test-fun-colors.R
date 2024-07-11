@@ -21,7 +21,7 @@ test_that("brew_palette works as expected", {
   expect_false(identical(normal_pal, shuffled_normal_pal))
   expect_identical(sort(normal_pal), sort(shuffled_normal_pal))
   
-  expect_error(brew_palette(n = "str", name = "Accent"), 
+  expect_error(brew_palette(n = "str", name = "Accent"),
                "Assertion on 'n' failed: Must be of type 'number', not 'character'.")
   expect_error(brew_palette(n = 0, name = "Accent"),
                "Assertion on 'n' failed: Element 1 is not >= 1.")
@@ -46,7 +46,7 @@ test_that("is_color_dark works as expected", {
   expect_false(is_color_dark(color_names[3]))
   
   expect_error(is_color_dark(1), "Must be of type 'string'")
-  expect_error(is_color_dark("nice pink"), "Must be valid color name")
+  expect_error(is_color_dark("nice pink"), "Must be a valid color name")
 })
 
 
@@ -62,7 +62,7 @@ test_that("get_col_luminance works as expected", {
   expect_equal(get_col_luminance(color_names[3]), 0.3238907, tolerance = 1e-5)
   
   expect_error(get_col_luminance(1), "Must be of type 'string'")
-  expect_error(get_col_luminance("nice pink"), "Must be valid color name")
+  expect_error(get_col_luminance("nice pink"), "Must be a valid color name")
 })
 
 
@@ -89,5 +89,5 @@ test_that("change_color_to_hex works as expected", {
   
   expect_error(change_color_to_hex(1), "Must be of type 'string'")
   expect_error(change_color_to_hex(NULL), "Must be of type 'string'")
-  expect_error(change_color_to_hex("pinki"), "Must be valid color name")
+  expect_error(change_color_to_hex("pinki"), "Must be a valid color name")
 })

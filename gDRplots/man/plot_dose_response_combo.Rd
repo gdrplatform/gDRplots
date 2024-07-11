@@ -14,8 +14,8 @@ plot_dose_response_combo(
 )
 }
 \arguments{
-\item{dt_average}{data.table representation of the data in \code{Averaged} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+\item{dt_average}{data.table representing data from the \code{Averaged} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
@@ -43,17 +43,17 @@ cl_name <- "cellline_BC"
 drug1_name <- "drug_011"
 drug2_name <- "drug_021"
 
-plot_dose_response_combo(dt_average = dt_average, 
+plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name)
                          
-plot_dose_response_combo(dt_average = dt_average, 
+plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name,
                          normalization_type = "RV",
-                         colormap = c("orange", "darkred"))                       
+                         colormap = c("orange", "darkred"))                     
                       
 }
 \keyword{combo_plots}

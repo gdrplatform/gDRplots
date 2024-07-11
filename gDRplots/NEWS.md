@@ -1,3 +1,6 @@
+## gDRplots 0.0.11 - 2024-07-11
+* add plots to quality control for combo data - combo metrics and reference isoline
+
 ## gDRplots 0.0.10 - 2024-07-10
 * add plot to visualize fitting accuracy
 
