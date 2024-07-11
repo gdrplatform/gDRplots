@@ -1,5 +1,8 @@
-## gDRplots 0.0.10 - 2024-07-10
+## gDRplots 0.0.11 - 2024-07-11
 * add plots to quality control for combo data - combo metrics and reference isoline
+
+## gDRplots 0.0.10 - 2024-07-10
+* add plot to visualize fitting accuracy
 
 ## gDRplots 0.0.9 - 2024-07-03
 * add plots to quality control of distribution of normalized data and metric stat
@@ -8,7 +11,7 @@
 * add function for plot size estimation
 
 ## gDRplots 0.0.7 - 2024-06-21
-* add plot to quality controle of dose response
+* add plot to quality control of dose response
 
 ## gDRplots 0.0.6 - 2024-06-19
 * update plot function for `processingReport` package
