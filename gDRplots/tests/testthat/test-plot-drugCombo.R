@@ -371,7 +371,6 @@ test_that("plolty_drug_combo_ratio", {
   
 })
 
-
 test_that(".round.conc works as expected", {
   conc <- c("0", "0.00000179", "0.00000541", "0.0000163", "0.0000493",
             "0.000149", "0.00045", "0.00136", "0.0041")
@@ -379,5 +378,41 @@ test_that(".round.conc works as expected", {
   
   # old solution
   expect_false(length(unique(conc)) == length(unique(round(as.numeric(conc), 5))))
+})
+
+test_that("get_iso_colors", {
+  ### expected values
+  gic <- get_iso_colors()
+  expect_true(length(gic) > 2)
+  expect_identical("character", class(gic))
+  gic2 <- get_iso_colors(formals(get_iso_colors)[[1]][[3]])
+  expect_true(any(gic != gic2))
+  expect_identical(length(gic), length(gic2))
+  
+  ### errors
+  expect_error(get_iso_colors("inv_param"), "'arg' should be one of ")
+})
+
+test_that("assert_RGB_format", {
+  color_vector <- c(25, 56, 189)
+  expect_equal(assert_RGB_format(color_vector), NULL)
+  color_vector <- c(201, 128, 352)
+  expect_error(assert_RGB_format(color_vector), 
+               "Some value is greater than 255. Not valid RGB format.")
+})
+
+test_that("get_combo_col_settings",  {
+  ### expected values
+  gcan <- names(get_combo_assay_names()[1])
+  gcc <-
+    get_combo_col_settings(g_metric = "GR", assay_type = gcan)
+  expect_true(inherits(gcc, "list"))
+  expect_identical(sort(names(gcc)), c("breaks", "colors", "limits"))
+  
+  ### errors
+  err_msg <- "Assertion on 'assay_type' failed: "
+  expect_error(get_combo_col_settings("GR", 8), err_msg)
+  err_msg <- "Assertion on 'g_metric' failed: "
+  expect_error(get_combo_col_settings("grvalue", 8), err_msg)
 })
 
