@@ -1,9 +1,9 @@
 #' Plot drug response curves for single-agent data
 #'
-#' @param dt_metrics data.table representation of the data in \code{Metrics} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#' @param dt_average data.table representation of the data in \code{Averaged} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#' @param dt_metrics data.table representing data from the \code{Metrics} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_average data.table representing data from the \code{Averaged} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #' @param grouping string name of dim of se to plot; it has to be opppsoite to this used to filter se
 #'    (that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")
 #' @param group_names character vector with names to subset from se (the same dim as \code{grouping});
@@ -349,10 +349,10 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
 
 #' Plot drug response curves for single-agent data to control quality of the data
 #'
-#' @param dt_metrics data.table representation of the data in \code{Metrics} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#' @param dt_average data.table representation of the data in \code{Averaged} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#' @param dt_metrics data.table representing data from the \code{Metrics} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_average data.table representing data from the \code{Averaged} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param d_name string vector with drug name to be plotted (Drug Name)
 #' @param normalization_type string with normalization_types to be selected

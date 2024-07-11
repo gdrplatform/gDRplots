@@ -1,19 +1,19 @@
-#' Plot fitted values heatmaps for combo data for combo metrics
+#' Plot heatmaps of fitted values for combination metrics data
 #'
-#' @param dt_excess data.table representation of the data in \code{excess} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
-#' @param dt_isobolograms data.table representation of the data in \code{isobolograms} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+#' @param dt_excess data.table data.table representing data from the \code{excess} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+#' @param dt_isobolograms data.table data.table representing data from the \code{isobolograms} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
-#' @param colors_vec_smooth character vector of colors (valid name or hex) used in heatmap 
-#'    for smooth values; as default will be used viridis pallette
-#' @param colors_vec_excess character vector of colors (valid name or hex) used in heatmap 
-#'    for excess values; as default will be used blue - light grey - red color scale
+#' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap 
+#'    for smooth values; the default is the viridis palette
+#' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap 
+#'    for excess values; the default is a blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
 #' @param as_panel logical flag whether return list of plot or panel
 #'
@@ -81,8 +81,8 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
-  stopifnot("Must be valid color name" = all(vapply(colors_vec_smooth, gDRplots::is_valid_color, logical(1))))
-  stopifnot("Must be valid color name" = all(vapply(colors_vec_excess, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
@@ -300,12 +300,12 @@ heatmap_combo_metrics <- function(
   return(final_plot)
 }
 
-#' Plot averaged values heatmaps for combo data
+#' Plot heatmaps of averaged values for combined data
 #'
-#' @param dt_excess data.table representation of the data in \code{excess} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
-#' @param dt_isobolograms data.table representation of the data in \code{isobolograms} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+#' @param dt_excess data.table representing data from the \code{excess} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+#' @param dt_isobolograms data.table representing data from the \code{isobolograms} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
@@ -315,7 +315,7 @@ heatmap_combo_metrics <- function(
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #' @param no_breaks numeric number of breaks on scale
 #'
-#' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
+#' @return list or panel with heatmaps with values for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
 #'    
 #' @keywords combo_plots
@@ -380,7 +380,7 @@ heatmap_combo_with_isoref <- function(
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
-    stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+    stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   }
   checkmate::assert_int(no_breaks, lower = 2)
   
@@ -456,8 +456,10 @@ heatmap_combo_with_isoref <- function(
     names(iso_label) <- available_iso_lvl
     
     iso_source <- NULL # due to NSE notes in R CMD check
-    tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")][, iso_source := "measured"]
-    tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")][, iso_source := "expected"]
+    tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
+    tab_measured[, iso_source := "measured"]
+    tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
+    tab_expected[, iso_source := "expected"]
     data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
     
     tab_isoline <- rbind(tab_measured, tab_expected)
@@ -506,14 +508,14 @@ heatmap_combo_with_isoref <- function(
 }
 
 
-#' Plot panel with thefitted values heatmaps and references data for isolobograms 
+#' Plot panel of heatmaps with fitted and reference data for isobolograms 
 #' to control quality of the data
 #'
 #' @inheritParams heatmap_combo_with_isoref
-#' @param cl_names character vector with cell line names names to be plotted (Cell Line NAme); 
-#'    if NULL - all available cell liene will be plotted
+#' @param cl_names character vector with cell line names to be plotted (Cell Line Name); 
+#'    if NULL - all available cell lines will be plotted
 #'    
-#' @return panel with heatmaps for fitted values and references data for isolobograms 
+#' @return panel with heatmaps for fitted values and reference data for isobolograms
 #'    for selected drug and co-drug by cell line names
 #'
 #' @keywords QC_plot
@@ -526,7 +528,7 @@ heatmap_combo_with_isoref <- function(
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' cl_names <- unique(dt_excess[["CellLineName"]])[1:4]
+#' cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(4)]
 #' 
 #' heatmap_combo_with_isoref_qc_panel(dt_excess,
 #'                                    dt_isobolograms,
@@ -578,7 +580,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
-    stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+    stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   }
   
   available_cls <- unique(dt_excess[[cellline_name]])
@@ -678,8 +680,8 @@ transform_log_conc <- function(conc_vec) {
   # replace the -Inf value coming from the 0 dose with one step less in the dose dilution 
   idx_inf <- (conc_vec == 0)
   doses <- sort(unique(log_values))
-  zero_replecement <- doses[2]  + (doses[2] - doses[3])
-  log_values[idx_inf] <- zero_replecement
+  zero_replacement <- doses[2] + (doses[2] - doses[3])
+  log_values[idx_inf] <- zero_replacement
   
   return(log_values)
 }

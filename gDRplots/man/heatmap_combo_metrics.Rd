@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_metrics}
 \alias{heatmap_combo_metrics}
-\title{Plot fitted values heatmaps for combo data for combo metrics}
+\title{Plot heatmaps of fitted values for combination metrics data}
 \usage{
 heatmap_combo_metrics(
   dt_excess,
@@ -19,11 +19,11 @@ heatmap_combo_metrics(
 )
 }
 \arguments{
-\item{dt_excess}{data.table representation of the data in \code{excess} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
+\item{dt_excess}{data.table data.table representing data from the \code{excess} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
 
-\item{dt_isobolograms}{data.table representation of the data in \code{isobolograms} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
+\item{dt_isobolograms}{data.table data.table representing data from the \code{isobolograms} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
@@ -36,11 +36,11 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected}
 
-\item{colors_vec_smooth}{character vector of colors (valid name or hex) used in heatmap 
-for smooth values; as default will be used viridis pallette}
+\item{colors_vec_smooth}{character vector of colors (valid names or hex codes) used in the heatmap 
+for smooth values; the default is the viridis palette}
 
-\item{colors_vec_excess}{character vector of colors (valid name or hex) used in heatmap 
-for excess values; as default will be used blue - light grey - red color scale}
+\item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap 
+for excess values; the default is a blue-light grey-red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
@@ -51,7 +51,7 @@ list or panel with heatmaps with value for excess assays for selected drugs and 
    selected isoline and comparison of iso levels
 }
 \description{
-Plot fitted values heatmaps for combo data for combo metrics
+Plot heatmaps of fitted values for combination metrics data
 }
 \examples{
 cl_name <- "cellline_BC"

@@ -61,10 +61,10 @@ test_that("prep_hm_limits works as expected", {
 test_that("transform_log_conc works as expected", {
   vec <- c(0, 0.003, 0.01, 0.03)
   result <- log10(vec)
-  result[1] <- result[2]  + (result[2] - result[3])
+  result[1] <- result[2] + (result[2] - result[3])
   expect_equal(transform_log_conc(vec), result)
 
-  expect_error(transform_log_conc(LETTERS[1:5]), 
+  expect_error(transform_log_conc(LETTERS[seq_len(5)]), 
                "Assertion on 'conc_vec' failed: Must be of type 'numeric'")   
   
   expect_error(transform_log_conc(-1:2),

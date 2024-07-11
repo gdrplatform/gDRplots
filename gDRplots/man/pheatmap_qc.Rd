@@ -19,7 +19,7 @@ pheatmap_qc(
 }
 \arguments{
 \item{tab_response}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
+outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Averaged" assay 
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
 \item{normalization_type}{string with normalization types to be selected

@@ -1,7 +1,7 @@
 #' Plot pretty heatmap for single-agent or combo data to control quality of the data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Averaged" 
+#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Averaged" assay 
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -65,7 +65,7 @@ pheatmap_qc <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
@@ -231,7 +231,7 @@ pheatmap_qc <- function(
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "Metrics" 
+#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
 #'    and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -323,7 +323,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -467,7 +467,7 @@ pheatmap_with_anno_sa <- function(
 #' Plot pretty heatmap with annotations for combo data
 #' 
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for assay "scores" 
+#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
 #'    and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
 #'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
@@ -549,7 +549,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
@@ -795,9 +795,9 @@ get_qual_colors <- function(n = NULL) {
 
 #' Create color map for annotation
 #'
-#' @param dt_ann data.table with annotation
+#' @param dt_ann data.table with the annotations
 #'
-#' @return list with color maping for annotation
+#' @return list with color maping for the annotations
 #' 
 #' @seealso \code{\link{pheatmap_qc}}
 #' 

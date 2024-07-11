@@ -7,10 +7,10 @@
 get_ann_color_map(dt_ann)
 }
 \arguments{
-\item{dt_ann}{data.table with annotation}
+\item{dt_ann}{data.table with the annotations}
 }
 \value{
-list with color maping for annotation
+list with color maping for the annotations
 }
 \description{
 Create color map for annotation

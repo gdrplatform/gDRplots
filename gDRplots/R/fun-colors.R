@@ -69,7 +69,7 @@ brew_palette <- function(n,
 #' @export
 is_color_dark <- function(col_name) {
   checkmate::assert_string(col_name)
-  stopifnot("Must be valid color name" = is_valid_color(col_name))
+  stopifnot("Must be a valid color name" = is_valid_color(col_name))
   
   get_col_luminance(col_name) <= 0.22
 }
@@ -92,7 +92,7 @@ is_color_dark <- function(col_name) {
 #' @export
 get_col_luminance <- function(col_name) {
   checkmate::assert_string(col_name)
-  stopifnot("Must be valid color name" = is_valid_color(col_name))
+  stopifnot("Must be a valid color name" = is_valid_color(col_name))
   
   colrgb <- grDevices::col2rgb(col_name)
   lum <- lapply(colrgb, function(x) {
@@ -150,7 +150,7 @@ is_valid_color <- function(col_name) {
 #' @export
 change_color_to_hex <- function(col_name) {
   checkmate::assert_string(col_name)
-  stopifnot("Must be valid color name" = col_name %in% grDevices::colors())
+  stopifnot("Must be a valid color name" = col_name %in% grDevices::colors())
   
   rgb <- grDevices::col2rgb(col_name)
   grDevices::rgb(rgb[1], rgb[2], rgb[3], maxColorValue = 255)

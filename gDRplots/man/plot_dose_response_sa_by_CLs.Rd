@@ -16,11 +16,11 @@ plot_dose_response_sa_by_CLs(
 )
 }
 \arguments{
-\item{dt_metrics}{data.table representation of the data in \code{Metrics} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+\item{dt_metrics}{data.table representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
-\item{dt_average}{data.table representation of the data in \code{Averaged} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+\item{dt_average}{data.table representing data from the \code{Averaged} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{cellline_name_vec}{character vector with cell line to be plotted (Cell Line Name)}
 

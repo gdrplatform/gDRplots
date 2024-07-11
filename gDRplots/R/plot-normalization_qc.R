@@ -1,7 +1,7 @@
 #' Plot violin for normalized or averaged single-agent data to control quality of the data
 #'
-#' @param dt_assay data.table representation of the data in assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
+#' @param dt_assay data.table representing data from the assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
 #'    for assay_name like "Normalized" and "Averaged"
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
@@ -75,8 +75,8 @@ plot_var_distribution_qc <- function(dt_assay,
 
 #' Lollipop plot for metric single-agent data to control quality of the data
 #'
-#' @param dt_assay data.table representation of the data in assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_assay data.table representing data from the assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
 #' @param normalization_type string with normalization_types to be selected
@@ -162,10 +162,10 @@ plot_var_stat_qc <- function(dt_assay,
 
 #' Plot drug response curves for single-agent data to control quality of the data
 #'
-#' @param dt_treat data.table representation of the data in \code{RawTreated} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
-#' @param dt_controls data.table representation of the data in \code{Controls} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
+#' @param dt_treat data.table representing data from the \code{RawTreated} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
+#' @param dt_controls data.table representing data from the \code{Controls} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
 #'
 #' @return hetamap of mapping controls to treated
 #'

@@ -1,7 +1,7 @@
 #' Plot drug response curves for combo data
 #'
-#' @param dt_average data.table representation of the data in \code{Averaged} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#' @param dt_average data.table representing data from the \code{Averaged} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line name to be plotted (identifiers \code{CellLineName}) 

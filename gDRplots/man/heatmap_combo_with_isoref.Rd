@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_with_isoref}
 \alias{heatmap_combo_with_isoref}
-\title{Plot averaged values heatmaps for combo data}
+\title{Plot heatmaps of averaged values for combined data}
 \usage{
 heatmap_combo_with_isoref(
   dt_excess,
@@ -17,11 +17,11 @@ heatmap_combo_with_isoref(
 )
 }
 \arguments{
-\item{dt_excess}{data.table representation of the data in \code{excess} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
+\item{dt_excess}{data.table representing data from the \code{excess} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
 
-\item{dt_isobolograms}{data.table representation of the data in \code{isobolograms} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
+\item{dt_isobolograms}{data.table representing data from the \code{isobolograms} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
@@ -43,7 +43,7 @@ list or panel with heatmaps with value for excess assays for selected drugs and 
    selected isoline and comparison of iso levels
 }
 \description{
-Plot averaged values heatmaps for combo data
+Plot heatmaps of averaged values for combined data
 }
 \examples{
 cl_name <- "cellline_BC"

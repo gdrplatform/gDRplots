@@ -13,8 +13,8 @@ plot_var_stat_qc(
 )
 }
 \arguments{
-\item{dt_assay}{data.table representation of the data in assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+\item{dt_assay}{data.table representing data from the assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
 

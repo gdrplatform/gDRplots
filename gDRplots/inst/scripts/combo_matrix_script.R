@@ -7,7 +7,7 @@ norm_type <- "RV"
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[["combination"]]
 
-selected_col <- 
+selected_col <-
   SummarizedExperiment::colData(se)[SummarizedExperiment::colData(se)$CellLineName == cell_line, ]
 selected_row <- 
   SummarizedExperiment::rowData(se)[SummarizedExperiment::rowData(se)$DrugName == drug1_name & 

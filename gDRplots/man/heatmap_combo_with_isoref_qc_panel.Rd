@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_with_isoref_qc_panel}
 \alias{heatmap_combo_with_isoref_qc_panel}
-\title{Plot panel with thefitted values heatmaps and references data for isolobograms 
+\title{Plot panel of heatmaps with fitted and reference data for isobolograms 
 to control quality of the data}
 \usage{
 heatmap_combo_with_isoref_qc_panel(
@@ -17,18 +17,18 @@ heatmap_combo_with_isoref_qc_panel(
 )
 }
 \arguments{
-\item{dt_excess}{data.table representation of the data in \code{excess} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
+\item{dt_excess}{data.table representing data from the \code{excess} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
 
-\item{dt_isobolograms}{data.table representation of the data in \code{isobolograms} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
+\item{dt_isobolograms}{data.table representing data from the \code{isobolograms} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
 \item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
-\item{cl_names}{character vector with cell line names names to be plotted (Cell Line NAme); 
-if NULL - all available cell liene will be plotted}
+\item{cl_names}{character vector with cell line names to be plotted (Cell Line Name); 
+if NULL - all available cell lines will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -38,11 +38,11 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 }
 \value{
-panel with heatmaps for fitted values and references data for isolobograms 
+panel with heatmaps for fitted values and reference data for isobolograms
    for selected drug and co-drug by cell line names
 }
 \description{
-Plot panel with thefitted values heatmaps and references data for isolobograms 
+Plot panel of heatmaps with fitted and reference data for isobolograms 
 to control quality of the data
 }
 \examples{
@@ -54,7 +54,7 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-cl_names <- unique(dt_excess[["CellLineName"]])[1:4]
+cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(4)]
 
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,

@@ -16,11 +16,11 @@ plot_dose_response_sa(
 )
 }
 \arguments{
-\item{dt_metrics}{data.table representation of the data in \code{Metrics} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+\item{dt_metrics}{data.table representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
 
-\item{dt_average}{data.table representation of the data in \code{Averaged} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+\item{dt_average}{data.table representing data from the \code{Averaged} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{grouping}{string name of dim of se to plot; it has to be opppsoite to this used to filter se
 (that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")}

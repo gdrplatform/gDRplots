@@ -7,11 +7,11 @@
 heatmap_control_mapping_qc(dt_treat, dt_controls)
 }
 \arguments{
-\item{dt_treat}{data.table representation of the data in \code{RawTreated} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}}
+\item{dt_treat}{data.table representing data from the \code{RawTreated} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}}
 
-\item{dt_controls}{data.table representation of the data in \code{Controls} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}}
+\item{dt_controls}{data.table representing data from the \code{Controls} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}}
 }
 \value{
 hetamap of mapping controls to treated
