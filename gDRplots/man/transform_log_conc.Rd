@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{transform_log_conc}
 \alias{transform_log_conc}
-\title{Calculate limit}
+\title{Transform concentrations values with log10}
 \usage{
 transform_log_conc(conc_vec)
 }
@@ -14,7 +14,7 @@ numeric vector with log10 concentration values; log10 for concentration equal 0 
    is replaced with one step less in the dose dilution
 }
 \description{
-Calculate limit
+Transform concentrations values with log10
 }
 \examples{
 \dontrun{

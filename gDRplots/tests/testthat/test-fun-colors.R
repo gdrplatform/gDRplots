@@ -21,7 +21,7 @@ test_that("brew_palette works as expected", {
   expect_false(identical(normal_pal, shuffled_normal_pal))
   expect_identical(sort(normal_pal), sort(shuffled_normal_pal))
   
-  expect_error(brew_palette(n = "str", name = "Accent"), 
+  expect_error(brew_palette(n = "str", name = "Accent"),
                "Assertion on 'n' failed: Must be of type 'number', not 'character'.")
   expect_error(brew_palette(n = 0, name = "Accent"),
                "Assertion on 'n' failed: Element 1 is not >= 1.")

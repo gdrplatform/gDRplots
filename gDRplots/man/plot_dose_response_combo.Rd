@@ -43,17 +43,17 @@ cl_name <- "cellline_BC"
 drug1_name <- "drug_011"
 drug2_name <- "drug_021"
 
-plot_dose_response_combo(dt_average = dt_average, 
+plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name)
                          
-plot_dose_response_combo(dt_average = dt_average, 
+plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name,
                          normalization_type = "RV",
-                         colormap = c("orange", "darkred"))                       
+                         colormap = c("orange", "darkred"))                     
                       
 }
 \keyword{combo_plots}

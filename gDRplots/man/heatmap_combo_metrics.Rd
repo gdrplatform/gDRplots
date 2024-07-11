@@ -36,10 +36,10 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected}
 
-\item{colors_vec_smooth}{character vector of colors (valid names or hex codes) used in the heatmap 
+\item{colors_vec_smooth}{character vector of colors (valid names or hex codes) used in the heatmap
 for smooth values; the default is the viridis palette}
 
-\item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap 
+\item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap
 for excess values; the default is a blue-light grey-red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}
@@ -63,16 +63,16 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-heatmap_combo_metrics(dt_excess, 
+heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
-                      drug1_name, drug2_name, 
-                      cl_name, 
+                      drug1_name, drug2_name,
+                      cl_name,
                       normalization_type = "GR")
                       
-heatmap_combo_metrics(dt_excess, 
-                      dt_isobolograms, 
-                      drug1_name, drug2_name, 
-                      cl_name, 
+heatmap_combo_metrics(dt_excess,
+                      dt_isobolograms,
+                      drug1_name, drug2_name,
+                      cl_name,
                       normalization_type = "RV",
                       iso_levels = "0.5",
                       as_panel = FALSE)

@@ -18,7 +18,7 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 
 \item{cl_name}{string with cell line name to be plotted (identifiers \code{CellLineName})}
 
-\item{d_names}{character vector with drug names to be plotted (Drug Name); 
+\item{d_names}{character vector with drug names to be plotted (Drug Name);
 if NULL - all available drugs will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected

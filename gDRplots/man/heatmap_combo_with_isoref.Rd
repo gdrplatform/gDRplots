@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_with_isoref}
 \alias{heatmap_combo_with_isoref}
-\title{Plot heatmaps of averaged values for combined data}
+\title{Plot heatmaps of averaged values for combination data}
 \usage{
 heatmap_combo_with_isoref(
   dt_excess,
@@ -39,11 +39,11 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{no_breaks}{numeric number of breaks on scale}
 }
 \value{
-list or panel with heatmaps with value for excess assays for selected drugs and cell line with
+list or panel with heatmaps with values for excess assays for selected drugs and cell line with
    selected isoline and comparison of iso levels
 }
 \description{
-Plot heatmaps of averaged values for combined data
+Plot heatmaps of averaged values for combination data
 }
 \examples{
 cl_name <- "cellline_BC"
@@ -55,22 +55,22 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-heatmap_combo_with_isoref(dt_excess, 
+heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
-                          drug1_name, drug2_name, 
+                          drug1_name, drug2_name,
                           cl_name)
                           
-heatmap_combo_with_isoref(dt_excess, 
+heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
-                          drug1_name, drug2_name, 
+                          drug1_name, drug2_name,
                           cl_name,
                           iso_levels = NULL,
-                          colors_vec = c("darkcyan", "snow", "darkorange"))                        
+                          colors_vec = c("darkcyan", "snow", "darkorange"))                      
                           
-heatmap_combo_with_isoref(dt_excess, 
-                          dt_isobolograms, 
-                          drug1_name, drug2_name, 
-                          cl_name, 
+heatmap_combo_with_isoref(dt_excess,
+                          dt_isobolograms,
+                          drug1_name, drug2_name,
+                          cl_name,
                           normalization_type = "RV",
                           iso_levels = c("0.25", "0.75"))
 

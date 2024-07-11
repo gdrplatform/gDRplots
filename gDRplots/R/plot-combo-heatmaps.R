@@ -6,13 +6,13 @@
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
-#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
+#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
-#' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap 
+#' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap
 #'    for smooth values; the default is the viridis palette
-#' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap 
+#' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is a blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
 #' @param as_panel logical flag whether return list of plot or panel
@@ -31,16 +31,16 @@
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_metrics(dt_excess, 
+#' heatmap_combo_metrics(dt_excess,
 #'                       dt_isobolograms,
-#'                       drug1_name, drug2_name, 
-#'                       cl_name, 
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
 #'                       normalization_type = "GR")
 #'                       
-#' heatmap_combo_metrics(dt_excess, 
-#'                       dt_isobolograms, 
-#'                       drug1_name, drug2_name, 
-#'                       cl_name, 
+#' heatmap_combo_metrics(dt_excess,
+#'                       dt_isobolograms,
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
 #'                       normalization_type = "RV",
 #'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
@@ -62,9 +62,7 @@ heatmap_combo_metrics <- function(
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   duration <- gDRutils::get_env_identifiers("duration")
@@ -96,9 +94,9 @@ heatmap_combo_metrics <- function(
   data.table::setkey(dt_isobolograms, NULL)
   
   # filter data for combination cell line (drug x drug2)
-  dt_excess <- 
+  dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-  dt_isobolograms <- 
+  dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
   # colors for isoline
@@ -106,7 +104,7 @@ heatmap_combo_metrics <- function(
   dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   avialable_iso <- unique(dt_isobolograms$iso_level)
   
-  # title 
+  # title
   main_title <- sprintf("%s (%s)",
                         cl_name,
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
@@ -166,7 +164,7 @@ heatmap_combo_metrics <- function(
     limits <- prep_hm_limits(dt_[[mx_name]])
     
     # base plot
-    plt <- 
+    plt <-
       ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
       ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
       ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
@@ -186,7 +184,7 @@ heatmap_combo_metrics <- function(
                                   expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limits)
-    
+
     # add isoline
     if (NROW(avialable_iso)) { # isobolograms as lines
       if (all(avialable_iso %in% c("0.25", "0.5", "0.75"))) {
@@ -203,7 +201,6 @@ heatmap_combo_metrics <- function(
                                          labels = legend_lbl_iso,
                                          name = legend_title_iso) +
           ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
-        
       } else {
         plt <- plt +
           ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
@@ -223,11 +220,10 @@ heatmap_combo_metrics <- function(
                        gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
                        normalization_type,
                        unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
-  legend_title <- ifelse(normalization_type == "GR", "GR", "IC")
-  
+
   if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
   # base plot
-  plt_iso_compare <- 
+  plt_iso_compare <-
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
     ggplot2::geom_line(
       data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
@@ -248,7 +244,6 @@ heatmap_combo_metrics <- function(
                                      labels = legend_lbl_iso,
                                      name = legend_title_iso) +
       ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
-    
   } else {
     plt_iso_compare <- plt_iso_compare +
       ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
@@ -263,7 +258,7 @@ heatmap_combo_metrics <- function(
   plt_iso_compare <- plt_iso_compare +
     ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
     ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
-    ggplot2::coord_cartesian(ylim = c(-5, 4)) + 
+    ggplot2::coord_cartesian(ylim = c(-5, 4)) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 9),
@@ -300,7 +295,7 @@ heatmap_combo_metrics <- function(
   return(final_plot)
 }
 
-#' Plot heatmaps of averaged values for combined data
+#' Plot heatmaps of averaged values for combination data
 #'
 #' @param dt_excess data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
@@ -308,7 +303,7 @@ heatmap_combo_metrics <- function(
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
-#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName}) 
+#' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
@@ -329,22 +324,22 @@ heatmap_combo_metrics <- function(
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_with_isoref(dt_excess, 
+#' heatmap_combo_with_isoref(dt_excess,
 #'                           dt_isobolograms,
-#'                           drug1_name, drug2_name, 
+#'                           drug1_name, drug2_name,
 #'                           cl_name)
 #'                           
-#' heatmap_combo_with_isoref(dt_excess, 
+#' heatmap_combo_with_isoref(dt_excess,
 #'                           dt_isobolograms,
-#'                           drug1_name, drug2_name, 
+#'                           drug1_name, drug2_name,
 #'                           cl_name,
 #'                           iso_levels = NULL,
-#'                           colors_vec = c("darkcyan", "snow", "darkorange"))                        
+#'                           colors_vec = c("darkcyan", "snow", "darkorange"))                      
 #'                           
-#' heatmap_combo_with_isoref(dt_excess, 
-#'                           dt_isobolograms, 
-#'                           drug1_name, drug2_name, 
-#'                           cl_name, 
+#' heatmap_combo_with_isoref(dt_excess,
+#'                           dt_isobolograms,
+#'                           drug1_name, drug2_name,
+#'                           cl_name,
 #'                           normalization_type = "RV",
 #'                           iso_levels = c("0.25", "0.75"))
 #'
@@ -357,7 +352,7 @@ heatmap_combo_with_isoref <- function(
     cl_name,
     normalization_type = "GR",
     iso_levels = "0.5",
-    colors_vec = NULL, 
+    colors_vec = NULL,
     no_breaks = 50) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -392,11 +387,11 @@ heatmap_combo_with_isoref <- function(
   data.table::setkeyv(dt_isobolograms, "normalization_type")
   dt_isobolograms <- dt_isobolograms[normalization_type]
   data.table::setkey(dt_isobolograms, NULL)
-  
+
   # filter data for combination cell line (drug x drug2)
-  dt_excess <- 
+  dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-  dt_isobolograms <- 
+  dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
   dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
@@ -410,7 +405,7 @@ heatmap_combo_with_isoref <- function(
   }
   
   # prep plot data
-  mx_name <- "smooth" 
+  mx_name <- "smooth"
   dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 ir conc_2 = 0
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
@@ -426,7 +421,7 @@ heatmap_combo_with_isoref <- function(
   tile_width <- diff(drug2_axis$pos_x[3:4])
   
   # panel title
-  cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]]) 
+  cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]])
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   legend_title_fill <- sprintf("%s %s",
@@ -437,7 +432,7 @@ heatmap_combo_with_isoref <- function(
   limits <- prep_hm_limits(dt_[[mx_name]])
   
   # base plot
-  plt <- 
+  plt <-
     ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
                        height = tile_height, width = tile_width, alpha = 0.90) +
@@ -450,8 +445,8 @@ heatmap_combo_with_isoref <- function(
   
   # plot isobologram
   if (NROW(dt_isobolograms)) { # add isolines - if there are such data
-    iso_label <- sprintf("%s%s", 
-                         ifelse(normalization_type == "GR", "GR", "IC"), 
+    iso_label <- sprintf("%s%s",
+                         ifelse(normalization_type == "GR", "GR", "IC"),
                          100 - 100 * as.numeric(available_iso_lvl))
     names(iso_label) <- available_iso_lvl
     
@@ -463,21 +458,21 @@ heatmap_combo_with_isoref <- function(
     data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
     
     tab_isoline <- rbind(tab_measured, tab_expected)
-    
+  
     if (NROW(available_iso_lvl) == 1) {
       plt <- plt +
-        ggplot2::geom_path(data = tab_isoline, 
-                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source), 
+        ggplot2::geom_path(data = tab_isoline,
+                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source),
                            linewidth = 1, color = "red") +
         ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
-                                       name = iso_label) 
+                                       name = iso_label)
     } else {
-      iso_colors <- 
+      iso_colors <-
         grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[seq_along(available_iso_lvl) * 2]
       names(iso_colors) <- available_iso_lvl
       plt <- plt +
-        ggplot2::geom_path(data = tab_isoline, 
-                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level), 
+        ggplot2::geom_path(data = tab_isoline,
+                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
                            linewidth = 1) +
         ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
                                        name = normalization_type) +
@@ -487,32 +482,31 @@ heatmap_combo_with_isoref <- function(
                                     name = "Iso Levels")
     }
   }
-  
+
   # final plot
   plt <- plt +
-    ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x, 
+    ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
                                 labels = drug2_axis$marks_x,
                                 expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y, 
+    ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
                                 labels = drug1_axis$marks_y,
-                                expand = c(0, 0)) + 
-    ggplot2::theme_bw() + 
+                                expand = c(0, 0)) +
+    ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 9),
                    plot.title = ggplot2::element_text(size = 11),
                    panel.grid.minor = ggplot2::element_blank(),
                    legend.key.width = ggplot2::unit(2, "line"))
   
-  
   return(plt)
 }
 
 
-#' Plot panel of heatmaps with fitted and reference data for isobolograms 
+#' Plot panel of heatmaps with fitted and reference data for isobolograms
 #' to control quality of the data
 #'
 #' @inheritParams heatmap_combo_with_isoref
-#' @param cl_names character vector with cell line names to be plotted (Cell Line Name); 
+#' @param cl_names character vector with cell line names to be plotted (Cell Line Name);
 #'    if NULL - all available cell lines will be plotted
 #'    
 #' @return panel with heatmaps for fitted values and reference data for isobolograms
@@ -548,7 +542,7 @@ heatmap_combo_with_isoref <- function(
 #'                                    cl_names,
 #'                                    normalization_type = "RV",
 #'                                    iso_levels = NULL,
-#'                                    colors_vec = c("darkcyan", "snow", "darkorange")) 
+#'                                    colors_vec = c("darkcyan", "snow", "darkorange"))
 #' 
 #' @export
 heatmap_combo_with_isoref_qc_panel <- function(
@@ -562,7 +556,6 @@ heatmap_combo_with_isoref_qc_panel <- function(
     colors_vec = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
@@ -588,8 +581,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
     cl_names  <- available_cls
   } else if (!all(cl_names %in% available_cls)) {
     cl_names <- cl_names[cl_names %in% available_cls]
-  } 
-  
+  }
+
   ls_celllines <- list(cl_name = cl_names)
   
   # panel title
@@ -600,7 +593,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
                          unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
   # list of plots for each drug
-  ls_plt <- purrr::pmap(ls_celllines, 
+  ls_plt <- purrr::pmap(ls_celllines,
                         gDRplots::heatmap_combo_with_isoref,
                         dt_excess = dt_excess,
                         dt_isobolograms = dt_isobolograms,
@@ -609,13 +602,12 @@ heatmap_combo_with_isoref_qc_panel <- function(
                         normalization_type = normalization_type,
                         iso_levels = iso_levels,
                         colors_vec = colors_vec)
-  
   names(ls_plt) <- cl_names
   
   # final panel
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right"),
-    top = panel_title) + 
+    top = panel_title) +
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
   return(panel)
@@ -624,7 +616,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
 
 
 
-#' Calculate limit 
+#' Calculate limit
 #'
 #' @param num_vec numeric vector
 #' @param lower_cap numeric lower capping value
@@ -650,17 +642,17 @@ prep_hm_limits <- function(num_vec,
   vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
   
   min_ <- min(c(lower_cap, min(vec_range)))
-  max_ <- max(c(upper_cap, max(vec_range))) 
+  max_ <- max(c(upper_cap, max(vec_range)))
 
   return(c(min_, max_))
 }
 
-#' Calculate limit 
+#' Transform concentrations values with log10
 #'
 #' @param conc_vec numeric vector with concentration values
 #'
 #' @return numeric vector with log10 concentration values; log10 for concentration equal 0 (-Inf)
-#'    is replaced with one step less in the dose dilution 
+#'    is replaced with one step less in the dose dilution
 #'
 #' @keywords internal
 #' @examples
@@ -677,7 +669,7 @@ transform_log_conc <- function(conc_vec) {
   }
   
   log_values <- log10(conc_vec)
-  # replace the -Inf value coming from the 0 dose with one step less in the dose dilution 
+  # replace the -Inf value coming from the 0 dose with one step less in the dose dilution
   idx_inf <- (conc_vec == 0)
   doses <- sort(unique(log_values))
   zero_replacement <- doses[2] + (doses[2] - doses[3])

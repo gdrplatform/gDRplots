@@ -25,7 +25,7 @@ swap_drugs_1_2 <- function(dt_) {
 
   for (dr_var in intersect(c(drug_name, drug, drug_moa, conc), colnames(dt_))) {
     dt_[[paste0("temp_", dr_var)]] <- dt_[[paste0(dr_var, "_2")]]
-    dt_[[paste0(dr_var, "_2")]] <- dt_[[dr_var]] 
+    dt_[[paste0(dr_var, "_2")]] <- dt_[[dr_var]]
     dt_[[dr_var]] <- dt_[[paste0("temp_", dr_var)]]
     dt_[[paste0("temp_", dr_var)]] <- NULL
   }

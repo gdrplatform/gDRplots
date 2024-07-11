@@ -43,6 +43,5 @@ heatmap_control_mapping_qc(dt_treat = dt_treat,
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls[1:3660, ])
 
-
 }
 \keyword{QC_plot}

@@ -52,19 +52,19 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
 group_names <- unique(dt_metrics[[grouping]])[1:3]
 
-plot_dose_response_sa(dt_metrics = dt_metrics, 
-                      dt_average = dt_average, 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
                       grouping = grouping,
                       group_names = group_names)
             
-iC <- colnames(se)[1]                    
+iC <- colnames(se)[1]
 grouping <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
 group_names <- unique(dt_metrics[[grouping]])[1:3]
 
-plot_dose_response_sa(dt_metrics = dt_metrics, 
-                      dt_average = dt_average, 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
                       grouping = grouping,
                       group_names = group_names)
                       

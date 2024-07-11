@@ -184,8 +184,8 @@ test_that("check output type and data",  {
     `Drug Name 2` = "drug_AB",
     `Cell Line Name` = c("cellline_XY", "cellline_XZ", "cellline_YX"),
     `Concentration 2` = c(0.0022, 0.0458, 0.0007, 0.6173, 1.6122, 4.1234))
-  dt_conc_2[[var_x]] <- dt[["GR_AOC"]][1:NROW(dt_conc_2)] * 0.50
-  dt_conc_2[[var_y]] <- dt[["GR_AOC"]][1:NROW(dt_conc_2)] * 1.25
+  dt_conc_2[[var_x]] <- dt[["GR_AOC"]][seq_len(NROW(dt_conc_2))] * 0.50
+  dt_conc_2[[var_y]] <- dt[["GR_AOC"]][seq_len(NROW(dt_conc_2))] * 1.25
   plt_5 <- plotly_metric_contrast(dt_conc_2, var_x, var_y, var_col, var_txt,
                     metric, identity = TRUE, correlation = TRUE)
   checkmate::expect_class(plt_5, "plotly")
@@ -203,8 +203,8 @@ test_that("check output type and data",  {
     `Cell Line Name` = c("cellline_XY", "cellline_XZ", "cellline_YX", "cellline_YZ"),
     `Tissue` = c("tissue_x", "tissue_x", "tissue_y", "tissue_z"),
     `Concentration 2` = c(0.0007, 0.1851, 1.6666))
-  dt_conc_2_tiss$drug_002 <- dt[["GR_AOC"]][1:NROW(dt_conc_2_tiss)] * 0.50
-  dt_conc_2_tiss$drug_003 <- dt[["GR_AOC"]][1:NROW(dt_conc_2_tiss)] * 2.25
+  dt_conc_2_tiss$drug_002 <- dt[["GR_AOC"]][seq_len(NROW(dt_conc_2_tiss))] * 0.50
+  dt_conc_2_tiss$drug_003 <- dt[["GR_AOC"]][seq_len(NROW(dt_conc_2_tiss))] * 2.25
   dt_conc_2_tiss <- na.omit(dt_conc_2_tiss)
   plt_6 <- plotly_metric_contrast(dt_conc_2_tiss,
                     var_x, var_y, var_col = "Tissue", var_txt,

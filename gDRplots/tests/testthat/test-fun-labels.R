@@ -2,7 +2,7 @@ context("Test fun labels")
 
 test_that("adjust_label works as expected", {
   ls_lbl <- c(
-    "G03405395 (G03642866 at 0.0007621 &mu;M)", 
+    "G03405395 (G03642866 at 0.0007621 &mu;M)",
     "G03580756 (G03642866 at 0.0007621 &mu;M)",
     "G03405395 (G03642866 at 0.002286 &mu;M)")
   ls_lbl_res <- c(
@@ -10,13 +10,13 @@ test_that("adjust_label works as expected", {
     "G03580756 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(G03642866 at 0.0007621 &mu;M)",
     "G03405395 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(G03642866 at 0.002286 &mu;M)"
   )
-  expect_equal(unname(adjust_label(ls_lbl)), ls_lbl_res) 
+  expect_equal(unname(adjust_label(ls_lbl)), ls_lbl_res)
   
   ls_lbl_2 <- c(
-    "G03405395\n(G03642866 at 0.0007621 &mu;M)", 
+    "G03405395\n(G03642866 at 0.0007621 &mu;M)",
     "G03580756\n(G03642866 at 0.0007621 &mu;M)",
     "G03405395\n(G03642866 at 0.002286 &mu;M)")
-  expect_equal(adjust_label(ls_lbl_2), ls_lbl_2) 
+  expect_equal(adjust_label(ls_lbl_2), ls_lbl_2)
   
   expect_error(adjust_label(1:5),
                "Assertion on 'x' failed: Must be of type 'character'")
@@ -86,7 +86,7 @@ test_that("build_label works as expected", {
   expect_equal(
     build_label(dt3, "curve")[1],
     "Cell Line Name: d\nDrug Name: a\nConcentration: 1 &mu;M\n(untreated at 4 &mu;M)\nGR AOC: 1.00")
-  expect_equal(build_label(dt4, "curve")[1], 
+  expect_equal(build_label(dt4, "curve")[1],
                "Cell Line Name: d\nDrug Name: a\nConcentration: 1 &mu;M\nGR AOC: 1.00")
   
   expect_equal(build_label(dt1, "grid")[1], "Cell Line Name: d\nDrug Name: a")
@@ -154,8 +154,8 @@ test_that("build_label works as expected", {
   var_grp <- "Tissue"
   expect_equal(build_label(dt6, "ranking")[1],
                "Drug Name: a\nTissue: tissue_A\nDrug MOA: moa_A\n(untreated at 4 &mu;M)\nTitle: 1.00")
-  var_col <- "Concentration" 
-  var_grp <- "Concentration" 
+  var_col <- "Concentration"
+  var_grp <- "Concentration"
   expect_error(build_label(dt6, "ranking"), "bad value provided for 'var_col'")
   var_col <- "Drug MOA"
   var_grp <- "none"
@@ -183,7 +183,7 @@ test_that("build_label works as expected", {
                "Drug Name: a\nTissue: tissue_A\nDrug MOA: moa_A\n(untreated at 4 &mu;M)\nTitle: 1.00")
   var_col <- "Concentration"
   expect_error(build_label(dt6, "ranking"), "bad value provided for 'var_grp'")
-  
+
   dt8 <-
     data.table::data.table(
       "value" = 1,
@@ -207,17 +207,17 @@ test_that("build_label works as expected", {
     "Duration" = "72",
     "Cell Line Name" = "cellline_A"
   )
-  
+
   var_col <- "none"
   var_grp <- "none"
   var_x <- "Drug Name"
-  expect_equal(build_label(dt8, "combo1-heatmap"), 
+  expect_equal(build_label(dt8, "combo1-heatmap"),
                "Cell Line: cellline_A\nb: 0.00063\na: 0.01\nMX full: 1")
-  expect_equal(build_label(dt8, "combo1-lines_ref"), 
+  expect_equal(build_label(dt8, "combo1-lines_ref"),
                "Cell Line: cellline_A\nb: 0.001\na: 0.016\nreference GR75")
-  expect_equal(build_label(dt8, "combo1-lines"), 
+  expect_equal(build_label(dt8, "combo1-lines"),
                "Cell Line: cellline_A\nb: 0.00063\na: 0.01\nIsobol: GR75")
-  expect_equal(build_label(dt8, "combo1-points"), 
+  expect_equal(build_label(dt8, "combo1-points"),
                "Cell Line: cellline_A\nb: 0.00063\na: 0.01\nMX full: 1.2")
   expect_equal(build_label(dt8, "combo-ratios"),
                "Cell Line Name: cellline_A\nlog10_ratio_conc: -1.5\nlog2_CI: 0\niso: 0.75")
@@ -235,5 +235,4 @@ test_that("build_label works as expected", {
     "Assertion on 'view' failed: Must be of type 'string', not 'double'.",
     fixed = TRUE
   )
-  
 })

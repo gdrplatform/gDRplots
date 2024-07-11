@@ -50,11 +50,11 @@ dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 cellline_name_vec <- unique(dt_metrics[["CellLineName"]])[2:5]
 drug_name_vec <- unique(dt_metrics[["DrugName"]])[5:7]
 
-plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
-                               dt_average = dt_average, 
-                               cellline_name_vec = cellline_name_vec, 
-                               drug_name_vec = drug_name_vec, 
-                               normalization_type = "RV", 
+plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics,
+                               dt_average = dt_average,
+                               cellline_name_vec = cellline_name_vec,
+                               drug_name_vec = drug_name_vec,
+                               normalization_type = "RV",
                                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
 
 }

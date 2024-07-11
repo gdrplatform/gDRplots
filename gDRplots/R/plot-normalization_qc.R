@@ -1,7 +1,7 @@
 #' Plot violin for normalized or averaged single-agent data to control quality of the data
 #'
 #' @param dt_assay data.table representing data from the assay,
-#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)} 
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)}
 #'    for assay_name like "Normalized" and "Averaged"
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
@@ -45,9 +45,8 @@ plot_var_distribution_qc <- function(dt_assay,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
   
-  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
   # filter data for normalization type
   data.table::setkeyv(dt_assay, "normalization_type")
   dt_assay <- dt_assay[normalization_type]
@@ -60,7 +59,7 @@ plot_var_distribution_qc <- function(dt_assay,
   
   plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
-    ggplot2::geom_violin(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
+    ggplot2::geom_violin(ggplot2::aes(fill = get(drug_name), color = get(drug_name)),
                          alpha = 0.25, na.rm = TRUE, drop = FALSE) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#2c3e50") +
     ggplot2::theme_minimal() +
@@ -111,7 +110,7 @@ plot_var_distribution_qc <- function(dt_assay,
 plot_var_stat_qc <- function(dt_assay,
                              cl_name,
                              metric = "r2",
-                             normalization_type = "GR", 
+                             normalization_type = "GR",
                              with_table = FALSE) {
   
   checkmate::expect_data_table(dt_assay)
@@ -123,9 +122,8 @@ plot_var_stat_qc <- function(dt_assay,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  
-  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
+
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
   # filter data for normalization type
   data.table::setkeyv(dt_assay, "normalization_type")
   dt_assay <- dt_assay[normalization_type]
@@ -140,7 +138,7 @@ plot_var_stat_qc <- function(dt_assay,
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#2c3e50", linetype = "dashed") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
-    ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
+    ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)),
                         alpha = 0.75, size = 5, shape = 21, stroke = 1) +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
@@ -151,8 +149,8 @@ plot_var_stat_qc <- function(dt_assay,
   
   if (with_table) {
     tab_metric <- ggpubr::ggtexttable(
-      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))], 
-      rows = NULL, theme = ggpubr::ttheme("light")) 
+      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))],
+      rows = NULL, theme = ggpubr::ttheme("light"))
     
     plt <- ggpubr::ggarrange(plt, tab_metric, nrow = 1, widths = c(2, 1))
   }
@@ -194,14 +192,13 @@ plot_var_stat_qc <- function(dt_assay,
 #' heatmap_control_mapping_qc(dt_treat = dt_treat,
 #'                            dt_controls = dt_controls[1:3660, ])
 #' 
-#' 
 #' @export
 heatmap_control_mapping_qc <- function(dt_treat,
                                        dt_controls) {
   checkmate::expect_data_table(dt_treat)
   checkmate::expect_data_table(dt_controls)
   
-  # calculate the frequency of each (rID, cID) combination in Controls 
+  # calculate the frequency of each (rID, cID) combination in Controls
   frequency <- dt_controls[, .N, by = .(rId, cId)]
   # merge the frequency with the Treated data.table
   result <- merge(unique(dt_treat[, c("rId", "cId")]), frequency, by = c("rId", "cId"), all.x = TRUE)

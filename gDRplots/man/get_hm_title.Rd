@@ -8,7 +8,7 @@ get_hm_title(metric = "xc50", normalization_type = "GR", dataset_name = NULL)
 }
 \arguments{
 \item{metric}{string name of metric
-one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -24,10 +24,10 @@ Get Legend Title
 }
 \examples{
 get_hm_title(dataset_name = "Dateset DX123",
-             metric = "x_mean", 
+             metric = "x_mean",
              normalization_type = "GR")
 
-get_hm_title(metric = "xc50", 
+get_hm_title(metric = "xc50",
              normalization_type = "GR")
              
 }

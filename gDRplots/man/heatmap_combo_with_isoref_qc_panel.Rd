@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_with_isoref_qc_panel}
 \alias{heatmap_combo_with_isoref_qc_panel}
-\title{Plot panel of heatmaps with fitted and reference data for isobolograms 
+\title{Plot panel of heatmaps with fitted and reference data for isobolograms
 to control quality of the data}
 \usage{
 heatmap_combo_with_isoref_qc_panel(
@@ -27,7 +27,7 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 
 \item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
-\item{cl_names}{character vector with cell line names to be plotted (Cell Line Name); 
+\item{cl_names}{character vector with cell line names to be plotted (Cell Line Name);
 if NULL - all available cell lines will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -42,7 +42,7 @@ panel with heatmaps for fitted values and reference data for isobolograms
    for selected drug and co-drug by cell line names
 }
 \description{
-Plot panel of heatmaps with fitted and reference data for isobolograms 
+Plot panel of heatmaps with fitted and reference data for isobolograms
 to control quality of the data
 }
 \examples{
@@ -74,7 +74,7 @@ heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    cl_names,
                                    normalization_type = "RV",
                                    iso_levels = NULL,
-                                   colors_vec = c("darkcyan", "snow", "darkorange")) 
+                                   colors_vec = c("darkcyan", "snow", "darkorange"))
 
 }
 \keyword{QC_plot}

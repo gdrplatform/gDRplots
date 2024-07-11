@@ -18,10 +18,10 @@ subset_data <- dt[key_cells_drugs, on = intersect(names(dt), names(key_cells_dru
 subset_curves <- prepared_curves[key_cells_drugs, on = intersect(names(prepared_curves),
                                                                  names(key_cells_drugs))]
 # prepare extras for selected
-subset_extras_points <- prepared_extras$points[key_cells_drugs, 
+subset_extras_points <- prepared_extras$points[key_cells_drugs,
                                                on = intersect(names(prepared_curves),
                                                               names(key_cells_drugs))]
-subset_extras_lines <- prepared_extras$lines[grepl(paste0(key_cells_drugs, collapse = "."), 
+subset_extras_lines <- prepared_extras$lines[grepl(paste0(key_cells_drugs, collapse = "."),
                                                    names(prepared_extras$lines))]
 subset_extras <- list(points = subset_extras_points,
                       lines = subset_extras_lines)
@@ -39,18 +39,18 @@ combo_key_cells_drugs <- data.table::data.table(
 )
 
 combo_prepared_extras <- prepare_extras(combo_dt)
-combo_subset_data <- 
+combo_subset_data <-
   combo_dt[combo_key_cells_drugs, on = intersect(names(combo_dt), names(combo_key_cells_drugs))]
-combo_subset_curves <- 
-  combo_prepared_curves[combo_key_cells_drugs, 
+combo_subset_curves <-
+  combo_prepared_curves[combo_key_cells_drugs,
                         on = intersect(names(combo_prepared_curves), names(combo_key_cells_drugs))]
 # prepare extras for selected
-combo_subset_extras_points <- 
+combo_subset_extras_points <-
   combo_prepared_extras$points[
-    combo_key_cells_drugs, 
+    combo_key_cells_drugs,
     on = intersect(names(combo_prepared_curves), names(combo_key_cells_drugs))]
-combo_subset_extras_lines <- 
-  combo_prepared_extras$lines[grepl(paste0(combo_key_cells_drugs, collapse = "."), 
+combo_subset_extras_lines <-
+  combo_prepared_extras$lines[grepl(paste0(combo_key_cells_drugs, collapse = "."),
                                     names(combo_prepared_extras$lines))]
 combo_subset_extras <- list(points = combo_subset_extras_points,
                             lines = combo_subset_extras_lines)
@@ -132,7 +132,7 @@ test_that("check output type for plotly_response_curve_all", {
   expect_equal(plt_all$height, 300)
   expect_equal(plt_all$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
   expect_equal(plt_all$x$layoutAttrs[[1]]$title$text,
-               paste0("Dose response curves for Drug Name: ", 
+               paste0("Dose response curves for Drug Name: ",
                       paste(drug_names, collapse = ", ")))
   
   plt_w <- 200
@@ -156,7 +156,7 @@ test_that("check output type for plotly_response_curve_all", {
   plt_all_2 <- plotly_response_curve_all(prepared_curves_2, var_y)
   expect_is(plt_all_2, "plotly")
   expect_equal(plt_all_2$x$layoutAttrs[[1]]$title$text,
-               paste0("Dose response curves for Cell Line Name: ", 
+               paste0("Dose response curves for Cell Line Name: ",
                       paste(selected_cl, collapse = ", ")))
 })
 
@@ -218,10 +218,10 @@ test_that("returns error with missing and wrong argument for plotly_response_cur
 
 # plotly_response_curve_selected tests ----
 test_that("check output type for plotly_response_curve_selected", {
-  plt_sel_1 <- plotly_response_curve_selected(data = subset_data, 
-                                              var_y = var_y, 
+  plt_sel_1 <- plotly_response_curve_selected(data = subset_data,
+                                              var_y = var_y,
                                               layers = c("curve", "average", "error"),
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               extras = subset_extras)
   
   expect_is(plt_sel_1, "plotly")
@@ -234,10 +234,10 @@ test_that("check output type for plotly_response_curve_selected", {
   
   plt_w <- 200
   plt_h <- 600
-  plt_sel_2 <- plotly_response_curve_selected(data = subset_data, 
-                                              var_y = var_y, 
+  plt_sel_2 <- plotly_response_curve_selected(data = subset_data,
+                                              var_y = var_y,
                                               layers = c("curve", "extras"),
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               extras = subset_extras,
                                               plot_width = plt_w,
                                               plot_height = plt_h)
@@ -264,10 +264,10 @@ test_that("check output type for plotly_response_curve_selected", {
   expect_equal(plt_sel_2$x$layoutAttrs[[plt_id]]$shapes[[6]], sub_ex[[2]])
   expect_equal(plt_sel_2$x$config$edits, get_plotly_edits())
   
-  plt_sel_3 <- plotly_response_curve_selected(data = subset_data, 
-                                              var_y = var_y, 
+  plt_sel_3 <- plotly_response_curve_selected(data = subset_data,
+                                              var_y = var_y,
                                               layers = c("observations", "error"),
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               extras = subset_extras)
   
   expect_is(plt_sel_3, "plotly")
@@ -280,10 +280,10 @@ test_that("check output type for plotly_response_curve_selected", {
   expect_equal(plt_sel_3$x$attrs[[2]]$y, subset_data[[var_y]])
   
   r_x <- c(3.8e-2, 4e+0)
-  plt_sel_4 <- plotly_response_curve_selected(data = subset_data, 
-                                              var_y = var_y, 
+  plt_sel_4 <- plotly_response_curve_selected(data = subset_data,
+                                              var_y = var_y,
                                               layers = c("observations", "error"),
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               range_x = r_x,
                                               extras = subset_extras)
   
@@ -291,22 +291,22 @@ test_that("check output type for plotly_response_curve_selected", {
   expect_equal(plt_sel_4$x$layoutAttrs[[1]]$xaxis$range, log10(r_x))
   
   selected_cl <- cell_names[1:3]
-  plt_sel_5 <- plotly_response_curve_selected(data = dt[`Cell Line Name` %in% selected_cl, ], 
-                                              var_y = var_y, 
+  plt_sel_5 <- plotly_response_curve_selected(data = dt[`Cell Line Name` %in% selected_cl, ],
+                                              var_y = var_y,
                                               layers = c("observations", "error"),
                                               curves = prepared_curves[`Cell Line Name` %in% selected_cl, ],
                                               extras = subset_extras)
   
   expect_is(plt_sel_5, "plotly")
   expect_equal(plt_sel_5$x$layoutAttrs[[1]]$title$text,
-               paste0("Drug dose response for Cell Line Name: ", 
+               paste0("Drug dose response for Cell Line Name: ",
                       paste(selected_cl, collapse = ", ")))
   
   # fast end - plotly_empty
-  plt_sel_4 <- plotly_response_curve_selected(data = subset_data, 
-                                              var_y = var_y, 
+  plt_sel_4 <- plotly_response_curve_selected(data = subset_data,
+                                              var_y = var_y,
                                               layers = NULL,
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               extras = subset_extras)
   expect_is(plt_sel_4, "plotly")
   expect_equal(plt_sel_4$x$attrs[[1]]$mode, "markers")
@@ -314,10 +314,10 @@ test_that("check output type for plotly_response_curve_selected", {
   
   subset_data_na <- data.table::copy(subset_data)
   subset_data_na[[var_y]] <- NA
-  plt_sel_5 <- plotly_response_curve_selected(data = subset_data_na, 
-                                              var_y = var_y, 
+  plt_sel_5 <- plotly_response_curve_selected(data = subset_data_na,
+                                              var_y = var_y,
                                               layers = c("observations", "error"),
-                                              curves = subset_curves, 
+                                              curves = subset_curves,
                                               extras = subset_extras)
   expect_is(plt_sel_5, "plotly")
   expect_equal(plt_sel_5$x$attrs[[1]]$mode, "markers")
@@ -325,10 +325,10 @@ test_that("check output type for plotly_response_curve_selected", {
 })
 
 test_that("check output type for plotly_response_curve_selected for combo", {
-  plt_sel_1 <- plotly_response_curve_selected(data = combo_subset_data, 
-                                              var_y = var_y, 
+  plt_sel_1 <- plotly_response_curve_selected(data = combo_subset_data,
+                                              var_y = var_y,
                                               layers = c("curve", "average", "error"),
-                                              curves = combo_subset_curves, 
+                                              curves = combo_subset_curves,
                                               extras = combo_subset_extras)
   
   expect_is(plt_sel_1, "plotly")
@@ -337,20 +337,18 @@ test_that("check output type for plotly_response_curve_selected for combo", {
   expect_equal(plt_sel_1$width, 400)
   expect_equal(plt_sel_1$height, 300)
   expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
-  expect_equal(sort(plt_sel_1$x$attrs[[2]]$color), 
+  expect_equal(sort(plt_sel_1$x$attrs[[2]]$color),
                sort(rep(combo_key_cells_drugs$`Cell Line Name`, 100)))
-  
 })
 
 test_that("check output for wrong data for plotly_response_curve_selected", {
   subset_data_out <- subset_data
   subset_data_out[[var_y]] <- subset_data_out[[var_y]] + 100
   
-  
   plt <- plotly_response_curve_selected(data = subset_data_out, 
-                                        var_y = "GR value", 
+                                        var_y = "GR value",
                                         layers = c("curve", "average", "error"),
-                                        curves = subset_curves, 
+                                        curves = subset_curves,
                                         extras = subset_extras)
   plt_msg <- plt$x$layoutAttrs[[1]]$annotations$text
   
@@ -474,11 +472,10 @@ test_that("get_longest_factor works as expected", {
   
   expect_error(get_longest_factor(letters), "Must inherit from class")
   expect_error(get_longest_factor(unname(factorList)), "Must have Object")
-  expect_error(get_longest_factor(list(f = factorList, i = iris)), 
+  expect_error(get_longest_factor(list(f = factorList, i = iris)),
                "Must be of type 'atomic vector'")
   expect_error(get_longest_factor(factorDatatable, TRUE),
                "Must inherit from class 'character'/'integer'/'numeric'")
   expect_error(get_longest_factor(factorDatatable, "str"), "Must be element of set")
   expect_error(get_longest_factor(factorDatatable, 5), "Assertion on 'default' failed")
 })
-

@@ -26,14 +26,14 @@ and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of metric;
-one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}), 
+one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
 or "x_std" (standard deviation)}
 
 \item{fit_source}{string source name for metrics}
 
 \item{hm_title}{string plot title}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap 
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap
 (first colour for min value, last colour - for max value)}
 
 \item{no_breaks}{numeric number of breaks on scale}
@@ -57,12 +57,11 @@ response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Averaged")
 
 pheatmap_qc(tab_response = response_metrics)
-pheatmap_qc(tab_response = response_metrics, 
+pheatmap_qc(tab_response = response_metrics,
             normalization_type = "RV",
             colors_vec = c("darkblue", "grey90"),
             lbl_by_CellLineName = TRUE,
             lbl_by_DrugName = TRUE)
-             
              
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,

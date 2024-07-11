@@ -25,9 +25,9 @@
 #' @seealso \code{RColorBrewer}, \code{colorRampPalette}
 #'
 #' @export
-brew_palette <- function(n, 
-                        name,
-                        shuffle = FALSE) {
+brew_palette <- function(n,
+                         name,
+                         shuffle = FALSE) {
   
   checkmate::assert_number(n, lower = 1)
   checkmate::assert_string(name)
@@ -44,13 +44,14 @@ brew_palette <- function(n,
       data.table::data.table(RColorBrewer::brewer.pal.info, keep.rownames = TRUE)
     n_max <- bpi[bpi$rn == name, "maxcolors"][[1]]
     rep(RColorBrewer::brewer.pal(n_max, name), length.out = n)
-  } 
+  }
   
   ans <- grDevices::colorRampPalette(b_pals)(n)
   
   if (shuffle) {
     ans <- sample(ans)
   }
+  
   return(ans)
 }
 
