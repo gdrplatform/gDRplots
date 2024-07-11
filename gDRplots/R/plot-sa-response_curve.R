@@ -194,7 +194,7 @@ plot_dose_response_sa <- function(dt_metrics,
 #'                              cellline_name_vec = cellline_name_vec,
 #'                              drug_name_vec = drug_name_vec,
 #'                              normalization_type = "RV",
-#'                              colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#'                              colormap = c("#00008B", "#FF6347", "#4CBB17"))
 #' 
 #' @export
 plot_dose_response_sa_by_CLs <- function(dt_metrics,
@@ -279,7 +279,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #'                                cellline_name_vec = cellline_name_vec,
 #'                                drug_name_vec = drug_name_vec,
 #'                                normalization_type = "RV",
-#'                                colormap = c("#B9D3EE", "#FF6347", "#C2F970"))
+#'                                colormap = c("#00008B", "#FF6347", "#4CBB17"))
 #' 
 #' @export
 plot_dose_response_sa_by_drugs <- function(dt_metrics,

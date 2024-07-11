@@ -130,7 +130,7 @@ heatmap_combo_metrics <- function(
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
-    dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE][!is.na(get(mx_name))]
+    dt_ <- dt_excess[!is.na(get(mx_name)), c(conc, conc_2, mx_name), with = FALSE]
 
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
     dt_$pos_y <- transform_log_conc(dt_[[conc]])

@@ -61,8 +61,10 @@ plot_var_stat_qc <- function(dt_assay,
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
   
-  plt <- ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
+  plt <- ggplot2::ggplot(tab_subplot, 
+                         ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
     ggplot2::geom_hline(yintercept = 1, color = "#2c3e50", linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 0, color = "#2c3e50", linetype = "solid") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
     ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
