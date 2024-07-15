@@ -161,7 +161,9 @@ heatmap_combo_metrics <- function(
                                  normalization_type)
     
     # prep limits
-    limits <- prep_hm_limits(dt_[[mx_name]])
+    limits <- prep_hm_limits(dt_[[mx_name]],   
+                             metric = mx_name,
+                             normalization_type = normalization_type)
     
     # base plot
     plt <-
@@ -430,7 +432,9 @@ heatmap_combo_with_isoref <- function(
                                normalization_type)
   
   # prep limits
-  limits <- prep_hm_limits(dt_[[mx_name]])
+  limits <- prep_hm_limits(dt_[[mx_name]],   
+                           metric = mx_name,
+                           normalization_type = normalization_type)
   
   # base plot
   plt <-
@@ -629,24 +633,35 @@ heatmap_combo_with_isoref_qc_panel <- function(
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' vec <- c(-5, -0.3, 0, Inf, NA)
+#' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 #' prep_hm_limits(vec)
 #' }
 #' 
 prep_hm_limits <- function(num_vec,
-                           lower_cap = -0.25,
-                           upper_cap = 0.25
+                           metric = "smooth",
+                           normalization_type = "GR"
 ) {
   checkmate::assert_numeric(num_vec)
-  checkmate::assert_number(lower_cap)
-  checkmate::assert_number(upper_cap)
+  checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
+  min_data <- min(vec_range)
+  max_data <- max(vec_range)
   
-  min_ <- min(c(lower_cap, min(vec_range)))
-  max_ <- max(c(upper_cap, max(vec_range)))
+  max_val <- if (metric == "smooth") {
+    max(1, max_data)
+  } else {
+    ifelse(min_data > -0.25, -0.25, min_data)
+  }
   
-  return(c(min_, max_))
+  min_val <- if (metric == "smooth") {
+    ifelse(normalization_type == "GR", min(0, min_data), 0)
+  } else {
+    ifelse(max_data < 0.25, 0.25, max_data)
+  }
+  
+  return(c(min_val, max_val))
 }
 
 #' Transform concentrations values with log10

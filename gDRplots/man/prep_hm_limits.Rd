@@ -4,7 +4,7 @@
 \alias{prep_hm_limits}
 \title{Calculate limit}
 \usage{
-prep_hm_limits(num_vec, lower_cap = -0.25, upper_cap = 0.25)
+prep_hm_limits(num_vec, metric = "smooth", normalization_type = "GR")
 }
 \arguments{
 \item{num_vec}{numeric vector}
@@ -21,7 +21,7 @@ Calculate limit
 }
 \examples{
 \dontrun{
-vec <- c(-5, -0.3, 0, Inf, NA)
+vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 prep_hm_limits(vec)
 }
 

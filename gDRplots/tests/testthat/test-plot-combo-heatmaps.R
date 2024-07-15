@@ -48,14 +48,10 @@ test_that("heatmap_combo_metrics works as expected", {
 test_that("prep_hm_limits works as expected", {
   vec <- c(-5, -0.3, 0, Inf, NA)
   expect_equal(prep_hm_limits(vec), c(-5, 0.25))
-  expect_equal(prep_hm_limits(vec, lower_cap =  -10), c(-10, 0.25))
+  expect_equal(prep_hm_limits(vec), c(-10, 0.25))
   
   expect_error(prep_hm_limits(LETTERS[1:5]),
                "Assertion on 'num_vec' failed: Must be of type 'numeric'")
-  expect_error(prep_hm_limits(vec, lower_cap = "str"),
-               "Assertion on 'lower_cap' failed: Must be of type 'number'")
-  expect_error(prep_hm_limits(vec, upper_cap = "str"),
-               "Assertion on 'upper_cap' failed: Must be of type 'number'")
 })
 
 test_that("transform_log_conc works as expected", {
