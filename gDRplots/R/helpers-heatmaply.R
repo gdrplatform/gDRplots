@@ -178,7 +178,12 @@ create_color_palette <- function(colors_vec,
   
   mid_color_idx <- ceiling(length(colors_vec) / 2)
   breaks <- abs(breaks)
-  
+
+  # prevent issue with the same vale of both limits
+  if (length(unique(limits)) == 1) {
+    limits[2] <- limits[1] + breaks
+  }
+
   if (all(limits == 0)) { 
     no_col_below <- 0
     no_col_under <- 1 # return neutral color

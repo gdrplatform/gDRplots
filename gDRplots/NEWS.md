@@ -1,3 +1,6 @@
+## gDRplots 0.0.13 - 2024-07-15
+* fix issue with app crash when limits in create_color_palette are the same
+
 ## gDRplots 0.0.12 - 2024-07-12
 * move `get_combo_col_settings` and `get_iso_colors` from `gDRutils` package
 
