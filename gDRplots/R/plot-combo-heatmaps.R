@@ -131,7 +131,7 @@ heatmap_combo_metrics <- function(
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
     dt_ <- dt_excess[!is.na(get(mx_name)), c(conc, conc_2, mx_name), with = FALSE]
-
+    
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
     dt_$pos_y <- transform_log_conc(dt_[[conc]])
     dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
@@ -183,8 +183,9 @@ heatmap_combo_metrics <- function(
                                   labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
-                                    limit = limits)
-
+                                    limit = limits,
+                                    labels = function(x) sprintf("%.2f", x))
+    
     # add isoline
     if (NROW(avialable_iso)) { # isobolograms as lines
       if (all(avialable_iso %in% c("0.25", "0.5", "0.75"))) {
@@ -220,7 +221,7 @@ heatmap_combo_metrics <- function(
                        gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
                        normalization_type,
                        unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
-
+  
   if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
   # base plot
   plt_iso_compare <-
@@ -282,8 +283,8 @@ heatmap_combo_metrics <- function(
           ncol = 2, common.legend = TRUE, legend = "right"),
         ggpubr::ggarrange(
           plotlist = list(
-            ls_plts[["hsa_excess"]] + ggplot2::guides(fill = ggplot2::guide_legend(title = "Excess")),
-            ls_plts[["bliss_excess"]] + ggplot2::guides(fill = ggplot2::guide_legend(title = "Excess"))
+            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
           ),
           ncol = 2, common.legend = TRUE, legend = "right"),
         common.legend = TRUE, nrow = 2),
@@ -387,7 +388,7 @@ heatmap_combo_with_isoref <- function(
   data.table::setkeyv(dt_isobolograms, "normalization_type")
   dt_isobolograms <- dt_isobolograms[normalization_type]
   data.table::setkey(dt_isobolograms, NULL)
-
+  
   # filter data for combination cell line (drug x drug2)
   dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
@@ -427,7 +428,7 @@ heatmap_combo_with_isoref <- function(
   legend_title_fill <- sprintf("%s %s",
                                gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                                normalization_type)
-
+  
   # prep limits
   limits <- prep_hm_limits(dt_[[mx_name]])
   
@@ -441,7 +442,8 @@ heatmap_combo_with_isoref <- function(
                   title = plt_title,
                   fill = legend_title_fill) +
     ggplot2::scale_fill_gradientn(colors = hm_color_palette,
-                                  limit = limits)
+                                  limit = limits,
+                                  labels = function(x) sprintf("%.2f", x))
   
   # plot isobologram
   if (NROW(dt_isobolograms)) { # add isolines - if there are such data
@@ -458,7 +460,7 @@ heatmap_combo_with_isoref <- function(
     data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
     
     tab_isoline <- rbind(tab_measured, tab_expected)
-  
+    
     if (NROW(available_iso_lvl) == 1) {
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline,
@@ -482,7 +484,7 @@ heatmap_combo_with_isoref <- function(
                                     name = "Iso Levels")
     }
   }
-
+  
   # final plot
   plt <- plt +
     ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
@@ -582,7 +584,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   } else if (!all(cl_names %in% available_cls)) {
     cl_names <- cl_names[cl_names %in% available_cls]
   }
-
+  
   ls_celllines <- list(cl_name = cl_names)
   
   # panel title
@@ -643,7 +645,7 @@ prep_hm_limits <- function(num_vec,
   
   min_ <- min(c(lower_cap, min(vec_range)))
   max_ <- max(c(upper_cap, max(vec_range)))
-
+  
   return(c(min_, max_))
 }
 
