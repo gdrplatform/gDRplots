@@ -22,10 +22,10 @@ dt_mx <- dt_mx[normalization_type == norm_type, ]
 dt_iso <- gDRutils::convert_se_assay_to_dt(se1, "isobolograms")
 dt_iso <- dt_iso[normalization_type == norm_type, ][, .(iso_level, pos_x, pos_y)]
 all_iso <- unique(dt_iso$iso_level)
-iso_colors <- gDRutils::get_iso_colors()[all_iso]
+iso_colors <- get_iso_colors()[all_iso]
 
 # nolint start
-# # note: this is now wrapped in gDRutils::get_iso_colors 
+# # note: this is now wrapped in get_iso_colors 
 # all_iso <- unique(dt_iso$iso_level)
 # iso_cutoff <- as.numeric(all_iso)
 # 
@@ -133,7 +133,7 @@ dt_iso <- gDRutils::convert_se_assay_to_dt(se1, "isobolograms")
 dt_iso <- dt_iso[normalization_type == norm_type, ][, .(iso_level, log10_ratio_conc, log2_CI)]
 
 all_iso <- unique(dt_iso$iso_level)
-iso_colors <- gDRutils::get_iso_colors()[all_iso]
+iso_colors <- get_iso_colors()[all_iso]
 
 # base plot
 plt_iso_compare <- 
