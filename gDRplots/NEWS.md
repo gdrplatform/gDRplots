@@ -1,3 +1,6 @@
+## gDRplots 0.0.12 - 2024-07-15
+* refactor code to properly visualize data with NAs
+
 ## gDRplots 0.0.11 - 2024-07-11
 * add plots to quality control for combo data - combo metrics and reference isoline
 
