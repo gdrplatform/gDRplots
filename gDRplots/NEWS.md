@@ -1,3 +1,6 @@
+## gDRplots 0.0.12 - 2024-07-15
+* fix issue with app crash when limits in create_color_palette are the same
+
 ## gDRplots 0.0.11 - 2024-07-11
 * add plots to quality control for combo data - combo metrics and reference isoline
 
