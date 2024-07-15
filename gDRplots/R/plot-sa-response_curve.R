@@ -530,7 +530,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
   
-  available_drugs <- unique(dt_metrics[[drug_name]])
+  available_drugs <- unique(dt_metrics[get(cellline_name) %in% cl_name, ][[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {

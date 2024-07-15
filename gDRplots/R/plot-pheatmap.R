@@ -166,8 +166,10 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
-  if (cluster_rows) {
-    cluster_rows <- stats::hclust(stats::dist(mat_cvd))
+  cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd))) {
+    stats::hclust(stats::dist(mat_cvd))
+  } else {
+    FALSE
   }
   
   # heatmap labels
