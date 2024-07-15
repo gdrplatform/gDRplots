@@ -13,6 +13,7 @@
 #' @param colormap character vector with colors for \code{group_names} - name or hex value
 #' @param plot_averaged_flag logical flag whether plot points with average values
 #' @param plot_fit_flag logical flag whether plot points with fitted values
+#' @param fit_source string source name for metrics
 #'
 #' @return plot with dose-response curves
 #'
@@ -50,7 +51,8 @@ plot_dose_response_sa <- function(dt_metrics,
                                   normalization_type = "GR",
                                   colormap = NULL,
                                   plot_averaged_flag = TRUE,
-                                  plot_fit_flag = TRUE) {
+                                  plot_fit_flag = TRUE,
+                                  fit_source = "gDR") {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -65,6 +67,7 @@ plot_dose_response_sa <- function(dt_metrics,
   checkmate::expect_character(colormap, null.ok = TRUE)
   checkmate::expect_flag(plot_averaged_flag)
   checkmate::expect_flag(plot_fit_flag)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
   
   # check input data
   if (grouping == cellline_name) {
@@ -77,13 +80,14 @@ plot_dose_response_sa <- function(dt_metrics,
   stopifnot("empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
   
   # filter data for normalization type
-  data.table::setkeyv(dt_metrics, "normalization_type")
-  dt_met_norm <- dt_metrics[normalization_type]
-  data.table::setkey(dt_met_norm, NULL)
-  data.table::setkeyv(dt_average, "normalization_type")
-  dt_avg_norm <- dt_average[normalization_type]
-  data.table::setkey(dt_avg_norm, NULL)
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_met_norm <- dt_metrics[eval(filter_expr)]
+  dt_avg_norm <- dt_average[eval(filter_expr)]
   
+  # intersect groupings
+  group_names <- intersect(dt_average[[grouping]], group_names)
+
   # variables
   conc <- gDRutils::get_env_identifiers("concentration")
   
@@ -98,7 +102,7 @@ plot_dose_response_sa <- function(dt_metrics,
   # group
   if (is.null(group_names)) group_names <- unique(dt_met_norm[[grouping]])
   
-  # prep fitted data
+# prep fitted data
   sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
   dt_fit <- data.table::data.table()
   
@@ -165,10 +169,8 @@ plot_dose_response_sa <- function(dt_metrics,
   }
   
   # define legend
-  plt <- plt +
+  plt +
     ggplot2::guides(colour = ggplot2::guide_legend(position = "left"))
-  
-  return(plt)
 }
 
 
@@ -396,14 +398,12 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   checkmate::expect_choice(d_name, choices = dt_metrics[[drug_name]])
   checkmate::expect_choice(d_name, choices = dt_average[[drug_name]])
 
-  # filter data for normalization_type
-  data.table::setkeyv(dt_metrics, "normalization_type")
-  dt_metrics <- dt_metrics[normalization_type]
-  data.table::setkey(dt_metrics, NULL)
-  data.table::setkeyv(dt_average, "normalization_type")
-  dt_average <- dt_average[normalization_type]
-  data.table::setkey(dt_average, NULL)
-  
+  # filter data for normalization_type and fit_source
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_metrics <- dt_metrics[eval(filter_expr)]
+  dt_average <- dt_average[eval(filter_expr)]
+
   # filter data for min required data
   dt_metrics <-
     dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]

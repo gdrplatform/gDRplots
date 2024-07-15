@@ -81,15 +81,9 @@ pheatmap_qc <- function(
   drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
   
   # select data for normalization type
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   # fill column
   if (conc_2 %in% names(tab_response)) {
@@ -332,15 +326,9 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # select data for normalization type
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   qmfun <- switch(metric,
                   "xc50" = log10,
@@ -559,15 +547,9 @@ pheatmap_with_anno_combo <- function(
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
   # prep data
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   # select data for normalization type
   tab_plot <- data.table::dcast(
