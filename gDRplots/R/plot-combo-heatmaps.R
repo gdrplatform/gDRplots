@@ -100,7 +100,7 @@ heatmap_combo_metrics <- function(
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
   # colors for isoline
-  iso_colors <- gDRutils::get_iso_colors()[iso_levels]
+  iso_colors <- get_iso_colors()[iso_levels]
   dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   avialable_iso <- unique(dt_isobolograms$iso_level)
   
