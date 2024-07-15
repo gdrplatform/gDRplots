@@ -403,7 +403,7 @@ test_that("assert_RGB_format", {
 
 test_that("get_combo_col_settings",  {
   ### expected values
-  gcan <- names(get_combo_assay_names()[1])
+  gcan <- names(gDRutils::get_combo_assay_names()[1])
   gcc <-
     get_combo_col_settings(g_metric = "GR", assay_type = gcan)
   expect_true(inherits(gcc, "list"))
