@@ -73,6 +73,13 @@ heatmap_combo_with_isoref(dt_excess,
                           cl_name,
                           normalization_type = "RV",
                           iso_levels = c("0.25", "0.75"))
+                          
+dt_isobolograms$iso_level <- NULL
+
+heatmap_combo_with_isoref(dt_excess,
+                          dt_isobolograms,
+                          drug1_name, drug2_name,
+                          cl_name)
 
 }
 \keyword{combo_plots}

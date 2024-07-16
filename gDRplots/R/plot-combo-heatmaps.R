@@ -48,6 +48,14 @@
 #'                       normalization_type = "RV",
 #'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
+#'                       
+#' dt_isobolograms$iso_level <- NULL 
+#' 
+#' heatmap_combo_metrics(dt_excess,
+#'                       dt_isobolograms,
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
+#'                       normalization_type = "GR")                       
 #'
 #' @export
 heatmap_combo_metrics <- function(
@@ -99,11 +107,13 @@ heatmap_combo_metrics <- function(
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
-  # colors for isoline
-  iso_colors <- get_iso_colors()[iso_levels]
-  dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
-  avialable_iso <- unique(dt_isobolograms$iso_level)
-  
+  # isoline data
+  if (!is.null(dt_isobolograms$iso_level)) {
+    dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
+  }
+  available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+  iso_colors <- get_iso_colors()[available_iso_lvl]
+
   # title
   main_title <- sprintf("%s (%s)",
                         cl_name,
@@ -112,7 +122,7 @@ heatmap_combo_metrics <- function(
   legend_title_iso <- "Iso Levels"
   legend_lbl_iso <- NULL # due to NSE notes in R CMD check
   legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                           100 - 100 * as.numeric(avialable_iso))
+                           100 - 100 * as.numeric(available_iso_lvl))
   
   # prep hm color palette
   hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
@@ -189,18 +199,18 @@ heatmap_combo_metrics <- function(
                                     labels = function(x) sprintf("%.2f", x))
     
     # add isoline
-    if (NROW(avialable_iso)) { # isobolograms as lines
-      if (all(avialable_iso %in% c("0.25", "0.5", "0.75"))) {
+    if (NROW(available_iso_lvl)) { # isobolograms as lines
+      if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
         # friendly for user with color vision deficiency
         plt <- plt +
           ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
-          ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
-                                      breaks = avialable_iso,
+          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                      breaks = available_iso_lvl,
                                       labels = legend_lbl_iso,
                                       name = legend_title_iso) +
           ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
-                                         breaks = avialable_iso,
+                                         breaks = available_iso_lvl,
                                          labels = legend_lbl_iso,
                                          name = legend_title_iso) +
           ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
@@ -208,8 +218,8 @@ heatmap_combo_metrics <- function(
         plt <- plt +
           ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
                              ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
-          ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
-                                      breaks = avialable_iso,
+          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                      breaks = available_iso_lvl,
                                       labels = legend_lbl_iso,
                                       name = legend_title_iso)
       }
@@ -233,28 +243,30 @@ heatmap_combo_metrics <- function(
     ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9")
   
   # add isoline
-  if (all(avialable_iso %in% c("0.25", "0.5", "0.75"))) {
-    # friendly for user with color vision deficiency
-    plt_iso_compare <- plt_iso_compare +
-      ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
-                         ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)) +
-      ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
-                                  breaks = avialable_iso,
+  if (NROW(available_iso_lvl)) { # isobolograms as lines
+    if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
+      # friendly for user with color vision deficiency
+      plt_iso_compare <- plt_iso_compare +
+        ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
+                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)) +
+        ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                    breaks = available_iso_lvl,
+                                    labels = legend_lbl_iso,
+                                    name = legend_title_iso) +
+        ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
+                                       breaks = available_iso_lvl,
+                                       labels = legend_lbl_iso,
+                                       name = legend_title_iso) +
+        ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+    } else {
+      plt_iso_compare <- plt_iso_compare +
+        ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
+                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level))
+      ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                  breaks = available_iso_lvl,
                                   labels = legend_lbl_iso,
-                                  name = legend_title_iso) +
-      ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
-                                     breaks = avialable_iso,
-                                     labels = legend_lbl_iso,
-                                     name = legend_title_iso) +
-      ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
-  } else {
-    plt_iso_compare <- plt_iso_compare +
-      ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
-                         ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level))
-    ggplot2::scale_color_manual(values = iso_colors[avialable_iso],
-                                breaks = avialable_iso,
-                                labels = legend_lbl_iso,
-                                name = legend_title_iso)
+                                  name = legend_title_iso)
+    }
   }
   
   # add x and y scales
@@ -345,6 +357,13 @@ heatmap_combo_metrics <- function(
 #'                           cl_name,
 #'                           normalization_type = "RV",
 #'                           iso_levels = c("0.25", "0.75"))
+#'                           
+#' dt_isobolograms$iso_level <- NULL
+#' 
+#' heatmap_combo_with_isoref(dt_excess,
+#'                           dt_isobolograms,
+#'                           drug1_name, drug2_name,
+#'                           cl_name)
 #'
 #' @export
 heatmap_combo_with_isoref <- function(
@@ -387,15 +406,18 @@ heatmap_combo_with_isoref <- function(
   dt_excess <- dt_excess[eval(filter_expr)]
   dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
   
-  
   # filter data for combination cell line (drug x drug2)
   dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
-  dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
+  # isoline data
+  if (!is.null(dt_isobolograms$iso_level)) {
+    dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
+  }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+  iso_colors <- get_iso_colors()[available_iso_lvl]
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec)) {
@@ -447,7 +469,7 @@ heatmap_combo_with_isoref <- function(
                                   labels = function(x) sprintf("%.2f", x))
   
   # plot isobologram
-  if (NROW(dt_isobolograms)) { # add isolines - if there are such data
+  if (NROW(available_iso_lvl)) { # add isolines - if there are such data
     iso_label <- sprintf("%s%s",
                          ifelse(normalization_type == "GR", "GR", "IC"),
                          100 - 100 * as.numeric(available_iso_lvl))
