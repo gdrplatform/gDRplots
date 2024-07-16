@@ -89,16 +89,12 @@ heatmap_combo_metrics <- function(
   checkmate::assert_flag(as_panel)
   
   # filter data for normalization type
-  data.table::setkeyv(dt_excess, "normalization_type")
-  dt_excess <- dt_excess[normalization_type]
-  data.table::setkey(dt_excess, NULL)
-  
-  data.table::setkeyv(dt_isobolograms, "normalization_type")
-  dt_isobolograms <- dt_isobolograms[normalization_type]
-  data.table::setkey(dt_isobolograms, NULL)
-  
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_excess <- dt_excess[eval(filter_expr)]
+  dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
+
   # filter data for combination cell line (drug x drug2)
-  dt_excess <-
+   dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
@@ -387,13 +383,10 @@ heatmap_combo_with_isoref <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   
   # filter data for normalization type
-  data.table::setkeyv(dt_excess, "normalization_type")
-  dt_excess <- dt_excess[normalization_type]
-  data.table::setkey(dt_excess, NULL)
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_excess <- dt_excess[eval(filter_expr)]
+  dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
   
-  data.table::setkeyv(dt_isobolograms, "normalization_type")
-  dt_isobolograms <- dt_isobolograms[normalization_type]
-  data.table::setkey(dt_isobolograms, NULL)
   
   # filter data for combination cell line (drug x drug2)
   dt_excess <-
@@ -623,7 +616,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   return(panel)
 }
 
-#' Calculate limit for combo heatmap with gDR assamptions
+#' Calculate limit for combo heatmap with gDR assumptions
 #'
 #' @param num_vec numeric vector
 #' @param metric string name of combo exccess metric;

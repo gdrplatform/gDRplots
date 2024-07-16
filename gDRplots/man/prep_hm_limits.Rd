@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{prep_hm_limits}
 \alias{prep_hm_limits}
-\title{Calculate limit for combo heatmap with gDR assamptions}
+\title{Calculate limit for combo heatmap with gDR assumptions}
 \usage{
 prep_hm_limits(num_vec, metric = "smooth", normalization_type = "GR")
 }
@@ -19,7 +19,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 capped limits (min and max) for given numeric vector
 }
 \description{
-Calculate limit for combo heatmap with gDR assamptions
+Calculate limit for combo heatmap with gDR assumptions
 }
 \examples{
 \dontrun{
