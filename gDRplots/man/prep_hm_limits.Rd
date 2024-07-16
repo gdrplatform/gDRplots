@@ -2,27 +2,30 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{prep_hm_limits}
 \alias{prep_hm_limits}
-\title{Calculate limit}
+\title{Calculate limit for combo heatmap with gDR assamptions}
 \usage{
 prep_hm_limits(num_vec, metric = "smooth", normalization_type = "GR")
 }
 \arguments{
 \item{num_vec}{numeric vector}
 
-\item{lower_cap}{numeric lower capping value}
+\item{metric}{string name of combo exccess metric;
+one of: "smooth", "hsa_excess", "bliss_excess"}
 
-\item{upper_cap}{numeric upper capping value}
+\item{normalization_type}{string with normalization_types to be selected
+one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 }
 \value{
 capped limits (min and max) for given numeric vector
 }
 \description{
-Calculate limit
+Calculate limit for combo heatmap with gDR assamptions
 }
 \examples{
 \dontrun{
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 prep_hm_limits(vec)
+prep_hm_limits(vec, metric = "hsa_excess")
 }
 
 }

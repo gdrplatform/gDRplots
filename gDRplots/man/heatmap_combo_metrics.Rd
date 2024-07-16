@@ -69,6 +69,10 @@ heatmap_combo_metrics(dt_excess,
                       cl_name,
                       normalization_type = "GR")
                       
+cl_name <- "cellline_JE"
+drug1_name <- "drug_011"
+drug2_name <- "drug_026"
+
 heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
                       drug1_name, drug2_name,

@@ -37,6 +37,10 @@
 #'                       cl_name,
 #'                       normalization_type = "GR")
 #'                       
+#' cl_name <- "cellline_JE"
+#' drug1_name <- "drug_011"
+#' drug2_name <- "drug_026"
+#' 
 #' heatmap_combo_metrics(dt_excess,
 #'                       dt_isobolograms,
 #'                       drug1_name, drug2_name,
@@ -619,14 +623,13 @@ heatmap_combo_with_isoref_qc_panel <- function(
   return(panel)
 }
 
-
-
-
-#' Calculate limit
+#' Calculate limit for combo heatmap with gDR assamptions
 #'
 #' @param num_vec numeric vector
-#' @param lower_cap numeric lower capping value
-#' @param upper_cap numeric upper capping value
+#' @param metric string name of combo exccess metric;
+#'    one of: "smooth", "hsa_excess", "bliss_excess"
+#' @param normalization_type string with normalization_types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
 #' @return capped limits (min and max) for given numeric vector
 #'
@@ -635,32 +638,32 @@ heatmap_combo_with_isoref_qc_panel <- function(
 #' \dontrun{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 #' prep_hm_limits(vec)
+#' prep_hm_limits(vec, metric = "hsa_excess")
 #' }
 #' 
 prep_hm_limits <- function(num_vec,
                            metric = "smooth",
-                           normalization_type = "GR"
-) {
+                           normalization_type = "GR") {
+  
   checkmate::assert_numeric(num_vec)
   checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  
+
   vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
   min_data <- min(vec_range)
   max_data <- max(vec_range)
-  
+
   max_val <- if (metric == "smooth") {
     max(1, max_data)
   } else {
-    ifelse(min_data > -0.25, -0.25, min_data)
+    ifelse(max_data < 0.25, 0.25, max_data)
   }
   
   min_val <- if (metric == "smooth") {
     ifelse(normalization_type == "GR", min(0, min_data), 0)
   } else {
-    ifelse(max_data < 0.25, 0.25, max_data)
+    ifelse(min_data > -0.25, -0.25, min_data)
   }
-  
   return(c(min_val, max_val))
 }
 
