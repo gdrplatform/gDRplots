@@ -92,9 +92,9 @@ heatmap_combo_metrics <- function(
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_excess <- dt_excess[eval(filter_expr)]
   dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
-
+  
   # filter data for combination cell line (drug x drug2)
-   dt_excess <-
+  dt_excess <-
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
@@ -641,13 +641,13 @@ prep_hm_limits <- function(num_vec,
   checkmate::assert_numeric(num_vec)
   checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-
+  
   vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
   min_data <- min(vec_range)
   max_data <- max(vec_range)
-
+  
   max_val <- if (metric == "smooth") {
-    max(1, max_data)
+    ifelse(max_data > 1, max_data, 1)
   } else {
     ifelse(max_data < 0.25, 0.25, max_data)
   }
