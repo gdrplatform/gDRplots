@@ -2,18 +2,18 @@
 % Please edit documentation in R/fun-colors.R
 \name{is_color_dark}
 \alias{is_color_dark}
-\title{Determine whether or not a colour is dark}
+\title{Determine whether or not a color is dark}
 \usage{
 is_color_dark(col_name)
 }
 \arguments{
-\item{col_name}{string representing a valid colour}
+\item{col_name}{string representing a valid color}
 }
 \value{
 logical flag
 }
 \description{
-Determine whether or not a colour is dark
+Determine whether or not a color is dark
 }
 \examples{
 is_color_dark("blue")

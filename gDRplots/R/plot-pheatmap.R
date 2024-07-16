@@ -11,7 +11,7 @@
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
-#'   (first colour for min value, last colour - for max value)
+#'   (first color for min value, last color - for max value)
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether ows should be clustered
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
@@ -81,15 +81,9 @@ pheatmap_qc <- function(
   drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
   
   # select data for normalization type
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   # fill column
   if (conc_2 %in% names(tab_response)) {
@@ -166,8 +160,10 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendogram
-  if (cluster_rows) {
-    cluster_rows <- stats::hclust(stats::dist(mat_cvd))
+  cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd))) {
+    stats::hclust(stats::dist(mat_cvd))
+  } else {
+    FALSE
   }
   
   # heatmap labels
@@ -330,15 +326,9 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # select data for normalization type
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   qmfun <- switch(metric,
                   "xc50" = log10,
@@ -557,15 +547,9 @@ pheatmap_with_anno_combo <- function(
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
   # prep data
-  data.table::setkeyv(tab_response, "normalization_type")
-  tab_response <- tab_response[normalization_type]
-  data.table::setkey(tab_response, NULL)
-  
-  if (fit_source %in% names(tab_response)) {
-    data.table::setkeyv(tab_response, "fit_source")
-    tab_response <- tab_response[fit_source]
-    data.table::setkey(tab_response, NULL)
-  }
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- tab_response[eval(filter_expr)]
   
   # select data for normalization type
   tab_plot <- data.table::dcast(
