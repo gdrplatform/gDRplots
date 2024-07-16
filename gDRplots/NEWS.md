@@ -1,5 +1,8 @@
-## gDRplots 0.0.14 - 2024-07-16
+## gDRplots 0.0.15 - 2024-07-16
 * fix issue with wrong order of colorbar values for combo heatmap
+
+## gDRplots 0.0.14 - 2024-07-15
+* refactor code to properly visualize data with NAs
 
 ## gDRplots 0.0.13 - 2024-07-15
 * fix issue with app crash when limits in `create_color_palette` are the same

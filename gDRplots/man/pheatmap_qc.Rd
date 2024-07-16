@@ -34,7 +34,7 @@ or "x_std" (standard deviation)}
 \item{hm_title}{string plot title}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap
-(first colour for min value, last colour - for max value)}
+(first color for min value, last color - for max value)}
 
 \item{no_breaks}{numeric number of breaks on scale}
 

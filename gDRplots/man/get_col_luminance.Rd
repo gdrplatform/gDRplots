@@ -2,18 +2,18 @@
 % Please edit documentation in R/fun-colors.R
 \name{get_col_luminance}
 \alias{get_col_luminance}
-\title{Calculate the luminance of a colour}
+\title{Calculate the luminance of a color}
 \usage{
 get_col_luminance(col_name)
 }
 \arguments{
-\item{col_name}{string representing a valid colour}
+\item{col_name}{string representing a valid color}
 }
 \value{
 single element numeric vector
 }
 \description{
-Calculate the luminance of a colour
+Calculate the luminance of a color
 }
 \examples{
 get_col_luminance("blue")
