@@ -85,8 +85,12 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_met_norm <- dt_metrics[eval(filter_expr)]
   dt_avg_norm <- dt_average[eval(filter_expr)]
   
-  # intersect groupings
-  group_names <- intersect(dt_average[[grouping]], group_names)
+  group_names <- if (is.null(group_names)) {
+    unique(dt_met_norm[[grouping]])
+  } else {
+    intersect(dt_met_norm[[grouping]], group_names)
+  }
+  
 
   # variables
   conc <- gDRutils::get_env_identifiers("concentration")
@@ -169,8 +173,10 @@ plot_dose_response_sa <- function(dt_metrics,
   }
   
   # define legend
-  plt +
-    ggplot2::guides(colour = ggplot2::guide_legend(position = "left"))
+  plt <- plt +
+    ggplot2::guides(color = ggplot2::guide_legend(position = "left"))
+  
+  return(plt)
 }
 
 

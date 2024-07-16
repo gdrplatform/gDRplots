@@ -101,7 +101,7 @@ plotly_metric_distribution <- function(data,
                                         text = data[["label"]],
                                         type = type)
     plot_populated <- plotly::layout(plot_populated, xaxis = list(title = title_y))
-  } else if (var_grp != "none" && var_col == "none") { ## grouping no colouring
+  } else if (var_grp != "none" && var_col == "none") { ## grouping no coloring
     # add traces
     cols <- c(var_x, var_grp)
     plot_base <- plotly::add_trace(plot_base,

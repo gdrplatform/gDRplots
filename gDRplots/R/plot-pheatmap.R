@@ -11,7 +11,7 @@
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
-#'   (first colour for min value, last colour - for max value)
+#'   (first color for min value, last color - for max value)
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether ows should be clustered
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid

@@ -7,7 +7,7 @@
 is_valid_color(col_name)
 }
 \arguments{
-\item{col_name}{string representing a valid colour}
+\item{col_name}{string representing a valid color}
 }
 \value{
 logical flag

@@ -55,9 +55,9 @@ brew_palette <- function(n,
   return(ans)
 }
 
-#' Determine whether or not a colour is dark
+#' Determine whether or not a color is dark
 #' 
-#' @param col_name string representing a valid colour
+#' @param col_name string representing a valid color
 #' 
 #' @examples
 #' is_color_dark("blue")
@@ -76,9 +76,9 @@ is_color_dark <- function(col_name) {
 }
 
 
-#' Calculate the luminance of a colour
+#' Calculate the luminance of a color
 #'
-#' @param col_name string representing a valid colour
+#' @param col_name string representing a valid color
 #' 
 #' @examples
 #' get_col_luminance("blue")
@@ -114,7 +114,7 @@ get_col_luminance <- function(col_name) {
 #' A name of color is valid when either is a color name listed by \code{\link[grDevices]{colors}}
 #' or a hexadecimal string of the form \code{#rrggbb} 
 #' 
-#' @param col_name string representing a valid colour
+#' @param col_name string representing a valid color
 #' 
 #' @keywords utils_color
 #' @return logical flag
