@@ -15,7 +15,7 @@ Imports:
     checkmate,
     data.table,
     ggplot2,
-    gDRutils (>= 1.1.16),
+    gDRutils (>= 1.3.6),
     pheatmap,
     plotly,
     plotlyLabelR (>= 0.1.1),
