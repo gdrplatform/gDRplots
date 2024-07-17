@@ -48,14 +48,6 @@
 #'                       normalization_type = "RV",
 #'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
-#'                       
-#' dt_isobolograms$iso_level <- NULL 
-#' 
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "GR")                       
 #'
 #' @export
 heatmap_combo_metrics <- function(
@@ -113,7 +105,7 @@ heatmap_combo_metrics <- function(
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
   iso_colors <- get_iso_colors()[available_iso_lvl]
-
+  
   # title
   main_title <- sprintf("%s (%s)",
                         cl_name,
@@ -140,25 +132,6 @@ heatmap_combo_metrics <- function(
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
-    dt_ <- dt_excess[!is.na(get(mx_name)), c(conc, conc_2, mx_name), with = FALSE]
-    
-    dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-    dt_$pos_y <- transform_log_conc(dt_[[conc]])
-    dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
-    
-    ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
-    drug1_axis <- ls_axes$axis_1
-    drug2_axis <- ls_axes$axis_2
-    tile_height <- diff(drug1_axis$pos_y[3:4])
-    tile_width <- diff(drug2_axis$pos_x[3:4])
-    
-    # prep hm color palette
-    hm_color_palette <- if (mx_name == "smooth") {
-      hm_color_palette_smooth
-    } else {
-      hm_color_palette_excess
-    }
-    
     # plot title
     plt_title <- sprintf("%s for %s, T=%sh",
                          gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
@@ -166,62 +139,91 @@ heatmap_combo_metrics <- function(
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
     
-    legend_title_fill <- sprintf("%s %s",
-                                 gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
-                                 normalization_type)
+    dt_ <- dt_excess[!is.na(get(mx_name)), c(conc, conc_2, mx_name), with = FALSE]
     
-    # prep limits
-    limits <- prep_hm_limits(dt_[[mx_name]],   
-                             metric = mx_name,
-                             normalization_type = normalization_type)
-    
-    # base plot
-    plt <-
-      ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
-      ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
-      ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                    y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
-                    title = plt_title,
-                    fill = legend_title_fill) +
-      ggplot2::theme_bw() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                     axis.text.y = ggplot2::element_text(size = 9),
-                     plot.title = ggplot2::element_text(size = 11),
-                     panel.grid = ggplot2::element_blank()) +
-      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                  labels = drug2_axis$marks_x,
-                                  expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                  labels = drug1_axis$marks_y,
-                                  expand = c(0, 0)) +
-      ggplot2::scale_fill_gradientn(colors = hm_color_palette,
-                                    limit = limits,
-                                    labels = function(x) sprintf("%.2f", x))
-    
-    # add isoline
-    if (NROW(available_iso_lvl)) { # isobolograms as lines
-      if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
-        # friendly for user with color vision deficiency
-        plt <- plt +
-          ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
-                             ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
-          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
-                                      breaks = available_iso_lvl,
-                                      labels = legend_lbl_iso,
-                                      name = legend_title_iso) +
-          ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
-                                         breaks = available_iso_lvl,
-                                         labels = legend_lbl_iso,
-                                         name = legend_title_iso) +
-          ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+    if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
+      plt <- 
+        ggplot2::ggplot() +
+        ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                      y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+                      title = plt_title) +
+        ggplot2::theme_bw()
+    } else {
+      dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
+      dt_$pos_y <- transform_log_conc(dt_[[conc]])
+      dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
+      
+      ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+      drug1_axis <- ls_axes$axis_1
+      drug2_axis <- ls_axes$axis_2
+      tile_height <- .get_tile_size(drug1_axis$pos_y)
+      tile_width <- .get_tile_size(drug2_axis$pos_x)
+      
+      # prep hm color palette
+      hm_color_palette <- if (mx_name == "smooth") {
+        hm_color_palette_smooth
       } else {
-        plt <- plt +
-          ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
-                             ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
-          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
-                                      breaks = available_iso_lvl,
-                                      labels = legend_lbl_iso,
-                                      name = legend_title_iso)
+        hm_color_palette_excess
+      }
+      
+      # legend title
+      legend_title_fill <- sprintf("%s %s",
+                                   gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
+                                   normalization_type)
+      
+      # prep limits
+      limits <- prep_hm_limits(dt_[[mx_name]],   
+                               metric = mx_name,
+                               normalization_type = normalization_type)
+      
+      # base plot
+      plt <-
+        ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
+        ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
+        ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                      y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+                      title = plt_title,
+                      fill = legend_title_fill) +
+        ggplot2::theme_bw() +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
+                       axis.text.y = ggplot2::element_text(size = 9),
+                       plot.title = ggplot2::element_text(size = 11),
+                       panel.grid = ggplot2::element_blank()) +
+        ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
+                                    labels = drug2_axis$marks_x,
+                                    expand = c(0, 0)) +
+        ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
+                                    labels = drug1_axis$marks_y,
+                                    expand = c(0, 0)) +
+        ggplot2::scale_fill_gradientn(colors = hm_color_palette,
+                                      limit = limits,
+                                      labels = function(x) sprintf("%.2f", x))
+      
+      # add isoline
+      if (NROW(available_iso_lvl)) { # isobolograms as lines
+        if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
+          # friendly for user with color vision deficiency
+          plt <- plt +
+            ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                               ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
+            ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                        breaks = available_iso_lvl,
+                                        labels = legend_lbl_iso,
+                                        name = legend_title_iso) +
+            ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
+                                           breaks = available_iso_lvl,
+                                           labels = legend_lbl_iso,
+                                           name = legend_title_iso) +
+            ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+        } else {
+          plt <- plt +
+            ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                               ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
+            ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                        breaks = available_iso_lvl,
+                                        labels = legend_lbl_iso,
+                                        name = legend_title_iso)
+        }
       }
     }
     plt
@@ -357,13 +359,6 @@ heatmap_combo_metrics <- function(
 #'                           cl_name,
 #'                           normalization_type = "RV",
 #'                           iso_levels = c("0.25", "0.75"))
-#'                           
-#' dt_isobolograms$iso_level <- NULL
-#' 
-#' heatmap_combo_with_isoref(dt_excess,
-#'                           dt_isobolograms,
-#'                           drug1_name, drug2_name,
-#'                           cl_name)
 #'
 #' @export
 heatmap_combo_with_isoref <- function(
@@ -426,102 +421,111 @@ heatmap_combo_with_isoref <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
+  # panel title
+  cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]])
+  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
+  
   # prep plot data
   mx_name <- "smooth"
   dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 ir conc_2 = 0
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   
-  dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-  dt_$pos_y <- transform_log_conc(dt_[[conc]])
-  dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
-  
-  ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
-  drug1_axis <- ls_axes$axis_1
-  drug2_axis <- ls_axes$axis_2
-  tile_height <- diff(drug1_axis$pos_y[3:4])
-  tile_width <- diff(drug2_axis$pos_x[3:4])
-  
-  # panel title
-  cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]])
-  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
-  
-  legend_title_fill <- sprintf("%s %s",
-                               gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
-                               normalization_type)
-  
-  # prep limits
-  limits <- prep_hm_limits(dt_[[mx_name]],   
-                           metric = mx_name,
-                           normalization_type = normalization_type)
-  
-  # base plot
-  plt <-
-    ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
-    ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
-                       height = tile_height, width = tile_width, alpha = 0.90) +
-    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                  y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
-                  title = plt_title,
-                  fill = legend_title_fill) +
-    ggplot2::scale_fill_gradientn(colors = hm_color_palette,
-                                  limit = limits,
-                                  labels = function(x) sprintf("%.2f", x))
-  
-  # plot isobologram
-  if (NROW(available_iso_lvl)) { # add isolines - if there are such data
-    iso_label <- sprintf("%s%s",
-                         ifelse(normalization_type == "GR", "GR", "IC"),
-                         100 - 100 * as.numeric(available_iso_lvl))
-    names(iso_label) <- available_iso_lvl
+  if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
+    plt <- 
+      ggplot2::ggplot() +
+      ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                    y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+                    title = plt_title) +
+      ggplot2::theme_bw()
+  } else {
+    dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
+    dt_$pos_y <- transform_log_conc(dt_[[conc]])
+    dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
     
-    iso_source <- NULL # due to NSE notes in R CMD check
-    tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
-    tab_measured[, iso_source := "measured"]
-    tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
-    tab_expected[, iso_source := "expected"]
-    data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
+    ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+    drug1_axis <- ls_axes$axis_1
+    drug2_axis <- ls_axes$axis_2
+    tile_height <- .get_tile_size(drug1_axis$pos_y)
+    tile_width <- .get_tile_size(drug2_axis$pos_x)
     
-    tab_isoline <- rbind(tab_measured, tab_expected)
+    legend_title_fill <- sprintf("%s %s",
+                                 gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
+                                 normalization_type)
     
-    if (NROW(available_iso_lvl) == 1) {
-      plt <- plt +
-        ggplot2::geom_path(data = tab_isoline,
-                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source),
-                           linewidth = 1, color = "red") +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
-                                       name = iso_label)
-    } else {
-      iso_colors <-
-        grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[seq_along(available_iso_lvl) * 2]
-      names(iso_colors) <- available_iso_lvl
-      plt <- plt +
-        ggplot2::geom_path(data = tab_isoline,
-                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
-                           linewidth = 1) +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
-                                       name = normalization_type) +
-        ggplot2::scale_color_manual(values = iso_colors,
-                                    label = iso_label,
-                                    breaks = available_iso_lvl,
-                                    name = "Iso Levels")
+    # prep limits
+    limits <- prep_hm_limits(dt_[[mx_name]],   
+                             metric = mx_name,
+                             normalization_type = normalization_type)
+    
+    # base plot
+    plt <-
+      ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
+                         height = tile_height, width = tile_width, alpha = 0.90) +
+      ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
+                    y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+                    title = plt_title,
+                    fill = legend_title_fill) +
+      ggplot2::scale_fill_gradientn(colors = hm_color_palette,
+                                    limit = limits,
+                                    labels = function(x) sprintf("%.2f", x))
+    
+    # plot isobologram
+    if (NROW(available_iso_lvl)) { # add isolines - if there are such data
+      iso_label <- sprintf("%s%s",
+                           ifelse(normalization_type == "GR", "GR", "IC"),
+                           100 - 100 * as.numeric(available_iso_lvl))
+      names(iso_label) <- available_iso_lvl
+      
+      iso_source <- NULL # due to NSE notes in R CMD check
+      tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
+      tab_measured[, iso_source := "measured"]
+      tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
+      tab_expected[, iso_source := "expected"]
+      data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
+      
+      tab_isoline <- rbind(tab_measured, tab_expected)
+      
+      if (NROW(available_iso_lvl) == 1) {
+        plt <- plt +
+          ggplot2::geom_path(data = tab_isoline,
+                             ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source),
+                             linewidth = 1, color = "red") +
+          ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                         name = iso_label)
+      } else {
+        iso_colors <-
+          grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[seq_along(available_iso_lvl) * 2] # nolint
+        names(iso_colors) <- available_iso_lvl
+        plt <- plt +
+          ggplot2::geom_path(data = tab_isoline,
+                             ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
+                             linewidth = 1) +
+          ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                         name = normalization_type) +
+          ggplot2::scale_color_manual(values = iso_colors,
+                                      label = iso_label,
+                                      breaks = available_iso_lvl,
+                                      name = "Iso Levels")
+      }
     }
+    
+    # final plot
+    plt <- plt +
+      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
+                                  labels = drug2_axis$marks_x,
+                                  expand = c(0, 0)) +
+      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
+                                  labels = drug1_axis$marks_y,
+                                  expand = c(0, 0)) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 9),
+                     plot.title = ggplot2::element_text(size = 11),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.key.width = ggplot2::unit(2, "line"))
   }
-  
-  # final plot
-  plt <- plt +
-    ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                labels = drug2_axis$marks_x,
-                                expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                labels = drug1_axis$marks_y,
-                                expand = c(0, 0)) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 9),
-                   plot.title = ggplot2::element_text(size = 11),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   legend.key.width = ggplot2::unit(2, "line"))
   
   return(plt)
 }
@@ -699,16 +703,38 @@ prep_hm_limits <- function(num_vec,
 transform_log_conc <- function(conc_vec) {
   checkmate::assert_numeric(conc_vec, lower = 0, any.missing = FALSE, finite = TRUE)
   
-  if (any(conc_vec == 0)) {
-    stopifnot("There are not enough values to handle 0." = NROW(unique(conc_vec[conc_vec != 0])) >= 2)
-  }
-  
   log_values <- log10(conc_vec)
   # replace the -Inf value coming from the 0 dose with one step less in the dose dilution
   idx_inf <- (conc_vec == 0)
-  doses <- sort(unique(log_values))
-  zero_replacement <- doses[2] + (doses[2] - doses[3])
+  doses <- sort(unique(log_values[!is.infinite(log_values)]))
+  zero_replacement <- doses[1] + (doses[1] - doses[2]) 
+  if (is.na(zero_replacement)) zero_replacement <- doses[1] - 0.5 # only two unique conc and one is 0
   log_values[idx_inf] <- zero_replacement
   
   return(log_values)
+}
+
+#' Calculate size of tiles based on pos_x/pos_y values
+#'
+#' Since \code{ggplot2::geom_tile} uses the center of the tile and its size (x, y, width, height),
+#' x and y are given as pos_x and pos_y, it is required to calculate the width and height.
+#'
+#' @param pos_vec numeric vector with pos_x or pos_y values
+#'
+#' @return size of tile in \code{ggplot2::geom_tile}
+#'
+#' @keywords internal
+.get_tile_size <- function(pos_vec) {
+  checkmate::assert_numeric(pos_vec)
+  
+  diff_ <- sort(unique(diff(pos_vec)), decreasing = TRUE)
+  
+  tile_size <- if (NROW(diff_) > 1) {
+    diff_[2] # 1st in related to conc = 0 and and is not conclusive
+  } else if (NROW(diff_) == 1) {
+    diff_
+  } else { 
+    0.5
+  }
+  tile_size
 }

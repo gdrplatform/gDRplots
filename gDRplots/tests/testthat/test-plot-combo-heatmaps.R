@@ -72,12 +72,12 @@ test_that("transform_log_conc works as expected", {
   result <- log10(vec)
   result[1] <- result[2] + (result[2] - result[3])
   expect_equal(transform_log_conc(vec), result)
+  expect_equal(transform_log_conc(vec), result)
+  
+  expect_equal(transform_log_conc(c(0, 0.001)), c(-3.5, -3.0))
   
   expect_error(transform_log_conc(LETTERS[seq_len(5)]), 
-               "Assertion on 'conc_vec' failed: Must be of type 'numeric'")   
-  
+               "Assertion on 'conc_vec' failed: Must be of type 'numeric'")
   expect_error(transform_log_conc(-1:2),
                "Assertion on 'conc_vec' failed: Element 1 is not >= 0")
-  expect_error(transform_log_conc(c(0, 0.001)),
-               "There are not enough values to handle 0.")
 })
