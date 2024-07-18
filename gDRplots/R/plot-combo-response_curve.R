@@ -63,9 +63,9 @@ plot_dose_response_combo <- function(dt_average,
                   drug1_name %in% drugs_combination[[drug_name]]))
 
   # filter data for normalization type
-  data.table::setkeyv(dt_average, "normalization_type")
-  dt_avg <- dt_average[normalization_type]
-  data.table::setkey(dt_avg, NULL)
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_avg <- dt_average[eval(filter_expr)]
+
   # and selected cell line
   dt_avg <- dt_avg[get(cellline_name) == cl_name, ]
   
@@ -76,6 +76,7 @@ plot_dose_response_combo <- function(dt_average,
   dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
   
+  # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
   dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
   

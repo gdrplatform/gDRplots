@@ -48,9 +48,8 @@ plot_var_distribution_qc <- function(dt_assay,
   
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
   # filter data for normalization type
-  data.table::setkeyv(dt_assay, "normalization_type")
-  dt_assay <- dt_assay[normalization_type]
-  data.table::setkey(dt_assay, NULL)
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_assay <- dt_assay[eval(filter_expr)]
   
   tab_subplot <- dt_assay[get(cellline_name) == cl_name, ]
   
