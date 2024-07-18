@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{.get_tile_size}
 \alias{.get_tile_size}
-\title{Calculate size of tiles based on pos_x/pos_y values}
+\title{Calculate the size of tiles based on pos_x/pos_y values}
 \usage{
 .get_tile_size(pos_vec)
 }

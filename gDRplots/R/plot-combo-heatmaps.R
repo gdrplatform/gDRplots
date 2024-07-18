@@ -714,7 +714,7 @@ transform_log_conc <- function(conc_vec) {
   return(log_values)
 }
 
-#' Calculate size of tiles based on pos_x/pos_y values
+#' Calculate the size of tiles based on pos_x/pos_y values
 #'
 #' Since \code{ggplot2::geom_tile} uses the center of the tile and its size (x, y, width, height),
 #' x and y are given as pos_x and pos_y, it is required to calculate the width and height.
