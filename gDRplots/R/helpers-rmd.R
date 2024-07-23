@@ -109,3 +109,53 @@ estimate_plot_size <- function(plt,
   
   return(c(width = estimated_width, height = estimated_height))
 }
+
+#' Save gDR plots to a specified path
+#'
+#' @param plt A plot object; either a ggplot2 or pheatmap object.
+#' @param path A string specifying the path where the plot should be saved.
+#' @param format A string specifying the format for saving the plot; either "svg", "png", or "pdf". Default is "svg".
+#'
+#' @return NULL
+#' @keywords internal
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#' p <- ggplot(mtcars, aes(mpg, wt)) + geom_point()
+#' save_plot(p, "path/to/file/sa_create_SE", "png")
+#' }
+save_plot <- function(plt, path, format) {
+  checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
+  checkmate::assert_string(path)
+  
+  # Check if the directory exists and has write access
+  dir_path <- dirname(path)
+  if (!dir.exists(dir_path)) {
+    stop("The specified directory does not exist.")
+  }
+  
+  if (file.access(dir_path, 2) != 0) {
+    stop("The specified directory does not have write access.")
+  }
+  
+  checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
+  
+  # Estimate plot size
+  plot_size <- estimate_plot_size(plt)
+  
+  filename <- paste(path, format, sep = ".")
+  
+  # Save the plot in the specified format
+  ggsave(filename = filename,
+         plot = plt,
+         units = "in",
+         width = plot_size[["width"]],
+         height = plot_size[["height"]],
+         dpi = 300,
+         device = format)
+  
+  invisible(NULL)
+}
+
