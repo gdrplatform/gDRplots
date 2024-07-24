@@ -63,7 +63,7 @@ test_that("save_plot throws error for unsupported plot type", {
 })
 
 test_that("save_plot throws error for non-existent directory", {
-  p <- ggplot(mtcars, aes(mpg, wt)) + geom_point()
+  p <- ggplot2::ggplot(datasets::mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
   file_path <- "non_existent_directory/test_plot"
   
   expect_error(save_plot(p, file_path, "svg"), "The specified directory does not exist.")
