@@ -154,8 +154,7 @@ save_plot <- function(plt, path, format) {
                   width = plot_size[["width"]],
                   height = plot_size[["height"]],
                   dpi = 300,
-                  device = format,
-                  bg = "white")
+                  device = format)
   
   invisible(NULL)
 }
