@@ -58,6 +58,7 @@ plot_dose_response_sa <- function(dt_metrics,
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
+  conc <- gDRutils::get_env_identifiers("concentration")
   
   checkmate::expect_data_table(dt_metrics)
   checkmate::expect_data_table(dt_average)
@@ -85,15 +86,12 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_met_norm <- dt_metrics[eval(filter_expr)]
   dt_avg_norm <- dt_average[eval(filter_expr)]
   
+  # group
   group_names <- if (is.null(group_names)) {
     unique(dt_met_norm[[grouping]])
   } else {
     intersect(dt_met_norm[[grouping]], group_names)
   }
-  
-
-  # variables
-  conc <- gDRutils::get_env_identifiers("concentration")
   
   # prep value ranges for plot
   data_range <- c(min(min(dt_avg_norm$x), 0) - 0.05, max(max(dt_avg_norm$x), 1) + 0.05)
@@ -103,10 +101,7 @@ plot_dose_response_sa <- function(dt_metrics,
   # remove conc = 0
   dt_avg_norm[[conc]][dt_avg_norm[[conc]] == 0] <- min_conc / 10
   
-  # group
-  if (is.null(group_names)) group_names <- unique(dt_met_norm[[grouping]])
-  
-# prep fitted data
+  # prep fitted data
   sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
   dt_fit <- data.table::data.table()
   
@@ -128,19 +123,19 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_fit <- dt_fit[!is.na(x)]
   data.table::setnames(dt_fit, "conc_col", conc)
   
-  # colors
-  if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
-    colormap <- grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
-    
-  } else if (NROW(colormap) != NROW(group_names)) {
-    colormap <- grDevices::colorRampPalette(colormap)(NROW(group_names))
-  }
-  names(colormap) <- group_names
-  color_values <- colormap[names(colormap) %in% unique(dt_fit[[grouping]])]
-  
   # prep averaged data
   dt_avg <- dt_avg_norm[get(grouping) %in% group_names, ]
   
+  # colors
+  color_values <- if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
+    grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
+  } else if (NROW(colormap) != NROW(group_names)) {
+    grDevices::colorRampPalette(colormap)(NROW(group_names))
+  } else {
+    colormap
+  }
+  names(color_values) <- group_names
+
   # levels
   dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
@@ -403,13 +398,13 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
   checkmate::expect_choice(d_name, choices = dt_metrics[[drug_name]])
   checkmate::expect_choice(d_name, choices = dt_average[[drug_name]])
-
+  
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_metrics <- dt_metrics[eval(filter_expr)]
   dt_average <- dt_average[eval(filter_expr)]
-
+  
   # filter data for min required data
   dt_metrics <-
     dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
@@ -532,7 +527,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-
+  
   checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
   

@@ -9,28 +9,44 @@ test_that("plot_dose_response_sa works as expected", {
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
   
-  plt <- plot_dose_response_sa(dt_metrics = dt_metrics,
-                               dt_average = dt_average,
-                               grouping = grouping)
-  expect_is(plt, "gg")
-  expect_true(grepl("GR", plt[["labels"]][["y"]]))
-  expect_length(plt[["layers"]], 3)
+  plt_1 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average,
+                                 grouping = grouping)
+  expect_is(plt_1, "gg")
+  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_length(plt_1[["layers"]], 3)
   
+
+  iC <- colnames(se)[1:2]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR, iC], "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se[iR, iC], "Averaged")
+  # lack of data for curve and small number of conc point
+  dt_metrics[, c("ec50", "x_inf", "x_0", "h", "r2")] <- NA
+  dt_average <- dt_average[Concentration %in% unique(dt_average$Concentration)[1:2], ]
+  
+  plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average,
+                                 grouping = grouping)
+  expect_is(plt_2, "gg")
+  expect_true(grepl("GR", plt_2[["labels"]][["y"]]))
+  expect_length(plt_2[["layers"]], 3)
+  expect_equal(names(plt_2[["guides"]][["guides"]]), "colour")
+
   grouping <- gDRutils::get_env_identifiers("drug_name")
   iC <- colnames(se)[1]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
   normalization_type <- "RV"
   
-  plt <- plot_dose_response_sa(dt_metrics = dt_metrics,
-                               dt_average = dt_average,
-                               grouping = grouping,
-                               normalization_type = normalization_type,
-                               colormap = c("cadetblue", "orange", "darkblue"),
-                               plot_fit_flag = FALSE)
-  expect_is(plt, "gg")
-  expect_true(grepl(normalization_type, plt[["labels"]][["y"]]))
-  expect_length(plt[["layers"]], 2)
+  plt_3 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average,
+                                 grouping = grouping,
+                                 normalization_type = normalization_type,
+                                 colormap = c("cadetblue", "orange", "darkblue"),
+                                 plot_fit_flag = FALSE)
+  expect_is(plt_3, "gg")
+  expect_true(grepl(normalization_type, plt_3[["labels"]][["y"]]))
+  expect_length(plt_3[["layers"]], 2)
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
@@ -137,7 +153,7 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                           cl_name = cl_name)
   expect_is(plt_1, "gg")
   expect_length(plt_1$layers[[1]]$constructor, 2)
-
+  
   normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,
