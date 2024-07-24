@@ -148,13 +148,13 @@ save_plot <- function(plt, path, format) {
   filename <- paste(path, format, sep = ".")
   
   # Save the plot in the specified format
-  ggsave(filename = filename,
-         plot = plt,
-         units = "in",
-         width = plot_size[["width"]],
-         height = plot_size[["height"]],
-         dpi = 300,
-         device = format)
+  ggplot2::ggsave(filename = filename,
+                  plot = plt,
+                  units = "in",
+                  width = plot_size[["width"]],
+                  height = plot_size[["height"]],
+                  dpi = 300,
+                  device = format)
   
   invisible(NULL)
 }
