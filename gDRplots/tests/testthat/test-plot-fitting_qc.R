@@ -30,7 +30,7 @@ test_that("heatmap_control_mapping_qc works as expected", {
   plt_3 <- heatmap_control_mapping_qc(dt_treat = treat,
                                       dt_controls = controls_3)
   expect_length(unique(as.vector(plt_3$gtable$grobs[[2]]$children[[1]]$gp$fill)), 
-                NROW(unique(frequency$N)))
+                NROW(unique(frequency$N)) + 1) # number of unique val + "red" for NA
   
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   cdata <- SummarizedExperiment::colData(se)

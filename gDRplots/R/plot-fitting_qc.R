@@ -217,8 +217,12 @@ heatmap_control_mapping_qc <- function(dt_treat,
   result_matrix[result_matrix == 0] <- NA
   
   # Generate the breaks for integers
-  max_count <- max(result_matrix, na.rm = TRUE)
-  breaks <- seq(1, max_count, by = 1)
+  maxval <- max(result_matrix, na.rm = TRUE)
+  minval <- min(c(0, min(result_matrix, na.rm = TRUE)))
+  
+  breaks <- seq(from = minval, to = maxval, by = 1)
+  hm_color_palette <- grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(NROW(breaks) - 1)
+  
   unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
   
   # renaming rows and columns
@@ -245,7 +249,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   
   # Generate the heatmap
   pheatmap::pheatmap(result_matrix,
-                     color = grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(length(breaks) - 1),
+                     color = hm_color_palette,
                      breaks = breaks,
                      na_col = "red",
                      main = "Counts of mapped controls",
