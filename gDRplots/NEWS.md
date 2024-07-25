@@ -1,3 +1,6 @@
+## gDRplots 0.0.17 - 2024-07-25
+* add a function for saving plots
+
 ## gDRplots 0.0.16 - 2024-07-24
 * fix an issue with annotations coloring due to multiple occurrences
 * fix the lack of color for dose-response curves for single-agent in a small set of data

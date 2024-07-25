@@ -39,3 +39,32 @@ test_that("estimate_plot_size handles invalid inputs", {
   expect_error(estimate_plot_size(p1, scale_factor = invalid_scale_factor),
                "Assertion on 'scale_factor' failed: Element 1 is not >= 0.")
 })
+
+
+test_that("save_plot saves ggplot2 object in a correct format", {
+  temp_dir <- tempdir()
+  file_path <- file.path(temp_dir, "test_plot")
+  
+  save_plot(p1, file_path)
+  expect_true(file.exists(paste0(file_path, ".svg")))
+  save_plot(p1, file_path, "png")
+  expect_true(file.exists(paste0(file_path, ".png")))
+  save_plot(p1, file_path, "pdf")
+  expect_true(file.exists(paste0(file_path, ".pdf")))
+})
+
+test_that("save_plot throws error for unsupported plot type", {
+  p <- list()  # Not a ggplot2 or pheatmap object
+  temp_dir <- tempdir()
+  file_path <- file.path(temp_dir, "test_plot")
+  
+  expect_error(save_plot(p, file_path, "svg"),
+               "Assertion on 'plt' failed: Must inherit from class 'ggplot'/'pheatmap', but has class 'list'.")
+})
+
+test_that("save_plot throws error for non-existent directory", {
+  p <- ggplot2::ggplot(datasets::mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
+  file_path <- "non_existent_directory/test_plot"
+  
+  expect_error(save_plot(p, file_path, "svg"), "The specified directory does not exist.")
+})
