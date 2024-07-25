@@ -1,3 +1,8 @@
+## gDRplots 0.0.16 - 2024-07-24
+* fix an issue with annotations coloring due to multiple occurrences
+* fix the lack of color for dose-response curves for single-agent in a small set of data
+* refactor naming for control_mapping heatmaps
+
 ## gDRplots 0.0.15 - 2024-07-16
 * fix issue with wrong order of colorbar values for combo heatmap
 

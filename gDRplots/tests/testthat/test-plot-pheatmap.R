@@ -123,3 +123,37 @@ test_that("get_qual_colors works", {
   expect_error(get_qual_colors(-1),
                "Assertion on 'n' failed: Element 1 is not >= 0.")
 })
+
+test_that("get_ann_color_map works", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]][2:3, ]
+  response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+  dt_ann <- unique(response_metrics[, .SD, .SDcols = c("Tissue", "ReferenceDivisionTime")])
+
+  result <- get_ann_color_map(dt_ann)
+  expect_equal(NROW(result), NCOL(dt_ann))
+  expect_equal(names(result), names(dt_ann))
+  expect_equal(NROW(result[["Tissue"]]), NROW(unique(dt_ann[["Tissue"]])))
+  expect_equal(NROW(result[["ReferenceDivisionTime"]]), NROW(unique(dt_ann[["ReferenceDivisionTime"]])))
+  expect_equal(NROW(unlist(result)), 
+               sum(dt_ann[, lapply(.SD, data.table::uniqueN), .SDcols = names(dt_ann)]))
+  
+  # the same lbl for different annotation column
+  dt_ann_2 <- data.table::data.table(
+    Tissue = c("tissue_x", "tissue_x", "unknown"),
+    drug_moa = c("moa_A", "unknown", "unknown"),
+    drug_moa_2 = c("unknown", "moa_AB", "moa_CD")
+  )
+  
+  result_2 <- get_ann_color_map(dt_ann_2)
+  expect_equal(NROW(result_2), NCOL(dt_ann_2))
+  expect_equal(names(result_2), names(dt_ann_2))
+  expect_equal(NROW(result_2[["Tissue"]]), NROW(unique(dt_ann_2[["Tissue"]])))
+  expect_equal(NROW(result_2[["drug_moa"]]), NROW(unique(dt_ann_2[["drug_moa"]])))
+  expect_equal(NROW(result_2[["drug_moa_2"]]), NROW(unique(dt_ann_2[["drug_moa_2"]])))
+  expect_equal(NROW(unlist(result_2)), 
+               sum(dt_ann_2[, lapply(.SD, data.table::uniqueN), .SDcols = names(dt_ann_2)]))
+  
+  expect_error(get_ann_color_map(list()),
+               "Assertion on 'dt_ann' failed: Must be a data.table")
+})
