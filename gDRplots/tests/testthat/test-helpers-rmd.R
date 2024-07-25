@@ -41,11 +41,11 @@ test_that("estimate_plot_size handles invalid inputs", {
 })
 
 
-test_that("save_plot saves ggplot2 object in correct forat", {
+test_that("save_plot saves ggplot2 object in a correct format", {
   temp_dir <- tempdir()
   file_path <- file.path(temp_dir, "test_plot")
   
-  save_plot(p1, file_path, "svg")
+  save_plot(p1, file_path)
   expect_true(file.exists(paste0(file_path, ".svg")))
   save_plot(p1, file_path, "png")
   expect_true(file.exists(paste0(file_path, ".png")))

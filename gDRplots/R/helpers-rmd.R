@@ -121,14 +121,14 @@ estimate_plot_size <- function(plt,
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' library(ggplot2)
-#' p <- ggplot(mtcars, aes(mpg, wt)) + geom_point()
-#' save_plot(p, "path/to/file/sa_create_SE", "png")
-#' }
-save_plot <- function(plt, path, format) {
+#' tmp_dir <- file.path(tempdir(), "plot_dir")
+#' dir.create(tmp_dir, showWarnings = FALSE)
+#' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
+#' save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
+save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
+  checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
   
   # Check if the directory exists and has write access
   dir_path <- dirname(path)
@@ -139,8 +139,6 @@ save_plot <- function(plt, path, format) {
   if (file.access(dir_path, 2) != 0) {
     stop("The specified directory does not have write access.")
   }
-  
-  checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
   
   # Estimate plot size
   plot_size <- estimate_plot_size(plt)

@@ -1,5 +1,5 @@
 ## gDRplots 0.0.16 - 2024-07-23
-* wrap functionality for saving plots into a function
+* add a function for saving plots
 
 ## gDRplots 0.0.15 - 2024-07-16
 * fix issue with wrong order of colorbar values for combo heatmap
