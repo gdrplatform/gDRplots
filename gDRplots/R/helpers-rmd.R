@@ -128,6 +128,16 @@ estimate_plot_size <- function(plt,
 save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
+  
+  # Extract the file extension if provided
+  provided_extension <- tools::file_ext(path)
+  
+  # Determine the format to use
+  if (provided_extension != "") {
+    format <- provided_extension
+  }
+  
+  # Validate the format
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
   
   # Check if the directory exists and has write access
@@ -143,7 +153,12 @@ save_plot <- function(plt, path, format = "svg") {
   # Estimate plot size
   plot_size <- estimate_plot_size(plt)
   
-  filename <- paste(path, format, sep = ".")
+  # Construct the filename
+  if (provided_extension == "") {
+    filename <- paste(path, format, sep = ".")
+  } else {
+    filename <- path
+  }
   
   # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
