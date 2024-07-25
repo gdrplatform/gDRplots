@@ -4,7 +4,7 @@
 \alias{save_plot}
 \title{Save gDR plots to a specified path}
 \usage{
-save_plot(plt, path, format)
+save_plot(plt, path, format = "svg")
 }
 \arguments{
 \item{plt}{A plot object; either a ggplot2 or pheatmap object.}
@@ -17,10 +17,9 @@ save_plot(plt, path, format)
 Save gDR plots to a specified path
 }
 \examples{
-\dontrun{
-library(ggplot2)
-p <- ggplot(mtcars, aes(mpg, wt)) + geom_point()
-save_plot(p, "path/to/file/sa_create_SE", "png")
-}
+tmp_dir <- file.path(tempdir(), "plot_dir")
+dir.create(tmp_dir, showWarnings = FALSE)
+p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
+save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
 }
 \keyword{internal}
