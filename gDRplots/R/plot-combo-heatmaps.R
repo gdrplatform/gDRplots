@@ -623,7 +623,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # list of plots for each drug
   ls_plt <- purrr::pmap(ls_celllines,
-                        gDRplots::heatmap_combo_with_isoref,
+                        heatmap_combo_with_isoref,
                         dt_excess = dt_excess,
                         dt_isobolograms = dt_isobolograms,
                         drug1_name = drug1_name,
