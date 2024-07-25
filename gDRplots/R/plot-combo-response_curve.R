@@ -189,7 +189,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   
   # list of plots for each drug
   ls_plts <- purrr::pmap(plt_tab,
-                         gDRplots::plot_dose_response_combo,
+                         plot_dose_response_combo,
                          dt_average = dt_average,
                          normalization_type = normalization_type)
   names(ls_plts) <- plt_name

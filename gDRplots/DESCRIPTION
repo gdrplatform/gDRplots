@@ -1,7 +1,7 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.16
-Date: 2024-07-23
+Version: 0.0.17
+Date: 2024-07-25
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
@@ -24,8 +24,8 @@ Imports:
 Suggests:
     BumpyMatrix,
     colorspace,
-    gDRtestData (>= 1.1.10),
-    gDRstyle (>= 1.1.5),
+    gDRtestData (>= 1.3.2),
+    gDRstyle (>= 1.3.2),
     ggpubr,
     heatmaply,
     jsonlite,

@@ -794,7 +794,9 @@ get_qual_colors <- function(n = NULL) {
 get_ann_color_map <- function(dt_ann) {
   checkmate::assert_data_table(dt_ann)
   
-  ls_colors <- get_qual_colors(NROW(unique(unlist(dt_ann))))
+  n_unique_ann <- sum(
+    vapply(names(dt_ann), function(nm) NROW(unique(dt_ann[[nm]])), FUN.VALUE = numeric(1)))
+  ls_colors <- get_qual_colors(n_unique_ann)
   
   annotation_colors <- list()
   for (ann in names(dt_ann)) {

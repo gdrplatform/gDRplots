@@ -51,7 +51,7 @@ plot_var_stat_qc <- function(dt_assay,
   gnumber <- gDRutils::get_env_identifiers("drug")
   
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
-
+  
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_assay <- dt_assay[eval(filter_expr)]
@@ -127,7 +127,7 @@ plot_fitting_acc <- function(dt_assay,
   r2 <- r2 +
     ggplot2::geom_text(data = subset(r2$data, p_value < 0.05),
                        ggplot2::aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
-                           y = 1.01),
+                                    y = 1.01),
                        position = ggplot2::position_dodge(0.5),
                        size = 4,
                        vjust = 0) +
@@ -217,13 +217,39 @@ heatmap_control_mapping_qc <- function(dt_treat,
   result_matrix[result_matrix == 0] <- NA
   
   # Generate the breaks for integers
-  max_count <- max(result_matrix, na.rm = TRUE)
-  breaks <- seq(1, max_count, by = 1)
+  maxval <- max(result_matrix, na.rm = TRUE)
+  minval <- min(c(0, min(result_matrix, na.rm = TRUE)))
+  
+  breaks <- seq(from = minval, to = maxval, by = 1)
+  hm_color_palette <- grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(NROW(breaks) - 1)
+  
   unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
+  
+  # renaming rows and columns
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  if (all(colnames(result_matrix) %in% unique(dt_treat$cId))) {
+    dict <- unique(dt_treat[, .SD, .SDcols = c("cId", cellline_name)])[order(colnames(result_matrix))]
+    colnames(result_matrix) <- dict[[cellline_name]]
+  }
+  if (all(rownames(result_matrix) %in% unique(dt_treat$rId))) {
+    if (drug_name_2 %in% names(dt_treat)) {
+      # combo data
+      dict <- 
+        unique(dt_treat[, .SD, .SDcols = c("rId", drug_name, drug_name_2)])[order(rownames(result_matrix))]
+      dict$drug_lbl <- paste(dict[[drug_name]], dict[[drug_name_2]], sep = "__")
+      rownames(result_matrix) <- dict[["drug_lbl"]]
+    } else {
+      # single-agent data
+      dict <- unique(dt_treat[, .SD, .SDcols = c("rId", drug_name)])[order(rownames(result_matrix))]
+      rownames(result_matrix) <- dict[[drug_name]]
+    }
+  }
   
   # Generate the heatmap
   pheatmap::pheatmap(result_matrix,
-                     color = grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(length(breaks) - 1),
+                     color = hm_color_palette,
                      breaks = breaks,
                      na_col = "red",
                      main = "Counts of mapped controls",
