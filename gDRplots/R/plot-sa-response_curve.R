@@ -135,7 +135,7 @@ plot_dose_response_sa <- function(dt_metrics,
     colormap
   }
   names(color_values) <- group_names
-
+  
   # levels
   dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
   dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
@@ -445,7 +445,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_errorbar(
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
-        width = 0.1) +
+        width = 0.1, position = ggplot2::position_dodge(0.1)) +
       ggplot2::geom_line(
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
@@ -453,7 +453,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_line(
         data = dt_reconstructed_fit,
         ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
-      ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
+      ggplot2::geom_hline(yintercept = 0, color = "#555555") +
       ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -462,9 +462,9 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
       ggplot2::theme(panel.grid.minor = ggplot2::element_blank()) +
-      ggplot2::scale_color_manual(values = c("Averaged Data" = "black",
-                                             "Fitted Curve" = "red",
-                                             "Errors Bar" = "#A9A9A9"))
+      ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
+                                             "Averaged Data" = "black",
+                                             "Fitted Curve" = "red"))
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
@@ -542,7 +542,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   
   # list of plots for each drug
   ls_plt <- purrr::pmap(ls_drug,
-                        gDRplots::plot_dose_response_sa_qc,
+                        plot_dose_response_sa_qc,
                         dt_metrics = dt_metrics,
                         dt_average = dt_average,
                         cl_name = cl_name,
