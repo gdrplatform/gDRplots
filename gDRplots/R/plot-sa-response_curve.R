@@ -169,7 +169,8 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # define legend
   plt <- plt +
-    ggplot2::guides(color = ggplot2::guide_legend(position = "left"))
+    ggplot2::guides(color = ggplot2::guide_legend(position = "left")) +
+    ggplot2::theme(aspect.ratio = 1)
   
   return(plt)
 }
@@ -461,7 +462,8 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::ggtitle(plt_title) +
       ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank()) +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     aspect.ratio = 1) +
       ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
                                              "Averaged Data" = "black",
                                              "Fitted Curve" = "red"))

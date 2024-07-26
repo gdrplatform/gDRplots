@@ -147,7 +147,8 @@ heatmap_combo_metrics <- function(
         ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                       y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                       title = plt_title) +
-        ggplot2::theme_bw()
+        ggplot2::theme_bw() +
+        ggplot2::theme(aspect.ratio = 1)
     } else {
       dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
       dt_$pos_y <- transform_log_conc(dt_[[conc]])
@@ -183,12 +184,7 @@ heatmap_combo_metrics <- function(
         ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                       y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                       title = plt_title,
-                      fill = legend_title_fill) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                       axis.text.y = ggplot2::element_text(size = 9),
-                       plot.title = ggplot2::element_text(size = 11),
-                       panel.grid = ggplot2::element_blank()) +
+                      fill = legend_title_fill)  +
         ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
                                     labels = drug2_axis$marks_x,
                                     expand = c(0, 0)) +
@@ -197,7 +193,13 @@ heatmap_combo_metrics <- function(
                                     expand = c(0, 0)) +
         ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                       limit = limits,
-                                      labels = function(x) sprintf("%.2f", x))
+                                      labels = function(x) sprintf("%.2f", x)) +
+        ggplot2::theme_bw() +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
+                       axis.text.y = ggplot2::element_text(size = 9),
+                       plot.title = ggplot2::element_text(size = 11),
+                       panel.grid = ggplot2::element_blank(),
+                       aspect.ratio = 1)
       
       # add isoline
       if (NROW(available_iso_lvl)) { # isobolograms as lines
@@ -437,7 +439,8 @@ heatmap_combo_with_isoref <- function(
       ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                     y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                     title = plt_title) +
-      ggplot2::theme_bw()
+      ggplot2::theme_bw() +
+      ggplot2::theme(aspect.ratio = 1)
   } else {
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
     dt_$pos_y <- transform_log_conc(dt_[[conc]])
@@ -524,7 +527,8 @@ heatmap_combo_with_isoref <- function(
                      axis.text.y = ggplot2::element_text(size = 9),
                      plot.title = ggplot2::element_text(size = 11),
                      panel.grid.minor = ggplot2::element_blank(),
-                     legend.key.width = ggplot2::unit(2, "line"))
+                     legend.key.width = ggplot2::unit(2, "line"),
+                     aspect.ratio = 1)
   }
   
   return(plt)
