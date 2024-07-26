@@ -104,8 +104,8 @@ estimate_render_size <- function(plt_list) {
 
 #' @keywords internal
 .get_pheatmap_dims <- function(phm) {
-  phm_height <- sum(vapply(phm$gtable$heights, grid::convertHeight, "in", FUN.VAL = numeric(1))) 
-  phm_width  <- sum(vapply(phm$gtable$widths, grid::convertWidth, "in", FUN.VAL = numeric(1))) 
+  phm_height <- sum(vapply(phm$gtable$heights, grid::convertHeight, "in", FUN.VALUE = numeric(1))) 
+  phm_width  <- sum(vapply(phm$gtable$widths, grid::convertWidth, "in", FUN.VALUE = numeric(1))) 
   return(list(height = phm_height, width = phm_width))
 }
 
