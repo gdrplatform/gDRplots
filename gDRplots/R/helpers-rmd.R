@@ -8,7 +8,8 @@
 #'
 #' @examples
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
-#'   plot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")])
+#'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+#'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
 #' })
 #' names(plotlist) <- unique(iris$Species)
 #' 
@@ -22,17 +23,28 @@
 #' @export
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
-                            header_level = 3) {
+                            header_level = 3, 
+                            define_size = TRUE) {
   checkmate::assert_list(plt_list)
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
+  checkmate::assert_flag(define_size)
+  
+  if (define_size) {
+    render_size <- estimate_render_size(plt_list)
+  }
   
   lvl <- paste0(rep("#", header_level), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
   template <- c(
     sprintf("%s `r names(%s)[{{nm}}]`\n", lvl, plt_list_name),
-    sprintf("```{r %s {{nm}}, echo = FALSE}\n", chunk_name),
+    if (define_size) {
+      sprintf("```{r %s {{nm}}, fig.width = %s, fig.height = %s, echo = FALSE}\n", 
+              chunk_name, render_size$width, render_size$height)
+    } else {
+      sprintf("```{r %s {{nm}}, echo = FALSE}\n", chunk_name)
+    },
     sprintf("%s[[{{nm}}]] \n", plt_list_name),
     "```\n",
     "\n"
@@ -60,6 +72,41 @@ escape_special_characters <- function(x) {
   if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
   if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
   x
+}
+
+#' Estimate the optimal plot size (either ggplot or pheatmap) for rendering plots
+#'
+#' @param plt_list named list with generated plots to be shown in tabs
+#'
+#' @return list with height and width for plots fom given list \code{plt_list}
+#' @keywords internal
+#' @export
+estimate_render_size <- function(plt_list) {
+  checkmate::assert_list(plt_list)
+  checkmate::assert_named(plt_list)
+  
+  # check type of plot
+  class <- unique(unlist(lapply(seq_along(plt_list), function(i) class(plt_list[[i]]))))
+  
+  if (all(class == "pheatmap")) {
+    ls_size <- unlist(lapply(seq_along(plt_list), function(i) .get_pheatmap_dims(plt_list[[i]])))
+    
+    plt_width <- round(max(ls_size[which(names(ls_size) == "width")]), 1)
+    plt_height <- round(max(ls_size[which(names(ls_size) == "height")]), 1)
+    list(height = plt_height, width = plt_width)
+  } else if (all(class == c("gg", "ggplot"))) {
+    list(height = 6, width = 10)
+  } else {
+    # return default
+    list(height = 6, width = 10)
+  }
+}
+
+#' @keywords internal
+.get_pheatmap_dims <- function(phm) {
+  phm_height <- sum(vapply(phm$gtable$heights, grid::convertHeight, "in", FUN.VAL = numeric(1))) 
+  phm_width  <- sum(vapply(phm$gtable$widths, grid::convertWidth, "in", FUN.VAL = numeric(1))) 
+  return(list(height = phm_height, width = phm_width))
 }
 
 #' Estimate the optimal plot size (either ggplot or pheatmap) for saving plots
@@ -157,4 +204,3 @@ save_plot <- function(plt, path, format = "svg") {
   
   invisible(NULL)
 }
-
