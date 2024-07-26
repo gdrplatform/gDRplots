@@ -278,14 +278,15 @@ heatmap_combo_metrics <- function(
     ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
     ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
     ggplot2::coord_cartesian(ylim = c(-5, 4)) +
+    ggplot2::labs(y = "CI",
+                  x = paste(drug2_name, "/", drug1_name, "ratio"),
+                  title = plt_title) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 9),
                    plot.title = ggplot2::element_text(size = 11),
-                   panel.grid.minor = ggplot2::element_blank()) +
-    ggplot2::labs(y = "CI",
-                  x = paste(drug2_name, "/", drug1_name, "ratio"),
-                  title = plt_title)
+                   panel.grid.minor = ggplot2::element_blank(),
+                   aspect.ratio = 1)
   
   # final plots
   ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))

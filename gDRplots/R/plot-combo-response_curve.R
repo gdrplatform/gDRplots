@@ -115,7 +115,9 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::ggtitle(plt_title) +
     ggplot2::labs(color = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), legend.position = "left")
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                   legend.position = "left",
+                   aspect.ratio = 1)
   
   return(plt)
 }
