@@ -4,7 +4,7 @@
 \alias{prep_plot_chunk}
 \title{Prepare markdown chunk based on the plots list}
 \usage{
-prep_plot_chunk(plt_list, chunk_name, header_level = 3)
+prep_plot_chunk(plt_list, chunk_name, header_level = 3, define_size = TRUE)
 }
 \arguments{
 \item{plt_list}{named list with generated plots to be shown in tabs}
@@ -21,7 +21,8 @@ Function output should be generated with \code{knitr::knit(text = unlist(<result
 }
 \examples{
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
-  plot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")])
+  ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+  ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
 })
 names(plotlist) <- unique(iris$Species)
 
