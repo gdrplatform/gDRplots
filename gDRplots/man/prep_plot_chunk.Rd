@@ -4,7 +4,7 @@
 \alias{prep_plot_chunk}
 \title{Prepare markdown chunk based on the plots list}
 \usage{
-prep_plot_chunk(plt_list, chunk_name, header_level = 3, define_size = TRUE)
+prep_plot_chunk(plt_list, chunk_name, header_level = 3)
 }
 \arguments{
 \item{plt_list}{named list with generated plots to be shown in tabs}
