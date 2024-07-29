@@ -195,9 +195,9 @@ heatmap_combo_metrics <- function(
                                       limit = limits,
                                       labels = function(x) sprintf("%.2f", x)) +
         ggplot2::theme_bw() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                       axis.text.y = ggplot2::element_text(size = 9),
-                       plot.title = ggplot2::element_text(size = 11),
+        ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                       axis.text.y = ggplot2::element_text(size = 8),
+                       plot.title = ggplot2::element_text(size = 10),
                        panel.grid = ggplot2::element_blank(),
                        aspect.ratio = 1)
       
@@ -282,9 +282,9 @@ heatmap_combo_metrics <- function(
                   x = paste(drug2_name, "/", drug1_name, "ratio"),
                   title = plt_title) +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 9),
-                   plot.title = ggplot2::element_text(size = 11),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank(),
                    aspect.ratio = 1)
   
@@ -524,9 +524,9 @@ heatmap_combo_with_isoref <- function(
                                   labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
       ggplot2::theme_bw() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 9, angle = 45, vjust = 1, hjust = 1),
-                     axis.text.y = ggplot2::element_text(size = 9),
-                     plot.title = ggplot2::element_text(size = 11),
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 10),
                      panel.grid.minor = ggplot2::element_blank(),
                      legend.key.width = ggplot2::unit(2, "line"),
                      aspect.ratio = 1)
@@ -640,7 +640,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right"),
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right", align = "hv"),
     top = panel_title) +
     ggpubr::bgcolor("white") + ggpubr::border("white")
   

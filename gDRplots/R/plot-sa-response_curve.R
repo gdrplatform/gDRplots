@@ -170,7 +170,10 @@ plot_dose_response_sa <- function(dt_metrics,
   # define legend
   plt <- plt +
     ggplot2::guides(color = ggplot2::guide_legend(position = "left")) +
-    ggplot2::theme(aspect.ratio = 1)
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   aspect.ratio = 1)
   
   return(plt)
 }
@@ -437,8 +440,8 @@ plot_dose_response_sa_qc <- function(dt_metrics,
     # set min and max values for y 
     ymin <- min(c(0, min(dt_average_plot$x)))
     ymax <- max(c(1.2, max(dt_average_plot$x)))
-    
-    plt_title <- sprintf("%s (%s)", dt_metrics_plot[[drug_name]], dt_metrics_plot[[gnumber]])
+
+    plt_title <- dt_metrics_plot[[drug_name]]
     
     # plot
     plt <-
@@ -462,7 +465,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::ggtitle(plt_title) +
       ggplot2::labs(color = "") +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 10),
+                     panel.grid.minor = ggplot2::element_blank(),
                      aspect.ratio = 1) +
       ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
                                              "Averaged Data" = "black",
@@ -554,10 +560,10 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   # panel title
   cl_clid <- unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]])
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
-  
+
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE),
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, align = "hv"),
     top = panel_title) +
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
