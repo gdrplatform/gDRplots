@@ -151,7 +151,7 @@ plot_dose_response_sa <- function(dt_metrics,
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::scale_color_manual(values = color_values,
-                                name = ifelse(grouping == "cId", "Cell Line", "Drug")) +
+                                name = ifelse(grouping == cellline_name, "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
