@@ -195,28 +195,27 @@ pheatmap_qc <- function(
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
-  hm <- pheatmap::pheatmap(
-    mat = mat_cvd,
-    scale = "none",
-    display_numbers = FALSE,
-    number_color = "black",
-    fontsize_number = 16,
-    color = hm_color_palette,
-    breaks = breaks,
-    angle_col = 45,
-    fontsize = 10,
-    show_colnames = FALSE,
-    main = hm_title,
-    na_col = "red",
-    annotation_legend = annotation_legend_flag,
-    # dendogram
-    treeheight_row = 70,
-    treeheight_col = 70,
-    cluster_cols = FALSE,
-    cluster_rows = cluster_rows,
-    # manual annotation
-    annotation_col = drug_annotation,
-    annotation_colors = drug_annotation_colors
+  hm <- pheatmap::pheatmap(mat = mat_cvd,
+                           scale = "none",
+                           display_numbers = FALSE,
+                           number_color = "black",
+                           fontsize_number = 16,
+                           color = hm_color_palette,
+                           breaks = breaks,
+                           angle_col = 45,
+                           fontsize = 10,
+                           show_colnames = FALSE,
+                           main = hm_title,
+                           na_col = "red",
+                           annotation_legend = annotation_legend_flag,
+                           # dendogram
+                           treeheight_row = 70,
+                           treeheight_col = 70,
+                           cluster_cols = FALSE,
+                           cluster_rows = cluster_rows,
+                           # manual annotation
+                           annotation_col = drug_annotation,
+                           annotation_colors = drug_annotation_colors
   )
   return(hm)
 }
@@ -433,9 +432,12 @@ pheatmap_with_anno_sa <- function(
   breaks <- seq(from = min(stats::na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
+  # display numbers - for readability, turn it off for matrices larger than 10x10
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  
   hm <- pheatmap::pheatmap(mat = t_mat_cvd,
                            scale = "none",
-                           display_numbers = TRUE,
+                           display_numbers = display_numbers_flag,
                            number_color = "black",
                            color = hm_color_palette,
                            breaks = breaks,
@@ -653,9 +655,12 @@ pheatmap_with_anno_combo <- function(
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
+  # display numbers - for readability, turn it off for matrices larger than 10x10
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  
   hm <- pheatmap::pheatmap(t_mat_cvd,
                            scale = "none",
-                           display_numbers = TRUE,
+                           display_numbers = display_numbers_flag,
                            number_color = "black",
                            color = hm_color_palette,
                            breaks = breaks,
