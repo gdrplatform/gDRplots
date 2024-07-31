@@ -640,7 +640,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right", align = "hv"),
+    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, legend = "right"),
     top = panel_title) +
     ggpubr::bgcolor("white") + ggpubr::border("white")
   

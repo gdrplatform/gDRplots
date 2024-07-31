@@ -549,7 +549,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   ls_drug <- list(d_name = d_names)
   
   # list of plots for each drug
-  ls_plt <- purrr::pmap(ls_drug,
+  ls_plts <- purrr::pmap(ls_drug,
                         plot_dose_response_sa_qc,
                         dt_metrics = dt_metrics,
                         dt_average = dt_average,
@@ -563,7 +563,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
 
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plt, common.legend = TRUE, align = "hv"),
+    ggpubr::ggarrange(plotlist = ls_plts, common.legend = TRUE),
     top = panel_title) +
     ggpubr::bgcolor("white") + ggpubr::border("white")
   
