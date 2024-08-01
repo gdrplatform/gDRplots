@@ -1,3 +1,7 @@
+## gDRplots 0.0.18 - 2024-07-26
+* improve the ratio of square plots
+* unify text size across qc plots
+
 ## gDRplots 0.0.17 - 2024-07-25
 * add a function for saving plots
 

@@ -47,7 +47,7 @@ plot_dose_response_combo <- function(dt_average,
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
-
+  
   checkmate::expect_data_table(dt_average)
   checkmate::assert_choice(drug1_name, choices = unique(dt_average[[drug_name]]))
   checkmate::assert_choice(drug2_name, choices = unique(dt_average[[drug_name_2]]))
@@ -61,11 +61,11 @@ plot_dose_response_combo <- function(dt_average,
   stopifnot("combination of drugs and cell line does not exist" =
               any(drug2_name %in% drugs_combination[[drug_name_2]],
                   drug1_name %in% drugs_combination[[drug_name]]))
-
+  
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_avg <- dt_average[eval(filter_expr)]
-
+  
   # and selected cell line
   dt_avg <- dt_avg[get(cellline_name) == cl_name, ]
   
@@ -94,7 +94,7 @@ plot_dose_response_combo <- function(dt_average,
   # set min and max values for y
   ymin <- min(c(0, min(dt_avg$x)))
   ymax <- max(c(1.2, max(dt_avg$x)))
-
+  
   # plt title
   cl_name <- unique(dt_avg[[cellline_name]])[1]
   cl_clid <- unique(dt_avg[get(cellline_name) == cl_name, ][[clid]])
@@ -115,7 +115,12 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::ggtitle(plt_title) +
     ggplot2::labs(color = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), legend.position = "left")
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank(), 
+                   legend.position = "left",
+                   aspect.ratio = 1)
   
   return(plt)
 }
@@ -172,7 +177,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   } else if (!all(d_names %in% available_drugs)) {
     d_names <- drug_name[drug_name %in% available_drugs]
   }
-
+  
   # check input data
   drugs_combination <-
     unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])

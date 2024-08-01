@@ -8,7 +8,8 @@
 #'
 #' @examples
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
-#'   plot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")])
+#'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+#'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
 #' })
 #' names(plotlist) <- unique(iris$Species)
 #' 
@@ -157,4 +158,3 @@ save_plot <- function(plt, path, format = "svg") {
   
   invisible(NULL)
 }
-
