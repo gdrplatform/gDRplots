@@ -1,7 +1,7 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.18
-Date: 2024-07-26
+Version: 0.0.19
+Date: 2024-08-01
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
@@ -35,6 +35,7 @@ Suggests:
     rlang,
     scales,
     SummarizedExperiment,
+    svglite,
     qs,
     testthat
 VignetteBuilder: 
