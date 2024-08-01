@@ -45,10 +45,10 @@ plolty_drug_combo_heatmap <- function(data,
   checkmate::assert_choice(metric_combo, names(cscore_anames))
   metric_combo <- match.arg(metric_combo, names(cscore_anames), FALSE)
   assay_name <- gDRutils::convert_combo_field_to_assay(metric_combo)
-  
-  data <- get_combo_score_matrix(data = data, c_assay = metric_combo, normalization_type = metric_growth)
-  
-  if (all(is.na(data))) {
+
+  data_matrix <- get_combo_score_matrix(data = data, c_assay = metric_combo, normalization_type = metric_growth)
+
+  if (all(is.na(data_matrix))) {
     return(plotly::layout(plotly::plotly_empty(), title = "no data to display"))
   }
   
@@ -56,7 +56,7 @@ plolty_drug_combo_heatmap <- function(data,
   # TODO: assure data has not be transformed already
   ci_scores <- as.character(cscore_anames[c("CIScore_50", "CIScore_80")])
   if (is.element(metric_combo, ci_scores)) {
-    data <- log2(data)
+    data_matrix <- log2(data_matrix)
   }
   # prepare labels
   label_combo <- cscore_anames[[metric_combo]]
@@ -68,9 +68,9 @@ plolty_drug_combo_heatmap <- function(data,
   cs <- get_combo_col_settings(metric_growth, assay_name)
   
   # obtain layout properties
-  longest_row_name <- max(nchar(rownames(data)))
-  longest_col_name <- max(nchar(colnames(data)))
-  font_size <- floor(225 / max(nrow(data), ncol(data)))
+  longest_row_name <- max(nchar(rownames(data_matrix)))
+  longest_col_name <- max(nchar(colnames(data_matrix)))
+  font_size <- floor(225 / max(nrow(data_matrix), ncol(data_matrix)))
   font_size <- if (font_size > 15) {
     15
   } else if (font_size < 9) {
@@ -88,7 +88,7 @@ plolty_drug_combo_heatmap <- function(data,
   # 2. colorbar position
   # see xanchor and yanchor below
   
-  data_long <- data.table::as.data.table(as.table(data))
+  data_long <- data.table::as.data.table(as.table(data_matrix))
   heatmap_hover_text <- matrix(
     sprintf(
       "%s: %s\n%s: %s\n%s: %.2f",
@@ -99,21 +99,21 @@ plolty_drug_combo_heatmap <- function(data,
       main_label,
       data_long$N
     ),
-    nrow = nrow(data),
-    ncol = ncol(data)
+    nrow = nrow(data_matrix),
+    ncol = ncol(data_matrix)
   )
   
-  show_dendrogram <- rep(all(dim(data) >= 2), 2)
+  show_dendrogram <- rep(all(dim(data_matrix) >= 2), 2)
   data_index <- ifelse(all(show_dendrogram), 3, 1)
   
   # build plot
   heatmap_combo <- heatmaply::heatmaply(
-    x = data,
+    x = data_matrix,
     plot_method = "plotly",
     main = plot_title,
     limit = cs$limits,
-    Rowv = nrow(data) >= 2,
-    Colv = ncol(data) >= 2,
+    Rowv = nrow(data_matrix) >= 2,
+    Colv = ncol(data_matrix) >= 2,
     show_dendrogram = show_dendrogram,
     colors = create_color_palette(cs$colors, cs$limits),
     key.title = main_label,
@@ -540,6 +540,7 @@ get_drug_axes <- function(dt, value_col = "smooth") {
   pi_conc2_name <- pidfs[["concentration2"]]
   pi_value_col <-
     gDRutils::prettify_flat_metrics(value_col, human_readable = TRUE)
+  
   dt_response <- data.table::dcast(
     dt,
     get(pi_conc_name) ~ get(pi_conc2_name),
@@ -633,7 +634,7 @@ get_combo_score_matrix <-
     
     assay_name <- gDRutils::convert_combo_field_to_assay(c_assay)
     checkmate::assert_list(data)
-    dt <- data[[assay_name]]
+    dt <- data.table::copy(data[[assay_name]])
     dt[, "drug_combo" := paste(get(drug_name), get(drug2_name), sep = " x ")]
     norm_col <- gDRutils::prettify_flat_metrics("normalization_type", human_readable = TRUE)
     data.table::setkeyv(dt, norm_col)
