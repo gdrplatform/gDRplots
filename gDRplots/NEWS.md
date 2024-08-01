@@ -1,5 +1,5 @@
 ## gDRplots 0.0.19 - 2024-08-01
-* prevent drugCombo plot overriding from overwriting the source data
+* prevent drugCombo plot from overwriting the source data
 
 ## gDRplots 0.0.18 - 2024-07-26
 * improve the ratio of square plots
