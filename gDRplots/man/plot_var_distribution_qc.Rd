@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-normalization_qc.R
 \name{plot_var_distribution_qc}
 \alias{plot_var_distribution_qc}
-\title{Plot violin for normalized or averaged single-agent data to control quality of the data}
+\title{Plot violin for normalized or averaged data (single-agent and combo) to control quality of the data}
 \usage{
 plot_var_distribution_qc(
   dt_assay,
@@ -14,7 +14,7 @@ plot_var_distribution_qc(
 \arguments{
 \item{dt_assay}{data.table representing data from the assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)}
-for assay_name like "Normalized" and "Averaged"}
+for assay_name like "Normalized" or "Averaged"}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
 
@@ -27,10 +27,10 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 plot with violin for each drug
 }
 \description{
-Plot violin for normalized or averaged single-agent data to control quality of the data
+Plot violin for normalized or averaged data (single-agent and combo) to control quality of the data
 }
 \examples{
-mae <- gDRutils::get_synthetic_data("small")
+mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 
 dt_norm <- gDRutils::convert_se_assay_to_dt(se, "Normalized")
@@ -49,5 +49,19 @@ plot_var_distribution_qc(dt_assay = dt_average,
                          metric = "x_std",
                          normalization_type = "RV")
                          
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+
+dt_norm <- gDRutils::convert_se_assay_to_dt(se, "Normalized")
+cl_name <- dt_norm[["CellLineName"]][1]
+
+plot_var_distribution_qc(dt_assay = dt_norm,
+                         cl_name = cl_name)
+                         
+dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+plot_var_distribution_qc(dt_assay = dt_average,
+                         cl_name = cl_name,
+                         normalization_type = "RV")
+       
 }
 \keyword{QC_plot}
