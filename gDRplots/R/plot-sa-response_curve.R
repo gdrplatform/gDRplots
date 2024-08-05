@@ -440,7 +440,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
     # set min and max values for y 
     ymin <- min(c(0, min(dt_average_plot$x)))
     ymax <- max(c(1.2, max(dt_average_plot$x)))
-
+    
     plt_title <- dt_metrics_plot[[drug_name]]
     
     # plot
@@ -506,7 +506,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 #' cl_name <- dt_metrics[["CellLineName"]][1]
-#' d_names <- unique(dt_metrics[["DrugName"]])[1:3]
+#' d_names <- unique(dt_metrics[["DrugName"]])[1:5]
 #' 
 #' plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
 #'                                dt_average = dt_average,
@@ -535,6 +535,8 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  conc <- gDRutils::get_env_identifiers("concentration")
   
   checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
@@ -546,26 +548,94 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
     d_names <- drug_name[drug_name %in% available_drugs]
   }
   
-  ls_drug <- list(d_name = d_names)
+  # filter data for normalization_type and fit_source
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_metrics <- dt_metrics[eval(filter_expr)]
+  dt_average <- dt_average[eval(filter_expr)]
   
-  # list of plots for each drug
-  ls_plts <- purrr::pmap(ls_drug,
-                        plot_dose_response_sa_qc,
-                        dt_metrics = dt_metrics,
-                        dt_average = dt_average,
-                        cl_name = cl_name,
-                        normalization_type = normalization_type,
-                        fit_source = fit_source)
+  # filter data for min required data
+  dt_metrics <-
+    dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
+  dt_average <-
+    dt_average[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
+  
+  selected_combination <- data.table::data.table(cellline_name = cl_name,
+                                                 drug_name = d_names)
+  data.table::setnames(selected_combination, c("cellline_name", "drug_name"), c(cellline_name, drug_name))
+  
+  # tab_plots
+  dt_average_plot <- dt_average[selected_combination, on = c(cellline_name, drug_name)]
+  dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name)]
+  
+  dt_reconstructed_fit <- data.table::data.table(drug_name = character(),
+                                                 conc = numeric(), 
+                                                 x = numeric())
+  min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
+  max_conc <- max(dt_average_plot[[conc]])
+  sampled_conc <- gDRplots::create_log_seq(min_conc, max_conc, 50)
+  
+  for (d_name in d_names) {
+    dt_met_plot <- dt_metrics_plot[get(drug_name) == d_name, ]
+    if (NROW(dt_met_plot) > 0) {
+      fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
+                                                                   dt_met_plot$x_inf,
+                                                                   dt_met_plot$x_0,
+                                                                   dt_met_plot$ec50,
+                                                                   dt_met_plot$h)
+      dt_fit <- data.table::data.table(
+        drug_name = d_name,
+        conc = sampled_conc,
+        x = fitted_curve_sampled
+      )
+      
+      dt_reconstructed_fit <- rbind(dt_reconstructed_fit, dt_fit)
+    }
+  }
+  data.table::setnames(dt_reconstructed_fit, c("drug_name", "conc"), c(drug_name, conc))
   
   # panel title
   cl_clid <- unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]])
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
-
-  # final panel
-  panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = ls_plts, common.legend = TRUE),
-    top = panel_title) +
-    ggpubr::bgcolor("white") + ggpubr::border("white")
   
-  return(panel)
+  # set min and max values for y 
+  ymin <- min(c(0, min(dt_average_plot$x)))
+  ymax <- max(c(1.2, max(dt_average_plot$x)))
+  
+  plt <- 
+    ggplot2::ggplot() + 
+    ggplot2::geom_errorbar(
+      data = dt_average_plot,
+      ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
+      width = 0.1, position = ggplot2::position_dodge(0.1)) +
+    ggplot2::geom_line(
+      data = dt_average_plot,
+      ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
+      linetype = "dashed") +
+    ggplot2::geom_line(
+      data = dt_reconstructed_fit,
+      ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
+    ggplot2::geom_hline(yintercept = 0, color = "#555555") +
+    ggplot2::scale_x_continuous(trans = "log10") +
+    ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
+    ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
+    ggplot2::ylab(normalization_type) +
+    ggplot2::ggtitle(panel_title) +
+    ggplot2::labs(color = "") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   aspect.ratio = 1) +
+    ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
+                                           "Averaged Data" = "black",
+                                           "Fitted Curve" = "red")) +
+    ggplot2::facet_wrap(~get(drug_name)) +
+    ggplot2::theme(strip.background = ggplot2::element_blank(),
+                   strip.text = ggplot2::element_text(face = "bold", hjust = 0),
+                   legend.position = "top",
+                   plot.title = ggplot2::element_text(size = 12, hjust = 0.5))
+  
+  return(plt)
 }
