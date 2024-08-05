@@ -238,7 +238,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
       # combo data
       dict <- 
         unique(dt_treat[, .SD, .SDcols = c("rId", drug_name, drug_name_2)])[order(rownames(result_matrix))]
-      dict$drug_lbl <- paste(dict[[drug_name]], dict[[drug_name_2]], sep = "__")
+      dict$drug_lbl <- paste(dict[[drug_name]], dict[[drug_name_2]], sep = " x ")
       rownames(result_matrix) <- dict[["drug_lbl"]]
     } else {
       # single-agent data
