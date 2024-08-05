@@ -250,7 +250,14 @@ plotly_response_curve_all <- function(curve_data,
   range_y <- switch(var_y,
                     "GR value" = c(-1, 1.1),
                     "Relative Viability" = c(0, 1.1))
+  
+  # positions of axis ticks
+  ticks_x <- 10 ^ (-10:10)
+  ticks_y <- -2:4 / 2
+  
   # line properties
+  range_x[1] <- max(ticks_x[ticks_x < range_x[1]])
+  
   line_horizontal_top <- list(
     type = "line", line = list(width = 1, color = "#A6A6A6"), layer = "below",
     x0 = range_x[1], x1 = range_x[2], y0 = 1, y1 = 1)
@@ -263,10 +270,6 @@ plotly_response_curve_all <- function(curve_data,
   line_vertical <- list(
     type = "line", line = list(width = 1), layer = "below",
     x0 = 1, x1 = 1, y0 = range_y[1], y1 = range_y[2])
-  
-  # positions of axis ticks
-  ticks_x <- 10 ^ (-10:10)
-  ticks_y <- -2:4 / 2
   
   # drop data points that would not fit in the plotting area
   # show exception_data if all data has been dropped
@@ -492,6 +495,15 @@ plotly_response_curve_selected <- function(data,
   
   # line properties
   lines <- NULL # reset
+  
+  
+  # positions of axis ticks
+  ticks_x <- 10 ^ (-10:10)
+  ticks_y <- -2:4 / 2
+  
+  # line properties
+  range_x[1] <- max(ticks_x[ticks_x < range_x[1]])
+  
   line_horizontal_top <- list(
     type = "line", line = list(width = 1, color = "#A6A6A6"), layer = "below",
     x0 = range_x[1], x1 = range_x[2], y0 = 1, y1 = 1)
@@ -511,10 +523,6 @@ plotly_response_curve_selected <- function(data,
     names(lines_extra) <- NULL
     lines <- c(lines, lines_extra)
   }
-  
-  # positions of axis ticks
-  ticks_x <- 10 ^ (-10:10)
-  ticks_y <- -2:4 / 2
   # axis options
   axis_options_x <- list(title = sprintf("%s [&mu;M]", concentration_name), type = "log",
                          showgrid = FALSE, zeroline = FALSE, range = log10(range_x),
