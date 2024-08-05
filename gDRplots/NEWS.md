@@ -1,3 +1,6 @@
+## gDRplots 0.0.20 - 2024-08-05
+* extend the range of x-axis in dose-response curve
+
 ## gDRplots 0.0.19 - 2024-08-01
 * prevent drugCombo plot from overwriting the source data
 
