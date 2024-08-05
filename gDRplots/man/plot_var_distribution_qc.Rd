@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-normalization_qc.R
 \name{plot_var_distribution_qc}
 \alias{plot_var_distribution_qc}
-\title{Plot violin for normalized or averaged data (single-agent and combo) to control quality of the data}
+\title{Plot a violin plot for normalized or averaged data (single-agent and combo) to control the quality of the data}
 \usage{
 plot_var_distribution_qc(
   dt_assay,
@@ -27,7 +27,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 plot with violin for each drug
 }
 \description{
-Plot violin for normalized or averaged data (single-agent and combo) to control quality of the data
+Plot a violin plot for normalized or averaged data (single-agent and combo) to control the quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")

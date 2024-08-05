@@ -1,4 +1,4 @@
-#' Plot violin for normalized or averaged data (single-agent and combo) to control quality of the data
+#' Plot a violin plot for normalized or averaged data (single-agent and combo) to control the quality of the data
 #'
 #' @param dt_assay data.table representing data from the assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)}
