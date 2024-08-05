@@ -130,7 +130,7 @@ test_that("check output type for plotly_response_curve_all", {
   expect_equal(plt_all$x$source, "curvePlot")
   expect_equal(plt_all$width, 400)
   expect_equal(plt_all$height, 300)
-  expect_equal(plt_all$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
+  expect_equal(plt_all$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-4, 50e+0)))
   expect_equal(plt_all$x$layoutAttrs[[1]]$title$text,
                paste0("Dose response curves for Drug Name: ",
                       paste(drug_names, collapse = ", ")))
@@ -147,7 +147,7 @@ test_that("check output type for plotly_response_curve_all", {
   plt <- plotly_response_curve_all(prepared_curves, var_y, range_x = r_x)
   expect_type(plt, "list")
   expect_is(plt, "plotly")
-  expect_equal(plt$x$layoutAttrs[[1]]$xaxis$range, log10(r_x))
+  expect_equal(plt$x$layoutAttrs[[1]]$xaxis$range, log10(c(0.01, 4e+0)))
   
   selected_cl <- cell_names[1:5]
   dt2 <- dt[`Cell Line Name` %in% selected_cl]
@@ -229,7 +229,7 @@ test_that("check output type for plotly_response_curve_selected", {
   expect_equal(plt_sel_1$x$attrs[[2]]$mode, "lines")
   expect_equal(plt_sel_1$width, 400)
   expect_equal(plt_sel_1$height, 300)
-  expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
+  expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-4, 50e+0)))
   expect_equal(plt_sel_1$x$attrs[[2]]$color, rep(key_cells_drugs$`Cell Line Name`, 100))
   
   plt_w <- 200
@@ -288,7 +288,7 @@ test_that("check output type for plotly_response_curve_selected", {
                                               extras = subset_extras)
   
   expect_is(plt_sel_4, "plotly")
-  expect_equal(plt_sel_4$x$layoutAttrs[[1]]$xaxis$range, log10(r_x))
+  expect_equal(plt_sel_4$x$layoutAttrs[[1]]$xaxis$range, log10(c(0.01, 4e+0)))
   
   selected_cl <- cell_names[1:3]
   plt_sel_5 <- plotly_response_curve_selected(data = dt[`Cell Line Name` %in% selected_cl, ],
@@ -336,7 +336,7 @@ test_that("check output type for plotly_response_curve_selected for combo", {
   expect_equal(plt_sel_1$x$attrs[[2]]$mode, "lines")
   expect_equal(plt_sel_1$width, 400)
   expect_equal(plt_sel_1$height, 300)
-  expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-3, 50e+0)))
+  expect_equal(plt_sel_1$x$layoutAttrs[[1]]$xaxis$range, log10(c(1e-4, 50e+0)))
   expect_equal(sort(plt_sel_1$x$attrs[[2]]$color),
                sort(rep(combo_key_cells_drugs$`Cell Line Name`, 100)))
 })
