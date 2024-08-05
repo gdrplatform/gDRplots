@@ -1,3 +1,6 @@
+## gDRplots 0.0.21 - 2024-08-05
+* update plots for quality control of the distribution of normalized combo data
+
 ## gDRplots 0.0.20 - 2024-08-05
 * extend the range of x-axis in dose-response curve
 

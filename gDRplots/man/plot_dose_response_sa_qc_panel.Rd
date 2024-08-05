@@ -43,7 +43,7 @@ se <- mae[[1]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 cl_name <- dt_metrics[["CellLineName"]][1]
-d_names <- unique(dt_metrics[["DrugName"]])[1:3]
+d_names <- unique(dt_metrics[["DrugName"]])[1:5]
 
 plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                dt_average = dt_average,

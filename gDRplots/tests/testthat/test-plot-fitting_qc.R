@@ -45,7 +45,7 @@ test_that("heatmap_control_mapping_qc works as expected", {
   expect_equal(plt_4$gtable$grobs[[1]]$label, "Counts of mapped controls") # title
   expect_equal(plt_4$gtable$grobs[[3]]$label, cdata[["CellLineName"]])
   expect_equal(plt_4$gtable$grobs[[4]]$label,
-               paste(rdata[["DrugName"]], rdata[["DrugName_2"]], sep = "__"))
+               paste(rdata[["DrugName"]], rdata[["DrugName_2"]], sep = " x "))
   expect_true(all(vapply(plt_4$gtable$grobs[[2]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   expect_length(NROW(unique(plt_4$gtable$grobs[[2]]$children[[1]]$gp$fill)), 1)
   

@@ -8,6 +8,8 @@
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param colormap character vector with colors for \code{group_names} - name or hex value
+#' @param split_by_conc split_by_conc logical flag indicating whether curves 
+#'    for \code{Concentration_2} should be plotted on a single plot or separately
 #'
 #' @return plot with dose-response curves for combo data
 #'
@@ -30,6 +32,12 @@
 #'                          drug1_name = drug1_name,
 #'                          drug2_name = drug2_name,
 #'                          cl_name = cl_name,
+#'                          split_by_conc = TRUE)
+#'                          
+#' plot_dose_response_combo(dt_average = dt_average,
+#'                          drug1_name = drug1_name,
+#'                          drug2_name = drug2_name,
+#'                          cl_name = cl_name,
 #'                          normalization_type = "RV",
 #'                          colormap = c("orange", "darkred"))                     
 #'                       
@@ -39,7 +47,8 @@ plot_dose_response_combo <- function(dt_average,
                                      drug2_name,
                                      cl_name,
                                      normalization_type = "GR",
-                                     colormap = NULL) {
+                                     colormap = NULL, 
+                                     split_by_conc = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -54,6 +63,7 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
+  checkmate::expect_flag(split_by_conc)
   
   # check input data
   drugs_combination <-
@@ -67,13 +77,15 @@ plot_dose_response_combo <- function(dt_average,
   dt_avg <- dt_average[eval(filter_expr)]
   
   # and selected cell line
-  dt_avg <- dt_avg[get(cellline_name) == cl_name, ]
+  required_cols <- c(cellline_name, drug_name, drug_name_2, conc, conc_2, "x")
+  dt_avg <- dt_avg[get(cellline_name) == cl_name, ][, .SD, .SDcols = required_cols]
   
   # filter data for combination cell line (drug x drug2)
   selecteted_combination <-
     drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
   
   dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
   
   # handle conc = 0
@@ -121,6 +133,17 @@ plot_dose_response_combo <- function(dt_average,
                    panel.grid.minor = ggplot2::element_blank(), 
                    legend.position = "left",
                    aspect.ratio = 1)
+  
+  # split
+  if (split_by_conc) {
+    lbls <- sprintf("%.4f", as.numeric(levels(ls_conc_2)))
+    names(lbls) <- levels(ls_conc_2)
+    
+    plt <- plt + 
+      ggplot2::facet_wrap(~get(conc_2), labeller = ggplot2::as_labeller(lbls)) + 
+      ggplot2::theme(legend.position = "none", 
+                     strip.text = ggplot2::element_text(face = "bold"))
+  }
   
   return(plt)
 }

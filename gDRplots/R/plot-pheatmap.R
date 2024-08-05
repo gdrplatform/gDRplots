@@ -189,7 +189,7 @@ pheatmap_qc <- function(
   
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
-  minval <- min(c(0, round(min(stats::na.omit(mat_cvd)), digits = 2)))
+  minval <- min(c(0, round(min(mat_cvd, na.rm = TRUE), digits = 2)))
   
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
@@ -429,7 +429,7 @@ pheatmap_with_anno_sa <- function(
   t_mat_cvd <- t(mat_cvd)
   
   # prep hm color palette
-  breaks <- seq(from = min(stats::na.omit(mat_cvd)), to = 1.0, length.out = no_breaks)
+  breaks <- seq(from = min(mat_cvd, na.rm = TRUE), to = 1.0, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
   # display numbers - for readability, turn it off for matrices larger than 10x10

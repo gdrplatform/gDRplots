@@ -10,7 +10,8 @@ plot_dose_response_combo(
   drug2_name,
   cl_name,
   normalization_type = "GR",
-  colormap = NULL
+  colormap = NULL,
+  split_by_conc = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colormap}{character vector with colors for \code{group_names} - name or hex value}
+
+\item{split_by_conc}{split_by_conc logical flag indicating whether curves 
+for \code{Concentration_2} should be plotted on a single plot or separately}
 }
 \value{
 plot with dose-response curves for combo data
@@ -47,6 +51,12 @@ plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
                          drug2_name = drug2_name,
                          cl_name = cl_name)
+                         
+plot_dose_response_combo(dt_average = dt_average,
+                         drug1_name = drug1_name,
+                         drug2_name = drug2_name,
+                         cl_name = cl_name,
+                         split_by_conc = TRUE)
                          
 plot_dose_response_combo(dt_average = dt_average,
                          drug1_name = drug1_name,
