@@ -92,7 +92,7 @@ plot_var_distribution_qc <- function(dt_assay,
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
   
-  if (max(tab_subplot[[metric]]) > 0.5) {
+  if (!all(is.na(tab_subplot[[metric]])) && max(tab_subplot[[metric]], na.rm = TRUE) > 0.5) {
     plt <- plt +
       ggplot2::geom_hline(yintercept = 1, color = "#2c3e50", linetype = "dashed")
   }
