@@ -189,8 +189,11 @@ prepare_extras <- function(metrics,
 #' @param curve_data a data.table containing coordinates for plotting predicted dose response curves
 #' @param var_y which variable to plot: GR value or Relative Viability
 #' @param range_x numeric vector of length 2, specifying range of X axis
-#' @param plot_width,plot_height numeric; dimensions of plot
-#' 
+#' @param plot_width numeric, width of the plot in pixels
+#' @param plot_height numeric, height of the plot in pixels
+#' @param ticks_x numeric vector, specifying the positions of ticks on the X axis
+#' @param ticks_y numeric vector, specifying the positions of ticks on the Y axis
+#'
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:8]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
@@ -199,7 +202,7 @@ prepare_extras <- function(metrics,
 #'
 #' @return A plotly object with highlights. The plot contains only response curves.
 #'
-#' The app will tracks clicks and create a secondary plot with a more detailed view of the selected curves.
+#' The app will track clicks and create a secondary plot with a more detailed view of the selected curves.
 #'
 #' @keywords drawResponseOverview
 #' @export
@@ -208,11 +211,15 @@ plotly_response_curve_all <- function(curve_data,
                                       var_y, 
                                       range_x = c(1e-3, 50e+0),
                                       plot_width = 400L,
-                                      plot_height = 300L) {
+                                      plot_height = 300L,
+                                      ticks_x = 10 ^ (-10:10),
+                                      ticks_y = -2:4 / 2) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
   checkmate::assert_numeric(range_x, len = 2)
+  checkmate::assert_numeric(ticks_x, min.len = 1)
+  checkmate::assert_numeric(ticks_y, min.len = 1)
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -250,10 +257,6 @@ plotly_response_curve_all <- function(curve_data,
   range_y <- switch(var_y,
                     "GR value" = c(-1, 1.1),
                     "Relative Viability" = c(0, 1.1))
-  
-  # positions of axis ticks
-  ticks_x <- 10 ^ (-10:10)
-  ticks_y <- -2:4 / 2
   
   # line properties
   range_x[1] <- max(ticks_x[ticks_x < range_x[1]])
@@ -352,7 +355,7 @@ plotly_response_curve_all <- function(curve_data,
 #'
 #' @section Recursive plotting:
 #' If the data set contains multiple co-drugs, this function is called recursively
-#' so that data for each co-drug is plotted on a separate panel. Panel are arranged vertically.
+#' so that data for each co-drug is plotted on a separate panel. Panels are arranged vertically.
 #'
 #' @param data a data.table with cell fitness data taken from a \code{SummarizedExperiment}
 #' @param var_y variable to plot on Y axis
@@ -360,8 +363,11 @@ plotly_response_curve_all <- function(curve_data,
 #' @param curves a data.table with drug response predicted from growth metrics
 #' @param range_x numeric vector of length 2, specifying range of X axis
 #' @param extras a list of extra features that comprise the fifth layer, see \code{Details}
-#' @param plot_width,plot_height numeric; dimensions of plot
-#' 
+#' @param plot_width numeric, width of the plot in pixels
+#' @param plot_height numeric, height of the plot in pixels
+#' @param ticks_x numeric vector, specifying the positions of ticks on the X axis
+#' @param ticks_y numeric vector, specifying the positions of ticks on the Y axis
+#'
 #' @examples
 #' se <- gDRutils::get_synthetic_data("small")[[1]][1:3, 4:6]
 #' dt <- gDRutils::convert_se_assay_to_custom_dt(se, "Metrics")
@@ -390,11 +396,15 @@ plotly_response_curve_selected <- function(data,
                                            range_x = c(1e-3, 50e+0),
                                            extras,
                                            plot_width = 400L,
-                                           plot_height = 300L) {
+                                           plot_height = 300L,
+                                           ticks_x = 10 ^ (-10:10),
+                                           ticks_y = -2:4 / 2) {
   
   checkmate::assert_numeric(plot_width, lower = 1)
   checkmate::assert_numeric(plot_height, lower = 1)
   checkmate::assert_numeric(range_x, len = 2)
+  checkmate::assert_numeric(ticks_x, min.len = 1)
+  checkmate::assert_numeric(ticks_y, min.len = 1)
   
   # get prettified identifiers
   pidfs <- gDRutils::get_prettified_identifiers(simplify = TRUE)
@@ -495,11 +505,7 @@ plotly_response_curve_selected <- function(data,
   
   # line properties
   lines <- NULL # reset
-  
-  
-  # positions of axis ticks
-  ticks_x <- 10 ^ (-10:10)
-  ticks_y <- -2:4 / 2
+
   
   # line properties
   range_x[1] <- max(ticks_x[ticks_x < range_x[1]])
