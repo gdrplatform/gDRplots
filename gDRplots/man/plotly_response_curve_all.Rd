@@ -9,7 +9,9 @@ plotly_response_curve_all(
   var_y,
   range_x = c(0.001, 50),
   plot_width = 400L,
-  plot_height = 300L
+  plot_height = 300L,
+  ticks_x = 10^(-10:10),
+  ticks_y = -2:4/2
 )
 }
 \arguments{
@@ -19,12 +21,18 @@ plotly_response_curve_all(
 
 \item{range_x}{numeric vector of length 2, specifying range of X axis}
 
-\item{plot_width, plot_height}{numeric; dimensions of plot}
+\item{plot_width}{numeric, width of the plot in pixels}
+
+\item{plot_height}{numeric, height of the plot in pixels}
+
+\item{ticks_x}{numeric vector, specifying the positions of ticks on the X axis}
+
+\item{ticks_y}{numeric vector, specifying the positions of ticks on the Y axis}
 }
 \value{
 A plotly object with highlights. The plot contains only response curves.
 
-The app will tracks clicks and create a secondary plot with a more detailed view of the selected curves.
+The app will track clicks and create a secondary plot with a more detailed view of the selected curves.
 }
 \description{
 Plot all curves in a given data set on a reactive plot.

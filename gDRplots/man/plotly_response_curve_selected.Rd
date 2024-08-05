@@ -12,7 +12,9 @@ plotly_response_curve_selected(
   range_x = c(0.001, 50),
   extras,
   plot_width = 400L,
-  plot_height = 300L
+  plot_height = 300L,
+  ticks_x = 10^(-10:10),
+  ticks_y = -2:4/2
 )
 }
 \arguments{
@@ -28,7 +30,13 @@ plotly_response_curve_selected(
 
 \item{extras}{a list of extra features that comprise the fifth layer, see \code{Details}}
 
-\item{plot_width, plot_height}{numeric; dimensions of plot}
+\item{plot_width}{numeric, width of the plot in pixels}
+
+\item{plot_height}{numeric, height of the plot in pixels}
+
+\item{ticks_x}{numeric vector, specifying the positions of ticks on the X axis}
+
+\item{ticks_y}{numeric vector, specifying the positions of ticks on the Y axis}
 }
 \value{
 a plotly object
@@ -59,7 +67,7 @@ Curve data is supplied in a separate data.table.
 \section{Recursive plotting}{
 
 If the data set contains multiple co-drugs, this function is called recursively
-so that data for each co-drug is plotted on a separate panel. Panel are arranged vertically.
+so that data for each co-drug is plotted on a separate panel. Panels are arranged vertically.
 }
 
 \examples{
