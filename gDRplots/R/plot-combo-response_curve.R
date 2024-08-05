@@ -8,8 +8,8 @@
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param colormap character vector with colors for \code{group_names} - name or hex value
-#' @param split_by_conc logical flag whether curves for \code{Concentration_2} plotted on one plot
-#'     or separate
+#' @param split_by_conc split_by_conc logical flag indicating whether curves 
+#'    for \code{Concentration_2} should be plotted on a single plot or separately
 #'
 #' @return plot with dose-response curves for combo data
 #'
