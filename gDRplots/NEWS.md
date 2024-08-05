@@ -1,5 +1,5 @@
 ## gDRplots 0.0.20 - 2024-08-02
-* update plots to quality control of distribution of normalized data for combo data
+* update plots for quality control of the distribution of normalized combo data
 
 ## gDRplots 0.0.19 - 2024-08-01
 * prevent drugCombo plot from overwriting the source data
