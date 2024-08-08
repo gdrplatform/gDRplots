@@ -55,7 +55,11 @@ each value describe in \code{annotation_row}) and in \code{annotation_col}) - re
 Not described elements will be colored in default.}
 }
 \value{
-heatmap for selected metric with annotation - if given
+list of object
+   - "matrix" with data shown in heatmap for selected metric 
+   - "heatmap" hetamp itself
+   - "annotation_row" table with row annotation (for \code{DrugName}) - if given
+   - "annotation_col" table with column annotation (for \code{CellLineName}) - if given
 }
 \description{
 Plot pretty heatmap with annotationsfor single-agent data
@@ -66,7 +70,8 @@ se <- mae[[gDRutils::get_supported_experiments("sa")]]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Metrics")
 
-pheatmap_with_anno_sa(tab_response = response_metrics)
+output <- pheatmap_with_anno_sa(tab_response = response_metrics)
+output[["heatmap"]]
 
 annotation_manual_col <-
   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
@@ -75,14 +80,15 @@ annotation_manual_row <-
 annotation_map <-
   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 
-pheatmap_with_anno_sa(tab_response = response_metrics,
-                      normalization_type = "RV",
-                      metric = "x_mean",
-                      colors_vec = c("darkblue", "grey90"),
-                      annotation_row = annotation_manual_row,
-                      annotation_col = annotation_manual_col,
-                      annotation_colors = annotation_map)
-                      
+output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+                                normalization_type = "RV",
+                                metric = "x_mean",
+                                colors_vec = c("darkblue", "grey90"),
+                                annotation_row = annotation_manual_row,
+                                annotation_col = annotation_manual_col,
+                                annotation_colors = annotation_map)
+output[["heatmap"]]
+
 annotation_manual <- data.table::data.table(
   CellLineName =
     c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
@@ -94,13 +100,14 @@ annotation_map <- list(
   mut_B = c("yes" = "black", "no" = "grey90")
 )
 
-pheatmap_with_anno_sa(tab_response = response_metrics,
-                      annotation_col = annotation_manual,
-                      annotation_colors = annotation_map,
-                      hm_title = get_hm_title(
-                        normalization_type = "GR",
-                        metric = "hsa_score",
-                        dataset_name = "Combo Matrix - combo data"))
+output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+                                annotation_col = annotation_manual,
+                                annotation_colors = annotation_map,
+                                hm_title = get_hm_title(
+                                  normalization_type = "GR",
+                                  metric = "hsa_score",
+                                  dataset_name = "Combo Matrix - combo data"))
+output[["heatmap"]]
 
 }
 \seealso{
