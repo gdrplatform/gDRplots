@@ -247,7 +247,7 @@ pheatmap_qc <- function(
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with valid color name for 
-#'   each value describe in \code{annotation_row} and in \code{annotation_col} - respectively.
+#'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 #'   Not described elements will be colored in default.
 #' 
 #' @seealso \code{\link[pheatmap]{pheatmap}}
@@ -301,8 +301,8 @@ pheatmap_qc <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in heatmap for selected metric ,}
-#'   \item{\code{heatmap} hetamp itself,}
+#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
+#'   \item{\code{heatmap} heatmap itself,}
 #'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
 #'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
 #' }
@@ -488,7 +488,7 @@ pheatmap_with_anno_sa <- function(
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with a valid color name for 
-#'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
+#'   each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 #'   Not described elements will be colored in default.
 #' @inheritParams pheatmap_with_anno_sa
 #' 
@@ -540,8 +540,8 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in heatmap for selected metric ,}
-#'   \item{\code{heatmap} hetamp itself,}
+#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
+#'   \item{\code{heatmap} heatamp itself,}
 #'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
 #'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
 #' }
