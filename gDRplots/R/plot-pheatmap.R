@@ -350,7 +350,7 @@ pheatmap_with_anno_sa <- function(
   # prep data
   tab_plot <- data.table::dcast(
     data = tab_response,
-    formula = get(cellline_name) ~  get(drug_name),
+    formula = get(cellline_name) ~ get(drug_name),
     value.var = metric)
   data.table::setnames(tab_plot, "cellline_name", cellline_name)
   
@@ -442,7 +442,7 @@ pheatmap_with_anno_sa <- function(
     }
   }
   
-  ls_output[["matrix"]] <- t_mat_cvd
+  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # prep hm color palette
@@ -683,7 +683,7 @@ pheatmap_with_anno_combo <- function(
     }
   }
   
-  ls_output[["matrix"]] <- t_mat_cvd
+  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
   
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
