@@ -1,5 +1,5 @@
 ## gDRplots 0.0.22 - 2024-08-08
-* update heatmap function 
+* update heatmap function to return plot and data
 
 ## gDRplots 0.0.21 - 2024-08-05
 * update plots for quality control of the distribution of normalized combo data
