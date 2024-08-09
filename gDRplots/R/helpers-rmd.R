@@ -3,6 +3,7 @@
 #' Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
 #'
 #' @param plt_list named list with generated plots to be shown in tabs
+#'     (for list without name - only ordinal numbers will be generated)
 #' @param chunk_name string name of markdown chunk; preferable without spaces
 #' @param header_level numeric level of markdown header
 #'
@@ -25,7 +26,6 @@ prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             header_level = 3) {
   checkmate::assert_list(plt_list)
-  checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   
@@ -43,7 +43,7 @@ prep_plot_chunk <- function(plt_list,
   })
 }
 
-#' Escape colon
+#' Escape colon and hash
 #'
 #' @param x String
 #'
@@ -52,7 +52,7 @@ prep_plot_chunk <- function(plt_list,
 #' escape_special_characters("AD_12")
 #' escape_special_characters("AD#12")
 #'
-#' @return Original string with \code{:}s escaped
+#' @return Original string with \code{:}s and \code{#}s escaped
 #' @keywords internal
 #'
 #' @export
@@ -61,6 +61,27 @@ escape_special_characters <- function(x) {
   if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
   if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
   x
+}
+
+#' Replace spaces with another character
+#'
+#' @param x String where matches are sought
+#' @param replacement String replacement for spaces
+#'
+#' @examples
+#' neutralize_spaces("GDC-123|Abc x G01234")
+#' neutralize_spaces("MNO-321P 789R YY#1 ")
+#' neutralize_spaces("drug_001 x drug_002", ".")
+#' 
+#' @return String with spaces replaced by the specified character
+#' @keywords internal
+#'
+#' @export
+neutralize_spaces <- function(x,
+                              replacement = "_") {
+  checkmate::assert_string(x)
+  checkmate::assert_string(replacement)
+  gsub(" ", replacement, trimws(x))
 }
 
 #' Estimate the optimal plot size (either ggplot or pheatmap) for saving plots

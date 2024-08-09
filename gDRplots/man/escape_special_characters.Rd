@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-rmd.R
 \name{escape_special_characters}
 \alias{escape_special_characters}
-\title{Escape colon}
+\title{Escape colon and hash}
 \usage{
 escape_special_characters(x)
 }
@@ -10,10 +10,10 @@ escape_special_characters(x)
 \item{x}{String}
 }
 \value{
-Original string with \code{:}s escaped
+Original string with \code{:}s and \code{#}s escaped
 }
 \description{
-Escape colon
+Escape colon and hash
 }
 \examples{
 escape_special_characters("ABC:123")
