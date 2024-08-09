@@ -1,4 +1,45 @@
-context("Test utils")
+context("Test helpers-rmd")
+
+test_that("escape_special_characters works as expected", {
+  plotlist <- lapply(unique(iris$Species), function(iris_name) {
+    ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+      ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
+  })
+  names(plotlist) <- unique(iris$Species)
+  
+  res_1 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris")
+  expect_is(res_1, "list")
+  expect_length(res_1, NROW(plotlist))
+  expect_true(all(vapply(seq_along(res_1), function(i) grepl("###", res_1[[i]]), logical(1))))
+  
+  res_2 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = 2)
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl("##", res_2[[i]]), logical(1))))
+  
+  expect_error(prep_plot_chunk(plt_list = iris, chunk_name = "iris"), 
+               "Assertion on 'plt_list' failed: Must be of type 'list'")
+  expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = 123), 
+               "Assertion on 'chunk_name' failed: Must be of type 'string'")
+  expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = "1"), 
+               "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
+})
+
+test_that("escape_special_characters works as expected", {
+  expect_equal(escape_special_characters("ABC:123"), "ABC\\:123")
+  expect_equal(escape_special_characters("AD_12"), "AD_12")
+  expect_equal(escape_special_characters("AD#12"), "AD[hash]12")
+  
+  expect_error(escape_special_characters(123), "Assertion on 'x' failed: Must be of type 'string'")
+})
+
+test_that("neutralize_spaces works as expected", {
+  expect_equal(neutralize_spaces("GDC-123|Abc x G01234"), "GDC-123|Abc_x_G01234")
+  expect_equal(neutralize_spaces("MNO-321P 789R YY#1 "), "MNO-321P_789R_YY#1")
+  expect_equal(neutralize_spaces("drug_001 x drug_002", replacement = "."), "drug_001.x.drug_002")
+  
+  expect_error(neutralize_spaces(123), "Assertion on 'x' failed: Must be of type 'string'")
+  expect_error(neutralize_spaces("ABC EF", replacement = 1), 
+               "Assertion on 'replacement' failed: Must be of type 'string'")
+})
 
 # Example ggplot object
 
