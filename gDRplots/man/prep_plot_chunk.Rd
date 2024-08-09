@@ -7,7 +7,8 @@
 prep_plot_chunk(plt_list, chunk_name, header_level = 3)
 }
 \arguments{
-\item{plt_list}{named list with generated plots to be shown in tabs}
+\item{plt_list}{named list with generated plots to be shown in tabs
+(for list without name - only ordinal numbers will be generated)}
 
 \item{chunk_name}{string name of markdown chunk; preferable without spaces}
 
