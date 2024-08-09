@@ -8,7 +8,17 @@ test_that("pheatmap_with_anno_sa works as expected", {
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  plt_1 <- pheatmap_with_anno_sa(tab_response = response_metrics)
+  res_1 <- data.table::dcast(data = response_metrics[normalization_type == "GR", ],
+                             formula = DrugName ~ CellLineName, value.var = "xc50")
+  data.table::setkey(res_1, NULL)
+  
+  out_1 <- pheatmap_with_anno_sa(tab_response = response_metrics) # default
+  expect_length(out_1, 2)
+  expect_equal(names(out_1), c("matrix", "heatmap"))
+  data_1 <- out_1[["matrix"]]
+  expect_is(data_1, "data.table")
+  expect_equal(data_1, res_1)
+  plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, rdata[["DrugName"]])
@@ -16,8 +26,16 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
+  res_2 <- data.table::dcast(data = response_metrics_na[normalization_type == "GR", ],
+                             formula = DrugName ~ CellLineName, value.var = "x_max")
+  data.table::setkey(res_2, NULL)
   
-  plt_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, metric = "x_max")
+  out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, metric = "x_max")
+  expect_length(out_2, 2)
+  expect_equal(names(out_2), c("matrix", "heatmap"))
+  data_2 <- out_2[["matrix"]]
+  expect_is(data_2, "data.table")
+  plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, unique(response_metrics_na[!is.na(x_max)]$DrugName))
   
@@ -26,9 +44,20 @@ test_that("pheatmap_with_anno_sa works as expected", {
     mut_A = c(1, 0),
     mut_B = c("yes", "no")
   )
-  plt_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, annotation_col = annotation_manual)
+  out_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
+                                 annotation_col = annotation_manual)
+  expect_length(out_3, 3)
+  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
+  data_3 <- out_3[["matrix"]]
+  expect_is(data_3, "data.table")
+  expect_equal(data_3, res_1)
+  anno_3 <- out_3[["annotation_col"]]
+  expect_equal(anno_3, annotation_manual)
+  expect_is(anno_3, "data.table")
+  plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
+  
 })
 
 test_that("pheatmap_with_anno_combo works as expected", {
@@ -39,7 +68,10 @@ test_that("pheatmap_with_anno_combo works as expected", {
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  plt_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
+  out_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
+  expect_length(out_1, 2)
+  expect_equal(names(out_1), c("matrix", "heatmap"))
+  plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
   expect_equal(plt_1$gtable$grobs[[3]]$label, sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2))
@@ -51,7 +83,10 @@ test_that("pheatmap_with_anno_combo works as expected", {
                                response_metrics_na[!is.na(bliss_score)]$DrugName, 
                                response_metrics_na[!is.na(bliss_score)]$DrugName_2))
   
-  plt_2 <- pheatmap_with_anno_combo(tab_response = response_metrics_na, metric = "bliss_score")
+  out_2 <- pheatmap_with_anno_combo(tab_response = response_metrics_na, metric = "bliss_score")
+  expect_length(out_2, 2)
+  expect_equal(names(out_2), c("matrix", "heatmap"))
+  plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, drug_combo)
   
@@ -60,7 +95,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
     mut_A = c(1, 0),
     mut_B = c("yes", "no")
   )
-  plt_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, annotation_col = annotation_manual)
+  out_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, annotation_col = annotation_manual)
+  expect_length(out_3, 3)
+  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
+  expect_equal(out_3[["annotation_col"]], annotation_manual)
+  plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
 })
@@ -129,7 +168,7 @@ test_that("get_ann_color_map works", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]][2:3, ]
   response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
   dt_ann <- unique(response_metrics[, .SD, .SDcols = c("Tissue", "ReferenceDivisionTime")])
-
+  
   result <- get_ann_color_map(dt_ann)
   expect_equal(NROW(result), NCOL(dt_ann))
   expect_equal(names(result), names(dt_ann))

@@ -247,7 +247,7 @@ pheatmap_qc <- function(
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with valid color name for 
-#'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
+#'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 #'   Not described elements will be colored in default.
 #' 
 #' @seealso \code{\link[pheatmap]{pheatmap}}
@@ -258,7 +258,8 @@ pheatmap_qc <- function(
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                      assay_name = "Metrics")
 #' 
-#' pheatmap_with_anno_sa(tab_response = response_metrics)
+#' output <- pheatmap_with_anno_sa(tab_response = response_metrics)
+#' output[["heatmap"]]
 #' 
 #' annotation_manual_col <-
 #'   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
@@ -267,14 +268,15 @@ pheatmap_qc <- function(
 #' annotation_map <-
 #'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 #' 
-#' pheatmap_with_anno_sa(tab_response = response_metrics,
-#'                       normalization_type = "RV",
-#'                       metric = "x_mean",
-#'                       colors_vec = c("darkblue", "grey90"),
-#'                       annotation_row = annotation_manual_row,
-#'                       annotation_col = annotation_manual_col,
-#'                       annotation_colors = annotation_map)
-#'                       
+#' output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+#'                                 normalization_type = "RV",
+#'                                 metric = "x_mean",
+#'                                 colors_vec = c("darkblue", "grey90"),
+#'                                 annotation_row = annotation_manual_row,
+#'                                 annotation_col = annotation_manual_col,
+#'                                 annotation_colors = annotation_map)
+#' output[["heatmap"]]
+#' 
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
 #'     c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
@@ -286,17 +288,25 @@ pheatmap_qc <- function(
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' pheatmap_with_anno_sa(tab_response = response_metrics,
-#'                       annotation_col = annotation_manual,
-#'                       annotation_colors = annotation_map,
-#'                       hm_title = get_hm_title(
-#'                         normalization_type = "GR",
-#'                         metric = "hsa_score",
-#'                         dataset_name = "Combo Matrix - combo data"))
+#' output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+#'                                 annotation_col = annotation_manual,
+#'                                 annotation_colors = annotation_map,
+#'                                 hm_title = get_hm_title(
+#'                                   normalization_type = "GR",
+#'                                   metric = "hsa_score",
+#'                                   dataset_name = "Combo Matrix - combo data"))
+#' output[["heatmap"]]
 #' 
 #' @keywords pheat_ann
 #' 
-#' @return heatmap for selected metric with annotation - if given
+#' @return A named list with elements:
+#' \itemize{
+#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
+#'   \item{\code{heatmap} heatmap itself,}
+#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
+#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#' }
+#' 
 #' @export
 pheatmap_with_anno_sa <- function(
     tab_response,
@@ -324,6 +334,9 @@ pheatmap_with_anno_sa <- function(
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
+  # output
+  ls_output <- list()
+  
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
@@ -337,8 +350,7 @@ pheatmap_with_anno_sa <- function(
   # prep data
   tab_plot <- data.table::dcast(
     data = tab_response,
-    formula = get(cellline_name) ~  get(drug_name),
-    # TODO add DrugNamePlot
+    formula = get(cellline_name) ~ get(drug_name),
     value.var = metric)
   data.table::setnames(tab_plot, "cellline_name", cellline_name)
   
@@ -349,13 +361,14 @@ pheatmap_with_anno_sa <- function(
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
-  mat_cvd[] <- vapply(mat_cvd, function(x) qmfun(x), numeric(1))
+  # flip
+  t_mat_cvd <- t(mat_cvd)
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
+    if (!all(colnames(t_mat_cvd) %in% annotation_col[[cellline_name]])) {
       tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
+        missing = colnames(t_mat_cvd)[!colnames(t_mat_cvd) %in% annotation_col[[cellline_name]]]
       )
       data.table::setnames(tab_missing_ann, "missing", cellline_name)
       
@@ -365,18 +378,20 @@ pheatmap_with_anno_sa <- function(
       annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
     # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
+    ls_output[["annotation_col"]] <- annotation_col
+    
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     data.table::setorder(annotation_col)
-    mat_cvd <- mat_cvd[rownames(annotation_col), ]
+    t_mat_cvd <- t_mat_cvd[, rownames(annotation_col), drop = FALSE]
   }
   
   if (!is.null(annotation_row)) {
-    if (!all(colnames(mat_cvd) %in% annotation_row[[drug_name]])) {
+    if (!all(rownames(t_mat_cvd) %in% annotation_row[[drug_name]])) {
       tab_missing_ann <- data.table::data.table(
-        missing = colnames(mat_cvd)[!colnames(mat_cvd) %in% annotation_row[[drug_name]]]
+        missing = rownames(t_mat_cvd)[!rownames(t_mat_cvd) %in% annotation_row[[drug_name]]]
       )
       data.table::setnames(tab_missing_ann, "missing", drug_name)
       
@@ -386,12 +401,14 @@ pheatmap_with_anno_sa <- function(
       annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
     # select annotation acc to matrix
-    annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
+    annotation_row <- annotation_row[get(drug_name) %in% rownames(t_mat_cvd), ]
+    ls_output[["annotation_row"]] <- annotation_row
+    
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
     data.table::setorder(annotation_row)
-    mat_cvd <- mat_cvd[, rownames(annotation_row)]
+    t_mat_cvd <- t_mat_cvd[rownames(annotation_row), , drop = FALSE]
   }
   
   # filling missing values
@@ -425,32 +442,33 @@ pheatmap_with_anno_sa <- function(
     }
   }
   
-  # flip
-  t_mat_cvd <- t(mat_cvd)
+  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
+  t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # prep hm color palette
-  breaks <- seq(from = min(mat_cvd, na.rm = TRUE), to = 1.0, length.out = no_breaks)
+  breaks <- seq(from = min(t_mat_cvd, na.rm = TRUE), to = 1.0, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   
-  hm <- pheatmap::pheatmap(mat = t_mat_cvd,
-                           scale = "none",
-                           display_numbers = display_numbers_flag,
-                           number_color = "black",
-                           color = hm_color_palette,
-                           breaks = breaks,
-                           angle_col = 90,
-                           main = hm_title,
-                           cluster_rows = FALSE,
-                           cluster_cols = FALSE,
-                           # manual annotation
-                           annotation_row = annotation_row,
-                           annotation_col = annotation_col,
-                           annotation_colors = annotation_colors
+  ls_output[["heatmap"]] <- pheatmap::pheatmap(mat = t_mat_cvd,
+                                               scale = "none",
+                                               display_numbers = display_numbers_flag,
+                                               number_color = "black",
+                                               color = hm_color_palette,
+                                               breaks = breaks,
+                                               angle_col = 90,
+                                               main = hm_title,
+                                               cluster_rows = FALSE,
+                                               cluster_cols = FALSE,
+                                               # manual annotation
+                                               annotation_row = annotation_row,
+                                               annotation_col = annotation_col,
+                                               annotation_colors = annotation_colors
   )
-  return(hm)
+  
+  return(ls_output)
 }
 
 
@@ -470,7 +488,7 @@ pheatmap_with_anno_sa <- function(
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with a valid color name for 
-#'   each value describe in \code{annotation_row}) and in \code{annotation_col}) - respectively.
+#'   each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 #'   Not described elements will be colored in default.
 #' @inheritParams pheatmap_with_anno_sa
 #' 
@@ -488,13 +506,14 @@ pheatmap_with_anno_sa <- function(
 #' annotation_map <-
 #'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 #' 
-#' pheatmap_with_anno_combo(tab_response = response_metrics,
-#'                          normalization_type = "RV",
-#'                          metric = "bliss_score",
-#'                          colors_vec = c("darkblue", "grey90", "darkred"),
-#'                          annotation_row = annotation_manual_row,
-#'                          annotation_col = annotation_manual_col,
-#'                          annotation_colors = annotation_map)
+#' output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+#'                                    normalization_type = "RV",
+#'                                    metric = "bliss_score",
+#'                                    colors_vec = c("darkblue", "grey90", "darkred"),
+#'                                    annotation_row = annotation_manual_row,
+#'                                    annotation_col = annotation_manual_col,
+#'                                    annotation_colors = annotation_map)
+#' output[["heatmap"]]
 #' 
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -508,17 +527,25 @@ pheatmap_with_anno_sa <- function(
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' pheatmap_with_anno_combo(tab_response = response_metrics,
-#'                          annotation_col = annotation_manual,
-#'                          annotation_colors = annotation_map,
-#'                          hm_title = get_hm_title(
-#'                            normalization_type = "GR",
-#'                            metric = "hsa_score",
-#'                            dataset_name = "Combo Matrix - combo data"))
+#' output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+#'                                    annotation_col = annotation_manual,
+#'                                    annotation_colors = annotation_map,
+#'                                    hm_title = get_hm_title(
+#'                                      normalization_type = "GR",
+#'                                      metric = "hsa_score",
+#'                                      dataset_name = "Combo Matrix - combo data"))
+#' output[["heatmap"]]
 #'             
 #' @keywords pheat_ann
 #' 
-#' @return heatmap for selected metric with annotation - if given
+#' @return A named list with elements:
+#' \itemize{
+#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
+#'   \item{\code{heatmap} heatamp itself,}
+#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
+#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#' }
+#' 
 #' @export
 pheatmap_with_anno_combo <- function(
     tab_response,
@@ -548,6 +575,9 @@ pheatmap_with_anno_combo <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
+  # output
+  ls_output <- list()
+  
   # prep data
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
@@ -557,7 +587,6 @@ pheatmap_with_anno_combo <- function(
   tab_plot <- data.table::dcast(
     data = tab_response,
     formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-    # TODO add DrugNamePlot
     value.var = metric)
   data.table::setnames(tab_plot, "cellline_name", cellline_name)
   
@@ -569,12 +598,14 @@ pheatmap_with_anno_combo <- function(
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  # flip
+  t_mat_cvd <- t(mat_cvd)
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
+    if (!all(colnames(t_mat_cvd) %in% annotation_col[[cellline_name]])) {
       tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
+        missing = colnames(t_mat_cvd)[!colnames(t_mat_cvd) %in% annotation_col[[cellline_name]]]
       )
       data.table::setnames(tab_missing_ann, "missing", cellline_name)
       
@@ -584,12 +615,14 @@ pheatmap_with_anno_combo <- function(
       annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
     # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
+    ls_output[["annotation_col"]] <- annotation_col
+    
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     data.table::setorder(annotation_col)
-    mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
+    t_mat_cvd <- t_mat_cvd[, rownames(annotation_col), drop = FALSE]
   }
   
   if (!is.null(annotation_row)) {
@@ -609,12 +642,14 @@ pheatmap_with_anno_combo <- function(
       annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     }
     # select annotation acc to matrix
-    annotation_row <- annotation_row[DrugCombination %in% colnames(mat_cvd), ]
+    annotation_row <- annotation_row[DrugCombination %in% rownames(t_mat_cvd), ]
+    ls_output[["annotation_row"]] <- annotation_row
+    
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
     # order matrix
     data.table::setorder(annotation_row)
-    mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
+    t_mat_cvd <- t_mat_cvd[rownames(annotation_row), , drop = FALSE]
   }
   
   # filling missing values
@@ -648,8 +683,7 @@ pheatmap_with_anno_combo <- function(
     }
   }
   
-  # flip
-  t_mat_cvd <- t(mat_cvd)
+  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
   
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
@@ -658,22 +692,23 @@ pheatmap_with_anno_combo <- function(
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   
-  hm <- pheatmap::pheatmap(t_mat_cvd,
-                           scale = "none",
-                           display_numbers = display_numbers_flag,
-                           number_color = "black",
-                           color = hm_color_palette,
-                           breaks = breaks,
-                           angle_col = 90,
-                           main = hm_title,
-                           cluster_rows = FALSE,
-                           cluster_cols = FALSE,
-                           # manual annotation
-                           annotation_row = annotation_row,
-                           annotation_col = annotation_col,
-                           annotation_colors = annotation_colors
+  ls_output[["heatmap"]] <- pheatmap::pheatmap(t_mat_cvd,
+                                               scale = "none",
+                                               display_numbers = display_numbers_flag,
+                                               number_color = "black",
+                                               color = hm_color_palette,
+                                               breaks = breaks,
+                                               angle_col = 90,
+                                               main = hm_title,
+                                               cluster_rows = FALSE,
+                                               cluster_cols = FALSE,
+                                               # manual annotation
+                                               annotation_row = annotation_row,
+                                               annotation_col = annotation_col,
+                                               annotation_colors = annotation_colors
   )
-  return(hm)
+  
+  return(ls_output)
 }
 
 # helpers ----
