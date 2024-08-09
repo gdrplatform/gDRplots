@@ -1,3 +1,6 @@
+## gDRplots 0.0.23 - 2024-08-09
+* add function for neutralizing spaces in file names
+
 ## gDRplots 0.0.22 - 2024-08-08
 * update heatmap function to return plot and data
 
