@@ -9,10 +9,10 @@ neutralize_spaces(x, replacement = "_")
 \arguments{
 \item{x}{String where matches are sought}
 
-\item{replacement}{String replacement for space}
+\item{replacement}{String replacement for spaces}
 }
 \value{
-String with spaces change into
+String with spaces replaced by the specified character
 }
 \description{
 Replace spaces with another character

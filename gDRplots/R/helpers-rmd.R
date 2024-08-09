@@ -66,14 +66,14 @@ escape_special_characters <- function(x) {
 #' Replace spaces with another character
 #'
 #' @param x String where matches are sought
-#' @param replacement String replacement for space
+#' @param replacement String replacement for spaces
 #'
 #' @examples
 #' neutralize_spaces("GDC-123|Abc x G01234")
 #' neutralize_spaces("MNO-321P 789R YY#1 ")
 #' neutralize_spaces("drug_001 x drug_002", ".")
 #' 
-#' @return String with spaces change into 
+#' @return String with spaces replaced by the specified character
 #' @keywords internal
 #'
 #' @export
