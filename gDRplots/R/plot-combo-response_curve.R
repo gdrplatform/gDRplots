@@ -57,9 +57,10 @@ plot_dose_response_combo <- function(dt_average,
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   
-  checkmate::expect_data_table(dt_average)
+  checkmate::assert_data_table(dt_average)
   checkmate::assert_choice(drug1_name, choices = unique(dt_average[[drug_name]]))
   checkmate::assert_choice(drug2_name, choices = unique(dt_average[[drug_name_2]]))
+  checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::expect_character(colormap, null.ok = TRUE)
@@ -71,6 +72,10 @@ plot_dose_response_combo <- function(dt_average,
   stopifnot("combination of drugs and cell line does not exist" =
               any(drug2_name %in% drugs_combination[[drug_name_2]],
                   drug1_name %in% drugs_combination[[drug_name]]))
+  
+  # plt title
+  cl_clid <- unique(dt_average[get(cellline_name) == cl_name, ][[clid]])
+  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -106,11 +111,6 @@ plot_dose_response_combo <- function(dt_average,
   # set min and max values for y
   ymin <- min(c(0, min(dt_avg$x)))
   ymax <- max(c(1.2, max(dt_avg$x)))
-  
-  # plt title
-  cl_name <- unique(dt_avg[[cellline_name]])[1]
-  cl_clid <- unique(dt_avg[get(cellline_name) == cl_name, ][[clid]])
-  plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   
   # final plot
   plt <-
@@ -187,7 +187,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   
-  checkmate::expect_data_table(dt_average)
+  checkmate::assert_data_table(dt_average)
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::expect_character(d_names, null.ok = TRUE)
