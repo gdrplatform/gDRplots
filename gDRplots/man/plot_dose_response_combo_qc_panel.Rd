@@ -9,7 +9,7 @@ plot_dose_response_combo_qc_panel(
   cl_name,
   d_names = NULL,
   normalization_type = "GR",
-  as_panel = TRUE
+  colormap = NULL
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ if NULL - all available drugs will be plotted}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{as_panel}{logical flag whether return list of plot or panel}
+\item{colormap}{character vector with colors for \code{group_names} - name or hex value}
 }
 \value{
 panel with plot with dose-response curves for selected cell line by drugs
@@ -40,8 +40,7 @@ dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 cl_name <- "cellline_IB"
 
 plot_dose_response_combo_qc_panel(dt_average = dt_average,
-                                  cl_name = cl_name,
-                                  as_panel = FALSE)
+                                  cl_name = cl_name)
 
 d_names <- c("drug_001", "drug_002")
 plot_dose_response_combo_qc_panel(dt_average = dt_average,
