@@ -218,7 +218,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   
   # and selected cell line
   required_cols <- c(cellline_name, drug_name, drug_name_2, conc, conc_2, "x")
-  dt_avg <- dt_avg[get(cellline_name) == cl_name, ][, .SD, .SDcols = required_cols]
+  dt_avg <- dt_avg[, .SD, .SDcols = required_cols]
   
   # filter data for combination cell line (drug x drug2)
   dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
