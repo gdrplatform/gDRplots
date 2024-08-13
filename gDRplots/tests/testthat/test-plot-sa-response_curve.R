@@ -51,11 +51,11 @@ test_that("plot_dose_response_sa works as expected", {
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
                                      grouping = grouping),
-               "Check on 'dt_metrics' failed: Must be a data.table")
+               "Assertion on 'dt_metrics' failed: Must be a data.table")
   expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
                                      dt_average = dt_average,
                                      grouping = "str"),
-               "Check on 'grouping' failed: Must be element of set")
+               "Assertion on 'grouping' failed: Must be element of set")
 })
 
 test_that("plot_dose_response_sa_by_CLs works as expected", {

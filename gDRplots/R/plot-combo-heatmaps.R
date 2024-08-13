@@ -72,8 +72,8 @@ heatmap_combo_metrics <- function(
   duration <- gDRutils::get_env_identifiers("duration")
   mx_names <- names(gDRutils::get_combo_excess_field_names())
   
-  checkmate::expect_data_table(dt_excess)
-  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
   checkmate::assert_string(drug1_name)
   checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
   checkmate::assert_string(drug2_name)
@@ -104,7 +104,8 @@ heatmap_combo_metrics <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-
+  iso_colors <- get_iso_colors(normalization_type)[available_iso_lvl]
+  
   # title
   main_title <- sprintf("%s (%s)",
                         cl_name,
@@ -381,8 +382,8 @@ heatmap_combo_with_isoref <- function(
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   
-  checkmate::expect_data_table(dt_excess)
-  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
   checkmate::assert_string(drug1_name)
   checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
   checkmate::assert_string(drug2_name)
@@ -593,8 +594,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   gnumber_2 <- gDRutils::get_env_identifiers("drug2")
   
-  checkmate::expect_data_table(dt_excess)
-  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
   checkmate::assert_string(drug1_name)
   checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
   checkmate::assert_string(drug2_name)

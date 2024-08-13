@@ -60,14 +60,14 @@ plot_dose_response_sa <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
   
-  checkmate::expect_data_table(dt_metrics)
-  checkmate::expect_data_table(dt_average)
-  checkmate::expect_choice(grouping, choices = c(cellline_name, drug_name))
-  checkmate::expect_character(group_names, null.ok = TRUE)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_character(colormap, null.ok = TRUE)
-  checkmate::expect_flag(plot_averaged_flag)
-  checkmate::expect_flag(plot_fit_flag)
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_choice(grouping, choices = c(cellline_name, drug_name))
+  checkmate::assert_character(group_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_flag(plot_averaged_flag)
+  checkmate::assert_flag(plot_fit_flag)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   # check input data
@@ -213,14 +213,14 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                                          plot_averaged_flag = TRUE,
                                          plot_fit_flag = TRUE) {
   
-  checkmate::expect_data_table(dt_metrics)
-  checkmate::expect_data_table(dt_average)
-  checkmate::expect_character(cellline_name_vec, null.ok = TRUE)
-  checkmate::expect_character(drug_name_vec, null.ok = TRUE)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_character(colormap, null.ok = TRUE)
-  checkmate::expect_flag(plot_averaged_flag)
-  checkmate::expect_flag(plot_fit_flag)
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_character(cellline_name_vec, null.ok = TRUE)
+  checkmate::assert_character(drug_name_vec, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_flag(plot_averaged_flag)
+  checkmate::assert_flag(plot_fit_flag)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -298,14 +298,14 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                                            plot_averaged_flag = TRUE,
                                            plot_fit_flag = TRUE) {
   
-  checkmate::expect_data_table(dt_metrics)
-  checkmate::expect_data_table(dt_average)
-  checkmate::expect_character(cellline_name_vec, null.ok = TRUE)
-  checkmate::expect_character(drug_name_vec, null.ok = TRUE)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_character(colormap, null.ok = TRUE)
-  checkmate::expect_flag(plot_averaged_flag)
-  checkmate::expect_flag(plot_fit_flag)
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_character(cellline_name_vec, null.ok = TRUE)
+  checkmate::assert_character(drug_name_vec, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_flag(plot_averaged_flag)
+  checkmate::assert_flag(plot_fit_flag)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -385,11 +385,11 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                                      normalization_type = "GR",
                                      fit_source = "gDR") {
   
-  checkmate::expect_data_table(dt_metrics)
-  checkmate::expect_data_table(dt_average)
-  checkmate::expect_string(cl_name)
-  checkmate::expect_string(d_name)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -398,10 +398,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
   
-  checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
-  checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
-  checkmate::expect_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::expect_choice(d_name, choices = dt_average[[drug_name]])
+  checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
+  checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
+  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
   
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -525,11 +525,11 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                                            normalization_type = "GR",
                                            fit_source = "gDR") {
   
-  checkmate::expect_data_table(dt_metrics)
-  checkmate::expect_data_table(dt_average)
-  checkmate::expect_string(cl_name)
-  checkmate::expect_character(d_names, null.ok = TRUE)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_character(d_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -538,8 +538,8 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
   
-  checkmate::expect_choice(cl_name, choices = dt_metrics[[cellline_name]])
-  checkmate::expect_choice(cl_name, choices = dt_average[[cellline_name]])
+  checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
+  checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
   
   available_drugs <- unique(dt_metrics[get(cellline_name) %in% cl_name, ][[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {

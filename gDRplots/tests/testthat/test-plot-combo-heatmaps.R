@@ -29,7 +29,7 @@ test_that("heatmap_combo_metrics works as expected", {
                                      drug1_name = drug1_name,
                                      drug2_name = drug2_name,
                                      cl_name = cl_name),
-               "Check on 'dt_excess' failed: Must be a data.table")
+               "Assertion on 'dt_excess' failed: Must be a data.table")
   expect_error(heatmap_combo_metrics(dt_excess = dt_excess,
                                      dt_isobolograms = dt_isobolograms,
                                      drug1_name = "unknown_drug",

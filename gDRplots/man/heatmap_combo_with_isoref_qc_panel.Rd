@@ -59,8 +59,7 @@ cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(4)]
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
                                    drug1_name, drug2_name,
-                                   cl_names,
-                                   normalization_type = "GR")
+                                   cl_names)
 
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
