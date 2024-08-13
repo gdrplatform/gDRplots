@@ -19,6 +19,33 @@ test_that("plot_dose_response_combo works as expected", {
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["title"]], sprintf("%s (%s)", cl_name, cl_clid))
   
+  normalization_type <- "RV"
+  plt_2 <- plot_dose_response_combo(dt_average = dt_average,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name,
+                                    normalization_type = normalization_type)
+  expect_is(plt_2, "gg")
+  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
+  
+  plt_3 <- plot_dose_response_combo(dt_average = dt_average,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name,
+                                    colormap = c("#FFA500", "#8B0000"))
+  expect_is(plt_3, "gg")
+  expect_true(any(grepl("#FFA500", plt_3[["plot_env"]][["colormap"]])))
+  expect_true(any(grepl("#8B0000", plt_3[["plot_env"]][["colormap"]])))
+  
+  plt_4 <- plot_dose_response_combo(dt_average = dt_average,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name,
+                                    colormap = c("pinky", "blackish"))
+  expect_is(plt_4, "gg")
+  expect_true(any(grepl(colorspace::sequential_hcl(1, palette = "viridis"), 
+                        plt_4[["plot_env"]][["colormap"]]))) # default colors when invalid `colormap`
+  
   expect_error(plot_dose_response_combo(dt_average = unlist(dt_average),
                                         drug1_name = drug1_name,
                                         drug2_name = drug2_name,
@@ -48,6 +75,20 @@ test_that("plot_dose_response_combo works as expected", {
                                         drug2_name = drug2_name,
                                         cl_name = "cellline_XX"),
                "Assertion on 'cl_name' failed: Must be element of set")
+  
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = drug1_name,
+                                        drug2_name = drug2_name,
+                                        cl_name = cl_name,
+                                        normalization_type = "AA"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = drug1_name,
+                                        drug2_name = drug2_name,
+                                        cl_name = cl_name,
+                                        colormap = 1:5),
+               "Assertion on 'colormap' failed: Must be of type 'character'")
 })
 
 test_that("plot_dose_response_combo_qc_panel works as expected", {
@@ -56,12 +97,77 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
   
   cl_name <- "cellline_IB"
+  d_names <- unique(dt_average$DrugName)[2:3]
+  
+  no_comb_all <- NROW(unique(
+    dt_average[CellLineName == cl_name, .SD, 
+               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+  ))
+  no_comb <- NROW(unique(
+    dt_average[DrugName %in% d_names & CellLineName == cl_name, .SD, 
+               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+  ))
   
   plt_1 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
                                              cl_name = cl_name)
-  
   expect_is(plt_1, "gg")
   expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
+  
+  normalization_type <- "RV"
+  plt_2 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                             cl_name = cl_name,
+                                             d_names = d_names,
+                                             normalization_type = normalization_type)
+  expect_is(plt_2, "gg")
+  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_2)$data[[1]]), no_comb)
+  
+  plt_3 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                             cl_name = cl_name,
+                                             colormap = c("#FFA500", "#8B0000"))
+  expect_is(plt_3, "gg")
+  expect_true(any(grepl("#FFA500", plt_3[["plot_env"]][["colormap"]])))
+  expect_true(any(grepl("#8B0000", plt_3[["plot_env"]][["colormap"]])))
+  
+  plt_4 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                             cl_name = cl_name,
+                                             colormap = c("pinky", "blackish"))
+  expect_is(plt_4, "gg")
+  expect_true(any(grepl(colorspace::sequential_hcl(1, palette = "viridis"), 
+                        plt_4[["plot_env"]][["colormap"]]))) # default colors when invalid `colormap`
+  
+  plt_5 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                             d_names = c("drug_XX", "drug_YY"),
+                                             cl_name = cl_name)
+  expect_is(plt_5, "gg")
+  expect_equal(NROW(ggplot2::ggplot_build(plt_5)$data[[1]]), no_comb_all) # default all drugs when invalid `d_names`
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = unlist(dt_average),
+                                                 cl_name = cl_name),
+               "Assertion on 'dt_average' failed: Must be a data.table")
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                                 d_names = 1,
+                                                 cl_name = cl_name),
+               "Assertion on 'd_names' failed: Must be of type 'character'")
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                                 cl_name = 1),
+               "Assertion on 'cl_name' failed: Must be of type 'string'")
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                                 cl_name = "cellline_XX"),
+               "Assertion on 'cl_name' failed: Must be element of set")
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                                 cl_name = cl_name,
+                                                 normalization_type = "AA"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  
+  expect_error(plot_dose_response_combo_qc_panel(dt_average = dt_average,
+                                                 cl_name = cl_name,
+                                                 colormap = 1:5),
+               "Assertion on 'colormap' failed: Must be of type 'character'")
 })
