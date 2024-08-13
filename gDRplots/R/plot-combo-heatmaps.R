@@ -104,8 +104,7 @@ heatmap_combo_metrics <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- get_iso_colors()[available_iso_lvl]
-  
+
   # title
   main_title <- sprintf("%s (%s)",
                         cl_name,
@@ -431,7 +430,7 @@ heatmap_combo_with_isoref <- function(
   # prep plot data
   mx_name <- "smooth"
   dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
-  # correction of NA for conc = 0 ir conc_2 = 0
+  # correction of NA for conc = 0 or conc_2 = 0
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   
   if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
@@ -561,8 +560,7 @@ heatmap_combo_with_isoref <- function(
 #' heatmap_combo_with_isoref_qc_panel(dt_excess,
 #'                                    dt_isobolograms,
 #'                                    drug1_name, drug2_name,
-#'                                    cl_names,
-#'                                    normalization_type = "GR")
+#'                                    cl_names)
 #' 
 #' heatmap_combo_with_isoref_qc_panel(dt_excess,
 #'                                    dt_isobolograms,
