@@ -86,10 +86,10 @@ plot_dose_response_combo <- function(dt_average,
   dt_avg <- dt_avg[get(cellline_name) == cl_name, ][, .SD, .SDcols = required_cols]
   
   # filter data for combination cell line (drug x drug2)
-  selecteted_combination <-
+  selected_combination <-
     drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
   
-  dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
   
@@ -205,11 +205,11 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   }
   
   # check input data
-  selecteted_combination <-
+  selected_combination <-
     unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
-  selecteted_combination <- selecteted_combination[get(drug_name) %in% d_names, ]
+  selected_combination <- selected_combination[get(drug_name) %in% d_names, ]
   stopifnot("combination of drugs and cell line does not exist" =
-              any(d_names %in% selecteted_combination[[drug_name]]))
+              any(d_names %in% selected_combination[[drug_name]]))
   
   # panel title
   cl_clid <- unique(dt_average[get(cellline_name) == cl_name, ][[clid]])
@@ -224,7 +224,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   dt_avg <- dt_avg[, .SD, .SDcols = required_cols]
   
   # filter data for combination cell line (drug x drug2)
-  dt_avg <- dt_avg[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
   
