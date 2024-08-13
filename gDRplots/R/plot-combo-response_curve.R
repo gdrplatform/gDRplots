@@ -62,9 +62,9 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_choice(drug2_name, choices = unique(dt_average[[drug_name_2]]))
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_character(colormap, null.ok = TRUE)
-  checkmate::expect_flag(split_by_conc)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_flag(split_by_conc)
   
   # check input data
   drugs_combination <-
@@ -193,9 +193,9 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   checkmate::assert_data_table(dt_average)
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
-  checkmate::expect_character(d_names, null.ok = TRUE)
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(d_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(colormap, null.ok = TRUE)
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
