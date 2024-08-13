@@ -1,3 +1,6 @@
+## gDRplots 0.0.24 - 2024-08-12
+* fix issue with coloring dose-response curve for combo data 
+
 ## gDRplots 0.0.23 - 2024-08-09
 * add function for neutralizing spaces in file names
 * add tests for rmarkdown helpers
