@@ -606,8 +606,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   
-  checkmate::expect_data_table(dt_excess)
-  checkmate::expect_data_table(dt_isobolograms)
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
   checkmate::assert_string(drug1_name)
   checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
   checkmate::assert_string(drug2_name)
@@ -615,10 +615,12 @@ heatmap_combo_with_isoref_qc_panel <- function(
   checkmate::assert_character(cl_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
-  if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
-  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  if (!is.null(iso_levels)) {
+    stopifnot("`iso_levels` must be a valid numeric value" = all(vapply(iso_levels, function(i) grepl("^0\\.[0-9]*", i), logical(1))))
+  }
+    checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
-    stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+    stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   }
   checkmate::assert_int(no_breaks, lower = 2)
   
