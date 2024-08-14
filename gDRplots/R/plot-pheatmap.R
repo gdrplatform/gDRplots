@@ -322,7 +322,8 @@ pheatmap_with_anno_sa <- function(
   
   checkmate::assert_data_table(tab_response)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("x", "xc50", "x_max", "x_mean"))
+  numeric_columns <- names(tab_response)[vapply(tab_response, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
@@ -344,8 +345,7 @@ pheatmap_with_anno_sa <- function(
   
   qmfun <- switch(metric,
                   "xc50" = log10,
-                  "x_max" = identity,
-                  "x_mean" = identity)
+                  identity)
   
   # prep data
   tab_plot <- data.table::dcast(
@@ -739,9 +739,8 @@ get_hm_title <- function(metric = "xc50",
   
   checkmate::assert_string(dataset_name, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric,
-                           choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
-  
+  # Allow for using any column (even custom), e.g. xc50_sd
+  checkmate::assert_character(metric)
   title_metric <-
     gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, normalization_type), human_readable = TRUE)
   
