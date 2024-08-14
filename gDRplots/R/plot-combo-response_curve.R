@@ -276,8 +276,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
       strip.background = ggplot2::element_blank(),
       strip.text = ggplot2::element_text(size = 8, face = "bold", hjust = 0, margin = ggplot2::margin()),
       legend.position = "left",
-      plot.title = ggplot2::element_text(size = 12, hjust = 0.5, margin = ggplot2::margin()),
-      panel.spacing = ggplot2::unit(0.5, "pt"))
+      plot.title = ggplot2::element_text(size = 12, hjust = 0.5, margin = ggplot2::margin()))
   
   return(plt)
 }
