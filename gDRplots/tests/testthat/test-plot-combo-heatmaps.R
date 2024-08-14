@@ -67,7 +67,7 @@ test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
   expect_true(grepl("GR", plt_1[["labels"]][["fill"]])) 
   expect_true(grepl(drug1_name, plt_1[["labels"]][["y"]][2]))
   expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]][2]))
-  expect_length(plt_1[["layers"]], 2) # heatmap + isoline
+  expect_length(plt_1[["layers"]], 2)
   expect_true(grepl(drug1_name, plt_1[["labels"]][["title"]]))
   expect_true(grepl(drug2_name, plt_1[["labels"]][["title"]]))
   expect_equal(plt_1[["labels"]][["fill"]], "Smooth GR")
