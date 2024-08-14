@@ -32,7 +32,8 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{iso_levels}{character vector with  isobologram levels to be selected}
+\item{iso_levels}{character vector with  isobologram levels to be selected;
+when \code{NULL} - none of isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 

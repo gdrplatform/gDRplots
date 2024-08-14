@@ -29,12 +29,13 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 \item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
 \item{cl_names}{character vector with cell line names to be plotted (Cell Line Name);
-if NULL - all available cell lines will be plotted}
+if \code{NULL} - all available cell lines will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{iso_levels}{character vector with  isobologram levels to be selected}
+\item{iso_levels}{character vector with  isobologram levels to be selected;
+when \code{NULL} - none of isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 
