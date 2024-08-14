@@ -497,7 +497,8 @@ heatmap_combo_with_isoref <- function(
       tab_isoline <- rbind(tab_measured, tab_expected)
       # adjust isoline range to heatmap
       tab_isoline <- 
-        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & data.table::between(pos_y, range_x[1], range_x[2]), ]
+        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
+                      data.table::between(pos_y, range_x[1], range_x[2]), ]
       
       
       if (NROW(available_iso_lvl) == 1) {
@@ -616,9 +617,10 @@ heatmap_combo_with_isoref_qc_panel <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) {
-    stopifnot("`iso_levels` must be a valid numeric value" = all(vapply(iso_levels, function(i) grepl("^0\\.[0-9]*", i), logical(1))))
+    stopifnot("`iso_levels` must be a valid numeric value" = 
+                all(vapply(iso_levels, function(i) grepl("^0\\.[0-9]*", i), logical(1))))
   }
-    checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
     stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
   }
@@ -667,7 +669,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   # correction of NA for conc = 0 or conc_2 = 0
   dt_all[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   dt_tile <- data.table::data.table()
- 
+  
   # prep data for heatmat
   for (cl in cl_names) {
     dt_ <- dt_all[get(cellline_name) == cl, ]
@@ -701,7 +703,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   plt <-
     ggplot2::ggplot(dt_tile, ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
-                       height = tile_height, width = tile_width, alpha = 0.90)+
+                       height = tile_height, width = tile_width, alpha = 0.90) +
     ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
                   y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
                   title = panel_title,
@@ -711,7 +713,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
                                   labels = function(x) sprintf("%.2f", x))
   
   # isoline data
-  if (!is.null(dt_isobolograms$iso_level) & !is.null(iso_levels)) {
+  if (!is.null(dt_isobolograms$iso_level) && !is.null(iso_levels)) {
     # iso level availability
     available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
     iso_levels <- iso_levels[iso_levels %in% available_iso_lvl]
@@ -720,9 +722,9 @@ heatmap_combo_with_isoref_qc_panel <- function(
       # order iso level
       iso_levels <- iso_levels[order(as.numeric(iso_levels))]
       
+      req_cols <- c(cellline_name, drug_name, drug_name_2, "iso_level", "pos_x_ref", "pos_y_ref", "pos_x", "pos_y")
       dt_iso <- 
-        dt_isobolograms[iso_level %in% iso_levels, 
-                        .SD, .SDcols = c(cellline_name, drug_name, drug_name_2, "iso_level", "pos_x_ref", "pos_y_ref", "pos_x", "pos_y")]
+        dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
       
       # colors for isoline
       iso_colors <- if (NROW(iso_levels) == 1) {
@@ -748,7 +750,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
       tab_isoline <- rbind(tab_measured, tab_expected)
       # adjust isoline range to heatmap
       tab_isoline <- 
-        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & data.table::between(pos_y, range_x[1], range_x[2]), ]
+        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
+                      data.table::between(pos_y, range_x[1], range_x[2]), ]
       
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline,
