@@ -13,7 +13,8 @@ heatmap_combo_with_isoref_qc_panel(
   cl_names,
   normalization_type = "GR",
   iso_levels = "0.5",
-  colors_vec = NULL
+  colors_vec = NULL,
+  no_breaks = 50
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{iso_levels}{character vector with  isobologram levels to be selected}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+
+\item{no_breaks}{numeric number of breaks on scale}
 }
 \value{
 panel with heatmaps for fitted values and reference data for isobolograms
@@ -54,7 +57,7 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(4)]
+cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(6)]
 
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
