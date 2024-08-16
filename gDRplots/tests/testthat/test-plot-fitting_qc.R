@@ -52,8 +52,8 @@ test_that("heatmap_control_mapping_qc works as expected", {
   
   expect_error(heatmap_control_mapping_qc(dt_treat = unlist(treat),
                                           dt_controls = controls),
-               "Check on 'dt_treat' failed: Must be a data.table")
+               "Assertion on 'dt_treat' failed: Must be a data.table")
   expect_error(heatmap_control_mapping_qc(dt_treat = treat,
                                           dt_controls = as.list(controls)),
-               "Check on 'dt_controls' failed: Must be a data.table")
+               "Assertion on 'dt_controls' failed: Must be a data.table")
 })
