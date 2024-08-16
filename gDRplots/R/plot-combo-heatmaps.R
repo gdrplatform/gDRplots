@@ -688,8 +688,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
   tile_height <- .get_tile_size(drug1_axis_all$pos_y)
   tile_width <- .get_tile_size(drug2_axis_all$pos_x)
   
-  range_x <- c(min(drug2_axis_all$pos_x), max(drug2_axis_all$pos_x) + 0.5 * tile_width)
-  range_y <- c(min(drug1_axis_all$pos_y), max(drug1_axis_all$pos_y) + 0.5 * tile_height)
+  range_x <- c(min(drug2_axis_all$pos_x), max(drug2_axis_all$pos_x) + tile_width)
+  range_y <- c(min(drug1_axis_all$pos_y), max(drug1_axis_all$pos_y) + tile_height)
   
   # prep limits
   limits <- prep_hm_limits(dt_tile[[mx_name]],   
