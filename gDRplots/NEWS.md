@@ -1,3 +1,6 @@
+## gDRplots 0.0.26 - 2024-08-16
+* move functions related to interactive plots to the separate package
+
 ## gDRplots 0.0.24 - 2024-08-12
 * fix issue with coloring dose-response curve for combo data 
 
