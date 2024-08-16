@@ -83,8 +83,8 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, gDRplots::is_valid_color, logical(1))))
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
@@ -327,7 +327,7 @@ heatmap_combo_metrics <- function(
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected;
-#'     when \code{NULL} - none of isolines will be displayed
+#'     when \code{NULL} - no isolines will be displayed
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #' @param no_breaks numeric number of breaks on scale
 #'
@@ -396,7 +396,7 @@ heatmap_combo_with_isoref <- function(
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
-    stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+    stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   }
   checkmate::assert_int(no_breaks, lower = 2)
   
@@ -558,6 +558,9 @@ heatmap_combo_with_isoref <- function(
 #'
 #' @keywords QC_plot
 #' @examples
+#' cl_names <- 
+#'   c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
+#' 
 #' drug1_name <- "drug_001"
 #' drug2_name <- "drug_026"
 #' 
@@ -565,8 +568,6 @@ heatmap_combo_with_isoref <- function(
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
-#' 
-#' cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(6)]
 #' 
 #' heatmap_combo_with_isoref_qc_panel(dt_excess,
 #'                                    dt_isobolograms,
@@ -618,11 +619,11 @@ heatmap_combo_with_isoref_qc_panel <- function(
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) {
     stopifnot("`iso_levels` must be a valid numeric value" = 
-                all(vapply(iso_levels, function(i) grepl("^0\\.[0-9]*", i), logical(1))))
+                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   if (!is.null(colors_vec)) {
-    stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+    stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   }
   checkmate::assert_int(no_breaks, lower = 2)
   
@@ -668,18 +669,17 @@ heatmap_combo_with_isoref_qc_panel <- function(
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 or conc_2 = 0
   dt_all[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
-  dt_tile <- data.table::data.table()
-  
+
   # prep data for heatmat
-  for (cl in cl_names) {
-    dt_ <- dt_all[get(cellline_name) == cl, ]
-    
-    dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-    dt_$pos_y <- transform_log_conc(dt_[[conc]])
-    dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
-    
-    dt_tile <- rbind(dt_tile, dt_)
-  }
+  dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
+                                                        `:=`(
+                                                          mx_name = pmin(1.1, get(mx_name)),
+                                                          pos_y = transform_log_conc(get(conc)),
+                                                          pos_x = transform_log_conc(get(conc_2))
+                                                        ), 
+                                                        by = cellline_name
+  ][, .SD, .SDcols = -mx_name]
+  data.table::setnames(dt_tile, "mx_name", mx_name)
   
   # tiles positioning 
   ls_axes_all <- gDRutils::define_matrix_grid_positions(dt_tile[[conc]], dt_all[[conc_2]])
@@ -721,8 +721,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
     if (NROW(iso_levels)) {
       # order iso level
       iso_levels <- iso_levels[order(as.numeric(iso_levels))]
-      
-      req_cols <- c(cellline_name, drug_name, drug_name_2, "iso_level", "pos_x_ref", "pos_y_ref", "pos_x", "pos_y")
+
+      req_cols <- c(cellline_name, drug_name, drug_name_2, gDRutils::get_header("iso_position"))
       dt_iso <- 
         dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
       
@@ -784,7 +784,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
     ggplot2::facet_wrap(~get(cellline_name)) +
     ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
                     linetype = ggplot2::guide_legend(order = 2), 
-                    colour = ggplot2::guide_legend(order = 3)) +
+                    color = ggplot2::guide_legend(order = 3)) +
     ggplot2::theme(
       legend.position = "left", 
       strip.background = ggplot2::element_blank(),

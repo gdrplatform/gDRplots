@@ -49,6 +49,8 @@ test_that("heatmap_combo_with_isoref works as expected", {
 })
 
 test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
+  cl_names <- 
+    c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
   drug1_name <- "drug_001"
   drug2_name <- "drug_026"
   
@@ -56,8 +58,6 @@ test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
   dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
-  
-  cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(6)]
   
   plt_1 <- heatmap_combo_with_isoref_qc_panel(dt_excess,
                                               dt_isobolograms,

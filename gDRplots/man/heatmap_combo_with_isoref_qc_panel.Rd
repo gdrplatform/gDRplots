@@ -35,7 +35,7 @@ if \code{NULL} - all available cell lines will be plotted}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected;
-when \code{NULL} - none of isolines will be displayed}
+when \code{NULL} - no isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
 
@@ -50,6 +50,9 @@ Plot panel of heatmaps with fitted and reference data for isobolograms
 to control quality of the data
 }
 \examples{
+cl_names <- 
+  c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
+
 drug1_name <- "drug_001"
 drug2_name <- "drug_026"
 
@@ -57,8 +60,6 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
-
-cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(6)]
 
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
