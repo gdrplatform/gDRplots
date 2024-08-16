@@ -22,4 +22,4 @@ The result is a numeric vector of length \code{length}.
 Differences between items are constant in logarithmic domain
 and therefore geometrically increase in linear domain.
 }
-\keyword{internal}
+\keyword{utils}

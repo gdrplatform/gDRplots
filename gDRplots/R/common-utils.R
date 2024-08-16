@@ -9,7 +9,7 @@
 #' @param start,end numeric, lower and upper margins of the sequence
 #' @param length integer, resulting sequence length
 #' 
-#' @keywords internal
+#' @keywords utils
 #' @return A numeric vector, see \code{Details}.
 #'
 #' @export 

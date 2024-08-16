@@ -29,7 +29,7 @@ is_valid_color <- function(col_name) {
 #' 
 #' 
 #' @param  normalization_type charvec normalization_types expected in the data
-#' @keywords internal
+#' @keywords utils_color
 #'
 #' @return named charvec with iso colors
 #' 

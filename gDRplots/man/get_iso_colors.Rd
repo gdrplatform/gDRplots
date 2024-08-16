@@ -19,4 +19,4 @@ get_iso_colors
 get_iso_colors()
 
 }
-\keyword{internal}
+\keyword{utils_color}
