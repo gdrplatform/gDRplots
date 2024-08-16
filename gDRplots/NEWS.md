@@ -1,3 +1,6 @@
+## gDRplots 0.0.25 - 2024-08-14
+* make plotting functions more versatile
+
 ## gDRplots 0.0.24 - 2024-08-12
 * fix issue with coloring dose-response curve for combo data 
 
