@@ -215,7 +215,8 @@ pheatmap_qc <- function(
                            cluster_rows = cluster_rows,
                            # manual annotation
                            annotation_col = drug_annotation,
-                           annotation_colors = drug_annotation_colors
+                           annotation_colors = drug_annotation_colors,
+                           silent = TRUE
   )
   return(hm)
 }
@@ -467,7 +468,8 @@ pheatmap_with_anno_sa <- function(
                                                # manual annotation
                                                annotation_row = annotation_row,
                                                annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors
+                                               annotation_colors = annotation_colors,
+                                               silent = TRUE
   )
   
   return(ls_output)
@@ -707,7 +709,8 @@ pheatmap_with_anno_combo <- function(
                                                # manual annotation
                                                annotation_row = annotation_row,
                                                annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors
+                                               annotation_colors = annotation_colors,
+                                               silent = TRUE
   )
   
   return(ls_output)
