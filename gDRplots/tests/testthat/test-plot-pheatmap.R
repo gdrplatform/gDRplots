@@ -121,6 +121,14 @@ test_that("get_hm_title works as expected", {
   metric <- "hsa_score"
   normalization_type <- "GR"
   expect_equal(get_hm_title(metric, normalization_type, dataset_name), "Dataset AB123 (HSA Score GR)")
+  
+  metric <- "x_mean_sd_custom_metric"
+  normalization_type <- "RV"
+  expect_equal(get_hm_title(metric, normalization_type), "RV Mean Sd Custom Metric")
+  
+  metric <- "aggregated xc50"
+  normalization_type <- "RV"
+  expect_equal(get_hm_title(metric, normalization_type), "Aggregated IC50")
 })
 
 test_that("change_NA_into_char works", {
