@@ -363,6 +363,7 @@ pheatmap_with_anno_sa <- function(
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
 
   # check completeness of annotation - TODO wrap in separate function
+  
   if (!is.null(annotation_col)) {
     if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
       tab_missing_ann <- data.table::data.table(
@@ -371,10 +372,10 @@ pheatmap_with_anno_sa <- function(
       data.table::setnames(tab_missing_ann, "missing", cellline_name)
       
       annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-      # data.table::nafill does not support character
-      cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-      annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
+    # data.table::nafill does not support character
+    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
+    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
     ls_output[["annotation_col"]] <- annotation_col
@@ -394,10 +395,10 @@ pheatmap_with_anno_sa <- function(
       data.table::setnames(tab_missing_ann, "missing", drug_name)
       
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
-      # data.table::nafill does not support character
-      cols <- names(annotation_row)[names(annotation_row) != drug_name]
-      annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
+    # data.table::nafill does not support character
+    cols <- names(annotation_row)[names(annotation_row) != drug_name]
+    annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     # select annotation acc to matrix
     annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
     ls_output[["annotation_row"]] <- annotation_row
