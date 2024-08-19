@@ -31,7 +31,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
   
-  out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, metric = "x_max")
+  out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, 
+                                 metric = "x_max")
   expect_length(out_2, 2)
   expect_equal(names(out_2), c("matrix", "heatmap"))
   data_2 <- out_2[["matrix"]]
@@ -72,7 +73,6 @@ test_that("pheatmap_with_anno_sa works as expected", {
   out_4 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
                                  annotation_col = annotation_manual[1, ],
                                  annotation_colors = annotation_map)
-  
   expect_length(out_4, 3)
   expect_equal(sort(names(out_4)), sort(c("matrix", "annotation_col", "heatmap")))
   data_4 <- out_4[["matrix"]]
@@ -84,6 +84,28 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
   expect_equal(plt_4$gtable$grobs[[5]]$label, c("mut_A", "mut_B", "mut_C"))
+  
+  annotation_manual_row <-
+    unique(response_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
+  anno_test <- data.table::data.table(
+    DrugName = c("drug_004", "drug_005", "drug_006"),
+    tested_AB = c("yes", "yes", "no")
+  )
+  annotation_manual_row <- anno_test[annotation_manual_row, on = "DrugName"]
+  
+  out_5 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
+                                 annotation_row = annotation_manual_row)
+  expect_length(out_5, 3)
+  expect_equal(sort(names(out_5)), sort(c("matrix", "annotation_row", "heatmap")))
+  data_5 <- out_5[["matrix"]]
+  expect_is(data_5, "data.table")
+  expect_equal(data_5, res_1)
+  anno_5 <- out_5[["annotation_row"]]
+  expect_is(anno_5, "data.table")
+  expect_equal(anno_5, annotation_manual_row)
+  plt_5 <- out_5[["heatmap"]]
+  expect_is(plt_5, "pheatmap")
+  expect_equal(plt_5$gtable$grobs[[5]]$label, c("tested_AB", "drug_moa"))
 })
 
 test_that("pheatmap_with_anno_combo works as expected", {
