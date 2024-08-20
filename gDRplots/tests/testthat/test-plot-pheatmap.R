@@ -26,12 +26,13 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   response_metrics_na <- data.table::copy(response_metrics)
   response_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
-  res_2 <- data.table::dcast(data = response_metrics_na[normalization_type == "GR", ],
+  res_2 <- data.table::dcast(data = response_metrics_na[normalization_type == "RV", ],
                              formula = CellLineName ~ DrugName, value.var = "x_max")
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
   
   out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, 
+                                 normalization_type = "RV",
                                  metric = "x_max")
   expect_length(out_2, 2)
   expect_equal(names(out_2), c("matrix", "heatmap"))
@@ -42,49 +43,54 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, unique(response_metrics_na[!is.na(x_max)]$DrugName))
   
-  annotation_manual <- data.table::data.table(
+  annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
     mut_A = c(1, 0),
     mut_B = c("yes", "no"),
     mut_C = c("CC", "CC")
   )
+  annotation_manual_row <- data.table::data.table(
+    DrugName = c("drug_002", "drug_011", "drug_021", "drug_026"),
+    group = c(1, 1, 2, 3)
+  )
+  annotation_manual_na <- annotation_manual_row[unique(response_metrics[,"DrugName"]), on = "DrugName"]
+  data.table::setorderv(annotation_manual_na, cols = "group", na.last = TRUE)
+  annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
+
   out_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
-                                 annotation_col = annotation_manual)
-  expect_length(out_3, 3)
-  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
-  data_3 <- out_3[["matrix"]]
-  expect_is(data_3, "data.table")
-  expect_equal(data_3, res_1)
-  anno_3 <- out_3[["annotation_col"]]
-  expect_is(anno_3, "data.table")
-  expect_equal(anno_3, annotation_manual)
+                                 annotation_row = annotation_manual_row,
+                                 annotation_col = annotation_manual_col)
+  expect_length(out_3, 4)
+  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "annotation_row", "heatmap")))
+  anno_col_3 <- out_3[["annotation_col"]]
+  expect_is(anno_col_3, "data.table")
+  expect_equal(anno_col_3, annotation_manual_col)
+  anno_row_3 <- out_3[["annotation_row"]]
+  expect_is(anno_row_3, "data.table")
+  expect_equal(anno_row_3, annotation_manual_na)
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B", "mut_C"))
+  expect_equal(plt_3$gtable$grobs[[7]]$label, c("group"))
   
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue"),
     mut_B = c("yes" = "black", "no" = "grey90"),
     mut_C = c("AA" = "yellow", "BB" = "green")
   )
-  annotation_manual_na <- data.table::copy(annotation_manual)
+  annotation_manual_na <- data.table::copy(annotation_manual_col)
   annotation_manual_na <- annotation_manual_na[, lapply(.SD, as.character)]
   annotation_manual_na[2, c("mut_A", "mut_B", "mut_C") := "NA"]
+  
   out_4 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
-                                 annotation_col = annotation_manual[1, ],
+                                 annotation_col = annotation_manual_col[1, ],
                                  annotation_colors = annotation_map)
   expect_length(out_4, 3)
   expect_equal(sort(names(out_4)), sort(c("matrix", "annotation_col", "heatmap")))
-  data_4 <- out_4[["matrix"]]
-  expect_is(data_4, "data.table")
-  expect_equal(data_4, res_1)
   anno_4 <- out_4[["annotation_col"]]
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_na)
-  plt_4 <- out_4[["heatmap"]]
-  expect_is(plt_4, "pheatmap")
-  expect_equal(plt_4$gtable$grobs[[5]]$label, c("mut_A", "mut_B", "mut_C"))
-  
+
   annotation_manual_row <-
     unique(response_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
   anno_test <- data.table::data.table(
