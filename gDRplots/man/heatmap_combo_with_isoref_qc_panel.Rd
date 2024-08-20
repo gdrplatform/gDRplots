@@ -13,7 +13,8 @@ heatmap_combo_with_isoref_qc_panel(
   cl_names,
   normalization_type = "GR",
   iso_levels = "0.5",
-  colors_vec = NULL
+  colors_vec = NULL,
+  no_breaks = 50
 )
 }
 \arguments{
@@ -28,14 +29,17 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
 \item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
 \item{cl_names}{character vector with cell line names to be plotted (Cell Line Name);
-if NULL - all available cell lines will be plotted}
+if \code{NULL} - all available cell lines will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{iso_levels}{character vector with  isobologram levels to be selected}
+\item{iso_levels}{character vector with  isobologram levels to be selected;
+when \code{NULL} - no isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+
+\item{no_breaks}{numeric number of breaks on scale}
 }
 \value{
 panel with heatmaps for fitted values and reference data for isobolograms
@@ -46,6 +50,9 @@ Plot panel of heatmaps with fitted and reference data for isobolograms
 to control quality of the data
 }
 \examples{
+cl_names <- 
+  c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
+
 drug1_name <- "drug_001"
 drug2_name <- "drug_026"
 
@@ -54,13 +61,10 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-cl_names <- unique(dt_excess[["CellLineName"]])[seq_len(4)]
-
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,
                                    drug1_name, drug2_name,
-                                   cl_names,
-                                   normalization_type = "GR")
+                                   cl_names)
 
 heatmap_combo_with_isoref_qc_panel(dt_excess,
                                    dt_isobolograms,

@@ -1,5 +1,8 @@
-## gDRplots 0.0.25 - 2024-08-14
+## gDRplots 0.0.26 - 2024-08-20
 * make plotting functions more versatile
+
+## gDRplots 0.0.25 - 2024-08-13
+* increase readability for reference isobolograms for combo data
 
 ## gDRplots 0.0.24 - 2024-08-12
 * fix issue with coloring dose-response curve for combo data 

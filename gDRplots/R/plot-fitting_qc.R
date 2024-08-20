@@ -39,11 +39,11 @@ plot_var_stat_qc <- function(dt_assay,
                              normalization_type = "GR", 
                              with_table = FALSE) {
   
-  checkmate::expect_data_table(dt_assay)
-  checkmate::expect_string(cl_name)
-  checkmate::expect_choice(metric, choices = names(dt_assay))
-  checkmate::expect_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::expect_flag(with_table)
+  checkmate::assert_data_table(dt_assay)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_choice(metric, choices = names(dt_assay))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_flag(with_table)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -199,8 +199,8 @@ plot_fitting_acc <- function(dt_assay,
 #' @export
 heatmap_control_mapping_qc <- function(dt_treat,
                                        dt_controls) {
-  checkmate::expect_data_table(dt_treat)
-  checkmate::expect_data_table(dt_controls)
+  checkmate::assert_data_table(dt_treat)
+  checkmate::assert_data_table(dt_controls)
   
   # calculate the frequency of each (rID, cID) combination in Controls 
   frequency <- dt_controls[, .N, by = .(rId, cId)]

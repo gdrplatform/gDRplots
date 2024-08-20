@@ -64,7 +64,7 @@ pheatmap_qc <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
@@ -302,10 +302,13 @@ pheatmap_qc <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
-#'   \item{\code{heatmap} heatmap itself,}
-#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
-#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'     \itemize{
+#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'     }
+#'   \item{\code{heatmap}}{the heatmap itself.}
 #' }
 #' 
 #' @export
@@ -328,7 +331,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -472,7 +475,7 @@ pheatmap_with_anno_sa <- function(
                                                silent = TRUE
   )
   
-  return(ls_output[c("matrix", "annotation_col", "annotation_row", "heatmap")])
+  return(ls_output)
 }
 
 
@@ -544,10 +547,13 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
-#'   \item{\code{heatmap} heatamp itself,}
-#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
-#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'     \itemize{
+#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'     }
+#'   \item{\code{heatmap}}{the heatmap itself.}
 #' }
 #' 
 #' @export
@@ -569,7 +575,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
@@ -712,7 +718,7 @@ pheatmap_with_anno_combo <- function(
                                                annotation_colors = annotation_colors,
                                                silent = TRUE
   )
-  return(ls_output[c("matrix", "annotation_col", "annotation_row", "heatmap")])
+  return(ls_output)
 }
 
 # helpers ----
