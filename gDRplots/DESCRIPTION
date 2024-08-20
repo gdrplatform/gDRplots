@@ -10,7 +10,7 @@ Authors@R: c(
              person("gDR", "team", email = "gdr-support-d@gene.com", role = "cre",
              comment = c(ORCID = "0009-0006-9310-1135"))
              )
-Description: gDRplot is a package that stores functions for gDR visualisations and their dedicated helpers.
+Description: gDRplot is a package that stores functions for gDR static visualizations and their dedicated helpers.
 License: Artistic-2.0
 Imports:
     checkmate,
