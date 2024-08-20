@@ -342,7 +342,8 @@ pheatmap_with_anno_sa <- function(
   # output
   ls_output <- list(data = list(matrix = NULL,
                                 annotation_col = NULL,
-                                annotation_row = NULL), heatmap = NULL)
+                                annotation_row = NULL),
+                    heatmap = NULL)
   
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -385,9 +386,9 @@ pheatmap_with_anno_sa <- function(
     }
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
-
-    rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     ls_output[["data"]][["annotation_col"]] <- annotation_col
+    
+    rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     data.table::setorder(annotation_col)
@@ -408,9 +409,9 @@ pheatmap_with_anno_sa <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[get(drug_name) %in% rownames(t_mat_cvd), ]
+    ls_output[["data"]][["annotation_row"]] <- annotation_col
 
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
-    ls_output[["data"]][["annotation_row"]] <- annotation_col
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
     data.table::setorder(annotation_row)
@@ -449,7 +450,6 @@ pheatmap_with_anno_sa <- function(
   }
   
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
-  ls_output[["data"]] <- ls_output[["data"]][c("matrix", "annotation_col", "annotation_row")]
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # prep hm color palette
@@ -596,7 +596,8 @@ pheatmap_with_anno_combo <- function(
   # output
   ls_output <- list(data = list(matrix = NULL,
                                 annotation_col = NULL,
-                                annotation_row = NULL), heatmap = NULL)
+                                annotation_row = NULL),
+                    heatmap = NULL)
   
   # prep data
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -636,9 +637,9 @@ pheatmap_with_anno_combo <- function(
     }
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
+    ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
-    ls_output[["data"]][["annotation_col"]] <- annotation_col
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     data.table::setorder(annotation_col)
@@ -663,9 +664,9 @@ pheatmap_with_anno_combo <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% rownames(t_mat_cvd), ]
-
-    rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     ls_output[["data"]][["annotation_row"]] <- annotation_row
+    
+    rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
     # order matrix
     data.table::setorder(annotation_row)
@@ -704,8 +705,7 @@ pheatmap_with_anno_combo <- function(
   }
   
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
-  ls_output[["data"]] <- ls_output[["data"]][c("matrix", "annotation_col", "annotation_row")]
-                              
+
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)

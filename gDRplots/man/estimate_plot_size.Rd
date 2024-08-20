@@ -4,13 +4,7 @@
 \alias{estimate_plot_size}
 \title{Estimate the optimal plot size (either ggplot or pheatmap) for saving plots}
 \usage{
-estimate_plot_size(
-  plt,
-  base_width = 10,
-  base_height = 6,
-  scale_factor = 0.5,
-  max_size = 49.9
-)
+estimate_plot_size(plt, base_width = 10, base_height = 6, scale_factor = 0.5)
 }
 \arguments{
 \item{plt}{a ggplot or pheatmap object}
@@ -20,8 +14,6 @@ estimate_plot_size(
 \item{base_height}{an integer with default base_height}
 
 \item{scale_factor}{an integer with default scale_factor}
-
-\item{max_size}{an integer with the maximum size of the plot (either width or height)}
 }
 \value{
 named vector with optimal width and height used in ggsave function
