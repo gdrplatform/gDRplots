@@ -11,7 +11,8 @@
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
-#'   (first color for min value, last color - for max value)
+#'    note that for \code{metric} "x" the first color will be assigned to the min value, and 
+#'    the last one - to the max; for "x_std" - that will be reversed
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether ows should be clustered
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
@@ -224,16 +225,17 @@ pheatmap_qc <- function(
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
-#'    and single-agent \code{SummarizedExperiment}
+#'  outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
+#'  and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of metric;
-#'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
-#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
+#'   note that the first color will be assigned to the min value, and the last one - to the max
 #' @param no_breaks numeric number of breaks on scale
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -475,11 +477,11 @@ pheatmap_with_anno_sa <- function(
 #' Plot pretty heatmap with annotations for combo data
 #' 
 #' @param tab_response \code{data.table} containing drug response metrics
-#'    output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
-#'    and combo \code{SummarizedExperiment}
+#'   output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
+#'   and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
-#'    one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-#'    depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.

@@ -33,7 +33,8 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 
 \item{hm_title}{string plot title}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap;
+note that the first color will be assigned to the min value, and the last one - to the max}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
