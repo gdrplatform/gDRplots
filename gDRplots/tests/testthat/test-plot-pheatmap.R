@@ -14,10 +14,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   out_1 <- pheatmap_with_anno_sa(tab_response = response_metrics) # default
   expect_length(out_1, 2)
-  expect_equal(names(out_1), c("matrix", "heatmap"))
-  data_1 <- out_1[["matrix"]]
-  expect_is(data_1, "data.table")
-  expect_equal(data_1, res_1)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  data_1 <- out_1[["data"]]
+  expect_is(data_1, "list")
+  expect_equal(names(data_1), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_1[["matrix"]], "data.table")
+  expect_equal(data_1[["matrix"]], res_1)
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
@@ -32,9 +34,11 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, metric = "x_max")
   expect_length(out_2, 2)
-  expect_equal(names(out_2), c("matrix", "heatmap"))
-  data_2 <- out_2[["matrix"]]
-  expect_is(data_2, "data.table")
+  expect_equal(names(out_2), c("data", "heatmap"))
+  data_2 <- out_2[["data"]]
+  expect_is(data_2, "list")
+  expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_2[["matrix"]], "data.table")
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, unique(response_metrics_na[!is.na(x_max)]$DrugName))
@@ -46,12 +50,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   )
   out_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
                                  annotation_col = annotation_manual)
-  expect_length(out_3, 3)
-  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
-  data_3 <- out_3[["matrix"]]
-  expect_is(data_3, "data.table")
-  expect_equal(data_3, res_1)
-  anno_3 <- out_3[["annotation_col"]]
+  expect_length(out_3, 2)
+  expect_equal(names(out_3), c("data", "heatmap"))
+  data_3 <- out_3[["data"]]
+  expect_is(data_3, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_3[["matrix"]], "data.table")
+  expect_equal(data_3[["matrix"]], res_1)
+  anno_3 <- data_3[["annotation_col"]]
   expect_equal(anno_3, annotation_manual)
   expect_is(anno_3, "data.table")
   plt_3 <- out_3[["heatmap"]]
@@ -70,7 +76,10 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
   expect_length(out_1, 2)
-  expect_equal(names(out_1), c("matrix", "heatmap"))
+  expect_equal(names(out_1), c("data", "heatmap"))
+  data_1 <- out_1[["data"]]
+  expect_is(data_1, "list")
+  expect_equal(names(data_1), c("matrix", "annotation_col", "annotation_row"))
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
@@ -85,7 +94,10 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_2 <- pheatmap_with_anno_combo(tab_response = response_metrics_na, metric = "bliss_score")
   expect_length(out_2, 2)
-  expect_equal(names(out_2), c("matrix", "heatmap"))
+  expect_equal(names(out_2), c("data", "heatmap"))
+  data_2 <- out_2[["data"]]
+  expect_is(data_2, "list")
+  expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, drug_combo)
@@ -96,9 +108,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
     mut_B = c("yes", "no")
   )
   out_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, annotation_col = annotation_manual)
-  expect_length(out_3, 3)
-  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
-  expect_equal(out_3[["annotation_col"]], annotation_manual)
+  expect_length(out_3, 2)
+  expect_equal(names(out_3), c("data", "heatmap"))
+  data_3 <- out_3[["data"]]
+  expect_is(data_3, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(data_3[["annotation_col"]], annotation_manual)
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
