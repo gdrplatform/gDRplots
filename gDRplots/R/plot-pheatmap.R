@@ -645,7 +645,7 @@ pheatmap_with_anno_combo <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% colnames(mat_cvd), ]
-    ls_output[["annotation_row"]] <- annotation_row
+    ls_output[["annotation_row"]] <- annotation_row[, .SD, .SDcol = -c("DrugCombination")]
     
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
