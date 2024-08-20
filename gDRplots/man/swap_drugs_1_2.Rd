@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{swap_drugs_1_2}
 \alias{swap_drugs_1_2}
-\title{TODO: check if can be removed
-Help function to change column suffix}
+\title{Help function to change column suffix}
 \usage{
 swap_drugs_1_2(dt_)
 }
@@ -14,7 +13,6 @@ swap_drugs_1_2(dt_)
 swapped data.table
 }
 \description{
-TODO: check if can be removed
 Help function to change column suffix
 }
 \examples{
