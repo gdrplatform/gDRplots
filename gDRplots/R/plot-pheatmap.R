@@ -363,7 +363,6 @@ pheatmap_with_anno_sa <- function(
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
 
   # check completeness of annotation - TODO wrap in separate function
-  
   if (!is.null(annotation_col)) {
     if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
       tab_missing_ann <- data.table::data.table(
