@@ -125,9 +125,9 @@ estimate_plot_size <- function(plt,
     stop("Unsupported plot type. Only ggplot2 and pheatmap objects are supported.")
   }
   
-  # Cap the width and height at max_size
-  estimated_width <- min(estimated_width, max_size)
-  estimated_height <- min(estimated_height, max_size)
+  # # Cap the width and height at max_size
+  # estimated_width <- min(estimated_width, max_size)
+  # estimated_height <- min(estimated_height, max_size)
   
   return(c(width = estimated_width, height = estimated_height))
 }
@@ -175,6 +175,7 @@ save_plot <- function(plt, path, format = "svg") {
                   width = plot_size[["width"]],
                   height = plot_size[["height"]],
                   dpi = 300,
+                  limitsize = FALSE,
                   device = format)
   
   invisible(NULL)
