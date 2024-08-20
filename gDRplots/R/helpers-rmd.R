@@ -90,7 +90,6 @@ neutralize_spaces <- function(x,
 #' @param base_width an integer with default base_width
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
-#' @param max_size an integer with the maximum size of the plot (either width or height)
 #'
 #' @return named vector with optimal width and height used in ggsave function
 #' @keywords internal
@@ -98,15 +97,13 @@ neutralize_spaces <- function(x,
 estimate_plot_size <- function(plt,
                                base_width = 10,
                                base_height = 6,
-                               scale_factor = 0.5,
-                               max_size = 49.9) {
+                               scale_factor = 0.5) {
   
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_numeric(base_width, lower = 0, finite = TRUE)
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
-  checkmate::assert_numeric(max_size, lower = 0, finite = TRUE)
-  
+
   if (inherits(plt, "ggplot")) {
     # For ggplot2 objects
     plot_data <- ggplot2::ggplot_build(plt)$data
@@ -124,11 +121,6 @@ estimate_plot_size <- function(plt,
   } else {
     stop("Unsupported plot type. Only ggplot2 and pheatmap objects are supported.")
   }
-  
-  # Cap the width and height at max_size
-  estimated_width <- min(estimated_width, max_size)
-  estimated_height <- min(estimated_height, max_size)
-  
   return(c(width = estimated_width, height = estimated_height))
 }
 
@@ -175,6 +167,7 @@ save_plot <- function(plt, path, format = "svg") {
                   width = plot_size[["width"]],
                   height = plot_size[["height"]],
                   dpi = 300,
+                  limitsize = FALSE,
                   device = format)
   
   invisible(NULL)
