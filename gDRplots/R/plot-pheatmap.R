@@ -409,7 +409,7 @@ pheatmap_with_anno_sa <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[get(drug_name) %in% rownames(t_mat_cvd), ]
-    ls_output[["data"]][["annotation_row"]] <- annotation_col
+    ls_output[["data"]][["annotation_row"]] <- annotation_row
 
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
