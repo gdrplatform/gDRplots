@@ -41,12 +41,13 @@ note that the first color will be assigned to the min value, and the last one - 
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.
+are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
+columns. Both columns are required.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific column. The columns in the data and in the annotation
-are matched using corresponding names from \code{CellLineName} column. 
+are matched using corresponding names from required  \code{CellLineName} column. 
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;

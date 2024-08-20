@@ -239,11 +239,11 @@ pheatmap_qc <- function(
 #' @param no_breaks numeric number of breaks on scale
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
-#'   are matched using corresponding names from \code{DrugName} column. 
+#'   are matched using corresponding names from required  \code{DrugName} column.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
-#'   are matched using corresponding names from \code{CellLineName} column. 
+#'   are matched using corresponding names from required  \code{CellLineName} column. 
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
@@ -330,6 +330,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_character(colors_vec)
   stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
   
@@ -484,7 +485,8 @@ pheatmap_with_anno_sa <- function(
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
-#'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.
+#'   are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
+#'   columns. Both columns are required.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
 #'   note list is named with annotation name (column names of \code{annotation_row} - 
