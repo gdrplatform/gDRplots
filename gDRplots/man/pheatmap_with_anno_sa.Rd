@@ -57,10 +57,13 @@ Not described elements will be colored in default.}
 \value{
 A named list with elements:
 \itemize{
-  \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
-  \item{\code{heatmap} heatmap itself,}
-  \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
-  \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+  \item{\code{data}}{a list containing the information visualized in the heatmap:}
+    \itemize{
+      \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
+      \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
+      \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+    }
+  \item{\code{heatmap}}{the heatmap itself.}
 }
 }
 \description{

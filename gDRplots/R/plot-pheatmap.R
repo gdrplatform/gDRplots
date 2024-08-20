@@ -64,7 +64,7 @@ pheatmap_qc <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
@@ -215,7 +215,8 @@ pheatmap_qc <- function(
                            cluster_rows = cluster_rows,
                            # manual annotation
                            annotation_col = drug_annotation,
-                           annotation_colors = drug_annotation_colors
+                           annotation_colors = drug_annotation_colors,
+                           silent = TRUE
   )
   return(hm)
 }
@@ -301,10 +302,13 @@ pheatmap_qc <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
-#'   \item{\code{heatmap} heatmap itself,}
-#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
-#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'     \itemize{
+#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'     }
+#'   \item{\code{heatmap}}{the heatmap itself.}
 #' }
 #' 
 #' @export
@@ -322,11 +326,12 @@ pheatmap_with_anno_sa <- function(
   
   checkmate::assert_data_table(tab_response)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("x", "xc50", "x_max", "x_mean"))
+  numeric_columns <- names(tab_response)[vapply(tab_response, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -335,7 +340,10 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # output
-  ls_output <- list()
+  ls_output <- list(data = list(matrix = NULL,
+                                annotation_col = NULL,
+                                annotation_row = NULL),
+                    heatmap = NULL)
   
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -344,8 +352,7 @@ pheatmap_with_anno_sa <- function(
   
   qmfun <- switch(metric,
                   "xc50" = log10,
-                  "x_max" = identity,
-                  "x_mean" = identity)
+                  identity)
   
   # prep data
   tab_plot <- data.table::dcast(
@@ -379,7 +386,7 @@ pheatmap_with_anno_sa <- function(
     }
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
-    ls_output[["annotation_col"]] <- annotation_col
+    ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
@@ -402,8 +409,8 @@ pheatmap_with_anno_sa <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[get(drug_name) %in% rownames(t_mat_cvd), ]
-    ls_output[["annotation_row"]] <- annotation_row
-    
+    ls_output[["data"]][["annotation_row"]] <- annotation_row
+
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
@@ -442,11 +449,18 @@ pheatmap_with_anno_sa <- function(
     }
   }
   
-  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
+  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # prep hm color palette
-  breaks <- seq(from = min(t_mat_cvd, na.rm = TRUE), to = 1.0, length.out = no_breaks)
+  min_val <- min(t_mat_cvd, na.rm = TRUE)
+  max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
+  
+  if (min_val == max_val) {
+    min_val <- min_val - 1
+  }
+  
+  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   
   # display numbers - for readability, turn it off for matrices larger than 10x10
@@ -465,7 +479,8 @@ pheatmap_with_anno_sa <- function(
                                                # manual annotation
                                                annotation_row = annotation_row,
                                                annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors
+                                               annotation_colors = annotation_colors,
+                                               silent = TRUE
   )
   
   return(ls_output)
@@ -540,10 +555,13 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{matrix} with data shown in the heatmap for the selected metric ,}
-#'   \item{\code{heatmap} heatamp itself,}
-#'   \item{\code{annotation_row} table with row annotation (for \code{DrugName}) - if given,}
-#'   \item{\code{annotation_col} table with column annotation (for \code{CellLineName}) - if given.}
+#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'     \itemize{
+#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'     }
+#'   \item{\code{heatmap}}{the heatmap itself.}
 #' }
 #' 
 #' @export
@@ -565,7 +583,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, gDRplots::is_valid_color, logical(1))))
+  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
@@ -576,7 +594,10 @@ pheatmap_with_anno_combo <- function(
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
   # output
-  ls_output <- list()
+  ls_output <- list(data = list(matrix = NULL,
+                                annotation_col = NULL,
+                                annotation_row = NULL),
+                    heatmap = NULL)
   
   # prep data
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -616,7 +637,7 @@ pheatmap_with_anno_combo <- function(
     }
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% colnames(t_mat_cvd), ]
-    ls_output[["annotation_col"]] <- annotation_col
+    ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
@@ -643,7 +664,7 @@ pheatmap_with_anno_combo <- function(
     }
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% rownames(t_mat_cvd), ]
-    ls_output[["annotation_row"]] <- annotation_row
+    ls_output[["data"]][["annotation_row"]] <- annotation_row
     
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
@@ -683,8 +704,8 @@ pheatmap_with_anno_combo <- function(
     }
   }
   
-  ls_output[["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
-  
+  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(t_mat_cvd, keep.rownames = drug_name)
+
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
@@ -705,9 +726,9 @@ pheatmap_with_anno_combo <- function(
                                                # manual annotation
                                                annotation_row = annotation_row,
                                                annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors
+                                               annotation_colors = annotation_colors,
+                                               silent = TRUE
   )
-  
   return(ls_output)
 }
 
@@ -739,9 +760,8 @@ get_hm_title <- function(metric = "xc50",
   
   checkmate::assert_string(dataset_name, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric,
-                           choices = c("xc50", "x_max", "x_mean", "hsa_score", "bliss_score"))
-  
+  # Allow for using any column (even custom), e.g. xc50_sd
+  checkmate::assert_character(metric)
   title_metric <-
     gDRutils::prettify_flat_metrics(sprintf("%s_%s", metric, normalization_type), human_readable = TRUE)
   
