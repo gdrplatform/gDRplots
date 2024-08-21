@@ -1,5 +1,8 @@
-## gDRplots 0.0.26 - 2024-08-19
+## gDRplots 0.0.27 - 2024-08-21
 * update heatmap function to return plot and data - change file schema
+
+## gDRplots 0.0.26 - 2024-08-20
+* make plotting functions more versatile
 
 ## gDRplots 0.0.25 - 2024-08-13
 * increase readability for reference isobolograms for combo data

@@ -14,10 +14,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   out_1 <- pheatmap_with_anno_sa(tab_response = response_metrics) # default
   expect_length(out_1, 2)
-  expect_equal(names(out_1), c("matrix", "heatmap"))
-  data_1 <- out_1[["matrix"]]
-  expect_is(data_1, "data.table")
-  expect_equal(data_1, res_1)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  data_1 <- out_1[["data"]]
+  expect_is(data_1, "list")
+  expect_equal(names(data_1), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_1[["matrix"]], "data.table")
+  expect_equal(data_1[["matrix"]], res_1)
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
@@ -35,10 +37,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                  normalization_type = "RV",
                                  metric = "x_max")
   expect_length(out_2, 2)
-  expect_equal(names(out_2), c("matrix", "heatmap"))
-  data_2 <- out_2[["matrix"]]
-  expect_is(data_2, "data.table")
-  expect_equal(data_2, res_2)
+  expect_equal(names(out_2), c("data", "heatmap"))
+  data_2 <- out_2[["data"]]
+  expect_is(data_2, "list")
+  expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_2[["matrix"]], "data.table")
+  expect_equal(data_2[["matrix"]], res_2)
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, unique(response_metrics_na[!is.na(x_max)]$DrugName))
@@ -60,12 +64,17 @@ test_that("pheatmap_with_anno_sa works as expected", {
   out_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
-  expect_length(out_3, 4)
-  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "annotation_row", "heatmap")))
-  anno_col_3 <- out_3[["annotation_col"]]
+  expect_length(out_3, 2)
+  expect_equal(names(out_3), c("data", "heatmap"))
+  data_3 <- out_3[["data"]]
+  expect_is(data_3, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_3[["matrix"]], "data.table")
+  expect_equal(data_3[["matrix"]], res_1[, .SD, .SDcols = names(data_3[["matrix"]])])
+  anno_col_3 <- data_3[["annotation_col"]]
   expect_is(anno_col_3, "data.table")
   expect_equal(anno_col_3, annotation_manual_col)
-  anno_row_3 <- out_3[["annotation_row"]]
+  anno_row_3 <- data_3[["annotation_row"]]
   expect_is(anno_row_3, "data.table")
   expect_equal(anno_row_3, annotation_manual_na)
   plt_3 <- out_3[["heatmap"]]
@@ -84,9 +93,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   out_4 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
                                  annotation_col = annotation_manual_col[1, ],
                                  annotation_colors = annotation_map)
-  expect_length(out_4, 3)
-  expect_equal(sort(names(out_4)), sort(c("matrix", "annotation_col", "heatmap")))
-  anno_4 <- out_4[["annotation_col"]]
+  expect_length(out_4, 2)
+  expect_equal(names(out_4), c("data", "heatmap"))
+  data_4 <- out_4[["data"]]
+  expect_is(data_4, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  anno_4 <- out_4[["data"]][["annotation_col"]]
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_col_na)
   
@@ -100,12 +112,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   out_5 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
                                  annotation_row = annotation_manual_row)
-  expect_length(out_5, 3)
-  expect_equal(sort(names(out_5)), sort(c("matrix", "annotation_row", "heatmap")))
-  data_5 <- out_5[["matrix"]]
-  expect_is(data_5, "data.table")
-  expect_equal(data_5, res_1)
-  anno_5 <- out_5[["annotation_row"]]
+  expect_length(out_5, 2)
+  expect_equal(names(out_5), c("data", "heatmap"))
+  data_5 <- out_5[["data"]]
+  expect_is(data_5, "list")
+  expect_equal(names(data_5), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_5[["matrix"]], "data.table")
+  expect_equal(data_5[["matrix"]], res_1)
+  anno_5 <- out_5[["data"]][["annotation_row"]]
   expect_is(anno_5, "data.table")
   expect_equal(anno_5, annotation_manual_row)
   plt_5 <- out_5[["heatmap"]]
@@ -161,10 +175,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
   expect_length(out_1, 2)
-  expect_equal(names(out_1), c("matrix", "heatmap"))
-  data_1 <- out_1[["matrix"]]
-  expect_is(data_1, "data.table")
-  expect_equal(data_1, res_1)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  data_1 <- out_1[["data"]]
+  expect_is(data_1, "list")
+  expect_equal(names(data_1), c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(data_1[["matrix"]], res_1)
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
@@ -186,10 +201,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
                                     normalization_type = "RV",
                                     metric = "bliss_score")
   expect_length(out_2, 2)
-  expect_equal(names(out_2), c("matrix", "heatmap"))
-  data_2 <- out_2[["matrix"]]
-  expect_is(data_2, "data.table")
-  expect_equal(data_2, res_2)
+  expect_equal(names(out_2), c("data", "heatmap"))
+  data_2 <- out_2[["data"]]
+  expect_is(data_2, "list")
+  expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(data_2[["matrix"]], res_2)
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[3]]$label, drug_combo)
@@ -208,9 +224,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   out_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, 
                                     annotation_col = annotation_manual_col,
                                     annotation_colors = annotation_map)
-  expect_length(out_3, 3)
-  expect_equal(sort(names(out_3)), sort(c("matrix", "annotation_col", "heatmap")))
-  expect_equal(out_3[["annotation_col"]], annotation_manual_col)
+  expect_length(out_3, 2)
+  expect_equal(names(out_3), c("data", "heatmap"))
+  data_3 <- out_3[["data"]]
+  expect_is(data_3, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(data_3[["annotation_col"]], annotation_manual_col)
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
@@ -220,12 +239,13 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_5 <- pheatmap_with_anno_combo(tab_response = response_metrics, 
                                     annotation_row = annotation_manual_row)
-  expect_length(out_5, 3)
-  expect_equal(sort(names(out_5)), sort(c("matrix", "annotation_row", "heatmap")))
-  data_5 <- out_5[["matrix"]]
-  expect_is(data_5, "data.table")
-  expect_equal(data_5, res_1)
-  anno_5 <- out_5[["annotation_row"]]
+  expect_length(out_5, 2)
+  expect_equal(names(out_5), c("data", "heatmap"))
+  data_5 <- out_5[["data"]]
+  expect_is(data_5, "list")
+  expect_equal(names(data_5), c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(data_5[["matrix"]], res_1)
+  anno_5 <- out_5[["data"]][["annotation_row"]]
   expect_is(anno_5, "data.table")
   expect_equal(anno_5, annotation_manual_row)
   plt_5 <- out_5[["heatmap"]]
@@ -283,6 +303,14 @@ test_that("get_hm_title works as expected", {
   metric <- "hsa_score"
   normalization_type <- "GR"
   expect_equal(get_hm_title(metric, normalization_type, dataset_name), "Dataset AB123 (HSA Score GR)")
+  
+  metric <- "x_mean_sd_custom_metric"
+  normalization_type <- "RV"
+  expect_equal(get_hm_title(metric, normalization_type), "RV Mean Sd Custom Metric")
+  
+  metric <- "aggregated xc50"
+  normalization_type <- "RV"
+  expect_equal(get_hm_title(metric, normalization_type), "Aggregated IC50")
 })
 
 test_that("change_NA_into_char works", {
