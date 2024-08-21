@@ -233,7 +233,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
-  
+
   annotation_manual_row <-
     unique(response_metrics[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
   
@@ -386,3 +386,34 @@ test_that("get_ann_color_map works", {
   expect_error(get_ann_color_map(list()),
                "Assertion on 'dt_ann' failed: Must be a data.table")
 })
+
+test_that("fill_ann_color_map works", {
+  annotation_manual <- data.table::data.table(
+    CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+    mut_A = c(0, 0, 1, 2, 3),
+    mut_B = c("yes", "yes", "no", NA, NA),
+    mut_C = c("AA", "AA", "AB", NA, "B")
+  )
+  
+  annotation_map <- list(
+    mut_A = c("1" = "coral", "0" = "cadetblue"), # should be removed as not enough long
+    mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"), 
+    # should be filled with NA = "darkred";"not_checked" should be removed
+    mut_C = c("AA" = "red", "AB" = "orange", "B" = "yellow") # should be filled with B = "black"
+  )
+  
+  res <- fill_ann_color_map(dt_ann = annotation_manual, 
+                            map_ann = annotation_map)
+  
+  expect_length(res, 2)
+  expect_equal(names(res), c("mut_B", "mut_C"))
+  expect_equal(res[["mut_B"]], 
+               c(annotation_map[["mut_B"]][na.omit(unique(annotation_manual[["mut_B"]]))], "NA" = "darkred"))
+  expect_equal(res[["mut_C"]], c(annotation_map[["mut_C"]], "NA" = "black"))
+  
+  expect_error(fill_ann_color_map(dt_ann = unlist(annotation_manual)),
+               "Assertion on 'dt_ann' failed: Must be a data.table")
+  expect_error(fill_ann_color_map(dt_ann = annotation_manual, map_ann = NULL),
+               "Assertion on 'map_ann' failed: Must be of type 'list'")
+})
+
