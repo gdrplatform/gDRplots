@@ -56,16 +56,7 @@ each value described in \code{annotation_row} and in \code{annotation_col} - res
 Not described elements will be colored in default.}
 }
 \value{
-A named list with elements:
-\describe{
-  \item{\code{data}}{a list containing the information visualized in the heatmap:}
-    \describe{
-      \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
-      \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
-      \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
-    }
-  \item{\code{heatmap}}{the heatmap itself.}
-}
+
 }
 \description{
 Plot pretty heatmap with annotationsfor single-agent data
