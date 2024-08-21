@@ -246,8 +246,8 @@ pheatmap_qc <- function(
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from required  \code{CellLineName} column. 
 #'   Note that color schemes takes into account if variable is continuous or discrete.
-#' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
-#'   note list is named with annotation name (column names of \code{annotation_row} - 
+#' @param annotation_colors  named list for specifying \code{annotation_col} and \code{annotation_row} 
+#'   track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with valid color name for 
 #'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
@@ -374,7 +374,7 @@ pheatmap_with_anno_sa <- function(
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
-
+  
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
     if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
@@ -391,11 +391,11 @@ pheatmap_with_anno_sa <- function(
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
     ls_output[["data"]][["annotation_col"]] <- annotation_col
-
+    
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
-    data.table::setorder(annotation_col)
+    data.table::setorderv(annotation_col, cols = cols)
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
   }
   
@@ -414,45 +414,22 @@ pheatmap_with_anno_sa <- function(
     # select annotation acc to matrix
     annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
     ls_output[["data"]][["annotation_row"]] <- annotation_row
-
+    
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
-    data.table::setorder(annotation_row)
+    data.table::setorderv(annotation_row, cols = cols)
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
   
   # filling missing values
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
-    ls_ann_with_colors <- names(annotation_col)[names(annotation_col) %in% names(annotation_colors)]
-    for (ann in ls_ann_with_colors) {
-      reqired_lvl <- unique(as.character(annotation_col[[ann]]))
-      avaialable_lvl <- names(annotation_colors[[ann]])
-      missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
-      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
-      } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default coloring
-      }
-    }
+    annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+  }
+  if (!is.null(annotation_row) && !is.null(annotation_colors)) {
+    annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
   
-  if (!is.null(annotation_row) && !is.null(annotation_colors)) {
-    ls_ann_with_colors <- names(annotation_row)[names(annotation_row) %in% names(annotation_colors)]
-    for (ann in ls_ann_with_colors) {
-      reqired_lvl <- unique(as.character(annotation_row[[ann]]))
-      avaialable_lvl <- names(annotation_colors[[ann]])
-      missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
-      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
-      } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default coloring
-      }
-    }
-  }
-
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
@@ -506,8 +483,8 @@ pheatmap_with_anno_sa <- function(
 #'   are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
 #'   columns. Both columns are required.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
-#' @param annotation_colors named list for specifying \code{annotation_col} track colors manually;
-#'   note list is named with annotation name (column names of \code{annotation_row} - 
+#' @param annotation_colors named list for specifying \code{annotation_col} and \code{annotation_row} 
+#'   track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
 #'   without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
 #'   without \code{CellLineName}), each list item is named vector with a valid color name for 
 #'   each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
@@ -628,7 +605,7 @@ pheatmap_with_anno_combo <- function(
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
   if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
-
+  
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
     if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
@@ -638,18 +615,18 @@ pheatmap_with_anno_combo <- function(
       data.table::setnames(tab_missing_ann, "missing", cellline_name)
       
       annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-      # data.table::nafill does not support character
-      cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-      annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     }
+    # data.table::nafill does not support character
+    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
+    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
     # select annotation acc to matrix
     annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
     ls_output[["data"]][["annotation_col"]] <- annotation_col
-
+    
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
-    data.table::setorder(annotation_col)
+    data.table::setorderv(annotation_col, cols = cols)
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
   }
   
@@ -665,56 +642,33 @@ pheatmap_with_anno_combo <- function(
       data.table::setnames(tab_missing_ann, "missing", "DrugCombination")
       
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
-      # # data.table::nafill does not support character
-      cols <- names(annotation_row)[names(annotation_row) != "DrugCombination"]
-      annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     }
+    # data.table::nafill does not support character
+    cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, "DrugCombination")]
+    annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% colnames(mat_cvd), ]
     ls_output[["data"]][["annotation_row"]] <- annotation_row[, .SD, .SDcol = -c("DrugCombination")]
-
+    
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
     # order matrix
-    data.table::setorder(annotation_row)
+    data.table::setorderv(annotation_row, cols = cols)
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
   
   # filling missing values
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
-    ls_ann_with_colors <- names(annotation_col)[names(annotation_col) %in% names(annotation_colors)]
-    for (ann in ls_ann_with_colors) {
-      reqired_lvl <- unique(annotation_col[[ann]])
-      avaialable_lvl <- names(annotation_colors[[ann]])
-      missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
-      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
-      } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default coloring
-      }
-    }
+    annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+  }
+  if (!is.null(annotation_row) && !is.null(annotation_colors)) {
+    annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
   
-  if (!is.null(annotation_row) && !is.null(annotation_colors)) {
-    ls_ann_with_colors <- names(annotation_row)[names(annotation_row) %in% names(annotation_colors)]
-    for (ann in ls_ann_with_colors) {
-      reqired_lvl <- unique(as.character(annotation_row[[ann]]))
-      avaialable_lvl <- names(annotation_colors[[ann]])
-      missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
-      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(annotation_colors[[ann]] %in% c("black", "#000000")), "darkred", "black")
-        annotation_colors[[ann]] <- c(annotation_colors[[ann]], "NA" = col_na)
-      } else if (NROW(missing_lvl) > 0) {
-        annotation_colors[[ann]] <- NULL # allow default coloring
-      }
-    }
-  }
-
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
-
+  
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
@@ -842,9 +796,9 @@ get_qual_colors <- function(n = NULL) {
 
 #' Create color map for annotation
 #'
-#' @param dt_ann data.table with the annotations
+#' @param dt_ann \code{data.table} with the annotations
 #'
-#' @return list with color maping for the annotations
+#' @return list with color mapping for the annotations
 #' 
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
@@ -877,4 +831,64 @@ get_ann_color_map <- function(dt_ann) {
     annotation_colors[[ann]] <- col_map
   }
   annotation_colors
+}
+
+#' Fill missing value in color map for annotation
+#'
+#' @param dt_ann \code{data.table} with the annotations
+#' @param map_ann \code{list} with the annotations
+#'
+#' @return list with color maping for the annotations
+#' 
+#' @seealso \code{\link{pheatmap_with_anno_sa}} \code{\link{pheatmap_with_anno_combo}}
+#' 
+#' @examples
+#' \dontrun{
+#' annotation_manual <- data.table::data.table(
+#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+#'   mut_A = c(0, 0, 1, 2, 3),
+#'   mut_B = c("yes", "yes", "no", NA, NA),
+#'   mut_C = c("AA", "AA", "AB", NA, "B")
+#' )
+#' 
+#' annotation_map <- list(
+#'   mut_A = c("1" = "coral", "0" = "cadetblue"),
+#'   mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"),
+#'   mut_C = c("AA" = "red", "AB" = "orange", "B" = "yellow")
+#' )
+#' 
+#' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
+#' }
+#' 
+#' @keywords utils_color
+#' @export 
+fill_ann_color_map <- function(dt_ann,
+                               map_ann) {
+  checkmate::assert_data_table(dt_ann)
+  checkmate::assert_list(map_ann)
+  
+  dt_ann <- dt_ann[, lapply(.SD, change_NA_into_char)] # annotation has to be character type without NA
+  
+  ls_ann_with_colors <- names(dt_ann)[names(dt_ann) %in% names(map_ann)]
+  if (!NROW(ls_ann_with_colors)) return(map_ann)
+  
+  for (ann in ls_ann_with_colors) {
+    reqired_lvl <- unique(dt_ann[[ann]])
+    avaialable_lvl <- names(map_ann[[ann]])
+    missing_lvl <- reqired_lvl[!reqired_lvl %in% avaialable_lvl]
+    
+    if (any(reqired_lvl == "NA")) {
+      reqired_lvl <- c(reqired_lvl[reqired_lvl != "NA"], "NA")
+    }
+    
+    if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
+      col_na <- ifelse(any(map_ann[[ann]] %in% c("black", "#000000")), "darkred", "black")
+      map_ann[[ann]] <- c(map_ann[[ann]], "NA" = col_na)
+    } else if (NROW(missing_lvl) > 0) {
+      map_ann[[ann]] <- NULL # allow default coloring
+    }
+    map_ann[[ann]] <- map_ann[[ann]][reqired_lvl]
+  }
+  
+  return(map_ann)
 }
