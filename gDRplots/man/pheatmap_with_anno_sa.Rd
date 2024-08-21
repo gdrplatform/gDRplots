@@ -77,7 +77,8 @@ response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Metrics")
 
 output <- pheatmap_with_anno_sa(tab_response = response_metrics)
-output[["heatmap"]]
+hm_1 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_1[["gtable"]])
 
 annotation_manual_col <-
   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
@@ -93,7 +94,8 @@ output <- pheatmap_with_anno_sa(tab_response = response_metrics,
                                 annotation_row = annotation_manual_row,
                                 annotation_col = annotation_manual_col,
                                 annotation_colors = annotation_map)
-output[["heatmap"]]
+hm_2 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_2[["gtable"]])
 
 annotation_manual <- data.table::data.table(
   CellLineName =
@@ -113,7 +115,8 @@ output <- pheatmap_with_anno_sa(tab_response = response_metrics,
                                   normalization_type = "GR",
                                   metric = "hsa_score",
                                   dataset_name = "Combo Matrix - combo data"))
-output[["heatmap"]]
+hm_3 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_3[["gtable"]])
 
 }
 \seealso{
