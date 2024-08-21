@@ -275,9 +275,9 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
                                         no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
-  # expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
-  #                                       annotation_row = unlist(annotation_manual_row)),
-  #              "Assertion on 'annotation_row' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+                                        annotation_row = unlist(annotation_manual_row)),
+               "Assertion on 'annotation_row' failed: Must be a data.table")
   expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
                                         annotation_col = unlist(annotation_manual_col)),
                "Assertion on 'annotation_col' failed: Must be a data.table")
