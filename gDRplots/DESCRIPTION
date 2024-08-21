@@ -1,15 +1,16 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.26
+Version: 0.0.27
 Date: 2024-08-20
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
              person("Bartosz", "Czech", role = "aut", comment = c(ORCID = "0000-0002-9908-3007")),
+             person("Arkadiusz", "Gladki", role=c("aut"), comment = c(ORCID = "0000-0002-7059-6378")),
              person("gDR", "team", email = "gdr-support-d@gene.com", role = "cre",
              comment = c(ORCID = "0009-0006-9310-1135"))
              )
-Description: gDRplot is a package that stores functions for all gDR visualisations and their dedicated helpers.
+Description: gDRplot is a package that stores functions for gDR static visualizations and their dedicated helpers.
 License: Artistic-2.0
 Imports:
     checkmate,
@@ -17,10 +18,7 @@ Imports:
     ggplot2,
     gDRutils (>= 1.3.6),
     pheatmap,
-    plotly,
-    plotlyLabelR (>= 0.1.1),
     RColorBrewer,
-    S4Vectors
 Suggests:
     BumpyMatrix,
     colorspace,
@@ -42,4 +40,4 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 LazyLoad: yes
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.1

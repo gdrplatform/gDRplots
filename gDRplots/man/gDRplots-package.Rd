@@ -9,7 +9,7 @@
 package help page
 }
 \description{
-gDRplot is a package that stores functions for all gDR visualisations and their dedicated helpers.
+gDRplot is a package that stores functions for gDR static visualizations and their dedicated helpers.
 }
 \note{
 To learn more about functions start with `help(package = "gDRplots")`
@@ -22,6 +22,7 @@ Authors:
   \item Marc Hafner (\href{https://orcid.org/0000-0003-1337-7598}{ORCID})
   \item Janina Smola
   \item Bartosz Czech (\href{https://orcid.org/0000-0002-9908-3007}{ORCID})
+  \item Arkadiusz Gladki (\href{https://orcid.org/0000-0002-7059-6378}{ORCID})
 }
 
 }

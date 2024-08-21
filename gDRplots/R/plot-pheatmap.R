@@ -302,13 +302,13 @@ pheatmap_qc <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'   \item{\code{data} a list containing the information visualized in the heatmap:}
 #'     \itemize{
-#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
-#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
-#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'       \item{\code{matrix} data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.}
 #'     }
-#'   \item{\code{heatmap}}{the heatmap itself.}
+#'   \item{\code{heatmap} the heatmap itself.}
 #' }
 #' 
 #' @export
@@ -555,13 +555,13 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @return A named list with elements:
 #' \itemize{
-#'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
+#'   \item{\code{data}a list containing the information visualized in the heatmap:}
 #'     \itemize{
-#'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
-#'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
-#'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
+#'       \item{\code{matrix}data shown in the heatmap for the selected metric.}
+#'       \item{\code{annotation_row}a table with row annotations (for \code{DrugName}), if provided.}
+#'       \item{\code{annotation_col}a table with column annotations (for \code{CellLineName}), if provided.}
 #'     }
-#'   \item{\code{heatmap}}{the heatmap itself.}
+#'   \item{\code{heatmap}the heatmap itself.}
 #' }
 #' 
 #' @export

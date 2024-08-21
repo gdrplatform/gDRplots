@@ -19,34 +19,10 @@ reference:
   desc:  Functions to plot annotated heatmap with helpers
 - contents:
   - has_keyword("pheat_ann")
-- title: Response Overview plots
-  desc:  Functions to plot drug response curves with helpers
-- contents:
-  - has_keyword("drawResponseOverview")
-- title: Heatmaps helpers
-  desc:  Helpers for heatmaps
-- contents:
-  - has_keyword("heatmaply")
-- title: Plugins plot
-  desc:  Functions for plugin plots with helpers
-- contents:
-  - has_keyword("plugin_plot")
-- title: Plotly helpers
-  desc:  Helpers for plotly
-- contents:
-  - has_keyword("plotly_config")
-- title: Plot label helpers
-  desc:  Helpers for plot labels
-- contents:
-  - has_keyword("utils_label")
 - title: Color helpers
   desc:  Plot color helpers
 - contents:
   - has_keyword("utils_color")
-- title: Legend helpers
-  desc:  Plot legend helpers
-- contents:
-  - has_keyword("utils_legend")
 - title: Utils
   desc:  Utils function
 - contents:
