@@ -48,8 +48,8 @@ Each row defines the features for a specific column. The columns in the data and
 are matched using corresponding names from required  \code{CellLineName} column. 
 Note that color schemes takes into account if variable is continuous or discrete.}
 
-\item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
-note list is named with annotation name (column names of \code{annotation_row} - 
+\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
 without \code{DrugName} and column names of \code{annotation_col} - 
 without \code{CellLineName}), each list item is named vector with valid color name for 
 each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
