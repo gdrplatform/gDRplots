@@ -640,6 +640,7 @@ pheatmap_with_anno_combo <- function(
         missing = colnames(mat_cvd)[!colnames(mat_cvd) %in% annotation_row[["DrugCombination"]]]
       )
       data.table::setnames(tab_missing_ann, "missing", "DrugCombination")
+      tab_missing_ann[, c(drug_name, drug_name_2) := data.table::tstrsplit(DrugCombination, " x ", fixed = TRUE)]
       
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
     }
