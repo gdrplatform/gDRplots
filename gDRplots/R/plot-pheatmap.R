@@ -306,9 +306,9 @@ pheatmap_qc <- function(
 #' @keywords pheat_ann
 #' 
 #' @return A named list with elements:
-#' \itemize{
+#' \describe{
 #'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
-#'     \itemize{
+#'     \describe{
 #'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
 #'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
 #'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
@@ -540,9 +540,9 @@ pheatmap_with_anno_sa <- function(
 #' @keywords pheat_ann
 #' 
 #' @return A named list with elements:
-#' \itemize{
+#' \describe{
 #'   \item{\code{data}}{a list containing the information visualized in the heatmap:}
-#'     \itemize{
+#'     \describe{
 #'       \item{\code{matrix}}{data shown in the heatmap for the selected metric.}
 #'       \item{\code{annotation_row}}{a table with row annotations (for \code{DrugName}), if provided.}
 #'       \item{\code{annotation_col}}{a table with column annotations (for \code{CellLineName}), if provided.}
