@@ -34,22 +34,24 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{hm_title}{string plot title}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap;
+note that the first color will be assigned to the min value, and the last one - to the max}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} columns.
+are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
+columns. Both columns are required.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific column. The columns in the data and in the annotation
-are matched using corresponding names from \code{CellLineName} column. 
+are matched using corresponding names from the required  \code{CellLineName} column.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
-\item{annotation_colors}{named list for specifying \code{annotation_col} track colors manually;
-note list is named with annotation name (column names of \code{annotation_row} - 
+\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
 without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
 without \code{CellLineName}), each list item is named vector with a valid color name for 
 each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
@@ -58,13 +60,13 @@ Not described elements will be colored in default.}
 \value{
 A named list with elements:
 \itemize{
-  \item{\code{data}a list containing the information visualized in the heatmap:}
+  \item \code{data} a list containing the information visualized in the heatmap:
     \itemize{
-      \item{\code{matrix}data shown in the heatmap for the selected metric.}
-      \item{\code{annotation_row}a table with row annotations (for \code{DrugName}), if provided.}
-      \item{\code{annotation_col}a table with column annotations (for \code{CellLineName}), if provided.}
+      \item \code{matrix} data shown in the heatmap for the selected metric.
+      \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
+      \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
     }
-  \item{\code{heatmap}the heatmap itself.}
+  \item \code{heatmap} the heatmap itself.
 }
 }
 \description{
@@ -89,7 +91,8 @@ output <- pheatmap_with_anno_combo(tab_response = response_metrics,
                                    annotation_row = annotation_manual_row,
                                    annotation_col = annotation_manual_col,
                                    annotation_colors = annotation_map)
-output[["heatmap"]]
+hm_1 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_1[["gtable"]])
 
 annotation_manual <- data.table::data.table(
   CellLineName =
@@ -110,7 +113,8 @@ output <- pheatmap_with_anno_combo(tab_response = response_metrics,
                                      normalization_type = "GR",
                                      metric = "hsa_score",
                                      dataset_name = "Combo Matrix - combo data"))
-output[["heatmap"]]
+hm_2 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_2[["gtable"]])
             
 }
 \seealso{

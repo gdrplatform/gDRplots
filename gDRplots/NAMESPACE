@@ -3,6 +3,7 @@
 export(create_log_seq)
 export(escape_special_characters)
 export(estimate_plot_size)
+export(fill_ann_color_map)
 export(get_ann_color_map)
 export(get_hm_title)
 export(get_iso_colors)
