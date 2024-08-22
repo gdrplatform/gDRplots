@@ -47,7 +47,7 @@ Note that color schemes takes into account if variable is continuous or discrete
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific column. The columns in the data and in the annotation
-are matched using corresponding names from required  \code{CellLineName} column. 
+are matched using corresponding names from the required  \code{CellLineName} column.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 

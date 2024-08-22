@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{fill_ann_color_map}
 \alias{fill_ann_color_map}
-\title{Fill missing value in color map for annotation}
+\title{Fill missing values in the color map for annotation}
 \usage{
 fill_ann_color_map(dt_ann, map_ann)
 }
@@ -12,10 +12,10 @@ fill_ann_color_map(dt_ann, map_ann)
 \item{map_ann}{\code{list} with the annotations}
 }
 \value{
-list with color maping for the annotations
+list with color mapping for the annotations with missing items filled in
 }
 \description{
-Fill missing value in color map for annotation
+Fill missing values in the color map for annotation
 }
 \examples{
 \dontrun{
