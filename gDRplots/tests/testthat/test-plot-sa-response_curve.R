@@ -13,7 +13,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  dt_average = dt_average,
                                  grouping = grouping)
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_length(plt_1[["layers"]], 3)
   
 
@@ -28,7 +28,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  dt_average = dt_average,
                                  grouping = grouping)
   expect_is(plt_2, "gg")
-  expect_true(grepl("GR", plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], "GR")
   expect_length(plt_2[["layers"]], 3)
   expect_equal(names(plt_2[["guides"]][["guides"]]), "colour")
 
@@ -45,7 +45,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  colormap = c("cadetblue", "orange", "darkblue"),
                                  plot_fit_flag = FALSE)
   expect_is(plt_3, "gg")
-  expect_true(grepl(normalization_type, plt_3[["labels"]][["y"]]))
+  expect_equal(plt_3[["labels"]][["y"]], normalization_type)
   expect_length(plt_3[["layers"]], 2)
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
@@ -122,7 +122,7 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                     cl_name = cl_name,
                                     d_name = d_name)
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(grepl(d_name, plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 4)
   
@@ -133,7 +133,7 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                     d_name = d_name, 
                                     normalization_type = normalization_type)
   expect_is(plt_2, "gg")
-  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], normalization_type)
 })
 
 test_that("plot_dose_response_sa_qc works as expected", {

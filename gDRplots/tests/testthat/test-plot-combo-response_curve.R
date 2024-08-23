@@ -15,7 +15,7 @@ test_that("plot_dose_response_combo works as expected", {
                                     drug2_name = drug2_name,
                                     cl_name = cl_name)
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["title"]], sprintf("%s (%s)", cl_name, cl_clid))
   
@@ -26,7 +26,7 @@ test_that("plot_dose_response_combo works as expected", {
                                     cl_name = cl_name,
                                     normalization_type = normalization_type)
   expect_is(plt_2, "gg")
-  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], normalization_type)
   
   plt_3 <- plot_dose_response_combo(dt_average = dt_average,
                                     drug1_name = drug1_name,
@@ -34,6 +34,7 @@ test_that("plot_dose_response_combo works as expected", {
                                     cl_name = cl_name,
                                     colormap = c("#FFA500", "#8B0000"))
   expect_is(plt_3, "gg")
+  expect_equal(plt_3[["labels"]][["y"]], "GR")
   expect_true(any(grepl("#FFA500", plt_3[["plot_env"]][["colormap"]])))
   expect_true(any(grepl("#8B0000", plt_3[["plot_env"]][["colormap"]])))
   
@@ -43,6 +44,7 @@ test_that("plot_dose_response_combo works as expected", {
                                     cl_name = cl_name,
                                     colormap = c("pinky", "blackish"))
   expect_is(plt_4, "gg")
+  expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(any(grepl(colorspace::sequential_hcl(1, palette = "viridis"), 
                         plt_4[["plot_env"]][["colormap"]]))) # default colors when invalid `colormap`
   
@@ -111,7 +113,7 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
   plt_1 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
                                              cl_name = cl_name)
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_length(plt_1[["layers"]], 3)
   expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
   
@@ -121,13 +123,14 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
                                              d_names = d_names,
                                              normalization_type = normalization_type)
   expect_is(plt_2, "gg")
-  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
-  expect_equal(NROW(ggplot2::ggplot_build(plt_2)$data[[1]]), no_comb)
+  expect_equal(plt_2[["labels"]][["y"]], normalization_type)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_2)$data[[1]]), 2 * no_comb) # 0 & 1 line
   
   plt_3 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
                                              cl_name = cl_name,
                                              colormap = c("#FFA500", "#8B0000"))
   expect_is(plt_3, "gg")
+  expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(any(grepl("#FFA500", plt_3[["plot_env"]][["colormap"]])))
   expect_true(any(grepl("#8B0000", plt_3[["plot_env"]][["colormap"]])))
   
@@ -135,6 +138,7 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
                                              cl_name = cl_name,
                                              colormap = c("pinky", "blackish"))
   expect_is(plt_4, "gg")
+  expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(any(grepl(colorspace::sequential_hcl(1, palette = "viridis"), 
                         plt_4[["plot_env"]][["colormap"]]))) # default colors when invalid `colormap`
   
@@ -142,7 +146,8 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
                                              d_names = c("drug_XX", "drug_YY"),
                                              cl_name = cl_name)
   expect_is(plt_5, "gg")
-  expect_equal(NROW(ggplot2::ggplot_build(plt_5)$data[[1]]), no_comb_all) # default all drugs when invalid `d_names`
+  expect_equal(plt_5[["labels"]][["y"]], "GR")
+  expect_equal(NROW(ggplot2::ggplot_build(plt_5)$data[[1]]), 2 * no_comb_all) # default all drugs when invalid `d_names`
   
   expect_error(plot_dose_response_combo_qc_panel(dt_average = unlist(dt_average),
                                                  cl_name = cl_name),

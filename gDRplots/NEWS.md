@@ -1,3 +1,7 @@
+## gDRplots 0.0.28 - 2024-08-23
+* fix bug in plot axis title
+* add horizontal line in 1 for dose response curve
+
 ## gDRplots 0.0.28 - 2024-08-22
 * update heatmap function to return plot and data - change file schema
 
