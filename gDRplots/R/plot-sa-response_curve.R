@@ -155,7 +155,7 @@ plot_dose_response_sa <- function(dt_metrics,
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(sprintf("log10(%s)", normalization_type)) +
+    ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::theme_bw()
   
@@ -457,7 +457,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_line(
         data = dt_reconstructed_fit,
         ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
-      ggplot2::geom_hline(yintercept = 0, color = "#555555") +
+      ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
       ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -615,7 +615,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
     ggplot2::geom_line(
       data = dt_reconstructed_fit,
       ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
-    ggplot2::geom_hline(yintercept = 0, color = "#555555") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
     ggplot2::scale_x_continuous(trans = "log10") +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +

@@ -1,3 +1,6 @@
+context("Test common fun colors")
+
+
 test_that("is_valid_color works as expected", {
   color_names <- c("#33cc33", "#d6f5d6", "#0a290a", "#F9B42DFF", "#714D6932", "#C2F970DC")
   expect_true(all(vapply(color_names, is_valid_color, logical(1))))

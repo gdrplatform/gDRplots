@@ -1,3 +1,5 @@
+context("Test common utils")
+
 test_that("create_log_seq works as expected", {
   sequence <- c(1, 1.18920711500272, 1.4142135623731, 1.68179283050743, 2)
   

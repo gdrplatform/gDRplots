@@ -116,7 +116,7 @@ plot_dose_response_combo <- function(dt_average,
   plt <-
     ggplot2::ggplot(dt_avg,
                     ggplot2::aes(x = get(conc), y = x, color = get(conc_2), group = get(conc_2))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#A9A9A9") +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
@@ -124,7 +124,7 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::scale_color_manual(values = colormap, 
                                 labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
-    ggplot2::ylab(sprintf("log10(%s)", normalization_type)) +
+    ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(plt_title) +
     ggplot2::labs(color = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() +
@@ -251,7 +251,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   plt <-
     ggplot2::ggplot(dt_avg,
                     ggplot2::aes(x = get(conc), y = x, color = get(conc_2), group = get(conc_2))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#A9A9A9") +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
@@ -259,7 +259,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
     ggplot2::scale_color_manual(values = colormap, 
                                 labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(~ "Concentration of Drug [" ~ mu * M ~ "]")) +
-    ggplot2::ylab(sprintf("log10(%s)", normalization_type)) +
+    ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(panel_title) +
     ggplot2::labs(color = bquote(~ "Codrug [" ~ mu * M ~ "]")) +
     ggplot2::theme_bw() +
