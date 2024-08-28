@@ -118,7 +118,8 @@ heatmap_combo_metrics <- function(
   
   # prep hm color palette
   hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    grDevices::colorRampPalette(
+      c("#3f2233", "#e400c4", "#DDDDDD", "#F2F2F2"))(no_breaks + 1)
   } else {
     grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
   }
@@ -669,7 +670,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 or conc_2 = 0
   dt_all[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
-
+  
   # prep data for heatmat
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
@@ -721,7 +722,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
     if (NROW(iso_levels)) {
       # order iso level
       iso_levels <- iso_levels[order(as.numeric(iso_levels))]
-
+      
       req_cols <- c(cellline_name, drug_name, drug_name_2, gDRutils::get_header("iso_position"))
       dt_iso <- 
         dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
