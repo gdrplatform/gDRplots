@@ -1,3 +1,6 @@
+## gDRplots 0.0.30 - 2024-08-28
+* replace viridis with another set of colors
+
 ## gDRplots 0.0.29 - 2024-08-23
 * fix bug in plot axis title
 * add horizontal line in 1 for dose response curve
