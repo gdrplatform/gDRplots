@@ -119,7 +119,7 @@ heatmap_combo_metrics <- function(
   # prep hm color palette
   hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
     grDevices::colorRampPalette(
-      c("#3f2233", "#e400c4", "#DDDDDD", "#F2F2F2"))(no_breaks + 1)
+      c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1)
   } else {
     grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
   }
