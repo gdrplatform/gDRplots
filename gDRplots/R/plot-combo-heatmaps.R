@@ -11,7 +11,7 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
 #' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap
-#'    for smooth values; the default is the viridis palette
+#'    for smooth values; the default is the dark purple-light grey palette
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is a blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
@@ -104,7 +104,13 @@ heatmap_combo_metrics <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- get_iso_colors(normalization_type)[available_iso_lvl]
+  # iso_colors <- get_iso_colors(normalization_type)[available_iso_lvl]
+
+  iso_colors_smooth <- grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(available_iso_lvl))[2 * seq_along(available_iso_lvl)] # nolint
+  names(iso_colors_smooth) <- available_iso_lvl
+  iso_colors_excess <- grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[2 * seq_along(available_iso_lvl)] # nolint
+  names(iso_colors_excess) <- available_iso_lvl
+  
   
   # title
   main_title <- sprintf("%s (%s)",
@@ -166,6 +172,12 @@ heatmap_combo_metrics <- function(
         hm_color_palette_smooth
       } else {
         hm_color_palette_excess
+      }
+      
+      iso_colors <- if (mx_name == "smooth") {
+        iso_colors_smooth
+      } else {
+        iso_colors_excess
       }
       
       # legend title
@@ -417,11 +429,14 @@ heatmap_combo_with_isoref <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- get_iso_colors()[available_iso_lvl]
+  # iso_colors <- get_iso_colors()[available_iso_lvl]
+  iso_colors_smooth <- grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(available_iso_lvl))[2 * seq_along(available_iso_lvl)] # nolint
+  names(iso_colors_smooth) <- available_iso_lvl
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    grDevices::colorRampPalette(
+      c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
@@ -659,7 +674,8 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    grDevices::colorRampPalette(
+      c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
@@ -728,12 +744,14 @@ heatmap_combo_with_isoref_qc_panel <- function(
         dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
       
       # colors for isoline
-      iso_colors <- if (NROW(iso_levels) == 1) {
-        "red"
-      } else {
-        grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
-      }
-      names(iso_colors) <- iso_levels 
+      # iso_colors <- if (NROW(iso_levels) == 1) {
+      #   "red"
+      # } else {
+      #   grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+      # }
+      # names(iso_colors) <- iso_levels 
+      iso_colors <- grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+      names(iso_colors) <- iso_levels
       
       # plot
       iso_label <- sprintf("%s%s",
