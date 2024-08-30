@@ -10,7 +10,7 @@ plot_dose_response_sa_by_CLs(
   cellline_name_vec = NULL,
   drug_name_vec = NULL,
   normalization_type = "GR",
-  colormap = NULL,
+  colors_vec = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE
 )
@@ -29,7 +29,7 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{colormap}{character vector with colors for \code{group_names} - name or hex value}
+\item{colors_vec}{character vector with colors for \code{group_names} - name or hex value}
 
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 
@@ -54,7 +54,7 @@ plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
                              cellline_name_vec = cellline_name_vec,
                              drug_name_vec = drug_name_vec,
                              normalization_type = "RV",
-                             colormap = c("#00008B", "#FF6347", "#4CBB17"))
+                             colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
 
 }
 \keyword{single-agent_plots}

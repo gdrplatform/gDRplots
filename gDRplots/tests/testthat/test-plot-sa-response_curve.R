@@ -42,7 +42,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  dt_average = dt_average,
                                  grouping = grouping,
                                  normalization_type = normalization_type,
-                                 colormap = c("cadetblue", "orange", "darkblue"),
+                                 colors_vec = c("cadetblue", "orange", "darkblue"),
                                  plot_fit_flag = FALSE)
   expect_is(plt_3, "gg")
   expect_equal(plt_3[["labels"]][["y"]], normalization_type)
@@ -84,7 +84,7 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                                        cellline_name_vec = cellline_name_vec,
                                        drug_name_vec = drug_name_vec,
                                        normalization_type = normalization_type,
-                                       colormap = c("#00008B", "#FF6347", "#4CBB17"))
+                                       colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
   expect_is(plts, "list")
   plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
   expect_equal(names(plts), 

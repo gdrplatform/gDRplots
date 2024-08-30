@@ -9,7 +9,7 @@ plot_dose_response_combo_qc_panel(
   cl_name,
   d_names = NULL,
   normalization_type = "GR",
-  colormap = NULL
+  colors_vec = NULL
 )
 }
 \arguments{
@@ -24,7 +24,9 @@ if NULL - all available drugs will be plotted}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{colormap}{character vector with colors for \code{group_names} - name or hex value}
+\item{colors_vec}{character vector with colors for \code{group_names} - name or hex value
+note that the first color will be assigned to the min value of \code{Concentration_2}, 
+and the last one - to the max of \code{Concentration_2}}
 }
 \value{
 panel with plot with dose-response curves for selected cell line by drugs

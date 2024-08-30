@@ -10,7 +10,7 @@
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colormap character vector with colors for \code{group_names} - name or hex value
+#' @param colors_vec character vector with colors for \code{group_names} - name or hex value
 #' @param plot_averaged_flag logical flag whether plot points with average values
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
@@ -49,7 +49,7 @@ plot_dose_response_sa <- function(dt_metrics,
                                   grouping,
                                   group_names = NULL,
                                   normalization_type = "GR",
-                                  colormap = NULL,
+                                  colors_vec = NULL,
                                   plot_averaged_flag = TRUE,
                                   plot_fit_flag = TRUE,
                                   fit_source = "gDR") {
@@ -65,7 +65,7 @@ plot_dose_response_sa <- function(dt_metrics,
   checkmate::assert_choice(grouping, choices = c(cellline_name, drug_name))
   checkmate::assert_character(group_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(plot_averaged_flag)
   checkmate::assert_flag(plot_fit_flag)
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -127,12 +127,12 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_avg <- dt_avg_norm[get(grouping) %in% group_names, ]
   
   # colors
-  color_values <- if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
+  color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     gDRplots::get_qual_colors(NROW(group_names))
-  } else if (NROW(colormap) != NROW(group_names)) {
-    grDevices::colorRampPalette(colormap)(NROW(group_names))
+  } else if (NROW(colors_vec) != NROW(group_names)) {
+    grDevices::colorRampPalette(colors_vec)(NROW(group_names))
   } else {
-    colormap
+    colors_vec
   }
   names(color_values) <- group_names
   
@@ -201,7 +201,7 @@ plot_dose_response_sa <- function(dt_metrics,
 #'                              cellline_name_vec = cellline_name_vec,
 #'                              drug_name_vec = drug_name_vec,
 #'                              normalization_type = "RV",
-#'                              colormap = c("#00008B", "#FF6347", "#4CBB17"))
+#'                              colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
 #' 
 #' @export
 plot_dose_response_sa_by_CLs <- function(dt_metrics,
@@ -209,7 +209,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                                          cellline_name_vec = NULL,
                                          drug_name_vec = NULL,
                                          normalization_type = "GR",
-                                         colormap = NULL,
+                                         colors_vec = NULL,
                                          plot_averaged_flag = TRUE,
                                          plot_fit_flag = TRUE) {
   
@@ -218,7 +218,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   checkmate::assert_character(cellline_name_vec, null.ok = TRUE)
   checkmate::assert_character(drug_name_vec, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(plot_averaged_flag)
   checkmate::assert_flag(plot_fit_flag)
   
@@ -254,7 +254,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                             grouping = cellline_name,
                             group_names = cellline_name_vec,
                             normalization_type = normalization_type,
-                            colormap = colormap,
+                            colors_vec = colors_vec,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
     plt_list[[plt_title]] <- plt
@@ -286,7 +286,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #'                                cellline_name_vec = cellline_name_vec,
 #'                                drug_name_vec = drug_name_vec,
 #'                                normalization_type = "RV",
-#'                                colormap = c("#00008B", "#FF6347", "#4CBB17"))
+#'                                colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
 #' 
 #' @export
 plot_dose_response_sa_by_drugs <- function(dt_metrics,
@@ -294,7 +294,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                                            cellline_name_vec = NULL,
                                            drug_name_vec = NULL,
                                            normalization_type = "GR",
-                                           colormap = NULL,
+                                           colors_vec = NULL,
                                            plot_averaged_flag = TRUE,
                                            plot_fit_flag = TRUE) {
   
@@ -303,7 +303,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   checkmate::assert_character(cellline_name_vec, null.ok = TRUE)
   checkmate::assert_character(drug_name_vec, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(plot_averaged_flag)
   checkmate::assert_flag(plot_fit_flag)
   
@@ -339,7 +339,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                             grouping = drug_name,
                             group_names = drug_name_vec,
                             normalization_type = normalization_type,
-                            colormap = colormap,
+                            colors_vec = colors_vec,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
     plt_list[[plt_title]] <- plt

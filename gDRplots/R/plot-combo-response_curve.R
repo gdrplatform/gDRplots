@@ -7,7 +7,9 @@
 #' @param cl_name string with cell line name to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colormap character vector with colors for \code{group_names} - name or hex value
+#' @param colors_vec character vector with colors for \code{group_names} - name or hex value
+#'    note that the first color will be assigned to the min value of \code{Concentration_2}, 
+#'    and the last one - to the max of \code{Concentration_2}
 #' @param split_by_conc split_by_conc logical flag indicating whether curves 
 #'    for \code{Concentration_2} should be plotted on a single plot or separately
 #'
@@ -39,7 +41,7 @@
 #'                          drug2_name = drug2_name,
 #'                          cl_name = cl_name,
 #'                          normalization_type = "RV",
-#'                          colormap = c("orange", "darkred"))                     
+#'                          colors_vec = c("orange", "darkred"))                     
 #'                       
 #' @export
 plot_dose_response_combo <- function(dt_average,
@@ -47,7 +49,7 @@ plot_dose_response_combo <- function(dt_average,
                                      drug2_name,
                                      cl_name,
                                      normalization_type = "GR",
-                                     colormap = NULL, 
+                                     colors_vec = NULL, 
                                      split_by_conc = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -63,7 +65,7 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(split_by_conc)
   
   # check input data
@@ -99,12 +101,12 @@ plot_dose_response_combo <- function(dt_average,
   
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
-  if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
+  if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     number_of_color <- NROW(ls_conc_2)
     colormap <-
       rev(colorspace::sequential_hcl(number_of_color + 1, palette = "viridis")[seq_along(ls_conc_2)])
-  } else if (NROW(colormap) != NROW(ls_conc_2)) {
-    colormap <- grDevices::colorRampPalette(colormap)(NROW(ls_conc_2))
+  } else if (NROW(colors_vec) != NROW(ls_conc_2)) {
+    colormap <- grDevices::colorRampPalette(colors_vec)(NROW(ls_conc_2))
   }
   names(colormap) <- levels(ls_conc_2)
   
@@ -180,7 +182,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
                                               cl_name,
                                               d_names = NULL,
                                               normalization_type = "GR",
-                                              colormap = NULL) {
+                                              colors_vec = NULL) {
   
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -195,7 +197,7 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   checkmate::assert_choice(cl_name, choices = unique(dt_average[[cellline_name]]))
   checkmate::assert_character(d_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(colormap, null.ok = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
@@ -234,12 +236,12 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
-  if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
+  if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     number_of_color <- NROW(ls_conc_2)
     colormap <-
       rev(colorspace::sequential_hcl(number_of_color + 1, palette = "viridis")[seq_along(ls_conc_2)])
-  } else if (NROW(colormap) != NROW(ls_conc_2)) {
-    colormap <- grDevices::colorRampPalette(colormap)(NROW(ls_conc_2))
+  } else if (NROW(colors_vec) != NROW(ls_conc_2)) {
+    colormap <- grDevices::colorRampPalette(colors_vec)(NROW(ls_conc_2))
   }
   names(colormap) <- levels(ls_conc_2)
   
