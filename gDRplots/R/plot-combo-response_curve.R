@@ -235,13 +235,11 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
   if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    number_of_color <- NROW(ls_conc_2)
-    colormap <-
-      rev(colorspace::sequential_hcl(number_of_color + 1, palette = "viridis")[seq_along(ls_conc_2)])
+    colormap <- .get_combo_curves_colors(ls_conc_2)
   } else if (NROW(colors_vec) != NROW(ls_conc_2)) {
     colormap <- grDevices::colorRampPalette(colors_vec)(NROW(ls_conc_2))
+    names(colormap) <- levels(ls_conc_2)
   }
-  names(colormap) <- levels(ls_conc_2)
   
   # set min and max values for y
   ymin <- min(c(0, min(dt_avg$x)))

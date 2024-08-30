@@ -140,8 +140,9 @@ test_that("plot_dose_response_combo_qc_panel works as expected", {
                                              colors_vec = c("pinky", "blackish"))
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
-  expect_true(any(grepl(colorspace::sequential_hcl(1, palette = "viridis"), 
-                        plt_4[["plot_env"]][["colormap"]]))) # default colors when invalid `colors_vec`
+  expect_equal(plt_4[["plot_env"]][["colormap"]],
+               .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
+  ) # default colors when invalid `colors_vec`
   
   plt_5 <- plot_dose_response_combo_qc_panel(dt_average = dt_average,
                                              d_names = c("drug_XX", "drug_YY"),
