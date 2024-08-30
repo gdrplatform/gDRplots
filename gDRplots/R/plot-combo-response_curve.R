@@ -9,7 +9,7 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param colors_vec character vector with colors for \code{group_names} - name or hex value
 #'    note that the first color will be assigned to the min value of \code{Concentration_2}, 
-#'    and the last one - to the max of \code{Concentration_2}
+#'    and the last one - to the max of \code{Concentration_2}; the default is the orange-black palette
 #' @param split_by_conc split_by_conc logical flag indicating whether curves 
 #'    for \code{Concentration_2} should be plotted on a single plot or separately
 #'
@@ -41,7 +41,7 @@
 #'                          drug2_name = drug2_name,
 #'                          cl_name = cl_name,
 #'                          normalization_type = "RV",
-#'                          colors_vec = c("orange", "darkred"))                     
+#'                          colors_vec = c("lightblue", "darkblue"))                     
 #'                       
 #' @export
 plot_dose_response_combo <- function(dt_average,
@@ -102,13 +102,11 @@ plot_dose_response_combo <- function(dt_average,
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
   if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    number_of_color <- NROW(ls_conc_2)
-    colormap <-
-      rev(colorspace::sequential_hcl(number_of_color + 1, palette = "viridis")[seq_along(ls_conc_2)])
+    colormap <- .get_combo_curves_colors(ls_conc_2)
   } else if (NROW(colors_vec) != NROW(ls_conc_2)) {
     colormap <- grDevices::colorRampPalette(colors_vec)(NROW(ls_conc_2))
+    names(colormap) <- levels(ls_conc_2)
   }
-  names(colormap) <- levels(ls_conc_2)
   
   # set min and max values for y
   ymin <- min(c(0, min(dt_avg$x)))
@@ -281,4 +279,21 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
       plot.title = ggplot2::element_text(size = 12, hjust = 0.5, margin = ggplot2::margin()))
   
   return(plt)
+}
+
+
+#' @keywords internal
+.get_combo_curves_colors <- function(ls_conc_2) {
+  checkmate::assert_factor(ls_conc_2)
+  
+  # order iso level
+  ls_conc_2 <- ls_conc_2[order(as.numeric(ls_conc_2))]
+  
+  conc_2_colors <- 
+    # grDevices::colorRampPalette(c("#FFD139", "#EC6608", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
+    # grDevices::colorRampPalette(c("#F2C707", "#F33608", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
+    grDevices::colorRampPalette(c("#FFE666", "#FB9C05", "#C01831", "#670532", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
+  names(conc_2_colors) <- levels(ls_conc_2)
+  
+  conc_2_colors
 }

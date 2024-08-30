@@ -26,7 +26,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colors_vec}{character vector with colors for \code{group_names} - name or hex value
 note that the first color will be assigned to the min value of \code{Concentration_2}, 
-and the last one - to the max of \code{Concentration_2}}
+and the last one - to the max of \code{Concentration_2}; the default is the orange-black palette}
 }
 \value{
 panel with plot with dose-response curves for selected cell line by drugs

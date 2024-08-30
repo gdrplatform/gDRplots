@@ -29,7 +29,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{colors_vec}{character vector with colors for \code{group_names} - name or hex value
 note that the first color will be assigned to the min value of \code{Concentration_2}, 
-and the last one - to the max of \code{Concentration_2}}
+and the last one - to the max of \code{Concentration_2}; the default is the orange-black palette}
 
 \item{split_by_conc}{split_by_conc logical flag indicating whether curves 
 for \code{Concentration_2} should be plotted on a single plot or separately}
@@ -65,7 +65,7 @@ plot_dose_response_combo(dt_average = dt_average,
                          drug2_name = drug2_name,
                          cl_name = cl_name,
                          normalization_type = "RV",
-                         colors_vec = c("orange", "darkred"))                     
+                         colors_vec = c("lightblue", "darkblue"))                     
                       
 }
 \keyword{combo_plots}
