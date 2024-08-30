@@ -37,7 +37,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{iso_levels}{character vector with  isobologram levels to be selected}
 
 \item{colors_vec_smooth}{character vector of colors (valid names or hex codes) used in the heatmap
-for smooth values; the default is the viridis palette}
+for smooth values; the default is the dark purple-light grey palette}
 
 \item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap
 for excess values; the default is a blue-light grey-red color scale}
