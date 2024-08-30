@@ -288,9 +288,8 @@ plot_dose_response_combo_qc_panel <- function(dt_average,
   ls_conc_2 <- ls_conc_2[order(as.numeric(ls_conc_2))]
   
   conc_2_colors <- 
-    # grDevices::colorRampPalette(c("#FFD139", "#EC6608", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
-    # grDevices::colorRampPalette(c("#F2C707", "#F33608", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
-    grDevices::colorRampPalette(c("#FFE666", "#FB9C05", "#C01831", "#670532", "black"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
+    grDevices::colorRampPalette(c(
+      "#EAF02D", "#FDE251", "#FB9C05", "#CC0666", "#57042C", "#2C2835"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
   names(conc_2_colors) <- levels(ls_conc_2)
   
   conc_2_colors
