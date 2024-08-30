@@ -128,7 +128,8 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # colors
   color_values <- if (is.null(colormap) || !all(vapply(colormap, is_valid_color, logical(1)))) {
-    grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
+    # grDevices::colorRampPalette(c("coral", "chartreuse", "darkblue"))(NROW(group_names))
+    gDRplots::get_qual_colors(NROW(group_names))
   } else if (NROW(colormap) != NROW(group_names)) {
     grDevices::colorRampPalette(colormap)(NROW(group_names))
   } else {
