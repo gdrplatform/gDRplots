@@ -298,13 +298,13 @@ heatmap_combo_metrics <- function(
             ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
             ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
           ),
-          ncol = 2, common.legend = TRUE, legend = "right"),
+          ncol = 2, common.legend = TRUE, legend = "left"),
         ggpubr::ggarrange(
           plotlist = list(
             ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
             ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
           ),
-          ncol = 2, common.legend = TRUE, legend = "right"),
+          ncol = 2, common.legend = TRUE, legend = "left"),
         common.legend = TRUE, nrow = 2),
       top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
@@ -893,7 +893,8 @@ transform_log_conc <- function(conc_vec) {
   iso_levels <- iso_levels[order(as.numeric(iso_levels))]
   
   iso_colors <- 
-    grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+    # grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+    grDevices::colorRampPalette(c("#F2C707", "#EC6608"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
   names(iso_colors) <- iso_levels
   
   iso_colors
@@ -904,7 +905,10 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1)
+    # c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1) # family #720062
+    c("#251739", "#6742a1", "#b59fd7", "#F2F2F2"))(no_breaks + 1) # family #218EAE
+    # c("#280051", "#5800b3", "#a147ff", "#F2F2F2"))(no_breaks + 1) # family #251739
+  #301668
 }
 
 #' @keywords internal
