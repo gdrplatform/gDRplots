@@ -37,7 +37,8 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{iso_levels}{character vector with  isobologram levels to be selected;
 when \code{NULL} - no isolines will be displayed}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap}
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
+the default is the dark purple-light grey palette}
 
 \item{no_breaks}{numeric number of breaks on scale}
 }

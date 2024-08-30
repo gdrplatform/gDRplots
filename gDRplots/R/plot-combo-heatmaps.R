@@ -327,7 +327,8 @@ heatmap_combo_metrics <- function(
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected;
 #'     when \code{NULL} - no isolines will be displayed
-#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap; 
+#'     the default is the dark purple-light grey palette
 #' @param no_breaks numeric number of breaks on scale
 #'
 #' @return list or panel with heatmaps with values for excess assays for selected drugs and cell line with
