@@ -63,8 +63,8 @@ plot_var_stat_qc <- function(dt_assay,
   
   plt <- ggplot2::ggplot(tab_subplot, 
                          ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
-    ggplot2::geom_hline(yintercept = 1, color = "#2c3e50", linetype = "dashed") +
-    ggplot2::geom_hline(yintercept = 0, color = "#2c3e50", linetype = "solid") +
+    ggplot2::geom_hline(yintercept = 1, color = "#555555", linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 0, color = "#555555", linetype = "solid") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
     ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
@@ -221,7 +221,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   minval <- min(c(0, min(result_matrix, na.rm = TRUE)))
   
   breaks <- seq(from = minval, to = maxval, by = 1)
-  hm_color_palette <- grDevices::colorRampPalette(c("#CEEFC8", "#76d364"))(NROW(breaks) - 1)
+  hm_color_palette <- grDevices::colorRampPalette(c("#CEEFC8", "#76D364"))(NROW(breaks) - 1)
   
   unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
   
