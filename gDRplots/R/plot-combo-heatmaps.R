@@ -893,7 +893,6 @@ transform_log_conc <- function(conc_vec) {
   iso_levels <- iso_levels[order(as.numeric(iso_levels))]
   
   iso_colors <- 
-    # grDevices::colorRampPalette(c("#9bd9ec", "#0f4352"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
     grDevices::colorRampPalette(c("#F2C707", "#EC6608"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
   names(iso_colors) <- iso_levels
   
@@ -905,10 +904,7 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    # c("#510046", "#b3009a", "#e400c4", "#F2F2F2"))(no_breaks + 1) # family #720062
     c("#251739", "#6742a1", "#b59fd7", "#F2F2F2"))(no_breaks + 1) # family #218EAE
-    # c("#280051", "#5800b3", "#a147ff", "#F2F2F2"))(no_breaks + 1) # family #251739
-  #301668
 }
 
 #' @keywords internal
