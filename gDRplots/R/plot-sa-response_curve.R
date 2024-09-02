@@ -128,7 +128,7 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # colors
   color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    gDRplots::get_qual_colors(NROW(group_names))
+    get_qual_colors(NROW(group_names))
   } else if (NROW(colors_vec) != NROW(group_names)) {
     grDevices::colorRampPalette(colors_vec)(NROW(group_names))
   } else {
