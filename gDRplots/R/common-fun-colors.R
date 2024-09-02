@@ -68,10 +68,9 @@ get_iso_colors <-
 #' @param x numeric vector describing rgb color 
 #' @keywords internal
 #'
-#' @return NULL
+#' @return \code{x} invisible, if the check is not successful throws an error message.
 assert_RGB_format <- function(x) {
   if (any(x > 255)) {
     stop("Some value is greater than 255. Not valid RGB format.")
   }
 }
-

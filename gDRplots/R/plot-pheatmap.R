@@ -768,12 +768,10 @@ change_NA_into_char <- function(x,
 #' @return vector with hex colors from qualitative palettes
 #' 
 #' @examples
-#' \dontrun{
 #' get_qual_colors()
 #' get_qual_colors(0)
 #' get_qual_colors(5)
 #' get_qual_colors(35)
-#' }
 #' 
 #' @keywords utils_color
 #' @export 
@@ -810,14 +808,12 @@ get_qual_colors <- function(n = NULL) {
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
 #' @examples
-#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 #' dt_ann <- response_metrics[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 #' 
 #' get_ann_color_map(dt_ann)
-#' }
 #' 
 #' @keywords utils_color
 #' @export 
@@ -850,7 +846,6 @@ get_ann_color_map <- function(dt_ann) {
 #' @seealso \code{\link{pheatmap_with_anno_sa}} \code{\link{pheatmap_with_anno_combo}}
 #' 
 #' @examples
-#' \dontrun{
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
 #'   mut_A = c(0, 0, 1, 2, 3),
@@ -865,7 +860,6 @@ get_ann_color_map <- function(dt_ann) {
 #' )
 #' 
 #' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
-#' }
 #' 
 #' @keywords utils_color
 #' @export 

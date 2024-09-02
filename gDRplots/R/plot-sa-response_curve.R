@@ -426,7 +426,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   if (NROW(dt_metrics_plot) > 0) {
     min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
     max_conc <- max(dt_average_plot[[conc]])
-    sampled_conc <- gDRplots::create_log_seq(min_conc, max_conc, 50)
+    sampled_conc <- create_log_seq(min_conc, max_conc, 50)
     fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
                                                                  dt_metrics_plot$x_inf,
                                                                  dt_metrics_plot$x_0,
@@ -573,7 +573,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                                                  x = numeric())
   min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
   max_conc <- max(dt_average_plot[[conc]])
-  sampled_conc <- gDRplots::create_log_seq(min_conc, max_conc, 50)
+  sampled_conc <- create_log_seq(min_conc, max_conc, 50)
   
   for (d_name in d_names) {
     dt_met_plot <- dt_metrics_plot[get(drug_name) == d_name, ]
