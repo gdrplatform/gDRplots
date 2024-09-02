@@ -91,8 +91,13 @@ neutralize_spaces <- function(x,
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
 #'
-#' @return named vector with optimal width and height used in ggsave function
+#' @return named vector with optimal width and height used in \code{\link[ggplot2]{ggsave}} function
 #' @keywords internal
+#' 
+#' @examples
+#' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
+#' estimate_plot_size(p)
+#' 
 #' @export
 estimate_plot_size <- function(plt,
                                base_width = 10,
@@ -130,15 +135,18 @@ estimate_plot_size <- function(plt,
 #' @param path A string specifying the path where the plot should be saved.
 #' @param format A string specifying the format for saving the plot; either "svg", "png", or "pdf". Default is "svg".
 #'
-#' @return NULL
+#' @return \code{NULL}
 #' @keywords internal
-#' @export
+#' 
+#' @seealso \code{\link[ggplot2]{ggsave}}
 #'
 #' @examples
 #' tmp_dir <- file.path(tempdir(), "plot_dir")
 #' dir.create(tmp_dir, showWarnings = FALSE)
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 #' save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
+#' 
+#' @export 
 save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)

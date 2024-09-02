@@ -57,22 +57,28 @@ se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Averaged")
 
-pheatmap_qc(tab_response = response_metrics)
-pheatmap_qc(tab_response = response_metrics,
-            normalization_type = "RV",
-            colors_vec = c("darkblue", "grey90"),
-            lbl_by_CellLineName = TRUE,
-            lbl_by_DrugName = TRUE)
+hm_1 <- pheatmap_qc(tab_response = response_metrics)
+
+hm_2 <- pheatmap_qc(tab_response = response_metrics,
+                    normalization_type = "RV",
+                    colors_vec = c("darkblue", "grey90"),
+                    lbl_by_CellLineName = TRUE,
+                    lbl_by_DrugName = TRUE)
              
+ggpubr::as_ggplot(hm_1[["gtable"]])
+ggpubr::as_ggplot(hm_2[["gtable"]])
+
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                      assay_name = "Averaged")
-pheatmap_qc(tab_response = response_metrics,
-            cluster_rows = FALSE)
-             
-pheatmap_qc(tab_response = response_metrics,
-            metric = "x_std",
-            cluster_rows = FALSE)
+hm_3 <- pheatmap_qc(tab_response = response_metrics,
+                    cluster_rows = FALSE)
+hm_4 <- pheatmap_qc(tab_response = response_metrics,
+                    metric = "x_std",
+                    cluster_rows = FALSE)
+                    
+ggpubr::as_ggplot(hm_3[["gtable"]])
+ggpubr::as_ggplot(hm_4[["gtable"]])
 
 }
 \seealso{

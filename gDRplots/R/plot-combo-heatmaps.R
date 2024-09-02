@@ -11,7 +11,7 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected
 #' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap
-#'    for smooth values; the default is the viridis palette
+#'    for smooth values; the default is the dark purple-light grey palette
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is a blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
@@ -104,7 +104,7 @@ heatmap_combo_metrics <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- get_iso_colors(normalization_type)[available_iso_lvl]
+  iso_colors <- .get_iso_colors(available_iso_lvl)
   
   # title
   main_title <- sprintf("%s (%s)",
@@ -118,14 +118,13 @@ heatmap_combo_metrics <- function(
   
   # prep hm color palette
   hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
   }
   
   hm_color_palette_excess <- if (is.null(colors_vec_excess)) {
-    grDevices::colorRampPalette(
-      c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
+    .get_excess_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec_excess)(no_breaks + 1)
   }
@@ -193,7 +192,7 @@ heatmap_combo_metrics <- function(
                                     expand = c(0, 0)) +
         ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                       limit = limits,
-                                      labels = function(x) sprintf("%.2f", x)) +
+                                      labels = function(x) sprintf("%.2f", x)) + 
         ggplot2::theme_bw() +
         ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                        axis.text.y = ggplot2::element_text(size = 8),
@@ -265,11 +264,11 @@ heatmap_combo_metrics <- function(
     } else {
       plt_iso_compare <- plt_iso_compare +
         ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
-                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level))
-      ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
-                                  breaks = available_iso_lvl,
-                                  labels = legend_lbl_iso,
-                                  name = legend_title_iso)
+                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) +
+        ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                    breaks = available_iso_lvl,
+                                    labels = legend_lbl_iso,
+                                    name = legend_title_iso)
     }
   }
   
@@ -299,13 +298,13 @@ heatmap_combo_metrics <- function(
             ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
             ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
           ),
-          ncol = 2, common.legend = TRUE, legend = "right"),
+          ncol = 2, common.legend = TRUE, legend = "left"),
         ggpubr::ggarrange(
           plotlist = list(
             ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
             ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
           ),
-          ncol = 2, common.legend = TRUE, legend = "right"),
+          ncol = 2, common.legend = TRUE, legend = "left"),
         common.legend = TRUE, nrow = 2),
       top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
@@ -328,7 +327,8 @@ heatmap_combo_metrics <- function(
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with  isobologram levels to be selected;
 #'     when \code{NULL} - no isolines will be displayed
-#' @param colors_vec character vector of colors (valid name or hex) used in heatmap
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap; 
+#'     the default is the dark purple-light grey palette
 #' @param no_breaks numeric number of breaks on scale
 #'
 #' @return list or panel with heatmaps with values for excess assays for selected drugs and cell line with
@@ -416,11 +416,11 @@ heatmap_combo_with_isoref <- function(
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- get_iso_colors()[available_iso_lvl]
+  iso_colors <- .get_iso_colors(available_iso_lvl)
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
@@ -499,19 +499,17 @@ heatmap_combo_with_isoref <- function(
       tab_isoline <- 
         tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
                       data.table::between(pos_y, range_x[1], range_x[2]), ]
-      
+      # colors for isoline
+      iso_colors <- .get_iso_colors(iso_levels)
       
       if (NROW(available_iso_lvl) == 1) {
         plt <- plt +
           ggplot2::geom_path(data = tab_isoline,
                              ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source),
-                             linewidth = 1, color = "red") +
+                             linewidth = 1, color = iso_colors) +
           ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
                                          name = iso_label)
       } else {
-        iso_colors <-
-          grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(available_iso_lvl))[seq_along(available_iso_lvl) * 2] # nolint
-        names(iso_colors) <- available_iso_lvl
         plt <- plt +
           ggplot2::geom_path(data = tab_isoline,
                              ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
@@ -534,6 +532,9 @@ heatmap_combo_with_isoref <- function(
                                   labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
       ggplot2::theme_bw() +
+      ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
+                      linetype = ggplot2::guide_legend(order = 2), 
+                      color = ggplot2::guide_legend(order = 3)) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                      axis.text.y = ggplot2::element_text(size = 8),
                      plot.title = ggplot2::element_text(size = 10),
@@ -658,7 +659,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec)) {
-    colorspace::sequential_hcl(no_breaks + 1, palette = "viridis")
+    .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
@@ -669,7 +670,7 @@ heatmap_combo_with_isoref_qc_panel <- function(
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, mx_name), with = FALSE]
   # correction of NA for conc = 0 or conc_2 = 0
   dt_all[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
-
+  
   # prep data for heatmat
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
@@ -721,18 +722,13 @@ heatmap_combo_with_isoref_qc_panel <- function(
     if (NROW(iso_levels)) {
       # order iso level
       iso_levels <- iso_levels[order(as.numeric(iso_levels))]
-
+      
       req_cols <- c(cellline_name, drug_name, drug_name_2, gDRutils::get_header("iso_position"))
       dt_iso <- 
         dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
       
       # colors for isoline
-      iso_colors <- if (NROW(iso_levels) == 1) {
-        "red"
-      } else {
-        grDevices::colorRampPalette(c("red", "darkred"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
-      }
-      names(iso_colors) <- iso_levels 
+      iso_colors <- .get_iso_colors(available_iso_lvl)
       
       # plot
       iso_label <- sprintf("%s%s",
@@ -888,4 +884,34 @@ transform_log_conc <- function(conc_vec) {
     0.5
   }
   tile_size
+}
+
+#' @keywords internal
+.get_iso_colors <- function(iso_levels) {
+  checkmate::assert_character(iso_levels)
+  
+  # order iso level
+  iso_levels <- iso_levels[order(as.numeric(iso_levels))]
+  
+  iso_colors <- 
+    grDevices::colorRampPalette(c("#F2C707", "#EC6608", "#AC2605"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+  names(iso_colors) <- iso_levels
+  
+  iso_colors
+}
+
+#' @keywords internal
+.get_smooth_palette <- function(no_breaks) {
+  checkmate::assert_int(no_breaks, lower = 2)
+  
+  grDevices::colorRampPalette(
+    c("#251739", "#6742a1", "#b59fd7", "#F2F2F2"))(no_breaks + 1) # family #218EAE
+}
+
+#' @keywords internal
+.get_excess_palette <- function(no_breaks) {
+  checkmate::assert_int(no_breaks, lower = 2)
+  
+  grDevices::colorRampPalette(
+    c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
 }

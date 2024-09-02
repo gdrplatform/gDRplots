@@ -10,7 +10,7 @@ plot_dose_response_sa(
   grouping,
   group_names = NULL,
   normalization_type = "GR",
-  colormap = NULL,
+  colors_vec = NULL,
   plot_averaged_flag = TRUE,
   plot_fit_flag = TRUE,
   fit_source = "gDR"
@@ -32,7 +32,7 @@ if \code{NULL} then all values will be plotted}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{colormap}{character vector with colors for \code{group_names} - name or hex value}
+\item{colors_vec}{character vector with colors for \code{group_names} - name or hex value}
 
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 

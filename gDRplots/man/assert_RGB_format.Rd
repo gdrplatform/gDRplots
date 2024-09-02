@@ -9,6 +9,9 @@ assert_RGB_format(x)
 \arguments{
 \item{x}{numeric vector describing rgb color}
 }
+\value{
+\code{x} invisible, if the check is not successful throws an error message.
+}
 \description{
 Assert whether number may code color in rgb
 }

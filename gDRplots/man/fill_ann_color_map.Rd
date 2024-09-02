@@ -18,7 +18,6 @@ list with color mapping for the annotations with missing items filled in
 Fill missing values in the color map for annotation
 }
 \examples{
-\dontrun{
 annotation_manual <- data.table::data.table(
   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
   mut_A = c(0, 0, 1, 2, 3),
@@ -33,7 +32,6 @@ annotation_map <- list(
 )
 
 fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
-}
 
 }
 \seealso{

@@ -12,6 +12,9 @@
 #' @keywords utils
 #' @return A numeric vector, see \code{Details}.
 #'
+#' @examples
+#' create_log_seq(1, 2, 5)
+#'
 #' @export 
 create_log_seq <- function(start, end, length) {
 
