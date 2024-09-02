@@ -29,17 +29,53 @@ The `gDRplots` package is intended to store functions for gDR static visualizati
 
 The `gDRplots` package supports metrics: 
 
-```{r metrics_def, echo = FALSE}
-ls_metrics <- c("GR value", "Relative Viability")
-dict <- gDRcomponents::get_dict()
-metrics_def <- data.table::data.table(
-  Metrics = sprintf("**%s**", ls_metrics),
-  Definition = vapply(ls_metrics, function(i) dict[[i]], character(1))
-)
-knitr::kable(metrics_def, escape = FALSE)
-```
+|: Metrics |: Definition |
+| ---- | ---------- |
+| **GR value** | Normalized Growth Rate (GR) value; calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
+| **Relative Viability** | (RV); calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 
 Note, all plot function required as an input data.table representation of the data in selected assaye with added information from colData created based on the gDR data model (MultiAssayExperiment).
+
+Used data:
+
+```{r sa_data, warning = FALSE, message = FALSE}
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+
+dt_norm_sa <- 
+  gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                   assay_name =  "Normalized")
+dt_metrics_sa <- 
+  gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                   assay_name = "Metrics")
+dt_average_sa <- 
+  gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                   assay_name = "Averaged")
+```
+
+```{r combo_data, warning = FALSE, message = FALSE}
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+
+dt_norm_combo <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                   assay_name =  "Normalized")
+dt_metrics_combo <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo, 
+                                   assay_name = "Metrics")
+dt_average_combo <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo, 
+                                   assay_name = "Averaged")
+dt_scores <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                   assay_name = "scores")
+dt_excess <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                   assay_name = "excess")
+dt_isobolograms <- 
+  gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                   assay_name = "isobolograms")
+```
 
 ## Dose Response Plots
 
@@ -75,19 +111,12 @@ plot_dose_response_sa(
 
 The **plot_dose_response_combo** function is dedicated for combination experiments.
 
-User can also use  **plot_dose_response_combo_qc_panel** to get panel of dose response plots by selected cell line name..
+User can also use **plot_dose_response_combo_panel** to get panel of dose response plots by selected cell line name.
 
 This function required as an input a table representing _the average assay_ and cell line name, and selected drug names and co-drug name.
 
 ```{r plot_dose_response_combo, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-se <- mae[[gDRutils::get_supported_experiments("combo")]]
-
-dt_average <- 
-  gDRutils::convert_se_assay_to_dt(se, 
-                                   assay_name = "Averaged")
-
-plot_dose_response_combo(dt_average = dt_average,
+plot_dose_response_combo(dt_average = dt_average_combo,
                          drug1_name = "drug_011",
                          drug2_name = "drug_021",
                          cl_name = "cellline_BC")
@@ -100,21 +129,15 @@ plot_dose_response_combo(dt_average = dt_average,
 **pheatmap_with_anno_sa**
 
 ```{r pheatmap_with_anno_sa, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-se <- mae[[gDRutils::get_supported_experiments("sa")]]
-dt_metrics <- 
-  gDRutils::convert_se_assay_to_dt(se = se,
-                                   assay_name = "Metrics")
-
 annotation_manual_col <-
-  unique(dt_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_metrics_sa[, .SD, .SDcols = c("CellLineName", "Tissue")])
 annotation_manual_row <-
-  unique(dt_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
+  unique(dt_metrics_sa[, .SD, .SDcols = c("DrugName", "drug_moa")])
 
-output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
-                                metric = "x_mean",
-                                annotation_row = annotation_manual_row,
-                                annotation_col = annotation_manual_col)
+output <- pheatmap_with_anno_sa(
+  dt_metrics = dt_metrics_sa,
+  annotation_row = annotation_manual_row,
+  annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
 ggpubr::as_ggplot(hm[["gtable"]])
 
@@ -123,57 +146,135 @@ knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 
 ### Combination Data
 
+For experiments with drug combinations, user can visualize the different combination metrics in a summary heatmaps where 
+
 **pheatmap_with_anno_combo**
+
+```{r pheatmap_with_anno_combo, warning = FALSE, message = FALSE}
+annotation_manual_col <-
+  unique(dt_scores[,.SD, .SDcols = c("CellLineName", "Tissue")])
+annotation_manual_row <-
+  unique(dt_scores[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+
+output <- pheatmap_with_anno_combo(
+  dt_scores = dt_scores,
+  annotation_row = annotation_manual_row,
+  annotation_col = annotation_manual_col)
+hm <- output[["heatmap"]]
+ggpubr::as_ggplot(hm[["gtable"]])
+
+knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
+```
 
 **heatmap_combo_metrics**
 
+```{r heatmap_combo_metrics, warning = FALSE, message = FALSE}
+heatmap_combo_metrics(dt_excess = dt_excess,
+                      dt_isobolograms = dt_isobolograms,
+                      drug1_name = "drug_001", 
+                      drug2_name = "drug_026",
+                      cl_name = "cellline_BC",
+                      iso_levels = "0.5")
+```
+
 **heatmap_combo_with_isoref**
+
+User can also use **heatmap_combo_with_isoref_panel** to get panel with heatmap for selected drug namea nad co-drug name and cell line names list.
+
+```{r heatmap_combo_with_isoref, warning = FALSE, message = FALSE}
+heatmap_combo_with_isoref(dt_excess = dt_excess,
+                          dt_isobolograms = dt_isobolograms,
+                          drug1_name = "drug_001", 
+                          drug2_name = "drug_026",
+                          cl_name = "cellline_BC",
+                          iso_levels = c("0.2", "0.5", "0.8"))
+```
+
 
 ## Quality Control 
 
-### Quality controls of mapping controls to treated
+### Mapping Controls to Treated
 
 SA and combo
 
 **heatmap_control_mapping_qc**
 
-### Quality Control of degree of errors in normalization
+```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE}
+dt_treat <- 
+  gDRutils::convert_se_assay_to_dt(se_sa, 
+                                   assay_name = "RawTreated")
+dt_controls <- 
+  gDRutils::convert_se_assay_to_dt(se_sa, 
+                                   assay_name = "Controls")
+
+heatmap_control_mapping_qc(dt_treat = dt_treat,
+                           dt_controls = dt_controls)
+
+
+dt_treat <- 
+  gDRutils::convert_se_assay_to_dt(se_combo, 
+                                   assay_name = "RawTreated")
+dt_controls <- 
+  gDRutils::convert_se_assay_to_dt(se_combo, 
+                                   assay_name = "Controls")
+
+heatmap_control_mapping_qc(dt_treat = dt_treat,
+                           dt_controls = dt_controls)
+```
+
+### Degree of Errors in Normalization Values
 
 SA nad combo
 
 **plot_var_distribution_qc**
 
+```{r plot_var_distribution_qc, warning = FALSE, message = FALSE}
+plot_var_distribution_qc(dt_assay = dt_norm_sa,
+                         cl_name = "cellline_BC")
 
-### Quality Control for Averaged 
+plot_var_distribution_qc(dt_assay = dt_norm_combo,
+                         cl_name = "cellline_BC")
+```
+
+### Averaged Values
 
 SA and combo 
 
 **pheatmap_qc**
 
+```{r pheatmap_qc_sa, warning = FALSE, message = FALSE}
+hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
+ggpubr::as_ggplot(hm_sa[["gtable"]])
+```
 
-### Quality Control - Accuarcy of Fitting Dose-response Curves
+```{r pheatmap_qc_combo, warning = FALSE, message = FALSE}
+hm_combo <- pheatmap_qc(dt_average = dt_average_combo)
+ggpubr::as_ggplot(hm_combo[["gtable"]])
+```
+
+### Accuarcy of Fitting Dose-response Curves
 
 Only SA
 
 **plot_dose_response_sa_qc**
-**plot_dose_response_sa_qc_panel**
 
+User can also use **plot_dose_response_sa_qc_panel** to get panel with heatmap for selected drug namea nad co-drug name and cell line names list.
 
+```{r plot_dose_response_sa_qc, warning = FALSE, message = FALSE}
+plot_dose_response_sa_qc(dt_metrics = dt_metrics_sa,
+                         dt_average = dt_average_sa,
+                         cl_name = "cellline_BC",
+                         d_name = "drug_001")
+```
 ### Quality Control - Fitting Precision 
 
 Only SA
 
 **plot_fitting_acc**
 
+
 ```{r plot_fitting_acc, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-se <- mae[[gDRutils::get_supported_experiments("sa")]]
-
-dt_metrics <- 
-  gDRutils::convert_se_assay_to_dt(se, 
-                                   assay_name = "Metrics")
-
-plot_fitting_acc(dt_assay = dt_metrics,
+plot_fitting_acc(dt_assay = dt_metrics_sa,
                  cl_name = "cellline_NE")
 ```
 
