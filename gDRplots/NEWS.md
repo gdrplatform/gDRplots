@@ -1,3 +1,6 @@
+## gDRplots 0.0.31 - 2024-09-03
+* add vignette
+
 ## gDRplots 0.0.30 - 2024-08-28
 * replace viridis with another set of colors
 

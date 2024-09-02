@@ -1,0 +1,31 @@
+---
+title: "gDRplots"
+author: "gDR team"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{gDRtestData}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, echo=FALSE}
+library(gDRplots)
+```
+
+# Overview
+
+The `gDRplots` package is intended to storefunctions for gDR static visualizations and their dedicated helpers.
+
+
+# SessionInfo {-}
+
+```{r sessionInfo}
+sessionInfo()
+```
