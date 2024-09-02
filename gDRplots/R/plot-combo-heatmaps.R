@@ -557,9 +557,9 @@ heatmap_combo_with_isoref <- function(
 #' @return panel with heatmaps for fitted values and reference data for isobolograms
 #'    for selected drug and co-drug by cell line names
 #'
-#' @keywords QC_plot
+#' @keywords combo_plots
 #' @examples
-#' cl_names <- 
+#' cl_names <-
 #'   c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
 #' 
 #' drug1_name <- "drug_001"
@@ -570,27 +570,27 @@ heatmap_combo_with_isoref <- function(
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_with_isoref_qc_panel(dt_excess,
-#'                                    dt_isobolograms,
-#'                                    drug1_name, drug2_name,
-#'                                    cl_names)
+#' heatmap_combo_with_isoref_panel(dt_excess,
+#'                                 dt_isobolograms,
+#'                                 drug1_name, drug2_name,
+#'                                 cl_names)
 #' 
-#' heatmap_combo_with_isoref_qc_panel(dt_excess,
-#'                                    dt_isobolograms,
-#'                                    drug1_name, drug2_name,
-#'                                    cl_names,
-#'                                    iso_levels = c("0.25", "0.5"))
-#'                                    
-#' heatmap_combo_with_isoref_qc_panel(dt_excess,
-#'                                    dt_isobolograms,
-#'                                    drug1_name, drug2_name,
-#'                                    cl_names,
-#'                                    normalization_type = "RV",
-#'                                    iso_levels = NULL,
-#'                                    colors_vec = c("darkcyan", "snow", "darkorange"))
+#' heatmap_combo_with_isoref_panel(dt_excess,
+#'                                 dt_isobolograms,
+#'                                 drug1_name, drug2_name,
+#'                                 cl_names,
+#'                                 iso_levels = c("0.25", "0.5"))
+#' 
+#' heatmap_combo_with_isoref_panel(dt_excess,
+#'                                 dt_isobolograms,
+#'                                 drug1_name, drug2_name,
+#'                                 cl_names,
+#'                                 normalization_type = "RV",
+#'                                 iso_levels = NULL,
+#'                                 colors_vec = c("darkcyan", "snow", "darkorange"))
 #' 
 #' @export
-heatmap_combo_with_isoref_qc_panel <- function(
+heatmap_combo_with_isoref_panel <- function(
     dt_excess,
     dt_isobolograms,
     drug1_name,

@@ -159,7 +159,7 @@ plot_dose_response_combo <- function(dt_average,
 #'
 #' @return panel with plot with dose-response curves for selected cell line by drugs
 #'
-#' @keywords QC_plot
+#' @keywords combo_plots
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -167,21 +167,20 @@ plot_dose_response_combo <- function(dt_average,
 #' 
 #' cl_name <- "cellline_IB"
 #' 
-#' plot_dose_response_combo_qc_panel(dt_average = dt_average,
-#'                                   cl_name = cl_name)
+#' plot_dose_response_combo_panel(dt_average = dt_average,
+#'                                cl_name = cl_name)
 #' 
 #' d_names <- c("drug_001", "drug_002")
-#' plot_dose_response_combo_qc_panel(dt_average = dt_average,
-#'                                   cl_name = cl_name,
-#'                                   d_names = d_names)
+#' plot_dose_response_combo_panel(dt_average = dt_average,
+#'                                cl_name = cl_name,
+#'                                d_names = d_names)
 #' 
 #' @export
-plot_dose_response_combo_qc_panel <- function(dt_average,
-                                              cl_name,
-                                              d_names = NULL,
-                                              normalization_type = "GR",
-                                              colors_vec = NULL) {
-  
+plot_dose_response_combo_panel <- function(dt_average,
+                                           cl_name,
+                                           d_names = NULL,
+                                           normalization_type = "GR",
+                                           colors_vec = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
