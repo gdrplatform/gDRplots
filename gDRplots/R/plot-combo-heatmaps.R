@@ -894,7 +894,7 @@ transform_log_conc <- function(conc_vec) {
   iso_levels <- iso_levels[order(as.numeric(iso_levels))]
   
   iso_colors <- 
-    grDevices::colorRampPalette(c("#F2C707", "#EC6608"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+    grDevices::colorRampPalette(c("#F2C707", "#EC6608", "#AC2605"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
   names(iso_colors) <- iso_levels
   
   iso_colors
