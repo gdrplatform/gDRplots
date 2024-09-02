@@ -5,7 +5,7 @@
 \title{Plot pretty heatmap for single-agent or combo data to control quality of the data}
 \usage{
 pheatmap_qc(
-  tab_response,
+  dt_average,
   normalization_type = "GR",
   metric = "x",
   fit_source = "gDR",
@@ -18,8 +18,8 @@ pheatmap_qc(
 )
 }
 \arguments{
-\item{tab_response}{\code{data.table} containing drug response metrics
-outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Averaged" assay 
+\item{dt_average}{\code{data.table} containing drug response metrics
+outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Averaged"} assay 
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -54,29 +54,29 @@ Plot pretty heatmap for single-agent or combo data to control quality of the dat
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                     assay_name = "Averaged")
+dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                               assay_name = "Averaged")
 
-hm_1 <- pheatmap_qc(tab_response = response_metrics)
+hm_1 <- pheatmap_qc(dt_average = dt_average)
 
-hm_2 <- pheatmap_qc(tab_response = response_metrics,
+hm_2 <- pheatmap_qc(dt_average = dt_average,
                     normalization_type = "RV",
                     colors_vec = c("darkblue", "grey90"),
                     lbl_by_CellLineName = TRUE,
                     lbl_by_DrugName = TRUE)
-             
+
 ggpubr::as_ggplot(hm_1[["gtable"]])
 ggpubr::as_ggplot(hm_2[["gtable"]])
 
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                     assay_name = "Averaged")
-hm_3 <- pheatmap_qc(tab_response = response_metrics,
+dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                               assay_name = "Averaged")
+hm_3 <- pheatmap_qc(dt_average = dt_average,
                     cluster_rows = FALSE)
-hm_4 <- pheatmap_qc(tab_response = response_metrics,
+hm_4 <- pheatmap_qc(dt_average = dt_average,
                     metric = "x_std",
                     cluster_rows = FALSE)
-                    
+
 ggpubr::as_ggplot(hm_3[["gtable"]])
 ggpubr::as_ggplot(hm_4[["gtable"]])
 

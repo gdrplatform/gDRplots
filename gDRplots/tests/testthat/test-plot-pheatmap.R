@@ -3,17 +3,17 @@ context("Test qc_heatmap")
 test_that("pheatmap_with_anno_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
   
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  res_1 <- data.table::dcast(data = response_metrics[normalization_type == "GR", ],
+  res_1 <- data.table::dcast(data = dt_metrics[normalization_type == "GR", ],
                              formula = CellLineName ~ DrugName, value.var = "xc50")
   data.table::setkey(res_1, NULL)
   
   # scenario 1: default
-  out_1 <- pheatmap_with_anno_sa(tab_response = response_metrics)
+  out_1 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
   expect_length(out_1, 2)
   expect_equal(names(out_1), c("data", "heatmap"))
   data_1 <- out_1[["data"]]
@@ -30,14 +30,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   
   # scenario 2: selected metric & normalization_type and NA
-  response_metrics_na <- data.table::copy(response_metrics)
-  response_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
-  res_2 <- data.table::dcast(data = response_metrics_na[normalization_type == "RV", ],
+  dt_metrics_na <- data.table::copy(dt_metrics)
+  dt_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
+  res_2 <- data.table::dcast(data = dt_metrics_na[normalization_type == "RV", ],
                              formula = CellLineName ~ DrugName, value.var = "x_max")
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
   
-  out_2 <- pheatmap_with_anno_sa(tab_response = response_metrics_na, 
+  out_2 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_na, 
                                  normalization_type = "RV",
                                  metric = "x_max",
                                  hm_title = "X MAX")
@@ -52,8 +52,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[1]]$label, "X MAX")
   expect_equal(plt_2$gtable$grobs[[4]]$label, 
-               unique(response_metrics_na[!is.na(x_max)]$DrugName)) # no rows with NA
-
+               unique(dt_metrics_na[!is.na(x_max)]$DrugName)) # no rows with NA
+  
   # scenario 3: annotations for row and col
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
@@ -65,11 +65,11 @@ test_that("pheatmap_with_anno_sa works as expected", {
     DrugName = c("drug_002", "drug_011", "drug_021", "drug_026"),
     group = c(1, 1, 2, 3)
   )
-  annotation_manual_na <- annotation_manual_row[unique(response_metrics[, "DrugName"]), on = "DrugName"]
+  annotation_manual_na <- annotation_manual_row[unique(dt_metrics[, "DrugName"]), on = "DrugName"]
   data.table::setorderv(annotation_manual_na, cols = "group", na.last = TRUE)
   annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
   
-  out_3 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
+  out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
   expect_length(out_3, 2)
@@ -101,7 +101,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   annotation_manual_col_na <- data.table::copy(annotation_manual_col)
   annotation_manual_col_na[2, c("mut_A", "mut_B", "mut_C") := "NA"]
   
-  out_4 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
+  out_4 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
                                  annotation_col = annotation_manual_col[1, ],
                                  annotation_colors = annotation_map)
   expect_length(out_4, 2)
@@ -120,14 +120,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   # scenario 5: incomplete annotations for row
   annotation_manual_row <-
-    unique(response_metrics[, c("DrugName", "drug_moa"), with = FALSE])
+    unique(dt_metrics[, c("DrugName", "drug_moa"), with = FALSE])
   anno_test <- data.table::data.table(
     DrugName = c("drug_004", "drug_005", "drug_006"),
     tested_AB = c("yes", "yes", "no")
   )
   annotation_manual_row <- anno_test[annotation_manual_row, on = "DrugName"]
   
-  out_5 <- pheatmap_with_anno_sa(tab_response = response_metrics, 
+  out_5 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
                                  annotation_row = annotation_manual_row)
   expect_length(out_5, 2)
   expect_equal(names(out_5), c("data", "heatmap"))
@@ -145,36 +145,36 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(plt_5$gtable$grobs[[5]]$label, c("tested_AB", "drug_moa"))
   
   # testing assertions
-  expect_error(pheatmap_with_anno_sa(tab_response = unlist(response_metrics)),
-               "Assertion on 'tab_response' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
+               "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      metric = "xxx"),
                "Assertion on 'metric' failed: Must be element of set")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      hm_title = NULL),
                "Assertion on 'hm_title' failed: Must be of type 'string'")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      colors_vec = c("pinky", "blackish")),
                "Must be a valid color name")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_row = unlist(annotation_manual_row)),
                "Assertion on 'annotation_row' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_col = unlist(annotation_manual_col)),
                "Assertion on 'annotation_col' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_sa(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_colors = unlist(annotation_map)),
                "Assertion on 'annotation_colors' failed: Must be of type 'list'")
 })
@@ -182,18 +182,18 @@ test_that("pheatmap_with_anno_sa works as expected", {
 test_that("pheatmap_with_anno_combo works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
   
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
   
-  res_1 <- data.table::dcast(data = response_metrics[normalization_type == "GR", ],
+  res_1 <- data.table::dcast(data = dt_scores[normalization_type == "GR", ],
                              formula = CellLineName ~ paste(DrugName, "x", DrugName_2), 
                              value.var = "hsa_score")
   data.table::setkey(res_1, NULL)
   
   # scenario 1: default
-  out_1 <- pheatmap_with_anno_combo(tab_response = response_metrics)
+  out_1 <- pheatmap_with_anno_combo(dt_scores = dt_scores)
   expect_length(out_1, 2)
   expect_equal(names(out_1), c("data", "heatmap"))
   data_1 <- out_1[["data"]]
@@ -207,18 +207,18 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   
   # scenario 2: selected metric & normalization_type and NA
-  response_metrics_na <- data.table::copy(response_metrics)
-  response_metrics_na[DrugName == "drug_004"]$bliss_score <- NA
-  res_2 <- data.table::dcast(data = response_metrics_na[normalization_type == "RV", ],
+  dt_scores_na <- data.table::copy(dt_scores)
+  dt_scores_na[DrugName == "drug_004"]$bliss_score <- NA
+  res_2 <- data.table::dcast(data = dt_scores_na[normalization_type == "RV", ],
                              formula = CellLineName ~ paste(DrugName, "x", DrugName_2), 
                              value.var = "bliss_score")
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
   drug_combo_names <- unique(sprintf("%s x %s",
-                                     response_metrics_na[!is.na(bliss_score)]$DrugName, 
-                                     response_metrics_na[!is.na(bliss_score)]$DrugName_2))
+                                     dt_scores_na[!is.na(bliss_score)]$DrugName, 
+                                     dt_scores_na[!is.na(bliss_score)]$DrugName_2))
   
-  out_2 <- pheatmap_with_anno_combo(tab_response = response_metrics_na, 
+  out_2 <- pheatmap_with_anno_combo(dt_scores = dt_scores_na, 
                                     normalization_type = "RV",
                                     metric = "bliss_score",
                                     hm_title = "RV Bliss Score")
@@ -234,7 +234,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[1]]$label, "RV Bliss Score")
   expect_equal(plt_2$gtable$grobs[[4]]$label, drug_combo_names)
-
+  
   # scenario 3: annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
@@ -247,7 +247,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
     mut_C = c("AA" = "yellow", "BB" = "green")
   )
   
-  out_3 <- pheatmap_with_anno_combo(tab_response = response_metrics, 
+  out_3 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
                                     annotation_col = annotation_manual_col,
                                     annotation_colors = annotation_map)
   expect_length(out_3, 2)
@@ -267,7 +267,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
     grp_C = c("AA" = "yellow", "BB" = "blue")
   )
   ls_combo_col <- c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")
-  annotation_manual_row <- unique(response_metrics[, ls_combo_col, with = FALSE])
+  annotation_manual_row <- unique(dt_scores[, ls_combo_col, with = FALSE])
   annotation_manual_row[["grp_B"]] <- c("yes", "yes", "yes", "no", "no", NA)
   annotation_manual_row[["grp_C"]] <- c("AA", "AA", "no_check", "BB", "no_check", "BB")
   
@@ -275,7 +275,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
     data.table::copy(annotation_manual_row), cols = c("drug_moa", "drug_moa_2", "grp_B", "grp_C"), na.last = TRUE)
   annotation_manual_row_res <- annotation_manual_row_res[, lapply(.SD, change_NA_into_char)]
   
-  out_4 <- pheatmap_with_anno_combo(tab_response = response_metrics,
+  out_4 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     annotation_row = annotation_manual_row,
                                     annotation_colors = annotation_map)
   expect_length(out_4, 2)
@@ -288,7 +288,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(anno_4, annotation_manual_row_res)
   expect_equal(data_4[["matrix"]], 
                res_1[, c("CellLineName", paste(anno_4$DrugName, "x", anno_4$DrugName_2)), with = FALSE])
-   plt_4 <- out_4[["heatmap"]]
+  plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
   expect_equal(plt_4$gtable$grobs[[5]]$label, c("drug_moa", "drug_moa_2", "grp_B", "grp_C"))
   
@@ -300,12 +300,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   annotation_manual_row_na <- annotation_manual_row[2:5, ls_combo_col, with = FALSE]
   annotation_manual_row_res <- merge(
     annotation_manual_row_na,
-    unique(response_metrics[, c("DrugName", "DrugName_2"), with = FALSE]), 
+    unique(dt_scores[, c("DrugName", "DrugName_2"), with = FALSE]), 
     by = c("DrugName", "DrugName_2"), all = TRUE)
   data.table::setorderv(annotation_manual_row_res, cols = c("drug_moa", "drug_moa_2"), na.last = TRUE)
   annotation_manual_row_res <- annotation_manual_row_res[, lapply(.SD, change_NA_into_char)]
   
-  out_5 <- pheatmap_with_anno_combo(tab_response = response_metrics, 
+  out_5 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
                                     annotation_row = annotation_manual_row_na,
                                     annotation_colors = annotation_map)
   expect_length(out_5, 2)
@@ -322,36 +322,36 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_5$gtable$grobs[[5]]$label, c("drug_moa", "drug_moa_2"))
   
   # testing assertions
-  expect_error(pheatmap_with_anno_combo(tab_response = unlist(response_metrics)),
-               "Assertion on 'tab_response' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
+               "Assertion on 'dt_scores' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         metric = "xxx"),
                "Assertion on 'metric' failed: Must be element of set")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         hm_title = NULL),
                "Assertion on 'hm_title' failed: Must be of type 'string'")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         colors_vec = c("pinky", "blackish")),
                "Must be a valid color name")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         annotation_row = unlist(annotation_manual_row)),
                "Assertion on 'annotation_row' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         annotation_col = unlist(annotation_manual_col)),
                "Assertion on 'annotation_col' failed: Must be a data.table")
-  expect_error(pheatmap_with_anno_combo(tab_response = response_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         annotation_colors = unlist(annotation_map)),
                "Assertion on 'annotation_colors' failed: Must be of type 'list'")
 })
@@ -426,8 +426,8 @@ test_that("get_qual_colors works", {
 test_that("get_ann_color_map works", {
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]][2:3, ]
-  response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-  dt_ann <- unique(response_metrics[, .SD, .SDcols = c("Tissue", "ReferenceDivisionTime")])
+  dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+  dt_ann <- unique(dt_averaged[, .SD, .SDcols = c("Tissue", "ReferenceDivisionTime")])
   
   result <- get_ann_color_map(dt_ann)
   expect_equal(NROW(result), NCOL(dt_ann))

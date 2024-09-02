@@ -18,8 +18,8 @@ Create color map for annotation
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-dt_ann <- response_metrics[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
+dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 
 get_ann_color_map(dt_ann)
 

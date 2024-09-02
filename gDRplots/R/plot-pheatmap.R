@@ -1,7 +1,7 @@
 #' Plot pretty heatmap for single-agent or combo data to control quality of the data
-#'
-#' @param tab_response \code{data.table} containing drug response metrics
-#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Averaged" assay 
+#'    
+#' @param dt_average \code{data.table} containing drug response metrics
+#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Averaged"} assay 
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -23,29 +23,29 @@
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                      assay_name = "Averaged")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Averaged")
 #' 
-#' hm_1 <- pheatmap_qc(tab_response = response_metrics)
+#' hm_1 <- pheatmap_qc(dt_average = dt_average)
 #' 
-#' hm_2 <- pheatmap_qc(tab_response = response_metrics,
+#' hm_2 <- pheatmap_qc(dt_average = dt_average,
 #'                     normalization_type = "RV",
 #'                     colors_vec = c("darkblue", "grey90"),
 #'                     lbl_by_CellLineName = TRUE,
 #'                     lbl_by_DrugName = TRUE)
-#'              
+#' 
 #' ggpubr::as_ggplot(hm_1[["gtable"]])
 #' ggpubr::as_ggplot(hm_2[["gtable"]])
 #' 
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                      assay_name = "Averaged")
-#' hm_3 <- pheatmap_qc(tab_response = response_metrics,
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Averaged")
+#' hm_3 <- pheatmap_qc(dt_average = dt_average,
 #'                     cluster_rows = FALSE)
-#' hm_4 <- pheatmap_qc(tab_response = response_metrics,
+#' hm_4 <- pheatmap_qc(dt_average = dt_average,
 #'                     metric = "x_std",
 #'                     cluster_rows = FALSE)
-#'                     
+#' 
 #' ggpubr::as_ggplot(hm_3[["gtable"]])
 #' ggpubr::as_ggplot(hm_4[["gtable"]])
 #' 
@@ -54,7 +54,7 @@
 #' @return heatmap for selected metric with annotation - if given
 #' @export
 pheatmap_qc <- function(
-    tab_response,
+    dt_average,
     normalization_type = "GR",
     metric = "x",
     fit_source = "gDR",
@@ -65,7 +65,7 @@ pheatmap_qc <- function(
     lbl_by_CellLineName = FALSE,
     lbl_by_DrugName = FALSE) {
   
-  checkmate::assert_data_table(tab_response)
+  checkmate::assert_data_table(dt_average)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("x", "x_std"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -90,7 +90,7 @@ pheatmap_qc <- function(
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- tab_response[eval(filter_expr)]
+  tab_response <- dt_average[eval(filter_expr)]
   
   # fill column
   if (conc_2 %in% names(tab_response)) {
@@ -231,8 +231,8 @@ pheatmap_qc <- function(
 
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
-#' @param tab_response \code{data.table} containing drug response metrics
-#'  outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
+#' @param dt_metrics \code{data.table} containing drug response metrics
+#'  outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Metrics"} assay
 #'  and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -264,21 +264,21 @@ pheatmap_qc <- function(
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                      assay_name = "Metrics")
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
 #' 
-#' output <- pheatmap_with_anno_sa(tab_response = response_metrics)
+#' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 #' hm_1 <- output[["heatmap"]]
 #' ggpubr::as_ggplot(hm_1[["gtable"]])
 #' 
 #' annotation_manual_col <-
-#'   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
 #' annotation_manual_row <-
-#'   unique(response_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
+#'   unique(dt_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
 #' annotation_map <-
-#'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
+#'   get_ann_color_map(unique(dt_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 #' 
-#' output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+#' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
 #'                                 normalization_type = "RV",
 #'                                 metric = "x_mean",
 #'                                 colors_vec = c("darkblue", "grey90"),
@@ -299,7 +299,7 @@ pheatmap_qc <- function(
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+#' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
 #'                                 annotation_col = annotation_manual,
 #'                                 annotation_colors = annotation_map,
 #'                                 hm_title = get_hm_title(
@@ -324,7 +324,7 @@ pheatmap_qc <- function(
 #' 
 #' @export
 pheatmap_with_anno_sa <- function(
-    tab_response,
+    dt_metrics,
     normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
@@ -335,9 +335,9 @@ pheatmap_with_anno_sa <- function(
     annotation_col = NULL,
     annotation_colors = NULL) {
   
-  checkmate::assert_data_table(tab_response)
+  checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  numeric_columns <- names(tab_response)[vapply(tab_response, is.numeric, logical(1))]
+  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
@@ -360,7 +360,7 @@ pheatmap_with_anno_sa <- function(
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- tab_response[eval(filter_expr)]
+  tab_response <- dt_metrics[eval(filter_expr)]
   
   qmfun <- switch(metric,
                   "xc50" = log10,
@@ -478,8 +478,8 @@ pheatmap_with_anno_sa <- function(
 
 #' Plot pretty heatmap with annotations for combo data
 #' 
-#' @param tab_response \code{data.table} containing drug response metrics
-#'   output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
+#' @param dt_scores \code{data.table} containing drug response metrics
+#'   output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"scores"} assay 
 #'   and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
@@ -502,16 +502,16 @@ pheatmap_with_anno_sa <- function(
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                      assay_name = "scores")
 #' annotation_manual_col <-
-#'   unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_scores[,.SD, .SDcols = c("CellLineName", "Tissue")])
 #' annotation_manual_row <-
-#'   unique(response_metrics[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+#'   unique(dt_scores[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
 #' annotation_map <-
-#'   get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
+#'   get_ann_color_map(unique(dt_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 #' 
-#' output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+#' output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
 #'                                    normalization_type = "RV",
 #'                                    metric = "bliss_score",
 #'                                    colors_vec = c("darkblue", "grey90", "darkred"),
@@ -533,7 +533,7 @@ pheatmap_with_anno_sa <- function(
 #'   mut_B = c("yes" = "black", "no" = "grey90")
 #' )
 #' 
-#' output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+#' output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
 #'                                    annotation_col = annotation_manual,
 #'                                    annotation_colors = annotation_map,
 #'                                    hm_title = get_hm_title(
@@ -558,7 +558,7 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @export
 pheatmap_with_anno_combo <- function(
-    tab_response,
+    dt_scores,
     normalization_type = "GR",
     metric = "hsa_score",
     fit_source = "gDR",
@@ -569,7 +569,7 @@ pheatmap_with_anno_combo <- function(
     annotation_col = NULL,
     annotation_colors = NULL) {
   
-  checkmate::assert_data_table(tab_response)
+  checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -594,7 +594,7 @@ pheatmap_with_anno_combo <- function(
   # prep data
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- tab_response[eval(filter_expr)]
+  tab_response <- dt_scores[eval(filter_expr)]
   
   # select data for normalization type
   tab_plot <- data.table::dcast(
@@ -810,8 +810,8 @@ get_qual_colors <- function(n = NULL) {
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#' response_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-#' dt_ann <- response_metrics[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 #' 
 #' get_ann_color_map(dt_ann)
 #' 
