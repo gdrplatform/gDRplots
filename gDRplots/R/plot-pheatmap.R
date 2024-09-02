@@ -272,9 +272,9 @@ pheatmap_qc <- function(
 #' ggpubr::as_ggplot(hm_1[["gtable"]])
 #' 
 #' annotation_manual_col <-
-#'   unique(dt_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_metrics[, .SD, .SDcols = c("CellLineName", "Tissue")])
 #' annotation_manual_row <-
-#'   unique(dt_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
+#'   unique(dt_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
 #' annotation_map <-
 #'   get_ann_color_map(unique(dt_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 #' 
@@ -503,11 +503,11 @@ pheatmap_with_anno_sa <- function(
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                      assay_name = "scores")
+#'                                               assay_name = "scores")
 #' annotation_manual_col <-
-#'   unique(dt_scores[,.SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_scores[, .SD, .SDcols = c("CellLineName", "Tissue")])
 #' annotation_manual_row <-
-#'   unique(dt_scores[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+#'   unique(dt_scores[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
 #' annotation_map <-
 #'   get_ann_color_map(unique(dt_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 #' 
