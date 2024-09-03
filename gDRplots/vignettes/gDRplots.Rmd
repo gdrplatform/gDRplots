@@ -89,8 +89,6 @@ The **plot_dose_response_sa** function is dedicated for single-agent experiments
 
 User can also use  **plot_dose_response_sa_by_CLs** or **plot_dose_response_sa_by_drugs** to get list of dose response plots by cell line names or by drugs accordingly.
 
-All above functions required as an input two tables representing _the metrics assay_ and _the average assay_.
-
 ```{r plot_dose_response_sa, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -244,7 +242,7 @@ In the gDR pipeline during normalization stage the raw data are normalized based
 
 The **plot_var_distribution_qc** function is dedicated for single-agent and combinations experiments.
 
-It allows to visually check whether the data distribution after normalization is correct and as expected.
+It allows to visually check whether the data distribution after normalization is correct and as expected on a set of violin plots by drug names.
 
 ```{r plot_var_distribution_qc, warning = FALSE, message = FALSE}
 plot_var_distribution_qc(dt_assay = dt_norm_sa,
@@ -256,9 +254,13 @@ plot_var_distribution_qc(dt_assay = dt_norm_combo,
 
 ### Averaged Values
 
+In the gDR pipeline during averaging stage, technical replicates that are stored in the same nested table are averaged.
+
 The **pheatmap_qc** function is dedicated for single-agent and combinations experiments.
 
-**pheatmap_qc**
+It allows to visually check whether the average values of selected metric are as expected. 
+
+The control heatmap is build for selected cell line names and drugs (for combination experiment - also for co-drug) that are order by concentration.
 
 ```{r pheatmap_qc_sa, warning = FALSE, message = FALSE}
 hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
@@ -290,7 +292,7 @@ plot_dose_response_sa_qc(dt_metrics = dt_metrics_sa,
 
 The **plot_var_stat_qc** function is dedicated for single-agent experiments.
 
-It allows to visually check values for selected metric (from _metric assay_) and selected cell line name by list of drugs.
+It allows to visually check values for selected metric (from _metric assay_) and selected cell line name on a lollipop plots by list of drugs.
 
 ```{r plot_var_stat_qc, warning = FALSE, message = FALSE}
 plot_var_stat_qc(dt_assay = dt_metrics_sa,
@@ -300,7 +302,7 @@ plot_var_stat_qc(dt_assay = dt_metrics_sa,
 
 The **plot_fitting_acc** function is dedicated for single-agent experiments.
 
-It allows to visually check the fitting precision (`R2` and `RSS` values on one panel) for selected cell line name by list of drugs.
+It allows to visually check the fitting precision (`R2` and `RSS` values on one panel) on a lollipop plots for selected cell line name by list of drugs.
 
 ```{r plot_fitting_acc, warning = FALSE, message = FALSE}
 plot_fitting_acc(dt_assay = dt_metrics_sa,
