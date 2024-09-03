@@ -14,7 +14,8 @@ plot_dose_response_combo_panel(
 }
 \arguments{
 \item{dt_average}{data.table representing data from the \code{Averaged} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+and combo \code{SummarizedExperiment}}
 
 \item{cl_name}{string with cell line name to be plotted (identifiers \code{CellLineName})}
 

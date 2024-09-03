@@ -19,8 +19,8 @@ pheatmap_with_anno_combo(
 )
 }
 \arguments{
-\item{dt_scores}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"scores"} assay 
+\item{dt_scores}{\code{data.table} representing data from the \code{scores} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 and combo \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected

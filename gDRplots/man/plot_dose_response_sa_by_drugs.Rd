@@ -17,10 +17,12 @@ plot_dose_response_sa_by_drugs(
 }
 \arguments{
 \item{dt_metrics}{data.table representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+and single-agent \code{SummarizedExperiment}}
 
 \item{dt_average}{data.table representing data from the \code{Averaged} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+and single-agent \code{SummarizedExperiment}}
 
 \item{cellline_name_vec}{character vector with cell line to be plotted (Cell Line Name)}
 

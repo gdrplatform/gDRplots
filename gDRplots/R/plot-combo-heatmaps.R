@@ -2,8 +2,10 @@
 #'
 #' @param dt_excess data.table data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+#'    and combo \code{SummarizedExperiment}
 #' @param dt_isobolograms data.table data.table representing data from the \code{isobolograms} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+#'    and combo \code{SummarizedExperiment}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
@@ -318,8 +320,10 @@ heatmap_combo_metrics <- function(
 #'
 #' @param dt_excess data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+#'    and combo \code{SummarizedExperiment}
 #' @param dt_isobolograms data.table representing data from the \code{isobolograms} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+#'    and combo \code{SummarizedExperiment}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})

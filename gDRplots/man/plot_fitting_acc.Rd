@@ -7,8 +7,9 @@
 plot_fitting_acc(dt_assay, cl_name, normalization_type = "GR")
 }
 \arguments{
-\item{dt_assay}{data.table representation of the data in assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+\item{dt_assay}{data.table representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+and single-agent \code{SummarizedExperiment}}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
 

@@ -1,7 +1,7 @@
 #' Plot pretty heatmap for single-agent or combo data to control quality of the data
 #'    
-#' @param dt_average \code{data.table} containing drug response metrics
-#'    outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Averaged"} assay 
+#' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -231,8 +231,8 @@ pheatmap_qc <- function(
 
 #' Plot pretty heatmap with annotationsfor single-agent data
 #'
-#' @param dt_metrics \code{data.table} containing drug response metrics
-#'  outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Metrics"} assay
+#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -478,8 +478,8 @@ pheatmap_with_anno_sa <- function(
 
 #' Plot pretty heatmap with annotations for combo data
 #' 
-#' @param dt_scores \code{data.table} containing drug response metrics
-#'   output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"scores"} assay 
+#' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
+#'   outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'   and combo \code{SummarizedExperiment}
 #' @param metric string name of combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 

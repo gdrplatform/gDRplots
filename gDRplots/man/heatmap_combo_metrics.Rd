@@ -20,10 +20,12 @@ heatmap_combo_metrics(
 }
 \arguments{
 \item{dt_excess}{data.table data.table representing data from the \code{excess} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
+and combo \code{SummarizedExperiment}}
 
 \item{dt_isobolograms}{data.table data.table representing data from the \code{isobolograms} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
+and combo \code{SummarizedExperiment}}
 
 \item{drug1_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 

@@ -1,7 +1,8 @@
 #' Lollipop plot for metric single-agent data to control quality of the data
 #'
-#' @param dt_assay data.table representation of the data in assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_assay data.table representing data from the \code{Metrics} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'    and single-agent \code{SummarizedExperiment}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
 #' @param normalization_type string with normalization_types to be selected
@@ -90,8 +91,9 @@ plot_var_stat_qc <- function(dt_assay,
 
 #' Visualization for the quality control of the fitting for single-agent data
 #'
-#' @param dt_assay data.table representation of the data in assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_assay data.table representing data from the \code{Metrics} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'    and single-agent \code{SummarizedExperiment}
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -161,12 +163,14 @@ plot_fitting_acc <- function(dt_assay,
 }
 
 
-#' Plot drug response curves for single-agent data to control quality of the data
+#' Plot heatmap of mapping controls to treated for single-agent and combo data to control quality of the data
 #'
-#' @param dt_treat data.table representation of the data in \code{RawTreated} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
-#' @param dt_controls data.table representation of the data in \code{Controls} assay
-#'    output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
+#' @param dt_treat data.table representation of the data in \code{RawTreated} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
+#'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
+#' @param dt_controls data.table representation of the data in \code{Controls} assay,
+#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
+#'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #'
 #' @return hetamap of mapping controls to treated
 #'

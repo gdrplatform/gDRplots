@@ -18,8 +18,8 @@ pheatmap_qc(
 )
 }
 \arguments{
-\item{dt_average}{\code{data.table} containing drug response metrics
-outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Averaged"} assay 
+\item{dt_average}{\code{data.table} representing data from the \code{Averaged} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
 \item{normalization_type}{string with normalization types to be selected

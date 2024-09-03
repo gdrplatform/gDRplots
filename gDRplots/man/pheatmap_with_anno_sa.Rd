@@ -18,8 +18,8 @@ pheatmap_with_anno_sa(
 )
 }
 \arguments{
-\item{dt_metrics}{\code{data.table} containing drug response metrics
-outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the \code{"Metrics"} assay
+\item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
