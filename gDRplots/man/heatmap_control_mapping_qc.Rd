@@ -2,22 +2,24 @@
 % Please edit documentation in R/plot-fitting_qc.R
 \name{heatmap_control_mapping_qc}
 \alias{heatmap_control_mapping_qc}
-\title{Plot drug response curves for single-agent data to control quality of the data}
+\title{Plot heatmap of mapping controls to treated for single-agent and combo data to control quality of the data}
 \usage{
 heatmap_control_mapping_qc(dt_treat, dt_controls)
 }
 \arguments{
-\item{dt_treat}{data.table representation of the data in \code{RawTreated} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}}
+\item{dt_treat}{data.table representation of the data in \code{RawTreated} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "RawTreated")}
+and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
-\item{dt_controls}{data.table representation of the data in \code{Controls} assay
-output from \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}}
+\item{dt_controls}{data.table representation of the data in \code{Controls} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
+and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 }
 \value{
 hetamap of mapping controls to treated
 }
 \description{
-Plot drug response curves for single-agent data to control quality of the data
+Plot heatmap of mapping controls to treated for single-agent and combo data to control quality of the data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("small")

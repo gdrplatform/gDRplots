@@ -48,7 +48,7 @@ test_that("heatmap_combo_metrics works as expected", {
 test_that("heatmap_combo_with_isoref works as expected", {
 })
 
-test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
+test_that("heatmap_combo_with_isoref_panel works as expected", {
   cl_names <- 
     c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
   drug1_name <- "drug_001"
@@ -59,10 +59,10 @@ test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
   dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
   dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
   
-  plt_1 <- heatmap_combo_with_isoref_qc_panel(dt_excess,
-                                              dt_isobolograms,
-                                              drug1_name, drug2_name,
-                                              cl_names)
+  plt_1 <- heatmap_combo_with_isoref_panel(dt_excess,
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name,
+                                           cl_names)
   expect_is(plt_1, "gg")
   expect_true(grepl("GR", plt_1[["labels"]][["fill"]])) 
   expect_true(grepl(drug1_name, plt_1[["labels"]][["y"]][2]))
@@ -74,33 +74,33 @@ test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
   expect_equal(plt_1[["labels"]][["colour"]], "iso_level")
   expect_equal(plt_1[["labels"]][["linetype"]], "iso_source")
   
-  plt_2 <- heatmap_combo_with_isoref_qc_panel(dt_excess,
-                                              dt_isobolograms,
-                                              drug1_name, drug2_name,
-                                              cl_names = "cellline_XX")
+  plt_2 <- heatmap_combo_with_isoref_panel(dt_excess,
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name,
+                                           cl_names = "cellline_XX")
   
   expect_is(plt_2, "gg")
   expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[1]]$PANEL),
                 NROW(unique(dt_excess[["CellLineName"]])))
   
   cl_names_NA <- c("cellline_AA", "cellline_XX")
-  plt_3 <- heatmap_combo_with_isoref_qc_panel(dt_excess,
-                                              dt_isobolograms,
-                                              drug1_name, drug2_name,
-                                              cl_names = cl_names_NA)
+  plt_3 <- heatmap_combo_with_isoref_panel(dt_excess,
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name,
+                                           cl_names = cl_names_NA)
   
   expect_is(plt_3, "gg")
   expect_length(unique(ggplot2::ggplot_build(plt_3)$data[[1]]$PANEL), 
                 NROW(intersect(cl_names_NA, unique(dt_excess[["CellLineName"]]))))
   
   normalization_type <- "RV"
-  plt_4 <- heatmap_combo_with_isoref_qc_panel(dt_excess,
-                                              dt_isobolograms,
-                                              drug1_name, drug2_name,
-                                              cl_names,
-                                              normalization_type = normalization_type,
-                                              iso_levels = NULL,
-                                              colors_vec = c("#003366", "#FFFAFA", "#FF8800"))
+  plt_4 <- heatmap_combo_with_isoref_panel(dt_excess,
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name,
+                                           cl_names,
+                                           normalization_type = normalization_type,
+                                           iso_levels = NULL,
+                                           colors_vec = c("#003366", "#FFFAFA", "#FF8800"))
   expect_is(plt_4, "gg")
   expect_true(grepl(normalization_type, plt_4[["labels"]][["fill"]]))
   expect_true(grepl(drug1_name, plt_4[["labels"]][["y"]][2]))
@@ -114,71 +114,71 @@ test_that("heatmap_combo_with_isoref_qc_panel works as expected", {
   expect_true(any(grepl("#003366", plt_4[["plot_env"]][["hm_color_palette"]])))
   expect_true(any(grepl("#FF8800", plt_4[["plot_env"]][["hm_color_palette"]])))
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = unlist(dt_excess),
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = unlist(dt_excess),
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names),
                "Assertion on 'dt_excess' failed: Must be a data.table")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = unlist(dt_isobolograms),
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = unlist(dt_isobolograms),
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names),
                "Assertion on 'dt_isobolograms' failed: Must be a data.table")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = 1,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = 1,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names),
                "Assertion on 'drug1_name' failed: Must be of type 'string'")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = "drug_XX",
-                                                  cl_names = cl_names),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = "drug_XX",
+                                               cl_names = cl_names),
                "Assertion on 'drug2_name' failed: Must be element of set")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = 1),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = 1),
                "Assertion on 'cl_names' failed: Must be of type 'character'")
-
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names,
-                                                  normalization_type = "XX"),
+  
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names,
+                                               normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names,
-                                                  iso_levels = LETTERS[seq_len(6)]),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names,
+                                               iso_levels = LETTERS[seq_len(6)]),
                "`iso_levels` must be a valid numeric value")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names,
-                                                  colors_vec = c("pinky", "blackish")),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names,
+                                               colors_vec = c("pinky", "blackish")),
                "`colors_vec` must be a valid color name")
   
-  expect_error(heatmap_combo_with_isoref_qc_panel(dt_excess = dt_excess,
-                                                  dt_isobolograms = dt_isobolograms,
-                                                  drug1_name = drug1_name,
-                                                  drug2_name = drug2_name,
-                                                  cl_names = cl_names,
-                                                  no_breaks = "10"),
+  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
+                                               dt_isobolograms = dt_isobolograms,
+                                               drug1_name = drug1_name,
+                                               drug2_name = drug2_name,
+                                               cl_names = cl_names,
+                                               no_breaks = "10"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
 })
 

@@ -9,7 +9,7 @@
 package help page
 }
 \description{
-gDRplot is a package that stores functions for gDR static visualizations and their dedicated helpers.
+gDRplots is a package that stores functions for gDR static visualizations and their dedicated helpers.
 }
 \note{
 To learn more about functions start with `help(package = "gDRplots")`

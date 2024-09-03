@@ -2,7 +2,8 @@
 #'
 #' @param dt_assay data.table representing data from the assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, <assay_name>)}
-#'    for assay_name like "Normalized" or "Averaged"
+#'    for assay_name like \code{Normalized} or \code{Averaged}
+#'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param cl_name string cell line name to be plotted (Cell Line Name)
 #' @param metric string with variable name to be plotted; it has to be in \code{dt_assay}
 #' @param normalization_type string with normalization_types to be selected

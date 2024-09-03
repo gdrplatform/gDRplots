@@ -5,7 +5,7 @@
 \title{Plot pretty heatmap with annotations for combo data}
 \usage{
 pheatmap_with_anno_combo(
-  tab_response,
+  dt_scores,
   normalization_type = "GR",
   metric = "hsa_score",
   fit_source = "gDR",
@@ -19,8 +19,8 @@ pheatmap_with_anno_combo(
 )
 }
 \arguments{
-\item{tab_response}{\code{data.table} containing drug response metrics
-output from \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "scores" assay 
+\item{dt_scores}{\code{data.table} representing data from the \code{scores} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 and combo \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -75,16 +75,16 @@ Plot pretty heatmap with annotations for combo data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                     assay_name = "scores")
+dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+                                              assay_name = "scores")
 annotation_manual_col <-
-  unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_scores[, .SD, .SDcols = c("CellLineName", "Tissue")])
 annotation_manual_row <-
-  unique(response_metrics[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+  unique(dt_scores[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
 annotation_map <-
-  get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
+  get_ann_color_map(unique(dt_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
 
-output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                    normalization_type = "RV",
                                    metric = "bliss_score",
                                    colors_vec = c("darkblue", "grey90", "darkred"),
@@ -106,7 +106,7 @@ annotation_map <- list(
   mut_B = c("yes" = "black", "no" = "grey90")
 )
 
-output <- pheatmap_with_anno_combo(tab_response = response_metrics,
+output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                    annotation_col = annotation_manual,
                                    annotation_colors = annotation_map,
                                    hm_title = get_hm_title(

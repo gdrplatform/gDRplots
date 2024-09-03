@@ -5,7 +5,7 @@
 \title{Plot pretty heatmap with annotationsfor single-agent data}
 \usage{
 pheatmap_with_anno_sa(
-  tab_response,
+  dt_metrics,
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
@@ -18,8 +18,8 @@ pheatmap_with_anno_sa(
 )
 }
 \arguments{
-\item{tab_response}{\code{data.table} containing drug response metrics
-outputted by \code{\link[gDRutils]{convert_se_assay_to_dt}} for the "Metrics" assay
+\item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -73,21 +73,21 @@ Plot pretty heatmap with annotationsfor single-agent data
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
-response_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                     assay_name = "Metrics")
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                               assay_name = "Metrics")
 
-output <- pheatmap_with_anno_sa(tab_response = response_metrics)
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 hm_1 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_1[["gtable"]])
 
 annotation_manual_col <-
-  unique(response_metrics[,.SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_metrics[, .SD, .SDcols = c("CellLineName", "Tissue")])
 annotation_manual_row <-
-  unique(response_metrics[,.SD, .SDcols = c("DrugName", "drug_moa")])
+  unique(dt_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
 annotation_map <-
-  get_ann_color_map(unique(response_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
+  get_ann_color_map(unique(dt_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
 
-output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 normalization_type = "RV",
                                 metric = "x_mean",
                                 colors_vec = c("darkblue", "grey90"),
@@ -108,7 +108,7 @@ annotation_map <- list(
   mut_B = c("yes" = "black", "no" = "grey90")
 )
 
-output <- pheatmap_with_anno_sa(tab_response = response_metrics,
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 annotation_col = annotation_manual,
                                 annotation_colors = annotation_map,
                                 hm_title = get_hm_title(

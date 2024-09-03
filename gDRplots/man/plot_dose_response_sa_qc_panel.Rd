@@ -15,10 +15,12 @@ plot_dose_response_sa_qc_panel(
 }
 \arguments{
 \item{dt_metrics}{data.table representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+and single-agent \code{SummarizedExperiment}}
 
 \item{dt_average}{data.table representing data from the \code{Averaged} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}}
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+and single-agent \code{SummarizedExperiment}}
 
 \item{cl_name}{string cell line name to be plotted (Cell Line Name)}
 
