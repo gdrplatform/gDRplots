@@ -21,20 +21,20 @@ library(gDRplots)
 
 # Overview
 
-The `gDRplots` package belongs to the `gDR` suite apps. 
+The `gDRplots` package belongs to the `gDR` suite app. 
 
 # Content
 
-The `gDRplots` package is intended to store functions for gDR static visualizations and their dedicated helpers. The package allows users to visualize different metrics for combinations of drugs and cell lines of interest - during and after processing.
+The `gDRplots` package is de to store functions for gDR static visualizations and their dedicated helpers. The package allows users to visualize different metrics for combinations of drugs and cell lines of interest, both during and after processing.
 
-The `gDRplots` package supports metrics: 
+The `gDRplots` package supports the following metrics: 
 
 | Metrics | Definition |
 | ---- | ---------- |
 | **GR value** | Normalized Growth Rate (GR) value; calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 | **Relative Viability** | (RV); calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 
-*Note* All plot functions require as an input data.table representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). More details about gDR data model user can find in the [gDRcore](https://www.bioconductor.org/packages/release/bioc/html/gDRcore.html){target="_blank"} package.
+*Note* All plot functions require as an input data.table representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). More details about the gDR data model user can find in the [gDRcore](https://www.bioconductor.org/packages/release/bioc/html/gDRcore.html){target="_blank"} package.
 
 Used data:
 
@@ -79,15 +79,15 @@ dt_isobolograms <-
 
 ## Dose Response Plots
 
-The dose response plots is classic drug response curves visualization in a consolidated way. 
+The dose-response plots are classic visualizations of drug response curves in a consolidated way. 
 
-The overview with many curves presented on the same scale gives the user a big picture of the dataset, especially in a big compound screening dataset, in which the drug has a universal resistant pattern across all cell lines and becomes easily spotted. The compound generated different sigmoid curves suggesting inhibitory or cytotoxic effects which is worth exploring further. 
+The overview with many curves presented on the same scale gives the user a comprehensive view of the dataset. This is particularly useful in large compound screening datasets, where a drug with a universal resistance pattern across all cell lines can be easily identified. The compound generates different sigmoid curves, suggesting inhibitory or cytotoxic effects, which are worth exploring further.
 
 ### Single-agent Data
 
-The **plot_dose_response_sa** function is dedicated for single-agent experiments.
+The **plot_dose_response_sa** function is dedicated to single-agent experiments.
 
-User can also use  **plot_dose_response_sa_by_CLs** or **plot_dose_response_sa_by_drugs** to get list of dose response plots by cell line names or by drugs accordingly.
+Users can also use  **plot_dose_response_sa_by_CLs** or **plot_dose_response_sa_by_drugs** to get a list of dose-response plots by cell line names or by drugs accordingly.
 
 ```{r plot_dose_response_sa, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("small")
@@ -107,9 +107,9 @@ plot_dose_response_sa(
 
 ### Combination Data
 
-The **plot_dose_response_combo** function is dedicated for combination experiments.
+The **plot_dose_response_combo** function is dedicated to combination experiments.
 
-User can also use **plot_dose_response_combo_panel** to get panel with dose response plots by selected cell line name.
+Users can also use **plot_dose_response_combo_panel** to get a panel with dose-response plots by selected cell line name.
 
 ```{r plot_dose_response_combo, warning = FALSE, message = FALSE}
 plot_dose_response_combo(dt_average = dt_average_combo,
@@ -124,11 +124,11 @@ A heat map built for all combinations of drugs and cell lines, colored according
 
 ### Single-agent Data
 
-The **pheatmap_with_anno_sa** function is dedicated for single-agent experiments.
+The **pheatmap_with_anno_sa** function is dedicated to single-agent experiments.
 
-Additionally, rows are annotated by `Tissue` and columns - by `drug MOA`. User can also use own annotations.
+Additionally, rows are annotated by `Tissue` and columns - by `drug MOA`. Users can also use their own annotations.
 
-This function returns heatmap itself and list of table with data: a matrix and annotation vetcors.
+This function returns the heatmap itself and a list of tables with data: a matrix and annotation vectors.
 
 ```{r pheatmap_with_anno_sa, warning = FALSE, message = FALSE}
 annotation_manual_col <-
@@ -148,11 +148,11 @@ knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 
 ### Combination Data
 
-The **pheatmap_with_anno_combo** function is dedicated for combinations experiments.
+The **pheatmap_with_anno_combo** function is dedicated to combination experiments.
 
-Additionally, rows are annotated by `Tissue` and columns - by `drug MOA` and `co-drug MOA`. User can also use own annotations.
+Additionally, rows are annotated by `Tissue` and columns - by `drug MOA` and `co-drug MOA`. Users can also use their own annotations.
 
-This function returns heatmap itself and list of table with data: a matrix and annotation vectors.
+This function returns the heatmap itself and a list of tables with data: a matrix and annotation vectors.
 
 ```{r pheatmap_with_anno_combo, warning = FALSE, message = FALSE}
 annotation_manual_col <-
@@ -170,11 +170,11 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
-For experiments with drug combinations, user can visualize the full response matrix in panel by using **heatmap_combo_metrics** function. 
+For experiments with drug combinations, users can visualize the full response matrix in the panel by using **heatmap_combo_metrics** function. 
 
-User get at once view with smooth value, HSA (highest single-agent) excess and Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
+Users get at once a view with smooth value, HSA (highest single-agent) excess, and Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
 
-Note, that as default this function returns panel, but it may also return list with those panel's item.
+Note that by default, this function returns a panel, but it can also return a list with the panel's items.
 
 ```{r heatmap_combo_metrics, warning = FALSE, message = FALSE}
 heatmap_combo_metrics(dt_excess = dt_excess,
@@ -185,9 +185,9 @@ heatmap_combo_metrics(dt_excess = dt_excess,
                       iso_levels = "0.5")
 ```
 
-The **heatmap_combo_with_isoref** function allows user to explore the reference isobolograms (additive Loewe model) comapred to the measured isobolograms on the background of smooth value of normalization type.
+The **heatmap_combo_with_isoref** function allows users to explore the reference isobolograms (additive Loewe model) compared to the measured isobolograms on the background of smooth value of normalization type.
 
-User can also use **heatmap_combo_with_isoref_panel** to get panel with heatmap for selected drug name and co-drug name and list of cell line names.
+Users can also use **heatmap_combo_with_isoref_panel** to get a panel with heatmap for selected drug name and co-drug name and list of cell line names.
 
 ```{r heatmap_combo_with_isoref, warning = FALSE, message = FALSE}
 heatmap_combo_with_isoref(dt_excess = dt_excess,
@@ -201,18 +201,19 @@ heatmap_combo_with_isoref(dt_excess = dt_excess,
 
 ## Quality Control 
 
-This group of function is very useful during processing raw data from experiment into the gDR model through gDR pipeline (for more details visit [gDRcore article](https://www.bioconductor.org/packages/release/bioc/vignettes/gDRcore/inst/doc/gDRcore.html){target="_blank"}). 
+This group of functions is very useful during processing raw data from experiments into the gDR model through the gDR pipeline (for more details visit [gDRcore article](https://www.bioconductor.org/packages/release/bioc/vignettes/gDRcore/inst/doc/gDRcore.html){target="_blank"}). 
 
-User can control data quality on each processing step. 
-Also, when using gDR model, the same control might be perform for corresponding assay.
+Users can control data quality at each processing step. 
+
+Also, when using the gDR model, the same control might be performed for the corresponding assay.
 
 ### Mapping Controls to Treated
 
-First stage of the gDR pipeline is dispatching the raw data and controls into the right nested tables.
+The first stage of the gDR pipeline involves dispatching the raw data and controls into the appropriate nested tables.
 
-The **heatmap_control_mapping_qc** function is dedicated for single-agent and combinations experiments. 
+The **heatmap_control_mapping_qc** function is dedicated to single-agent and combination experiments.
 
-It allows to visually check whether the raw data and the control is correct and has been correctly assigned and nothing is missing.
+It allows to visually check whether the raw data and the control are correct and have been correctly assigned and nothing is missing.
 
 ```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE}
 dt_treat <- 
@@ -238,9 +239,9 @@ heatmap_control_mapping_qc(dt_treat = dt_treat,
 
 ### Degree of Errors in Normalization Values
 
-In the gDR pipeline during normalization stage the raw data are normalized based on the control.
+In the gDR pipeline during the normalization stage, the raw data are normalized based on the control.
 
-The **plot_var_distribution_qc** function is dedicated for single-agent and combinations experiments.
+The **plot_var_distribution_qc** function is dedicated to single-agent and combination experiments.
 
 It allows to visually check whether the data distribution after normalization is correct and as expected on a set of violin plots by drug names.
 
@@ -254,13 +255,13 @@ plot_var_distribution_qc(dt_assay = dt_norm_combo,
 
 ### Averaged Values
 
-In the gDR pipeline during averaging stage, technical replicates that are stored in the same nested table are averaged.
+In the gDR pipeline during the averaging stage, technical replicates that are stored in the same nested table are averaged.
 
-The **pheatmap_qc** function is dedicated for single-agent and combinations experiments.
+The **pheatmap_qc** function is dedicated to single-agent and combination experiments.
 
-It allows to visually check whether the average values of selected metric are as expected. 
+It allows to visually check whether the average values of selected metrics are as expected. 
 
-The control heatmap is build for selected cell line names and drugs (for combination experiment - also for co-drug) that are order by concentration.
+The control heatmap is built for selected cell line names and drugs (for the combination experiment - also for co-drug) that are ordered by concentration.
 
 ```{r pheatmap_qc_sa, warning = FALSE, message = FALSE}
 hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
@@ -272,15 +273,15 @@ hm_combo <- pheatmap_qc(dt_average = dt_average_combo)
 ggpubr::as_ggplot(hm_combo[["gtable"]])
 ```
 
-### Accuarcy of Fitting Dose-response Curves
+### Accuracy of Fitting Dose-response Curves
 
-In the gDR pipeline during fitting stage the dose-response curves are fitted and the response metrics for each normalization type are calculated.
+In the gDR pipeline during the fitting stage, the dose-response curves are fitted and the response metrics for each normalization type are calculated.
 
-The **plot_dose_response_sa_qc** function is dedicated for single-agent experiments. 
+The **plot_dose_response_sa_qc** function is dedicated to single-agent experiments.
 
-It allows to visually check whether the fitted dose response curves reflect correctly the measured data after normalization.
+It allows to visually check whether the fitted dose-response curves reflect correctly the measured data after normalization.
 
-User can also use **plot_dose_response_sa_qc_panel** to get panel with the dose response curves - fitted and averaged - for list of cell line names.
+Users can also use **plot_dose_response_sa_qc_panel** to get a panel with the dose-response curves - fitted and averaged - for list of cell line names.
 
 ```{r plot_dose_response_sa_qc, warning = FALSE, message = FALSE}
 plot_dose_response_sa_qc(dt_metrics = dt_metrics_sa,
@@ -290,9 +291,9 @@ plot_dose_response_sa_qc(dt_metrics = dt_metrics_sa,
 ```
 ### Quality Control - Fitting Precision 
 
-The **plot_var_stat_qc** function is dedicated for single-agent experiments.
+The **plot_var_stat_qc** function is dedicated to single-agent experiments.
 
-It allows to visually check values for selected metric (from _metric assay_) and selected cell line name on a lollipop plots by list of drugs.
+It allows to visually check values for the selected metric (from _metric assay_) and selected cell line name on lollipop plots by the list of drugs.
 
 ```{r plot_var_stat_qc, warning = FALSE, message = FALSE}
 plot_var_stat_qc(dt_assay = dt_metrics_sa,
@@ -300,9 +301,9 @@ plot_var_stat_qc(dt_assay = dt_metrics_sa,
                  metric = "x_mean")
 ```
 
-The **plot_fitting_acc** function is dedicated for single-agent experiments.
+The **plot_fitting_acc** function is dedicated to single-agent experiments.
 
-It allows to visually check the fitting precision (`R2` and `RSS` values on one panel) on a lollipop plots for selected cell line name by list of drugs.
+It allows to visually check the fitting precision (`R2` and `RSS` values on one panel) on lollipop plots for selected cell line name by the list of drugs.
 
 ```{r plot_fitting_acc, warning = FALSE, message = FALSE}
 plot_fitting_acc(dt_assay = dt_metrics_sa,
