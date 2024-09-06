@@ -34,4 +34,13 @@ or "x_std" (standard deviation)}
 \description{
 Prep table with metric values by doses for single-agent experiment
 }
+\examples{
+mae <- dsassembly::getDataset(id = "DS000015225")
+se <- mae[["single-agent"]]
+dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                               assay_name = "Averaged")
+d_name <- "G03488889"
+dt_response <- .prep_dt_response_dose_sa(dt_average, d_name)
+
+}
 \keyword{prism_plots}

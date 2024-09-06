@@ -162,6 +162,7 @@
 #'                                               assay_name = "scores")
 #' d_name <- "Paclitaxel"
 #' dt_response <- .prep_dt_response_scores(dt_scores, d_name)
+#' 
 #' dt_response <- .prep_dt_response_scores(dt_scores, d_name, 
 #'                                         metric = c("hsa_score", "bliss_score"))
 #' 
@@ -220,7 +221,6 @@ prep_dt_assoc <- function(dt_response,
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
-  checkmate::assert_string(depmap_col)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -229,6 +229,7 @@ prep_dt_assoc <- function(dt_response,
   gnumber <- gDRutils::get_env_identifiers("drug")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  CCLEName <- NULL # due to NSE notes in R CMD check
   
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
