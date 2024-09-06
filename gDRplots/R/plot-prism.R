@@ -3,9 +3,9 @@
 #' @param dt_assoc \code{data.table} with the calculated linear association between depmap and metrics
 #'     outputted by \code{kaleidoscope::calc_assoc}
 #' @param condition_txt string describing experiment condition 
-#'     (prefered: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_|code{"Duration"})
+#'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
 #' @param correlation_txt string describing association 
-#'     (prefered: \code{metric}_\code{depmap feature of metdata})
+#'     (preferred: \code{metric}_\code{depmap feature of metdata})
 #' @param q_cutoff numeric cutoff to identify statistically significant correlations
 #' @param named_p_top numeric value for p-top statistically significant correlations to be labeled on the plot
 #' @param max_N numeric value for limit maximum number of non-statistically significant points to plot; 
@@ -39,7 +39,7 @@ plot_volcano_assoc <- function(dt_assoc,
     # empty plot
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(correlation_txt, ': all NAs')) +
+      ggplot2::labs(title = paste(correlation_txt, ": all NAs")) +
       ggplot2::theme_bw()
   } else {
     tab_plot <- data.table::setorderv(data.table::copy(dt_assoc), cols = "q_value")
@@ -68,8 +68,8 @@ plot_volcano_assoc <- function(dt_assoc,
       ggplot2::ggplot(data = tab_plot,
                       mapping = ggplot2::aes(x = get(x_lbl), y = get(y_lbl), label = label, color = stat_sig)) +
       ggplot2::geom_point() +
-      ggplot2::scale_x_continuous(trans = 'identity', name = x_lbl) +
-      ggplot2::scale_y_continuous(trans = 'identity', name = y_lbl) +
+      ggplot2::scale_x_continuous(trans = "identity", name = x_lbl) +
+      ggplot2::scale_y_continuous(trans = "identity", name = y_lbl) +
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
                                   name = "Statistically\nSignificant") +
       ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
