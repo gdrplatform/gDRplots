@@ -23,6 +23,7 @@ Suggests:
     BiocStyle,
     BumpyMatrix,
     colorspace,
+    dsassembly,
     gDRtestData (>= 1.3.2),
     gDRstyle (>= 1.3.2),
     ggpubr,
