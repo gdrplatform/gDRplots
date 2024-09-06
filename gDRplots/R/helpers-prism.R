@@ -24,6 +24,7 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @export
 .prep_dt_response_metric_sa <- function(dt_metrics,
                                         d_name,
                                         normalization_type = "RV",
@@ -96,6 +97,7 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @export
 .prep_dt_response_dose_sa <- function(dt_average,
                                       d_name,
                                       normalization_type = "RV",
@@ -169,6 +171,7 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @export
 .prep_dt_response_scores <- function(dt_scores,
                                      d_name,
                                      normalization_type = "RV",
@@ -254,7 +257,7 @@ prep_dt_assoc <- function(dt_response,
     , rownames = "CellLineName"
   )
   
-  # create dt_assoc
-  dt_assoc <- kaleidoscope::calc_assoc(X, Y)
-  return(dt_assoc)
+  # # create dt_assoc # nolint start WIP
+  # dt_assoc <- kaleidoscope::calc_assoc(X, Y)
+  # return(dt_assoc) # nolint end
 }
