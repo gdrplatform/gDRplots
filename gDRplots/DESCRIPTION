@@ -20,6 +20,7 @@ Imports:
     pheatmap,
     RColorBrewer,
 Suggests:
+    artificer.bumpy,
     BiocStyle,
     BumpyMatrix,
     colorspace,
@@ -30,7 +31,6 @@ Suggests:
     ggrepel,
     heatmaply,
     jsonlite,
-    kaleidoscope,
     knitr,
     matrixStats,
     purrr,
