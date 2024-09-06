@@ -18,10 +18,10 @@ plot_volcano_assoc(
 outputted by \code{kaleidoscope::calc_assoc}}
 
 \item{condition_txt}{string describing experiment condition 
-(prefered: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_|code{"Duration"})}
+(preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}
 
 \item{correlation_txt}{string describing association 
-(prefered: \code{metric}_\code{depmap feature of metdata})}
+(preferred: \code{metric}_\code{depmap feature of metdata})}
 
 \item{q_cutoff}{numeric cutoff to identify statistically significant correlations}
 
