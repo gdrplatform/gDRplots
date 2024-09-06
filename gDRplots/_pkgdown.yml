@@ -19,6 +19,10 @@ reference:
   desc:  Functions to plot annotated heatmap with helpers
 - contents:
   - has_keyword("pheat_ann")
+- title: PRISM visualisation
+  desc:  Functions to plot PRISM visualisation with helpers
+- contents:
+  - has_keyword("prism_plots")
 - title: Color helpers
   desc:  Plot color helpers
 - contents:
