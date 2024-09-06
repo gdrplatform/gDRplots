@@ -30,6 +30,7 @@ Suggests:
     ggrepel,
     heatmaply,
     jsonlite,
+    kaleidoscope,
     knitr,
     matrixStats,
     purrr,
