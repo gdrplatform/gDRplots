@@ -1,3 +1,6 @@
+## gDRplots 0.0.32 - 2024-09-06
+* add plot for PRISM data
+
 ## gDRplots 0.0.31 - 2024-09-03
 * add vignette
 
