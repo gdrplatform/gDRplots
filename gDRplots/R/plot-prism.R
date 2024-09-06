@@ -32,6 +32,7 @@ plot_volcano_assoc <- function(dt_assoc,
   
   x_lbl <- "rho"
   y_lbl <- "neglog_q_value"
+  stat_sig <- q_value <- label <- feature <- NULL # due to NSE notes in R CMD check
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, y_lbl, "q_value", "feature"))
   
