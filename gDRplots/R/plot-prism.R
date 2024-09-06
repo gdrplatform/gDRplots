@@ -11,7 +11,7 @@
 #' @param max_N numeric value for limit maximum number of non-statistically significant points to plot; 
 #'     for default \code{NULL} all points will be plotted.
 #'
-#' @return a volcano plot with 
+#' @return a volcano plot with association
 #' @keywords prism_plots
 #' 
 #' @export

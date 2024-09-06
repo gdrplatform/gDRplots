@@ -31,7 +31,7 @@ outputted by \code{kaleidoscope::calc_assoc}}
 for default \code{NULL} all points will be plotted.}
 }
 \value{
-a volcano plot with
+a volcano plot with association
 }
 \description{
 Volcano plot with association
