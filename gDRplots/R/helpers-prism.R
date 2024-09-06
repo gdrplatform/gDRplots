@@ -12,7 +12,7 @@
 #' @param fit_source string source name for metrics
 #' 
 #' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225)
+#' mae <- dsassembly::getDataset(id = "DS000015225")
 #' se <- mae[["single-agent"]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")
@@ -86,7 +86,7 @@
 #' @param fit_source string source name for metrics
 #' 
 #' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225)
+#' mae <- dsassembly::getDataset(id = "DS000015225")
 #' se <- mae[["single-agent"]]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Averaged")
@@ -156,7 +156,7 @@
 #' @param fit_source string source name for metrics
 #' 
 #' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225)
+#' mae <- dsassembly::getDataset(id = "DS000015225")
 #' se <- mae[["matrix"]]
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                               assay_name = "scores")
@@ -222,8 +222,13 @@ prep_dt_assoc <- function(dt_response,
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_string(depmap_col)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-  
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
   
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
