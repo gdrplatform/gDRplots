@@ -29,9 +29,7 @@
                                         d_name,
                                         normalization_type = "RV",
                                         metric = "xc50",
-                                        fit_source = "gDR"
-                                        
-) {
+                                        fit_source = "gDR") {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -102,9 +100,7 @@
                                       d_name,
                                       normalization_type = "RV",
                                       metric = "x",
-                                      fit_source = "gDR"
-                                      
-) {
+                                      fit_source = "gDR") {
   # TODO add ls_conc -> user can selec conc
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -175,9 +171,7 @@
                                      d_name,
                                      normalization_type = "RV",
                                      metric = "hsa_score",
-                                     fit_source = "gDR"
-                                     
-) {
+                                     fit_source = "gDR") {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -231,6 +225,7 @@ prep_dt_assoc <- function(dt_response,
   gnumber <- gDRutils::get_env_identifiers("drug")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
   CCLEName <- NULL # due to NSE notes in R CMD check
   
   # shared cell line
@@ -247,13 +242,11 @@ prep_dt_assoc <- function(dt_response,
   # convert to a matrix
   x_col <- setdiff(names(X_dt), c("ModelID", "CCLEName"))
   X <- as.matrix(
-    X_dt[, .SD, .SDcols = c("CCLEName", x_col)]
-    , rownames = "CCLEName"
+    X_dt[, .SD, .SDcols = c("CCLEName", x_col)], rownames = "CCLEName"
   )
   y_col <- setdiff(names(Y_dt), c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
   Y <- as.matrix(
-    Y_dt[, .SD, .SDcols = c("CellLineName", y_col)]
-    , rownames = "CellLineName"
+    Y_dt[, .SD, .SDcols = c("CellLineName", y_col)], rownames = "CellLineName"
   )
   
   # # create dt_assoc # nolint start WIP
