@@ -34,15 +34,4 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 \description{
 Prep table with metric values for single-agent experiment
 }
-\examples{
-mae <- dsassembly::getDataset(id = "DS000015225")
-se <- mae[["single-agent"]]
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                               assay_name = "Metrics")
-d_name <- "G03488889"
-dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name)
-dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name, 
-                                           metric = c("xc50", "x_mean", "x_max"))
-
-}
 \keyword{prism_plots}

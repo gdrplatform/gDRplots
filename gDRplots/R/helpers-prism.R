@@ -11,16 +11,6 @@
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' 
-#' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225")
-#' se <- mae[["single-agent"]]
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Metrics")
-#' d_name <- "G03488889"
-#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name)
-#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name, 
-#'                                            metric = c("xc50", "x_mean", "x_max"))
-#' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
@@ -86,14 +76,6 @@
 #'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' 
-#' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225")
-#' se <- mae[["single-agent"]]
-#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Averaged")
-#' d_name <- "G03488889"
-#' dt_response <- .prep_dt_response_dose_sa(dt_average, d_name)
-#' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
@@ -156,17 +138,6 @@
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
-#' 
-#' @examples
-#' mae <- dsassembly::getDataset(id = "DS000015225")
-#' se <- mae[["matrix"]]
-#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                               assay_name = "scores")
-#' d_name <- "Paclitaxel"
-#' dt_response <- .prep_dt_response_scores(dt_scores, d_name)
-#' 
-#' dt_response <- .prep_dt_response_scores(dt_scores, d_name, 
-#'                                         metric = c("hsa_score", "bliss_score"))
 #' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
