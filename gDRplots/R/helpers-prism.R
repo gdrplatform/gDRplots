@@ -14,6 +14,16 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#' d_name <- "drug_004"
+#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name)
+#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name,
+#'                                            metric = c("xc50", "x_mean", "x_max"))
+#' 
 #' @export
 .prep_dt_response_metric_sa <- function(dt_metrics,
                                         d_name,
@@ -79,6 +89,14 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Averaged")
+#' d_name <- "drug_004"
+#' dt_response <- .prep_dt_response_dose_sa(dt_average, d_name)
+#' 
 #' @export
 .prep_dt_response_dose_sa <- function(dt_average,
                                       d_name,
@@ -142,6 +160,16 @@
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "scores")
+#' d_name <- "drug_004"
+#' dt_response <- .prep_dt_response_scores(dt_scores, d_name)
+#' dt_response <- .prep_dt_response_scores(dt_scores, d_name,
+#'                                         metric = c("hsa_score", "bliss_score"))
+#' 
 #' @export
 .prep_dt_response_scores <- function(dt_scores,
                                      d_name,
@@ -196,7 +224,7 @@ prep_dt_assoc <- function(dt_response,
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")

@@ -34,4 +34,15 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 \description{
 Prep table with metric values for combination experiment
 }
+\examples{
+mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+                                              assay_name = "scores")
+d_name <- "drug_004"
+dt_response <- .prep_dt_response_scores(dt_scores, d_name)
+dt_response <- .prep_dt_response_scores(dt_scores, d_name,
+                                        metric = c("hsa_score", "bliss_score"))
+
+}
 \keyword{prism_plots}
