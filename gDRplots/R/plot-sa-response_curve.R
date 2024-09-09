@@ -462,7 +462,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
         data = dt_reconstructed_fit,
         ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
       ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
-      ggplot2::scale_x_log10(oob = scales::squish_infinite) + +
+      ggplot2::scale_x_log10(oob = scales::squish_infinite) +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
       ggplot2::ylab(normalization_type) +
@@ -620,7 +620,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
       data = dt_reconstructed_fit,
       ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
-    ggplot2::scale_x_log10(oob = scales::squish_infinite) + +
+    ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(normalization_type) +
