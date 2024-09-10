@@ -115,7 +115,7 @@ Users can also use **plot_dose_response_combo_panel** to get a panel with dose-r
 plot_dose_response_combo(dt_average = dt_average_combo,
                          drug1_name = "drug_011",
                          drug2_name = "drug_021",
-                         cl_name = "cellline_BC")
+                         cl_name = "cellline_NE")
 ```
 
 ## Metrics plot
@@ -181,7 +181,7 @@ heatmap_combo_metrics(dt_excess = dt_excess,
                       dt_isobolograms = dt_isobolograms,
                       drug1_name = "drug_001", 
                       drug2_name = "drug_026",
-                      cl_name = "cellline_BC",
+                      cl_name = "cellline_NE",
                       iso_levels = "0.5")
 ```
 
@@ -194,7 +194,7 @@ heatmap_combo_with_isoref(dt_excess = dt_excess,
                           dt_isobolograms = dt_isobolograms,
                           drug1_name = "drug_001", 
                           drug2_name = "drug_026",
-                          cl_name = "cellline_BC",
+                          cl_name = "cellline_NE",
                           iso_levels = c("0.2", "0.5", "0.8"))
 ```
 
@@ -247,10 +247,10 @@ It allows to visually check whether the data distribution after normalization is
 
 ```{r plot_var_distribution_qc, warning = FALSE, message = FALSE}
 plot_var_distribution_qc(dt_assay = dt_norm_sa,
-                         cl_name = "cellline_BC")
+                         cl_name = "cellline_NE")
 
 plot_var_distribution_qc(dt_assay = dt_norm_combo,
-                         cl_name = "cellline_BC")
+                         cl_name = "cellline_NE")
 ```
 
 ### Averaged Values
@@ -286,9 +286,10 @@ Users can also use **plot_dose_response_sa_qc_panel** to get a panel with the do
 ```{r plot_dose_response_sa_qc, warning = FALSE, message = FALSE}
 plot_dose_response_sa_qc(dt_metrics = dt_metrics_sa,
                          dt_average = dt_average_sa,
-                         cl_name = "cellline_BC",
+                         cl_name = "cellline_AA",
                          d_name = "drug_001")
 ```
+
 ### Quality Control - Fitting Precision 
 
 The **plot_var_stat_qc** function is dedicated to single-agent experiments.
@@ -297,7 +298,7 @@ It allows to visually check values for the selected metric (from _metric assay_)
 
 ```{r plot_var_stat_qc, warning = FALSE, message = FALSE}
 plot_var_stat_qc(dt_assay = dt_metrics_sa,
-                 cl_name = "cellline_NE",
+                 cl_name = "cellline_AA",
                  metric = "x_mean")
 ```
 
@@ -307,7 +308,7 @@ It allows to visually check the fitting precision (`R2` and `RSS` values on one 
 
 ```{r plot_fitting_acc, warning = FALSE, message = FALSE}
 plot_fitting_acc(dt_assay = dt_metrics_sa,
-                 cl_name = "cellline_NE")
+                 cl_name = "cellline_EA")
 ```
 
 # SessionInfo {-}
