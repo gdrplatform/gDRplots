@@ -293,12 +293,17 @@
   
   # calculate differences
   dt_combo_diff <- 
-    dt_combo_diff[, (paste0(metric, "_cotrt_diff")) := Map('-', mget(paste0(metric, "_cotrt")), mget(paste0(metric, "_cotrt_zero")))]
+    dt_combo_diff[, (paste0(metric, "_cotrt_diff")) := Map("-", 
+                                                           mget(paste0(metric, "_cotrt")), 
+                                                           mget(paste0(metric, "_cotrt_zero")))]
   data.table::setcolorder(dt_combo_diff, c(meta_col,  "cotrt_value_zero", "cotrt_value"))
   
   # final
-  met_col <- 
-    c(vapply(metric, function(met) names(dt_combo_diff)[grepl(met, names(dt_combo_diff))], character(3), USE.NAMES = FALSE))
+  met_col <- c(
+    vapply(metric, function(met) {
+      names(dt_combo_diff)[grepl(met, names(dt_combo_diff))]
+    }, FUN.VALUE = character(3), USE.NAMES = FALSE)
+  )
   data.table::setnames(dt_combo_diff, met_col, sprintf("%s_%s_%s", normalization_type, fit_source, met_col))
   unique(dt_combo_diff)
 }
