@@ -80,3 +80,75 @@ plot_volcano_assoc <- function(dt_assoc,
   
   return(plt)
 }
+
+#' Plot scatter with correlation
+#'
+#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
+#'  outputted by one of functions: \code{\link[gDRplots]{.prep_dt_response_metric_sa}},
+#'  \code{\link[gDRplots]{.prep_dt_response_dose_sa}}, \code{\link[gDRplots]{.prep_dt_response_scores}}
+#'  or \code{\link[gDRplots]{.prep_dt_response_metric_diff}}, 
+#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
+#'    feature or one metadata; (rows are samples, columns are features or meta). 
+#'    (rows are samples, columns are features or meta).
+#'
+#' @return a scatter plot with correlation
+#' @keywords prism_plots
+#' 
+#' @export
+plot_scatter_with_corr <- function(dt_response,
+                                   dt_depmap, 
+                                   selected_feat) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
+  checkmate::assert_string(selected_feat)
+  
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
+  stopifnot("PRovide dt_response for one metric" = NROW(selected_metric) == 1)
+  
+  CCLEName <- NULL # due to NSE notes in R CMD check
+  
+  # prep table with data to plot
+  X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
+  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+  # remove NA
+  tab_plot <- stats::na.omit(tab_plot)
+  
+  # re-calculate correlation
+  c <- stats::cor(tab_plot[[selected_feat]], tab_plot[[selected_metric]], 
+                  method = "pearson", use = "pairwise.complete.obs") 
+  # calculate slope (b1 = r * (sd(y) / sd(x)))
+  slope <- c * (stats::sd(tab_plot[[selected_metric]]) / stats::sd(tab_plot[[selected_feat]])) 
+  # calculate intercept (b0 = mean(y) - b1 * mean(x))
+  intercept <- mean(tab_plot[[selected_metric]]) - slope * mean(tab_plot[[selected_feat]])
+  
+  # plot title
+  feature_type <- "placeholder"
+  plt_title <- 
+    sprintf("%s\n corr=%2.2f, slope=%2.2f, intercept=%2.2f", 
+            feature_type, c, slope, intercept)
+  
+  plt <-        
+    ggplot2::ggplot(
+      data = tab_plot,
+      mapping =  ggplot2::aes(x = get(selected_feat), y = get(selected_metric), label = get(cellline_name))) +
+    ggplot2::geom_point() +
+    ggplot2::scale_x_continuous(trans = "identity", name = selected_feat) +
+    ggplot2::scale_y_continuous(trans = "identity", name = selected_metric) +
+    ggrepel::geom_text_repel(size = 2) +
+    ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
+    ggplot2::labs(title = plt_title) +
+    ggplot2::theme_bw()
+  
+  return(plt)
+}
