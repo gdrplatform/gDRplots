@@ -9,7 +9,7 @@ prep_dt_assoc(dt_response, dt_depmap)
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples).}
 
-\item{dt_depmap}{\code{data.table} with dependent variables data matrix 
+\item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
 (rows are samples, columns are features or meta).}
 }
 \value{

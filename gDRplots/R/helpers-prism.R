@@ -311,7 +311,7 @@
 #' Prep table with calculated linear associations
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples).
-#' @param dt_depmap \code{data.table} with dependent variables data matrix 
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'    (rows are samples, columns are features or meta).
 #'
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}
@@ -342,7 +342,7 @@ prep_dt_assoc <- function(dt_response,
   X_dt <- dt_depmap[CCLEName %in% shared_lines]
   data.table::setorder(X_dt, "CCLEName")
   Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
-  data.table::setorder(Y_dt, cellline_name)
+  data.table::setorderv(Y_dt, cellline_name)
   
   # convert to a matrix
   x_col <- setdiff(names(X_dt), c("ModelID", "CCLEName"))
