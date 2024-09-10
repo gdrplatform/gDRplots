@@ -469,17 +469,17 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
       ggplot2::ylab(normalization_type) +
       ggplot2::ggtitle(plt_title) +
-      ggplot2::labs(color = "") +
+      ggplot2::labs(color = legend_title) +
       ggplot2::theme_bw() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                      axis.text.y = ggplot2::element_text(size = 8),
                      plot.title = ggplot2::element_text(size = 10),
+                     legend.title = ggplot2::element_text(size = 10),
                      panel.grid.minor = ggplot2::element_blank(),
                      aspect.ratio = 1) +
       ggplot2::scale_color_manual(values = c("Errors Bar" = "black",
                                              "Averaged Data" = "black",
-                                             "Fitted Curve" = "red"),
-                                  name = legend_title)
+                                             "Fitted Curve" = "red"))
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
