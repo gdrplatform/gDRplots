@@ -205,8 +205,8 @@
 
 #' Prep table with metric values for combination experiment
 #' 
-#' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
@@ -223,11 +223,11 @@
 #' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                               assay_name = "Metrics")
+#'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name)
 #' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name,
-#'                                              metric = c("hsa_score", "bliss_score"))
+#'                                              metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 .prep_dt_response_metric_diff <- function(dt_metrics,
@@ -235,12 +235,15 @@
                                           normalization_type = "RV",
                                           metric = "xc50",
                                           fit_source = "gDR") {
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
+  cotrt_value <- NULL # due to NSE notes in R CMD check
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
@@ -283,11 +286,12 @@
   
   # merge zero and non zero
   dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "source"), nomatch = NULL]
+  dt_combo_diff <- dt_combo_merged[source == "row_fittings", ][, source := NULL]
   
   # calculate differences
   dt_combo_diff <- 
-    dt_combo_merged[, (paste0(metric, "_cotrt_diff")) := Map('-', mget(paste0(metric, "_cotrt")), mget(paste0(metric, "_cotrt_zero")))]
-  data.table::setcolorder(dt_combo_diff, c(meta_col, "source", "cotrt_value_zero", "cotrt_value"))
+    dt_combo_diff[, (paste0(metric, "_cotrt_diff")) := Map('-', mget(paste0(metric, "_cotrt")), mget(paste0(metric, "_cotrt_zero")))]
+  data.table::setcolorder(dt_combo_diff, c(meta_col,  "cotrt_value_zero", "cotrt_value"))
   
   # final
   met_col <- 

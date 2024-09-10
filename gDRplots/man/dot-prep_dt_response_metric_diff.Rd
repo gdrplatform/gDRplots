@@ -13,6 +13,10 @@
 )
 }
 \arguments{
+\item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
+outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+and combo \code{SummarizedExperiment}}
+
 \item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -23,10 +27,6 @@ one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
-
-\item{dt_scores}{\code{data.table} representing data from the \code{scores} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
-and combo \code{SummarizedExperiment}}
 }
 \value{
 \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
@@ -38,11 +38,11 @@ Prep table with metric values for combination experiment
 mae <- gDRutils::get_synthetic_data("combo_matrix_small")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                              assay_name = "Metrics")
+                                               assay_name = "Metrics")
 d_name <- "drug_004"
 dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name)
 dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name,
-                                             metric = c("hsa_score", "bliss_score"))
+                                             metric = c("xc50", "x_mean", "x_max"))
 
 }
 \keyword{prism_plots}
