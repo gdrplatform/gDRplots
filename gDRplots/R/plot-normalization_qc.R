@@ -82,12 +82,12 @@ plot_var_distribution_qc <- function(dt_assay,
   
   plt <- 
     ggplot2::ggplot(tab_subplot, ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#555555", linetype = "solid") +
+    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
     ggplot2::geom_violin(ggplot2::aes(fill = get(drug_name), color = get(drug_name)),
                          alpha = 0.25, na.rm = TRUE, drop = FALSE) +
     ggplot2::scale_fill_manual(values = color_palette) +
     ggplot2::scale_color_manual(values = color_palette) +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#555555") + 
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
     ggplot2::theme_minimal() +
     ggplot2::labs(y = sprintf("%s for %s", metric, normalization_type), x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
@@ -95,7 +95,7 @@ plot_var_distribution_qc <- function(dt_assay,
   
   if (!all(is.na(tab_subplot[[metric]])) && max(tab_subplot[[metric]], na.rm = TRUE) > 0.5) {
     plt <- plt +
-      ggplot2::geom_hline(yintercept = 1, color = "#555555", linetype = "dashed")
+      ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
   }
   
   return(plt)

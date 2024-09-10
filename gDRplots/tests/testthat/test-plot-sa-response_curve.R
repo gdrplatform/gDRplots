@@ -123,8 +123,9 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                     d_name = d_name)
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
-  expect_true(grepl(d_name, plt_1[["labels"]][["title"]]))
-  expect_length(plt_1[["layers"]], 4)
+  expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
+  expect_true(grepl(d_name, plt_1[["labels"]][["colour"]]))
+  expect_length(plt_1[["layers"]], 5)
   
   normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
