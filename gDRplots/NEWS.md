@@ -1,5 +1,11 @@
-## gDRplots 0.0.32 - 2024-09-06
+## gDRplots 0.0.34 - 2024-09-11
 * add plot for PRISM data
+
+## gDRplots 0.0.33 - 2024-09-10
+* increase the readability of QC dose-response curves for single-agent
+
+## gDRplots 0.0.32 - 2024-09-09
+* fix infinity values on the x-axis
 
 ## gDRplots 0.0.31 - 2024-09-03
 * add vignette

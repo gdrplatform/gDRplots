@@ -121,7 +121,7 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
-    ggplot2::scale_x_continuous(trans = "log10") +
+    ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_color_manual(values = colormap, 
                                 labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
@@ -253,7 +253,7 @@ plot_dose_response_combo_panel <- function(dt_average,
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
-    ggplot2::scale_x_continuous(trans = "log10") +
+    ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_color_manual(values = colormap, 
                                 labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
     ggplot2::xlab(bquote(~ "Concentration of Drug [" ~ mu * M ~ "]")) +
