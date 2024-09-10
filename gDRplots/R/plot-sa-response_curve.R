@@ -151,7 +151,7 @@ plot_dose_response_sa <- function(dt_metrics,
   # final plot
   plt <-
     ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
     ggplot2::scale_color_manual(values = color_values,
                                 name = ifelse(grouping == cellline_name, "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
@@ -450,6 +450,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
     # plot
     plt <-
       ggplot2::ggplot() +
+      ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+      ggplot2::geom_line(
+        data = dt_reconstructed_fit,
+        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
       ggplot2::geom_errorbar(
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
@@ -458,10 +462,6 @@ plot_dose_response_sa_qc <- function(dt_metrics,
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
         linetype = "dashed") +
-      ggplot2::geom_line(
-        data = dt_reconstructed_fit,
-        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
-      ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
       ggplot2::scale_x_log10(oob = scales::squish_infinite) +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -608,18 +608,18 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   
   plt <- 
     ggplot2::ggplot() + 
+    ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+    ggplot2::geom_line(
+      data = dt_reconstructed_fit,
+      ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
     ggplot2::geom_errorbar(
       data = dt_average_plot,
       ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
       width = 0.1, position = ggplot2::position_dodge(0.1)) +
-    ggplot2::geom_line(
+    ggplot2::geom_point(
       data = dt_average_plot,
       ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
-      linetype = "dashed") +
-    ggplot2::geom_line(
-      data = dt_reconstructed_fit,
-      ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#555555") +
+      shape = 20) +
     ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -632,7 +632,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                    plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank(),
                    aspect.ratio = 1) +
-    ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
+    ggplot2::scale_color_manual(values = c("Errors Bar" = "black",
                                            "Averaged Data" = "black",
                                            "Fitted Curve" = "red")) +
     ggplot2::facet_wrap(~get(drug_name)) +

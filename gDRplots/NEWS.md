@@ -1,3 +1,6 @@
+## gDRplots 0.0.33 - 2024-09-10
+* increase readability of QC dose-response curves for single-agent
+
 ## gDRplots 0.0.32 - 2024-09-09
 * fix infinity values on the x-axis
 
