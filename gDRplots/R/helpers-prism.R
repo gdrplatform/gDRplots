@@ -130,9 +130,9 @@
     fill = NA
   )
   data.table::setkey(dt_response_dose_fin, NULL)
-  ls_con <- names(dt_response_dose_fin)[names(dt_response_dose_fin) != "cellline_name"]
+  ls_conc <- names(dt_response_dose_fin)[names(dt_response_dose_fin) != "cellline_name"]
   data.table::setnames(dt_response_dose_fin, names(dt_response_dose_fin), 
-                       c(cellline_name, sprintf("%s_%s_%s", normalization_type, fit_source, ls_con)))
+                       c(cellline_name, sprintf("%s_%s_%s", normalization_type, fit_source, ls_conc)))
   
   # final
   meta_col <- c(cellline_name, clid, drug_name, gnumber)
@@ -202,6 +202,99 @@
   data.table::setnames(dt_response_scores, metric, sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
 
+
+#' Prep table with metric values for combination experiment
+#' 
+#' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  and combo \code{SummarizedExperiment}
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of combo metric;
+#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param fit_source string source name for metrics
+#' 
+#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @keywords prism_plots
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "Metrics")
+#' d_name <- "drug_004"
+#' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name)
+#' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name,
+#'                                              metric = c("hsa_score", "bliss_score"))
+#' 
+#' @export
+.prep_dt_response_metric_diff <- function(dt_metrics,
+                                          d_name,
+                                          normalization_type = "RV",
+                                          metric = "xc50",
+                                          fit_source = "gDR") {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(metric, any.missing = FALSE)
+  checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_response_metric <- dt_metrics[eval(filter_expr)]
+  
+  # select required columns
+  dt_response_metric <- dt_response_metric[get(drug_name) == d_name, ]
+  
+  # take care of Inf and NaN values in IC50 metrics
+  if (any(metric == "xc50")) {
+    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]]) # TODO check: Inf & -Inf
+    if (any(inf_xc50)) {
+      dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
+      # check whether all metric are below 10 ^ maxlog10Concentration
+      over_xc50 <- dt_response_metric[["xc50"]] > 10^dt_response_metric[["maxlog10Concentration"]]
+      if (any(over_xc50)) {
+        dt_response_metric[over_xc50, ][["xc50"]] <- 10^dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
+      }
+    }
+  }
+  
+  # create entries of non-zero co-trt
+  meta_col <- c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2)
+  ls_cols <- c(meta_col, "cotrt_value", "source", metric)
+  dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
+  data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
+  
+  # create entries of zero co-trt (single agent)
+  dt_zero <- data.table::copy(dt_response_metric)[cotrt_value == 0, .SD, .SDcols = ls_cols]
+  data.table::setnames(dt_zero, c("cotrt_value", metric), c("cotrt_value_zero", paste0(metric, "_cotrt_zero")))
+  
+  # merge zero and non zero
+  dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "source"), nomatch = NULL]
+  
+  # calculate differences
+  dt_combo_diff <- 
+    dt_combo_merged[, (paste0(metric, "_cotrt_diff")) := Map('-', mget(paste0(metric, "_cotrt")), mget(paste0(metric, "_cotrt_zero")))]
+  data.table::setcolorder(dt_combo_diff, c(meta_col, "source", "cotrt_value_zero", "cotrt_value"))
+  
+  # final
+  met_col <- 
+    c(vapply(metric, function(met) names(dt_combo_diff)[grepl(met, names(dt_combo_diff))], character(3), USE.NAMES = FALSE))
+  data.table::setnames(dt_combo_diff, met_col, sprintf("%s_%s_%s", normalization_type, fit_source, met_col))
+  dt_combo_diff
+}
 
 #' Prep table with calculated linear associations
 #'
