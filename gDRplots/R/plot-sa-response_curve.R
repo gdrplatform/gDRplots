@@ -436,16 +436,15 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                                                                  dt_metrics_plot$x_0,
                                                                  dt_metrics_plot$ec50,
                                                                  dt_metrics_plot$h)
-    dt_reconstructed_fit <- data.table::data.table(
-      Concentration = sampled_conc,
-      x = fitted_curve_sampled
-    )
+    dt_reconstructed_fit <- data.table::data.table(Concentration = sampled_conc,
+                                                   x = fitted_curve_sampled)
     
     # set min and max values for y 
     ymin <- min(c(0, min(dt_average_plot$x)))
     ymax <- max(c(1.2, max(dt_average_plot$x)))
     
-    plt_title <- dt_metrics_plot[[drug_name]]
+    legend_title <- d_name
+    plt_title <- cl_name
     
     # plot
     plt <-
@@ -461,7 +460,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_line(
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
-        linetype = "dashed") +
+        linetype = "longdash") +
+      ggplot2::geom_point(
+        data = dt_average_plot,
+        ggplot2::aes(x = get(conc), y = x, color = "Averaged Data")) +
       ggplot2::scale_x_log10(oob = scales::squish_infinite) +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -474,9 +476,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                      plot.title = ggplot2::element_text(size = 10),
                      panel.grid.minor = ggplot2::element_blank(),
                      aspect.ratio = 1) +
-      ggplot2::scale_color_manual(values = c("Errors Bar" = "#A9A9A9",
+      ggplot2::scale_color_manual(values = c("Errors Bar" = "black",
                                              "Averaged Data" = "black",
-                                             "Fitted Curve" = "red"))
+                                             "Fitted Curve" = "red"),
+                                  name = legend_title)
   } else {
     txt_err <- sprintf(
       "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
