@@ -41,8 +41,9 @@ dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
 d_name <- "drug_004"
 dt_response <- .prep_dt_response_scores(dt_scores, d_name)
-dt_response <- .prep_dt_response_scores(dt_scores, d_name,
-                                        metric = c("hsa_score", "bliss_score"))
-
+dt_response <- 
+  .prep_dt_response_scores(dt_scores, d_name,
+                           metric = c("hsa_score", "bliss_score"))
+#' 
 }
 \keyword{prism_plots}

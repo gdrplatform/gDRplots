@@ -21,8 +21,9 @@
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name)
-#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name,
-#'                                            metric = c("xc50", "x_mean", "x_max"))
+#' dt_response <- 
+#'   .prep_dt_response_metric_sa(dt_metrics, d_name,
+#'                               metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 .prep_dt_response_metric_sa <- function(dt_metrics,
@@ -163,9 +164,10 @@
 #'                                               assay_name = "scores")
 #' d_name <- "drug_004"
 #' dt_response <- .prep_dt_response_scores(dt_scores, d_name)
-#' dt_response <- .prep_dt_response_scores(dt_scores, d_name,
-#'                                         metric = c("hsa_score", "bliss_score"))
-#' 
+#' dt_response <- 
+#'   .prep_dt_response_scores(dt_scores, d_name,
+#'                            metric = c("hsa_score", "bliss_score"))
+#' #' 
 #' @export
 .prep_dt_response_scores <- function(dt_scores,
                                      d_name,
@@ -226,8 +228,9 @@
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name)
-#' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name,
-#'                                              metric = c("xc50", "x_mean", "x_max"))
+#' dt_response <- 
+#'   .prep_dt_response_metric_diff(dt_metrics, d_name,
+#'                                 metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 .prep_dt_response_metric_diff <- function(dt_metrics,
@@ -297,7 +300,7 @@
   met_col <- 
     c(vapply(metric, function(met) names(dt_combo_diff)[grepl(met, names(dt_combo_diff))], character(3), USE.NAMES = FALSE))
   data.table::setnames(dt_combo_diff, met_col, sprintf("%s_%s_%s", normalization_type, fit_source, met_col))
-  dt_combo_diff
+  unique(dt_combo_diff)
 }
 
 #' Prep table with calculated linear associations
