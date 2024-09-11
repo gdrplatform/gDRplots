@@ -88,7 +88,6 @@ plot_volcano_assoc <- function(dt_assoc,
 #'  or \code{\link[gDRplots]{.prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    feature or one metadata; (rows are samples, columns are features or meta). 
-#'    (rows are samples, columns are features or meta).
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #'
 #' @return a scatter plot with correlation
@@ -113,7 +112,7 @@ plot_scatter_with_corr <- function(dt_response,
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
-  stopifnot("PRovide dt_response for one metric" = NROW(selected_metric) == 1)
+  stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
   CCLEName <- NULL # due to NSE notes in R CMD check
   
@@ -149,6 +148,70 @@ plot_scatter_with_corr <- function(dt_response,
     ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
     ggplot2::labs(title = plt_title) +
     ggplot2::theme_bw()
+  
+  return(plt)
+}
+
+
+#' Plot boxplot for metric values grouped by metadata from DepMap
+#'
+#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
+#'  outputted by one of functions: \code{\link[gDRplots]{.prep_dt_response_metric_sa}},
+#'  \code{\link[gDRplots]{.prep_dt_response_dose_sa}}, \code{\link[gDRplots]{.prep_dt_response_scores}}
+#'  or \code{\link[gDRplots]{.prep_dt_response_metric_diff}}, 
+#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
+#'    metadata; (rows are samples, columns are features or meta). 
+#' @param selected_meta string with name of selected meta data from \code{dt_depmap}
+#'
+#' @return a boxplot
+#' @keywords prism_plots
+#' 
+#' @export
+plot_boxplot_meta <- function(dt_response,
+                              dt_depmap, 
+                              selected_meta) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  clid <- gDRutils::get_env_identifiers("cellline")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_meta))
+  checkmate::assert_string(selected_meta)
+  
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
+  stopifnot("Provide `dt_response` for one metric" = NROW(selected_metric) == 1)
+  
+  stopifnot("There is no data in `dt_depmap`" = !all(is.na(dt_depmap[[selected_meta]])))
+  stopifnot("It seems that `dt_depmap` has too many categories - try use `plot_scatter_with_corr()`" = 
+              NROW(unique(dt_depmap[!is.na(get(selected_meta)), ])) <  NROW(dt_depmap[!is.na(get(selected_meta)), ]))
+  
+  CCLEName <- NULL # due to NSE notes in R CMD check
+  
+  # prep table with data to plot
+  X_dt <- dt_depmap[, c("CCLEName", selected_meta), with = FALSE]
+  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+  # remove NA
+  tab_plot <- stats::na.omit(tab_plot)
+
+  plt <-        
+    ggplot2::ggplot(
+      data = tab_plot,
+      mapping =  ggplot2::aes(x = get(selected_meta), y = get(selected_metric))) +
+    ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+    ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+    ggplot2::labs(y = selected_metric, x = selected_meta, title = selected_meta) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "none",
+                   axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
   
   return(plt)
 }
