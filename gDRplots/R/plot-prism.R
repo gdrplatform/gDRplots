@@ -189,8 +189,9 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_int(max_x_lbl_length, lower = 5)
   
-  selected_metric <- setdiff(names(dt_response), 
-                             c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
+  selected_metric <- setdiff(
+    names(dt_response), 
+    c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2, "cotrt_value_zero", "cotrt_value"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
   stopifnot("There is no data in `dt_depmap` (all `selected_meta` is NA)." = !all(is.na(dt_depmap[[selected_meta]])))
@@ -213,7 +214,7 @@ plot_boxplot_meta <- function(dt_response,
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
-
+  
   # plot without group with only on item
   if (!with_1_item_grp) {
     multi_item_grp <- tab_plot[, .N, by = selected_meta][N > 1, ][[selected_meta]]
@@ -221,7 +222,8 @@ plot_boxplot_meta <- function(dt_response,
   }
   
   # some labels may be too long to see the boxes 
-  if (any(nchar(unique(tab_plot[[selected_meta]])) > max_x_lbl_length)) {
+  if (is.character(tab_plot[[selected_meta]]) && 
+      any(nchar(unique(tab_plot[[selected_meta]])) > max_x_lbl_length)) {
     too_long_lbl <- which(nchar(tab_plot[[selected_meta]]) > max_x_lbl_length)
     tab_plot[too_long_lbl, ][[selected_meta]] <- 
       paste0(substr(tab_plot[too_long_lbl, ][[selected_meta]], 1, max_x_lbl_length - 3), "...")
