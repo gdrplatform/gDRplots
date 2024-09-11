@@ -20,8 +20,7 @@ plot_volcano_assoc <- function(dt_assoc,
                                correlation_txt,
                                q_cutoff = 0.05,
                                named_p_top = 10,
-                               max_N = NULL
-) {
+                               max_N = NULL) {
   
   checkmate::assert_data_table(dt_assoc)
   checkmate::assert_string(condition_txt)
@@ -90,6 +89,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    feature or one metadata; (rows are samples, columns are features or meta). 
 #'    (rows are samples, columns are features or meta).
+#' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #'
 #' @return a scatter plot with correlation
 #' @keywords prism_plots

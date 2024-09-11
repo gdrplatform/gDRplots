@@ -15,6 +15,8 @@ or \code{\link[gDRplots]{.prep_dt_response_metric_diff}},}
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one
 feature or one metadata; (rows are samples, columns are features or meta). 
 (rows are samples, columns are features or meta).}
+
+\item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 }
 \value{
 a scatter plot with correlation
