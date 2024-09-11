@@ -89,12 +89,14 @@
 #' @keywords prism_plots
 #' 
 #' @examples
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Averaged")
 #' d_name <- "drug_004"
 #' dt_response <- .prep_dt_response_dose_sa(dt_average, d_name)
+#' }
 #' 
 #' @export
 .prep_dt_response_dose_sa <- function(dt_average,
