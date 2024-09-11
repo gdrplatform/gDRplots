@@ -4,7 +4,13 @@
 \alias{plot_boxplot_meta}
 \title{Plot boxplot for metric values grouped by metadata from DepMap}
 \usage{
-plot_boxplot_meta(dt_response, dt_depmap, selected_meta)
+plot_boxplot_meta(
+  dt_response,
+  dt_depmap,
+  selected_meta,
+  with_1_item_grp = TRUE,
+  max_x_lbl_length = 130
+)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
@@ -16,6 +22,10 @@ or \code{\link[gDRplots]{.prep_dt_response_metric_diff}},}
 metadata; (rows are samples, columns are features or meta).}
 
 \item{selected_meta}{string with name of selected meta data from \code{dt_depmap}}
+
+\item{with_1_item_grp}{logical flag whether to show group with only one item}
+
+\item{max_x_lbl_length}{numeric value for max character number of x-axis label}
 }
 \value{
 a boxplot
