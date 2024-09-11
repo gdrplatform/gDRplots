@@ -310,15 +310,141 @@
   unique(dt_combo_diff)
 }
 
+#' Load DepMap merged data and metadata
+#'
+#' @param feature_sets character vector with the molecular feature set(s) to load from DepMap.
+#' @param prefix character vector with the prefixes to use for the each feature set in \code{feature_sets};
+#'    has to be the same length as \code{feature_sets}
+#' @param metadata_cols character vector with the metadata columns to load for DepMap cell lines
+#'
+#' @return \code{data.table} with merged data and meta
+#' @keywords internal
+#'
+#' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
+#'
+#' @examples
+#' \dontrun{
+#' dt_depmap <- .prep_dt_depmap() 
+#' }
+#' 
+#' @export
+.prep_dt_depmap <- function(
+    feature_sets = feature_sets <- c(
+      "CRISPRGeneEffect", # DepMap Chronos scores (CRISPR knockouts)
+      "OmicsExpressionProteinCodingGenesTPMLogp1", # gene xpression
+      "OmicsExpressionSignatures", # gene expression signatures
+      "OmicsSomaticMutationsMatrixHotspot", # hotspot mutations
+      "OmicsSomaticMutationsMatrixDamaging", # damaging mutations
+      "OmicsCNGene" # relative copy number 
+    ),
+    prefix = c("KO_",
+               "GE_",
+               "SG_",
+               "HM_",
+               "DM_",
+               "CN_"),
+    metadata_cols = c("OncotreeLineage", "PatientRace", "CCLEName")) {
+  
+  checkmate::assert_character(feature_sets, any.missing = FALSE)
+  checkmate::assert_character(prefix, any.missing = FALSE)
+  checkmate::assert_character(metadata_cols, any.missing = FALSE, null.ok = TRUE)
+  
+  ModelID <- NULL # due to NSE notes in R CMD check
+  
+  stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
+  
+  dt_depmap <- kaleidoscope::load_depmap_merged(
+    feature_sets = feature_sets,
+    prefix = prefix,
+    metadata_columns = unique(c("CCLEName", metadata_cols)))
+  dt_depmap[, ModelID := NULL]
+  
+  dt_depmap["CCLEName" != ""]
+  return(dt_depmap)
+}
+
+#' Load DepMap merged data for one selected feature
+#'
+#' @param feature_set string name of the molecular feature set to load from DepMap.
+#' @param prefix string prefixes to use for the each feature set in \code{feature_set};
+#'    has to be the same length as \code{feature_sets}
+#'
+#' @return \code{data.table} with feature data
+#' @keywords internal
+#'
+#' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
+#'
+#' @examples
+#' \dontrun{
+#' dt_depmap_feat <- .prep_dt_depmap_feat() 
+#' }
+#' 
+#' @export
+.prep_dt_depmap_feat <- function(
+    feature_set = "CRISPRGeneEffect",
+    prefix = "KO_") {
+  
+  checkmate::assert_string(feature_set)
+  checkmate::assert_string(prefix)
+  
+  stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_set) == NROW(prefix))
+  
+  dt_depmap <- kaleidoscope::load_depmap_merged(
+    feature_sets = feature_set,
+    prefix = prefix,
+    metadata_columns = "CCLEName")
+  data.table::setkey(dt_depmap, NULL)
+  dt_depmap["CCLEName" != ""]
+  
+  return(dt_depmap)
+}
+
+#' Load DepMap merged data for one selected metadata
+#'
+#' @param metadata_col character vector with the metadata columns to load for DepMap cell lines
+#'
+#' @return \code{data.table} with meta data
+#' @keywords internal
+#'
+#' @seealso \code{\link[kaleidoscope]{load_depmap_list}}
+#'
+#' @examples
+#' \dontrun{
+#' dt_depmap_meta <- .prep_dt_depmap_meta() 
+#' }
+#' @export
+.prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
+  
+  checkmate::assert_string(metadata_col)
+  
+  ls_depmap <- kaleidoscope::load_depmap_list(
+    feature_sets = "OmicsCNGene",
+    prefix = "CN_",
+    metadata_columns = unique(c(metadata_col, "CCLEName")))
+  ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
+  
+  dt_depmap <- data.table::data.table(
+    merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
+  )
+  data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
+  dt_depmap["CCLEName" != ""]
+  
+  return(dt_depmap)
+}
+
 #' Prep table with calculated linear associations
 #'
-#' @param dt_response \code{data.table} with experimental response data (rows are samples).
+#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
-#'    (rows are samples, columns are features or meta).
-#'
+#'   (rows are samples, columns are features or meta);  
+#'   outputted by one of \code{\link[gDRplots]{.prep_dt_depmap_feat}} or
+#'   \code{\link[gDRplots]{.prep_dt_depmap_meta}}
+#'   
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}
+#' 
 #' @keywords prism_plots
 #' 
+#' @export
 prep_dt_assoc <- function(dt_response,
                           dt_depmap) {
   
@@ -347,16 +473,18 @@ prep_dt_assoc <- function(dt_response,
   data.table::setorderv(Y_dt, cellline_name)
   
   # convert to a matrix
-  x_col <- setdiff(names(X_dt), c("ModelID", "CCLEName"))
+  selected_feat_meta <- setdiff(names(X_dt), c("ModelID", "CCLEName"))
   X <- as.matrix(
-    X_dt[, .SD, .SDcols = c("CCLEName", x_col)], rownames = "CCLEName"
+    X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
   )
-  y_col <- setdiff(names(Y_dt), c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
+  selected_metric <- setdiff(
+    names(dt_response), 
+    c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2, "cotrt_value_zero", "cotrt_value"))
   Y <- as.matrix(
-    Y_dt[, .SD, .SDcols = c("CellLineName", y_col)], rownames = "CellLineName"
+    Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
   )
   
-  # # create dt_assoc # nolint start WIP
-  # dt_assoc <- kaleidoscope::calc_assoc(X, Y)
-  # return(dt_assoc) # nolint end
+  # create dt_assoc # nolint start WIP
+  dt_assoc <- kaleidoscope::calc_assoc(X, Y)
+  return(dt_assoc) # nolint end
 }
