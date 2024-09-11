@@ -11,8 +11,8 @@ prep_dt_assoc(dt_response, dt_depmap)
 
 \item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
 (rows are samples, columns are features or meta);  
-outputted by one of \code{\link[gDRplots]{.prep_dt_depmap_feat}} or
-\code{\link[gDRplots]{.prep_dt_depmap_meta}}}
+outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
+\code{\link[gDRplots]{prep_dt_depmap_meta}}}
 }
 \value{
 \code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}

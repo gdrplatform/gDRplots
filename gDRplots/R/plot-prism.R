@@ -83,9 +83,9 @@ plot_volcano_assoc <- function(dt_assoc,
 #' Plot scatter with correlation
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{.prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{.prep_dt_response_dose_sa}}, \code{\link[gDRplots]{.prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{.prep_dt_response_metric_diff}}, 
+#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
+#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    feature or one metadata; (rows are samples, columns are features or meta). 
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
@@ -156,9 +156,9 @@ plot_scatter_with_corr <- function(dt_response,
 #' Plot boxplot for metric values grouped by metadata from DepMap
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{.prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{.prep_dt_response_dose_sa}}, \code{\link[gDRplots]{.prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{.prep_dt_response_metric_diff}}, 
+#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
+#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    metadata; (rows are samples, columns are features or meta). 
 #' @param selected_meta string with name of selected meta data from \code{dt_depmap}

@@ -8,9 +8,9 @@ plot_scatter_with_corr(dt_response, dt_depmap, selected_feat)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
-outputted by one of functions: \code{\link[gDRplots]{.prep_dt_response_metric_sa}},
-\code{\link[gDRplots]{.prep_dt_response_dose_sa}}, \code{\link[gDRplots]{.prep_dt_response_scores}}
-or \code{\link[gDRplots]{.prep_dt_response_metric_diff}},}
+outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+\code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
+or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one
 feature or one metadata; (rows are samples, columns are features or meta).}

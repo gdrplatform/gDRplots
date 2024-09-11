@@ -20,13 +20,13 @@
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
-#' dt_response <- .prep_dt_response_metric_sa(dt_metrics, d_name)
+#' dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
 #' dt_response <- 
-#'   .prep_dt_response_metric_sa(dt_metrics, d_name,
+#'   prep_dt_response_metric_sa(dt_metrics, d_name,
 #'                               metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
-.prep_dt_response_metric_sa <- function(dt_metrics,
+prep_dt_response_metric_sa <- function(dt_metrics,
                                         d_name,
                                         normalization_type = "RV",
                                         metric = "xc50",
@@ -95,11 +95,11 @@
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Averaged")
 #' d_name <- "drug_004"
-#' dt_response <- .prep_dt_response_dose_sa(dt_average, d_name)
+#' dt_response <- prep_dt_response_dose_sa(dt_average, d_name)
 #' }
 #' 
 #' @export
-.prep_dt_response_dose_sa <- function(dt_average,
+prep_dt_response_dose_sa <- function(dt_average,
                                       d_name,
                                       normalization_type = "RV",
                                       metric = "x",
@@ -165,13 +165,13 @@
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                               assay_name = "scores")
 #' d_name <- "drug_004"
-#' dt_response <- .prep_dt_response_scores(dt_scores, d_name)
+#' dt_response <- prep_dt_response_scores(dt_scores, d_name)
 #' dt_response <- 
-#'   .prep_dt_response_scores(dt_scores, d_name,
+#'   prep_dt_response_scores(dt_scores, d_name,
 #'                            metric = c("hsa_score", "bliss_score"))
 #' #' 
 #' @export
-.prep_dt_response_scores <- function(dt_scores,
+prep_dt_response_scores <- function(dt_scores,
                                      d_name,
                                      normalization_type = "RV",
                                      metric = "hsa_score",
@@ -229,13 +229,13 @@
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
-#' dt_response <- .prep_dt_response_metric_diff(dt_metrics, d_name)
+#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name)
 #' dt_response <- 
-#'   .prep_dt_response_metric_diff(dt_metrics, d_name,
+#'   prep_dt_response_metric_diff(dt_metrics, d_name,
 #'                                 metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
-.prep_dt_response_metric_diff <- function(dt_metrics,
+prep_dt_response_metric_diff <- function(dt_metrics,
                                           d_name,
                                           normalization_type = "RV",
                                           metric = "xc50",
@@ -324,11 +324,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' dt_depmap <- .prep_dt_depmap() 
+#' dt_depmap <- prep_dt_depmap() 
 #' }
 #' 
 #' @export
-.prep_dt_depmap <- function(
+prep_dt_depmap <- function(
     feature_sets = feature_sets <- c(
       "CRISPRGeneEffect", # DepMap Chronos scores (CRISPR knockouts)
       "OmicsExpressionProteinCodingGenesTPMLogp1", # gene xpression
@@ -376,11 +376,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' dt_depmap_feat <- .prep_dt_depmap_feat() 
+#' dt_depmap_feat <- prep_dt_depmap_feat() 
 #' }
 #' 
 #' @export
-.prep_dt_depmap_feat <- function(
+prep_dt_depmap_feat <- function(
     feature_set = "CRISPRGeneEffect",
     prefix = "KO_") {
   
@@ -410,10 +410,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' dt_depmap_meta <- .prep_dt_depmap_meta() 
+#' dt_depmap_meta <- prep_dt_depmap_meta() 
 #' }
 #' @export
-.prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
+prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   
   checkmate::assert_string(metadata_col)
   
@@ -437,8 +437,8 @@
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'   (rows are samples, columns are features or meta);  
-#'   outputted by one of \code{\link[gDRplots]{.prep_dt_depmap_feat}} or
-#'   \code{\link[gDRplots]{.prep_dt_depmap_meta}}
+#'   outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
+#'   \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #'   
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}
 #' 
