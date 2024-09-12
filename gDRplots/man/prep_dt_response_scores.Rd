@@ -43,7 +43,7 @@ d_name <- "drug_004"
 dt_response <- prep_dt_response_scores(dt_scores, d_name)
 dt_response <- 
   prep_dt_response_scores(dt_scores, d_name,
-                           metric = c("hsa_score", "bliss_score"))
-#' 
+                          metric = c("hsa_score", "bliss_score"))
+
 }
 \keyword{prism_plots}

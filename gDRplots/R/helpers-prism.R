@@ -21,21 +21,19 @@
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
-#' dt_response <- 
+#' dt_response <-
 #'   prep_dt_response_metric_sa(dt_metrics, d_name,
-#'                               metric = c("xc50", "x_mean", "x_max"))
+#'                              metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_sa <- function(dt_metrics,
-                                        d_name,
-                                        normalization_type = "RV",
-                                        metric = "xc50",
-                                        fit_source = "gDR") {
+                                       d_name,
+                                       normalization_type = "RV",
+                                       metric = "xc50",
+                                       fit_source = "gDR") {
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
@@ -67,7 +65,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   }
   
   # final
-  meta_col <- c(cellline_name, clid, drug_name, gnumber)
+  meta_col <- c("rId", "cId", cellline_name)
   dt_response_metric <- dt_response_metric[, c(meta_col, metric), with = FALSE]
   data.table::setnames(dt_response_metric, metric, sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
@@ -89,26 +87,22 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #' @keywords prism_plots
 #' 
 #' @examples
-#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Averaged")
 #' d_name <- "drug_004"
 #' dt_response <- prep_dt_response_dose_sa(dt_average, d_name)
-#' }
 #' 
 #' @export
 prep_dt_response_dose_sa <- function(dt_average,
-                                      d_name,
-                                      normalization_type = "RV",
-                                      metric = "x",
-                                      fit_source = "gDR") {
+                                     d_name,
+                                     normalization_type = "RV",
+                                     metric = "x",
+                                     fit_source = "gDR") {
   # TODO add ls_conc -> user can selec conc
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   conc <- gDRutils::get_env_identifiers("concentration")
   
   checkmate::assert_data_table(dt_average)
@@ -138,8 +132,10 @@ prep_dt_response_dose_sa <- function(dt_average,
                        c(cellline_name, sprintf("%s_%s_%s", normalization_type, fit_source, ls_conc)))
   
   # final
-  meta_col <- c(cellline_name, clid, drug_name, gnumber)
-  unique(dt_response_dose[, meta_col, with = FALSE])[dt_response_dose_fin, on = cellline_name]
+  meta_col <- c("rId", "cId", cellline_name)
+  dt_response_dose_fin <- 
+    unique(dt_response_dose[, meta_col, with = FALSE])[dt_response_dose_fin, on = cellline_name]
+  dt_response_dose_fin
 }
 
 
@@ -168,21 +164,17 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' dt_response <- prep_dt_response_scores(dt_scores, d_name)
 #' dt_response <- 
 #'   prep_dt_response_scores(dt_scores, d_name,
-#'                            metric = c("hsa_score", "bliss_score"))
-#' #' 
+#'                           metric = c("hsa_score", "bliss_score"))
+#' 
 #' @export
 prep_dt_response_scores <- function(dt_scores,
-                                     d_name,
-                                     normalization_type = "RV",
-                                     metric = "hsa_score",
-                                     fit_source = "gDR") {
+                                    d_name,
+                                    normalization_type = "RV",
+                                    metric = "hsa_score",
+                                    fit_source = "gDR") {
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_string(d_name)
@@ -201,7 +193,7 @@ prep_dt_response_scores <- function(dt_scores,
   dt_response_scores <- dt_response_scores[get(drug_name) == d_name, ]
   
   # final
-  meta_col <- c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2)
+  meta_col <- c("rId", "cId", cellline_name)
   dt_response_scores <- dt_response_scores[, c(meta_col, metric), with = FALSE]
   data.table::setnames(dt_response_scores, metric, sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
@@ -232,23 +224,19 @@ prep_dt_response_scores <- function(dt_scores,
 #' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name)
 #' dt_response <- 
 #'   prep_dt_response_metric_diff(dt_metrics, d_name,
-#'                                 metric = c("xc50", "x_mean", "x_max"))
+#'                                metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
-                                          d_name,
-                                          normalization_type = "RV",
-                                          metric = "xc50",
-                                          fit_source = "gDR") {
+                                         d_name,
+                                         normalization_type = "RV",
+                                         metric = "xc50",
+                                         fit_source = "gDR") {
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
-  cotrt_value <- NULL # due to NSE notes in R CMD check
+  cotrt_value <- cotrt_value_zero <- NULL # due to NSE notes in R CMD check
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
@@ -280,34 +268,38 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   }
   
   # create entries of non-zero co-trt
-  meta_col <- c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2)
+  meta_col <- c("rId", "cId", cellline_name)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
   
   # create entries of zero co-trt (single agent)
   dt_zero <- data.table::copy(dt_response_metric)[cotrt_value == 0, .SD, .SDcols = ls_cols]
-  data.table::setnames(dt_zero, c("cotrt_value", metric), c("cotrt_value_zero", paste0(metric, "_cotrt_zero")))
+  data.table::setnames(dt_zero, 
+                       old = c("cotrt_value", metric), 
+                       new = c("cotrt_value_zero", paste0(metric, "_cotrt_zero")))
   
   # merge zero and non zero
   dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "source"), nomatch = NULL]
-  dt_combo_diff <- dt_combo_merged[source == "row_fittings", ][, source := NULL]
+  dt_combo_merged[, cotrt_value_zero := NULL]
   
   # calculate differences
   dt_combo_diff <- 
-    dt_combo_diff[, (paste0(metric, "_cotrt_diff")) := Map("-", 
-                                                           mget(paste0(metric, "_cotrt")), 
-                                                           mget(paste0(metric, "_cotrt_zero")))]
-  data.table::setcolorder(dt_combo_diff, c(meta_col,  "cotrt_value_zero", "cotrt_value"))
+    dt_combo_merged[, (paste0(metric, "_cotrt_diff")) := Map("-", 
+                                                             mget(paste0(metric, "_cotrt")), 
+                                                             mget(paste0(metric, "_cotrt_zero")))]
+  ls_col_met <- 
+    colnames(dt_combo_diff)[!colnames(dt_combo_diff) %in% c(meta_col, "cotrt_value", "source")]
+  ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
+  data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
   
   # final
-  met_col <- c(
-    vapply(metric, function(met) {
-      names(dt_combo_diff)[grepl(met, names(dt_combo_diff))]
-    }, FUN.VALUE = character(3), USE.NAMES = FALSE)
-  )
-  data.table::setnames(dt_combo_diff, met_col, sprintf("%s_%s_%s", normalization_type, fit_source, met_col))
-  unique(dt_combo_diff)
+  dt_combo_diff <- data.table::dcast(
+    data = dt_combo_diff, 
+    formula = rId + cId + get(cellline_name) ~ cotrt_value + source, 
+    value.var = ls_col_met_fin)
+  data.table::setkey(dt_combo_diff, NULL)
+  (dt_combo_diff)
 }
 
 #' Load DepMap merged data and metadata
@@ -484,7 +476,7 @@ prep_dt_assoc <- function(dt_response,
     Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
   )
   
-  # create dt_assoc # nolint start WIP
+  # create dt_assoc
   dt_assoc <- kaleidoscope::calc_assoc(X, Y)
-  return(dt_assoc) # nolint end
+  return(dt_assoc)
 }

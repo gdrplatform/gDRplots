@@ -65,8 +65,9 @@ plot_volcano_assoc <- function(dt_assoc,
     
     # volcano plot
     plt <- 
-      ggplot2::ggplot(data = tab_plot,
-                      mapping = ggplot2::aes(x = get(x_lbl), y = get(y_lbl), label = label, color = stat_sig)) +
+      ggplot2::ggplot(
+        data = tab_plot,
+        mapping = ggplot2::aes(x = get(x_lbl), y = get(y_lbl), label = label, color = stat_sig)) +
       ggplot2::geom_point() +
       ggplot2::scale_x_continuous(trans = "identity", name = x_lbl) +
       ggplot2::scale_y_continuous(trans = "identity", name = y_lbl) +
@@ -98,12 +99,8 @@ plot_scatter_with_corr <- function(dt_response,
                                    dt_depmap, 
                                    selected_feat) {
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
@@ -111,7 +108,7 @@ plot_scatter_with_corr <- function(dt_response,
   checkmate::assert_string(selected_feat)
   
   selected_metric <- setdiff(names(dt_response), 
-                             c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2))
+                             c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
   CCLEName <- NULL # due to NSE notes in R CMD check
@@ -175,12 +172,8 @@ plot_boxplot_meta <- function(dt_response,
                               with_1_item_grp = TRUE,
                               max_x_lbl_length = 130) {
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
@@ -189,9 +182,8 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_int(max_x_lbl_length, lower = 5)
   
-  selected_metric <- setdiff(
-    names(dt_response), 
-    c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2, "cotrt_value_zero", "cotrt_value"))
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
   stopifnot("There is no data in `dt_depmap` (all `selected_meta` is NA)." = !all(is.na(dt_depmap[[selected_meta]])))

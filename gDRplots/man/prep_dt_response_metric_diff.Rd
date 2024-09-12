@@ -43,7 +43,7 @@ d_name <- "drug_004"
 dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name)
 dt_response <- 
   prep_dt_response_metric_diff(dt_metrics, d_name,
-                                metric = c("xc50", "x_mean", "x_max"))
+                               metric = c("xc50", "x_mean", "x_max"))
 
 }
 \keyword{prism_plots}

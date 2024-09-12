@@ -41,9 +41,9 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
 d_name <- "drug_004"
 dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
-dt_response <- 
+dt_response <-
   prep_dt_response_metric_sa(dt_metrics, d_name,
-                              metric = c("xc50", "x_mean", "x_max"))
+                             metric = c("xc50", "x_mean", "x_max"))
 
 }
 \keyword{prism_plots}
