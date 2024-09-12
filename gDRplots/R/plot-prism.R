@@ -233,7 +233,7 @@ plot_boxplot_meta <- function(dt_response,
     ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
     ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
-    ggplot2::labs(y = selected_metric, title = selected_meta) +
+    ggplot2::labs(y = selected_metric, x = "", title = selected_meta) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
