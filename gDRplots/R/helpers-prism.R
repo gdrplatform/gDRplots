@@ -465,7 +465,7 @@ prep_dt_assoc <- function(dt_response,
   X <- as.matrix(
     X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
   )
-  selected_metric <- setdiff(names(dt_response), c("rId","cId", cellline_name))
+  selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
   Y <- as.matrix(
     Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
   )
