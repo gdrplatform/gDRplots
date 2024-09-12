@@ -1,11 +1,10 @@
 #' Volcano plot with association
 #'
-#' @param dt_assoc \code{data.table} with the calculated linear association between depmap and metrics
+#' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
 #'     outputted by \code{kaleidoscope::calc_assoc}
-#' @param condition_txt string describing experiment condition 
+#' @param feature_info string describing name of associated feature/metadata from DepMap
+#' @param condition_info string describing experiment condition 
 #'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
-#' @param correlation_txt string describing association 
-#'     (preferred: \code{metric}_\code{depmap feature of metdata})
 #' @param q_cutoff numeric cutoff to identify statistically significant correlations
 #' @param named_p_top numeric value for p-top statistically significant correlations to be labeled on the plot
 #' @param max_N numeric value for limit maximum number of non-statistically significant points to plot; 
@@ -16,15 +15,15 @@
 #' 
 #' @export
 plot_volcano_assoc <- function(dt_assoc,
-                               condition_txt,
-                               correlation_txt,
+                               feature_info,
+                               condition_info = NULL,
                                q_cutoff = 0.05,
                                named_p_top = 10,
                                max_N = NULL) {
   
   checkmate::assert_data_table(dt_assoc)
-  checkmate::assert_string(condition_txt)
-  checkmate::assert_string(correlation_txt)
+  checkmate::assert_string(feature_info)
+  checkmate::assert_string(condition_info, null.ok = TRUE)
   checkmate::assert_number(q_cutoff, lower = 0, upper = 1)
   checkmate::assert_number(named_p_top, lower = 0)
   checkmate::assert_number(max_N, lower = 10, null.ok = TRUE)
@@ -35,11 +34,13 @@ plot_volcano_assoc <- function(dt_assoc,
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
   
+  plt_title <- sprintf("%s__%s", unique(dt_assoc[["response"]]), feature_info)
+  
   if (all(is.na(dt_assoc[["q_value"]]))) {
     # empty plot
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(correlation_txt, ": all NAs")) +
+      ggplot2::labs(title = paste(plt_title, ": all NAs")) +
       ggplot2::theme_bw()
   } else {
     tab_plot <- data.table::setorderv(data.table::copy(dt_assoc), cols = "q_value")
@@ -74,7 +75,7 @@ plot_volcano_assoc <- function(dt_assoc,
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
                                   name = "Statistically\nSignificant") +
       ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
-      ggplot2::labs(title = sprintf("%s (%s)", correlation_txt, condition_txt)) +
+      ggplot2::labs(title = plt_title, subtitle = condition_info) +
       ggplot2::theme_bw()
   }
   
@@ -157,12 +158,14 @@ plot_scatter_with_corr <- function(dt_response,
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
-#'    metadata; (rows are samples, columns are features or meta). 
+#'    metadata; (rows are samples, columns are features or meta);
+#'    outputted by \code{\link[gDRplots]{prep_dt_depmap}}
 #' @param selected_meta string with name of selected meta data from \code{dt_depmap}
 #' @param with_1_item_grp logical flag whether to show group with only one item
 #' @param max_x_lbl_length numeric value for max character number of x-axis label
 #'
 #' @return a boxplot
+#' 
 #' @keywords prism_plots
 #' 
 #' @export
@@ -170,7 +173,7 @@ plot_boxplot_meta <- function(dt_response,
                               dt_depmap, 
                               selected_meta,
                               with_1_item_grp = TRUE,
-                              max_x_lbl_length = 130) {
+                              max_x_lbl_length = 60) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")

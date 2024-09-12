@@ -13,7 +13,11 @@ prep_dt_depmap_feat(feature_set = "CRISPRGeneEffect", prefix = "KO_")
 has to be the same length as \code{feature_sets}}
 }
 \value{
-\code{data.table} with feature data
+A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+\itemize{
+  \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
+  \item \code{selected_feat_meta} string name of feature..
+}
 }
 \description{
 Load DepMap merged data for one selected feature

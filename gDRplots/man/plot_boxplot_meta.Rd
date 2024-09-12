@@ -9,7 +9,7 @@ plot_boxplot_meta(
   dt_depmap,
   selected_meta,
   with_1_item_grp = TRUE,
-  max_x_lbl_length = 130
+  max_x_lbl_length = 60
 )
 }
 \arguments{
@@ -19,7 +19,8 @@ outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}
 or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one
-metadata; (rows are samples, columns are features or meta).}
+metadata; (rows are samples, columns are features or meta);
+outputted by \code{\link[gDRplots]{prep_dt_depmap}}}
 
 \item{selected_meta}{string with name of selected meta data from \code{dt_depmap}}
 

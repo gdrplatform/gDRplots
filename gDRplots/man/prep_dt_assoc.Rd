@@ -4,7 +4,7 @@
 \alias{prep_dt_assoc}
 \title{Prep table with calculated linear associations}
 \usage{
-prep_dt_assoc(dt_response, dt_depmap)
+prep_dt_assoc(dt_response, dt_depmap, selected_feat_meta = NULL)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric}
@@ -15,7 +15,13 @@ outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
 \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 }
 \value{
-\code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}
+A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
+\itemize{
+  \item \code{dt_assoc} \code{data.table} with calculated association values between 
+     feature/meta of DepMap and selected metric,
+  \item \code{condition_info} string describing experiment condition (drugs),
+  \item \code{feature_info} string name of feature/meta.
+}
 }
 \description{
 Prep table with calculated linear associations

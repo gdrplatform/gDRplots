@@ -310,6 +310,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param metadata_cols character vector with the metadata columns to load for DepMap cell lines
 #'
 #' @return \code{data.table} with merged data and meta
+#' 
 #' @keywords internal
 #'
 #' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
@@ -361,7 +362,12 @@ prep_dt_depmap <- function(
 #' @param prefix string prefixes to use for the each feature set in \code{feature_set};
 #'    has to be the same length as \code{feature_sets}
 #'
-#' @return \code{data.table} with feature data
+#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' \itemize{
+#'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
+#'   \item \code{selected_feat_meta} string name of feature..
+#' }
+#' 
 #' @keywords internal
 #'
 #' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
@@ -388,14 +394,19 @@ prep_dt_depmap_feat <- function(
   data.table::setkey(dt_depmap, NULL)
   dt_depmap["CCLEName" != ""]
   
-  return(dt_depmap)
+  return(list(dt_depmap = dt_depmap, selected_feat_meta = feature_set))
 }
 
 #' Load DepMap merged data for one selected metadata
 #'
 #' @param metadata_col character vector with the metadata columns to load for DepMap cell lines
 #'
-#' @return \code{data.table} with meta data
+#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' \itemize{
+#'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
+#'   \item \code{selected_feat_meta} string name of meta.
+#' }
+#' 
 #' @keywords internal
 #'
 #' @seealso \code{\link[kaleidoscope]{load_depmap_list}}
@@ -421,7 +432,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
   dt_depmap["CCLEName" != ""]
   
-  return(dt_depmap)
+  return(list(dt_depmap = dt_depmap, selected_feat_meta = metadata_col))
 }
 
 #' Prep table with calculated linear associations
@@ -432,17 +443,25 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
 #'   outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
 #'   \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #'   
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{plot_volcano_assoc}}
+#' @return A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
+#' \itemize{
+#'   \item \code{dt_assoc} \code{data.table} with calculated association values between 
+#'      feature/meta of DepMap and selected metric,
+#'   \item \code{condition_info} string describing experiment condition (drugs),
+#'   \item \code{feature_info} string name of feature/meta.
+#' }
 #' 
 #' @keywords prism_plots
 #' 
 #' @export
 prep_dt_assoc <- function(dt_response,
-                          dt_depmap) {
+                          dt_depmap,
+                          selected_feat_meta = NULL) {
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
+  checkmate::assert_string(selected_feat_meta, null.ok = TRUE)
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -472,5 +491,10 @@ prep_dt_assoc <- function(dt_response,
   
   # create dt_assoc
   dt_assoc <- kaleidoscope::calc_assoc(X, Y)
-  return(dt_assoc)
+  
+  # final
+  dt_assoc <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
+  list(dt_assoc = dt_assoc,
+       condition_info = unique(dt_response[["rId"]]),
+       feature_info = selected_feat_meta)
 }

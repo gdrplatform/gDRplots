@@ -6,22 +6,21 @@
 \usage{
 plot_volcano_assoc(
   dt_assoc,
-  condition_txt,
-  correlation_txt,
+  feature_info,
+  condition_info = NULL,
   q_cutoff = 0.05,
   named_p_top = 10,
   max_N = NULL
 )
 }
 \arguments{
-\item{dt_assoc}{\code{data.table} with the calculated linear association between depmap and metrics
+\item{dt_assoc}{\code{data.table} with the calculated linear association between DepMap and metrics
 outputted by \code{kaleidoscope::calc_assoc}}
 
-\item{condition_txt}{string describing experiment condition 
-(preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}
+\item{feature_info}{string describing name of associated feature/metadata from DepMap}
 
-\item{correlation_txt}{string describing association 
-(preferred: \code{metric}_\code{depmap feature of metdata})}
+\item{condition_info}{string describing experiment condition 
+(preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}
 
 \item{q_cutoff}{numeric cutoff to identify statistically significant correlations}
 
