@@ -462,7 +462,7 @@ prep_dt_assoc <- function(dt_response,
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-  checkmate::assert_string(selected_feat_meta, null.ok = TRUE)
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
