@@ -130,10 +130,9 @@ plot_scatter_with_corr <- function(dt_response,
   intercept <- mean(tab_plot[[selected_metric]]) - slope * mean(tab_plot[[selected_feat]])
   
   # plot title
-  feature_type <- "placeholder"
   plt_title <- 
     sprintf("%s\n corr=%2.2f, slope=%2.2f, intercept=%2.2f", 
-            feature_type, c, slope, intercept)
+            selected_feat, c, slope, intercept)
   
   plt <-        
     ggplot2::ggplot(
