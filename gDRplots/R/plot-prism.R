@@ -91,6 +91,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    feature or one metadata; (rows are samples, columns are features or meta). 
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
+#' @param selected_feat_meta_col string name of feature column in DepMap
 #'
 #' @return a scatter plot with correlation
 #' @keywords prism_plots
@@ -98,7 +99,8 @@ plot_volcano_assoc <- function(dt_assoc,
 #' @export
 plot_scatter_with_corr <- function(dt_response,
                                    dt_depmap, 
-                                   selected_feat) {
+                                   selected_feat,
+                                   selected_feat_meta_col = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -107,6 +109,7 @@ plot_scatter_with_corr <- function(dt_response,
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
   checkmate::assert_string(selected_feat)
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -132,7 +135,7 @@ plot_scatter_with_corr <- function(dt_response,
   # plot title
   plt_title <- 
     sprintf("%s\n corr=%2.2f, slope=%2.2f, intercept=%2.2f", 
-            selected_feat, c, slope, intercept)
+            selected_feat_meta_col, c, slope, intercept)
   
   plt <-        
     ggplot2::ggplot(

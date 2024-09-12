@@ -4,7 +4,12 @@
 \alias{plot_scatter_with_corr}
 \title{Plot scatter with correlation}
 \usage{
-plot_scatter_with_corr(dt_response, dt_depmap, selected_feat)
+plot_scatter_with_corr(
+  dt_response,
+  dt_depmap,
+  selected_feat,
+  selected_feat_meta_col = NULL
+)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
@@ -16,6 +21,8 @@ or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 feature or one metadata; (rows are samples, columns are features or meta).}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
+
+\item{selected_feat_meta_col}{string name of feature column in DepMap}
 }
 \value{
 a scatter plot with correlation
