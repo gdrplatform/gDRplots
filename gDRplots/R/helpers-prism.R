@@ -444,12 +444,8 @@ prep_dt_assoc <- function(dt_response,
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   CCLEName <- NULL # due to NSE notes in R CMD check
   
@@ -469,9 +465,7 @@ prep_dt_assoc <- function(dt_response,
   X <- as.matrix(
     X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
   )
-  selected_metric <- setdiff(
-    names(dt_response), 
-    c(cellline_name, clid, drug_name, gnumber, drug_name_2, gnumber_2, "cotrt_value_zero", "cotrt_value"))
+  selected_metric <- setdiff(names(dt_response), c("rId","cId", cellline_name))
   Y <- as.matrix(
     Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
   )
