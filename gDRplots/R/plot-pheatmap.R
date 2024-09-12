@@ -808,7 +808,7 @@ get_qual_colors <- function(n = NULL) {
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
