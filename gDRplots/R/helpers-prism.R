@@ -394,7 +394,7 @@ prep_dt_depmap_feat <- function(
   data.table::setkey(dt_depmap, NULL)
   dt_depmap["CCLEName" != ""]
   
-  return(list(dt_depmap = dt_depmap, selected_feat_meta = feature_set))
+  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set))
 }
 
 #' Load DepMap merged data for one selected metadata
@@ -432,7 +432,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
   dt_depmap["CCLEName" != ""]
   
-  return(list(dt_depmap = dt_depmap, selected_feat_meta = metadata_col))
+  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
 }
 
 #' Prep table with calculated linear associations
@@ -442,6 +442,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
 #'   (rows are samples, columns are features or meta);  
 #'   outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
 #'   \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#' @param selected_feat_meta_col string name of feature/meta column in DepMap
 #'   
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
 #' \itemize{
@@ -456,7 +457,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
 #' @export
 prep_dt_assoc <- function(dt_response,
                           dt_depmap,
-                          selected_feat_meta = NULL) {
+                          selected_feat_meta_col = NULL) {
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
@@ -496,5 +497,5 @@ prep_dt_assoc <- function(dt_response,
   dt_assoc <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
   list(dt_assoc = dt_assoc,
        condition_info = unique(dt_response[["rId"]]),
-       feature_info = selected_feat_meta)
+       feature_info = selected_feat_meta_col)
 }
