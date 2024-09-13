@@ -181,9 +181,9 @@ plot_boxplot_meta <- function(dt_response,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
-  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_data_table(dt_depmap_lng)
   checkmate::assert_string(selected_meta)
-  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_meta))
+  checkmate::assert_names(names(dt_depmap_lng), must.include = c("CCLEName", selected_meta))
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_int(max_x_lbl_length, lower = 5)
   
@@ -191,19 +191,19 @@ plot_boxplot_meta <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  stopifnot("There is no data in `dt_depmap` (all `selected_meta` is NA)." = !all(is.na(dt_depmap[[selected_meta]])))
+  stopifnot("There is no data in `dt_depmap_lng` (all `selected_meta` is NA)." = !all(is.na(dt_depmap_lng[[selected_meta]])))
   stopifnot(
-    "It seems that `dt_depmap` has too many categories for `selected_meta` - try use `plot_scatter_with_corr()`." = 
+    "It seems that `dt_depmap_lng` has too many categories for `selected_meta` - try use `plot_scatter_with_corr()`." = 
       all(
-        NROW(unique(dt_depmap[!is.na(get(selected_meta)), ][[selected_meta]])) < NROW(dt_depmap[!is.na(get(selected_meta)), ]), # nolint
-        NROW(unique(dt_depmap[get(selected_meta) != "", ][[selected_meta]])) < NROW(dt_depmap[get(selected_meta) != "", ]) # nolint
+        NROW(unique(dt_depmap_lng[!is.na(get(selected_meta)), ][[selected_meta]])) < NROW(dt_depmap_lng[!is.na(get(selected_meta)), ]), # nolint
+        NROW(unique(dt_depmap_lng[get(selected_meta) != "", ][[selected_meta]])) < NROW(dt_depmap_lng[get(selected_meta) != "", ]) # nolint
       )
   )
   
   N <- CCLEName <- NULL # due to NSE notes in R CMD check
   
   # prep table with data to plot
-  X_dt <- dt_depmap[, c("CCLEName", selected_meta), with = FALSE]
+  X_dt <- dt_depmap_lng[, c("CCLEName", selected_meta), with = FALSE]
   if (is.numeric(X_dt[[selected_meta]])) {
     X_dt[[selected_meta]] <- as.factor(X_dt[[selected_meta]])
   }
@@ -274,9 +274,7 @@ plot_volcano_corr_panel <- function(dt_response,
   checkmate::assert_string(selected_feat)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-  
-  value <- NULL # due to NSE notes in R CMD check
-  
+
   # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
   
   # plot data
@@ -290,7 +288,7 @@ plot_volcano_corr_panel <- function(dt_response,
                                 feature_info = selected_feat)
   
   # scatter plot with corr
-  top_4 <- data.table::setorderv(dt_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
+  top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
   ls_plt_corr <- lapply(top_4, function(top_feat) {
     gDRplots::plot_scatter_with_corr(dt_response = dt_response_,
                                      dt_depmap = dt_depmap,
@@ -338,6 +336,8 @@ plot_volcano_box_panel <- function(dt_response,
   checkmate::assert_string(selected_meta)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
+  
+  value <- NULL # due to NSE notes in R CMD check
   
   # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
   
