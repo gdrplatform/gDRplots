@@ -191,7 +191,7 @@ plot_boxplot_meta <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  stopifnot("There is no data in `dt_depmap_lng` (all `selected_meta` is NA)." = !all(is.na(dt_depmap_lng[[selected_meta]])))
+  stopifnot("There is no data in `dt_depmap_lng` (all `selected_meta` is NA)." = !all(is.na(dt_depmap_lng[[selected_meta]]))) # nolint
   stopifnot(
     "It seems that `dt_depmap_lng` has too many categories for `selected_meta` - try use `plot_scatter_with_corr()`." = 
       all(
