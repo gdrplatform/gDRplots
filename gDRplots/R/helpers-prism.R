@@ -391,6 +391,7 @@ prep_dt_depmap_feat <- function(
     feature_sets = feature_set,
     prefix = prefix,
     metadata_columns = "CCLEName")
+  
   data.table::setkey(dt_depmap, NULL)
   dt_depmap["CCLEName" != ""]
   
@@ -430,6 +431,8 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
     merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
   )
   data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
+  
+  data.table::setkey(dt_depmap, NULL)
   dt_depmap["CCLEName" != ""]
   
   return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
