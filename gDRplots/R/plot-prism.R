@@ -77,8 +77,8 @@ plot_volcano_assoc <- function(dt_assoc,
       ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
       ggplot2::labs(title = plt_title, subtitle = condition_info) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "bottom",
-                     legend.direction = "horizontal")
+      ggplot2::theme(legend.position = "bottom", 
+                     legend.title = ggplot2::element_text(vjust = 0.5, hjust = 1))
   }
   
   return(plt)
