@@ -73,7 +73,7 @@ plot_volcano_assoc <- function(dt_assoc,
       ggplot2::scale_x_continuous(trans = "identity", name = x_lbl) +
       ggplot2::scale_y_continuous(trans = "identity", name = y_lbl) +
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
-                                  name = "Statistically\nSignificant") +
+                                  name = "Statistically Significant") +
       ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
       ggplot2::labs(title = plt_title, subtitle = condition_info) +
       ggplot2::theme_bw() +
