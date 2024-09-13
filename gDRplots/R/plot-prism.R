@@ -274,7 +274,7 @@ plot_volcano_corr_panel <- function(dt_response,
   checkmate::assert_string(selected_feat)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-
+  
   # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
   
   # plot data
@@ -285,7 +285,8 @@ plot_volcano_corr_panel <- function(dt_response,
                                        selected_feat_meta_col = selected_feat)
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                feature_info = selected_feat)
+                                feature_info = selected_feat) +
+    ggplot2::labs(title = "")
   
   # scatter plot with corr
   top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
@@ -293,7 +294,8 @@ plot_volcano_corr_panel <- function(dt_response,
     gDRplots::plot_scatter_with_corr(dt_response = dt_response_,
                                      dt_depmap = dt_depmap,
                                      selected_feat = top_feat,
-                                     selected_feat_meta_col = selected_feat)
+                                     selected_feat_meta_col = selected_feat) +
+      ggplot2::labs(title = "", subtitle = "")
   })
   
   # final panel
@@ -301,7 +303,8 @@ plot_volcano_corr_panel <- function(dt_response,
     ggpubr::ggarrange(plotlist = list(plt_vol,
                                       ggpubr::ggarrange(plotlist = ls_plt_corr)), 
                       widths = c(1, 1)),
-    top = obj_assoc[["condition_info"]])
+    top = sprintf("%s__%s\n%s", selected_metric, selected_feat, obj_assoc[["condition_info"]])
+  )
   return(panel)
 }
 
@@ -354,15 +357,18 @@ plot_volcano_box_panel <- function(dt_response,
   
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                feature_info = selected_meta)
+                                feature_info = selected_meta) +
+    ggplot2::labs(title = "")
   # boxplot
   plt_box <- plot_boxplot_meta(dt_response = dt_response_,
                                dt_depmap_lng = dt_depmap_lng,
-                               selected_meta = selected_meta)
+                               selected_meta = selected_meta) +
+    ggplot2::labs(title = "")
   
   # final panel
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_box), widths = c(1, 1)),
-    top = obj_assoc[["condition_info"]])
+    top = sprintf("%s__%s\n%s", selected_metric, selected_meta, obj_assoc[["condition_info"]])
+  )
   return(panel)
 }
