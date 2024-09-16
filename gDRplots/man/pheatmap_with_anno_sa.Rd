@@ -117,7 +117,6 @@ annotation_map <- list(
 )
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
-                                cluster_cols = FALSE,
                                 annotation_col = annotation_manual,
                                 annotation_colors = annotation_map,
                                 hm_title = get_hm_title(

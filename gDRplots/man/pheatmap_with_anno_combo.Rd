@@ -115,6 +115,7 @@ annotation_map <- list(
 )
 
 output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
+                                   cluster_cols = FALSE,
                                    annotation_col = annotation_manual,
                                    annotation_colors = annotation_map,
                                    hm_title = get_hm_title(
