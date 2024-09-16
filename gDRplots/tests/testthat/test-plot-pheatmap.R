@@ -51,8 +51,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[1]]$label, "X MAX")
-  expect_equal(plt_2$gtable$grobs[[4]]$label, 
-               unique(dt_metrics_na[!is.na(x_max)]$DrugName)) # no rows with NA
+  expect_equal(sort(plt_2$gtable$grobs[[6]]$label), 
+               sort(unique(dt_metrics_na[!is.na(x_max)]$DrugName))) # no rows with NA
   
   # scenario 3: annotations for row and col
   annotation_manual_col <- data.table::data.table(
@@ -143,6 +143,24 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
   expect_equal(plt_5$gtable$grobs[[5]]$label, c("tested_AB", "drug_moa"))
+  expect_true(is.na(plt_5[["tree_row"]])) # no clustering due NA
+  expect_true(is.na(plt_5[["tree_col"]])) # no clustering due NA
+  
+  
+  out_6 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
+                                 metric = "x_AOC_range",
+                                 cluster_cols = FALSE)
+  expect_length(out_6, 2)
+  expect_equal(names(out_6), c("data", "heatmap"))
+  data_6 <- out_6[["data"]]
+  expect_is(data_6, "list")
+  expect_true(all(vapply(c("annotation_col", "annotation_row"), 
+                         function(i) is.null(data_6[[i]]), logical(1))))
+  plt_6 <- out_6[["heatmap"]]
+  expect_is(plt_6, "pheatmap")
+  expect_is(plt_6[["tree_row"]], "hclust") # rows are clustered
+  expect_true(is.na(plt_6[["tree_col"]])) # cols aren't clustered
+  
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
@@ -168,6 +186,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     cluster_rows = 1),
+               "Assertion on 'cluster_rows' failed: Must be of type 'logical flag'")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     cluster_cols = "yes"),
+               "Assertion on 'cluster_cols' failed: Must be of type 'logical flag'")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_row = unlist(annotation_manual_row)),
                "Assertion on 'annotation_row' failed: Must be a data.table")
@@ -202,9 +226,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(data_1[["matrix"]], res_1)
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
-  expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
-  expect_equal(plt_1$gtable$grobs[[3]]$label, sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2))
+  expect_equal(plt_1$gtable$grobs[[4]]$label, cdata[["CellLineName"]])
+  expect_equal(sort(plt_1$gtable$grobs[[5]]$label), 
+               sort(sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2)))
   expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
+  expect_is(plt_1[["tree_row"]], "hclust") # rows are clustered
+  expect_is(plt_1[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 2: selected metric & normalization_type and NA
   dt_scores_na <- data.table::copy(dt_scores)
@@ -221,7 +248,8 @@ test_that("pheatmap_with_anno_combo works as expected", {
   out_2 <- pheatmap_with_anno_combo(dt_scores = dt_scores_na, 
                                     normalization_type = "RV",
                                     metric = "bliss_score",
-                                    hm_title = "RV Bliss Score")
+                                    hm_title = "RV Bliss Score",
+                                    cluster_cols = FALSE)
   expect_length(out_2, 2)
   expect_equal(names(out_2), c("data", "heatmap"))
   data_2 <- out_2[["data"]]
@@ -233,7 +261,9 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[1]]$label, "RV Bliss Score")
-  expect_equal(plt_2$gtable$grobs[[4]]$label, drug_combo_names)
+  expect_equal(sort(plt_2$gtable$grobs[[5]]$label), sort(drug_combo_names))
+  expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
+  expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered
   
   # scenario 3: annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
@@ -248,6 +278,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   )
   
   out_3 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
+                                    cluster_rows = FALSE,
                                     annotation_col = annotation_manual_col,
                                     annotation_colors = annotation_map)
   expect_length(out_3, 2)
@@ -259,7 +290,9 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(data_3[["annotation_row"]], NULL)
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
-  expect_equal(plt_3$gtable$grobs[[5]]$label, c("mut_A", "mut_B"))
+  expect_equal(plt_3$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
+  expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered
+  expect_is(plt_3[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 4: incomplete annotations for row and incomplete color maps
   annotation_map <- list(
@@ -290,7 +323,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
                res_1[, c("CellLineName", paste(anno_4$DrugName, "x", anno_4$DrugName_2)), with = FALSE])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
-  expect_equal(plt_4$gtable$grobs[[5]]$label, c("drug_moa", "drug_moa_2", "grp_B", "grp_C"))
+  expect_equal(plt_4$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2", "grp_B", "grp_C"))
   
   # scenario 5: incomplete annotations for row and incomplete color maps
   annotation_map <- list(
@@ -319,7 +352,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(anno_5, annotation_manual_row_res) 
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
-  expect_equal(plt_5$gtable$grobs[[5]]$label, c("drug_moa", "drug_moa_2"))
+  expect_equal(plt_5$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2"))
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
@@ -345,6 +378,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
+                                     cluster_rows = 1),
+               "Assertion on 'cluster_rows' failed: Must be of type 'logical flag'")
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
+                                     cluster_cols = "yes"),
+               "Assertion on 'cluster_cols' failed: Must be of type 'logical flag'")
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         annotation_row = unlist(annotation_manual_row)),
                "Assertion on 'annotation_row' failed: Must be a data.table")
