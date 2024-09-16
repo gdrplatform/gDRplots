@@ -14,7 +14,8 @@
 #'    note that for \code{metric} "x" the first color will be assigned to the min value, and 
 #'    the last one - to the max; for "x_std" - that will be reversed
 #' @param no_breaks numeric number of breaks on scale
-#' @param cluster_rows logical flag whether ows should be clustered
+#' @param cluster_rows logical flag whether rows should be clustered; dendogram will be not shown for
+#'   matrix with any NA values
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
@@ -248,6 +249,10 @@ pheatmap_qc <- function(
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{DrugName} column.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
+#' @param cluster_rows logical flag whether rows should be clustered; dendogram will be not shown for
+#'   matrix with any NA or -Inf/Inf value
+#' @param cluster_cols logical flag whether columns should be clustered; dendogram will be not shown for
+#'   matrix with any NA or -Inf/Inf value
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -300,6 +305,7 @@ pheatmap_qc <- function(
 #' )
 #' 
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+#'                                 cluster_cols = FALSE,
 #'                                 annotation_col = annotation_manual,
 #'                                 annotation_colors = annotation_map,
 #'                                 hm_title = get_hm_title(
@@ -331,6 +337,8 @@ pheatmap_with_anno_sa <- function(
     hm_title = NA,
     colors_vec = c("firebrick2", "white"),
     no_breaks = 50,
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
     annotation_row = NULL,
     annotation_col = NULL,
     annotation_colors = NULL) {
@@ -344,6 +352,8 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_character(colors_vec)
   stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(cluster_rows)
+  checkmate::assert_flag(cluster_cols)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -441,6 +451,20 @@ pheatmap_with_anno_sa <- function(
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
+  # dendogram
+  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
+    NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
+  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
+    stats::hclust(stats::dist(t_mat_cvd))
+  } else {
+    FALSE
+  }
+  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
+    stats::hclust(stats::dist(t(t_mat_cvd)))
+  } else {
+    FALSE
+  }
+  
   # prep hm color palette
   min_val <- min(t_mat_cvd, na.rm = TRUE)
   max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
@@ -455,22 +479,23 @@ pheatmap_with_anno_sa <- function(
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   
-  ls_output[["heatmap"]] <- pheatmap::pheatmap(mat = t_mat_cvd,
-                                               scale = "none",
-                                               display_numbers = display_numbers_flag,
-                                               number_color = "black",
-                                               color = hm_color_palette,
-                                               breaks = breaks,
-                                               angle_col = 90,
-                                               main = hm_title,
-                                               cluster_rows = FALSE,
-                                               cluster_cols = FALSE,
-                                               # manual annotation
-                                               annotation_row = annotation_row,
-                                               annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors,
-                                               silent = TRUE
-  )
+  ls_output[["heatmap"]] <- 
+    pheatmap::pheatmap(mat = t_mat_cvd,
+                       scale = "none",
+                       display_numbers = display_numbers_flag,
+                       number_color = "black",
+                       color = hm_color_palette,
+                       breaks = breaks,
+                       angle_col = 90,
+                       main = hm_title,
+                       # dendogram
+                       cluster_rows = cluster_rows,
+                       cluster_cols = cluster_cols,
+                       # manual annotation
+                       annotation_row = annotation_row,
+                       annotation_col = annotation_col,
+                       annotation_colors = annotation_colors,
+                       silent = TRUE)
   
   return(ls_output)
 }
@@ -565,6 +590,8 @@ pheatmap_with_anno_combo <- function(
     hm_title = NA,
     colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"),
     no_breaks = 50,
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
     annotation_row = NULL,
     annotation_col = NULL,
     annotation_colors = NULL) {
@@ -577,6 +604,8 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_character(colors_vec)
   stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(cluster_rows)
+  checkmate::assert_flag(cluster_cols)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
@@ -676,6 +705,20 @@ pheatmap_with_anno_combo <- function(
   # flip
   t_mat_cvd <- t(mat_cvd)
   
+  # dendogram
+  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
+    NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
+  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
+    stats::hclust(stats::dist(t_mat_cvd))
+  } else {
+    FALSE
+  }
+  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
+    stats::hclust(stats::dist(t(t_mat_cvd)))
+  } else {
+    FALSE
+  }
+  
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
@@ -683,22 +726,23 @@ pheatmap_with_anno_combo <- function(
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   
-  ls_output[["heatmap"]] <- pheatmap::pheatmap(t_mat_cvd,
-                                               scale = "none",
-                                               display_numbers = display_numbers_flag,
-                                               number_color = "black",
-                                               color = hm_color_palette,
-                                               breaks = breaks,
-                                               angle_col = 90,
-                                               main = hm_title,
-                                               cluster_rows = FALSE,
-                                               cluster_cols = FALSE,
-                                               # manual annotation
-                                               annotation_row = annotation_row,
-                                               annotation_col = annotation_col,
-                                               annotation_colors = annotation_colors,
-                                               silent = TRUE
-  )
+  ls_output[["heatmap"]] <- 
+    pheatmap::pheatmap(t_mat_cvd,
+                       scale = "none",
+                       display_numbers = display_numbers_flag,
+                       number_color = "black",
+                       color = hm_color_palette,
+                       breaks = breaks,
+                       angle_col = 90,
+                       main = hm_title,
+                       # dendogram
+                       cluster_rows = cluster_rows,
+                       cluster_cols = cluster_cols,
+                       # manual annotation
+                       annotation_row = annotation_row,
+                       annotation_col = annotation_col,
+                       annotation_colors = annotation_colors,
+                       silent = TRUE)
   return(ls_output)
 }
 
