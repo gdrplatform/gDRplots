@@ -39,7 +39,8 @@ the last one - to the max; for "x_std" - that will be reversed}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{cluster_rows}{logical flag whether ows should be clustered}
+\item{cluster_rows}{logical flag whether rows should be clustered; dendogram will be not shown for
+matrix with any NA values}
 
 \item{lbl_by_CellLineName}{logical flag whether heatmap should be described by CellLineNames instead of clid}
 
