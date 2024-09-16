@@ -13,6 +13,8 @@ pheatmap_with_anno_combo(
   colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1",
     "firebrick3"),
   no_breaks = 50,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
   annotation_row = NULL,
   annotation_col = NULL,
   annotation_colors = NULL
@@ -38,6 +40,12 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 note that the first color will be assigned to the min value, and the last one - to the max}
 
 \item{no_breaks}{numeric number of breaks on scale}
+
+\item{cluster_rows}{logical flag whether rows should be clustered; dendogram will be not shown for
+matrix with any NA or -Inf/Inf value}
+
+\item{cluster_cols}{logical flag whether columns should be clustered; dendogram will be not shown for
+matrix with any NA or -Inf/Inf value}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation

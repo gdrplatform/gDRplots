@@ -12,6 +12,8 @@ pheatmap_with_anno_sa(
   hm_title = NA,
   colors_vec = c("firebrick2", "white"),
   no_breaks = 50,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
   annotation_row = NULL,
   annotation_col = NULL,
   annotation_colors = NULL
@@ -37,6 +39,12 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 note that the first color will be assigned to the min value, and the last one - to the max}
 
 \item{no_breaks}{numeric number of breaks on scale}
+
+\item{cluster_rows}{logical flag whether rows should be clustered; dendogram will be not shown for
+matrix with any NA or -Inf/Inf value}
+
+\item{cluster_cols}{logical flag whether columns should be clustered; dendogram will be not shown for
+matrix with any NA or -Inf/Inf value}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -109,6 +117,7 @@ annotation_map <- list(
 )
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                cluster_cols = FALSE,
                                 annotation_col = annotation_manual,
                                 annotation_colors = annotation_map,
                                 hm_title = get_hm_title(
