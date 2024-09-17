@@ -14,8 +14,8 @@
 #'    note that for \code{metric} "x" the first color will be assigned to the min value, and 
 #'    the last one - to the max; for "x_std" - that will be reversed
 #' @param no_breaks numeric number of breaks on scale
-#' @param cluster_rows logical flag whether rows should be clustered; dendogram will be not shown for
-#'   matrix with any NA values
+#' @param cluster_rows logical flag whether rows should be clustered;
+#'   the dendrogram will not be shown for the matrix with any NA values
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
@@ -167,7 +167,7 @@ pheatmap_qc <- function(
            })
   names(drug_annotation_colors) <- drug_to_colored
   
-  # dendogram
+  # dendrogram
   cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd))) {
     stats::hclust(stats::dist(mat_cvd))
   } else {
@@ -216,7 +216,7 @@ pheatmap_qc <- function(
                            main = hm_title,
                            na_col = "red",
                            annotation_legend = annotation_legend_flag,
-                           # dendogram
+                           # dendrogram
                            treeheight_row = 70,
                            treeheight_col = 70,
                            cluster_cols = FALSE,
@@ -249,10 +249,10 @@ pheatmap_qc <- function(
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{DrugName} column.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
-#' @param cluster_rows logical flag whether rows should be clustered; dendogram will be not shown for
-#'   matrix with any NA or -Inf/Inf value
-#' @param cluster_cols logical flag whether columns should be clustered; dendogram will be not shown for
-#'   matrix with any NA or -Inf/Inf value
+#' @param cluster_rows logical flag whether rows should be clustered;
+#'   the dendrogram will not be shown for the matrix with any NA values
+#' @param cluster_cols logical flag whether columns should be clustered;
+#'   the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -450,7 +450,7 @@ pheatmap_with_anno_sa <- function(
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
-  # dendogram
+  # dendrogram
   cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
     NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
   cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
@@ -487,7 +487,7 @@ pheatmap_with_anno_sa <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       # dendogram
+                       # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
                        # manual annotation
@@ -705,7 +705,7 @@ pheatmap_with_anno_combo <- function(
   # flip
   t_mat_cvd <- t(mat_cvd)
   
-  # dendogram
+  # dendrogram
   cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
     NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
   cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
@@ -735,7 +735,7 @@ pheatmap_with_anno_combo <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       # dendogram
+                       # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
                        # manual annotation

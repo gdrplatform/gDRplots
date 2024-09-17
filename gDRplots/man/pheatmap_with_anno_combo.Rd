@@ -41,11 +41,11 @@ note that the first color will be assigned to the min value, and the last one - 
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{cluster_rows}{logical flag whether rows should be clustered; dendogram will be not shown for
-matrix with any NA or -Inf/Inf value}
+\item{cluster_rows}{logical flag whether rows should be clustered;
+the dendrogram will not be shown for the matrix with any NA values}
 
-\item{cluster_cols}{logical flag whether columns should be clustered; dendogram will be not shown for
-matrix with any NA or -Inf/Inf value}
+\item{cluster_cols}{logical flag whether columns should be clustered;
+the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
