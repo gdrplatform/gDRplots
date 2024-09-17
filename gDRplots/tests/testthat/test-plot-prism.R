@@ -37,7 +37,7 @@ obj_depmap_meta <- list(
 # tests ----
 test_that("plot_volcano_assoc works as expected", {
 })
- 
+
 test_that("plot_scatter_with_corr works as expected", {
 }) 
 
@@ -57,6 +57,8 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(plt_1[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_1)$data[[3]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
+  expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range), 
+               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap_lng = dt_depmap_meta_lng, 
@@ -66,6 +68,8 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(plt_2[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_2)$data[[3]]$xid,
                 NROW(grp_stat[!is.na(meta_xx) & N > 1]))
+  expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
+               sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap_lng = dt_depmap_meta_lng, 
@@ -75,4 +79,11 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(plt_3[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_3)$data[[3]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
+  ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
+  short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
+  expect_true(all(grp_stat[!is.na(meta_xx) & nchar(meta_xx) < 8]$meta_xx %in% ls_x_lbl))
+  expect_true(short_lbl %in% ls_x_lbl)
+  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
+               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+  
 }) 
