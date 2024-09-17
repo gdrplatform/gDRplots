@@ -15,7 +15,7 @@
 #'    the last one - to the max; for "x_std" - that will be reversed
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether rows should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA values
+#'   the dendrogram will not be shown for the matrix with any NA value
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
