@@ -91,7 +91,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
-#'    feature or one metadata; (rows are samples, columns are features or meta). 
+#'    feature or one metadata; (rows are samples, column are feature or meta level). 
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #' @param selected_feat_meta_col string name of feature column in DepMap
 #'
@@ -218,14 +218,6 @@ plot_boxplot_meta <- function(dt_response,
     tab_plot <- tab_plot[get(selected_meta) %in% multi_item_grp, ]
   }
   
-  # some labels may be too long to see the boxes 
-  if (is.character(tab_plot[[selected_meta]]) && 
-      any(nchar(unique(tab_plot[[selected_meta]])) > max_x_lbl_length)) {
-    too_long_lbl <- which(nchar(tab_plot[[selected_meta]]) > max_x_lbl_length)
-    tab_plot[too_long_lbl, ][[selected_meta]] <- 
-      paste0(substr(tab_plot[too_long_lbl, ][[selected_meta]], 1, max_x_lbl_length - 3), "...")
-  }
-  
   # final plt
   plt <-        
     ggplot2::ggplot(
@@ -240,6 +232,20 @@ plot_boxplot_meta <- function(dt_response,
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
   
+  # some labels may be too long to see the boxes 
+  if (is.character(tab_plot[[selected_meta]]) && 
+      any(nchar(unique(tab_plot[[selected_meta]])) > max_x_lbl_length)) {
+    too_long_lbl <- which(nchar(tab_plot[[selected_meta]]) > max_x_lbl_length)
+    
+    vec_lbl <- tab_plot[[selected_meta]]
+    names(vec_lbl) <- tab_plot[[selected_meta]]
+    vec_lbl[too_long_lbl] <- 
+      paste0(substr(tab_plot[too_long_lbl, ][[selected_meta]], 1, max_x_lbl_length - 3), "...")
+    
+    plt <- plt + 
+      ggplot2::scale_x_discrete(labels = vec_lbl)
+  } 
+  
   return(plt)
 }
 
@@ -251,7 +257,7 @@ plot_boxplot_meta <- function(dt_response,
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'  (rows are samples, columns are meta);  
-#'  outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}}
+#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
 #' @param selected_metric string name of metric in \code{dt_response}
 #' @param selected_feat string with name of selected meta in \code{dt_depmap}
 #'
@@ -316,7 +322,7 @@ plot_volcano_corr_panel <- function(dt_response,
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'  (rows are samples, columns are meta);  
-#'  outputted by one of \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #' @param selected_metric string name of metric in \code{dt_response}
 #' @param selected_meta string with name of selected meta in \code{dt_depmap}
 #'
