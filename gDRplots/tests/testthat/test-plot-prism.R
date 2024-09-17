@@ -8,11 +8,25 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
 dt_average <- gDRutils::convert_se_assay_to_dt(se = se_sa,
                                                assay_name = "Averaged")
 
-d_name <- "drug_002"
-dt_response_met <- prep_dt_response_metric_sa(dt_metrics, d_name,
-                                              metric = c("xc50", "x_mean", "x_max"))
-dt_response_dose <- prep_dt_response_dose_sa(dt_average, d_name)
+se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_metrics_combo <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                                     assay_name = "Metrics")
+dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                              assay_name = "scores")
 
+d_name <- "drug_002"
+dt_response_met <- 
+  prep_dt_response_metric_sa(dt_metrics, d_name,
+                             metric = c("xc50", "x_mean", "x_max"))
+dt_response_dose <- 
+  prep_dt_response_dose_sa(dt_average, d_name)
+
+dt_response_score <- 
+  prep_dt_response_scores(dt_scores, d_name,
+                          metric = c("hsa_score", "bliss_score"))
+dt_response_diff <-
+  prep_dt_response_metric_diff(dt_metrics_combo, d_name,
+                               metric = c("xc50", "x_mean", "x_max"))
 
 
 # fake depmap data
@@ -73,19 +87,19 @@ test_that("plot_scatter_with_corr works as expected", {
   selected_metrics <- "RV_gDR_0.01"
   dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metrics), with = FALSE]
   
-  plt_1 <- plot_scatter_with_corr(
-    dt_response = dt_response,
-    dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-    selected_feat = "XZ_A3OP")
+  plt_1 <- 
+    plot_scatter_with_corr(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                           selected_feat = "XZ_A3OP")
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_length(plt_1[["layers"]], 2)
   
-  plt_2 <- plot_scatter_with_corr(
-    dt_response = dt_response,
-    dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-    selected_feat = "XZ_A3OP",
-    selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_2 <- 
+    plot_scatter_with_corr(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                           selected_feat = "XZ_A3OP",
+                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
   expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
   expect_length(plt_2[["layers"]], 2)
