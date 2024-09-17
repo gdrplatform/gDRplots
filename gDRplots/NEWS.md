@@ -1,3 +1,6 @@
+## gDRplots 0.0.34 - 2024-09-16
+* add clustering in `pheatmap_with_anno_sa` and `pheatmap_with_anno_combo` functions
+
 ## gDRplots 0.0.33 - 2024-09-10
 * increase the readability of QC dose-response curves for single-agent
 
