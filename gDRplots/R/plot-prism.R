@@ -70,12 +70,13 @@ plot_volcano_assoc <- function(dt_assoc,
         data = tab_plot,
         mapping = ggplot2::aes(x = get(x_lbl), y = get(y_lbl), label = label, color = stat_sig)) +
       ggplot2::geom_point() +
-      ggplot2::scale_x_continuous(trans = "identity", name = x_lbl) +
-      ggplot2::scale_y_continuous(trans = "identity", name = y_lbl) +
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
                                   name = "Statistically Significant") +
       ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
-      ggplot2::labs(title = plt_title, subtitle = condition_info) +
+      ggplot2::labs(title = plt_title, 
+                    subtitle = condition_info,
+                    x = x_lbl,
+                    y = y_lbl) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "bottom", 
                      legend.title = ggplot2::element_text(vjust = 0.5, hjust = 1))
@@ -143,14 +144,13 @@ plot_scatter_with_corr <- function(dt_response,
       data = tab_plot,
       mapping =  ggplot2::aes(x = get(selected_feat), y = get(selected_metric), label = get(cellline_name))) +
     ggplot2::geom_point() +
-    ggplot2::scale_x_continuous(trans = "identity") +
-    ggplot2::scale_y_continuous(trans = "identity") +
     # ggrepel::geom_text_repel(size = 2) + # nolint
     ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
     ggplot2::labs(title = selected_feat_meta_col, 
                   subtitle = plt_subtitle, 
                   x = selected_feat, 
-                  y = selected_metric) +
+                  y = selected_metric,
+                  caption = unique(dt_response$rId)) +
     ggplot2::theme_bw()
   
   return(plt)
@@ -230,7 +230,10 @@ plot_boxplot_meta <- function(dt_response,
     ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
     ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
-    ggplot2::labs(y = selected_metric, x = "", title = selected_meta) +
+    ggplot2::labs(title = selected_meta,
+                  y = selected_metric, 
+                  x = "",
+                  caption = unique(dt_response$rId)) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
@@ -304,7 +307,7 @@ plot_volcano_corr_panel <- function(dt_response,
                                      dt_depmap = dt_depmap,
                                      selected_feat = top_feat,
                                      selected_feat_meta_col = selected_feat) +
-      ggplot2::labs(title = "", subtitle = "")
+      ggplot2::labs(title = "", subtitle = "", caption = "")
   })
   
   # final panel
@@ -372,7 +375,7 @@ plot_volcano_box_panel <- function(dt_response,
   plt_box <- plot_boxplot_meta(dt_response = dt_response_,
                                dt_depmap_lng = dt_depmap_lng,
                                selected_meta = selected_meta) +
-    ggplot2::labs(title = "")
+    ggplot2::labs(title = "", caption = "")
   
   # final panel
   panel <- ggpubr::annotate_figure(

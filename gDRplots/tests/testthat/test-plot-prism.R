@@ -94,12 +94,13 @@ test_that("plot_scatter_with_corr works as expected", {
                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                            selected_feat = selected_feat)
   expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 2)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
   expect_equal(plt_1[["labels"]][["y"]], selected_metrics)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
   expect_true(all(vapply(c("corr", "slope", "intercept"), 
                          function(i) grepl(i, plt_1[["labels"]][["subtitle"]]), logical(1))))
-  expect_length(plt_1[["layers"]], 2)
   
   plt_2 <- 
     plot_scatter_with_corr(dt_response = dt_response,
@@ -107,23 +108,24 @@ test_that("plot_scatter_with_corr works as expected", {
                            selected_feat = selected_feat,
                            selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   expect_length(plt_2[["layers"]], 2)
+  expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   
   selected_feat_2 <- "XZ_A5BN"
   selected_metrics_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metrics_2), with = FALSE]
   
-  plt_3 <- # TODO differentiate drug2
+  plt_3 <-
     plot_scatter_with_corr(dt_response = dt_response_2,
                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                            selected_feat = selected_feat_2,
                            selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 2)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat_2)
   expect_equal(plt_3[["labels"]][["y"]], selected_metrics_2)
   expect_equal(plt_3[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
-  expect_length(plt_3[["layers"]], 2)
+  expect_equal(plt_3[["labels"]][["caption"]], unique(dt_response_2$rId))
 }) 
 
 test_that("plot_boxplot_meta works as expected", {
@@ -171,4 +173,16 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
+  
+  selected_metrics_2 <- "RV_gDR_bliss_score"
+  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metrics_2), with = FALSE]
+  
+  plt_4 <- plot_boxplot_meta(dt_response = dt_response_2,
+                             dt_depmap_lng = dt_depmap_meta_lng, 
+                             selected_meta = selected_meta)
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 4)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metrics_2)
+  expect_equal(plt_4[["labels"]][["title"]], selected_meta)
+  expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
 }) 
