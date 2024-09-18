@@ -143,11 +143,14 @@ plot_scatter_with_corr <- function(dt_response,
       data = tab_plot,
       mapping =  ggplot2::aes(x = get(selected_feat), y = get(selected_metric), label = get(cellline_name))) +
     ggplot2::geom_point() +
-    ggplot2::scale_x_continuous(trans = "identity", name = selected_feat) +
-    ggplot2::scale_y_continuous(trans = "identity", name = selected_metric) +
+    ggplot2::scale_x_continuous(trans = "identity") +
+    ggplot2::scale_y_continuous(trans = "identity") +
     # ggrepel::geom_text_repel(size = 2) + # nolint
     ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
-    ggplot2::labs(title = selected_feat_meta_col, subtitle = plt_subtitle) +
+    ggplot2::labs(title = selected_feat_meta_col, 
+                  subtitle = plt_subtitle, 
+                  x = selected_feat, 
+                  y = selected_metric) +
     ggplot2::theme_bw()
   
   return(plt)
