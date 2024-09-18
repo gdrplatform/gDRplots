@@ -7,6 +7,7 @@
 prep_dt_response_scores(
   dt_scores,
   d_name,
+  d_name2,
   normalization_type = "RV",
   metric = "hsa_score",
   fit_source = "gDR"
@@ -18,6 +19,8 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 and combo \code{SummarizedExperiment}}
 
 \item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
+
+\item{d_name2}{string with drug name to be plotted (identifiers \code{DrugName_2})}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -40,9 +43,10 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
 d_name <- "drug_004"
-dt_response <- prep_dt_response_scores(dt_scores, d_name)
+d_name2 <- "drug_026"
+dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2)
 dt_response <- 
-  prep_dt_response_scores(dt_scores, d_name,
+  prep_dt_response_scores(dt_scores, d_name, d_name2,
                           metric = c("hsa_score", "bliss_score"))
 
 }

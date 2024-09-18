@@ -48,7 +48,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_metric <- dt_metrics[eval(filter_expr)]
   
-  # select required columns
+  # select required drug
   dt_response_metric <- dt_response_metric[get(drug_name) == d_name, ]
   
   # take care of Inf and NaN values in IC50 metrics
@@ -117,7 +117,7 @@ prep_dt_response_dose_sa <- function(dt_average,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_dose <- dt_average[eval(filter_expr)]
   
-  # select required columns
+  # select required drug
   dt_response_dose <- dt_response_dose[get(drug_name) == d_name, ]
   
   dt_response_dose_fin <- data.table::dcast(
@@ -145,6 +145,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of combo metric;
@@ -161,24 +162,29 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                               assay_name = "scores")
 #' d_name <- "drug_004"
-#' dt_response <- prep_dt_response_scores(dt_scores, d_name)
+#' d_name2 <- "drug_026"
+#' dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2)
 #' dt_response <- 
-#'   prep_dt_response_scores(dt_scores, d_name,
+#'   prep_dt_response_scores(dt_scores, d_name, d_name2,
 #'                           metric = c("hsa_score", "bliss_score"))
 #' 
 #' @export
 prep_dt_response_scores <- function(dt_scores,
                                     d_name,
+                                    d_name2,
                                     normalization_type = "RV",
                                     metric = "hsa_score",
                                     fit_source = "gDR") {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_string(d_name)
   checkmate::assert_choice(d_name, choices = dt_scores[[drug_name]])
+  checkmate::assert_string(d_name2)
+  checkmate::assert_choice(d_name2, choices = dt_scores[[drug_name_2]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("hsa_score", "bliss_score"), empty.ok = FALSE)
@@ -189,8 +195,8 @@ prep_dt_response_scores <- function(dt_scores,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_scores <- dt_scores[eval(filter_expr)]
   
-  # select required columns
-  dt_response_scores <- dt_response_scores[get(drug_name) == d_name, ]
+  # select required drugs combination
+  dt_response_scores <- dt_response_scores[get(drug_name) == d_name & get(drug_name_2) == d_name2, ]
   
   # final
   meta_col <- c("rId", "cId", cellline_name)
@@ -205,6 +211,7 @@ prep_dt_response_scores <- function(dt_scores,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of combo metric;
@@ -221,19 +228,22 @@ prep_dt_response_scores <- function(dt_scores,
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
-#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name)
+#' d_name2 <- "drug_026"
+#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2)
 #' dt_response <- 
-#'   prep_dt_response_metric_diff(dt_metrics, d_name,
+#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
 #'                                metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
                                          d_name,
+                                         d_name2,
                                          normalization_type = "RV",
                                          metric = "xc50",
                                          fit_source = "gDR") {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   cotrt_value <- cotrt_value_zero <- NULL # due to NSE notes in R CMD check
@@ -241,6 +251,8 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
   checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_string(d_name2)
+  checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
@@ -251,8 +263,8 @@ prep_dt_response_metric_diff <- function(dt_metrics,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_metric <- dt_metrics[eval(filter_expr)]
   
-  # select required columns
-  dt_response_metric <- dt_response_metric[get(drug_name) == d_name, ]
+  # select required drugs combination
+  dt_response_metric <- dt_response_metric[get(drug_name) == d_name & get(drug_name_2) == d_name2, ]
   
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
