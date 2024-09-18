@@ -14,7 +14,7 @@ or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
 (rows are samples, columns are meta);  
-outputted by one of \code{\link[gDRplots]{prep_dt_depmap_meta}}}
+outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 
 \item{selected_metric}{string name of metric in \code{dt_response}}
 
