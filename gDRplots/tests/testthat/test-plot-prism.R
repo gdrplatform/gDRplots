@@ -94,7 +94,7 @@ test_that("plot_scatter_with_corr works as expected", {
                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                            selected_feat = selected_feat)
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 2)
+  expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
   expect_equal(plt_1[["labels"]][["y"]], selected_metrics)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
@@ -108,7 +108,7 @@ test_that("plot_scatter_with_corr works as expected", {
                            selected_feat = selected_feat,
                            selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 2)
+  expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   
   selected_feat_2 <- "XZ_A5BN"
@@ -121,7 +121,7 @@ test_that("plot_scatter_with_corr works as expected", {
                            selected_feat = selected_feat_2,
                            selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 2)
+  expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat_2)
   expect_equal(plt_3[["labels"]][["y"]], selected_metrics_2)
   expect_equal(plt_3[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
