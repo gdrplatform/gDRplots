@@ -173,8 +173,7 @@ This function returns the heatmap itself and a list of tables with data: a matri
 annotation_manual_col <-
   unique(dt_metrics_cd[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_metrics_cd[, c("DrugName", "DrugName_2", 
-                           "Concentration_2", 
+  unique(dt_metrics_cd[, c("DrugName", "DrugName_2",
                            "drug_moa", "drug_moa_2"), with = FALSE])
 
 output <- pheatmap_with_anno_cd(

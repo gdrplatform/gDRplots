@@ -549,7 +549,7 @@ pheatmap_with_anno_sa <- function(
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 #' annotation_manual_row <-
-#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2", "drug_moa", "drug_moa_2"), 
+#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), 
 #'   with = FALSE])
 #' annotation_map <-
 #'   get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
