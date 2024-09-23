@@ -250,16 +250,6 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_6[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_6[["tree_col"]])) # cols aren't clustered
   
-  mae <- gDRutils::get_synthetic_data("combo_codilution")
-  se <- mae[[gDRutils::get_supported_experiments("cd")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
-  annotation_manual_col <-
-    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
-  annotation_manual_row <-
-    unique(dt_metrics[,  c("DrugName", "drug_moa"), with = FALSE])
-  annotation_map <-
-    get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa"), with = FALSE]))
-
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
@@ -297,6 +287,123 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                      annotation_col = unlist(annotation_manual_col)),
                "Assertion on 'annotation_col' failed: Must be a data.table")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     annotation_colors = unlist(annotation_map)),
+               "Assertion on 'annotation_colors' failed: Must be of type 'list'")
+})
+
+test_that("pheatmap_with_anno_cd works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_codilution")
+  se <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  
+  cdata <- SummarizedExperiment::colData(se)
+  rdata <- SummarizedExperiment::rowData(se)
+  
+  res_1 <- data.table::dcast(
+    data = dt_metrics[normalization_type == "GR", ],
+    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
+    value.var = "xc50")
+  data.table::setkey(res_1, NULL)
+  
+  # scenario 1: default
+  out_1 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics)
+  expect_length(out_1, 2)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  data_1 <- out_1[["data"]]
+  expect_is(data_1, "list")
+  expect_equal(names(data_1), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_1[["matrix"]], "data.table")
+  expect_equal(data_1[["matrix"]], res_1)
+  expect_equal(data_1[["annotation_col"]], NULL)
+  expect_equal(data_1[["annotation_row"]], NULL)
+  plt_1 <- out_1[["heatmap"]]
+  expect_is(plt_1, "pheatmap")
+  expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
+  expect_equal(
+    sort(plt_1$gtable$grobs[[3]]$label), 
+    sort(paste(rdata[["DrugName"]], "x", paste0(rdata[["DrugName_2"]], "__", rdata[["Concentration_2"]]))))
+  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
+  
+  annotation_manual_col <-
+    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
+  annotation_manual_row <-
+    unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2", "drug_moa", "drug_moa_2"),
+                      with = FALSE])
+  annotation_map <-
+    get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
+  
+  res_2 <- data.table::dcast(
+    data = dt_metrics[normalization_type == "RV", ],
+    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
+    value.var = "x_max")
+  data.table::setkey(res_2, NULL)
+  
+  annotation_manual_row_out <- data.table::copy(annotation_manual_row)
+  data.table::setorderv(annotation_manual_row_out, c("Concentration_2"), order = 1L)
+  annotation_manual_row_out[["Concentration_2"]] <- 
+    as.character(annotation_manual_row_out[["Concentration_2"]])
+  
+  
+  out_2 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
+                                 metric = "x_max",
+                                 normalization_type = "RV",
+                                 cluster_cols = FALSE,
+                                 annotation_row = annotation_manual_row,
+                                 annotation_col = annotation_manual_col,
+                                 annotation_colors = annotation_map)
+  expect_length(out_2, 2)
+  expect_equal(names(out_2), c("data", "heatmap"))
+  data_2 <- out_2[["data"]]
+  expect_is(data_2, "list")
+  expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_2[["matrix"]], "data.table")
+  anno_2 <- out_2[["data"]][["annotation_row"]]
+  expect_is(anno_2, "data.table")
+  expect_equal(anno_2, annotation_manual_row_out)
+  expect_equal(data_2[["matrix"]], 
+               res_2[, names(data_2[["matrix"]]), with = FALSE])
+  plt_2 <- out_2[["heatmap"]]
+  expect_is(plt_2, "pheatmap")
+  expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
+  expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered
+  
+  # testing assertions
+  expect_error(pheatmap_with_anno_cd(dt_metrics = unlist(dt_metrics)),
+               "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     metric = "xxx"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     hm_title = NULL),
+               "Assertion on 'hm_title' failed: Must be of type 'string'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     colors_vec = 1:3),
+               "Assertion on 'colors_vec' failed: Must be of type 'character'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     colors_vec = c("pinky", "blackish")),
+               "Must be a valid color name")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     no_breaks = "str"),
+               "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     cluster_rows = 1),
+               "Assertion on 'cluster_rows' failed: Must be of type 'logical flag'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     cluster_cols = "yes"),
+               "Assertion on 'cluster_cols' failed: Must be of type 'logical flag'")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     annotation_row = unlist(annotation_manual_row)),
+               "Assertion on 'annotation_row' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
+                                     annotation_col = unlist(annotation_manual_col)),
+               "Assertion on 'annotation_col' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                      annotation_colors = unlist(annotation_map)),
                "Assertion on 'annotation_colors' failed: Must be of type 'list'")
 })
