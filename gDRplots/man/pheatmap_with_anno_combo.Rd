@@ -86,11 +86,11 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
 annotation_manual_col <-
-  unique(dt_scores[, .SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_scores[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_scores[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+  unique(dt_scores[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), with = FALSE])
 annotation_map <-
-  get_ann_color_map(unique(dt_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
+  get_ann_color_map(unique(dt_scores[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
 
 output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                    normalization_type = "RV",
