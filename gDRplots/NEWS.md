@@ -1,3 +1,6 @@
+## gDRplots 0.0.35 - 2024-09-23
+* update clustering condition
+ 
 ## gDRplots 0.0.34 - 2024-09-16
 * add clustering in `pheatmap_with_anno_sa` and `pheatmap_with_anno_combo` functions
 

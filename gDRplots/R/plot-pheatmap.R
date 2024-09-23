@@ -168,7 +168,7 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendrogram
-  cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd))) {
+  cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd)) && NROW(mat_cvd) >= 2) {
     stats::hclust(stats::dist(mat_cvd))
   } else {
     FALSE
@@ -277,11 +277,11 @@ pheatmap_qc <- function(
 #' ggpubr::as_ggplot(hm_1[["gtable"]])
 #' 
 #' annotation_manual_col <-
-#'   unique(dt_metrics[, .SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 #' annotation_manual_row <-
-#'   unique(dt_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
+#'   unique(dt_metrics[, c("DrugName", "drug_moa"), with = FALSE])
 #' annotation_map <-
-#'   get_ann_color_map(unique(dt_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
+#'   get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa"), with = FALSE]))
 #' 
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
 #'                                 normalization_type = "RV",
@@ -452,7 +452,7 @@ pheatmap_with_anno_sa <- function(
   
   # dendrogram
   cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
+    any(dim(t_mat_cvd) < 200) # gDR standard
   cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
     stats::hclust(stats::dist(t_mat_cvd))
   } else {
@@ -529,11 +529,11 @@ pheatmap_with_anno_sa <- function(
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                               assay_name = "scores")
 #' annotation_manual_col <-
-#'   unique(dt_scores[, .SD, .SDcols = c("CellLineName", "Tissue")])
+#'   unique(dt_scores[, c("CellLineName", "Tissue"), with = FALSE])
 #' annotation_manual_row <-
-#'   unique(dt_scores[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+#'   unique(dt_scores[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), with = FALSE])
 #' annotation_map <-
-#'   get_ann_color_map(unique(dt_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
+#'   get_ann_color_map(unique(dt_scores[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
 #' 
 #' output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
 #'                                    normalization_type = "RV",
@@ -707,7 +707,7 @@ pheatmap_with_anno_combo <- function(
   
   # dendrogram
   cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    NROW(t_mat_cvd) * NCOL(t_mat_cvd) <= 200 # gDR standard
+    any(dim(t_mat_cvd) < 200)  # gDR standard
   cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
     stats::hclust(stats::dist(t_mat_cvd))
   } else {

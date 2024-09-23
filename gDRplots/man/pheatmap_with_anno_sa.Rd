@@ -89,11 +89,11 @@ hm_1 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_1[["gtable"]])
 
 annotation_manual_col <-
-  unique(dt_metrics[, .SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_metrics[, .SD, .SDcols = c("DrugName", "drug_moa")])
+  unique(dt_metrics[, c("DrugName", "drug_moa"), with = FALSE])
 annotation_map <-
-  get_ann_color_map(unique(dt_metrics[,.SD, .SDcols = c("Tissue", "drug_moa")]))
+  get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa"), with = FALSE]))
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 normalization_type = "RV",
