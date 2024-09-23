@@ -351,15 +351,41 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(data_2, "list")
   expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
   expect_is(data_2[["matrix"]], "data.table")
+  expect_equal(data_2[["matrix"]], 
+               res_2[, names(data_2[["matrix"]]), with = FALSE])
   anno_2 <- out_2[["data"]][["annotation_row"]]
   expect_is(anno_2, "data.table")
   expect_equal(anno_2, annotation_manual_row)
-  expect_equal(data_2[["matrix"]], 
-               res_2[, names(data_2[["matrix"]]), with = FALSE])
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered
+  
+
+  annotation_manual_row_res <- data.table::copy(annotation_manual_row)
+  annotation_manual_row_res[1:20, c("drug_moa", "drug_moa_2")] <- "NA"
+  annotation_manual_row_na <- annotation_manual_row_res[21:NROW(annotation_manual_row_res), ]
+
+  out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
+                                 metric = "x_max",
+                                 normalization_type = "RV",
+                                 cluster_cols = FALSE,
+                                 cluster_rows = FALSE,
+                                 annotation_row = annotation_manual_row_na,
+                                 annotation_colors = annotation_map)
+  expect_length(out_3, 2)
+  expect_equal(names(out_3), c("data", "heatmap"))
+  data_3 <- out_3[["data"]]
+  expect_is(data_3, "list")
+  expect_equal(names(data_3), c("matrix", "annotation_col", "annotation_row"))
+  expect_true(is.null(data_3[["annotation_col"]]))
+  anno_3 <- out_3[["data"]][["annotation_row"]]
+  expect_is(anno_3, "data.table")
+  expect_equal(data.table::setorder(anno_3), data.table::setorder(annotation_manual_row_res))
+  plt_3 <- out_3[["heatmap"]]
+  expect_is(plt_3, "pheatmap")
+  expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered
+  expect_true(is.na(plt_3[["tree_col"]])) # cols aren't clustered
   
   # testing assertions
   expect_error(pheatmap_with_anno_cd(dt_metrics = unlist(dt_metrics)),
