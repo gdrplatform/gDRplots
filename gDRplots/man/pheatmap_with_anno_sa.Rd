@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{pheatmap_with_anno_sa}
 \alias{pheatmap_with_anno_sa}
-\title{Plot pretty heatmap with annotationsfor single-agent data}
+\title{Plot pretty heatmap with annotations for single-agent data}
 \usage{
 pheatmap_with_anno_sa(
   dt_metrics,
@@ -76,7 +76,7 @@ A named list with elements:
 }
 }
 \description{
-Plot pretty heatmap with annotationsfor single-agent data
+Plot pretty heatmap with annotations for single-agent data
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
