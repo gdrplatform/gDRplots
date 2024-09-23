@@ -40,29 +40,30 @@ note that the first color will be assigned to the min value, and the last one - 
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{cluster_rows}{logical flag whether rows should be clustered;
+\item{cluster_rows}{logical flag whether indicating rows should be clustered;
 the dendrogram will not be shown for the matrix with any NA values}
 
-\item{cluster_cols}{logical flag whether columns should be clustered;
+\item{cluster_cols}{logical flag indicating whether columns should be clustered;
 the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value}
 
-\item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
+\item{annotation_row}{\code{data.table} that specifies the annotations shown on the left side 
+of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from the required  \code{DrugName}, 
-\code{DrugName_2} and \code{Concentration_2} column.
-Note that color schemes takes into account if variable is continuous or discrete.}
+\code{DrugName_2} and \code{Concentration_2} columns.
+Note that color schemes takes into account if the variable is continuous or discrete.}
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
 Each row defines the features for a specific column. The columns in the data and in the annotation
 are matched using corresponding names from the required  \code{CellLineName} column.
-Note that color schemes takes into account if variable is continuous or discrete.}
+Note that color schemes takes into account if the variable is continuous or discrete.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
 track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
 without \code{DrugName} and column names of \code{annotation_col} - 
 without \code{CellLineName}), each list item is named vector with valid color name for 
-each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
-Not described elements will be colored in default.}
+each value described in \code{annotation_row} and in \code{annotation_col}, respectively.
+Not described elements will be colored by default.}
 }
 \value{
 A named list with elements:
