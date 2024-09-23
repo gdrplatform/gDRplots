@@ -342,6 +342,9 @@ pheatmap_with_anno_sa <- function(
     annotation_col = NULL,
     annotation_colors = NULL) {
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
@@ -354,11 +357,14 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
+  if (!is.null(annotation_row)) {
+    checkmate::assert_names(names(annotation_row), must.include = drug_name)
+  }
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
+  if (!is.null(annotation_col)) {
+    checkmate::assert_names(names(annotation_col), must.include = cellline_name)
+  }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
-  
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   # output
   ls_output <- list(data = list(matrix = NULL,
@@ -549,8 +555,9 @@ pheatmap_with_anno_sa <- function(
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 #' annotation_manual_row <-
-#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), 
-#'   with = FALSE])
+#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+#'                         "drug_moa", "drug_moa_2"),
+#'                     with = FALSE])
 #' annotation_map <-
 #'   get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
 #' 
@@ -613,6 +620,11 @@ pheatmap_with_anno_cd <- function(
     annotation_col = NULL,
     annotation_colors = NULL) {
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
@@ -625,13 +637,14 @@ pheatmap_with_anno_cd <- function(
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
+  if (!is.null(annotation_row)) {
+    checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2, conc_2))
+  }
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
+  if (!is.null(annotation_col)) {
+    checkmate::assert_names(names(annotation_col), must.include = cellline_name)
+  }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
-  
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  conc_2 <- gDRutils::get_env_identifiers("concentration2")
   
   # output
   ls_output <- list(data = list(matrix = NULL,
@@ -710,7 +723,8 @@ pheatmap_with_anno_cd <- function(
     ls_output[["data"]][["annotation_row"]] <- annotation_row[, !c("DrugCombination"), with = FALSE]
     
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
-    annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
+    annotation_row <- 
+      annotation_row[, -c(drug_name, drug_name_2, conc_2, "DrugCombination"), with = FALSE]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
@@ -875,6 +889,10 @@ pheatmap_with_anno_combo <- function(
     annotation_col = NULL,
     annotation_colors = NULL) {
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
@@ -886,12 +904,14 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
+  if (!is.null(annotation_row)) {
+    checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2))
+  }
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
+  if (!is.null(annotation_col)) {
+    checkmate::assert_names(names(annotation_col), must.include = cellline_name)
+  }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
-  
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   
   # output
   ls_output <- list(data = list(matrix = NULL,

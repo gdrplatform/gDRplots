@@ -173,7 +173,7 @@ This function returns the heatmap itself and a list of tables with data: a matri
 annotation_manual_col <-
   unique(dt_metrics_cd[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_metrics_cd[, c("DrugName", "DrugName_2",
+  unique(dt_metrics_cd[, c("DrugName", "DrugName_2", "Concentration_2",
                            "drug_moa", "drug_moa_2"), with = FALSE])
 
 output <- pheatmap_with_anno_cd(
@@ -289,10 +289,8 @@ It allows to visually check whether the data distribution after normalization is
 ```{r plot_var_distribution_qc, warning = FALSE, message = FALSE}
 plot_var_distribution_qc(dt_assay = dt_norm_sa,
                          cl_name = "cellline_NE")
-
 plot_var_distribution_qc(dt_assay = dt_norm_cd,
                          cl_name = "cellline_BA")
-
 plot_var_distribution_qc(dt_assay = dt_norm_combo,
                          cl_name = "cellline_NE")
 ```
