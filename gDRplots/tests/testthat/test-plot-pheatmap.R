@@ -337,13 +337,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
     formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
     value.var = "x_max")
   data.table::setkey(res_2, NULL)
-  
-  annotation_manual_row_out <- data.table::copy(annotation_manual_row)
-  data.table::setorderv(annotation_manual_row_out, c("Concentration_2"), order = 1L)
-  annotation_manual_row_out[["Concentration_2"]] <- 
-    as.character(annotation_manual_row_out[["Concentration_2"]])
-  
-  
+
   out_2 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
                                  metric = "x_max",
                                  normalization_type = "RV",
@@ -359,7 +353,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(data_2[["matrix"]], "data.table")
   anno_2 <- out_2[["data"]][["annotation_row"]]
   expect_is(anno_2, "data.table")
-  expect_equal(anno_2, annotation_manual_row_out)
+  expect_equal(anno_2, annotation_manual_row)
   expect_equal(data_2[["matrix"]], 
                res_2[, names(data_2[["matrix"]]), with = FALSE])
   plt_2 <- out_2[["heatmap"]]

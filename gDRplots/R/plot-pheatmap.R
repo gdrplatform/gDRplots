@@ -716,7 +716,7 @@ pheatmap_with_anno_cd <- function(
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
     }
     # data.table::nafill does not support character
-    cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, "DrugCombination")]
+    cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, conc_2, "DrugCombination")]
     data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
     annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     # select annotation acc to matrix
@@ -725,7 +725,7 @@ pheatmap_with_anno_cd <- function(
     
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <- 
-      annotation_row[, -c(drug_name, drug_name_2, conc_2, "DrugCombination"), with = FALSE]
+      annotation_row[, .SD, .SDcols = -c(drug_name, drug_name_2, conc_2, "DrugCombination")]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
