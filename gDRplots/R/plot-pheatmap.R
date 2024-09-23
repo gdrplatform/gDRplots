@@ -712,6 +712,8 @@ pheatmap_with_anno_cd <- function(
       )
       data.table::setnames(tab_missing_ann, "missing", "DrugCombination")
       tab_missing_ann[, c(drug_name, drug_name_2) := data.table::tstrsplit(DrugCombination, " x ", fixed = TRUE)]
+      tab_missing_ann[, c(drug_name_2, conc_2) := data.table::tstrsplit(get(drug_name_2), "__", fixed = TRUE)]
+      tab_missing_ann[[conc_2]] <- as.numeric(tab_missing_ann[[conc_2]])
       
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
     }
