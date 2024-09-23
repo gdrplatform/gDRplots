@@ -230,7 +230,7 @@ pheatmap_qc <- function(
 }
 
 
-#' Plot pretty heatmap with annotationsfor single-agent data
+#' Plot pretty heatmap with annotations for single-agent data
 #'
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -499,7 +499,7 @@ pheatmap_with_anno_sa <- function(
   return(ls_output)
 }
 
-#' Plot pretty heatmap with annotationsfor co-dilution data
+#' Plot pretty heatmap with annotations for co-dilution data
 #'
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -537,7 +537,7 @@ pheatmap_with_anno_sa <- function(
 #' @seealso \code{\link[pheatmap]{pheatmap}}
 #'
 #' @examples
-#' mae <- gDRutils::get_synthetic_data("combo_codilution")
+#' mae <- gDRutils::get_synthetic_data("combo_codilution_small")
 #' se <- mae[[gDRutils::get_supported_experiments("cd")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")

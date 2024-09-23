@@ -53,6 +53,21 @@ dt_average_sa <-
                                    assay_name = "Averaged")
 ```
 
+```{r cd_data, warning = FALSE, message = FALSE}
+mae <- gDRutils::get_synthetic_data("combo_codilution_small")
+se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+
+dt_norm_cd <- 
+  gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                   assay_name =  "Normalized")
+dt_metrics_cd <- 
+  gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                   assay_name = "Metrics")
+dt_average_cd <- 
+  gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                   assay_name = "Averaged")
+```
+
 ```{r combo_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -132,12 +147,38 @@ This function returns the heatmap itself and a list of tables with data: a matri
 
 ```{r pheatmap_with_anno_sa, warning = FALSE, message = FALSE}
 annotation_manual_col <-
-  unique(dt_metrics_sa[, .SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_metrics_sa[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_metrics_sa[, .SD, .SDcols = c("DrugName", "drug_moa")])
+  unique(dt_metrics_sa[, c("DrugName", "drug_moa"), with = FALSE])
 
 output <- pheatmap_with_anno_sa(
   dt_metrics = dt_metrics_sa,
+  annotation_row = annotation_manual_row,
+  annotation_col = annotation_manual_col)
+hm <- output[["heatmap"]]
+ggpubr::as_ggplot(hm[["gtable"]])
+
+knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
+```
+
+### Co-dilution Data
+
+The **pheatmap_with_anno_cd** function is dedicated to co-dilution experiments.
+
+Additionally, rows are annotated by `Tissue` and columns - by `drug MOA` and `drug MOA 2`. Users can also use their own annotations.
+
+This function returns the heatmap itself and a list of tables with data: a matrix and annotation vectors.
+
+```{r pheatmap_with_anno_cd, warning = FALSE, message = FALSE}
+annotation_manual_col <-
+  unique(dt_metrics_cd[, c("CellLineName", "Tissue"), with = FALSE])
+annotation_manual_row <-
+  unique(dt_metrics_cd[, c("DrugName", "DrugName_2", 
+                           "Concentration_2", 
+                           "drug_moa", "drug_moa_2"), with = FALSE])
+
+output <- pheatmap_with_anno_cd(
+  dt_metrics = dt_metrics_cd,
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
@@ -156,9 +197,10 @@ This function returns the heatmap itself and a list of tables with data: a matri
 
 ```{r pheatmap_with_anno_combo, warning = FALSE, message = FALSE}
 annotation_manual_col <-
-  unique(dt_scores[,.SD, .SDcols = c("CellLineName", "Tissue")])
+  unique(dt_scores[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_scores[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+  unique(dt_scores[, c("DrugName", "DrugName_2", 
+                       "drug_moa", "drug_moa_2"), with = FALSE])
 
 output <- pheatmap_with_anno_combo(
   dt_scores = dt_scores,
@@ -211,7 +253,7 @@ Also, when using the gDR model, the same control might be performed for the corr
 
 The first stage of the gDR pipeline involves dispatching the raw data and controls into the appropriate nested tables.
 
-The **heatmap_control_mapping_qc** function is dedicated to single-agent and combination experiments.
+The **heatmap_control_mapping_qc** function is dedicated to single-agent, co-dilution and combination experiments.
 
 It allows to visually check whether the raw data and the control are correct and have been correctly assigned and nothing is missing.
 
@@ -241,13 +283,16 @@ heatmap_control_mapping_qc(dt_treat = dt_treat,
 
 In the gDR pipeline during the normalization stage, the raw data are normalized based on the control.
 
-The **plot_var_distribution_qc** function is dedicated to single-agent and combination experiments.
+The **plot_var_distribution_qc** function is dedicated to single-agent, co-dilution and combination experiments.
 
 It allows to visually check whether the data distribution after normalization is correct and as expected on a set of violin plots by drug names.
 
 ```{r plot_var_distribution_qc, warning = FALSE, message = FALSE}
 plot_var_distribution_qc(dt_assay = dt_norm_sa,
                          cl_name = "cellline_NE")
+
+plot_var_distribution_qc(dt_assay = dt_norm_cd,
+                         cl_name = "cellline_BA")
 
 plot_var_distribution_qc(dt_assay = dt_norm_combo,
                          cl_name = "cellline_NE")
@@ -257,7 +302,7 @@ plot_var_distribution_qc(dt_assay = dt_norm_combo,
 
 In the gDR pipeline during the averaging stage, technical replicates that are stored in the same nested table are averaged.
 
-The **pheatmap_qc** function is dedicated to single-agent and combination experiments.
+The **pheatmap_qc** function is dedicated to single-agent, co-dilution and combination experiments.
 
 It allows to visually check whether the average values of selected metrics are as expected. 
 
@@ -266,6 +311,11 @@ The control heatmap is built for selected cell line names and drugs (for the com
 ```{r pheatmap_qc_sa, warning = FALSE, message = FALSE}
 hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
 ggpubr::as_ggplot(hm_sa[["gtable"]])
+```
+
+```{r pheatmap_qc_cd, warning = FALSE, message = FALSE}
+hm_cd <- pheatmap_qc(dt_average = dt_average_cd)
+ggpubr::as_ggplot(hm_cd[["gtable"]])
 ```
 
 ```{r pheatmap_qc_combo, warning = FALSE, message = FALSE}

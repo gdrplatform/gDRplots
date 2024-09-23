@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{pheatmap_with_anno_cd}
 \alias{pheatmap_with_anno_cd}
-\title{Plot pretty heatmap with annotationsfor co-dilution data}
+\title{Plot pretty heatmap with annotations for co-dilution data}
 \usage{
 pheatmap_with_anno_cd(
   dt_metrics,
@@ -77,10 +77,10 @@ A named list with elements:
 }
 }
 \description{
-Plot pretty heatmap with annotationsfor co-dilution data
+Plot pretty heatmap with annotations for co-dilution data
 }
 \examples{
-mae <- gDRutils::get_synthetic_data("combo_codilution")
+mae <- gDRutils::get_synthetic_data("combo_codilution_small")
 se <- mae[[gDRutils::get_supported_experiments("cd")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
