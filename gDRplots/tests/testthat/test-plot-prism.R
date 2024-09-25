@@ -79,9 +79,54 @@ obj_depmap_meta <- list(
   selected_feat_meta_col = "meta_xx"
 )
 
+#_assoc
+ls_feat <- setdiff(names(obj_depmap_feat[["dt_depmap"]]), c("ModelID", "CCLEName"))
+dist_q <- withr::with_seed(42, rnorm(400, mean = 0.3, sd = 0.05))
+
+dt_assoc_sa <- data.table::data.table(
+  feature = ls_feat,
+  response = rep("RV_gDR_xc50", NROW(ls_feat)),
+  rho = withr::with_seed(42, rnorm(NROW(ls_feat), mean = 0, sd = 0.05)),
+  q_value = withr::with_seed(42, sample(dist_q[dist_q < 0.3], NROW(ls_feat), replace = TRUE))
+)
+
+obj_assoc_sa <- list(dt_assoc = dt_assoc_sa,
+                     condition_info = unique(dt_response_met[["rId"]]),
+                     feature_info = "XZ_fatures")
+
+ls_meta <- setdiff(names(obj_depmap_meta[["dt_depmap"]]), c("ModelID", "CCLEName"))
+dist_q <- withr::with_seed(42, rnorm(400, mean = 1, sd = 0.1))
+
+dt_assoc_combo <- data.table::data.table(
+  feature = ls_meta,
+  response = rep("hsa_score", NROW(ls_meta)),
+  rho = withr::with_seed(42, rnorm(NROW(ls_meta), mean = 0, sd = 0.05)),
+  q_value = withr::with_seed(42, sample(dist_q[dist_q < 0.75], NROW(ls_meta), replace = TRUE))
+)
+
+obj_assoc_combo <- list(dt_assoc = dt_assoc_combo,
+                        condition_info = unique(dt_response_score[["rId"]]),
+                        feature_info = "meta_xx")
 
 # tests ----
 test_that("plot_volcano_assoc works as expected", {
+  plt_1 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                              feature_info = obj_assoc_sa[["feature_info"]])
+  
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 2)
+  expect_equal(plt_1[["labels"]][["x"]], "rho")
+  expect_equal(plt_1[["labels"]][["y"]], "neglog_q_value")
+  expect_equal(plt_1[["labels"]][["title"]], "RV_gDR_xc50__XZ_fatures") # <metric>__<feat>
+  
+  plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
+                              feature_info = obj_assoc_combo[["feature_info"]])
+  
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 2)
+  expect_equal(plt_2[["labels"]][["x"]], "rho")
+  expect_equal(plt_2[["labels"]][["y"]], "neglog_q_value")
+  expect_equal(plt_2[["labels"]][["title"]], "hsa_score__meta_xx") # <metric>__<feat>
 })
 
 test_that("plot_scatter_with_corr works as expected", {
