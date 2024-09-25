@@ -484,33 +484,45 @@ prep_dt_assoc <- function(dt_response,
   
   CCLEName <- NULL # due to NSE notes in R CMD check
   
+  # checking input format
+  selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
+  stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
+  selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+  stopifnot("Provide `dt_depmap` for one feature or one meta only." = 
+              all(vapply(dt_depmap[,selected_feat_meta, with = FALSE], is.numeric, logical(1))))
+  
+  # result
+  obj_assoc <- list(dt_assoc = data.table::data.table(),
+                    condition_info = NULL,
+                    feature_info = selected_feat_meta_col)
+  
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
   response_lines <- dt_response[[cellline_name]]
   shared_lines <- intersect(depmap_lines, response_lines)
   
-  # subset the data.table and order it
-  X_dt <- dt_depmap[CCLEName %in% shared_lines]
-  data.table::setorder(X_dt, "CCLEName")
-  Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
-  data.table::setorderv(Y_dt, cellline_name)
-  
-  # convert to a matrix
-  selected_feat_meta <- setdiff(names(X_dt), c("ModelID", "CCLEName"))
-  X <- as.matrix(
-    X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
-  )
-  selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
-  Y <- as.matrix(
-    Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
-  )
-  
-  # create dt_assoc
-  dt_assoc <- kaleidoscope::calc_assoc(X, Y)
-  
-  # final
-  dt_assoc <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
-  list(dt_assoc = dt_assoc,
-       condition_info = unique(dt_response[["rId"]]),
-       feature_info = selected_feat_meta_col)
+  if (NROW(shared_lines) > 0) {
+    # subset the data.table and order it
+    X_dt <- dt_depmap[CCLEName %in% shared_lines]
+    data.table::setorder(X_dt, "CCLEName")
+    Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
+    data.table::setorderv(Y_dt, cellline_name)
+    
+    # convert to a matrix
+    X <- as.matrix(
+      X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
+    )
+    Y <- as.matrix(
+      Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
+    )
+    
+    # create dt_assoc
+    dt_assoc <- kaleidoscope::calc_assoc(X, Y)
+    
+    # final
+    obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
+    obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
+  }
+  # return
+  return(obj_assoc)
 }
