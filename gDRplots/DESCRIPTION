@@ -36,7 +36,8 @@ Suggests:
     SummarizedExperiment,
     svglite,
     qs,
-    testthat
+    testthat,
+    withr
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
