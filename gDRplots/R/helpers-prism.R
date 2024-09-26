@@ -489,7 +489,7 @@ prep_dt_assoc <- function(dt_response,
   stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
   selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
   stopifnot("Provide `dt_depmap` for one feature or one meta only." = 
-              all(vapply(dt_depmap[,selected_feat_meta, with = FALSE], is.numeric, logical(1))))
+              all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
   
   # result
   obj_assoc <- list(dt_assoc = data.table::data.table(),
