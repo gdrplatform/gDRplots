@@ -138,6 +138,63 @@ prep_dt_response_dose_sa <- function(dt_average,
   dt_response_dose_fin
 }
 
+#' Prep table with metric values for single-agent experiment
+#' 
+#' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
+#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  and single-agent \code{SummarizedExperiment}
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param fit_source string source name for metrics
+#' 
+#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @keywords prism_plots
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Averaged")
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#' d_name <- "drug_004"
+#' dt_response_sa <- prep_dt_response_sa(dt_average, dt_metrics, d_name)
+#' 
+#' @export
+prep_dt_response_sa <- function(dt_average,
+                                dt_metrics,
+                                d_name,
+                                normalization_type = "RV",
+                                fit_source = "gDR") {
+  
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
+  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  
+  dt_response_met <-
+    prep_dt_response_metric_sa(dt_metrics = dt_metrics,
+                               d_name = d_name,
+                               normalization_type = normalization_type,
+                               metric = c("xc50", "x_mean", "x_max"))
+  dt_response_dose <- 
+    prep_dt_response_dose_sa(dt_average = dt_average, 
+                             d_name = d_name,
+                             normalization_type = normalization_type)
+  
+  id_col <- c("rId", "cId", "CellLineName")
+  dt_response_sa <- merge(dt_response_met, dt_response_dose, by = id_col)
+  return(dt_response_sa)
+}
 
 #' Prep table with metric values for combination experiment
 #' 
@@ -246,7 +303,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
- 
+  
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
   checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
@@ -352,7 +409,7 @@ prep_dt_depmap <- function(
   checkmate::assert_character(feature_sets, any.missing = FALSE)
   checkmate::assert_character(prefix, any.missing = FALSE)
   checkmate::assert_character(metadata_cols, any.missing = FALSE, null.ok = TRUE)
-
+  
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
   
   dt_depmap <- kaleidoscope::load_depmap_merged(
@@ -478,7 +535,7 @@ prep_dt_assoc <- function(dt_response,
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-
+  
   # checking input format
   selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
   stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
