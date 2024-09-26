@@ -7,18 +7,18 @@
 plot_volcano_corr_panel(dt_response, dt_depmap, selected_metric, selected_feat)
 }
 \arguments{
-\item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
-outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+\item{dt_response}{\code{data.table} with the experimental response data (rows are samples) 
+for one metric outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
-\item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
+\item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap.
 (rows are samples, columns are meta);  
 outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 
-\item{selected_metric}{string name of metric in \code{dt_response}}
+\item{selected_metric}{string name of the metric in \code{dt_response}}
 
-\item{selected_feat}{string with name of selected meta in \code{dt_depmap}}
+\item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 }
 \value{
 a panel with volcano plot and scatter plots with correlation for feature set

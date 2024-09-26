@@ -18,11 +18,11 @@ outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}
 or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one
-feature or one metadata; (rows are samples, column are feature or meta level).}
+feature or one metadata; (rows are samples, column are feature or metadata level).}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 
-\item{selected_feat_meta_col}{string name of feature column in DepMap}
+\item{selected_feat_meta_col}{string with the name of a feature column in DepMap}
 }
 \value{
 a scatter plot with correlation

@@ -114,7 +114,6 @@ heatmap_combo_metrics <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  legend_lbl_iso <- NULL # due to NSE notes in R CMD check
   legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(available_iso_lvl))
   
@@ -490,8 +489,7 @@ heatmap_combo_with_isoref <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(available_iso_lvl))
       names(iso_label) <- available_iso_lvl
-      
-      iso_source <- NULL # due to NSE notes in R CMD check
+ 
       tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
@@ -739,8 +737,7 @@ heatmap_combo_with_isoref_panel <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(iso_levels))
       names(iso_label) <- iso_levels
-      
-      iso_source <- NULL # due to NSE notes in R CMD check
+  
       tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_iso[, .SD, .SDcols = -c("pos_x", "pos_y")]

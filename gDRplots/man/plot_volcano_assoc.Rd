@@ -17,17 +17,18 @@ plot_volcano_assoc(
 \item{dt_assoc}{\code{data.table} with the calculated linear association between DepMap and metrics
 outputted by \code{kaleidoscope::calc_assoc}}
 
-\item{feature_info}{string describing name of associated feature/metadata from DepMap}
+\item{feature_info}{string describing the name of the associated feature/metadata from DepMap}
 
 \item{condition_info}{string describing experiment condition 
 (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}
 
 \item{q_cutoff}{numeric cutoff to identify statistically significant correlations}
 
-\item{named_p_top}{numeric value for p-top statistically significant correlations to be labeled on the plot}
+\item{named_p_top}{numeric value for p-top statistically significant correlations 
+to be labeled on the plot}
 
-\item{max_N}{numeric value for limit maximum number of non-statistically significant points to plot; 
-for default \code{NULL} all points will be plotted.}
+\item{max_N}{numeric value for limit the maximum number of non-statistically 
+significant points to plot; for default \code{NULL} all points will be plotted.}
 }
 \value{
 a volcano plot with association

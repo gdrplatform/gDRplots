@@ -2,13 +2,14 @@
 #'
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
 #'     outputted by \code{kaleidoscope::calc_assoc}
-#' @param feature_info string describing name of associated feature/metadata from DepMap
+#' @param feature_info string describing the name of the associated feature/metadata from DepMap
 #' @param condition_info string describing experiment condition 
 #'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
 #' @param q_cutoff numeric cutoff to identify statistically significant correlations
-#' @param named_p_top numeric value for p-top statistically significant correlations to be labeled on the plot
-#' @param max_N numeric value for limit maximum number of non-statistically significant points to plot; 
-#'     for default \code{NULL} all points will be plotted.
+#' @param named_p_top numeric value for p-top statistically significant correlations 
+#'     to be labeled on the plot
+#' @param max_N numeric value for limit the maximum number of non-statistically 
+#'     significant points to plot; for default \code{NULL} all points will be plotted.
 #'
 #' @return a volcano plot with association
 #' @keywords prism_plots
@@ -30,7 +31,6 @@ plot_volcano_assoc <- function(dt_assoc,
   
   x_lbl <- "rho"
   y_lbl <- "neglog_q_value"
-  stat_sig <- q_value <- label <- feature <- NULL # due to NSE notes in R CMD check
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
   
@@ -59,7 +59,7 @@ plot_volcano_assoc <- function(dt_assoc,
     data.table::setorderv(tab_plot, cols = "q_value")
     named_p_top_act <- min(named_p_top, NROW(tab_plot)) # deal with less than p-entries
     tab_plot[["label"]] <- ""
-    tab_plot[1:named_p_top_act, label := feature]
+    tab_plot[seq_len(named_p_top_act), label := feature]
     
     # prep data
     tab_plot[[y_lbl]] <- -log10(tab_plot$q_value)
@@ -92,9 +92,9 @@ plot_volcano_assoc <- function(dt_assoc,
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one
-#'    feature or one metadata; (rows are samples, column are feature or meta level). 
+#'    feature or one metadata; (rows are samples, column are feature or metadata level). 
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
-#' @param selected_feat_meta_col string name of feature column in DepMap
+#' @param selected_feat_meta_col string with the name of a feature column in DepMap
 #'
 #' @return a scatter plot with correlation
 #' @keywords prism_plots
@@ -117,9 +117,7 @@ plot_scatter_with_corr <- function(dt_response,
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
-  
-  label <- CCLEName <- NULL # due to NSE notes in R CMD check
-  
+
   # prep table with data to plot
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
@@ -178,9 +176,9 @@ plot_scatter_with_corr <- function(dt_response,
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap_lng \code{data.table} with dependent variables data loaded from DepMap - for one
 #'    metadata in long format - column with cellline names and second with values for meta.
-#' @param selected_meta string with name of selected meta data from \code{dt_depmap}
-#' @param with_1_item_grp logical flag whether to show group with only one item
-#' @param max_x_lbl_length numeric value for max character number of x-axis label
+#' @param selected_meta string with the name of the selected metadata from \code{dt_depmap}
+#' @param with_1_item_grp logical flag indicating whether to show group with only one item
+#' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
 #'
 #' @return a boxplot
 #' 
@@ -215,9 +213,7 @@ plot_boxplot_meta <- function(dt_response,
         NROW(unique(dt_depmap_lng[get(selected_meta) != "", ][[selected_meta]])) < NROW(dt_depmap_lng[get(selected_meta) != "", ]) # nolint
       )
   )
-  
-  N <- CCLEName <- NULL # due to NSE notes in R CMD check
-  
+
   # prep table with data to plot
   X_dt <- dt_depmap_lng[, c("CCLEName", selected_meta), with = FALSE]
   if (is.numeric(X_dt[[selected_meta]])) {
@@ -270,15 +266,15 @@ plot_boxplot_meta <- function(dt_response,
 
 #' Plot panel with volcano plot and scatter plots (top 4) features from DepMap
 #'
-#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+#' @param dt_response \code{data.table} with the experimental response data (rows are samples) 
+#'  for one metric outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
-#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap.
 #'  (rows are samples, columns are meta);  
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
-#' @param selected_metric string name of metric in \code{dt_response}
-#' @param selected_feat string with name of selected meta in \code{dt_depmap}
+#' @param selected_metric string name of the metric in \code{dt_response}
+#' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #'
 #' @return a panel with volcano plot and scatter plots with correlation for feature set
 #' 
@@ -305,7 +301,7 @@ plot_volcano_corr_panel <- function(dt_response,
   # plot data
   dt_response_ <- dt_response[, c("rId", "cId", cellline_name, selected_metric), with = FALSE]
   
-  obj_assoc <- gDRplots::prep_dt_assoc(dt_response = dt_response_,
+  obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                                        dt_depmap = dt_depmap,
                                        selected_feat_meta_col = selected_feat)
   # volcano plot
@@ -316,7 +312,7 @@ plot_volcano_corr_panel <- function(dt_response,
   # scatter plot with corr
   top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
   ls_plt_corr <- lapply(top_4, function(top_feat) {
-    gDRplots::plot_scatter_with_corr(dt_response = dt_response_,
+    plot_scatter_with_corr(dt_response = dt_response_,
                                      dt_depmap = dt_depmap,
                                      selected_feat = top_feat,
                                      selected_feat_meta_col = selected_feat) +
@@ -342,8 +338,8 @@ plot_volcano_corr_panel <- function(dt_response,
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'  (rows are samples, columns are meta);  
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
-#' @param selected_metric string name of metric in \code{dt_response}
-#' @param selected_meta string with name of selected meta in \code{dt_depmap}
+#' @param selected_metric string name of the metric in \code{dt_response}
+#' @param selected_meta string with the name of the selected metadata from \code{dt_depmap}
 #'
 #' @return a panel with volcano plot and boxplot for mata
 #' 
@@ -364,21 +360,19 @@ plot_volcano_box_panel <- function(dt_response,
   checkmate::assert_string(selected_meta)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-  
-  value <- NULL # due to NSE notes in R CMD check
-  
+
   # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
   
   # plot data
   dt_response_ <- dt_response[, c("rId", "cId", cellline_name, selected_metric), with = FALSE]
   
-  obj_assoc <- gDRplots::prep_dt_assoc(dt_response = dt_response_,
-                                       dt_depmap = dt_depmap,
-                                       selected_feat_meta_col = selected_meta)
+  obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
+                             dt_depmap = dt_depmap,
+                             selected_feat_meta_col = selected_meta)
   dt_depmap_lng <- 
     data.table::melt(dt_depmap, 
                      id.vars = c("ModelID", "CCLEName"), variable.name = selected_meta
-    )[value == 1, ][, value := NULL]
+    )[value == 1, !"value"]
   
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],

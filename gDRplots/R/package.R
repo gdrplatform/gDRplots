@@ -20,7 +20,20 @@ utils::globalVariables(
     "x_std",
     "cId",
     "rId",
-    "p_value"
+    "p_value",
+    "CCLEName",
+    "cotrt_value",
+    "cotrt_value_zero",
+    "DrugCombination",
+    "feature",
+    "iso_source",
+    "label",
+    "legend_lbl_iso",
+    "ModelID",
+    "N",
+    "stat_sig",
+    "q_value",
+    "value"
   ),
   utils::packageName())
 

@@ -702,7 +702,6 @@ pheatmap_with_anno_cd <- function(
   }
   
   if (!is.null(annotation_row)) {
-    DrugCombination <- NULL # due to NSE notes in R CMD check
     annotation_row$DrugCombination <-
       paste(annotation_row[[drug_name]], "x", paste0(annotation_row[[drug_name_2]], "__", annotation_row[[conc_2]]))
     
@@ -968,7 +967,6 @@ pheatmap_with_anno_combo <- function(
   }
   
   if (!is.null(annotation_row)) {
-    DrugCombination <- NULL # due to NSE notes in R CMD check
     annotation_row$DrugCombination <-
       paste(annotation_row[[drug_name]], "x", annotation_row[[drug_name_2]])
     

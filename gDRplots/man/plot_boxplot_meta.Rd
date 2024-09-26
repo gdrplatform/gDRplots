@@ -21,11 +21,11 @@ or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 \item{dt_depmap_lng}{\code{data.table} with dependent variables data loaded from DepMap - for one
 metadata in long format - column with cellline names and second with values for meta.}
 
-\item{selected_meta}{string with name of selected meta data from \code{dt_depmap}}
+\item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}}
 
-\item{with_1_item_grp}{logical flag whether to show group with only one item}
+\item{with_1_item_grp}{logical flag indicating whether to show group with only one item}
 
-\item{max_x_lbl_length}{numeric value for max character number of x-axis label}
+\item{max_x_lbl_length}{numeric value for the maximum number of characters in the x-axis label}
 }
 \value{
 a boxplot

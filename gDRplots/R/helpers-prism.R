@@ -201,7 +201,8 @@ prep_dt_response_scores <- function(dt_scores,
   # final
   meta_col <- c("rId", "cId", cellline_name)
   dt_response_scores <- dt_response_scores[, c(meta_col, metric), with = FALSE]
-  data.table::setnames(dt_response_scores, metric, sprintf("%s_%s_%s", normalization_type, fit_source, metric))
+  data.table::setnames(dt_response_scores, old = metric, 
+                       new = sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
 
 
@@ -245,9 +246,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  
-  cotrt_value <- cotrt_value_zero <- NULL # due to NSE notes in R CMD check
-  
+ 
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
   checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
@@ -353,9 +352,7 @@ prep_dt_depmap <- function(
   checkmate::assert_character(feature_sets, any.missing = FALSE)
   checkmate::assert_character(prefix, any.missing = FALSE)
   checkmate::assert_character(metadata_cols, any.missing = FALSE, null.ok = TRUE)
-  
-  ModelID <- NULL # due to NSE notes in R CMD check
-  
+
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
   
   dt_depmap <- kaleidoscope::load_depmap_merged(
@@ -481,9 +478,7 @@ prep_dt_assoc <- function(dt_response,
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  
-  CCLEName <- NULL # due to NSE notes in R CMD check
-  
+
   # checking input format
   selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
   stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)

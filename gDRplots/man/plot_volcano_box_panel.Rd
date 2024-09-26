@@ -16,9 +16,9 @@ or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 (rows are samples, columns are meta);  
 outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 
-\item{selected_metric}{string name of metric in \code{dt_response}}
+\item{selected_metric}{string name of the metric in \code{dt_response}}
 
-\item{selected_meta}{string with name of selected meta in \code{dt_depmap}}
+\item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}}
 }
 \value{
 a panel with volcano plot and boxplot for mata
