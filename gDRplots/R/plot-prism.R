@@ -124,17 +124,14 @@ plot_scatter_with_corr <- function(dt_response,
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
-  
-  # re-calculate correlation
-  c <- stats::cor(tab_plot[[selected_feat]], tab_plot[[selected_metric]], 
-                  method = "pearson", use = "pairwise.complete.obs") 
-  # calculate slope (b1 = r * (sd(y) / sd(x)))
-  slope <- c * (stats::sd(tab_plot[[selected_metric]]) / stats::sd(tab_plot[[selected_feat]])) 
-  # calculate intercept (b0 = mean(y) - b1 * mean(x))
-  intercept <- mean(tab_plot[[selected_metric]]) - slope * mean(tab_plot[[selected_feat]])
-  
+
+  # re-calculate correlation, slope and intercept
   # add label for points driving the correlation
   fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
+  intercept <- fit$coefficients[1]
+  slope <- fit$coefficients[2]
+  c <- summary(fit)$adj.r.squared
+  
   dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
   top_driving_corr <- as.numeric(names(dist_cooks)[1:5])
   tab_plot$label <- ""
