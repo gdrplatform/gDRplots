@@ -67,7 +67,9 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   # final
   meta_col <- c("rId", "cId", cellline_name)
   dt_response_metric <- dt_response_metric[, c(meta_col, metric), with = FALSE]
-  data.table::setnames(dt_response_metric, metric, sprintf("%s_%s_%s", normalization_type, fit_source, metric))
+  data.table::setnames(dt_response_metric, 
+                       old = metric, 
+                       new = sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
 
 #' Prep table with metric values by doses for single-agent experiment
@@ -100,7 +102,7 @@ prep_dt_response_dose_sa <- function(dt_average,
                                      normalization_type = "RV",
                                      metric = "x",
                                      fit_source = "gDR") {
-  # TODO add ls_conc -> user can selec conc
+  # TODO add ls_conc -> user can select conc
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   conc <- gDRutils::get_env_identifiers("concentration")
@@ -128,8 +130,10 @@ prep_dt_response_dose_sa <- function(dt_average,
   )
   data.table::setkey(dt_response_dose_fin, NULL)
   ls_conc <- names(dt_response_dose_fin)[names(dt_response_dose_fin) != "cellline_name"]
-  data.table::setnames(dt_response_dose_fin, names(dt_response_dose_fin), 
-                       c(cellline_name, sprintf("%s_%s_%s", normalization_type, fit_source, ls_conc)))
+  data.table::setnames(
+    dt_response_dose_fin, 
+    old = names(dt_response_dose_fin), 
+    new = c(cellline_name, sprintf("%s_%s_%s_%s", normalization_type, fit_source, metric, ls_conc)))
   
   # final
   meta_col <- c("rId", "cId", cellline_name)
