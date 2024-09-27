@@ -184,7 +184,7 @@ test_that("plot_volcano_assoc works as expected", {
 
 test_that("plot_scatter_with_corr works as expected", {
   selected_feat <- "XZ_A3OP"
-  selected_metric <- "RV_gDR_0.01"
+  selected_metric <- "RV_gDR_x_0.01"
   dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   plt_1 <- 
@@ -316,6 +316,10 @@ test_that("plot_boxplot_meta works as expected", {
                                  dt_depmap_lng = unlist(dt_depmap_meta_lng), 
                                  selected_meta = selected_meta),
                "Assertion on 'dt_depmap_lng' failed: Must be a data.table")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = "non_existen_meta"),
+               "Assertion on 'names\\(dt_depmap_lng\\)' failed: Names must include the elements")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap_lng = dt_depmap_meta_lng, 
                                  selected_meta = 1),
