@@ -115,24 +115,77 @@ test_that("plot_volcano_assoc works as expected", {
   
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 2)
-  expect_equal(plt_1[["labels"]][["x"]], "rho")
-  expect_equal(plt_1[["labels"]][["y"]], "neglog_q_value")
+  expect_equal(plt_1[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_1[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_equal(plt_1[["labels"]][["title"]], "RV_gDR_xc50__XZ_fatures") # <metric>__<feat>
   
-  plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
-                              feature_info = obj_assoc_combo[["feature_info"]])
-  
+  no_lbl <- 3
+  q_alpha <- 0.25
+  plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                              feature_info = obj_assoc_sa[["feature_info"]],
+                              condition_info = obj_assoc_sa[["condition_info"]],
+                              alpha = q_alpha,
+                              named_p_top = no_lbl)
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 2)
-  expect_equal(plt_2[["labels"]][["x"]], "rho")
-  expect_equal(plt_2[["labels"]][["y"]], "neglog_q_value")
-  expect_equal(plt_2[["labels"]][["title"]], "hsa_score__meta_xx") # <metric>__<feat>
+  expect_equal(plt_2[["labels"]][["subtitle"]], obj_assoc_sa[["condition_info"]])
+  expect_length(unique(unlist(ggplot2::ggplot_build(plt_2)$data[[1]]$colour)), 
+                NROW(unique(obj_assoc_sa[["dt_assoc"]]$q_value <= q_alpha))) # stat significant
+  expect_length( 
+    ggplot2::ggplot_build(plt_2)$data[[1]]$label[ggplot2::ggplot_build(plt_2)$data[[1]]$label != ""],
+    no_lbl) # lbl for top feat
+  
+  plt_3 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
+                              feature_info = obj_assoc_combo[["feature_info"]])
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 2)
+  expect_equal(plt_3[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_3[["labels"]][["y"]], "neglog_q_value") # predef for y axis
+  expect_equal(plt_3[["labels"]][["title"]], "hsa_score__meta_xx") # <metric>__<meta>
+  
+  q_alpha_2 <- 0.71
+  plt_4 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
+                              feature_info = obj_assoc_combo[["feature_info"]],
+                              alpha = q_alpha_2)
+  expect_is(plt_4, "gg")
+  plt_4_data <- data.table::as.data.table(ggplot2::ggplot_build(plt_4)$data[[1]])
+  expect_length(unique(unlist(plt_4_data$colour)), 
+                NROW(unique(obj_assoc_combo[["dt_assoc"]]$q_value <= q_alpha_2))) # stat significant
+  expect_equal(sort(plt_4_data$label[which(unlist(plt_4_data$colour) == "black")]),
+               sort(obj_assoc_combo[["dt_assoc"]][q_value <= q_alpha_2, ]$feature))
+  
+  # testing assertions
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
+                                  feature_info = obj_assoc_sa[["feature_info"]]),
+               "Assertion on 'dt_assoc' failed: Must be a data.table")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa),
+               "Assertion on 'feature_info' failed: Must be of type 'string'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  condition_info = 123),
+               "Assertion on 'condition_info' failed: Must be of type 'string'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  alpha = "0.1"),
+               "Assertion on 'alpha' failed: Must be of type 'number'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  named_p_top = "5"),
+               "Assertion on 'named_p_top' failed: Must be of type 'number'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  max_N = "only 10"),
+               "Assertion on 'max_N' failed: Must be of type 'number'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  max_N = 2:6),
+               "Assertion on 'max_N' failed: Must have length 1.")
 })
 
 test_that("plot_scatter_with_corr works as expected", {
   selected_feat <- "XZ_A3OP"
-  selected_metrics <- "RV_gDR_0.01"
-  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metrics), with = FALSE]
+  selected_metric <- "RV_gDR_0.01"
+  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   plt_1 <- 
     plot_scatter_with_corr(dt_response = dt_response,
@@ -141,7 +194,7 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
-  expect_equal(plt_1[["labels"]][["y"]], selected_metrics)
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
   expect_true(all(vapply(c("corr", "slope", "intercept"), 
@@ -157,8 +210,8 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   
   selected_feat_2 <- "XZ_A5BN"
-  selected_metrics_2 <- "RV_gDR_bliss_score"
-  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metrics_2), with = FALSE]
+  selected_metric_2 <- "RV_gDR_bliss_score"
+  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
   plt_3 <-
     plot_scatter_with_corr(dt_response = dt_response_2,
@@ -168,15 +221,38 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat_2)
-  expect_equal(plt_3[["labels"]][["y"]], selected_metrics_2)
+  expect_equal(plt_3[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_3[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   expect_equal(plt_3[["labels"]][["caption"]], unique(dt_response_2$rId))
+  
+  # testing assertions
+  expect_error(plot_scatter_with_corr(dt_response = unlist(dt_response),
+                                      dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                      selected_feat = selected_feat),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_scatter_with_corr(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat, 
+                                      selected_feat = selected_feat),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_scatter_with_corr(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                      selected_feat = 1),
+               "Assertion on 'selected_feat' failed: Must be of type 'string'")
+  expect_error(plot_scatter_with_corr(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                      selected_feat = "not_existen_feat"),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+  expect_error(plot_scatter_with_corr(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                      selected_feat = selected_feat,
+                                      selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
 }) 
 
 test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
-  selected_metrics <- "RV_gDR_xc50"
-  dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metrics), with = FALSE]
+  selected_metric <- "RV_gDR_xc50"
+  dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
   
@@ -184,7 +260,7 @@ test_that("plot_boxplot_meta works as expected", {
                              dt_depmap_lng = dt_depmap_meta_lng, 
                              selected_meta = selected_meta)
   expect_is(plt_1, "gg")
-  expect_equal(plt_1[["labels"]][["y"]], selected_metrics)
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
   expect_length(plt_1[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_1)$data[[3]]$xid,
@@ -219,15 +295,44 @@ test_that("plot_boxplot_meta works as expected", {
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
   
-  selected_metrics_2 <- "RV_gDR_bliss_score"
-  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metrics_2), with = FALSE]
+  selected_metric_2 <- "RV_gDR_bliss_score"
+  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
   plt_4 <- plot_boxplot_meta(dt_response = dt_response_2,
                              dt_depmap_lng = dt_depmap_meta_lng, 
                              selected_meta = selected_meta)
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4)
-  expect_equal(plt_4[["labels"]][["y"]], selected_metrics_2)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
+  
+  # testing assertions
+  expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = selected_meta),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = unlist(dt_depmap_meta_lng), 
+                                 selected_meta = selected_meta),
+               "Assertion on 'dt_depmap_lng' failed: Must be a data.table")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = 1),
+               "Assertion on 'selected_meta' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = selected_meta,
+                                 with_1_item_grp = "str"),
+               "Assertion on 'with_1_item_grp' failed: Must be of type 'logical flag'")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = selected_meta,
+                                 max_x_lbl_length = "ten"),
+               "Assertion on 'max_x_lbl_length' failed: Must be of type 'number'")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 selected_meta = selected_meta,
+                                 max_x_lbl_length = 1:5),
+               "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 

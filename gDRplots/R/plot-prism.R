@@ -110,8 +110,8 @@ plot_scatter_with_corr <- function(dt_response,
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
-  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
   checkmate::assert_string(selected_feat)
+  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
@@ -197,7 +197,7 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_string(selected_meta)
   checkmate::assert_names(names(dt_depmap_lng), must.include = c("CCLEName", selected_meta))
   checkmate::assert_flag(with_1_item_grp)
-  checkmate::assert_int(max_x_lbl_length, lower = 5)
+  checkmate::assert_number(max_x_lbl_length, lower = 5)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
