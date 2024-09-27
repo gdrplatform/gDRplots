@@ -5,7 +5,7 @@
 #' @param feature_info string describing the name of the associated feature/metadata from DepMap
 #' @param condition_info string describing experiment condition 
 #'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
-#' @param q_cutoff numeric cutoff to identify statistically significant correlations
+#' @param alpha numeric cutoff to identify statistically significant correlations
 #' @param named_p_top numeric value for p-top statistically significant correlations 
 #'     to be labeled on the plot
 #' @param max_N numeric value for limit the maximum number of non-statistically 
@@ -18,14 +18,14 @@
 plot_volcano_assoc <- function(dt_assoc,
                                feature_info,
                                condition_info = NULL,
-                               q_cutoff = 0.05,
+                               alpha = 0.05,
                                named_p_top = 10,
                                max_N = NULL) {
   
   checkmate::assert_data_table(dt_assoc)
   checkmate::assert_string(feature_info)
   checkmate::assert_string(condition_info, null.ok = TRUE)
-  checkmate::assert_number(q_cutoff, lower = 0, upper = 1)
+  checkmate::assert_number(alpha, lower = 0, upper = 1)
   checkmate::assert_number(named_p_top, lower = 0)
   checkmate::assert_number(max_N, lower = 10, null.ok = TRUE)
   
@@ -46,7 +46,7 @@ plot_volcano_assoc <- function(dt_assoc,
     tab_plot <- data.table::setorderv(data.table::copy(dt_assoc), cols = "q_value")
     
     # prep column with statistically significant
-    tab_plot[, stat_sig :=  data.table::fifelse(q_value <= q_cutoff, "yes", "no")]
+    tab_plot[, stat_sig :=  data.table::fifelse(q_value <= alpha, "yes", "no")]
     
     # downsample non-statistically significant dots
     if (!is.null(max_N) && NROW(tab_plot[stat_sig == "no", ]) > max_N) {
@@ -128,9 +128,10 @@ plot_scatter_with_corr <- function(dt_response,
   # re-calculate correlation, slope and intercept
   # add label for points driving the correlation
   fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
-  intercept <- fit$coefficients[1]
-  slope <- fit$coefficients[2]
-  c <- summary(fit)$adj.r.squared
+  intercept <- stats::coef(fit)[1]
+  slope <- stats::coef(fit)[2]
+  r_squared <- summary(fit)$r.squared
+  correlation <- sqrt(r_squared)
   
   dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
   top_driving_corr <- as.numeric(names(dist_cooks)[1:5])
@@ -141,7 +142,7 @@ plot_scatter_with_corr <- function(dt_response,
   
   # plot title
   plt_subtitle <- 
-    sprintf("corr=%2.2f, slope=%2.2f, intercept=%2.2f", c, slope, intercept)
+    sprintf("corr=%2.2f, slope=%2.2f, intercept=%2.2f", correlation, slope, intercept)
   
   plt <-        
     ggplot2::ggplot(

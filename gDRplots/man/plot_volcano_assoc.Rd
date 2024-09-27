@@ -8,7 +8,7 @@ plot_volcano_assoc(
   dt_assoc,
   feature_info,
   condition_info = NULL,
-  q_cutoff = 0.05,
+  alpha = 0.05,
   named_p_top = 10,
   max_N = NULL
 )
@@ -22,7 +22,7 @@ outputted by \code{kaleidoscope::calc_assoc}}
 \item{condition_info}{string describing experiment condition 
 (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}
 
-\item{q_cutoff}{numeric cutoff to identify statistically significant correlations}
+\item{alpha}{numeric cutoff to identify statistically significant correlations}
 
 \item{named_p_top}{numeric value for p-top statistically significant correlations 
 to be labeled on the plot}
