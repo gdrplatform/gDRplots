@@ -312,10 +312,11 @@ test_that("prep_dt_response_combo works as expected", {
   
   dt_response_combo <- prep_dt_response_combo(dt_metrics, dt_scores, d_name, d_name2) # default
   expect_is(dt_response_combo, "data.table")
-  expect_true(all(names(dt_response_combo) %in%  
-                    c(meta_col, 
-                      sprintf("RV_gDR_%s", sel_met_combo),
-                      do.call(paste0, expand.grid(sprintf("RV_gDR_%s", sel_met), sprintf("_%s_", comb), ls_col_diff_fin)))))
+  expect_true(
+    all(names(dt_response_combo) %in%  
+          c(meta_col, 
+            sprintf("RV_gDR_%s", sel_met_combo),
+            do.call(paste0, expand.grid(sprintf("RV_gDR_%s", sel_met), sprintf("_%s_", comb), ls_col_diff_fin))))) # nolint
   expect_equal(NROW(dt_response_combo), NROW(res_scores))
   expect_equal(NROW(dt_response_combo), NROW(res_cotrt))
   
