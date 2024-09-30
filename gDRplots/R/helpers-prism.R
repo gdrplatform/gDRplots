@@ -457,7 +457,7 @@ prep_dt_response_combo <- function(dt_metrics,
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
+#' @seealso \code{kaleidoscope::load_depmap_merged}
 #'
 #' @examples
 #' \dontrun{
@@ -513,7 +513,7 @@ prep_dt_depmap <- function(
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{\link[kaleidoscope]{load_depmap_merged}}
+#' @seealso \code{kaleidoscope::load_depmap_merged}
 #'
 #' @examples
 #' \dontrun{
@@ -554,7 +554,7 @@ prep_dt_depmap_feat <- function(
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{\link[kaleidoscope]{load_depmap_list}}
+#' @seealso \code{kaleidoscope::load_depmap_merged}
 #'
 #' @examples
 #' \dontrun{
@@ -648,11 +648,11 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # create dt_assoc
-    # dt_assoc <- kaleidoscope::calc_assoc(X, Y) # required GDR-2704 to be done # nolint
+    # dt_assoc <- kaleidoscope::calc_assoc(X, Y) # required GDR-2704 to be done # nolint start
     
     # # final
     # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
-    # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # no lint end
+    # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
   }
   # return
   return(obj_assoc)

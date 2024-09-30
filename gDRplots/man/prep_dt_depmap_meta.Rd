@@ -25,6 +25,6 @@ dt_depmap_meta <- prep_dt_depmap_meta()
 }
 }
 \seealso{
-\code{\link[kaleidoscope]{load_depmap_list}}
+\code{kaleidoscope::load_depmap_merged}
 }
 \keyword{internal}

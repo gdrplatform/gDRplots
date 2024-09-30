@@ -29,6 +29,6 @@ dt_depmap_feat <- prep_dt_depmap_feat()
 
 }
 \seealso{
-\code{\link[kaleidoscope]{load_depmap_merged}}
+\code{kaleidoscope::load_depmap_merged}
 }
 \keyword{internal}
