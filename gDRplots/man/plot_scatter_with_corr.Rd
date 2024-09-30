@@ -23,7 +23,8 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 
-\item{selected_feat_meta_col}{string with the name of a feature column in DepMap}
+\item{selected_feat_meta_col}{string with the name of a feature column in DepMap 
+(will be used as a plot title)}
 }
 \value{
 a scatter plot with correlation

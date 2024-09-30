@@ -22,7 +22,8 @@ or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 (rows are samples, columns are metadata levels);  
 outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 
-\item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}}
+\item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}
+(will be used as a plot title)}
 
 \item{with_1_item_grp}{logical flag indicating whether to show group with only one item}
 

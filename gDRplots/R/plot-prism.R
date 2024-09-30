@@ -95,7 +95,8 @@ plot_volcano_assoc <- function(dt_assoc,
 #'  (rows are samples, columns are features). 
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
-#' @param selected_feat_meta_col string with the name of a feature column in DepMap
+#' @param selected_feat_meta_col string with the name of a feature column in DepMap 
+#'  (will be used as a plot title)
 #'
 #' @return a scatter plot with correlation
 #' @keywords prism_plots
@@ -177,6 +178,7 @@ plot_scatter_with_corr <- function(dt_response,
 #'  (rows are samples, columns are metadata levels);  
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #' @param selected_meta string with the name of the selected metadata from \code{dt_depmap}
+#'  (will be used as a plot title)
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
 #' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
 #'
