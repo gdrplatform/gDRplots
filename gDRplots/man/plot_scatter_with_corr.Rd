@@ -17,8 +17,9 @@ outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}
 \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
-\item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one
-feature or one metadata; (rows are samples, column are feature or metadata level).}
+\item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one feature;
+(rows are samples, columns are features). 
+outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 
