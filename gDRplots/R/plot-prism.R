@@ -172,8 +172,9 @@ plot_scatter_with_corr <- function(dt_response,
 #'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
-#' @param dt_depmap_lng \code{data.table} with dependent variables data loaded from DepMap - for one
-#'    metadata in long format - column with cellline names and second with values for meta.
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'  (rows are samples, columns are meta);  
+#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #' @param selected_meta string with the name of the selected metadata from \code{dt_depmap}
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
 #' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
@@ -184,7 +185,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' 
 #' @export
 plot_boxplot_meta <- function(dt_response,
-                              dt_depmap_lng, 
+                              dt_depmap, 
                               selected_meta,
                               with_1_item_grp = TRUE,
                               max_x_lbl_length = 60) {
@@ -193,9 +194,9 @@ plot_boxplot_meta <- function(dt_response,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
-  checkmate::assert_data_table(dt_depmap_lng)
+  checkmate::assert_data_table(dt_depmap)
   checkmate::assert_string(selected_meta)
-  checkmate::assert_names(names(dt_depmap_lng), must.include = c("CCLEName", selected_meta))
+  checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_number(max_x_lbl_length, lower = 5)
   
@@ -203,7 +204,14 @@ plot_boxplot_meta <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  stopifnot("There is no data in `dt_depmap_lng` (all `selected_meta` is NA)." = !all(is.na(dt_depmap_lng[[selected_meta]]))) # nolint
+  dt_depmap_lng <- 
+    data.table::melt(dt_depmap, 
+                     id.vars = c("ModelID", "CCLEName"), 
+                     variable.name = selected_meta, variable.factor = FALSE
+    )[value == 1, !"value"]
+  
+  stopifnot("There is no data in `dt_depmap` (all `selected_meta` is NA)." =
+              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_meta]]))) # nolint
   stopifnot(
     "It seems that `dt_depmap_lng` has too many categories for `selected_meta` - try use `plot_scatter_with_corr()`." = 
       all(
@@ -211,7 +219,7 @@ plot_boxplot_meta <- function(dt_response,
         NROW(unique(dt_depmap_lng[get(selected_meta) != "", ][[selected_meta]])) < NROW(dt_depmap_lng[get(selected_meta) != "", ]) # nolint
       )
   )
-
+  
   # prep table with data to plot
   X_dt <- dt_depmap_lng[, c("CCLEName", selected_meta), with = FALSE]
   if (is.numeric(X_dt[[selected_meta]])) {
@@ -367,18 +375,15 @@ plot_volcano_box_panel <- function(dt_response,
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_meta)
-  dt_depmap_lng <- 
-    data.table::melt(dt_depmap, 
-                     id.vars = c("ModelID", "CCLEName"), variable.name = selected_meta
-    )[value == 1, !"value"]
-  
+
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
                                 feature_info = selected_meta) +
     ggplot2::labs(title = "")
+  
   # boxplot
   plt_box <- plot_boxplot_meta(dt_response = dt_response_,
-                               dt_depmap_lng = dt_depmap_lng,
+                               dt_depmap = dt_depmap,
                                selected_meta = selected_meta) +
     ggplot2::labs(title = "", caption = "")
   

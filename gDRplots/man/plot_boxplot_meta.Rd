@@ -6,7 +6,7 @@
 \usage{
 plot_boxplot_meta(
   dt_response,
-  dt_depmap_lng,
+  dt_depmap,
   selected_meta,
   with_1_item_grp = TRUE,
   max_x_lbl_length = 60
@@ -18,8 +18,9 @@ outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}
 \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
 
-\item{dt_depmap_lng}{\code{data.table} with dependent variables data loaded from DepMap - for one
-metadata in long format - column with cellline names and second with values for meta.}
+\item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
+(rows are samples, columns are meta);  
+outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 
 \item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}}
 

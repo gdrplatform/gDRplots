@@ -71,7 +71,7 @@ dt_depmap_meta <- data.table::dcast(data = dt_depmap_meta_lng,
                                     formula = CCLEName ~ meta_xx, 
                                     fun.aggregate = length)
 data.table::setkey(dt_depmap_meta, NULL)
-data.table::setnames(dt_depmap_meta, "NA", "unknown")
+dt_depmap_meta[, "NA" := NULL] # as in kaleidoscope
 dt_depmap_meta <- merge(dt_model, dt_depmap_meta, by = "CCLEName")
 
 obj_depmap_meta <- list(
@@ -257,7 +257,7 @@ test_that("plot_boxplot_meta works as expected", {
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
   
   plt_1 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap_lng = dt_depmap_meta_lng, 
+                             dt_depmap = dt_depmap_meta, 
                              selected_meta = selected_meta)
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
@@ -265,11 +265,11 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(plt_1[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_1)$data[[3]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
-  expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range), 
+  expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap_lng = dt_depmap_meta_lng, 
+                             dt_depmap = dt_depmap_meta, 
                              selected_meta = selected_meta,
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
@@ -280,7 +280,7 @@ test_that("plot_boxplot_meta works as expected", {
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap_lng = dt_depmap_meta_lng, 
+                             dt_depmap = dt_depmap_meta, 
                              selected_meta = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
@@ -299,7 +299,7 @@ test_that("plot_boxplot_meta works as expected", {
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
   plt_4 <- plot_boxplot_meta(dt_response = dt_response_2,
-                             dt_depmap_lng = dt_depmap_meta_lng, 
+                             dt_depmap = dt_depmap_meta, 
                              selected_meta = selected_meta)
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4)
@@ -309,34 +309,36 @@ test_that("plot_boxplot_meta works as expected", {
   
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 dt_depmap = dt_depmap_meta,
                                  selected_meta = selected_meta),
                "Assertion on 'dt_response' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = unlist(dt_depmap_meta_lng), 
+                                 dt_depmap = unlist(dt_depmap_meta), 
                                  selected_meta = selected_meta),
-               "Assertion on 'dt_depmap_lng' failed: Must be a data.table")
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
-                                 selected_meta = "non_existen_meta"),
-               "Assertion on 'names\\(dt_depmap_lng\\)' failed: Names must include the elements")
-  expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 dt_depmap = dt_depmap_meta,
                                  selected_meta = 1),
                "Assertion on 'selected_meta' failed: Must be of type 'string'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 dt_depmap = dt_depmap_meta, 
                                  selected_meta = selected_meta,
                                  with_1_item_grp = "str"),
                "Assertion on 'with_1_item_grp' failed: Must be of type 'logical flag'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 dt_depmap = dt_depmap_meta, 
                                  selected_meta = selected_meta,
                                  max_x_lbl_length = "ten"),
                "Assertion on 'max_x_lbl_length' failed: Must be of type 'number'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
-                                 dt_depmap_lng = dt_depmap_meta_lng, 
+                                 dt_depmap = dt_depmap_meta, 
                                  selected_meta = selected_meta,
                                  max_x_lbl_length = 1:5),
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 
+
+test_that("plot_volcano_corr_panel works as expected", {
+})
+
+test_that("plot_volcano_box_panel works as expected", {
+})

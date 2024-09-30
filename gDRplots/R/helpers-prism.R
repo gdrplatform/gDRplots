@@ -488,14 +488,15 @@ prep_dt_depmap <- function(
   
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
   
-  dt_depmap <- kaleidoscope::load_depmap_merged(
-    feature_sets = feature_sets,
-    prefix = prefix,
-    metadata_columns = unique(c("CCLEName", metadata_cols)))
-  dt_depmap[, ModelID := NULL]
-  
-  dt_depmap["CCLEName" != ""]
-  return(dt_depmap)
+  # required GDR-2704 to be done # nolint start
+  # dt_depmap <- kaleidoscope::load_depmap_merged( 
+  #   feature_sets = feature_sets,
+  #   prefix = prefix,
+  #   metadata_columns = unique(c("CCLEName", metadata_cols))) 
+  # dt_depmap[, ModelID := NULL]
+  # 
+  # dt_depmap["CCLEName" != ""]
+  # return(dt_depmap) # nolint end
 }
 
 #' Load DepMap merged data for one selected feature
@@ -529,15 +530,16 @@ prep_dt_depmap_feat <- function(
   
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_set) == NROW(prefix))
   
-  dt_depmap <- kaleidoscope::load_depmap_merged(
-    feature_sets = feature_set,
-    prefix = prefix,
-    metadata_columns = "CCLEName")
-  
-  data.table::setkey(dt_depmap, NULL)
-  dt_depmap["CCLEName" != ""]
-  
-  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set))
+  # required GDR-2704 to be done # nolint start
+  # dt_depmap <- kaleidoscope::load_depmap_merged(
+  #   feature_sets = feature_set,
+  #   prefix = prefix,
+  #   metadata_columns = "CCLEName") 
+  # 
+  # data.table::setkey(dt_depmap, NULL)
+  # dt_depmap["CCLEName" != ""]
+  # 
+  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
 }
 
 #' Load DepMap merged data for one selected metadata
@@ -563,10 +565,11 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   
   checkmate::assert_string(metadata_col)
   
-  ls_depmap <- kaleidoscope::load_depmap_list(
-    feature_sets = "OmicsCNGene",
-    prefix = "CN_",
-    metadata_columns = unique(c(metadata_col, "CCLEName")))
+  # required GDR-2704 to be done # nolint start
+  # ls_depmap <- kaleidoscope::load_depmap_list(
+  #   feature_sets = "OmicsCNGene",
+  #   prefix = "CN_",
+  #   metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
   ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
   
   dt_depmap <- data.table::data.table(
@@ -645,11 +648,11 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # create dt_assoc
-    dt_assoc <- kaleidoscope::calc_assoc(X, Y)
+    # dt_assoc <- kaleidoscope::calc_assoc(X, Y) # required GDR-2704 to be done # nolint
     
-    # final
-    obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
-    obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
+    # # final
+    # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
+    # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # no lint end
   }
   # return
   return(obj_assoc)
