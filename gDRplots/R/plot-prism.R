@@ -259,7 +259,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       panel.grid.minor = ggplot2::element_blank(), 
       aspect.ratio = 1,
       strip.background = ggplot2::element_blank(),
-      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
+      strip.text = ggplot2::element_text(size = 10, hjust = 0, margin = ggplot2::margin()),
       legend.position = "none"
     )
   
@@ -422,7 +422,7 @@ plot_volcano_corr_panel <- function(dt_response,
                                            dt_depmap = dt_depmap,
                                            selected_feats = top_4,
                                            selected_feat_meta_col = selected_feat) + 
-    ggplot2::labs(caption = "")
+    ggplot2::labs(title = "", caption = "")
   
   # final panel
   panel <- ggpubr::annotate_figure(
