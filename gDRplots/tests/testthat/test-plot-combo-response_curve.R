@@ -49,6 +49,17 @@ test_that("plot_dose_response_combo works as expected", {
                .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
   ) # default colors when invalid `colors_vec`
   
+  plt_5 <- plot_dose_response_combo(dt_average = dt_average,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name,
+                                    split_by_conc = TRUE)
+  expect_is(plt_5, "gg")
+  expect_equal(plt_5[["labels"]][["y"]], "GR")
+  expect_equal(plt_5[["labels"]][["title"]], sprintf("%s (%s)", cl_name, cl_clid))
+  expect_true(NROW(plt_5[["facet"]][["params"]]) > 0) # plot is faceted
+  expect_true(grepl("conc_2", names(plt_5[["facet"]][["params"]][["facets"]])))
+  
   expect_error(plot_dose_response_combo(dt_average = unlist(dt_average),
                                         drug1_name = drug1_name,
                                         drug2_name = drug2_name,
@@ -92,6 +103,13 @@ test_that("plot_dose_response_combo works as expected", {
                                         cl_name = cl_name,
                                         colors_vec = 1:5),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
+  
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = drug1_name,
+                                        drug2_name = drug2_name,
+                                        cl_name = cl_name,
+                                        split_by_conc = 1),
+               "Assertion on 'split_by_conc' failed: Must be of type 'logical flag'")
 })
 
 test_that("plot_dose_response_combo_panel works as expected", {
@@ -150,6 +168,19 @@ test_that("plot_dose_response_combo_panel works as expected", {
   expect_is(plt_5, "gg")
   expect_equal(plt_5[["labels"]][["y"]], "GR")
   expect_equal(NROW(ggplot2::ggplot_build(plt_5)$data[[1]]), 2 * no_comb_all) # default all drugs when invalid `d_names`
+  
+  ls_drug <- c(d_names, "drug_YY")
+  no_comb_err <- NROW(unique(
+    dt_average[DrugName %in% ls_drug & CellLineName == cl_name, .SD, 
+               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+  ))
+  
+  plt_6 <- plot_dose_response_combo_panel(dt_average = dt_average,
+                                          d_names = ls_drug,
+                                          cl_name = cl_name)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["y"]], "GR")
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)$data[[1]]), 2 * no_comb_err)
   
   expect_error(plot_dose_response_combo_panel(dt_average = unlist(dt_average),
                                               cl_name = cl_name),
