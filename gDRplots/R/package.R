@@ -26,6 +26,7 @@ utils::globalVariables(
     "cotrt_value_zero",
     "DrugCombination",
     "feature",
+    "feat_val",
     "iso_source",
     "label",
     "legend_lbl_iso",

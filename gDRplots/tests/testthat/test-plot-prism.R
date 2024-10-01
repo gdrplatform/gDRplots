@@ -249,6 +249,60 @@ test_that("plot_scatter_with_corr works as expected", {
                "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
 }) 
 
+test_that("plot_scatter_with_corr_panel works as expected", {
+  selected_feats <- c("XZ_A1QW", "XZ_A3OP", "XZ_A5BN")
+  selected_metric <- "RV_gDR_x_10"
+  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_1 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 3)
+  expect_equal(plt_1[["labels"]][["x"]], "")
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_1[["labels"]][["title"]], NULL)
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+
+  plt_2 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats[1],
+                                 selected_feat_meta_col = "XZ_fatures")
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 3)
+  expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
+  expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response$rId))
+  
+  # testing assertions
+  expect_error(plot_scatter_with_corr_panel(dt_response = unlist(dt_response),
+                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                            selected_feats = selected_feats),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
+                                            dt_depmap = obj_depmap_feat, 
+                                            selected_feats = selected_feats),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
+                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                            selected_feats = 1),
+               "Assertion on 'selected_feats' failed: Must be of type 'character'")
+  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
+                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                            selected_feats = c(NA, selected_feats)),
+               "Assertion on 'selected_feats' failed: Contains missing values")
+  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
+                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                            selected_feats = "not_existen_feat"),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
+                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                            selected_feats = selected_feats,
+                                            selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
+})
+
 test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
   selected_metric <- "RV_gDR_xc50"
@@ -338,7 +392,9 @@ test_that("plot_boxplot_meta works as expected", {
 }) 
 
 test_that("plot_volcano_corr_panel works as expected", {
+  # TODO in GDR-2710
 })
 
 test_that("plot_volcano_box_panel works as expected", {
+  # TODO in GDR-2710
 })

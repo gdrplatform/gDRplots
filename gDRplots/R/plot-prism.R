@@ -119,14 +119,14 @@ plot_scatter_with_corr <- function(dt_response,
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
-
+  
   # prep table with data to plot
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
-
+  
   # re-calculate correlation, slope and intercept
   # add label for points driving the correlation
   fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
@@ -167,6 +167,104 @@ plot_scatter_with_corr <- function(dt_response,
   return(plt)
 }
 
+
+#' Plot panel with scatter with correlation
+#' 
+#' @inheritParams plot_scatter_with_corr
+#' @param selected_feats character vector with names of selected features from \code{dt_depmap}
+#'
+#' @return a scatter plot with correlation
+#' @keywords prism_plots
+#' 
+#' @export
+plot_scatter_with_corr_panel <- function(dt_response,
+                                         dt_depmap, 
+                                         selected_feats,
+                                         selected_feat_meta_col = NULL) {
+  
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_character(selected_feats, any.missing = FALSE)
+  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feats))
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, "rId", "cId"))
+  stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
+  
+  plt_title <- list()
+  tab_plot_all <- data.table::data.table()
+  
+  for (selected_feat in selected_feats) {
+    # prep table with data to plot
+    X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
+    Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+    tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+    # remove NA
+    tab_plot <- stats::na.omit(tab_plot)
+    
+    # re-calculate correlation, slope and intercept
+    # add label for points driving the correlation
+    fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
+    intercept <- stats::coef(fit)[1]
+    slope <- stats::coef(fit)[2]
+    r_squared <- summary(fit)$r.squared
+    correlation <- sqrt(r_squared)
+    
+    dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
+    top_driving_corr <- as.numeric(names(dist_cooks)[1:5])
+    tab_plot$label <- ""
+    tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
+    tab_plot$col <- "no"
+    tab_plot[top_driving_corr, ]$col <- "yes"
+    
+    tab_plot$feat_lbl <- selected_feat
+    data.table::setnames(tab_plot, selected_feat, "feat_val")
+    
+    tab_plot_all <- rbind(tab_plot_all, tab_plot)
+    
+    # plot title
+    plt_title[[selected_feat]] <- 
+      sprintf("%s\ncorr=%2.2f, slope=%2.2f, intercept=%2.2f", 
+              selected_feat, correlation, slope, intercept)
+  }
+  
+  plt <-
+    ggplot2::ggplot(
+      data = tab_plot_all,
+      mapping =  ggplot2::aes(x = feat_val, 
+                              y = get(selected_metric), 
+                              label = label, color = col)) +
+    ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
+    ggrepel::geom_text_repel(size = 3, color = "black") +
+    ggplot2::labs(title = selected_feat_meta_col, 
+                  x = "", 
+                  y = selected_metric,
+                  caption = unique(dt_response$rId)) +
+    ggplot2::theme_bw() +
+    ggplot2::guides(color = "none") +
+    ggplot2::scale_color_manual(values = c(yes = "red", no = "black")) +
+    ggplot2::facet_wrap(~feat_lbl, 
+                        scales = "free", 
+                        labeller = ggplot2::as_labeller(unlist(plt_title))) +
+    ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
+                         formula = y ~ x, method = "lm", se = FALSE, inherit.aes = FALSE) +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(size = 8),
+      axis.text.y = ggplot2::element_text(size = 8),
+      plot.title = ggplot2::element_text(size = 12),
+      panel.grid.minor = ggplot2::element_blank(), 
+      aspect.ratio = 1,
+      strip.background = ggplot2::element_blank(),
+      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
+      legend.position = "none"
+    )
+  
+  return(plt)
+}
 
 #' Plot boxplot for metric values grouped by metadata from DepMap
 #'
@@ -311,8 +409,8 @@ plot_volcano_corr_panel <- function(dt_response,
   dt_response_ <- dt_response[, c("rId", "cId", cellline_name, selected_metric), with = FALSE]
   
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
-                                       dt_depmap = dt_depmap,
-                                       selected_feat_meta_col = selected_feat)
+                             dt_depmap = dt_depmap,
+                             selected_feat_meta_col = selected_feat)
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
                                 feature_info = selected_feat) +
@@ -320,18 +418,15 @@ plot_volcano_corr_panel <- function(dt_response,
   
   # scatter plot with corr
   top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
-  ls_plt_corr <- lapply(top_4, function(top_feat) {
-    plot_scatter_with_corr(dt_response = dt_response_,
-                                     dt_depmap = dt_depmap,
-                                     selected_feat = top_feat,
-                                     selected_feat_meta_col = selected_feat) +
-      ggplot2::labs(title = "", subtitle = "", caption = "")
-  })
+  plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                           dt_depmap = dt_depmap,
+                                           selected_feats = top_4,
+                                           selected_feat_meta_col = selected_feat) + 
+    ggplot2::labs(caption = "")
   
   # final panel
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = list(plt_vol,
-                                      ggpubr::ggarrange(plotlist = ls_plt_corr)), 
+    ggpubr::ggarrange(plotlist = list(plt_vol, plt_corr), 
                       widths = c(1, 1)),
     top = sprintf("%s__%s\n%s", selected_metric, selected_feat, obj_assoc[["condition_info"]])
   )
@@ -369,7 +464,7 @@ plot_volcano_box_panel <- function(dt_response,
   checkmate::assert_string(selected_meta)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
-
+  
   # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
   
   # plot data
@@ -378,7 +473,7 @@ plot_volcano_box_panel <- function(dt_response,
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_meta)
-
+  
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
                                 feature_info = selected_meta) +
