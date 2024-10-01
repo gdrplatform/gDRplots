@@ -121,12 +121,11 @@ test_that("plot_dose_response_combo_panel works as expected", {
   d_names <- unique(dt_average$DrugName)[2:3]
   
   no_comb_all <- NROW(unique(
-    dt_average[CellLineName == cl_name, .SD, 
-               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+    dt_average[CellLineName == cl_name,  c("CellLineName", "DrugName", "DrugName_2"), with = FALSE]
   ))
   no_comb <- NROW(unique(
-    dt_average[DrugName %in% d_names & CellLineName == cl_name, .SD, 
-               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+    dt_average[DrugName %in% d_names & CellLineName == cl_name, 
+               c("CellLineName", "DrugName", "DrugName_2"), with = FALSE]
   ))
   
   plt_1 <- plot_dose_response_combo_panel(dt_average = dt_average,
@@ -171,8 +170,8 @@ test_that("plot_dose_response_combo_panel works as expected", {
   
   ls_drug <- c(d_names, "drug_YY")
   no_comb_err <- NROW(unique(
-    dt_average[DrugName %in% ls_drug & CellLineName == cl_name, .SD, 
-               .SDcols = c("CellLineName", "DrugName", "DrugName_2")]
+    dt_average[DrugName %in% ls_drug & CellLineName == cl_name, 
+               c("CellLineName", "DrugName", "DrugName_2"), with = FALSE]
   ))
   
   plt_6 <- plot_dose_response_combo_panel(dt_average = dt_average,
