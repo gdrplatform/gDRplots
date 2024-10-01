@@ -418,7 +418,7 @@ plot_volcano_corr_panel <- function(dt_response,
   
   # scatter plot with corr
   top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
-  plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response,
+  plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                            dt_depmap = dt_depmap,
                                            selected_feats = top_4,
                                            selected_feat_meta_col = selected_feat) + 
