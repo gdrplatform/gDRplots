@@ -488,7 +488,7 @@ prep_dt_depmap <- function(
   
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
   
-  # required GDR-2704 to be done # nolint start
+  # TODO in GDR-2710 # nolint start
   # dt_depmap <- kaleidoscope::load_depmap_merged( 
   #   feature_sets = feature_sets,
   #   prefix = prefix,
@@ -530,7 +530,7 @@ prep_dt_depmap_feat <- function(
   
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_set) == NROW(prefix))
   
-  # required GDR-2704 to be done # nolint start
+  # TODO in GDR-2710 # nolint start
   # dt_depmap <- kaleidoscope::load_depmap_merged(
   #   feature_sets = feature_set,
   #   prefix = prefix,
@@ -565,7 +565,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   
   checkmate::assert_string(metadata_col)
   
-  # required GDR-2704 to be done # nolint start
+  # TODO in GDR-2710 # nolint start
   # ls_depmap <- kaleidoscope::load_depmap_list(
   #   feature_sets = "OmicsCNGene",
   #   prefix = "CN_",
@@ -648,7 +648,8 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # create dt_assoc
-    # dt_assoc <- kaleidoscope::calc_assoc(X, Y) # required GDR-2704 to be done # nolint start
+    # TODO in GDR-2710
+    # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
     
     # # final
     # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
