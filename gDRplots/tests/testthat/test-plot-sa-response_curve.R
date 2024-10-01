@@ -16,7 +16,14 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_length(plt_1[["layers"]], 3)
   
-
+  plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average,
+                                 grouping = grouping,
+                                 colors_vec = rainbow(NROW(unique(dt_metrics[[grouping]]))))
+  expect_is(plt_2, "gg")
+  expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[2]][["colour"]]),
+                NROW(unique(dt_metrics[[grouping]])))
+  
   iC <- colnames(se)[1:2]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR, iC], "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se[iR, iC], "Averaged")
@@ -24,29 +31,29 @@ test_that("plot_dose_response_sa works as expected", {
   dt_metrics[, c("ec50", "x_inf", "x_0", "h", "r2")] <- NA
   dt_average <- dt_average[Concentration %in% unique(dt_average$Concentration)[1:2], ]
   
-  plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+  plt_3 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  grouping = grouping)
-  expect_is(plt_2, "gg")
-  expect_equal(plt_2[["labels"]][["y"]], "GR")
-  expect_length(plt_2[["layers"]], 3)
-  expect_equal(names(plt_2[["guides"]][["guides"]]), "colour")
-
+  expect_is(plt_3, "gg")
+  expect_equal(plt_3[["labels"]][["y"]], "GR")
+  expect_length(plt_3[["layers"]], 3)
+  expect_equal(names(plt_3[["guides"]][["guides"]]), "colour")
+  
   grouping <- gDRutils::get_env_identifiers("drug_name")
   iC <- colnames(se)[1]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
   normalization_type <- "RV"
   
-  plt_3 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+  plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  grouping = grouping,
                                  normalization_type = normalization_type,
                                  colors_vec = c("cadetblue", "orange", "darkblue"),
                                  plot_fit_flag = FALSE)
-  expect_is(plt_3, "gg")
-  expect_equal(plt_3[["labels"]][["y"]], normalization_type)
-  expect_length(plt_3[["layers"]], 2)
+  expect_is(plt_4, "gg")
+  expect_equal(plt_4[["labels"]][["y"]], normalization_type)
+  expect_length(plt_4[["layers"]], 2)
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
@@ -114,8 +121,8 @@ test_that("plot_dose_response_sa_qc works as expected", {
   
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  cl_name <- dt_metrics[["CellLineName"]][1]
-  d_name <- dt_metrics[["DrugName"]][1]
+  cl_name <- "cellline_BA"
+  d_name <- "drug_002"
   
   plt_1 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
                                     dt_average = dt_average,
@@ -135,6 +142,24 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                     normalization_type = normalization_type)
   expect_is(plt_2, "gg")
   expect_equal(plt_2[["labels"]][["y"]], normalization_type)
+  
+  # lack of data in dt_metrics
+  dt_metrics_na <- data.table::copy(dt_metrics)
+  dt_metrics_na$x_inf <- NA
+  plt_3 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics_na,
+                                    dt_average = dt_average,
+                                    cl_name = cl_name,
+                                    d_name = d_name)
+  expect_is(plt_3, "gg")
+  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]], 0) # no "Fitted Curve"
+  
+  # one concentration
+  plt_4 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                    dt_average = dt_average[Concentration == 10, ],
+                                    cl_name = cl_name,
+                                    d_name = d_name)
+  expect_is(plt_4, "gg")
+  expect_length(ggplot2::ggplot_build(plt_4)$data[[2]], 0) # no "Fitted Curve"
 })
 
 test_that("plot_dose_response_sa_qc works as expected", {
