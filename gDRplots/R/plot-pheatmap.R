@@ -702,7 +702,6 @@ pheatmap_with_anno_cd <- function(
   }
   
   if (!is.null(annotation_row)) {
-    DrugCombination <- NULL # due to NSE notes in R CMD check
     annotation_row$DrugCombination <-
       paste(annotation_row[[drug_name]], "x", paste0(annotation_row[[drug_name_2]], "__", annotation_row[[conc_2]]))
     
@@ -968,7 +967,6 @@ pheatmap_with_anno_combo <- function(
   }
   
   if (!is.null(annotation_row)) {
-    DrugCombination <- NULL # due to NSE notes in R CMD check
     annotation_row$DrugCombination <-
       paste(annotation_row[[drug_name]], "x", annotation_row[[drug_name_2]])
     
@@ -1154,12 +1152,14 @@ get_qual_colors <- function(n = NULL) {
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
 #' @examples
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 #' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 #' 
 #' get_ann_color_map(dt_ann)
+#' }
 #' 
 #' @keywords utils_color
 #' @export 

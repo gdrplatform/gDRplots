@@ -415,9 +415,9 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   
   # filter data for min required data
   dt_metrics <-
-    dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
+    dt_metrics[, c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h"), with = FALSE]
   dt_average <-
-    dt_average[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
+    dt_average[, c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std"), with = FALSE]
   
   selected_combination <- data.table::data.table(cellline_name = cl_name,
                                                  drug_name = d_name)
@@ -428,6 +428,9 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name)]
   
   if (NROW(dt_metrics_plot) > 0) {
+    
+    if (NROW(stats::na.omit(dt_metrics_plot)) > 0 && NROW(unique(dt_average_plot[[conc]])) > 1) {
+    
     min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
     max_conc <- max(dt_average_plot[[conc]])
     sampled_conc <- create_log_seq(min_conc, max_conc, 50)
@@ -438,6 +441,11 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                                                                  dt_metrics_plot$h)
     dt_reconstructed_fit <- data.table::data.table(Concentration = sampled_conc,
                                                    x = fitted_curve_sampled)
+    
+    } else {
+      dt_reconstructed_fit <- data.table::data.table(Concentration = numeric(),
+                                                     x = numeric())
+    }
     
     # set min and max values for y 
     ymin <- min(c(0, min(dt_average_plot$x)))
@@ -452,18 +460,19 @@ plot_dose_response_sa_qc <- function(dt_metrics,
       ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
       ggplot2::geom_line(
         data = dt_reconstructed_fit,
-        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
+        ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve", group = "Fitted Curve")) +
       ggplot2::geom_errorbar(
         data = dt_average_plot,
-        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
+        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std,
+                     color = "Errors Bar"),
         width = 0.1, position = ggplot2::position_dodge(0.1)) +
-      ggplot2::geom_line(
-        data = dt_average_plot,
-        ggplot2::aes(x = get(conc), y = x, color = "Averaged Data"),
-        linetype = "longdash") +
       ggplot2::geom_point(
         data = dt_average_plot,
         ggplot2::aes(x = get(conc), y = x, color = "Averaged Data")) +
+      ggplot2::geom_line(
+        data = dt_average_plot,
+        ggplot2::aes(x = get(conc), y = x, color = "Averaged Data", group = "Averaged Data"),
+        linetype = "longdash") +
       ggplot2::scale_x_log10(oob = scales::squish_infinite) +
       ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
       ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -552,7 +561,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
-    d_names <- drug_name[drug_name %in% available_drugs]
+    d_names <- d_names[d_names %in% available_drugs]
   }
   
   # filter data for normalization_type and fit_source
@@ -563,9 +572,9 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   
   # filter data for min required data
   dt_metrics <-
-    dt_metrics[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h")]
+    dt_metrics[, c(drug_name, gnumber, cellline_name, clid, "x_inf", "x_0", "ec50", "h"), with = FALSE]
   dt_average <-
-    dt_average[, .SD, .SDcols = c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std")]
+    dt_average[, c(drug_name, gnumber, cellline_name, clid, conc, "x", "x_std"), with = FALSE]
   
   selected_combination <- data.table::data.table(cellline_name = cl_name,
                                                  drug_name = d_names)
@@ -578,13 +587,16 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   dt_reconstructed_fit <- data.table::data.table(drug_name = character(),
                                                  conc = numeric(), 
                                                  x = numeric())
-  min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
-  max_conc <- max(dt_average_plot[[conc]])
-  sampled_conc <- create_log_seq(min_conc, max_conc, 50)
   
   for (d_name in d_names) {
     dt_met_plot <- dt_metrics_plot[get(drug_name) == d_name, ]
-    if (NROW(dt_met_plot) > 0) {
+    dt_avg_plot <- dt_average_plot[get(drug_name) == d_name, ]
+    
+    if (NROW(stats::na.omit(dt_met_plot)) > 0 && NROW(unique(dt_avg_plot[[conc]])) > 1) {
+      min_conc <- min(dt_avg_plot[get(conc) != 0][[conc]])
+      max_conc <- max(dt_avg_plot[[conc]])
+      sampled_conc <- create_log_seq(min_conc, max_conc, 50)
+      
       fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
                                                                    dt_met_plot$x_inf,
                                                                    dt_met_plot$x_0,

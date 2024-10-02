@@ -1,3 +1,6 @@
+## gDRplots 0.0.36 - 2024-09-25
+* add plots and help functions for PRISM data 
+
 ## gDRplots 0.0.35 - 2024-09-23
 * update clustering condition
 * add `pheatmap_with_anno_cd` function
