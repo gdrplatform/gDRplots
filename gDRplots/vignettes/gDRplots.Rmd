@@ -358,6 +358,36 @@ plot_fitting_acc(dt_assay = dt_metrics_sa,
                  cl_name = "cellline_EA")
 ```
 
+## Correlation between PRISM and DepMap
+
+The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot 
+with associations between the molecular features or the metadata and readout of interest.
+
+Note. It required dedicated input calculated with `prep_dt_assoc` function.
+
+![](../inst/figure/plot_volcano.png)
+
+![](../inst/figure/plot_volcano_meta.png)
+
+User can also explore more detailed correlation between one selected feature and selected metric with use of **plot_scatter_with_corr** function.
+
+Note. It required special dedicated calculated with `prep_dt_depmap_feat` function and one of functions
+with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`. 
+
+Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation 
+for list of the DepMap features.
+
+![](../inst/figure/plot_scatter_with_corr.png)
+
+User can also explore more detailed distribution of selected metadate and selected metric with use of **plot_boxplot_meta** function.
+
+![](../inst/figure/plot_boxplot_meta.png)
+
+Note. It required special dedicated calculated with `prep_dt_depmap_meta` function and one of function
+with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`. 
+
+
+
 # SessionInfo {-}
 
 ```{r sessionInfo}
