@@ -439,7 +439,8 @@ prep_dt_response_combo <- function(dt_metrics,
     prep_dt_response_metric_diff(dt_metrics = dt_metrics, 
                                  d_name = d_name,
                                  d_name2 = d_name2,
-                                 normalization_type = normalization_type)
+                                 normalization_type = normalization_type,
+                                 metric = c("xc50", "x_mean", "x_max"))
   
   id_col <- c("rId", "cId", cellline_name)
   dt_response_combo <- merge(dt_response_scores, dt_response_met_diff, by = id_col)
