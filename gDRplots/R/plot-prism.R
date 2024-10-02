@@ -136,7 +136,7 @@ plot_scatter_with_corr <- function(dt_response,
   correlation <- sqrt(r_squared)
   
   dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
-  top_driving_corr <- as.numeric(names(dist_cooks)[1:5])
+  top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
   tab_plot$label <- ""
   tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
   tab_plot$col <- "no"
@@ -215,7 +215,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
     correlation <- sqrt(r_squared)
     
     dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
-    top_driving_corr <- as.numeric(names(dist_cooks)[1:5])
+    top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
     tab_plot$label <- ""
     tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
     tab_plot$col <- "no"
@@ -417,7 +417,7 @@ plot_volcano_corr_panel <- function(dt_response,
     ggplot2::labs(title = "")
   
   # scatter plot with corr
-  top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][1:4]
+  top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
   plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                            dt_depmap = dt_depmap,
                                            selected_feats = top_4,
