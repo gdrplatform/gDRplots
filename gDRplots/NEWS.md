@@ -1,3 +1,6 @@
+## gDRplots 0.0.37 - 2024-10-02
+* update vignette
+
 ## gDRplots 0.0.36 - 2024-09-25
 * add plots and help functions for PRISM data 
 
