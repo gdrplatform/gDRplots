@@ -718,6 +718,7 @@ heatmap_combo_with_isoref_panel <- function(
   # isoline data
   if (!is.null(dt_isobolograms$iso_level) && !is.null(iso_levels)) {
     # iso level availability
+    dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
     available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
     iso_levels <- iso_levels[iso_levels %in% available_iso_lvl]
     
