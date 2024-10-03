@@ -371,7 +371,7 @@ Note: It requires dedicated input calculated with `prep_dt_assoc` function.
 
 Users can also explore more detailed correlation between one selected feature and selected metric using **plot_scatter_with_corr** function.
 
-Note: It requires special dedicated calculated with `prep_dt_depmap_feat` function and one of the functions
+Note: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions
 with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`. 
 
 Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation 
@@ -383,7 +383,7 @@ Users can also explore more detailed distribution of selected metadata and selec
 
 ![](plot_boxplot_meta.png)
 
-Note: It requires special dedicated calculated with `prep_dt_depmap_meta` function and one of the functions
+Note: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
 with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`. 
 
 
