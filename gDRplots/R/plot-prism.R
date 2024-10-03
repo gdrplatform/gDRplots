@@ -251,7 +251,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       panel.grid.minor = ggplot2::element_blank(), 
       aspect.ratio = 1,
       strip.background = ggplot2::element_blank(),
-      strip.text = ggplot2::element_text(size = 10, hjust = 0, margin = ggplot2::margin()),
+      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
       legend.position = "none"
     )
   
