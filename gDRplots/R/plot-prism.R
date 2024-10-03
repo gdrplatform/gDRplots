@@ -195,7 +195,6 @@ plot_scatter_with_corr_panel <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  plt_title <- list()
   tab_plot_all <- data.table::data.table()
   
   for (selected_feat in selected_feats) {
@@ -225,11 +224,6 @@ plot_scatter_with_corr_panel <- function(dt_response,
     data.table::setnames(tab_plot, selected_feat, "feat_val")
     
     tab_plot_all <- rbind(tab_plot_all, tab_plot)
-    
-    # plot title
-    plt_title[[selected_feat]] <- 
-      sprintf("%s\ncorr=%2.2f, slope=%2.2f, intercept=%2.2f", 
-              selected_feat, correlation, slope, intercept)
   }
   
   plt <-
@@ -247,9 +241,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
     ggplot2::theme_bw() +
     ggplot2::guides(color = "none") +
     ggplot2::scale_color_manual(values = c(yes = "red", no = "black")) +
-    ggplot2::facet_wrap(~feat_lbl, 
-                        scales = "free", 
-                        labeller = ggplot2::as_labeller(unlist(plt_title))) +
+    ggplot2::facet_wrap(~feat_lbl, scales = "free") +
     ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
                          formula = y ~ x, method = "lm", se = FALSE, inherit.aes = FALSE) +
     ggplot2::theme(
@@ -259,7 +251,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       panel.grid.minor = ggplot2::element_blank(), 
       aspect.ratio = 1,
       strip.background = ggplot2::element_blank(),
-      strip.text = ggplot2::element_text(size = 10, hjust = 0, margin = ggplot2::margin()),
+      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
       legend.position = "none"
     )
   
