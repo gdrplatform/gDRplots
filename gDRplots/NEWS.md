@@ -1,3 +1,6 @@
+## gDRplots 0.0.38 - 2024-10-04
+* add help function for knitting rmarkdown
+
 ## gDRplots 0.0.37 - 2024-10-02
 * update vignette
 
