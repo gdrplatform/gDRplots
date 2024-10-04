@@ -8,6 +8,7 @@
 #' @param header_level numeric level of markdown header
 #'
 #' @examples
+#' \dontrun{
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
 #'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -16,6 +17,7 @@
 #' 
 #' prep_plot_chunk(plotlist, "iris")
 #'
+#' }
 #' @return list of character vector - input for \code{knitr::knit}
 #' @keywords internal
 #' 
@@ -54,11 +56,10 @@ prep_plot_chunk <- function(plt_list,
 #' @param header_level numeric level of markdown header - only for the first level
 #'
 #' @examples
+#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-#' 
-#' plotlist <- list()
 #' 
 #' # help function
 #' plot_col <- function(tab_plt, norm_type) {
@@ -70,17 +71,20 @@ prep_plot_chunk <- function(plt_list,
 #'   return(plt)
 #' }
 #' 
+#' # creating nested list with plots
+#' plotlist <- list()
 #' for (drug in unique(dt_metrics$DrugName)) {
 #'   for (cl in unique(dt_metrics$CellLineName)) {
 #'     tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
 #'     
 #'     plotlist[[drug]][[cl]][["RV"]] <- list(plt_GR = plot_col(tab_plot, "RV"))
-#'     plotlist[[drug]][[cl]][["GR"]] <-  list(plt_RV = plot_col(tab_plot, "GR"))
+#'     plotlist[[drug]][[cl]][["GR"]] <- list(plt_RV = plot_col(tab_plot, "GR"))
 #'   }
 #' }
 #' 
 #' prep_nested_plot_chunk(plotlist, "metric_value")
 #' 
+#' }
 #' @return list of character vector - input for \code{knitr::knit}
 #' @keywords internal
 #' 

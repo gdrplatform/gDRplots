@@ -1,6 +1,6 @@
 context("Test helpers-rmd")
 
-test_that("escape_special_characters works as expected", {
+test_that("prep_plot_chunk works as expected", {
   plotlist <- lapply(unique(iris$Species), function(iris_name) {
     ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
       ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -20,6 +20,48 @@ test_that("escape_special_characters works as expected", {
   expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
   expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = "1"), 
+               "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
+})
+
+test_that("prep_nested_plot_chunk works as expected", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  
+  # help function
+  plot_col <- function(tab_plt, norm_type) {
+    tab_plt <-
+      data.table::melt(tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
+                       id = "rId")
+    plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) +
+      ggplot2::geom_col() +
+      ggplot2::theme_light()
+    return(plt)
+  }
+  
+  # creating nested list with plots
+  plotlist <- list()
+  for (drug in unique(dt_metrics$DrugName)) {
+    for (cl in unique(dt_metrics$CellLineName)) {
+      tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
+      
+      plotlist[[drug]][[cl]][["RV"]] <- list(plt_GR = plot_col(tab_plot, "RV"))
+      plotlist[[drug]][[cl]][["GR"]] <- list(plt_RV = plot_col(tab_plot, "GR"))
+    }
+  }
+  
+  res_1 <- prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col")
+  expect_is(res_1, "list")
+  expect_length(res_1, NROW(plotlist))
+  expect_length(res_1, NROW(unique(dt_metrics$DrugName)))
+  expect_equal(sum(grepl("######", res_1[[1]])), # the lowest lvl with plots
+               NROW(c("GR", "RV")) * NROW(unique(dt_metrics$CellLineName)))
+  
+  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
+               "Assertion on 'plt_list' failed: Must be of type 'list'")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = 123), 
+               "Assertion on 'chunk_name' failed: Must be of type 'string'")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
 })
 
