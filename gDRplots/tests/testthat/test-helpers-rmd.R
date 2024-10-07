@@ -45,8 +45,8 @@ test_that("prep_nested_plot_chunk works as expected", {
     for (cl in unique(dt_metrics$CellLineName)) {
       tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
       
-      plotlist[[drug]][[cl]][["RV"]] <- list(plt_GR = plot_col(tab_plot, "RV"))
-      plotlist[[drug]][[cl]][["GR"]] <- list(plt_RV = plot_col(tab_plot, "GR"))
+      plotlist[[drug]][[cl]][["RV"]] <- list(plt_RV = plot_col(tab_plot, "RV"))
+      plotlist[[drug]][[cl]][["GR"]] <- list(plt_GR = plot_col(tab_plot, "GR"))
     }
   }
   
