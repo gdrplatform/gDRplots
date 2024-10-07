@@ -640,21 +640,23 @@ prep_dt_assoc <- function(dt_response,
     Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
     data.table::setorderv(Y_dt, cellline_name)
     
-    # convert to a matrix
-    X <- as.matrix(
-      X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
-    )
-    Y <- as.matrix(
-      Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
-    )
-    
-    # create dt_assoc
-    # TODO in GDR-2710
-    # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-    
-    # # final
-    # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
-    # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+    if (!NROW(stats::na.omit(X_dt)) & !NROW(stats::na.omit(Y_dt))) {
+      # convert to a matrix
+      X <- as.matrix(
+        X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
+      )
+      Y <- as.matrix(
+        Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
+      )
+      
+      # create dt_assoc
+      # TODO in GDR-2710
+      # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
+      
+      # # final
+      # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
+      # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+    }
   }
   # return
   return(obj_assoc)
