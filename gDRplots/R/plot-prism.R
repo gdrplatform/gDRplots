@@ -3,6 +3,7 @@
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
 #'     outputted by \code{kaleidoscope::calc_assoc}
 #' @param feature_info string describing the name of the associated feature/metadata from DepMap
+#' @param selected_metric string describing the name of the selected metric used the association calculation
 #' @param condition_info string describing experiment condition 
 #'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
 #' @param alpha numeric cutoff to identify statistically significant correlations
@@ -17,6 +18,7 @@
 #' @export
 plot_volcano_assoc <- function(dt_assoc,
                                feature_info,
+                               selected_metric,
                                condition_info = NULL,
                                alpha = 0.05,
                                named_p_top = 10,
@@ -24,6 +26,7 @@ plot_volcano_assoc <- function(dt_assoc,
   
   checkmate::assert_data_table(dt_assoc)
   checkmate::assert_string(feature_info)
+  checkmate::assert_string(selected_metric)
   checkmate::assert_string(condition_info, null.ok = TRUE)
   checkmate::assert_number(alpha, lower = 0, upper = 1)
   checkmate::assert_number(named_p_top, lower = 0)
@@ -34,9 +37,9 @@ plot_volcano_assoc <- function(dt_assoc,
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
   
-  plt_title <- sprintf("%s__%s", unique(dt_assoc[["response"]]), feature_info)
+  plt_title <- sprintf("%s__%s", selected_metric, feature_info)
   
-  if (all(is.na(dt_assoc[["q_value"]]))) {
+  if (NROW(dt_assoc) == 0 || all(is.na(dt_assoc[["q_value"]]))) {
     # empty plot
     plt <- 
       ggplot2::ggplot() + 
@@ -383,7 +386,7 @@ plot_boxplot_meta <- function(dt_response,
 #'  (rows are samples, columns are features). 
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
 #' @param selected_metric string name of the metric in \code{dt_response}
-#' @param selected_feat string with name of selected feature from \code{dt_depmap}
+#' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap}
 #'
 #' @return a panel with volcano plot and scatter plots with correlation for feature set
 #' 
@@ -393,7 +396,7 @@ plot_boxplot_meta <- function(dt_response,
 plot_volcano_corr_panel <- function(dt_response,
                                     dt_depmap,
                                     selected_metric,  
-                                    selected_feat) {
+                                    selected_feat_meta_col) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -401,7 +404,7 @@ plot_volcano_corr_panel <- function(dt_response,
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
   checkmate::assert_string(selected_metric)
-  checkmate::assert_string(selected_feat)
+  checkmate::assert_string(selected_feat_meta_col)
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   
@@ -412,10 +415,10 @@ plot_volcano_corr_panel <- function(dt_response,
   
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
-                             selected_feat_meta_col = selected_feat)
+                             selected_feat_meta_col = selected_feat_meta_col)
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                feature_info = selected_feat) +
+                                feature_info = obj_assoc[["feature_info"]]) +
     ggplot2::labs(title = "")
   
   # scatter plot with corr
@@ -423,14 +426,14 @@ plot_volcano_corr_panel <- function(dt_response,
   plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                            dt_depmap = dt_depmap,
                                            selected_feats = top_4,
-                                           selected_feat_meta_col = selected_feat) + 
+                                           selected_feat_meta_col = selected_feat_meta_col) + 
     ggplot2::labs(title = "", caption = "")
   
   # final panel
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_corr), 
                       widths = c(1, 1)),
-    top = sprintf("%s__%s\n%s", selected_metric, selected_feat, obj_assoc[["condition_info"]])
+    top = sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]])
   )
   return(panel)
 }

@@ -4,7 +4,12 @@
 \alias{plot_volcano_corr_panel}
 \title{Plot panel with volcano plot and scatter plots (top 4) features from DepMap}
 \usage{
-plot_volcano_corr_panel(dt_response, dt_depmap, selected_metric, selected_feat)
+plot_volcano_corr_panel(
+  dt_response,
+  dt_depmap,
+  selected_metric,
+  selected_feat_meta_col
+)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with the experimental response data (rows are samples) 
@@ -18,7 +23,7 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 
 \item{selected_metric}{string name of the metric in \code{dt_response}}
 
-\item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
+\item{selected_feat_meta_col}{string with name of selected feature from \code{dt_depmap}}
 }
 \value{
 a panel with volcano plot and scatter plots with correlation for feature set

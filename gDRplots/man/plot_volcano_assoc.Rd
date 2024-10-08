@@ -7,6 +7,7 @@
 plot_volcano_assoc(
   dt_assoc,
   feature_info,
+  selected_metric,
   condition_info = NULL,
   alpha = 0.05,
   named_p_top = 10,
@@ -18,6 +19,8 @@ plot_volcano_assoc(
 outputted by \code{kaleidoscope::calc_assoc}}
 
 \item{feature_info}{string describing the name of the associated feature/metadata from DepMap}
+
+\item{selected_metric}{string describing the name of the selected metric used the association calculation}
 
 \item{condition_info}{string describing experiment condition 
 (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})}

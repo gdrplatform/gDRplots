@@ -624,8 +624,14 @@ prep_dt_assoc <- function(dt_response,
               all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
   
   # result
-  obj_assoc <- list(dt_assoc = data.table::data.table(),
+  # will be returned in this format when: 1) length (shared lines) = 0 
+  # 2) all/one of the association calculation inputs will have only NA values
+  obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
+                                                      response = character(0),
+                                                      rho = numeric(0),
+                                                      q_value = numeric(0)),
                     condition_info = NULL,
+                    selected_metric = selected_metric,
                     feature_info = selected_feat_meta_col)
   
   # shared cell line
@@ -640,7 +646,8 @@ prep_dt_assoc <- function(dt_response,
     Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
     data.table::setorderv(Y_dt, cellline_name)
     
-    if (!NROW(stats::na.omit(X_dt)) & !NROW(stats::na.omit(Y_dt))) {
+    # association can only be calculated for a value other than NA
+    if (NROW(stats::na.omit(X_dt)) > 0 && NROW(stats::na.omit(Y_dt)) > 0) {
       # convert to a matrix
       X <- as.matrix(
         X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
@@ -652,7 +659,7 @@ prep_dt_assoc <- function(dt_response,
       # create dt_assoc
       # TODO in GDR-2710
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-      
+      # 
       # # final
       # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
       # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
