@@ -4,7 +4,12 @@
 \alias{plot_volcano_box_panel}
 \title{Plot panel with volcano plot and boxplot for metric values grouped by metadata from DepMap}
 \usage{
-plot_volcano_box_panel(dt_response, dt_depmap, selected_metric, selected_meta)
+plot_volcano_box_panel(
+  dt_response,
+  dt_depmap,
+  selected_metric,
+  selected_feat_meta_col
+)
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
@@ -18,7 +23,7 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 
 \item{selected_metric}{string name of the metric in \code{dt_response}}
 
-\item{selected_meta}{string with the name of the selected metadata from \code{dt_depmap}}
+\item{selected_feat_meta_col}{string with the name of the selected metadata from \code{dt_depmap}}
 }
 \value{
 a panel with volcano plot and boxplot for matadata levels
