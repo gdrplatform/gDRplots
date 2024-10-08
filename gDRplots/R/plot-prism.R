@@ -221,9 +221,9 @@ plot_scatter_with_corr_panel <- function(dt_response,
     
     if (sum(is.na(selected_feats)) > 1) {
       tmp <- data.table::data.table(selected_feats)
-      tmp[, num := 1:.N, by = selected_feats]
-      tmp[, nm := ifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, num), selected_feats)]
-      selected_feats <- tmp$nm
+      tmp[, N := seq_len(.N), by = selected_feats]
+      tmp[, selected_feats := ifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
+      selected_feats <- tmp$selected_feats
     }
     
     for (selected_feat in selected_feats) {
