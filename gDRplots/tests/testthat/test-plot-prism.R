@@ -225,6 +225,40 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_equal(plt_3[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   expect_equal(plt_3[["labels"]][["caption"]], unique(dt_response_2$rId))
   
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[["RV_gDR_x_0.01"]] <- NA
+  
+  plt_4 <- 
+    plot_scatter_with_corr(dt_response = dt_response_na,
+                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                           selected_feat = selected_feat,
+                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], 
+               paste(obj_depmap_feat[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  dt_depmap_na[[selected_feat]] <- NA
+    
+  plt_5 <- 
+    plot_scatter_with_corr(dt_response = dt_response,
+                           dt_depmap = dt_depmap_na, 
+                           selected_feat = selected_feat,
+                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_5[["labels"]][["title"]], 
+               paste(obj_depmap_feat[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
   # testing assertions
   expect_error(plot_scatter_with_corr(dt_response = unlist(dt_response),
                                       dt_depmap = obj_depmap_feat[["dt_depmap"]], 

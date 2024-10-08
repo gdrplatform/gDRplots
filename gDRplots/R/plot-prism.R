@@ -127,42 +127,52 @@ plot_scatter_with_corr <- function(dt_response,
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
   
-  # re-calculate correlation, slope and intercept
-  # add label for points driving the correlation
-  fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
-  intercept <- stats::coef(fit)[1]
-  slope <- stats::coef(fit)[2]
-  r_squared <- summary(fit)$r.squared
-  correlation <- sqrt(r_squared)
-  
-  dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
-  top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
-  tab_plot$label <- ""
-  tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
-  tab_plot$col <- "no"
-  tab_plot[top_driving_corr, ]$col <- "yes"
-  
-  # plot title
-  plt_subtitle <- 
-    sprintf("corr=%2.2f, slope=%2.2f, intercept=%2.2f", correlation, slope, intercept)
-  
-  plt <-        
-    ggplot2::ggplot(
-      data = tab_plot,
-      mapping =  ggplot2::aes(x = get(selected_feat), 
-                              y = get(selected_metric), 
-                              label = label, color = col)) +
-    ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
-    ggrepel::geom_text_repel(size = 3, color = "black") +
-    ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
-    ggplot2::labs(title = selected_feat_meta_col, 
-                  subtitle = plt_subtitle, 
-                  x = selected_feat, 
-                  y = selected_metric,
-                  caption = unique(dt_response$rId)) +
-    ggplot2::theme_bw() +
-    ggplot2::guides(color = "none") +
-    ggplot2::scale_color_manual(values = c(yes = "red", no = "black"))
+  if (NROW(tab_plot) == 0) {
+    plt <- 
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+                    x = selected_feat, 
+                    y = selected_metric,
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw()
+  } else {
+    # re-calculate correlation, slope and intercept
+    # add label for points driving the correlation
+    fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
+    intercept <- stats::coef(fit)[1]
+    slope <- stats::coef(fit)[2]
+    r_squared <- summary(fit)$r.squared
+    correlation <- sqrt(r_squared)
+    
+    dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
+    top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
+    tab_plot$label <- ""
+    tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
+    tab_plot$col <- "no"
+    tab_plot[top_driving_corr, ]$col <- "yes"
+    
+    # plot title
+    plt_subtitle <- 
+      sprintf("corr=%2.2f, slope=%2.2f, intercept=%2.2f", correlation, slope, intercept)
+    
+    plt <-        
+      ggplot2::ggplot(
+        data = tab_plot,
+        mapping =  ggplot2::aes(x = get(selected_feat), 
+                                y = get(selected_metric), 
+                                label = label, color = col)) +
+      ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
+      ggrepel::geom_text_repel(size = 3, color = "black") +
+      ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
+      ggplot2::labs(title = selected_feat_meta_col, 
+                    subtitle = plt_subtitle, 
+                    x = selected_feat, 
+                    y = selected_metric,
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw() +
+      ggplot2::guides(color = "none") +
+      ggplot2::scale_color_manual(values = c(yes = "red", no = "black"))
+  } 
   
   return(plt)
 }
