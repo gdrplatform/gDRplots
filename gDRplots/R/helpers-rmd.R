@@ -63,10 +63,10 @@ prep_plot_chunk <- function(plt_list,
 #' 
 #' # help function
 #' plot_col <- function(tab_plt, norm_type) {
-#'   tab_plt <- 
-#'     data.table::melt(tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
-#'                      id = "rId")
-#'   plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) + 
+#'   tab_plt <- data.table::melt(
+#'     data = tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
+#'     id = "rId")
+#'   plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) +
 #'     ggplot2::geom_col()
 #'   return(plt)
 #' }
