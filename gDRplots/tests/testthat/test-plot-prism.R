@@ -242,8 +242,7 @@ test_that("plot_scatter_with_corr works as expected", {
   
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
-  dt_response_na[["RV_gDR_x_0.01"]] <- NA
-  
+  dt_response_na[[selected_metric]] <- NA
   plt_4 <- 
     plot_scatter_with_corr(dt_response = dt_response_na,
                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
@@ -260,7 +259,6 @@ test_that("plot_scatter_with_corr works as expected", {
   # NAs in depmap
   dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
   dt_depmap_na[[selected_feat]] <- NA
-    
   plt_5 <- 
     plot_scatter_with_corr(dt_response = dt_response,
                            dt_depmap = dt_depmap_na, 
@@ -313,7 +311,7 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
-
+  
   plt_2 <- 
     plot_scatter_with_corr_panel(dt_response = dt_response,
                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
@@ -323,6 +321,78 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
   expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response$rId))
+  
+  # selected feat is not present in dt_depmap
+  new_selected_feats <- c(selected_feats, "XZ_non_avial")
+  plt_3 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = new_selected_feats)
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 3)
+  expect_equal(plt_3[["labels"]][["y"]], selected_metric)
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_3)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    NROW(new_selected_feats[!new_selected_feats %in% names(obj_depmap_feat[["dt_depmap"]])])) 
+  
+  # only NAs in selected_feats 
+  plt_4 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = rep(NA, 2),
+                                 selected_feat_meta_col = "XZ_fatures")
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], "")
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], "XZ_fatures : all NAs")
+  
+  # some NAs in selected_feats 
+  selected_feats_with_NAs <- c(NA, selected_feats, NA) 
+  plt_5 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats_with_NAs)
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 3)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[1]]$PANEL)),
+               NROW(selected_feats_with_NAs))
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_5)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    NROW(selected_feats_with_NAs[!selected_feats_with_NAs %in% names(obj_depmap_feat[["dt_depmap"]])])) 
+  
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_6 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response_na,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["x"]], "")
+  expect_equal(plt_6[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_6[["labels"]][["title"]], NULL)
+  expect_equal(plt_6[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[1]]$PANEL)), 
+               NROW(selected_feats))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)[["data"]]), NROW(selected_feats))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  dt_depmap_na[[selected_feats[2]]] <- NA
+  plt_7 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = dt_depmap_na, 
+                                 selected_feats = selected_feats)
+  expect_is(plt_7, "gg")
+  expect_equal(plt_7[["labels"]][["x"]], "")
+  expect_equal(plt_7[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_7[["labels"]][["title"]], NULL)
+  expect_equal(plt_6[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_7)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    sum(vapply(selected_feats, function(nm) all(is.na(dt_depmap_na[[nm]])), logical(1)))) 
   
   # testing assertions
   expect_error(plot_scatter_with_corr_panel(dt_response = unlist(dt_response),
@@ -337,14 +407,6 @@ test_that("plot_scatter_with_corr_panel works as expected", {
                                             dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                             selected_feats = 1),
                "Assertion on 'selected_feats' failed: Must be of type 'character'")
-  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
-                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                            selected_feats = c(NA, selected_feats)),
-               "Assertion on 'selected_feats' failed: Contains missing values")
-  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
-                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                            selected_feats = "not_existen_feat"),
-               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
   expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
                                             dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                             selected_feats = selected_feats,
@@ -447,3 +509,4 @@ test_that("plot_volcano_corr_panel works as expected", {
 test_that("plot_volcano_box_panel works as expected", {
   # TODO in GDR-2710
 })
+

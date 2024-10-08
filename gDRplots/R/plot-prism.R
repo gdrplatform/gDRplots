@@ -200,74 +200,119 @@ plot_scatter_with_corr_panel <- function(dt_response,
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
-  checkmate::assert_character(selected_feats, any.missing = FALSE)
-  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feats))
+  checkmate::assert_character(selected_feats)
+  checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  tab_plot_all <- data.table::data.table()
-  
-  for (selected_feat in selected_feats) {
-    # prep table with data to plot
-    X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
-    Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
-    tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
-    # remove NA
-    tab_plot <- stats::na.omit(tab_plot)
+  if (all(is.na(selected_feats))) {
+    plt <- 
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+                    x = "", 
+                    y = selected_metric) +
+      ggplot2::theme_bw()
+  } else {
+    available_feats <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+    tab_plot_all <- data.table::data.table()
     
-    # re-calculate correlation, slope and intercept
-    # add label for points driving the correlation
-    fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
-    intercept <- stats::coef(fit)[1]
-    slope <- stats::coef(fit)[2]
-    r_squared <- summary(fit)$r.squared
-    correlation <- sqrt(r_squared)
+    if (sum(is.na(selected_feats)) > 1) {
+      tmp <- data.table::data.table(selected_feats)
+      tmp[, num := 1:.N, by = selected_feats]
+      tmp[, nm := ifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, num), selected_feats)]
+      selected_feats <- tmp$nm
+    }
     
-    dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
-    top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
-    tab_plot$label <- ""
-    tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
-    tab_plot$col <- "no"
-    tab_plot[top_driving_corr, ]$col <- "yes"
+    for (selected_feat in selected_feats) {
+      
+      if (selected_feat %in% available_feats) {
+        # prep table with data to plot
+        X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
+        Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+        tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+        # remove NA
+        tab_plot <- stats::na.omit(tab_plot)
+        
+        if (NROW(tab_plot) > 0) { 
+          # re-calculate correlation, slope and intercept
+          fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
+          intercept <- stats::coef(fit)[1]
+          slope <- stats::coef(fit)[2]
+          r_squared <- summary(fit)$r.squared
+          correlation <- sqrt(r_squared)
+          # add label for points driving the correlation
+          dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
+          top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
+          tab_plot$label <- ""
+          tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
+          tab_plot$col <- "no"
+          tab_plot[top_driving_corr, ]$col <- "yes"
+          tab_plot$feat_lbl <- selected_feat
+          data.table::setnames(tab_plot, selected_feat, "feat_val")
+        } else {
+          # dummy data when all data is NA
+          tab_plot <- data.table::data.table(
+            cellline_name = "",
+            selected_metric = 0,
+            feat_val = 0,
+            label = "",
+            col = "NA",
+            feat_lbl = paste(selected_feat, ": all NAs")
+          )
+          data.table::setnames(tab_plot, 
+                               old = c("cellline_name", "selected_metric"), 
+                               new = c(cellline_name, selected_metric))
+        }
+      } else {
+        # dummy data required for faceting
+        tab_plot <- data.table::data.table(
+          cellline_name = "",
+          selected_metric = 0,
+          feat_val = 0,
+          label = "",
+          col = "NA",
+          feat_lbl = paste(selected_feat, ": all NAs")
+        )
+        data.table::setnames(tab_plot, 
+                             old = c("cellline_name", "selected_metric"), 
+                             new = c(cellline_name, selected_metric))
+      }
+      tab_plot_all <- rbind(tab_plot_all, tab_plot)
+    }
     
-    tab_plot$feat_lbl <- selected_feat
-    data.table::setnames(tab_plot, selected_feat, "feat_val")
-    
-    tab_plot_all <- rbind(tab_plot_all, tab_plot)
+    plt <-
+      ggplot2::ggplot(
+        data = tab_plot_all,
+        mapping = ggplot2::aes(x = feat_val, 
+                               y = get(selected_metric), 
+                               label = label, color = col)) +
+      ggplot2::geom_point(ggplot2::aes(alpha = col), fill = "black", shape = 21, size = 1, stroke = 1) +
+      ggrepel::geom_text_repel(size = 3, color = "black") +
+      ggplot2::labs(title = selected_feat_meta_col, 
+                    x = "", 
+                    y = selected_metric,
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw() +
+      ggplot2::guides(color = "none") +
+      ggplot2::scale_color_manual(values = c(yes = "red", no = "black")) +
+      ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free") +
+      ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
+                           formula = y ~ x, method = "lm", se = FALSE, inherit.aes = FALSE) +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(size = 8),
+        axis.text.y = ggplot2::element_text(size = 8),
+        plot.title = ggplot2::element_text(size = 12),
+        panel.grid.minor = ggplot2::element_blank(), 
+        aspect.ratio = 1,
+        strip.background = ggplot2::element_blank(),
+        strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
+        legend.position = "none"
+      )
   }
-  
-  plt <-
-    ggplot2::ggplot(
-      data = tab_plot_all,
-      mapping =  ggplot2::aes(x = feat_val, 
-                              y = get(selected_metric), 
-                              label = label, color = col)) +
-    ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
-    ggrepel::geom_text_repel(size = 3, color = "black") +
-    ggplot2::labs(title = selected_feat_meta_col, 
-                  x = "", 
-                  y = selected_metric,
-                  caption = unique(dt_response$rId)) +
-    ggplot2::theme_bw() +
-    ggplot2::guides(color = "none") +
-    ggplot2::scale_color_manual(values = c(yes = "red", no = "black")) +
-    ggplot2::facet_wrap(~feat_lbl, scales = "free") +
-    ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
-                         formula = y ~ x, method = "lm", se = FALSE, inherit.aes = FALSE) +
-    ggplot2::theme(
-      axis.text.x = ggplot2::element_text(size = 8),
-      axis.text.y = ggplot2::element_text(size = 8),
-      plot.title = ggplot2::element_text(size = 12),
-      panel.grid.minor = ggplot2::element_blank(), 
-      aspect.ratio = 1,
-      strip.background = ggplot2::element_blank(),
-      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
-      legend.position = "none"
-    )
-  
   return(plt)
 }
 
