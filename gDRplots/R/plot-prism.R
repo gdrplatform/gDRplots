@@ -325,7 +325,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap - for one metadata;
 #'  (rows are samples, columns are metadata levels);  
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
-#' @param selected_meta string with the name of the selected metadata from \code{dt_depmap}
+#' @param selected_feat_meta_col string with the name of the selected metadata from \code{dt_depmap}
 #'  (will be used as a plot title)
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
 #' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
@@ -337,7 +337,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #' @export
 plot_boxplot_meta <- function(dt_response,
                               dt_depmap, 
-                              selected_meta,
+                              selected_feat_meta_col,
                               with_1_item_grp = TRUE,
                               max_x_lbl_length = 60) {
   
@@ -346,7 +346,7 @@ plot_boxplot_meta <- function(dt_response,
   
   checkmate::assert_data_table(dt_response)
   checkmate::assert_data_table(dt_depmap)
-  checkmate::assert_string(selected_meta)
+  checkmate::assert_string(selected_feat_meta_col)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_number(max_x_lbl_length, lower = 5)
@@ -358,23 +358,23 @@ plot_boxplot_meta <- function(dt_response,
   dt_depmap_lng <- 
     data.table::melt(dt_depmap, 
                      id.vars = c("ModelID", "CCLEName"), 
-                     variable.name = selected_meta, variable.factor = FALSE
+                     variable.name = selected_feat_meta_col, variable.factor = FALSE
     )[value == 1, !"value"]
   
-  stopifnot("There is no data in `dt_depmap` (all `selected_meta` is NA)." =
-              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_meta]]))) # nolint
+  stopifnot("There is no data in `dt_depmap` (all `selected_feat_meta_col` is NA)." =
+              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) # nolint
   stopifnot(
-    "It seems that `dt_depmap_lng` has too many categories for `selected_meta` - try use `plot_scatter_with_corr()`." = 
+    "It seems that `dt_depmap_lng` has too many categories for `selected_feat_meta_col` - try use `plot_scatter_with_corr()`." = 
       all(
-        NROW(unique(dt_depmap_lng[!is.na(get(selected_meta)), ][[selected_meta]])) < NROW(dt_depmap_lng[!is.na(get(selected_meta)), ]), # nolint
-        NROW(unique(dt_depmap_lng[get(selected_meta) != "", ][[selected_meta]])) < NROW(dt_depmap_lng[get(selected_meta) != "", ]) # nolint
+        NROW(unique(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ][[selected_feat_meta_col]])) < NROW(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ]), # nolint
+        NROW(unique(dt_depmap_lng[get(selected_feat_meta_col) != "", ][[selected_feat_meta_col]])) < NROW(dt_depmap_lng[get(selected_feat_meta_col) != "", ]) # nolint
       )
   )
   
   # prep table with data to plot
-  X_dt <- dt_depmap_lng[, c("CCLEName", selected_meta), with = FALSE]
-  if (is.numeric(X_dt[[selected_meta]])) {
-    X_dt[[selected_meta]] <- as.factor(X_dt[[selected_meta]])
+  X_dt <- dt_depmap_lng[, c("CCLEName", selected_feat_meta_col), with = FALSE]
+  if (is.numeric(X_dt[[selected_feat_meta_col]])) {
+    X_dt[[selected_feat_meta_col]] <- as.factor(X_dt[[selected_feat_meta_col]])
   }
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
@@ -383,20 +383,20 @@ plot_boxplot_meta <- function(dt_response,
   
   # plot without group with only on item
   if (!with_1_item_grp) {
-    multi_item_grp <- tab_plot[, .N, by = selected_meta][N > 1, ][[selected_meta]]
-    tab_plot <- tab_plot[get(selected_meta) %in% multi_item_grp, ]
+    multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
+    tab_plot <- tab_plot[get(selected_feat_meta_col) %in% multi_item_grp, ]
   }
   
   # final plt
   plt <-        
     ggplot2::ggplot(
       data = tab_plot,
-      mapping =  ggplot2::aes(x = get(selected_meta), y = get(selected_metric))) +
+      mapping =  ggplot2::aes(x = get(selected_feat_meta_col), y = get(selected_metric))) +
     ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed") +
     ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
     ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
-    ggplot2::labs(title = selected_meta,
+    ggplot2::labs(title = selected_feat_meta_col,
                   y = selected_metric, 
                   x = "",
                   caption = unique(dt_response$rId)) +
@@ -405,14 +405,14 @@ plot_boxplot_meta <- function(dt_response,
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
   
   # some labels may be too long to see the boxes 
-  if (is.character(tab_plot[[selected_meta]]) && 
-      any(nchar(unique(tab_plot[[selected_meta]])) > max_x_lbl_length)) {
-    too_long_lbl <- which(nchar(tab_plot[[selected_meta]]) > max_x_lbl_length)
+  if (is.character(tab_plot[[selected_feat_meta_col]]) && 
+      any(nchar(unique(tab_plot[[selected_feat_meta_col]])) > max_x_lbl_length)) {
+    too_long_lbl <- which(nchar(tab_plot[[selected_feat_meta_col]]) > max_x_lbl_length)
     
-    vec_lbl <- tab_plot[[selected_meta]]
-    names(vec_lbl) <- tab_plot[[selected_meta]]
+    vec_lbl <- tab_plot[[selected_feat_meta_col]]
+    names(vec_lbl) <- tab_plot[[selected_feat_meta_col]]
     vec_lbl[too_long_lbl] <- 
-      paste0(substr(tab_plot[too_long_lbl, ][[selected_meta]], 1, max_x_lbl_length - 3), "...")
+      paste0(substr(tab_plot[too_long_lbl, ][[selected_feat_meta_col]], 1, max_x_lbl_length - 3), "...")
     
     plt <- plt + 
       ggplot2::scale_x_discrete(labels = vec_lbl)
@@ -534,7 +534,7 @@ plot_volcano_box_panel <- function(dt_response,
   # boxplot
   plt_box <- plot_boxplot_meta(dt_response = dt_response_,
                                dt_depmap = dt_depmap,
-                               selected_meta = selected_feat_meta_col) +
+                               selected_feat_meta_col = selected_feat_meta_col) +
     ggplot2::labs(title = "", caption = "")
   
   # final panel
