@@ -423,7 +423,7 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_1 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta)
+                             selected_feat_meta_col = selected_meta)
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
@@ -435,7 +435,7 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta,
+                             selected_feat_meta_col = selected_meta,
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 4)
@@ -446,7 +446,7 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta,
+                             selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 4)
@@ -465,7 +465,7 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_4 <- plot_boxplot_meta(dt_response = dt_response_2,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta)
+                             selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4)
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
@@ -475,29 +475,29 @@ test_that("plot_boxplot_meta works as expected", {
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
                                  dt_depmap = dt_depmap_meta,
-                                 selected_meta = selected_meta),
+                                 selected_feat_meta_col = selected_meta),
                "Assertion on 'dt_response' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = unlist(dt_depmap_meta), 
-                                 selected_meta = selected_meta),
+                                 selected_feat_meta_col = selected_meta),
                "Assertion on 'dt_depmap' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta,
-                                 selected_meta = 1),
-               "Assertion on 'selected_meta' failed: Must be of type 'string'")
+                                 selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  with_1_item_grp = "str"),
                "Assertion on 'with_1_item_grp' failed: Must be of type 'logical flag'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  max_x_lbl_length = "ten"),
                "Assertion on 'max_x_lbl_length' failed: Must be of type 'number'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  max_x_lbl_length = 1:5),
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 
