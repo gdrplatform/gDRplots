@@ -16,7 +16,7 @@ has to be the same length as \code{feature_sets}}
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
-  \item \code{selected_feat_meta} string name of feature..
+  \item \code{selected_feat_meta_col} string name of feature.
 }
 }
 \description{

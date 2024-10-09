@@ -2,7 +2,7 @@
 #'
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
 #'     outputted by \code{kaleidoscope::calc_assoc}
-#' @param feature_info string describing the name of the associated feature/metadata from DepMap
+#' @param selected_feat_meta_col string describing the name of the associated feature/metadata from DepMap
 #' @param selected_metric string describing the name of the selected metric used the association calculation
 #' @param condition_info string describing experiment condition 
 #'     (preferred: \code{"DrugName"}_\code{"Gnumber"}_\code{"drug_moa"}_\code{"Duration"})
@@ -17,7 +17,7 @@
 #' 
 #' @export
 plot_volcano_assoc <- function(dt_assoc,
-                               feature_info,
+                               selected_feat_meta_col,
                                selected_metric,
                                condition_info = NULL,
                                alpha = 0.05,
@@ -25,7 +25,7 @@ plot_volcano_assoc <- function(dt_assoc,
                                max_N = NULL) {
   
   checkmate::assert_data_table(dt_assoc)
-  checkmate::assert_string(feature_info)
+  checkmate::assert_string(selected_feat_meta_col)
   checkmate::assert_string(selected_metric)
   checkmate::assert_string(condition_info, null.ok = TRUE)
   checkmate::assert_number(alpha, lower = 0, upper = 1)
@@ -37,7 +37,7 @@ plot_volcano_assoc <- function(dt_assoc,
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
   
-  plt_title <- sprintf("%s__%s", selected_metric, feature_info)
+  plt_title <- sprintf("%s__%s", selected_metric, selected_feat_meta_col)
   
   if (NROW(dt_assoc) == 0 || all(is.na(dt_assoc[["q_value"]]))) {
     # empty plot
@@ -463,7 +463,7 @@ plot_volcano_corr_panel <- function(dt_response,
                              selected_feat_meta_col = selected_feat_meta_col)
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                feature_info = obj_assoc[["feature_info"]],
+                                selected_feat_meta_col = obj_assoc[["selected_feat_meta_col"]],
                                 selected_metric = obj_assoc[["selected_metric"]]) +
     ggplot2::labs(title = "")
   
@@ -527,7 +527,7 @@ plot_volcano_box_panel <- function(dt_response,
   
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                feature_info = obj_assoc[["feature_info"]],
+                                selected_feat_meta_col = obj_assoc[["selected_feat_meta_col"]],
                                 selected_metric = obj_assoc[["selected_metric"]]) +
     ggplot2::labs(title = "")
   

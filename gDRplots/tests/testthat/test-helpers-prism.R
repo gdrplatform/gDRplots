@@ -365,10 +365,6 @@ test_that("prep_dt_response_combo works as expected", {
                "Assertion on 'fit_source' failed: Must be of type 'string'")
 })
 
-test_that("prep_dt_depmap works as expected", {
-  # TODO in GDR-2710
-})
-
 test_that("prep_dt_depmap_feat works as expected", {
   # TODO in GDR-2710
 })

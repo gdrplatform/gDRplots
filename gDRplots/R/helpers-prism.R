@@ -447,59 +447,6 @@ prep_dt_response_combo <- function(dt_metrics,
   return(dt_response_combo)
 }
 
-#' Load DepMap merged data and metadata
-#'
-#' @param feature_sets character vector with the molecular feature set(s) to load from DepMap.
-#' @param prefix character vector with the prefixes to use for the each feature set in \code{feature_sets};
-#'    has to be the same length as \code{feature_sets}
-#' @param metadata_cols character vector with the metadata columns to load for DepMap cell lines
-#'
-#' @return \code{data.table} with merged data and meta
-#' 
-#' @keywords internal
-#'
-#' @seealso \code{kaleidoscope::load_depmap_merged}
-#'
-#' @examples
-#' \dontrun{
-#' dt_depmap <- prep_dt_depmap() 
-#' }
-#' 
-#' @export
-prep_dt_depmap <- function(
-    feature_sets = feature_sets <- c(
-      "CRISPRGeneEffect", # DepMap Chronos scores (CRISPR knockouts)
-      "OmicsExpressionProteinCodingGenesTPMLogp1", # gene xpression
-      "OmicsExpressionSignatures", # gene expression signatures
-      "OmicsSomaticMutationsMatrixHotspot", # hotspot mutations
-      "OmicsSomaticMutationsMatrixDamaging", # damaging mutations
-      "OmicsCNGene" # relative copy number 
-    ),
-    prefix = c("KO_",
-               "GE_",
-               "SG_",
-               "HM_",
-               "DM_",
-               "CN_"),
-    metadata_cols = c("OncotreeLineage", "PatientRace", "CCLEName")) {
-  
-  checkmate::assert_character(feature_sets, any.missing = FALSE)
-  checkmate::assert_character(prefix, any.missing = FALSE)
-  checkmate::assert_character(metadata_cols, any.missing = FALSE, null.ok = TRUE)
-  
-  stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
-  
-  # TODO in GDR-2710 # nolint start
-  # dt_depmap <- kaleidoscope::load_depmap_merged( 
-  #   feature_sets = feature_sets,
-  #   prefix = prefix,
-  #   metadata_columns = unique(c("CCLEName", metadata_cols))) 
-  # dt_depmap[, ModelID := NULL]
-  # 
-  # dt_depmap["CCLEName" != ""]
-  # return(dt_depmap) # nolint end
-}
-
 #' Load DepMap merged data for one selected feature
 #'
 #' @param feature_set string name of the molecular feature set to load from DepMap.
@@ -509,7 +456,7 @@ prep_dt_depmap <- function(
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
-#'   \item \code{selected_feat_meta} string name of feature..
+#'   \item \code{selected_feat_meta_col} string name of feature.
 #' }
 #' 
 #' @keywords internal
@@ -550,7 +497,7 @@ prep_dt_depmap_feat <- function(
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-#'   \item \code{selected_feat_meta} string name of meta.
+#'   \item \code{selected_feat_meta_col} string name of metadata column..
 #' }
 #' 
 #' @keywords internal
@@ -598,7 +545,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
 #'   \item \code{dt_assoc} \code{data.table} with calculated association values between 
 #'      feature/meta of DepMap and selected metric,
 #'   \item \code{condition_info} string describing experiment condition (drugs),
-#'   \item \code{feature_info} string name of feature/meta.
+#'   \item \code{selected_feat_meta_col} string name of feature/meta.
 #' }
 #' 
 #' @keywords prism_plots
@@ -626,13 +573,14 @@ prep_dt_assoc <- function(dt_response,
   # result
   # will be returned in this format when: 1) length (shared lines) = 0 
   # 2) all/one of the association calculation inputs will have only NA values
+  # 3) selected_metric values have no variance (dut to cdsrmodels::lin_associations)
   obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
                                                       response = character(0),
                                                       rho = numeric(0),
                                                       q_value = numeric(0)),
                     condition_info = NULL,
                     selected_metric = selected_metric,
-                    feature_info = selected_feat_meta_col)
+                    selected_feat_meta_col = selected_feat_meta_col)
   
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
@@ -647,7 +595,8 @@ prep_dt_assoc <- function(dt_response,
     data.table::setorderv(Y_dt, cellline_name)
     
     # association can only be calculated for a value other than NA
-    if (NROW(stats::na.omit(X_dt)) > 0 && NROW(stats::na.omit(Y_dt)) > 0) {
+    if (NROW(stats::na.omit(X_dt)) > 0 && NROW(stats::na.omit(Y_dt)) > 0 &&
+        stats::sd(Y_dt[[selected_metric]]) > 0) {
       # convert to a matrix
       X <- as.matrix(
         X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"

@@ -93,7 +93,7 @@ dt_assoc_sa <- data.table::data.table(
 obj_assoc_sa <- list(dt_assoc = dt_assoc_sa,
                      condition_info = unique(dt_response_met[["rId"]]),
                      selected_metric = "RV_gDR_xc50",
-                     feature_info = "XZ_fatures")
+                     selected_feat_meta_col = "XZ_fatures")
 
 ls_meta <- setdiff(names(obj_depmap_meta[["dt_depmap"]]), c("ModelID", "CCLEName"))
 dist_q <- withr::with_seed(42, rnorm(400, mean = 1, sd = 0.1))
@@ -108,12 +108,12 @@ dt_assoc_combo <- data.table::data.table(
 obj_assoc_combo <- list(dt_assoc = dt_assoc_combo,
                         condition_info = unique(dt_response_score[["rId"]]),
                         selected_metric = "hsa_score",
-                        feature_info = "meta_xx")
+                        selected_feat_meta_col = "meta_xx")
 
 # tests ----
 test_that("plot_volcano_assoc works as expected", {
   plt_1 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                              feature_info = obj_assoc_sa[["feature_info"]],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                               selected_metric = obj_assoc_sa[["selected_metric"]])
   
   expect_is(plt_1, "gg")
@@ -126,7 +126,7 @@ test_that("plot_volcano_assoc works as expected", {
   q_alpha <- 0.25
   plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
                               selected_metric = obj_assoc_sa[["selected_metric"]],
-                              feature_info = obj_assoc_sa[["feature_info"]],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                               condition_info = obj_assoc_sa[["condition_info"]],
                               alpha = q_alpha,
                               named_p_top = no_lbl)
@@ -139,7 +139,7 @@ test_that("plot_volcano_assoc works as expected", {
     no_lbl) # lbl for top feat
   
   plt_3 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
-                              feature_info = obj_assoc_combo[["feature_info"]],
+                              selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
                               selected_metric = obj_assoc_combo[["selected_metric"]])
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 2)
@@ -149,7 +149,7 @@ test_that("plot_volcano_assoc works as expected", {
   
   q_alpha_2 <- 0.71
   plt_4 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
-                              feature_info = obj_assoc_combo[["feature_info"]],
+                              selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
                               selected_metric = obj_assoc_combo[["selected_metric"]],
                               alpha = q_alpha_2)
   expect_is(plt_4, "gg")
@@ -161,37 +161,37 @@ test_that("plot_volcano_assoc works as expected", {
   
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
-                                  feature_info = obj_assoc_sa[["feature_info"]]),
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]]),
                "Assertion on 'dt_assoc' failed: Must be a data.table")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa),
-               "Assertion on 'feature_info' failed: Must be of type 'string'")
+                                  selected_feat_meta_col = obj_assoc_sa),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = 1),
                "Assertion on 'selected_metric' failed: Must be of type 'string'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   condition_info = 123),
                "Assertion on 'condition_info' failed: Must be of type 'string'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   alpha = "0.1"),
                "Assertion on 'alpha' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   named_p_top = "5"),
                "Assertion on 'named_p_top' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   max_N = "only 10"),
                "Assertion on 'max_N' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   max_N = 2:6),
                "Assertion on 'max_N' failed: Must have length 1.")
@@ -316,7 +316,7 @@ test_that("plot_scatter_with_corr_panel works as expected", {
     plot_scatter_with_corr_panel(dt_response = dt_response,
                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                  selected_feats = selected_feats[1],
-                                 selected_feat_meta_col = "XZ_fatures")
+                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
@@ -340,7 +340,7 @@ test_that("plot_scatter_with_corr_panel works as expected", {
     plot_scatter_with_corr_panel(dt_response = dt_response,
                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                  selected_feats = rep(NA, 2),
-                                 selected_feat_meta_col = "XZ_fatures")
+                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 0) # empty plot
   expect_equal(plt_4[["labels"]][["x"]], "")

@@ -13,7 +13,7 @@ prep_dt_depmap_meta(metadata_col = "OncotreeLineage")
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-  \item \code{selected_feat_meta} string name of meta.
+  \item \code{selected_feat_meta_col} string name of metadata column..
 }
 }
 \description{
