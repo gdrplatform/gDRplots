@@ -573,12 +573,12 @@ prep_dt_assoc <- function(dt_response,
   # result
   # will be returned in this format when: 1) length (shared lines) = 0 
   # 2) all/one of the association calculation inputs will have only NA values
-  # 3) selected_metric values have no variance (dut to cdsrmodels::lin_associations)
+  # 3) selected_metric values have no variance (due to cdsrmodels::lin_associations)
   obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
                                                       response = character(0),
                                                       rho = numeric(0),
                                                       q_value = numeric(0)),
-                    condition_info = NULL,
+                    condition_info = unique(dt_response[["rId"]]),
                     selected_metric = selected_metric,
                     selected_feat_meta_col = selected_feat_meta_col)
   
@@ -589,14 +589,14 @@ prep_dt_assoc <- function(dt_response,
   
   if (NROW(shared_lines) > 0) {
     # subset the data.table and order it
-    X_dt <- dt_depmap[CCLEName %in% shared_lines]
+    X_dt <- dt_depmap[CCLEName %in% shared_lines, ]
     data.table::setorder(X_dt, "CCLEName")
-    Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
+    Y_dt <- dt_response[get(cellline_name) %in% shared_lines, ]
     data.table::setorderv(Y_dt, cellline_name)
     
     # association can only be calculated for a value other than NA
-    if (NROW(stats::na.omit(X_dt)) > 0 && NROW(stats::na.omit(Y_dt)) > 0 &&
-        stats::sd(Y_dt[[selected_metric]]) > 0) {
+    if (NROW(stats::na.omit(X_dt)) > 2 && # the minimum degrees of freedom = 2
+        NROW(stats::na.omit(Y_dt)) > 0 && stats::sd(Y_dt[[selected_metric]]) > 0) {
       # convert to a matrix
       X <- as.matrix(
         X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
@@ -610,7 +610,6 @@ prep_dt_assoc <- function(dt_response,
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
       # 
       # # final
-      # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
       # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
     }
   }
