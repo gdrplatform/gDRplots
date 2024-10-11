@@ -597,11 +597,13 @@ prep_dt_assoc <- function(dt_response,
     
     # association can only be calculated for a value other than NA
     Y_condition <- 
-      NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0
+      all(NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0)
     X_condition <-
-      vapply(shared_lines, function(nm) {
-        stats::sd(X_dt[[nm]], na.rm = TRUE) > 0 && all(!is.na(X_dt[[nm]]))
-      }, logical(1))
+      any(vapply(shared_lines, function(nm) {
+        stats::sd(X_dt[CCLEName == nm, .SD, 
+                       .SDcols = vapply(X_dt, is.numeric, logical(1))], na.rm = TRUE) > 0 && 
+          all(!is.na(X_dt[CCLEName == nm]))
+      }, logical(1)))
     
     if (Y_condition && X_condition) {
       # convert to a matrix
