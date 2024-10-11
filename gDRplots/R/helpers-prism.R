@@ -571,7 +571,8 @@ prep_dt_assoc <- function(dt_response,
               all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
   
   # result
-  # will be returned in this format when: 1) length (shared lines) = 0 
+  # will be returned in this format when: 
+  # 1) length (shared lines) < 6 
   # 2) all/one of the association calculation inputs will have only NA values
   # 3) selected_metric values have no variance (due to cdsrmodels::lin_associations)
   obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
@@ -587,7 +588,7 @@ prep_dt_assoc <- function(dt_response,
   response_lines <- dt_response[[cellline_name]]
   shared_lines <- intersect(depmap_lines, response_lines)
   
-  if (NROW(shared_lines) > 0) {
+  if (NROW(shared_lines) >= 6) { # (the minimum degrees of freedom = 4) + 2
     # subset the data.table and order it
     X_dt <- dt_depmap[CCLEName %in% shared_lines, ]
     data.table::setorder(X_dt, "CCLEName")
@@ -595,8 +596,14 @@ prep_dt_assoc <- function(dt_response,
     data.table::setorderv(Y_dt, cellline_name)
     
     # association can only be calculated for a value other than NA
-    if (NROW(stats::na.omit(X_dt)) > 2 && # the minimum degrees of freedom = 2
-        NROW(stats::na.omit(Y_dt)) > 0 && stats::sd(Y_dt[[selected_metric]]) > 0) {
+    Y_condition <- 
+      NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0
+    X_condition <-
+      vapply(shared_lines, function(nm) {
+        stats::sd(X_dt[[nm]], na.rm = TRUE) > 0 && all(!is.na(X_dt[[nm]]))
+      }, logical(1))
+    
+    if (Y_condition && X_condition) {
       # convert to a matrix
       X <- as.matrix(
         X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
