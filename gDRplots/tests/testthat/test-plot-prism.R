@@ -159,6 +159,27 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(sort(plt_4_data$label[which(unlist(plt_4_data$colour) == "black")]),
                sort(obj_assoc_combo[["dt_assoc"]][q_value <= q_alpha_2, ]$feature))
   
+  # NAs in depmap
+  dt_assoc_na <- data.table::copy(obj_assoc_sa[["dt_assoc"]])
+  plt_5 <- plot_volcano_assoc(dt_assoc = dt_assoc_na[0, ],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_5[["labels"]][["y"]], "neglog_q_value") # predef for y axis
+  expect_true(grepl(": all NAs", plt_5[["labels"]][["title"]]))
+  
+  dt_assoc_na[["q_value"]] <- NA
+  plt_6 <- plot_volcano_assoc(dt_assoc = dt_assoc_na,
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]])
+  expect_is(plt_6, "gg")
+  expect_length(plt_6[["layers"]], 0) # empty plot
+  expect_equal(plt_6[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_6[["labels"]][["y"]], "neglog_q_value") # predef for y axis
+  expect_true(grepl(": all NAs", plt_6[["labels"]][["title"]]))
+  
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
                                   selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]]),

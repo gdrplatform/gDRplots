@@ -43,7 +43,9 @@ plot_volcano_assoc <- function(dt_assoc,
     # empty plot
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(plt_title, ": all NAs")) +
+      ggplot2::labs(title = paste(plt_title, ": all NAs"),
+                    x = x_lbl,
+                    y = y_lbl) +
       ggplot2::theme_bw()
   } else {
     tab_plot <- data.table::setorderv(data.table::copy(dt_assoc), cols = "q_value")
