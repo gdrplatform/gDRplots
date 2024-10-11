@@ -297,7 +297,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::guides(color = "none") +
-      ggplot2::scale_color_manual(values = c(yes = "red", no = "black")) +
+      ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
       ggplot2::facet_wrap(~feat_lbl, scales = "free") +
       ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
@@ -362,12 +362,15 @@ plot_boxplot_meta <- function(dt_response,
     )[value == 1, !"value"]
   
   stopifnot("There is no data in `dt_depmap` (all `selected_feat_meta_col` is NA)." =
-              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) # nolint
+              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) 
   stopifnot(
-    "It seems that `dt_depmap_lng` has too many categories for `selected_feat_meta_col` - try use `plot_scatter_with_corr()`." = 
+    "It seems that `dt_depmap_lng` has too many categories for 
+    `selected_feat_meta_col` - try use `plot_scatter_with_corr()`." = 
       all(
-        NROW(unique(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ][[selected_feat_meta_col]])) < NROW(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ]), # nolint
-        NROW(unique(dt_depmap_lng[get(selected_feat_meta_col) != "", ][[selected_feat_meta_col]])) < NROW(dt_depmap_lng[get(selected_feat_meta_col) != "", ]) # nolint
+        NROW(unique(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ][[selected_feat_meta_col]])) < 
+          NROW(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ]),
+        NROW(unique(dt_depmap_lng[get(selected_feat_meta_col) != "", ][[selected_feat_meta_col]])) < 
+          NROW(dt_depmap_lng[get(selected_feat_meta_col) != "", ])
       )
   )
   
