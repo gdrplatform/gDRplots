@@ -397,7 +397,6 @@ plot_boxplot_meta <- function(dt_response,
     ggplot2::ggplot(
       data = tab_plot,
       mapping =  ggplot2::aes(x = get(selected_feat_meta_col), y = get(selected_metric))) +
-    ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed") +
     ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
     ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
@@ -408,6 +407,12 @@ plot_boxplot_meta <- function(dt_response,
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
+  
+  if (!all(is.na(tab_plot[[selected_metric]])) && 
+      max(tab_plot[[selected_metric]], na.rm = TRUE) > 0.5) {
+    plt <- plt +
+      ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
+  }
   
   # some labels may be too long to see the boxes 
   if (is.character(tab_plot[[selected_feat_meta_col]]) && 

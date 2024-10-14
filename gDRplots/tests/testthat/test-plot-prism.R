@@ -180,6 +180,25 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_6[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_true(grepl(": all NAs", plt_6[["labels"]][["title"]]))
   
+  # check max_N
+  dt_assoc_big <- data.table::data.table(
+    feature = sprintf("XZ_A%02dTT", 1:50),
+    response = rep("RV_gDR_xc50", 50),
+    rho = withr::with_seed(42, rnorm(n = 50, mean = 0, sd = 0.035)),
+    q_value = withr::with_seed(42, rnorm(n = 50, mean = 0.15, sd = 0.05))
+  )
+  max_non_stat_sig <- 20
+  plt_7 <- plot_volcano_assoc(dt_assoc = dt_assoc_big,
+                              selected_metric = obj_assoc_sa[["selected_metric"]],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              condition_info = obj_assoc_sa[["condition_info"]],
+                              max_N = max_non_stat_sig)
+  expect_is(plt_7, "gg")
+  expect_length(plt_7[["layers"]], 2)
+  expect_equal(sum(ggplot2::ggplot_build(plt_7)$data[[1]][["label"]] != ""), 10) # default named_p_top
+  expect_equal(NROW(ggplot2::ggplot_build(plt_7)$data[[1]]),
+               NROW(dt_assoc_big[q_value < 0.05]) + max_non_stat_sig) # default alpha
+  
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
                                   selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]]),
@@ -216,6 +235,11 @@ test_that("plot_volcano_assoc works as expected", {
                                   selected_metric = obj_assoc_sa[["selected_metric"]],
                                   max_N = 2:6),
                "Assertion on 'max_N' failed: Must have length 1.")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
+                                  max_N = 6),
+               "Assertion on 'max_N' failed: Element 1 is not >= 10.")
 })
 
 test_that("plot_scatter_with_corr works as expected", {
@@ -449,7 +473,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
   expect_length(plt_1[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_1)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_1)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
@@ -460,7 +484,7 @@ test_that("plot_boxplot_meta works as expected", {
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_2)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_2)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx) & N > 1]))
   expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
@@ -471,7 +495,7 @@ test_that("plot_boxplot_meta works as expected", {
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_3)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
   short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
@@ -480,7 +504,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
-  
+  # combo plot
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
@@ -488,10 +512,25 @@ test_that("plot_boxplot_meta works as expected", {
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 4)
+  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
+  
+  # numeric meta
+  dt_depmap_meta_numeric <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
+  names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
+  dt_ <- dt_depmap_meta_numeric[CCLEName %in% dt_response[["CellLineName"]], ]
+  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]), 
+                 function(nm) !all(dt_[[nm]] == 0), logical(1))
+  
+  plt_5 <- plot_boxplot_meta(dt_response = dt_response,
+                             dt_depmap = dt_depmap_meta_numeric, 
+                             selected_feat_meta_col = selected_meta)
+  expect_is(plt_5, "gg")
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(ggplot2::layer_scales(plt_5)$x$range$range, names(lbl_)[lbl_])
   
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
