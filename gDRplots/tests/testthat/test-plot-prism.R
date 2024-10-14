@@ -512,7 +512,7 @@ test_that("plot_boxplot_meta works as expected", {
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5
+  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
