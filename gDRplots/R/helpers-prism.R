@@ -597,13 +597,13 @@ prep_dt_assoc <- function(dt_response,
     
     # association can only be calculated for a value other than NA
     Y_condition <- 
-      all(NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0)
+      all(all(NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0))
     X_condition <-
       any(vapply(shared_lines, function(nm) {
-        stats::sd(X_dt[CCLEName == nm, .SD, 
-                       .SDcols = vapply(X_dt, is.numeric, logical(1))], na.rm = TRUE) > 0 && 
+        stats::sd(X_dt[CCLEName == nm, -c("CCLEName", "ModelID")], na.rm = TRUE) > 0 && 
           all(!is.na(X_dt[CCLEName == nm]))
-      }, logical(1)))
+      }, logical(1))) && 
+      sum(X_dt[, lapply(.SD, sd, na.rm = TRUE) > 0, .SDcols = is.numeric]) > 1 # cdsr_models does not handle 1 
     
     if (Y_condition && X_condition) {
       # convert to a matrix
