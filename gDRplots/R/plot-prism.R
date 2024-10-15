@@ -77,7 +77,7 @@ plot_volcano_assoc <- function(dt_assoc,
       ggplot2::geom_point() +
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
                                   name = "Statistically Significant") +
-      ggrepel::geom_text_repel(size = 4, show.legend = FALSE) +
+      ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE) +
       ggplot2::labs(title = plt_title, 
                     subtitle = condition_info,
                     x = x_lbl,
@@ -167,7 +167,7 @@ plot_scatter_with_corr <- function(dt_response,
                                 y = get(selected_metric), 
                                 label = label, color = col)) +
       ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
-      ggrepel::geom_text_repel(size = 3, color = "black") +
+      ggrepel::geom_text_repel(size = 3, max.overlaps = 20, color = "black") +
       ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
       ggplot2::labs(title = selected_feat_meta_col, 
                     subtitle = plt_subtitle, 
@@ -292,7 +292,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
                                y = get(selected_metric), 
                                label = label, color = col)) +
       ggplot2::geom_point(ggplot2::aes(alpha = col), fill = "black", shape = 21, size = 1, stroke = 1) +
-      ggrepel::geom_text_repel(size = 3, color = "black") +
+      ggrepel::geom_text_repel(size = 3, max.overlaps = 20, color = "black") +
       ggplot2::labs(title = selected_feat_meta_col, 
                     x = "", 
                     y = selected_metric,
