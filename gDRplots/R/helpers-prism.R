@@ -595,25 +595,23 @@ prep_dt_assoc <- function(dt_response,
     Y_dt <- dt_response[get(cellline_name) %in% shared_lines, ]
     data.table::setorderv(Y_dt, cellline_name)
     
-    # association can only be calculated for a value other than NA
-    Y_condition <- 
-      all(all(NROW(stats::na.omit(Y_dt)) >= 6 && stats::sd(Y_dt[[selected_metric]], na.rm = TRUE) > 0))
-    X_condition <-
-      any(vapply(shared_lines, function(nm) {
-        stats::sd(X_dt[CCLEName == nm, -c("CCLEName", "ModelID")], na.rm = TRUE) > 0 && 
-          all(!is.na(X_dt[CCLEName == nm]))
-      }, logical(1))) && 
-      sum(X_dt[, lapply(.SD, sd, na.rm = TRUE) > 0, .SDcols = is.numeric]) > 1 # cdsr_models does not handle 1 
+    # convert to a matrix
+    X <- as.matrix(
+      X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
+    )
+    Y <- as.matrix(
+      Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
+    )
+    
+    # association can only be calculated for conditions
+    X_condition <- all(
+      sum(apply(X, 1, function(x) sd(x, na.rm = TRUE) > 0 & all(!is.na(x)))) > 1, # ashr::ash does not handle 1 
+      sum(apply(X, 2, function(x) sd(x, na.rm = TRUE)) > 0) > 1) # WGCNA::cor does not handle 1 
+    Y_condition <- all(
+      NROW(stats::na.omit(Y)) >= 6, # (n.min = 4) + 2 # nolint
+      stats::sd(Y[, 1], na.rm = TRUE) > 0) 
     
     if (Y_condition && X_condition) {
-      # convert to a matrix
-      X <- as.matrix(
-        X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
-      )
-      Y <- as.matrix(
-        Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
-      )
-      
       # create dt_assoc
       # TODO in GDR-2710
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
