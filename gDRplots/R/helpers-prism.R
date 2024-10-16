@@ -492,7 +492,7 @@ prep_dt_depmap_feat <- function(
 
 #' Load DepMap merged data for one selected metadata
 #'
-#' @param metadata_col character vector with the metadata columns to load for DepMap cell lines
+#' @param metadata_col string with the metadata columns to load for DepMap cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
