@@ -566,6 +566,7 @@ prep_dt_assoc <- function(dt_response,
   # checking input format
   selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
   stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
+  stopifnot("Column with metric should be numeric." = is.numeric(dt_response[[selected_metric]]))
   selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
   stopifnot("Provide `dt_depmap` for one feature or one meta only." = 
               all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
@@ -605,8 +606,10 @@ prep_dt_assoc <- function(dt_response,
     
     # association can only be calculated for conditions
     X_condition <- all(
-      sum(apply(X, 1, function(x) sd(x, na.rm = TRUE) > 0 & all(!is.na(x)))) > 1, # ashr::ash does not handle 1 
-      sum(apply(X, 2, function(x) sd(x, na.rm = TRUE)) > 0) > 1) # WGCNA::cor does not handle 1 
+      # ashr::ash does not handle 1 
+      sum(apply(X, 1, function(x) stats::sd(x, na.rm = TRUE) > 0 & all(!is.na(x))), na.rm = TRUE) > 1,
+      # WGCNA::cor does not handle 1 
+      sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE)) > 0, na.rm = TRUE) > 1) 
     Y_condition <- all(
       NROW(stats::na.omit(Y)) >= 6, # (n.min = 4) + 2 # nolint
       stats::sd(Y[, 1], na.rm = TRUE) > 0) 
