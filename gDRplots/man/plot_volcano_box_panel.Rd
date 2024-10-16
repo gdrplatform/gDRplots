@@ -15,7 +15,8 @@ plot_volcano_box_panel(
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
 outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
+or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+must have at least a column with \code{CellLineName} and a numeric column with metric values.}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap - for one metadata;
 (rows are samples, columns are metadata levels);  

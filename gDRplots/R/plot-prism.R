@@ -437,6 +437,7 @@ plot_boxplot_meta <- function(dt_response,
 #'  for one metric outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  must have at least a column with \code{CellLineName} and a numeric column with metric values.
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one feature;
 #'  (rows are samples, columns are features). 
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
@@ -463,10 +464,9 @@ plot_volcano_corr_panel <- function(dt_response,
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   
-  # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
-  
   # plot data
-  dt_response_ <- dt_response[, c("rId", "cId", cellline_name, selected_metric), with = FALSE]
+  ls_cols <- intersect(names(dt_response), c("rId", "cId", cellline_name, selected_metric))
+  dt_response_ <- dt_response[, ls_cols, with = FALSE]
   
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
@@ -486,11 +486,15 @@ plot_volcano_corr_panel <- function(dt_response,
     ggplot2::labs(title = "", caption = "")
   
   # final panel
+  panel_title <- 
+    ifelse(is.null(obj_assoc[["condition_info"]]),
+           sprintf("%s__%s", selected_metric, selected_feat_meta_col),
+           sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]]))
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_corr), 
                       widths = c(1, 1)),
-    top = sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]])
-  )
+    top = panel_title)
+  
   return(panel)
 }
 
@@ -500,6 +504,7 @@ plot_volcano_corr_panel <- function(dt_response,
 #'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  must have at least a column with \code{CellLineName} and a numeric column with metric values.
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap - for one metadata;
 #'  (rows are samples, columns are metadata levels);  
 #'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
@@ -526,10 +531,9 @@ plot_volcano_box_panel <- function(dt_response,
   checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   
-  # TODO add validation for NROW(intersect(dt_response[[cellline_name]],  dt_depmap[["CCLEName"]])) == 0
-  
   # plot data
-  dt_response_ <- dt_response[, c("rId", "cId", cellline_name, selected_metric), with = FALSE]
+  ls_cols <- intersect(names(dt_response), c("rId", "cId", cellline_name, selected_metric))
+  dt_response_ <- dt_response[, ls_cols, with = FALSE]
   
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
@@ -548,9 +552,13 @@ plot_volcano_box_panel <- function(dt_response,
     ggplot2::labs(title = "", caption = "")
   
   # final panel
+  panel_title <- 
+    ifelse(is.null(obj_assoc[["condition_info"]]),
+           sprintf("%s__%s", selected_metric, selected_feat_meta_col),
+           sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]]))
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_box), widths = c(1, 1)),
-    top = sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]])
-  )
+    top = panel_title)
+  
   return(panel)
 }
