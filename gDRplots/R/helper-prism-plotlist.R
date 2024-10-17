@@ -39,16 +39,26 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   checkmate::assert_character(drug_name_vec)
   checkmate::assert_data_table(dt_metrics, null.ok = TRUE)
   checkmate::assert_data_table(dt_average, null.ok = TRUE)
-  checkmate::assert_character(drug_name_vec, null.ok = TRUE)
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE, null.ok = TRUE)
-  stopifnot("Provide `metric` for  `dt_metrics`." = !is.null(dt_metrics) && is.null(metric))
-  checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
+  stopifnot("Provide `metric` for  `dt_metrics`." = !is.null(dt_metrics) && !is.null(metric))
+  if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
+  if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   checkmate::assert_character(prefixes, null.ok = TRUE)
   stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
   checkmate::assert_character(metadata_columns, null.ok = TRUE)
+  stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
+              !is.null(feature_sets) || !is.null(metadata_columns))
+  
+  # adjust drug list
+  available_drugs <- unique(dt_metrics[[drug_name]])
+  if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
+    drug_name_vec  <- available_drugs
+  } else if (!all(drug_name_vec %in% available_drugs)) {
+    drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+  }
   
   ls_plot <- list()
   
@@ -85,7 +95,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           }
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
-          # prep vis
+          # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_corr_panel,
                                 dt_response = dt_response_sa,
@@ -132,7 +142,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           }
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
-          # prep vis
+          # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_corr_panel,
                                 dt_response = dt_response_sa,
