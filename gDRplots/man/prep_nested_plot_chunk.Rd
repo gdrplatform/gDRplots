@@ -4,7 +4,7 @@
 \alias{prep_nested_plot_chunk}
 \title{Prepare markdown chunk based on the nested plots list}
 \usage{
-prep_nested_plot_chunk(plt_list, chunk_name, header_level = 3)
+prep_nested_plot_chunk(plt_list, chunk_name, header_level = 2)
 }
 \arguments{
 \item{plt_list}{named list with generated plots to be shown in tabs; list of plots in nested 

@@ -50,11 +50,19 @@ test_that("prep_nested_plot_chunk works as expected", {
     }
   }
   
-  res_1 <- prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col")
+  res_1 <- prep_nested_plot_chunk(plt_list = plotlist, 
+                                  chunk_name = "metric_col")
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_length(res_1, NROW(unique(dt_metrics$DrugName)))
-  expect_equal(sum(grepl("######", res_1[[1]])), # the lowest lvl with plots
+  expect_equal(sum(grepl("#####", res_1[[1]])), # the lowest lvl with plots - default
+               NROW(c("GR", "RV")) * NROW(unique(dt_metrics$CellLineName)))
+  
+  res_2 <- prep_nested_plot_chunk(plt_list = plotlist, 
+                                  chunk_name = "metric_col", 
+                                  header_level = 1)
+  expect_is(res_2, "list")
+  expect_equal(sum(grepl("####", res_2[[1]])),
                NROW(c("GR", "RV")) * NROW(unique(dt_metrics$CellLineName)))
   
   expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
@@ -63,6 +71,8 @@ test_that("prep_nested_plot_chunk works as expected", {
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
   expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = 0), 
+               "Assertion on 'header_level' failed: Element 1 is not >= 1")
 })
 
 test_that("escape_special_characters works as expected", {

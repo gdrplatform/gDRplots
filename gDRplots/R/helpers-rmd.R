@@ -93,7 +93,7 @@ prep_plot_chunk <- function(plt_list,
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
-                                   header_level = 3) {
+                                   header_level = 2) {
   checkmate::assert_list(plt_list)
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
