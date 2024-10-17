@@ -28,25 +28,33 @@ se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 
 # help function
-plot_col <- function(tab_plt, norm_type) {
+plot_col <- function(tab_plt, norm_type, col = "red") {
   tab_plt <- data.table::melt(
     data = tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
     id = "rId")
   plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) +
-    ggplot2::geom_col()
+    ggplot2::geom_col(fill = col)
   return(plt)
 }
 
 # creating nested list with plots
 plotlist <- list()
+ls_color <- c("darkred", "orange", "darkcyan")
 for (drug in unique(dt_metrics$DrugName)) {
   for (cl in unique(dt_metrics$CellLineName)) {
     tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
     
-    plotlist[[drug]][[cl]][["RV"]] <- list(plt_GR = plot_col(tab_plot, "RV"))
-    plotlist[[drug]][[cl]][["GR"]] <- list(plt_RV = plot_col(tab_plot, "GR"))
+    plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+    names(plt_GR) <- sprintf("\%s_\%s", "GR", ls_color)
+    plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+    names(plt_RV) <- sprintf("\%s_\%s", "RV", ls_color)
+    
+    plotlist[[drug]][[cl]][["RV"]] <- plt_RV
+    plotlist[[drug]][[cl]][["GR"]] <- plt_GR
   }
 }
+
+prep_nested_plot_chunk(plotlist, "metric_value")
 
 prep_nested_plot_chunk(plotlist, "metric_value")
 

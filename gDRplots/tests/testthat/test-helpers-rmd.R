@@ -29,41 +29,46 @@ test_that("prep_nested_plot_chunk works as expected", {
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   
   # help function
-  plot_col <- function(tab_plt, norm_type) {
-    tab_plt <-
-      data.table::melt(tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
-                       id = "rId")
+  plot_col <- function(tab_plt, norm_type, col = "red") {
+    tab_plt <- data.table::melt(
+      data = tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
+      id = "rId")
     plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) +
-      ggplot2::geom_col() +
-      ggplot2::theme_light()
+      ggplot2::geom_col(fill = col)
     return(plt)
   }
   
   # creating nested list with plots
   plotlist <- list()
+  ls_color <- c("darkred", "orange", "darkcyan")
   for (drug in unique(dt_metrics$DrugName)) {
     for (cl in unique(dt_metrics$CellLineName)) {
       tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
       
-      plotlist[[drug]][[cl]][["RV"]] <- list(plt_RV = plot_col(tab_plot, "RV"))
-      plotlist[[drug]][[cl]][["GR"]] <- list(plt_GR = plot_col(tab_plot, "GR"))
+      plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+      names(plt_GR) <- sprintf("%s_%s", "GR", ls_color)
+      plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+      names(plt_RV) <- sprintf("%s_%s", "RV", ls_color)
+      
+      plotlist[[drug]][[cl]][["RV"]] <- plt_RV
+      plotlist[[drug]][[cl]][["GR"]] <- plt_GR
     }
   }
-  
+
   res_1 <- prep_nested_plot_chunk(plt_list = plotlist, 
                                   chunk_name = "metric_col")
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_length(res_1, NROW(unique(dt_metrics$DrugName)))
   expect_equal(sum(grepl("#####", res_1[[1]])), # the lowest lvl with plots - default
-               NROW(c("GR", "RV")) * NROW(unique(dt_metrics$CellLineName)))
+               NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color))
   
   res_2 <- prep_nested_plot_chunk(plt_list = plotlist, 
                                   chunk_name = "metric_col", 
                                   header_level = 1)
   expect_is(res_2, "list")
   expect_equal(sum(grepl("####", res_2[[1]])),
-               NROW(c("GR", "RV")) * NROW(unique(dt_metrics$CellLineName)))
+               NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color))
   
   expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
