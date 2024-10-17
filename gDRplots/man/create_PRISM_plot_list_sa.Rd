@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper-prism-plotlist.R
 \name{create_PRISM_plot_list_sa}
 \alias{create_PRISM_plot_list_sa}
-\title{Create nested plots list for PRISM data}
+\title{Create nested plots list for PRISM data with single-agent metrics}
 \usage{
 create_PRISM_plot_list_sa(
   drug_name_vec,
@@ -30,8 +30,8 @@ and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 \item{normalization_type_vec}{character vector with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
 
-\item{metric}{string name of metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+\item{metric}{character vector with names of metric;
+ chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
@@ -47,6 +47,6 @@ has to be the same length as \code{feature_sets}}
 list with plots (nested structure)
 }
 \description{
-Create nested plots list for PRISM data
+Create nested plots list for PRISM data with single-agent metrics
 }
 \keyword{prism_plots}

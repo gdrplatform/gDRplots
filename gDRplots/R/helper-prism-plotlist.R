@@ -1,4 +1,4 @@
-#' Create nested plots list for PRISM data
+#' Create nested plots list for PRISM data with single-agent metrics
 #' 
 #' @param drug_name_vec character vector with cell line to be plotted \code{Drug Name}
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
@@ -9,8 +9,8 @@
 #'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo 
 #' @param normalization_type_vec character vector with normalization types to be selected
 #'                               one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both
-#' @param metric string name of metric;
-#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#' @param metric character vector with names of metric;
+#'   chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' @param feature_sets character vector names of the molecular feature set to load from DepMap.
@@ -41,7 +41,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   checkmate::assert_data_table(dt_average, null.ok = TRUE)
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE, null.ok = TRUE)
-  stopifnot("Provide `metric` for  `dt_metrics`." = !is.null(dt_metrics) && !is.null(metric))
+  stopifnot("Provide `metric` for `dt_metrics`." = !is.null(dt_metrics) && !is.null(metric))
   if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
   if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -144,10 +144,10 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
-                                plot_volcano_corr_panel,
+                                plot_volcano_box_panel,
                                 dt_response = dt_response_sa,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
-                                selected_feat_meta_col = feat)
+                                selected_feat_meta_col = meta)
           names(ls_vol) <- ls_selected_met$selected_metric
           
           ls_plot[[meta]][[d_name]][[norm]] <- ls_vol
