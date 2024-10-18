@@ -604,6 +604,10 @@ prep_dt_assoc <- function(dt_response,
       Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
     )
     
+    # remove col with all NA
+    feat_all_na <- apply(X, 2, function(x) all(is.na(x)))
+    X <- X[, colnames(X)[!feat_all_na]]
+    
     # association can only be calculated for conditions
     X_condition <- all(
       # ashr::ash does not handle 1 
