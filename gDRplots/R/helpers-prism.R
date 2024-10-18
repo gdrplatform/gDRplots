@@ -611,7 +611,7 @@ prep_dt_assoc <- function(dt_response,
     # association can only be calculated for conditions
     X_condition <- 
       # cdsr_models does not handle 1 feat
-      sum(apply(X, 2, function(x) sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1 
+      sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1 
     Y_condition <- 
       # (n.min = 4) + 2 # nolint
       all(NROW(stats::na.omit(Y)) >= 6, stats::sd(Y[, 1], na.rm = TRUE) > 0) 
