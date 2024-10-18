@@ -49,6 +49,19 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feature_sets = feature_sets,
                                          prefixes = 1:2),
                "Assertion on 'prefixes' failed: Must be of type 'character'")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         feature_sets = NULL,
+                                         prefixes = NULL),
+               "Provide `feature_sets` or `metadata_columns` for DepMam subset")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         feature_sets = NULL,
+                                         prefixes = NULL,
+                                         metadata_columns = 1:3),
+               "Assertion on 'metadata_columns' failed: Must be of type 'character'")
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
@@ -114,4 +127,19 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             feature_sets = feature_sets,
                                             prefixes = 1:2),
                "Assertion on 'prefixes' failed: Must be of type 'character'")
+  expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                            drug2_name_vec = d_names_2,
+                                            dt_metrics = dt_metrics,
+                                            dt_scores = dt_scores,
+                                            feature_sets = NULL,
+                                            prefixes = NULL),
+               "Provide `feature_sets` or `metadata_columns` for DepMam subset")
+  expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                            drug2_name_vec = d_names_2,
+                                            dt_metrics = dt_metrics,
+                                            dt_scores = dt_scores,
+                                            feature_sets = NULL,
+                                            prefixes = NULL,
+                                            metadata_columns = 1:3),
+               "Assertion on 'metadata_columns' failed: Must be of type 'character'")
 })
