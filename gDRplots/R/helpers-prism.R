@@ -607,18 +607,17 @@ prep_dt_assoc <- function(dt_response,
     # remove col with all NA
     feat_all_na <- apply(X, 2, function(x) all(is.na(x)))
     X <- X[, colnames(X)[!feat_all_na]]
-    
+ 
     # association can only be calculated for conditions
-    X_condition <- all(
-      # ashr::ash does not handle 1 
-      sum(apply(X, 1, function(x) stats::sd(x, na.rm = TRUE) > 0 & all(!is.na(x))), na.rm = TRUE) > 1,
-      # WGCNA::cor does not handle 1 
-      sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE)) > 0, na.rm = TRUE) > 1) 
-    Y_condition <- all(
-      NROW(stats::na.omit(Y)) >= 6, # (n.min = 4) + 2 # nolint
-      stats::sd(Y[, 1], na.rm = TRUE) > 0) 
+    X_condition <- 
+      # cdsr_models does not handle 1 feat
+      sum(apply(X, 2, function(x) sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1 
+    Y_condition <- 
+      # (n.min = 4) + 2 # nolint
+      all(NROW(stats::na.omit(Y)) >= 6, stats::sd(Y[, 1], na.rm = TRUE) > 0) 
+    XY_condition <- sum(t(!is.na(X)) %*% (!is.na(Y)) >= 6) > 1
     
-    if (Y_condition && X_condition) {
+    if (Y_condition && X_condition && XY_condition) {
       # create dt_assoc
       # TODO in GDR-2710
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
