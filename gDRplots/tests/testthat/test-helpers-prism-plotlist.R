@@ -12,6 +12,8 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   prefixes <- c("KO_", "CN_")
   metadata_columns <- "OncotreeLineage"
   
+  # TODO in GDR-2710
+  
   # testing assertions
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = 1:3,
                                          dt_metrics = dt_metrics,
@@ -76,6 +78,8 @@ test_that("create_PRISM_plot_list_combo works as expected", {
   feature_sets <- c("CRISPRGeneEffect", "OmicsCNGene")
   prefixes <- c("KO_", "CN_")
   metadata_columns <- "OncotreeLineage"
+  
+  # TODO in GDR-2710
   
   # testing assertions
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = 1:3,
