@@ -1,3 +1,6 @@
+## gDRplots 0.0.38 - 2024-10-21
+* add support for visualizing combo data without isobolograms
+
 ## gDRplots 0.0.37 - 2024-10-02
 * update vignette
 
