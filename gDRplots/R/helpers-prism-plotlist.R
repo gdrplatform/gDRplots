@@ -55,7 +55,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   # adjust drug list
   available_drugs <- unique(dt_metrics[[drug_name]])
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
-    drug_name_vec  <- available_drugs
+    drug_name_vec <- available_drugs
   } else if (!all(drug_name_vec %in% available_drugs)) {
     drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
   }
