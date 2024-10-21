@@ -54,7 +54,7 @@
 #' @export
 heatmap_combo_metrics <- function(
     dt_excess,
-    dt_isobolograms,
+    dt_isobolograms = NULL,
     drug1_name,
     drug2_name,
     cl_name,
@@ -75,7 +75,6 @@ heatmap_combo_metrics <- function(
   mx_names <- names(gDRutils::get_combo_excess_field_names())
   
   checkmate::assert_data_table(dt_excess)
-  checkmate::assert_data_table(dt_isobolograms)
   checkmate::assert_string(drug1_name)
   checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
   checkmate::assert_string(drug2_name)
@@ -84,29 +83,38 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
-  if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
+  if (!is.null(iso_levels)) {
+    checkmate::assert_numeric(as.numeric(iso_levels))
+    checkmate::assert_data_table(dt_isobolograms)  # Only check if iso_levels is not NULL
+  }
   stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, is_valid_color, logical(1))))
   stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
-  # filter data for normalization type
+  # Data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_excess <- dt_excess[eval(filter_expr)]
-  dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
-  
-  # filter data for combination cell line (drug x drug2)
-  dt_excess <-
-    dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-  dt_isobolograms <-
-    dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-  
-  # isoline data
-  if (!is.null(dt_isobolograms$iso_level)) {
+  if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
+    dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
+    dt_isobolograms <- dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
-  available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- .get_iso_colors(available_iso_lvl)
+  
+  dt_excess <- dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
+  
+  # Check if isolines are available and adjust plotting logic accordingly
+  available_iso_lvl <- if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
+    unique(dt_isobolograms[["iso_level"]])
+  } else {
+    NULL
+  }
+  
+  iso_colors <- if (!is.null(available_iso_lvl)) {
+    .get_iso_colors(available_iso_lvl)
+  } else {
+    NULL
+  }
   
   # title
   main_title <- sprintf("%s (%s)",
@@ -139,7 +147,7 @@ heatmap_combo_metrics <- function(
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
     
-    dt_ <- dt_excess[!is.na(get(mx_name)), c(conc, conc_2, mx_name), with = FALSE]
+    dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
     
     if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
       plt <- 
@@ -193,7 +201,8 @@ heatmap_combo_metrics <- function(
                                     expand = c(0, 0)) +
         ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                       limit = limits,
-                                      labels = function(x) sprintf("%.2f", x)) + 
+                                      labels = function(x) sprintf("%.2f", x),
+                                      na.value = "lightgrey") + 
         ggplot2::theme_bw() +
         ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                        axis.text.y = ggplot2::element_text(size = 8),
@@ -290,6 +299,10 @@ heatmap_combo_metrics <- function(
   
   # final plots
   ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
+  
+  if (is.null(iso_levels)) {
+    ls_plts[["iso_compare"]] <- NULL
+  }
   
   final_plot <- if (as_panel) {
     ggpubr::annotate_figure(
