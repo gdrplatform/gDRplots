@@ -97,7 +97,8 @@ heatmap_combo_metrics <- function(
   dt_excess <- dt_excess[eval(filter_expr)]
   if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
     dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
-    dt_isobolograms <- dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
+    dt_isobolograms <- dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name &
+                                         get(drug_name_2) == drug2_name]
     dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
   }
   
