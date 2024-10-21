@@ -1,4 +1,4 @@
-#' Create nested plots list for PRISM data with single-agent metrics
+#' Create a nested list of plots for PRISM data with single-agent metrics
 #' 
 #' @param drug_name_vec character vector with drug names to be plotted (identifiers \code{DrugName})
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
@@ -18,7 +18,7 @@
 #'    has to be the same length as \code{feature_sets}
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
-#' @return list with plots (nested structure)
+#' @return nested list of plots
 #' @keywords prism_plots
 #'   
 #' @export
@@ -57,7 +57,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
     drug_name_vec  <- available_drugs
   } else if (!all(drug_name_vec %in% available_drugs)) {
-    drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+    drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
   }
   
   ls_plot <- list()
@@ -160,7 +160,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 }
 
 
-#' Create nested plots list for PRISM data with combo metrics
+#' Create a nested list of plots for PRISM data with combo metrics
 #' 
 #' @param drug1_name_vec character vector with drug names to be plotted (identifiers \code{DrugName})
 #' @param drug2_name_vec character vector with co-drug names to be plotted (identifiers \code{DrugName_2})
@@ -184,7 +184,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'    has to be the same length as \code{feature_sets}
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
-#' @return list with plots (nested structure)
+#' @return nested list of plots
 #' @keywords prism_plots
 #'   
 #' @export

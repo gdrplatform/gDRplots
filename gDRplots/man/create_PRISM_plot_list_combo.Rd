@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-prism-plotlist.R
 \name{create_PRISM_plot_list_combo}
 \alias{create_PRISM_plot_list_combo}
-\title{Create nested plots list for PRISM data with combo metrics}
+\title{Create a nested list of plots for PRISM data with combo metrics}
 \usage{
 create_PRISM_plot_list_combo(
   drug1_name_vec,
@@ -52,9 +52,9 @@ has to be the same length as \code{feature_sets}}
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 }
 \value{
-list with plots (nested structure)
+nested list of plots
 }
 \description{
-Create nested plots list for PRISM data with combo metrics
+Create a nested list of plots for PRISM data with combo metrics
 }
 \keyword{prism_plots}

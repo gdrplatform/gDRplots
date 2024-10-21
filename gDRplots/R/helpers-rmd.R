@@ -50,7 +50,7 @@ prep_plot_chunk <- function(plt_list,
 #' Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
 #'
 #' @param plt_list named list with generated plots to be shown in tabs; list of plots in nested 
-#'   hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} describe by
+#'   hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
 #'   one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'     
 #' @param chunk_name string name of markdown chunk; preferable without spaces
 #' @param header_level numeric level of markdown header - only for the first level
@@ -93,7 +93,7 @@ prep_plot_chunk <- function(plt_list,
 #' prep_nested_plot_chunk(plotlist, "metric_value")
 #' 
 #' }
-#' @return list of character vector - input for \code{knitr::knit}
+#' @return list of character vectors - input for \code{knitr::knit}
 #' @keywords internal
 #' 
 #' @seealso \code{\link[knitr]{knit}}

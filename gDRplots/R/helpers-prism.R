@@ -475,8 +475,7 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # remove col with all NA
-    feat_all_na <- apply(X, 2, function(x) all(is.na(x)))
-    X <- X[, colnames(X)[!feat_all_na]]
+    X <- X[, colSums(is.na(X)) != NROW(X)]
  
     # association can only be calculated for conditions
     X_condition <- 
@@ -484,7 +483,7 @@ prep_dt_assoc <- function(dt_response,
       sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1 
     Y_condition <- 
       # (n.min = 4) + 2 # nolint
-      all(NROW(stats::na.omit(Y)) >= 6, stats::sd(Y[, 1], na.rm = TRUE) > 0) 
+      NROW(na.omit(Y)) >= 6 & stats::sd(Y[, 1], na.rm = TRUE) > 0
     XY_condition <- sum(t(!is.na(X)) %*% (!is.na(Y)) >= 6) > 1
     
     if (Y_condition && X_condition && XY_condition) {
