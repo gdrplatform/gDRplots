@@ -92,7 +92,8 @@ dt_assoc_sa <- data.table::data.table(
 
 obj_assoc_sa <- list(dt_assoc = dt_assoc_sa,
                      condition_info = unique(dt_response_met[["rId"]]),
-                     feature_info = "XZ_fatures")
+                     selected_metric = "RV_gDR_xc50",
+                     selected_feat_meta_col = "XZ_fatures")
 
 ls_meta <- setdiff(names(obj_depmap_meta[["dt_depmap"]]), c("ModelID", "CCLEName"))
 dist_q <- withr::with_seed(42, rnorm(400, mean = 1, sd = 0.1))
@@ -106,12 +107,14 @@ dt_assoc_combo <- data.table::data.table(
 
 obj_assoc_combo <- list(dt_assoc = dt_assoc_combo,
                         condition_info = unique(dt_response_score[["rId"]]),
-                        feature_info = "meta_xx")
+                        selected_metric = "hsa_score",
+                        selected_feat_meta_col = "meta_xx")
 
 # tests ----
 test_that("plot_volcano_assoc works as expected", {
   plt_1 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                              feature_info = obj_assoc_sa[["feature_info"]])
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]])
   
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 2)
@@ -122,7 +125,8 @@ test_that("plot_volcano_assoc works as expected", {
   no_lbl <- 3
   q_alpha <- 0.25
   plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                              feature_info = obj_assoc_sa[["feature_info"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
                               condition_info = obj_assoc_sa[["condition_info"]],
                               alpha = q_alpha,
                               named_p_top = no_lbl)
@@ -135,7 +139,8 @@ test_that("plot_volcano_assoc works as expected", {
     no_lbl) # lbl for top feat
   
   plt_3 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
-                              feature_info = obj_assoc_combo[["feature_info"]])
+                              selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_combo[["selected_metric"]])
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 2)
   expect_equal(plt_3[["labels"]][["x"]], "rho") # predef for x axis
@@ -144,7 +149,8 @@ test_that("plot_volcano_assoc works as expected", {
   
   q_alpha_2 <- 0.71
   plt_4 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
-                              feature_info = obj_assoc_combo[["feature_info"]],
+                              selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_combo[["selected_metric"]],
                               alpha = q_alpha_2)
   expect_is(plt_4, "gg")
   plt_4_data <- data.table::as.data.table(ggplot2::ggplot_build(plt_4)$data[[1]])
@@ -153,33 +159,87 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(sort(plt_4_data$label[which(unlist(plt_4_data$colour) == "black")]),
                sort(obj_assoc_combo[["dt_assoc"]][q_value <= q_alpha_2, ]$feature))
   
+  # NAs in depmap
+  dt_assoc_na <- data.table::copy(obj_assoc_sa[["dt_assoc"]])
+  plt_5 <- plot_volcano_assoc(dt_assoc = dt_assoc_na[0, ],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_5[["labels"]][["y"]], "neglog_q_value") # predef for y axis
+  expect_true(grepl(": all NAs", plt_5[["labels"]][["title"]]))
+  
+  dt_assoc_na[["q_value"]] <- NA
+  plt_6 <- plot_volcano_assoc(dt_assoc = dt_assoc_na,
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]])
+  expect_is(plt_6, "gg")
+  expect_length(plt_6[["layers"]], 0) # empty plot
+  expect_equal(plt_6[["labels"]][["x"]], "rho") # predef for x axis
+  expect_equal(plt_6[["labels"]][["y"]], "neglog_q_value") # predef for y axis
+  expect_true(grepl(": all NAs", plt_6[["labels"]][["title"]]))
+  
+  # check max_N
+  dt_assoc_big <- data.table::data.table(
+    feature = sprintf("XZ_A%02dTT", 1:50),
+    response = rep("RV_gDR_xc50", 50),
+    rho = withr::with_seed(42, rnorm(n = 50, mean = 0, sd = 0.035)),
+    q_value = withr::with_seed(42, rnorm(n = 50, mean = 0.15, sd = 0.05))
+  )
+  max_non_stat_sig <- 20
+  plt_7 <- plot_volcano_assoc(dt_assoc = dt_assoc_big,
+                              selected_metric = obj_assoc_sa[["selected_metric"]],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              condition_info = obj_assoc_sa[["condition_info"]],
+                              max_N = max_non_stat_sig)
+  expect_is(plt_7, "gg")
+  expect_length(plt_7[["layers"]], 2)
+  expect_equal(sum(ggplot2::ggplot_build(plt_7)$data[[1]][["label"]] != ""), 10) # default named_p_top
+  expect_equal(NROW(ggplot2::ggplot_build(plt_7)$data[[1]]),
+               NROW(dt_assoc_big[q_value < 0.05]) + max_non_stat_sig) # default alpha
+  
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
-                                  feature_info = obj_assoc_sa[["feature_info"]]),
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]]),
                "Assertion on 'dt_assoc' failed: Must be a data.table")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa),
-               "Assertion on 'feature_info' failed: Must be of type 'string'")
+                                  selected_feat_meta_col = obj_assoc_sa),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = 1),
+               "Assertion on 'selected_metric' failed: Must be of type 'string'")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
                                   condition_info = 123),
                "Assertion on 'condition_info' failed: Must be of type 'string'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
                                   alpha = "0.1"),
                "Assertion on 'alpha' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
                                   named_p_top = "5"),
                "Assertion on 'named_p_top' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
                                   max_N = "only 10"),
                "Assertion on 'max_N' failed: Must be of type 'number'")
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
-                                  feature_info = obj_assoc_sa[["feature_info"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
                                   max_N = 2:6),
                "Assertion on 'max_N' failed: Must have length 1.")
+  expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
+                                  selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                                  selected_metric = obj_assoc_sa[["selected_metric"]],
+                                  max_N = 6),
+               "Assertion on 'max_N' failed: Element 1 is not >= 10.")
 })
 
 test_that("plot_scatter_with_corr works as expected", {
@@ -225,6 +285,38 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_equal(plt_3[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
   expect_equal(plt_3[["labels"]][["caption"]], unique(dt_response_2$rId))
   
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_4 <- 
+    plot_scatter_with_corr(dt_response = dt_response_na,
+                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                           selected_feat = selected_feat,
+                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], 
+               paste(obj_depmap_feat[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  dt_depmap_na[[selected_feat]] <- NA
+  plt_5 <- 
+    plot_scatter_with_corr(dt_response = dt_response,
+                           dt_depmap = dt_depmap_na, 
+                           selected_feat = selected_feat,
+                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_5[["labels"]][["title"]], 
+               paste(obj_depmap_feat[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
   # testing assertions
   expect_error(plot_scatter_with_corr(dt_response = unlist(dt_response),
                                       dt_depmap = obj_depmap_feat[["dt_depmap"]], 
@@ -264,16 +356,88 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
-
+  
   plt_2 <- 
     plot_scatter_with_corr_panel(dt_response = dt_response,
                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                  selected_feats = selected_feats[1],
-                                 selected_feat_meta_col = "XZ_fatures")
+                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
   expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response$rId))
+  
+  # selected feat is not present in dt_depmap
+  new_selected_feats <- c(selected_feats, "XZ_non_avial")
+  plt_3 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = new_selected_feats)
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 3)
+  expect_equal(plt_3[["labels"]][["y"]], selected_metric)
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_3)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    NROW(new_selected_feats[!new_selected_feats %in% names(obj_depmap_feat[["dt_depmap"]])])) 
+  
+  # only NAs in selected_feats 
+  plt_4 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = rep(NA, 2),
+                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], "")
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], "XZ_fatures : all NAs")
+  
+  # some NAs in selected_feats 
+  selected_feats_with_NAs <- c(NA, selected_feats, NA) 
+  plt_5 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats_with_NAs)
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 3)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[1]]$PANEL)),
+               NROW(selected_feats_with_NAs))
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_5)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    NROW(selected_feats_with_NAs[!selected_feats_with_NAs %in% names(obj_depmap_feat[["dt_depmap"]])])) 
+  
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_6 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response_na,
+                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                 selected_feats = selected_feats)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["x"]], "")
+  expect_equal(plt_6[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_6[["labels"]][["title"]], NULL)
+  expect_equal(plt_6[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[1]]$PANEL)), 
+               NROW(selected_feats))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)[["data"]]), NROW(selected_feats))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  dt_depmap_na[[selected_feats[2]]] <- NA
+  plt_7 <- 
+    plot_scatter_with_corr_panel(dt_response = dt_response,
+                                 dt_depmap = dt_depmap_na, 
+                                 selected_feats = selected_feats)
+  expect_is(plt_7, "gg")
+  expect_equal(plt_7[["labels"]][["x"]], "")
+  expect_equal(plt_7[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_7[["labels"]][["title"]], NULL)
+  expect_equal(plt_6[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(
+    NROW(data.table::data.table(ggplot2::ggplot_build(plt_7)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
+    sum(vapply(selected_feats, function(nm) all(is.na(dt_depmap_na[[nm]])), logical(1)))) 
   
   # testing assertions
   expect_error(plot_scatter_with_corr_panel(dt_response = unlist(dt_response),
@@ -290,14 +454,6 @@ test_that("plot_scatter_with_corr_panel works as expected", {
                "Assertion on 'selected_feats' failed: Must be of type 'character'")
   expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
                                             dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                            selected_feats = c(NA, selected_feats)),
-               "Assertion on 'selected_feats' failed: Contains missing values")
-  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
-                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                            selected_feats = "not_existen_feat"),
-               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
-  expect_error(plot_scatter_with_corr_panel(dt_response = dt_response,
-                                            dt_depmap = obj_depmap_feat[["dt_depmap"]], 
                                             selected_feats = selected_feats,
                                             selected_feat_meta_col = 1),
                "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
@@ -312,34 +468,34 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_1 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta)
+                             selected_feat_meta_col = selected_meta)
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
   expect_length(plt_1[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_1)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_1)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta,
+                             selected_feat_meta_col = selected_meta,
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_2)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_2)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx) & N > 1]))
   expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta,
+                             selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_3)$data[[3]]$xid,
+  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
   short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
@@ -348,45 +504,60 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
-  
+  # combo plot
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
   plt_4 <- plot_boxplot_meta(dt_response = dt_response_2,
                              dt_depmap = dt_depmap_meta, 
-                             selected_meta = selected_meta)
+                             selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 4)
+  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
   
+  # numeric meta
+  dt_depmap_meta_numeric <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
+  names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
+  dt_ <- dt_depmap_meta_numeric[CCLEName %in% dt_response[["CellLineName"]], ]
+  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]), 
+                 function(nm) !all(dt_[[nm]] == 0), logical(1))
+  
+  plt_5 <- plot_boxplot_meta(dt_response = dt_response,
+                             dt_depmap = dt_depmap_meta_numeric, 
+                             selected_feat_meta_col = selected_meta)
+  expect_is(plt_5, "gg")
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(ggplot2::layer_scales(plt_5)$x$range$range, names(lbl_)[lbl_])
+  
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
                                  dt_depmap = dt_depmap_meta,
-                                 selected_meta = selected_meta),
+                                 selected_feat_meta_col = selected_meta),
                "Assertion on 'dt_response' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = unlist(dt_depmap_meta), 
-                                 selected_meta = selected_meta),
+                                 selected_feat_meta_col = selected_meta),
                "Assertion on 'dt_depmap' failed: Must be a data.table")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta,
-                                 selected_meta = 1),
-               "Assertion on 'selected_meta' failed: Must be of type 'string'")
+                                 selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  with_1_item_grp = "str"),
                "Assertion on 'with_1_item_grp' failed: Must be of type 'logical flag'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  max_x_lbl_length = "ten"),
                "Assertion on 'max_x_lbl_length' failed: Must be of type 'number'")
   expect_error(plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
-                                 selected_meta = selected_meta,
+                                 selected_feat_meta_col = selected_meta,
                                  max_x_lbl_length = 1:5),
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 
@@ -398,3 +569,4 @@ test_that("plot_volcano_corr_panel works as expected", {
 test_that("plot_volcano_box_panel works as expected", {
   # TODO in GDR-2710
 })
+

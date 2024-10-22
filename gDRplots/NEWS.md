@@ -1,5 +1,8 @@
-## gDRplots 0.0.38 - 2024-10-21
+## gDRplots 0.0.39 - 2024-10-22
 * add support for visualizing combo data without isobolograms
+
+## gDRplots 0.0.38 - 2024-10-04
+* add helper functions for knitting Rmarkdown reports
 
 ## gDRplots 0.0.37 - 2024-10-02
 * update vignette
