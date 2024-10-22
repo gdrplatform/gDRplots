@@ -82,9 +82,9 @@ heatmap_combo_metrics <- function(
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_character(iso_levels, null.ok = TRUE)
   checkmate::assert_data_table(dt_isobolograms, null.ok = TRUE)
   if (!is.null(dt_isobolograms)) {
+    checkmate::assert_character(iso_levels, null.ok = TRUE)
     checkmate::assert_numeric(as.numeric(iso_levels))
     checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   }
