@@ -83,16 +83,17 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(iso_levels, null.ok = TRUE)
-  if (!is.null(iso_levels)) {
+  checkmate::assert_data_table(dt_isobolograms, null.ok = TRUE)
+  if (!is.null(dt_isobolograms)) {
     checkmate::assert_numeric(as.numeric(iso_levels))
-    checkmate::assert_data_table(dt_isobolograms)  # Only check if iso_levels is not NULL
+    checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   }
   stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, is_valid_color, logical(1))))
   stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   
-  # Data filtering and processing
+  # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_excess <- dt_excess[eval(filter_expr)]
   if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
@@ -104,7 +105,7 @@ heatmap_combo_metrics <- function(
   
   dt_excess <- dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   
-  # Check if isolines are available and adjust plotting logic accordingly
+  # check if isolines are available and adjust plotting logic accordingly
   available_iso_lvl <- if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
     unique(dt_isobolograms[["iso_level"]])
   } else {
@@ -243,21 +244,20 @@ heatmap_combo_metrics <- function(
   names(mx_plts) <- mx_names
   
   # isobolograms across range of concentration ratios
-  plt_title <- sprintf("%s for %s, T=%sh",
-                       gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
-                       normalization_type,
-                       unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
-  
-  if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
-  # base plot
-  plt_iso_compare <-
-    ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
-    ggplot2::geom_line(
-      data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9")
-  
-  # add isoline
   if (NROW(available_iso_lvl)) { # isobolograms as lines
+    plt_title <- sprintf("%s for %s, T=%sh",
+                         gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
+                         normalization_type,
+                         unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
+    
+    if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
+    # base plot
+    plt_iso_compare <-
+      ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
+      ggplot2::geom_line(
+        data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9")
+    
     if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
       # friendly for user with color vision deficiency
       plt_iso_compare <- plt_iso_compare +
@@ -281,28 +281,26 @@ heatmap_combo_metrics <- function(
                                     labels = legend_lbl_iso,
                                     name = legend_title_iso)
     }
-  }
-  
-  # add x and y scales
-  plt_iso_compare <- plt_iso_compare +
-    ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
-    ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
-    ggplot2::coord_cartesian(ylim = c(-5, 4)) +
-    ggplot2::labs(y = "CI",
-                  x = paste(drug2_name, "/", drug1_name, "ratio"),
-                  title = plt_title) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   aspect.ratio = 1)
-  
-  # final plots
-  ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
-  
-  if (is.null(iso_levels)) {
-    ls_plts[["iso_compare"]] <- NULL
+    
+    # add x and y scales
+    plt_iso_compare <- plt_iso_compare +
+      ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+      ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
+      ggplot2::coord_cartesian(ylim = c(-5, 4)) +
+      ggplot2::labs(y = "CI",
+                    x = paste(drug2_name, "/", drug1_name, "ratio"),
+                    title = plt_title) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 10),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     aspect.ratio = 1)
+    
+    # final plots
+    ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
+  } else {
+    ls_plts <- mx_plts
   }
   
   final_plot <- if (as_panel) {

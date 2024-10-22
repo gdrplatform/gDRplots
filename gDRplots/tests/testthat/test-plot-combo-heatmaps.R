@@ -42,10 +42,30 @@ test_that("heatmap_combo_metrics works as expected", {
                                      cl_name = cl_name,
                                      normalization_type = "AB"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-})
-
-
-test_that("heatmap_combo_with_isoref works as expected", {
+  
+  
+  # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
+  
+  # test with dt_isobolograms as NULL
+  plts_1 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name)
+  
+  # check if the output is a ggplot object
+  expect_is(plts_1, "gg")
+  
+  normalization_type <- "RV"
+  plts_2 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name, as_panel = FALSE)
+  
+  # check if the output is a list
+  expect_is(plts_2, "list")
+  expect_length(plts_2, 3)
+  
+  # check if names of the list are as expected
+  expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
+  
 })
 
 test_that("heatmap_combo_with_isoref_panel works as expected", {
@@ -181,38 +201,6 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                                no_breaks = "10"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
 })
-
-
-test_that("heatmap_combo_metrics works as expected when dt_isobolograms is NULL", {
-  cl_name <- "cellline_FD"
-  drug1_name <- "drug_011"
-  drug2_name <- "drug_026"
-  
-  mae <- gDRutils::get_synthetic_data("combo_matrix")
-  se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
-  
-  # Test with dt_isobolograms as NULL
-  plts_1 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
-                                  dt_isobolograms = NULL,
-                                  drug1_name, drug2_name, cl_name)
-  
-  # Check if the output is a ggplot object
-  expect_is(plts_1, "gg")
-  
-  normalization_type <- "RV"
-  plts_2 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
-                                  dt_isobolograms = NULL,
-                                  drug1_name, drug2_name, cl_name, as_panel = FALSE)
-  
-  # Check if the output is a list
-  expect_is(plts_2, "list")
-  expect_length(plts_2, 3)
-  
-  # Check if names of the list are as expected
-  expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
-})
-
 
 test_that("prep_hm_limits works as expected", {
   vec <- c(1.0089, 0.9806, 0.1174, -0.1657, -0.2826)
