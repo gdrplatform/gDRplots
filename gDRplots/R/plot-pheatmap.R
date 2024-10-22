@@ -393,8 +393,8 @@ pheatmap_with_anno_sa <- function(
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {

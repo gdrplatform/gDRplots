@@ -6,7 +6,7 @@
 \usage{
 heatmap_combo_metrics(
   dt_excess,
-  dt_isobolograms,
+  dt_isobolograms = NULL,
   drug1_name,
   drug2_name,
   cl_name,

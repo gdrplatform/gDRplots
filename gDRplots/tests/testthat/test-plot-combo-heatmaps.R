@@ -42,10 +42,30 @@ test_that("heatmap_combo_metrics works as expected", {
                                      cl_name = cl_name,
                                      normalization_type = "AB"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-})
-
-
-test_that("heatmap_combo_with_isoref works as expected", {
+  
+  
+  # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
+  
+  # test with dt_isobolograms as NULL
+  plts_1 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name)
+  
+  # check if the output is a ggplot object
+  expect_is(plts_1, "gg")
+  
+  normalization_type <- "RV"
+  plts_2 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name, as_panel = FALSE)
+  
+  # check if the output is a list
+  expect_is(plts_2, "list")
+  expect_length(plts_2, 3)
+  
+  # check if names of the list are as expected
+  expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
+  
 })
 
 test_that("heatmap_combo_with_isoref_panel works as expected", {
