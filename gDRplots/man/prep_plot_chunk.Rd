@@ -21,6 +21,7 @@ list of character vector - input for \code{knitr::knit}
 Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
 }
 \examples{
+\dontrun{
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -29,6 +30,7 @@ names(plotlist) <- unique(iris$Species)
 
 prep_plot_chunk(plotlist, "iris")
 
+}
 }
 \seealso{
 \code{\link[knitr]{knit}}

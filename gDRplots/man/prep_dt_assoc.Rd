@@ -22,7 +22,7 @@ A named list with elements, that may be input to \code{\link[gDRplots]{plot_volc
   \item \code{dt_assoc} \code{data.table} with calculated association values between 
      feature/meta of DepMap and selected metric,
   \item \code{condition_info} string describing experiment condition (drugs),
-  \item \code{feature_info} string name of feature/meta.
+  \item \code{selected_feat_meta_col} string name of feature/meta.
 }
 }
 \description{

@@ -54,11 +54,11 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
     inf_xc50 <- is.infinite(dt_response_metric[["xc50"]]) # TODO check: Inf & -Inf
-    if (any(inf_xc50)) {
+    if (any(inf_xc50, na.rm = TRUE)) {
       dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
       over_xc50 <- dt_response_metric[["xc50"]] > 10^dt_response_metric[["maxlog10Concentration"]]
-      if (any(over_xc50)) {
+      if (any(over_xc50, na.rm = TRUE)) {
         dt_response_metric[over_xc50, ][["xc50"]] <- 10^dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
       }
     }
@@ -140,65 +140,6 @@ prep_dt_response_dose_sa <- function(dt_average,
   dt_response_dose_fin <- 
     unique(dt_response_dose[, meta_col, with = FALSE])[dt_response_dose_fin, on = cellline_name]
   dt_response_dose_fin
-}
-
-#' Prep table with metric values for single-agent experiment
-#' 
-#' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
-#'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
-#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#'  and single-agent \code{SummarizedExperiment}
-#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
-#' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param fit_source string source name for metrics
-#' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
-#' @keywords prism_plots
-#' 
-#' @examples
-#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
-#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Averaged")
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Metrics")
-#' d_name <- "drug_004"
-#' dt_response_sa <- prep_dt_response_sa(dt_average, dt_metrics, d_name)
-#' 
-#' @export
-prep_dt_response_sa <- function(dt_average,
-                                dt_metrics,
-                                d_name,
-                                normalization_type = "RV",
-                                fit_source = "gDR") {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  
-  checkmate::assert_data_table(dt_average)
-  checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_string(fit_source, null.ok = TRUE)
-  
-  dt_response_met <-
-    prep_dt_response_metric_sa(dt_metrics = dt_metrics,
-                               d_name = d_name,
-                               normalization_type = normalization_type,
-                               metric = c("xc50", "x_mean", "x_max"))
-  dt_response_dose <- 
-    prep_dt_response_dose_sa(dt_average = dt_average, 
-                             d_name = d_name,
-                             normalization_type = normalization_type)
-  
-  id_col <- c("rId", "cId", cellline_name)
-  dt_response_sa <- merge(dt_response_met, dt_response_dose, by = id_col)
-  return(dt_response_sa)
 }
 
 #' Prep table with metric values for combination experiment
@@ -330,11 +271,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
     inf_xc50 <- is.infinite(dt_response_metric[["xc50"]]) # TODO check: Inf & -Inf
-    if (any(inf_xc50)) {
+    if (any(inf_xc50, na.rm = TRUE)) {
       dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
       over_xc50 <- dt_response_metric[["xc50"]] > 10^dt_response_metric[["maxlog10Concentration"]]
-      if (any(over_xc50)) {
+      if (any(over_xc50, na.rm = TRUE)) {
         dt_response_metric[over_xc50, ][["xc50"]] <- 10^dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
       }
     }
@@ -376,130 +317,6 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   (dt_combo_diff)
 }
 
-#' Prep table with metric values for combination experiment
-#' 
-#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#'  and combo \code{SummarizedExperiment}
-#' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
-#'  and combo \code{SummarizedExperiment}
-#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
-#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
-#' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param fit_source string source name for metrics
-#' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
-#' @keywords prism_plots
-#' 
-#' @examples
-#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
-#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Metrics")
-#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                               assay_name = "scores")
-#' d_name <- "drug_004"
-#' d_name2 <- "drug_026"
-#' dt_response_combo <-
-#'   prep_dt_response_combo(dt_metrics, dt_scores, d_name, d_name2)
-#' 
-#' @export
-prep_dt_response_combo <- function(dt_metrics,
-                                   dt_scores,
-                                   d_name,
-                                   d_name2,
-                                   normalization_type = "RV",
-                                   fit_source = "gDR") {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  
-  checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_data_table(dt_scores)
-  checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::assert_choice(d_name, choices = dt_scores[[drug_name]])
-  checkmate::assert_string(d_name2)
-  checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
-  checkmate::assert_choice(d_name2, choices = dt_scores[[drug_name_2]])
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_string(fit_source, null.ok = TRUE)
-  
-  dt_response_scores <-
-    prep_dt_response_scores(dt_scores = dt_scores,
-                            d_name = d_name,
-                            d_name2 = d_name2,
-                            normalization_type = normalization_type,
-                            metric = c("hsa_score", "bliss_score"))
-  
-  dt_response_met_diff <- 
-    prep_dt_response_metric_diff(dt_metrics = dt_metrics, 
-                                 d_name = d_name,
-                                 d_name2 = d_name2,
-                                 normalization_type = normalization_type,
-                                 metric = c("xc50", "x_mean", "x_max"))
-  
-  id_col <- c("rId", "cId", cellline_name)
-  dt_response_combo <- merge(dt_response_scores, dt_response_met_diff, by = id_col)
-  return(dt_response_combo)
-}
-
-#' Load DepMap merged data and metadata
-#'
-#' @param feature_sets character vector with the molecular feature set(s) to load from DepMap.
-#' @param prefix character vector with the prefixes to use for the each feature set in \code{feature_sets};
-#'    has to be the same length as \code{feature_sets}
-#' @param metadata_cols character vector with the metadata columns to load for DepMap cell lines
-#'
-#' @return \code{data.table} with merged data and meta
-#' 
-#' @keywords internal
-#'
-#' @seealso \code{kaleidoscope::load_depmap_merged}
-#'
-#' @examples
-#' \dontrun{
-#' dt_depmap <- prep_dt_depmap() 
-#' }
-#' 
-#' @export
-prep_dt_depmap <- function(
-    feature_sets = feature_sets <- c(
-      "CRISPRGeneEffect", # DepMap Chronos scores (CRISPR knockouts)
-      "OmicsExpressionProteinCodingGenesTPMLogp1", # gene xpression
-      "OmicsExpressionSignatures", # gene expression signatures
-      "OmicsSomaticMutationsMatrixHotspot", # hotspot mutations
-      "OmicsSomaticMutationsMatrixDamaging", # damaging mutations
-      "OmicsCNGene" # relative copy number 
-    ),
-    prefix = c("KO_",
-               "GE_",
-               "SG_",
-               "HM_",
-               "DM_",
-               "CN_"),
-    metadata_cols = c("OncotreeLineage", "PatientRace", "CCLEName")) {
-  
-  checkmate::assert_character(feature_sets, any.missing = FALSE)
-  checkmate::assert_character(prefix, any.missing = FALSE)
-  checkmate::assert_character(metadata_cols, any.missing = FALSE, null.ok = TRUE)
-  
-  stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefix))
-  
-  # TODO in GDR-2710 # nolint start
-  # dt_depmap <- kaleidoscope::load_depmap_merged( 
-  #   feature_sets = feature_sets,
-  #   prefix = prefix,
-  #   metadata_columns = unique(c("CCLEName", metadata_cols))) 
-  # dt_depmap[, ModelID := NULL]
-  # 
-  # dt_depmap["CCLEName" != ""]
-  # return(dt_depmap) # nolint end
-}
-
 #' Load DepMap merged data for one selected feature
 #'
 #' @param feature_set string name of the molecular feature set to load from DepMap.
@@ -509,7 +326,7 @@ prep_dt_depmap <- function(
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
-#'   \item \code{selected_feat_meta} string name of feature..
+#'   \item \code{selected_feat_meta_col} string name of feature.
 #' }
 #' 
 #' @keywords internal
@@ -545,12 +362,12 @@ prep_dt_depmap_feat <- function(
 
 #' Load DepMap merged data for one selected metadata
 #'
-#' @param metadata_col character vector with the metadata columns to load for DepMap cell lines
+#' @param metadata_col string with the metadata columns to load for DepMap cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-#'   \item \code{selected_feat_meta} string name of meta.
+#'   \item \code{selected_feat_meta_col} string name of metadata column..
 #' }
 #' 
 #' @keywords internal
@@ -598,7 +415,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
 #'   \item \code{dt_assoc} \code{data.table} with calculated association values between 
 #'      feature/meta of DepMap and selected metric,
 #'   \item \code{condition_info} string describing experiment condition (drugs),
-#'   \item \code{feature_info} string name of feature/meta.
+#'   \item \code{selected_feat_meta_col} string name of feature/meta.
 #' }
 #' 
 #' @keywords prism_plots
@@ -619,25 +436,34 @@ prep_dt_assoc <- function(dt_response,
   # checking input format
   selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
   stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
+  stopifnot("Column with metric should be numeric." = is.numeric(dt_response[[selected_metric]]))
   selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
   stopifnot("Provide `dt_depmap` for one feature or one meta only." = 
               all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
   
   # result
-  obj_assoc <- list(dt_assoc = data.table::data.table(),
-                    condition_info = NULL,
-                    feature_info = selected_feat_meta_col)
+  # will be returned in this format when: 
+  # 1) length (shared lines) < 6 
+  # 2) all/one of the association calculation inputs will have only NA values
+  # 3) selected_metric values have no variance (due to cdsrmodels::lin_associations)
+  obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
+                                                      response = character(0),
+                                                      rho = numeric(0),
+                                                      q_value = numeric(0)),
+                    condition_info = unique(dt_response[["rId"]]),
+                    selected_metric = selected_metric,
+                    selected_feat_meta_col = selected_feat_meta_col)
   
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
   response_lines <- dt_response[[cellline_name]]
   shared_lines <- intersect(depmap_lines, response_lines)
   
-  if (NROW(shared_lines) > 0) {
+  if (NROW(shared_lines) >= 6) { # (the minimum degrees of freedom = 4) + 2
     # subset the data.table and order it
-    X_dt <- dt_depmap[CCLEName %in% shared_lines]
+    X_dt <- dt_depmap[CCLEName %in% shared_lines, ]
     data.table::setorder(X_dt, "CCLEName")
-    Y_dt <- dt_response[get(cellline_name) %in% shared_lines]
+    Y_dt <- dt_response[get(cellline_name) %in% shared_lines, ]
     data.table::setorderv(Y_dt, cellline_name)
     
     # convert to a matrix
@@ -648,13 +474,26 @@ prep_dt_assoc <- function(dt_response,
       Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
     )
     
-    # create dt_assoc
-    # TODO in GDR-2710
-    # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
+    # remove col with all NA
+    X <- X[, colSums(is.na(X)) != NROW(X)]
+ 
+    # association can only be calculated for conditions
+    X_condition <- 
+      # cdsr_models does not handle 1 feat
+      sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1 
+    Y_condition <- 
+      # (n.min = 4) + 2 # nolint
+      NROW(stats::na.omit(Y)) >= 6 & stats::sd(Y[, 1], na.rm = TRUE) > 0
+    XY_condition <- sum(t(!is.na(X)) %*% (!is.na(Y)) >= 6) > 1
     
-    # # final
-    # obj_assoc[["condition_info"]] <- unique(dt_response[["rId"]])
-    # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+    if (Y_condition && X_condition && XY_condition) {
+      # create dt_assoc
+      # TODO in GDR-2710
+      # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
+      # 
+      # # final
+      # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+    }
   }
   # return
   return(obj_assoc)

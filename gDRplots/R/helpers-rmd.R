@@ -8,6 +8,7 @@
 #' @param header_level numeric level of markdown header
 #'
 #' @examples
+#' \dontrun{
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
 #'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -16,6 +17,7 @@
 #' 
 #' prep_plot_chunk(plotlist, "iris")
 #'
+#' }
 #' @return list of character vector - input for \code{knitr::knit}
 #' @keywords internal
 #' 
@@ -40,6 +42,117 @@ prep_plot_chunk <- function(plt_list,
   )
   lapply(seq_along(plt_list), function(nm) {
     knitr::knit_expand(text = template)
+  })
+}
+
+#' Prepare markdown chunk based on the nested plots list
+#'
+#' Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
+#'
+#' @param plt_list named list with generated plots to be shown in tabs; list of plots in nested 
+#'   hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
+#'   one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'     
+#' @param chunk_name string name of markdown chunk; preferable without spaces
+#' @param header_level numeric level of markdown header - only for the first level
+#'
+#' @examples
+#' \dontrun{
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' 
+#' # help function
+#' plot_col <- function(tab_plt, norm_type, col = "red") {
+#'   tab_plt <- data.table::melt(
+#'     data = tab_plt[normalization_type == norm_type][, c("rId", "xc50", "x_mean", "x_max")],
+#'     id = "rId")
+#'   plt <- ggplot2::ggplot(tab_plt, ggplot2::aes(x = variable, y = value)) +
+#'     ggplot2::geom_col(fill = col)
+#'   return(plt)
+#' }
+#' 
+#' # creating nested list with plots
+#' plotlist <- list()
+#' ls_color <- c("darkred", "orange", "darkcyan")
+#' for (drug in unique(dt_metrics$DrugName)) {
+#'   for (cl in unique(dt_metrics$CellLineName)) {
+#'     tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
+#'     
+#'     plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+#'     names(plt_GR) <- sprintf("%s_%s", "GR", ls_color)
+#'     plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+#'     names(plt_RV) <- sprintf("%s_%s", "RV", ls_color)
+#'     
+#'     plotlist[[drug]][[cl]][["RV"]] <- plt_RV
+#'     plotlist[[drug]][[cl]][["GR"]] <- plt_GR
+#'   }
+#' }
+#' 
+#' prep_nested_plot_chunk(plotlist, "metric_value")
+#' 
+#' prep_nested_plot_chunk(plotlist, "metric_value")
+#' 
+#' }
+#' @return list of character vectors - input for \code{knitr::knit}
+#' @keywords internal
+#' 
+#' @seealso \code{\link[knitr]{knit}}
+#' 
+#' @export
+prep_nested_plot_chunk <- function(plt_list,
+                                   chunk_name,
+                                   header_level = 2) {
+  checkmate::assert_list(plt_list)
+  checkmate::assert_named(plt_list)
+  checkmate::assert_string(chunk_name)
+  checkmate::assert_int(header_level, lower = 1)
+  
+  lvl_1 <- paste0(rep("#", header_level), collapse =  "")
+  lvl_2 <- paste0(rep("#", header_level + 1), collapse =  "")
+  lvl_3 <- paste0(rep("#", header_level + 2), collapse =  "")
+  lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
+  plt_list_name <- deparse(substitute(plt_list))
+  
+  lapply(names(plt_list), function(nm_1) {
+    c(
+      sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
+      unlist(
+        lapply(names(plt_list[[nm_1]]), function(nm_2) {
+          c(
+            sprintf("%s %s {.tabset .tabset-fade .tabset-pills}\n\n", lvl_2, nm_2),
+            unlist(
+              lapply(names(plt_list[[nm_1]][[nm_2]]), function(nm_norm) {
+                norm_title <- switch(nm_norm,
+                                     "RV" = "Relative Viability",
+                                     "GR" = "GR Value")
+                c(
+                  sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
+                  unlist(
+                    lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
+                      
+                      chunk_name <- sprintf("%s__%s_%s_%s",
+                                            chunk_name, nm_1, nm_2, nm_norm)
+                      
+                      plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]', 
+                                               plt_list_name, nm_1, nm_2, nm_norm)
+                      
+                      template <- c(
+                        sprintf("%s {{nm_vis}} \n\n", lvl_4),
+                        sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
+                        sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
+                        "```\n",
+                        "\n"
+                      )
+                      knitr::knit_expand(text = template)
+                    })
+                  )
+                )
+              })
+            )
+          )
+        })
+      )
+    )
   })
 }
 
