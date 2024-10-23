@@ -49,6 +49,18 @@ test_that("pheatmap_qc works as expected", {
   expect_is(hm_4[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_4[["tree_col"]], NA) # no dendrogram
   
+  ls_col <- c("#000000", "#F0F0F0")
+  hm_5 <- pheatmap_qc(dt_average = dt_average,
+                      metric = "x_std",
+                      colors_vec = ls_col) 
+  expect_is(hm_5, "pheatmap")
+  hm_5_data <- hm_5[["gtable"]][["grobs"]][[2]][["children"]][[1]][["gp"]][["fill"]]
+  min_val <- data.table::setorderv(data.table::copy(dt_average)[normalization_type == "GR", ], "x_std")[1, ]
+  expect_equal(hm_5_data[min_val$clid, 
+                         grepl(sprintf("%s_%s_%s_", min_val$Gnumber, min_val$Gnumber_2, min_val$Concentration), 
+                               colnames(hm_5_data))],
+               ls_col[2]) # check rev
+  
   # testing assertions
   expect_error(pheatmap_qc(dt_average = unlist(dt_average)),
                "Assertion on 'dt_average' failed: Must be a data.table")
@@ -334,7 +346,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
     formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
     value.var = "x_max")
   data.table::setkey(res_2, NULL)
-
+  
   out_2 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
                                  metric = "x_max",
                                  normalization_type = "RV",
@@ -358,11 +370,11 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered
   
-
+  
   annotation_manual_row_res <- data.table::copy(annotation_manual_row)
   annotation_manual_row_res[1:20, c("drug_moa", "drug_moa_2")] <- "NA"
   annotation_manual_row_na <- annotation_manual_row_res[21:NROW(annotation_manual_row_res), ]
-
+  
   out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
                                  metric = "x_max",
                                  normalization_type = "RV",
