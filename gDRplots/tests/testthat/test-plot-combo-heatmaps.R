@@ -61,8 +61,8 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
   expect_true(all(ls_col_2 %in% plts_5[["hsa_excess"]][["plot_env"]][["hm_color_palette"]]))
   
-  dt_excess_ <- dt_excess[get(drug_name) == drug1_name & 
-                            get(drug_name_2) == drug2_name & get(cellline_name) == cl_name][1:2, ]
+  dt_excess_ <- dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name &
+                            CellLineName == cl_name][1:2, ]
   plts_6 <- heatmap_combo_metrics(dt_excess = dt_excess_, 
                                   dt_isobolograms,
                                   drug1_name, drug2_name, cl_name,
@@ -70,7 +70,7 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_is(plts_6, "list")
   expect_true(all(vapply(seq_along(plts_6), function(x) is(plts_6[[x]], "gg"), logical(1))))
   expect_true(all(vapply(names(gDRutils::get_combo_excess_field_names()), 
-                         function(nm) NROW(ggplot2::ggplot_build(plt_4)[["data"]][[1]]) == 0,
+                         function(nm) NROW(ggplot2::ggplot_build(plts_6[[nm]])[["data"]][[1]]) == 0,
                          logical(1)))) # no excess data
                            
 
@@ -166,8 +166,8 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_true(all(ls_col %in% plt_3[["plot_env"]][["hm_color_palette"]]))
   expect_length(ggplot2::ggplot_build(plt_3)[["data"]], 1) # no isoline data
 
-  dt_excess_ <- dt_excess[get(drug_name) == drug1_name & 
-                            get(drug_name_2) == drug2_name & get(cellline_name) == cl_name][1:2, ]
+  dt_excess_ <- dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name & 
+                            CellLineName == cl_name][1:2, ]
   plt_4 <- heatmap_combo_with_isoref(dt_excess_,
                                      dt_isobolograms,
                                      drug1_name, drug2_name,
@@ -343,7 +343,6 @@ test_that("transform_log_conc works as expected", {
 })
 
 test_that(".get_tile_size works as expected", {
-  
   res_1 <- .get_tile_size(c(-0.35, 0, 0.349, 0.7))
   expect_equal(res_1, 0.35)
   
