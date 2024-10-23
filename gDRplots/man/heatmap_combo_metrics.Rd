@@ -82,6 +82,14 @@ heatmap_combo_metrics(dt_excess,
                       normalization_type = "RV",
                       iso_levels = "0.5",
                       as_panel = FALSE)
+                      
+heatmap_combo_metrics(dt_excess,
+                      dt_isobolograms,
+                      drug1_name, drug2_name,
+                      cl_name,
+                      normalization_type = "RV",
+                      iso_levels = NULL,
+                      as_panel = TRUE)
 
 }
 \keyword{combo_plots}

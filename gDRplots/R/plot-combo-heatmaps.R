@@ -50,6 +50,14 @@
 #'                       normalization_type = "RV",
 #'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
+#'                       
+#' heatmap_combo_metrics(dt_excess,
+#'                       dt_isobolograms,
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
+#'                       normalization_type = "RV",
+#'                       iso_levels = NULL,
+#'                       as_panel = TRUE)
 #'
 #' @export
 heatmap_combo_metrics <- function(
@@ -900,10 +908,16 @@ transform_log_conc <- function(conc_vec) {
   tile_size
 }
 
+#' Get color palette for the isobologram levels
+#' 
 #' @param iso_levels character vector with isobologram levels
+#' 
 #' @return gDR palette for isoline given in \code{iso_levels}
 #' 
 #' @keywords internal
+#' @examples
+#' ls_iso_lvl <- c("0.25", "0.5", "0.75")
+#' .get_iso_colors(ls_iso_lvl)
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
   
@@ -920,10 +934,16 @@ transform_log_conc <- function(conc_vec) {
   iso_colors
 }
 
+
+#' Get color palette for the smooth values
+#' 
 #' @param no_breaks numeric number of breaks on scale
+#' 
 #' @return gDR palette for smooth values with given \code{no_breaks}
 #' 
 #' @keywords internal
+#' @examples
+#' .get_smooth_palette(25)
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
@@ -933,10 +953,15 @@ transform_log_conc <- function(conc_vec) {
   )(no_breaks + 1)
 }
 
+#' Get color palette for the excess values
+#' 
 #' @param no_breaks numeric number of breaks on scale
+#' 
 #' @return gDR palette for excess values with given \code{no_breaks}
 #' 
 #' @keywords internal
+#' @examples
+#' .get_excess_palette(20)
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
