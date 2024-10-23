@@ -16,7 +16,9 @@ gDR palette for isoline given in \code{iso_levels}
 Get color palette for the isobologram levels
 }
 \examples{
+\dontrun{
 ls_iso_lvl <- c("0.25", "0.5", "0.75")
 .get_iso_colors(ls_iso_lvl)
+}
 }
 \keyword{internal}

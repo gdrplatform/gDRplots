@@ -16,7 +16,9 @@ gDR palette for Concentration_2 given in \code{ls_conc_2}
 Get color palette for the dose response curves for combination data
 }
 \examples{
+\dontrun{
 ls_conc <- factor(c("0.001", "0.01", "1"))
 .get_combo_curves_colors(ls_conc)
+}
 }
 \keyword{internal}

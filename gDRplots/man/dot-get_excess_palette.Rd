@@ -16,6 +16,8 @@ gDR palette for excess values with given \code{no_breaks}
 Get color palette for the excess values
 }
 \examples{
+\dontrun{
 .get_excess_palette(20)
+}
 }
 \keyword{internal}
