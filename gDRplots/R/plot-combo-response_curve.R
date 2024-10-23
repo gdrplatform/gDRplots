@@ -287,8 +287,10 @@ plot_dose_response_combo_panel <- function(dt_average,
 #' 
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' ls_conc <- factor(c("0.001", "0.01", "1"))
 #' .get_combo_curves_colors(ls_conc)
+#' }
 .get_combo_curves_colors <- function(ls_conc_2) {
   checkmate::assert_factor(ls_conc_2)
   

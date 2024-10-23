@@ -916,8 +916,10 @@ transform_log_conc <- function(conc_vec) {
 #' 
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
 #' .get_iso_colors(ls_iso_lvl)
+#' }
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
   
@@ -943,7 +945,9 @@ transform_log_conc <- function(conc_vec) {
 #' 
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' .get_smooth_palette(25)
+#' }
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
@@ -961,7 +965,9 @@ transform_log_conc <- function(conc_vec) {
 #' 
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' .get_excess_palette(20)
+#' }
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
