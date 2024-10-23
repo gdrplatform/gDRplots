@@ -1,21 +1,3 @@
 {
-    "VIS_RANGE": {
-        "GR AOC within set range": [
-            0,
-            1
-        ],
-        "RV AOC within set range": [
-            0,
-            1
-        ]
-    },
-    "PLOTLY_EDITS": {
-        "axisTitleText": true,
-        "titleText": true
-    },
-        "METRICS_TRANSFORMED": [
-        "GR50",
-        "IC50",
-        "EC50"
-    ]
+
 }
