@@ -10,7 +10,7 @@ pheatmap_with_anno_sa(
   metric = "xc50",
   fit_source = "gDR",
   hm_title = NA,
-  colors_vec = c("firebrick2", "white"),
+  colors_vec = NULL,
   no_breaks = 50,
   cluster_rows = TRUE,
   cluster_cols = TRUE,

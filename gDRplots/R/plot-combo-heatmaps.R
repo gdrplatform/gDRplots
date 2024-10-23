@@ -645,9 +645,6 @@ heatmap_combo_with_isoref_panel <- function(
                 all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
-  if (!is.null(colors_vec)) {
-    stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
-  }
   checkmate::assert_int(no_breaks, lower = 2)
   
   available_cls <- unique(dt_excess[[cellline_name]])
@@ -680,12 +677,12 @@ heatmap_combo_with_isoref_panel <- function(
     dt_isobolograms[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   # prep hm color palette
-  hm_color_palette <- if (is.null(colors_vec)) {
+  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
-  
+
   # prep panel elements
   mx_name <- "smooth"
   # prep plot data

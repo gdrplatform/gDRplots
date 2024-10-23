@@ -269,9 +269,6 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                      colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
-                                     colors_vec = c("pinky", "blackish")),
-               "Must be a valid color name")
-  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
@@ -405,9 +402,6 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                      colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
-  expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
-                                     colors_vec = c("pinky", "blackish")),
-               "Must be a valid color name")
   expect_error(pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                      no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
@@ -597,9 +591,6 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
-  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
-                                        colors_vec = c("pinky", "blackish")),
-               "Must be a valid color name")
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         no_breaks = "str"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")

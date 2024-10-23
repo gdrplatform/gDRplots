@@ -10,8 +10,7 @@ pheatmap_with_anno_combo(
   metric = "hsa_score",
   fit_source = "gDR",
   hm_title = NA,
-  colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1",
-    "firebrick3"),
+  colors_vec = NULL,
   no_breaks = 50,
   cluster_rows = TRUE,
   cluster_cols = TRUE,
@@ -49,7 +48,7 @@ the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf v
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
+are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} 
 columns. Both columns are required.
 Note that color schemes takes into account if variable is continuous or discrete.}
 

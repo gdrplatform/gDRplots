@@ -184,15 +184,7 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                                cl_names = cl_names,
                                                iso_levels = LETTERS[seq_len(6)]),
                "`iso_levels` must be a valid numeric value")
-  
-  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
-                                               dt_isobolograms = dt_isobolograms,
-                                               drug1_name = drug1_name,
-                                               drug2_name = drug2_name,
-                                               cl_names = cl_names,
-                                               colors_vec = c("pinky", "blackish")),
-               "`colors_vec` must be a valid color name")
-  
+
   expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
                                                dt_isobolograms = dt_isobolograms,
                                                drug1_name = drug1_name,
