@@ -11,7 +11,7 @@
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param iso_levels character vector with  isobologram levels to be selected
+#' @param iso_levels character vector with isobologram levels to be selected
 #' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap
 #'    for smooth values; the default is the dark purple-light grey palette
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
@@ -501,7 +501,7 @@ heatmap_combo_with_isoref <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(available_iso_lvl))
       names(iso_label) <- available_iso_lvl
- 
+      
       tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
@@ -750,7 +750,7 @@ heatmap_combo_with_isoref_panel <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(iso_levels))
       names(iso_label) <- iso_levels
-  
+      
       tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_iso[, .SD, .SDcols = -c("pos_x", "pos_y")]
@@ -900,6 +900,9 @@ transform_log_conc <- function(conc_vec) {
   tile_size
 }
 
+#' @param iso_levels character vector with isobologram levels
+#' @return gDR palette for isoline given in \code{iso_levels}
+#' 
 #' @keywords internal
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
@@ -908,24 +911,37 @@ transform_log_conc <- function(conc_vec) {
   iso_levels <- iso_levels[order(as.numeric(iso_levels))]
   
   iso_colors <- 
-    grDevices::colorRampPalette(c("#F2C707", "#EC6608", "#AC2605"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+    grDevices::colorRampPalette(
+      gDRutils::get_settings_from_json("ISOLINE_PALETTE",
+                                       system.file(package = "gDRplots", "settings.json"))
+    )(2 * NROW(iso_levels))[2 * seq_along(iso_levels)]
   names(iso_colors) <- iso_levels
   
   iso_colors
 }
 
+#' @param no_breaks numeric number of breaks on scale
+#' @return gDR palette for smooth values with given \code{no_breaks}
+#' 
 #' @keywords internal
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    c("#251739", "#6742a1", "#b59fd7", "#F2F2F2"))(no_breaks + 1) # family #218EAE
+    gDRutils::get_settings_from_json("SMOOTH_PALETTE",
+                                     system.file(package = "gDRplots", "settings.json"))
+  )(no_breaks + 1)
 }
 
+#' @param no_breaks numeric number of breaks on scale
+#' @return gDR palette for excess values with given \code{no_breaks}
+#' 
 #' @keywords internal
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
+    gDRutils::get_settings_from_json("EXCESS_PALETTE",
+                                     system.file(package = "gDRplots", "settings.json"))
+  )(no_breaks + 1)
 }

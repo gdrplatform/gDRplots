@@ -36,7 +36,7 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{iso_levels}{character vector with  isobologram levels to be selected}
+\item{iso_levels}{character vector with isobologram levels to be selected}
 
 \item{colors_vec_smooth}{character vector of colors (valid names or hex codes) used in the heatmap
 for smooth values; the default is the dark purple-light grey palette}

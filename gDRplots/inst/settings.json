@@ -1,3 +1,29 @@
 {
-
+  "SMOOTH_PALETTE": [
+    "#251739",
+    "#6742a1", 
+    "#b59fd7", 
+    "#F2F2F2"
+  ],
+  "EXCESS_PALETTE": [
+    "royalblue3", 
+    "royalblue1", 
+    "grey95", 
+    "grey95", 
+    "firebrick1", 
+    "firebrick3"
+  ],
+  "ISOLINE_PALETTE": [
+    "#F2C707", 
+    "#EC6608", 
+    "#AC2605"
+  ],
+  "COMBO_CURVES_PALETTE": [
+    "#EAF02D", 
+    "#FDE251", 
+    "#FB9C05", 
+    "#CC0666", 
+    "#57042C", 
+    "#2C2835"
+  ]
 }

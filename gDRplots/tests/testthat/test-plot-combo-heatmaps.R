@@ -238,3 +238,53 @@ test_that("transform_log_conc works as expected", {
   expect_error(transform_log_conc(-1:2),
                "Assertion on 'conc_vec' failed: Element 1 is not >= 0")
 })
+
+test_that(".get_iso_colors works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_iso_p <- s$ISOLINE_PALETTE
+  
+  ls_iso_lvl <- c("0.25", "0.5", "0.75")
+  res <- .get_iso_colors(ls_iso_lvl)
+  ls_col <- grDevices::colorRampPalette(ls_iso_p)(2 * NROW(ls_iso_lvl))
+  expect_length(res, NROW(ls_iso_lvl))
+  expect_named(res, ls_iso_lvl)
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_iso_colors(c(0.5, 0.75)),
+               "Assertion on 'iso_levels' failed: Must be of type 'character'")
+})
+
+test_that(".get_smooth_palette works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_smooth <- s$SMOOTH_PALETTE
+
+  no_br <- 25
+  res <- .get_smooth_palette(no_br)
+  ls_col <- grDevices::colorRampPalette(ls_smooth)(no_br + 1)
+  expect_length(res, NROW(ls_col))
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_smooth_palette("all"),
+               "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(.get_smooth_palette(0),
+               "Assertion on 'no_breaks' failed: Element 1 is not >= 2.")
+})
+
+test_that(".get_excess_palette works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_excess <- s$EXCESS_PALETTE
+  
+  no_br <- 2
+  res <- .get_excess_palette(no_br)
+  ls_col <- grDevices::colorRampPalette(ls_excess)(no_br + 1)
+  expect_length(res, NROW(ls_col))
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_excess_palette("all"),
+               "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(.get_excess_palette(1),
+               "Assertion on 'no_breaks' failed: Element 1 is not >= 2.")
+})
