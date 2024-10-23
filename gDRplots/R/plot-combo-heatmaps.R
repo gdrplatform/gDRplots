@@ -893,7 +893,7 @@ transform_log_conc <- function(conc_vec) {
 .get_tile_size <- function(pos_vec) {
   checkmate::assert_numeric(pos_vec)
   
-  diff_ <- sort(unique(diff(pos_vec)), decreasing = TRUE)
+  diff_ <- sort(unique(diff(sort(unique(pos_vec)))), decreasing = TRUE)
   
   tile_size <- if (NROW(diff_) > 1) {
     diff_[2] # 1st in related to conc = 0 and and is not conclusive

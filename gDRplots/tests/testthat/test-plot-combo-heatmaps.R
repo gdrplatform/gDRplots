@@ -17,11 +17,28 @@ test_that("heatmap_combo_metrics works as expected", {
   normalization_type <- "RV"
   plts_2 <- heatmap_combo_metrics(dt_excess, dt_isobolograms,
                                   drug1_name, drug2_name, cl_name,
-                                  normalization_type, as_panel = FALSE)
+                                  normalization_type, 
+                                  as_panel = FALSE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
                          function(i) grepl(normalization_type, plts_2[[i]]$labels$title), logical(1))))
+  
+  plts_3 <- heatmap_combo_metrics(dt_excess, dt_isobolograms,
+                                  drug1_name, drug2_name, cl_name,
+                                  iso_levels = NULL,
+                                  as_panel = FALSE)
+  expect_is(plts_3, "list")
+  expect_true(all(vapply(seq_along(plts_3), function(x) is(plts_3[[x]], "gg"), logical(1))))
+  expect_length(plts_3, 3) # smooth, hsa_excess, bliss_excess
+  
+  plts_4 <- heatmap_combo_metrics(dt_excess, 
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name,
+                                  as_panel = FALSE)
+  expect_is(plts_4, "list")
+  expect_true(all(vapply(seq_along(plts_4), function(x) is(plts_3[[x]], "gg"), logical(1))))
+  expect_length(plts_4, 3) # smooth, hsa_excess, bliss_excess
   
   expect_error(heatmap_combo_metrics(dt_excess = unlist(dt_excess),
                                      dt_isobolograms = dt_isobolograms,
@@ -229,6 +246,32 @@ test_that("transform_log_conc works as expected", {
                "Assertion on 'conc_vec' failed: Must be of type 'numeric'")
   expect_error(transform_log_conc(-1:2),
                "Assertion on 'conc_vec' failed: Element 1 is not >= 0")
+})
+
+test_that(".get_tile_size works as expected", {
+
+  res_1 <- .get_tile_size(c(-0.35, 0, 0.349, 0.7))
+  expect_equal(res_1, 0.35)
+  
+  res_2 <- .get_tile_size(c(0.349, 0.7, -0.35, 0))
+  expect_equal(res_1, res_2)
+  
+  res_3 <- .get_tile_size(c(0.349, 0.7))
+  expect_equal(res_3, 0.351)
+  
+  res_4 <- .get_tile_size(c(0.349))
+  expect_equal(res_4, 0.5)
+  
+  res_5 <- .get_tile_size(c(0.349, 0.349))
+  expect_equal(res_5, 0.5)
+  
+  res_6 <- .get_tile_size(c(0.349, 0.7, -0.35, 0, -0.35, 0))
+  expect_equal(res_6, 0.35)
+  
+  res_7 <- .get_tile_size(c(0.5, 0.75, NA))
+  expect_equal(res_7, 0.25)
+  expect_error(.get_tile_size(c("0.5", "0.75")),
+               "Assertion on 'pos_vec' failed: Must be of type 'numeric'")
 })
 
 test_that(".get_iso_colors works as expected", {
