@@ -56,7 +56,25 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], normalization_type)
   expect_true(grepl(selected_celline, plt_4[["labels"]][["title"]]))
-  expect_length(plt_4[["layers"]], 2)
+  expect_length(plt_4[["layers"]], 2) # lack of fit lines
+  
+  # lack of metric data for selected `group_names`
+  drug_name_subset <- c("drug_002", "drug_003", "drug_004", "drug_005", "drug_006")
+  dt_metrics_lack <- data.table::copy(dt_metrics)[DrugName %in% drug_name_subset]
+  drug_name_vec <- c("drug_005", "drug_006", "drug_007", "drug_008", "drug_009", "drug_010")
+  
+  plt_5 <- plot_dose_response_sa(dt_metrics = dt_metrics_lack,
+                                 dt_average = dt_average,
+                                 selection_name = selected_celline,
+                                 group_var = group_var,
+                                 group_names = drug_name_vec,
+                                 normalization_type = normalization_type,
+                                 colors_vec = c("cadetblue", "orange", "darkblue"))
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 3)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["colour"]])), 
+               NROW(intersect(drug_name_subset, drug_name_vec)))
+  
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
