@@ -99,9 +99,10 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # update group (it depends on user choice for `group_names` and `selection_name`)
   group_names <- if (is.null(group_names)) {
-    unique(dt_met[[group_var]])
+    unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
   } else {
-    intersect(unique(dt_met[[group_var]]), group_names)
+    intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))), 
+              group_names)
   }
 
   # filter dat
@@ -109,12 +110,12 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
   # prep value ranges for plot
-  data_range <- c(min(min(dt_avg_norm$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg_norm$x, na.rm = TRUE), 1) + 0.05)
-  min_conc <- min(dt_avg_norm[dt_avg_norm[[conc]] > 0, ][[conc]], na.rm = TRUE)
-  max_conc <- max(dt_avg_norm[[conc]], na.rm = TRUE)
+  data_range <- c(min(min(dt_avg$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg$x, na.rm = TRUE), 1) + 0.05)
+  min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
+  max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
   conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
   # remove conc = 0
-  dt_avg_norm[[conc]][dt_avg_norm[[conc]] == 0] <- min_conc / 10
+  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 10
   
   # prep fitted data
   sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
@@ -122,6 +123,7 @@ plot_dose_response_sa <- function(dt_metrics,
   
   for (grp_nm in group_names) {
     sel_metrics <- dt_met[get(group_var) == grp_nm, ]
+    if (NROW(sel_metrics) == 0) next
     dt_fit <- rbind(dt_fit,
                     cbind(sel_metrics[, group_var, with = FALSE],
                           data.table::data.table(
