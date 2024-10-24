@@ -208,3 +208,19 @@ test_that("plot_dose_response_combo_panel works as expected", {
                                               colors_vec = 1:5),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
 })
+
+test_that(".get_combo_curves_colors works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_cur_p <- s$COMBO_CURVES_PALETTE
+  
+  ls_conc <- factor(c("0.001", "0.005", "0.01", "0.05", "1", "5"))
+  res <- .get_combo_curves_colors(ls_conc)
+  ls_col <- grDevices::colorRampPalette(ls_cur_p)(2 * NROW(ls_conc))
+  expect_length(res, NROW(ls_conc))
+  expect_named(res, levels(ls_conc))
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_combo_curves_colors(c("0.001", "0.01", "1")),
+               "Assertion on 'ls_conc_2' failed: Must be of type 'factor'")
+})

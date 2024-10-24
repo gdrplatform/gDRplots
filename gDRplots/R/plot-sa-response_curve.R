@@ -6,9 +6,10 @@
 #' @param dt_average data.table representing data from the \code{Averaged} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 #'    and single-agent \code{SummarizedExperiment}
-#' @param grouping string name of dim of se to plot; it has to be opppsoite to this used to filter se
-#'    (that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")
-#' @param group_names character vector with names to subset from se (the same dim as \code{grouping});
+#' @param selection_name string name of selected main variable - one value from column 
+#'    \code{"CellLineName"} or \code{"DrugName"}
+#' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}
+#' @param group_names character vector with names to subset from se (the same dim as \code{group_var});
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -23,32 +24,35 @@
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' iR <- rownames(se)[1]
-#' grouping <- "CellLineName"
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
-#' dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
-#' group_names <- unique(dt_metrics[[grouping]])[1:3]
+#' selected_drug <- "drug_002"
+#' group_var <- "CellLineName"
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+#' celline_names <- unique(dt_metrics[[group_var]])[1:3]
 #' 
 #' plot_dose_response_sa(dt_metrics = dt_metrics,
 #'                       dt_average = dt_average,
-#'                       grouping = grouping,
-#'                       group_names = group_names)
+#'                       selection_name = selected_drug,
+#'                       group_var = group_var,
+#'                       group_names = celline_names)
 #'             
-#' iC <- colnames(se)[1]
-#' grouping <- "DrugName"
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
-#' dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
-#' group_names <- unique(dt_metrics[[grouping]])[1:3]
+#' selected_cellline <- "cellline_HB"
+#' group_var <- "DrugName"
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+#' group_names <- unique(dt_metrics[[group_var]])[1:3]
 #' 
 #' plot_dose_response_sa(dt_metrics = dt_metrics,
 #'                       dt_average = dt_average,
-#'                       grouping = grouping,
+#'                       selection_name = selected_cellline,
+#'                       group_var = group_var,
 #'                       group_names = group_names)
 #'                       
 #' @export
 plot_dose_response_sa <- function(dt_metrics,
                                   dt_average,
-                                  grouping,
+                                  selection_name,
+                                  group_var,
                                   group_names = NULL,
                                   normalization_type = "GR",
                                   colors_vec = NULL,
@@ -64,7 +68,8 @@ plot_dose_response_sa <- function(dt_metrics,
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average)
-  checkmate::assert_choice(grouping, choices = c(cellline_name, drug_name))
+  checkmate::assert_string(selection_name)
+  checkmate::assert_choice(group_var, choices = c(cellline_name, drug_name))
   checkmate::assert_character(group_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -73,12 +78,12 @@ plot_dose_response_sa <- function(dt_metrics,
   checkmate::assert_string(fit_source, null.ok = TRUE)
   
   # check input data
-  if (grouping == cellline_name) {
-    stopifnot("grouping` does not fit to `dt_metrics` and `dt_average`" =
-                (NROW(unique(dt_metrics[[drug_name]])) == 1 && NROW(unique(dt_average[[drug_name]])) == 1))
-  } else if (grouping == drug_name) {
-    stopifnot("grouping` does not fit to `dt_metrics` and `dt_average`" =
-                (NROW(unique(dt_metrics[[cellline_name]])) == 1 && NROW(unique(dt_average[[cellline_name]])) == 1))
+  if (group_var == cellline_name) {
+    checkmate::assert_choice(selection_name, choices = dt_metrics[[drug_name]])
+    main_var <- drug_name
+  } else if (group_var == drug_name) {
+    checkmate::assert_choice(selection_name, choices = dt_metrics[[cellline_name]])
+    main_var <- cellline_name
   }
   stopifnot("empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
   
@@ -88,29 +93,39 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_met_norm <- dt_metrics[eval(filter_expr)]
   dt_avg_norm <- dt_average[eval(filter_expr)]
   
-  # group
+  # filter data for selected main variable
+  dt_met <- dt_met_norm[get(main_var) == selection_name, ]
+  dt_avg <- dt_avg_norm[get(main_var) == selection_name, ]
+  
+  # update group (it depends on user choice for `group_names` and `selection_name`)
   group_names <- if (is.null(group_names)) {
-    unique(dt_met_norm[[grouping]])
+    unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
   } else {
-    intersect(dt_met_norm[[grouping]], group_names)
+    intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))), 
+              group_names)
   }
+
+  # filter dat
+  dt_met <- dt_met[get(group_var) %in% group_names, ]
+  dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
   # prep value ranges for plot
-  data_range <- c(min(min(dt_avg_norm$x), 0) - 0.05, max(max(dt_avg_norm$x), 1) + 0.05)
-  min_conc <- min(dt_avg_norm[dt_avg_norm[[conc]] > 0, ][[conc]])
-  max_conc <- max(dt_avg_norm[[conc]])
+  data_range <- c(min(min(dt_avg$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg$x, na.rm = TRUE), 1) + 0.05)
+  min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
+  max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
   conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
   # remove conc = 0
-  dt_avg_norm[[conc]][dt_avg_norm[[conc]] == 0] <- min_conc / 10
+  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 10
   
   # prep fitted data
   sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
   dt_fit <- data.table::data.table()
   
-  for (icol in group_names) {
-    sel_metrics <- dt_met_norm[get(grouping) == icol, ]
+  for (grp_nm in group_names) {
+    sel_metrics <- dt_met[get(group_var) == grp_nm, ]
+    if (NROW(sel_metrics) == 0) next
     dt_fit <- rbind(dt_fit,
-                    cbind(sel_metrics[, grouping, with = FALSE],
+                    cbind(sel_metrics[, group_var, with = FALSE],
                           data.table::data.table(
                             conc_col = sel_conc,
                             x = gDRutils::predict_efficacy_from_conc(sel_conc,
@@ -124,10 +139,7 @@ plot_dose_response_sa <- function(dt_metrics,
   }
   dt_fit <- dt_fit[!is.na(x)]
   data.table::setnames(dt_fit, "conc_col", conc)
-  
-  # prep averaged data
-  dt_avg <- dt_avg_norm[get(grouping) %in% group_names, ]
-  
+
   # colors
   color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     get_qual_colors(NROW(group_names))
@@ -139,21 +151,21 @@ plot_dose_response_sa <- function(dt_metrics,
   names(color_values) <- group_names
   
   # levels
-  dt_avg$grouping <- factor(dt_avg[[grouping]], levels = group_names)
-  dt_fit$grouping <- factor(dt_fit[[grouping]], levels = group_names)
+  dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
+  dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
   
   plt_title <- sprintf(
     "%s (%s)",
-    ifelse(grouping == cellline_name, unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
-    ifelse(grouping == cellline_name, unique(dt_metrics[[gnumber]]), unique(dt_metrics[[clid]]))
+    ifelse(group_var == cellline_name, unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
+    ifelse(group_var == cellline_name, unique(dt_metrics[[gnumber]]), unique(dt_metrics[[clid]]))
   )
   
   # final plot
   plt <-
-    ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = grouping, group = grouping)) +
+    ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = group_var, group = group_var)) +
     ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
     ggplot2::scale_color_manual(values = color_values,
-                                name = ifelse(grouping == cellline_name, "Cell Line", "Drug")) +
+                                name = ifelse(group_var == cellline_name, "Cell Line", "Drug")) +
     ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
     ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
@@ -243,23 +255,20 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   }
   
   plt_list <- list()
-  for (iR in drug_name_vec) {
-    # subset data
-    dt_metrics_subset <- dt_metrics[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
-    dt_average_subset <- dt_average[get(drug_name) == iR & get(cellline_name) %in% cellline_name_vec]
-    
-    plt_title <- sprintf("%s (%s)", iR, unique(dt_metrics[get(drug_name) == iR, ][[gnumber]]))
-    
-    plt <-
-      plot_dose_response_sa(dt_metrics = dt_metrics_subset,
-                            dt_average = dt_average_subset,
-                            grouping = cellline_name,
+  for (d_name in drug_name_vec) {
+    plt_title <- 
+      sprintf("%s (%s)", d_name, unique(dt_metrics[get(drug_name) == d_name, ][[gnumber]]))
+
+    plt_list[[plt_title]] <-       
+      plot_dose_response_sa(dt_metrics = dt_metrics,
+                            dt_average = dt_average,
+                            selection_name = d_name,
+                            group_var = cellline_name,
                             group_names = cellline_name_vec,
                             normalization_type = normalization_type,
                             colors_vec = colors_vec,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
-    plt_list[[plt_title]] <- plt
   }
   
   return(plt_list)
@@ -328,23 +337,20 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   }
   
   plt_list <- list()
-  for (iC in cellline_name_vec) {
-    # subset data
-    dt_metrics_subset <- dt_metrics[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
-    dt_average_subset <- dt_average[get(cellline_name) == iC & get(drug_name) %in% drug_name_vec]
+  for (cl_name in cellline_name_vec) {
+    plt_title <- 
+      sprintf("%s (%s)", cl_name, unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]]))
     
-    plt_title <- sprintf("%s (%s)", iC, unique(dt_metrics[get(cellline_name) == iC, ][[clid]]))
-    
-    plt <-
-      plot_dose_response_sa(dt_metrics = dt_metrics_subset,
-                            dt_average = dt_average_subset,
-                            grouping = drug_name,
+    plt_list[[plt_title]] <-
+      plot_dose_response_sa(dt_metrics = dt_metrics,
+                            dt_average = dt_average,
+                            selection_name = cl_name,
+                            group_var = drug_name,
                             group_names = drug_name_vec,
                             normalization_type = normalization_type,
                             colors_vec = colors_vec,
                             plot_averaged_flag = plot_averaged_flag,
                             plot_fit_flag = plot_fit_flag)
-    plt_list[[plt_title]] <- plt
   }
   
   return(plt_list)
@@ -430,18 +436,18 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   if (NROW(dt_metrics_plot) > 0) {
     
     if (NROW(stats::na.omit(dt_metrics_plot)) > 0 && NROW(unique(dt_average_plot[[conc]])) > 1) {
-    
-    min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
-    max_conc <- max(dt_average_plot[[conc]])
-    sampled_conc <- create_log_seq(min_conc, max_conc, 50)
-    fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
-                                                                 dt_metrics_plot$x_inf,
-                                                                 dt_metrics_plot$x_0,
-                                                                 dt_metrics_plot$ec50,
-                                                                 dt_metrics_plot$h)
-    dt_reconstructed_fit <- data.table::data.table(Concentration = sampled_conc,
-                                                   x = fitted_curve_sampled)
-    
+      
+      min_conc <- min(dt_average_plot[get(conc) != 0][[conc]])
+      max_conc <- max(dt_average_plot[[conc]])
+      sampled_conc <- create_log_seq(min_conc, max_conc, 50)
+      fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
+                                                                   dt_metrics_plot$x_inf,
+                                                                   dt_metrics_plot$x_0,
+                                                                   dt_metrics_plot$ec50,
+                                                                   dt_metrics_plot$h)
+      dt_reconstructed_fit <- data.table::data.table(Concentration = sampled_conc,
+                                                     x = fitted_curve_sampled)
+      
     } else {
       dt_reconstructed_fit <- data.table::data.table(Concentration = numeric(),
                                                      x = numeric())

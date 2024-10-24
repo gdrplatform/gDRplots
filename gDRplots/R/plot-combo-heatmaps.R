@@ -11,7 +11,7 @@
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param iso_levels character vector with  isobologram levels to be selected
+#' @param iso_levels character vector with isobologram levels to be selected
 #' @param colors_vec_smooth character vector of colors (valid names or hex codes) used in the heatmap
 #'    for smooth values; the default is the dark purple-light grey palette
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
@@ -50,6 +50,14 @@
 #'                       normalization_type = "RV",
 #'                       iso_levels = "0.5",
 #'                       as_panel = FALSE)
+#'                       
+#' heatmap_combo_metrics(dt_excess,
+#'                       dt_isobolograms,
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
+#'                       normalization_type = "RV",
+#'                       iso_levels = NULL,
+#'                       as_panel = TRUE)
 #'
 #' @export
 heatmap_combo_metrics <- function(
@@ -501,7 +509,7 @@ heatmap_combo_with_isoref <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(available_iso_lvl))
       names(iso_label) <- available_iso_lvl
- 
+      
       tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
@@ -637,9 +645,6 @@ heatmap_combo_with_isoref_panel <- function(
                 all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
-  if (!is.null(colors_vec)) {
-    stopifnot("`colors_vec` must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
-  }
   checkmate::assert_int(no_breaks, lower = 2)
   
   available_cls <- unique(dt_excess[[cellline_name]])
@@ -672,12 +677,12 @@ heatmap_combo_with_isoref_panel <- function(
     dt_isobolograms[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   # prep hm color palette
-  hm_color_palette <- if (is.null(colors_vec)) {
+  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
-  
+
   # prep panel elements
   mx_name <- "smooth"
   # prep plot data
@@ -750,7 +755,7 @@ heatmap_combo_with_isoref_panel <- function(
                            ifelse(normalization_type == "GR", "GR", "IC"),
                            100 - 100 * as.numeric(iso_levels))
       names(iso_label) <- iso_levels
-  
+      
       tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
       tab_measured[, iso_source := "measured"]
       tab_expected <- dt_iso[, .SD, .SDcols = -c("pos_x", "pos_y")]
@@ -888,7 +893,7 @@ transform_log_conc <- function(conc_vec) {
 .get_tile_size <- function(pos_vec) {
   checkmate::assert_numeric(pos_vec)
   
-  diff_ <- sort(unique(diff(pos_vec)), decreasing = TRUE)
+  diff_ <- sort(unique(diff(sort(unique(pos_vec)))), decreasing = TRUE)
   
   tile_size <- if (NROW(diff_) > 1) {
     diff_[2] # 1st in related to conc = 0 and and is not conclusive
@@ -900,7 +905,18 @@ transform_log_conc <- function(conc_vec) {
   tile_size
 }
 
+#' Get color palette for the isobologram levels
+#' 
+#' @param iso_levels character vector with isobologram levels
+#' 
+#' @return gDR palette for isoline given in \code{iso_levels}
+#' 
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' ls_iso_lvl <- c("0.25", "0.5", "0.75")
+#' .get_iso_colors(ls_iso_lvl)
+#' }
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
   
@@ -908,24 +924,52 @@ transform_log_conc <- function(conc_vec) {
   iso_levels <- iso_levels[order(as.numeric(iso_levels))]
   
   iso_colors <- 
-    grDevices::colorRampPalette(c("#F2C707", "#EC6608", "#AC2605"))(2 * NROW(iso_levels))[2 * seq_along(iso_levels)] # nolint
+    grDevices::colorRampPalette(
+      gDRutils::get_settings_from_json("ISOLINE_PALETTE",
+                                       system.file(package = "gDRplots", "settings.json"))
+    )(2 * NROW(iso_levels))[2 * seq_along(iso_levels)]
   names(iso_colors) <- iso_levels
   
   iso_colors
 }
 
+
+#' Get color palette for the smooth values
+#' 
+#' @param no_breaks numeric number of breaks on scale
+#' 
+#' @return gDR palette for smooth values with given \code{no_breaks}
+#' 
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' .get_smooth_palette(25)
+#' }
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    c("#251739", "#6742a1", "#b59fd7", "#F2F2F2"))(no_breaks + 1) # family #218EAE
+    gDRutils::get_settings_from_json("SMOOTH_PALETTE",
+                                     system.file(package = "gDRplots", "settings.json"))
+  )(no_breaks + 1)
 }
 
+#' Get color palette for the excess values
+#' 
+#' @param no_breaks numeric number of breaks on scale
+#' 
+#' @return gDR palette for excess values with given \code{no_breaks}
+#' 
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' .get_excess_palette(20)
+#' }
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
   
   grDevices::colorRampPalette(
-    c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"))(no_breaks + 1)
+    gDRutils::get_settings_from_json("EXCESS_PALETTE",
+                                     system.file(package = "gDRplots", "settings.json"))
+  )(no_breaks + 1)
 }

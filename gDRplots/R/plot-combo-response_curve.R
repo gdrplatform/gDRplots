@@ -279,8 +279,18 @@ plot_dose_response_combo_panel <- function(dt_average,
   return(plt)
 }
 
-
+#' Get color palette for the dose response curves for combination data
+#' 
+#' @param ls_conc_2 factor vector with values for \code{Concentration_2}
+#' 
+#' @return gDR palette for Concentration_2 given in \code{ls_conc_2}
+#' 
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' ls_conc <- factor(c("0.001", "0.01", "1"))
+#' .get_combo_curves_colors(ls_conc)
+#' }
 .get_combo_curves_colors <- function(ls_conc_2) {
   checkmate::assert_factor(ls_conc_2)
   
@@ -288,8 +298,10 @@ plot_dose_response_combo_panel <- function(dt_average,
   ls_conc_2 <- ls_conc_2[order(as.numeric(ls_conc_2))]
   
   conc_2_colors <- 
-    grDevices::colorRampPalette(c(
-      "#EAF02D", "#FDE251", "#FB9C05", "#CC0666", "#57042C", "#2C2835"))(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)] # nolint
+    grDevices::colorRampPalette(
+      gDRutils::get_settings_from_json("COMBO_CURVES_PALETTE",
+                                       system.file(package = "gDRplots", "settings.json"))
+    )(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)]
   names(conc_2_colors) <- levels(ls_conc_2)
   
   conc_2_colors

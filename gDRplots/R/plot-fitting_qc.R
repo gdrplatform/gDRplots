@@ -40,17 +40,18 @@ plot_var_stat_qc <- function(dt_assay,
                              normalization_type = "GR", 
                              with_table = FALSE) {
   
-  checkmate::assert_data_table(dt_assay)
-  checkmate::assert_string(cl_name)
-  checkmate::assert_choice(metric, choices = names(dt_assay))
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_flag(with_table)
-  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
-  
+    
+  checkmate::assert_data_table(dt_assay)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
+  checkmate::assert_choice(metric, choices = names(dt_assay))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_flag(with_table)
+
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
   
   # filter data for normalization type
@@ -114,9 +115,15 @@ plot_var_stat_qc <- function(dt_assay,
 #' @export
 plot_fitting_acc <- function(dt_assay,
                              cl_name,
-                             normalization_type = "GR"
-) {
+                             normalization_type = "GR") {
   
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  
+  checkmate::assert_data_table(dt_assay)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+
   r2 <- plot_var_stat_qc(dt_assay,
                          cl_name,
                          metric = "r2",

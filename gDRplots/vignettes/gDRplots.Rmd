@@ -105,19 +105,12 @@ The **plot_dose_response_sa** function is dedicated to single-agent experiments.
 Users can also use  **plot_dose_response_sa_by_CLs** or **plot_dose_response_sa_by_drugs** to get a list of dose-response plots by cell line names or by drugs accordingly.
 
 ```{r plot_dose_response_sa, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("small")
-se <- mae[[gDRutils::get_supported_experiments("sa")]]
-
-dt_metrics <- gDRutils::convert_se_assay_to_dt(
-  se["G00002_drug_002_moa_A_72"], assay_name = "Metrics")
-dt_average <- gDRutils::convert_se_assay_to_dt(
-  se["G00002_drug_002_moa_A_72"], assay_name = "Averaged")
-
 plot_dose_response_sa(
-  dt_metrics = dt_metrics,
-  dt_average = dt_average,
-  grouping = "CellLineName",
-  group_names = c("cellline_BA", "cellline_CA", "cellline_DA"))
+  dt_metrics = dt_metrics_sa,
+  dt_average = dt_average_sa,
+  selection_name = "drug_002",
+  group_var = "CellLineName",
+  group_names = c("cellline_BC", "cellline_FD", "cellline_JE"))
 ```
 
 ### Combination Data

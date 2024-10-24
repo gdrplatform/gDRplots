@@ -7,7 +7,8 @@
 plot_dose_response_sa(
   dt_metrics,
   dt_average,
-  grouping,
+  selection_name,
+  group_var,
   group_names = NULL,
   normalization_type = "GR",
   colors_vec = NULL,
@@ -25,10 +26,12 @@ and single-agent \code{SummarizedExperiment}}
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 and single-agent \code{SummarizedExperiment}}
 
-\item{grouping}{string name of dim of se to plot; it has to be opppsoite to this used to filter se
-(that is when rownames(se) == 1 it has to be "cId", otherwise - "rId")}
+\item{selection_name}{string name of selected main variable - one value from column 
+\code{"CellLineName"} or \code{"DrugName"}}
 
-\item{group_names}{character vector with names to subset from se (the same dim as \code{grouping});
+\item{group_var}{string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}}
+
+\item{group_names}{character vector with names to subset from se (the same dim as \code{group_var});
 if \code{NULL} then all values will be plotted}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -51,26 +54,28 @@ Plot drug response curves for single-agent data
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
-iR <- rownames(se)[1]
-grouping <- "CellLineName"
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se[iR], "Metrics")
-dt_average <- gDRutils::convert_se_assay_to_dt(se[iR], "Averaged")
-group_names <- unique(dt_metrics[[grouping]])[1:3]
+selected_drug <- "drug_002"
+group_var <- "CellLineName"
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+celline_names <- unique(dt_metrics[[group_var]])[1:3]
 
 plot_dose_response_sa(dt_metrics = dt_metrics,
                       dt_average = dt_average,
-                      grouping = grouping,
-                      group_names = group_names)
+                      selection_name = selected_drug,
+                      group_var = group_var,
+                      group_names = celline_names)
             
-iC <- colnames(se)[1]
-grouping <- "DrugName"
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se[, iC], "Metrics")
-dt_average <- gDRutils::convert_se_assay_to_dt(se[, iC], "Averaged")
-group_names <- unique(dt_metrics[[grouping]])[1:3]
+selected_cellline <- "cellline_HB"
+group_var <- "DrugName"
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+group_names <- unique(dt_metrics[[group_var]])[1:3]
 
 plot_dose_response_sa(dt_metrics = dt_metrics,
                       dt_average = dt_average,
-                      grouping = grouping,
+                      selection_name = selected_cellline,
+                      group_var = group_var,
                       group_names = group_names)
                       
 }

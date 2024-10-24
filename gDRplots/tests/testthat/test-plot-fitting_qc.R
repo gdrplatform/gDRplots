@@ -1,5 +1,90 @@
 context("Test fitting_qc")
 
+test_that("plot_var_stat_qc works as expected", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  cl_name <- dt_metrics[["CellLineName"]][1]
+  
+  plt_1 <- plot_var_stat_qc(dt_assay = dt_metrics,
+                            cl_name = cl_name)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 4)
+  expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
+  expect_true(grepl("r2", plt_1[["labels"]][["y"]]))
+  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_1)[["data"]][[3]]),
+               NROW(unique(dt_metrics[["DrugName"]])))
+  
+  plt_2 <- plot_var_stat_qc(dt_assay = dt_metrics,
+                            cl_name = cl_name,
+                            normalization_type = "RV")
+  expect_is(plt_2, "gg")
+  expect_true(grepl("RV", plt_2[["labels"]][["y"]]))
+  
+  plt_3 <- plot_var_stat_qc(dt_assay = dt_metrics,
+                            cl_name = cl_name,
+                            metric = "x_AOC",
+                            normalization_type = "RV",
+                            with_table = TRUE)
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 2)
+  
+  expect_error(plot_var_stat_qc(dt_assay = unlist(dt_metrics),
+                                cl_name = cl_name),
+               "Assertion on 'dt_assay' failed: Must be a data.table")
+  expect_error(plot_var_stat_qc(dt_assay = dt_metrics,
+                                cl_name = c("cl_1", "cl_2")),
+               "Assertion on 'cl_name' failed: Must have length 1.")
+  expect_error(plot_var_stat_qc(dt_assay = dt_metrics,
+                                cl_name = "unknown_cl"),
+               "Assertion on 'cl_name' failed: Must be element of set")
+  expect_error(plot_var_stat_qc(dt_assay = dt_metrics,
+                                cl_name = cl_name, 
+                                metric = "strange_metric"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(plot_var_stat_qc(dt_assay = dt_metrics,
+                                cl_name = cl_name, 
+                                normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(plot_var_stat_qc(dt_assay = dt_metrics,
+                                cl_name = cl_name, 
+                                with_table = "yes"),
+               "Assertion on 'with_table' failed: Must be of type 'logical flag'")
+})
+
+test_that("plot_fitting_acc works as expected", {
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  cl_name <- dt_metrics[["CellLineName"]][1]
+  
+  plt_1 <- plot_fitting_acc(dt_assay = dt_metrics,
+                            cl_name = cl_name)
+  expect_is(plt_1, "gg")
+  
+  plt_2 <- plot_fitting_acc(dt_assay = dt_metrics,
+                            cl_name = cl_name,
+                            normalization_type = "RV")
+  expect_is(plt_2, "gg")
+  
+  expect_error(plot_fitting_acc(dt_assay = unlist(dt_metrics),
+                                cl_name = cl_name),
+               "Assertion on 'dt_assay' failed: Must be a data.table")
+  expect_error(plot_fitting_acc(dt_assay = dt_metrics,
+                                cl_name = 123),
+               "Assertion on 'cl_name' failed: Must be of type 'string'")
+  expect_error(plot_fitting_acc(dt_assay = dt_metrics,
+                                cl_name = "unknown_cl"),
+               "Assertion on 'cl_name' failed: Must be element of set")
+  expect_error(plot_fitting_acc(dt_assay = dt_metrics,
+                                cl_name = cl_name,
+                                normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+})
+
 test_that("heatmap_control_mapping_qc works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]

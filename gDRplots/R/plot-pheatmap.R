@@ -134,8 +134,8 @@ pheatmap_qc <- function(
   rownames(mat_cvd) <- tab_plot[[clid]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   if (metric == "x_std") mat_cvd <- mat_cvd ^ 2
   
   # annotation
@@ -334,7 +334,7 @@ pheatmap_with_anno_sa <- function(
     metric = "xc50",
     fit_source = "gDR",
     hm_title = NA,
-    colors_vec = c("firebrick2", "white"),
+    colors_vec = NULL,
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
@@ -351,8 +351,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
-  checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
@@ -479,7 +478,11 @@ pheatmap_with_anno_sa <- function(
   }
   
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+    .get_smooth_palette(no_breaks)
+  } else {
+    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  }
   
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
@@ -613,7 +616,7 @@ pheatmap_with_anno_cd <- function(
     metric = "xc50",
     fit_source = "gDR",
     hm_title = NA,
-    colors_vec = c("firebrick2", "white"),
+    colors_vec = NULL,
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
@@ -632,8 +635,7 @@ pheatmap_with_anno_cd <- function(
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
-  checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
@@ -674,8 +676,8 @@ pheatmap_with_anno_cd <- function(
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -769,7 +771,11 @@ pheatmap_with_anno_cd <- function(
   }
   
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+    .get_smooth_palette(no_breaks)
+  } else {
+    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  }
   
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
@@ -805,7 +811,7 @@ pheatmap_with_anno_cd <- function(
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
-#'   are matched using corresponding combination of names from  \code{DrugName} and \code{DrugName_2} 
+#'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} 
 #'   columns. Both columns are required.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param annotation_colors named list for specifying \code{annotation_col} and \code{annotation_row} 
@@ -883,7 +889,7 @@ pheatmap_with_anno_combo <- function(
     metric = "hsa_score",
     fit_source = "gDR",
     hm_title = NA,
-    colors_vec = c("royalblue3", "royalblue1", "grey95", "grey95", "firebrick1", "firebrick3"),
+    colors_vec = NULL,
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
@@ -900,8 +906,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
-  checkmate::assert_character(colors_vec)
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
@@ -939,8 +944,8 @@ pheatmap_with_anno_combo <- function(
   rownames(mat_cvd) <- tab_plot[[cellline_name]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, ]
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -1021,8 +1026,12 @@ pheatmap_with_anno_combo <- function(
   
   # prep hm color palette
   breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
-  
+  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+    .get_excess_palette(no_breaks)
+  } else {
+    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  }
+ 
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   

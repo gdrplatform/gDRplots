@@ -1,3 +1,6 @@
+## gDRplots 0.0.40 - 2024-10-23
+* update settings.json with colors palette
+
 ## gDRplots 0.0.39 - 2024-10-22
 * add support for visualizing combo data without isobolograms
 

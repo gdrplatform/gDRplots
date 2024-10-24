@@ -17,12 +17,63 @@ test_that("heatmap_combo_metrics works as expected", {
   normalization_type <- "RV"
   plts_2 <- heatmap_combo_metrics(dt_excess, dt_isobolograms,
                                   drug1_name, drug2_name, cl_name,
-                                  normalization_type, as_panel = FALSE)
+                                  normalization_type, 
+                                  as_panel = FALSE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
                          function(i) grepl(normalization_type, plts_2[[i]]$labels$title), logical(1))))
   
+  iso_lvl <- c("0.2", "0.4")
+  plts_3 <- heatmap_combo_metrics(dt_excess, dt_isobolograms,
+                                  drug1_name, drug2_name, cl_name,
+                                  iso_levels = iso_lvl, 
+                                  as_panel = FALSE)
+  expect_is(plts_3, "list")
+  expect_equal(names(plts_3), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plts_3[["smooth"]])[["data"]][[2]][["colour"]])),
+               NROW(iso_lvl))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plts_3[["iso_compare"]])[["data"]][[3]][["colour"]])),
+               NROW(iso_lvl))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plts_3[["hsa_excess"]])[["data"]][[2]][["colour"]])),
+               NROW(iso_lvl))
+  
+  ls_col_1 <- c("#008B8B", "#FFA500", "#FFFFFF")
+  plts_4 <- heatmap_combo_metrics(dt_excess, dt_isobolograms,
+                                  drug1_name, drug2_name, cl_name,
+                                  iso_levels = NULL,
+                                  colors_vec_smooth = ls_col_1,
+                                  as_panel = FALSE)
+  expect_is(plts_4, "list")
+  expect_true(all(vapply(seq_along(plts_4), function(x) is(plts_4[[x]], "gg"), logical(1))))
+  expect_length(plts_4, 3) # smooth, hsa_excess, bliss_excess
+  expect_equal(names(plts_4), c(names(gDRutils::get_combo_excess_field_names())))
+  expect_true(all(ls_col_1 %in% plts_4[["smooth"]][["plot_env"]][["hm_color_palette"]]))
+  
+  ls_col_2 <- c("#FF1493", "#350040")
+  plts_5 <- heatmap_combo_metrics(dt_excess, 
+                                  dt_isobolograms = NULL,
+                                  drug1_name, drug2_name, cl_name,
+                                  colors_vec_excess = ls_col_2,
+                                  as_panel = FALSE)
+  expect_is(plts_5, "list")
+  expect_true(all(vapply(seq_along(plts_5), function(x) is(plts_5[[x]], "gg"), logical(1))))
+  expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
+  expect_true(all(ls_col_2 %in% plts_5[["hsa_excess"]][["plot_env"]][["hm_color_palette"]]))
+  
+  dt_excess_ <- dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name &
+                            CellLineName == cl_name][1:2, ]
+  plts_6 <- heatmap_combo_metrics(dt_excess = dt_excess_, 
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name, cl_name,
+                                  as_panel = FALSE)
+  expect_is(plts_6, "list")
+  expect_true(all(vapply(seq_along(plts_6), function(x) is(plts_6[[x]], "gg"), logical(1))))
+  expect_true(all(vapply(names(gDRutils::get_combo_excess_field_names()), 
+                         function(nm) NROW(ggplot2::ggplot_build(plts_6[[nm]])[["data"]][[1]]) == 0,
+                         logical(1)))) # no excess data
+                           
+
   expect_error(heatmap_combo_metrics(dt_excess = unlist(dt_excess),
                                      dt_isobolograms = dt_isobolograms,
                                      drug1_name = drug1_name,
@@ -45,7 +96,6 @@ test_that("heatmap_combo_metrics works as expected", {
   
   
   # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
-  
   # test with dt_isobolograms as NULL
   plts_1 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
                                   dt_isobolograms = NULL,
@@ -66,6 +116,67 @@ test_that("heatmap_combo_metrics works as expected", {
   # check if names of the list are as expected
   expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
   
+})
+
+test_that("heatmap_combo_with_isoref works as expected", {
+  cl_name <- "cellline_BC"
+  drug1_name <- "drug_001"
+  drug2_name <- "drug_026"
+  
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+  dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+  
+  plt_1 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name)
+  expect_is(plt_1, "gg")
+  expect_true(grepl("GR", plt_1[["labels"]][["fill"]])) 
+  expect_true(grepl(cl_name, plt_1[["labels"]][["title"]])) 
+  expect_true(any(grepl(drug1_name, plt_1[["labels"]][["y"]])))
+  expect_true(any(grepl(drug2_name, plt_1[["labels"]][["x"]])))
+  
+  normalization_type <- "RV"
+  iso_lvl <- c("0.2", "0.4")
+  ls_col <- c("#003366", "#FFFAFA", "#FF8800")
+  plt_2 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name,
+                                     normalization_type = normalization_type,
+                                     iso_levels = iso_lvl,
+                                     colors_vec = ls_col)
+  expect_is(plt_2, "gg")
+  expect_true(grepl(normalization_type, plt_2[["labels"]][["fill"]]))
+  expect_true(all(ls_col %in% plt_2[["plot_env"]][["hm_color_palette"]]))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["colour"]])),
+               NROW(iso_lvl))
+  
+  plt_3 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name,
+                                     normalization_type = normalization_type,
+                                     iso_levels = NULL,
+                                     colors_vec = ls_col)
+  expect_is(plt_3, "gg")
+  expect_true(grepl(normalization_type, plt_3[["labels"]][["fill"]]))
+  expect_true(all(ls_col %in% plt_3[["plot_env"]][["hm_color_palette"]]))
+  expect_length(ggplot2::ggplot_build(plt_3)[["data"]], 1) # no isoline data
+
+  dt_excess_ <- dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name & 
+                            CellLineName == cl_name][1:2, ]
+  plt_4 <- heatmap_combo_with_isoref(dt_excess_,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name)
+  expect_is(plt_4, "gg")
+  expect_true(grepl(cl_name, plt_4[["labels"]][["title"]])) 
+  expect_true(any(grepl(drug1_name, plt_4[["labels"]][["y"]])))
+  expect_true(any(grepl(drug2_name, plt_4[["labels"]][["x"]])))
+  expect_length(ggplot2::ggplot_build(plt_4)[["data"]][[1]], 0) # no excess data
 })
 
 test_that("heatmap_combo_with_isoref_panel works as expected", {
@@ -190,14 +301,6 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                                drug1_name = drug1_name,
                                                drug2_name = drug2_name,
                                                cl_names = cl_names,
-                                               colors_vec = c("pinky", "blackish")),
-               "`colors_vec` must be a valid color name")
-  
-  expect_error(heatmap_combo_with_isoref_panel(dt_excess = dt_excess,
-                                               dt_isobolograms = dt_isobolograms,
-                                               drug1_name = drug1_name,
-                                               drug2_name = drug2_name,
-                                               cl_names = cl_names,
                                                no_breaks = "10"),
                "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
 })
@@ -237,4 +340,79 @@ test_that("transform_log_conc works as expected", {
                "Assertion on 'conc_vec' failed: Must be of type 'numeric'")
   expect_error(transform_log_conc(-1:2),
                "Assertion on 'conc_vec' failed: Element 1 is not >= 0")
+})
+
+test_that(".get_tile_size works as expected", {
+  res_1 <- .get_tile_size(c(-0.35, 0, 0.349, 0.7))
+  expect_equal(res_1, 0.35)
+  
+  res_2 <- .get_tile_size(c(0.349, 0.7, -0.35, 0))
+  expect_equal(res_1, res_2)
+  
+  res_3 <- .get_tile_size(c(0.349, 0.7))
+  expect_equal(res_3, 0.351)
+  
+  res_4 <- .get_tile_size(c(0.349))
+  expect_equal(res_4, 0.5)
+  
+  res_5 <- .get_tile_size(c(0.349, 0.349))
+  expect_equal(res_5, 0.5)
+  
+  res_6 <- .get_tile_size(c(0.349, 0.7, -0.35, 0, -0.35, 0))
+  expect_equal(res_6, 0.35)
+  
+  res_7 <- .get_tile_size(c(0.5, 0.75, NA))
+  expect_equal(res_7, 0.25)
+  expect_error(.get_tile_size(c("0.5", "0.75")),
+               "Assertion on 'pos_vec' failed: Must be of type 'numeric'")
+})
+
+test_that(".get_iso_colors works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_iso_p <- s$ISOLINE_PALETTE
+  
+  ls_iso_lvl <- c("0.25", "0.5", "0.75")
+  res <- .get_iso_colors(ls_iso_lvl)
+  ls_col <- grDevices::colorRampPalette(ls_iso_p)(2 * NROW(ls_iso_lvl))
+  expect_length(res, NROW(ls_iso_lvl))
+  expect_named(res, ls_iso_lvl)
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_iso_colors(c(0.5, 0.75)),
+               "Assertion on 'iso_levels' failed: Must be of type 'character'")
+})
+
+test_that(".get_smooth_palette works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_smooth <- s$SMOOTH_PALETTE
+  
+  no_br <- 25
+  res <- .get_smooth_palette(no_br)
+  ls_col <- grDevices::colorRampPalette(ls_smooth)(no_br + 1)
+  expect_length(res, NROW(ls_col))
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_smooth_palette("all"),
+               "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(.get_smooth_palette(0),
+               "Assertion on 'no_breaks' failed: Element 1 is not >= 2.")
+})
+
+test_that(".get_excess_palette works as expected", {
+  json_path <- system.file(package = "gDRplots", "settings.json")
+  s <- gDRutils::get_settings_from_json(json_path = json_path)
+  ls_excess <- s$EXCESS_PALETTE
+  
+  no_br <- 2
+  res <- .get_excess_palette(no_br)
+  ls_col <- grDevices::colorRampPalette(ls_excess)(no_br + 1)
+  expect_length(res, NROW(ls_col))
+  expect_true(all(res %in% ls_col))
+  
+  expect_error(.get_excess_palette("all"),
+               "Assertion on 'no_breaks' failed: Must be of type 'single integerish value'")
+  expect_error(.get_excess_palette(1),
+               "Assertion on 'no_breaks' failed: Element 1 is not >= 2.")
 })
