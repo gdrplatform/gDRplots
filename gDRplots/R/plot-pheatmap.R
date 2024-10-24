@@ -135,7 +135,7 @@ pheatmap_qc <- function(
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   if (metric == "x_std") mat_cvd <- mat_cvd ^ 2
   
   # annotation
@@ -677,7 +677,7 @@ pheatmap_with_anno_cd <- function(
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -945,7 +945,7 @@ pheatmap_with_anno_combo <- function(
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
   if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
