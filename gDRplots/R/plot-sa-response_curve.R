@@ -93,16 +93,20 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_met_norm <- dt_metrics[eval(filter_expr)]
   dt_avg_norm <- dt_average[eval(filter_expr)]
   
-  # group
-  group_names <- if (is.null(group_names)) {
-    unique(dt_met_norm[[group_var]])
-  } else {
-    intersect(dt_met_norm[[group_var]], group_names)
-  }
+  # filter data for selected main variable
+  dt_met <- dt_met_norm[get(main_var) == selection_name, ]
+  dt_avg <- dt_avg_norm[get(main_var) == selection_name, ]
   
-  # filter data
-  dt_met <- dt_met_norm[get(group_var) %in% group_names & get(main_var) == selection_name, ]
-  dt_avg <- dt_avg_norm[get(group_var) %in% group_names & get(main_var) == selection_name, ]
+  # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names <- if (is.null(group_names)) {
+    unique(dt_met[[group_var]])
+  } else {
+    intersect(unique(dt_met[[group_var]]), group_names)
+  }
+
+  # filter dat
+  dt_met <- dt_met[get(group_var) %in% group_names, ]
+  dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
   # prep value ranges for plot
   data_range <- c(min(min(dt_avg_norm$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg_norm$x, na.rm = TRUE), 1) + 0.05)
@@ -252,7 +256,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   for (d_name in drug_name_vec) {
     plt_title <- 
       sprintf("%s (%s)", d_name, unique(dt_metrics[get(drug_name) == d_name, ][[gnumber]]))
-    
+
     plt_list[[plt_title]] <-       
       plot_dose_response_sa(dt_metrics = dt_metrics,
                             dt_average = dt_average,
