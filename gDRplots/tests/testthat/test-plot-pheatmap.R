@@ -600,6 +600,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
     merge(unique(dt_scores[, c("CellLineName"), with = FALSE]),
           annotation_manual_col, all.x = TRUE)[, lapply(.SD, change_NA_into_char, "NA")]
   data.table::setorderv(annotation_manual_row_res, order = c(-1L))
+  
   out_6 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
                                     cluster_rows = FALSE,
                                     annotation_col = annotation_manual_col,
@@ -609,7 +610,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   data_6 <- out_6[["data"]]
   expect_is(data_6, "list")
   expect_equal(names(data_6), c("matrix", "annotation_col", "annotation_row"))
-  # expect_equal(data_6[["annotation_col"]], annotation_manual_col)
+  expect_equal(data_6[["annotation_col"]], annotation_manual_row_res)
   expect_equal(data_6[["annotation_row"]], NULL)
   plt_6 <- out_6[["heatmap"]]
   expect_is(plt_6, "pheatmap")
