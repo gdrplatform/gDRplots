@@ -137,7 +137,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   out_2 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_na, 
                                  normalization_type = "RV",
                                  metric = "x_max",
-                                 hm_title = "X MAX")
+                                 hm_title = "X MAX",
+                                 colors_vec = c("darkblue", "grey90"))
   expect_length(out_2, 2)
   expect_equal(names(out_2), c("data", "heatmap"))
   data_2 <- out_2[["data"]]
@@ -584,6 +585,37 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
   expect_equal(plt_5$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2"))
+  
+  # scenario 6: incomplete annotations for col and color maps
+  annotation_manual_col <- data.table::data.table(
+    CellLineName = c("cellline_XX", "cellline_HB"),
+    mut_A = c(1, 0),
+    mut_B = c("yes", "no")
+  )
+  annotation_map <- list(
+    mut_A = c("1" = "coral", "0" = "cadetblue")
+  )
+  
+  annotation_manual_row_res <- 
+    merge(unique(dt_scores[, c("CellLineName"), with = FALSE]),
+          annotation_manual_col, all.x = TRUE)[, lapply(.SD, change_NA_into_char, "NA")]
+  data.table::setorderv(annotation_manual_row_res, order = c(-1L))
+  out_6 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
+                                    cluster_rows = FALSE,
+                                    annotation_col = annotation_manual_col,
+                                    annotation_colors = annotation_map)
+  expect_length(out_6, 2)
+  expect_equal(names(out_6), c("data", "heatmap"))
+  data_6 <- out_6[["data"]]
+  expect_is(data_6, "list")
+  expect_equal(names(data_6), c("matrix", "annotation_col", "annotation_row"))
+  # expect_equal(data_6[["annotation_col"]], annotation_manual_col)
+  expect_equal(data_6[["annotation_row"]], NULL)
+  plt_6 <- out_6[["heatmap"]]
+  expect_is(plt_6, "pheatmap")
+  expect_equal(plt_6$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
+  expect_true(is.na(plt_6[["tree_row"]])) # rows aren't clustered
+  expect_is(plt_6[["tree_col"]], "hclust") # cols are clustered
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
