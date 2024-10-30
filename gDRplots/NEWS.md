@@ -1,3 +1,6 @@
+## gDRplots 0.0.41 - 2024-10-30
+* update handling special characters in rmd
+
 ## gDRplots 0.0.40 - 2024-10-23
 * update settings.json with colors palette
 
