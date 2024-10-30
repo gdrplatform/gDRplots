@@ -84,6 +84,7 @@ test_that("escape_special_characters works as expected", {
   expect_equal(escape_special_characters("ABC:123"), "ABC\\:123")
   expect_equal(escape_special_characters("AD_12"), "AD_12")
   expect_equal(escape_special_characters("AD#12"), "AD[hash]12")
+  expect_equal(escape_special_characters("AD/12"), "AD[slash]12")
   
   expect_error(escape_special_characters(123), "Assertion on 'x' failed: Must be of type 'string'")
 })

@@ -164,6 +164,7 @@ prep_nested_plot_chunk <- function(plt_list,
 #' escape_special_characters("ABC:123")
 #' escape_special_characters("AD_12")
 #' escape_special_characters("AD#12")
+#' escape_special_characters("AD/12")
 #'
 #' @return Original string with \code{:}s and \code{#}s escaped
 #' @keywords internal
@@ -172,6 +173,7 @@ prep_nested_plot_chunk <- function(plt_list,
 escape_special_characters <- function(x) {
   checkmate::assert_string(x)
   if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
+  if (grepl("\\/", x)) x <- gsub(pattern = "\\/", replacement = "[slash]", x = x)
   if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
   x
 }
