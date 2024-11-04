@@ -156,8 +156,8 @@ plot_dose_response_sa <- function(dt_metrics,
   
   plt_title <- sprintf(
     "%s (%s)",
-    ifelse(group_var == cellline_name, unique(dt_metrics[[drug_name]]), unique(dt_metrics[[cellline_name]])),
-    ifelse(group_var == cellline_name, unique(dt_metrics[[gnumber]]), unique(dt_metrics[[clid]]))
+    ifelse(group_var == cellline_name, unique(dt_met[[drug_name]]), unique(dt_met[[cellline_name]])),
+    ifelse(group_var == cellline_name, unique(dt_met[[gnumber]]), unique(dt_met[[clid]]))
   )
   
   # final plot
@@ -238,8 +238,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
-  
+
   available_drugs <- unique(dt_metrics[[drug_name]])
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
     drug_name_vec  <- available_drugs
@@ -256,10 +255,8 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   
   plt_list <- list()
   for (d_name in drug_name_vec) {
-    plt_title <- 
-      sprintf("%s (%s)", d_name, unique(dt_metrics[get(drug_name) == d_name, ][[gnumber]]))
 
-    plt_list[[plt_title]] <-       
+    plt_list[[d_name]] <-       
       plot_dose_response_sa(dt_metrics = dt_metrics,
                             dt_average = dt_average,
                             selection_name = d_name,
@@ -319,7 +316,6 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   checkmate::assert_flag(plot_fit_flag)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   available_cellline <- unique(dt_metrics[[cellline_name]])
@@ -338,10 +334,8 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   
   plt_list <- list()
   for (cl_name in cellline_name_vec) {
-    plt_title <- 
-      sprintf("%s (%s)", cl_name, unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]]))
-    
-    plt_list[[plt_title]] <-
+
+    plt_list[[cl_name]] <-
       plot_dose_response_sa(dt_metrics = dt_metrics,
                             dt_average = dt_average,
                             selection_name = cl_name,

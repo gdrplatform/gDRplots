@@ -1,3 +1,6 @@
+## gDRplots 0.0.42 - 2024-11-04
+* fix invalid title for dose-response curves for single-agent
+
 ## gDRplots 0.0.41 - 2024-10-30
 * update handling special characters in rmd
 
