@@ -115,9 +115,7 @@ test_that("plot_dose_response_sa works as expected", {
 
 test_that("plot_dose_response_sa_by_CLs works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
   
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -130,8 +128,9 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
   plts_1 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                                          dt_average = dt_average)
   expect_is(plts_1, "list")
-  expect_equal(names(plts_1), 
-               sprintf("%s (%s)", unique(dt_metrics[[drug_name]]), unique(dt_metrics[[gnumber]])))
+  expect_equal(names(plts_1), unique(dt_metrics[[drug_name]]))
+  expect_true(all(vapply(names(plts_1), 
+                         function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
   
   normalization_type <- "RV"
   plts_2 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
@@ -142,10 +141,12 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                                          colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
   expect_is(plts_2, "list")
   plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
-  expect_equal(names(plts_2), 
-               sprintf("%s (%s)", plotted_, unique(dt_metrics[get(drug_name) %in% plotted_][[gnumber]])))
+  expect_equal(names(plts_2), plotted_)
   expect_true(all(vapply(seq_along(plts_2), 
                          function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
+  expect_true(all(vapply(names(plts_2), 
+                         function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
+  
   
   cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
   drug_name_vec_2 <- c(drug_name_vec, "drug_100")
@@ -156,8 +157,7 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                                          drug_name_vec = drug_name_vec_2)
   expect_is(plts_3, "list")
   plotted_ <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
-  expect_equal(names(plts_3), 
-               sprintf("%s (%s)", plotted_, unique(dt_metrics[get(drug_name) %in% plotted_][[gnumber]])))
+  expect_equal(names(plts_3), plotted_)
   plotted <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
   expect_true(all(vapply(seq_along(plts_3), 
                          function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
@@ -167,7 +167,6 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  gnumber <- gDRutils::get_env_identifiers("drug")
   
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -180,8 +179,9 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
   plts_1 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
                                            dt_average = dt_average)
   expect_is(plts_1, "list")
-  expect_equal(names(plts_1), 
-               sprintf("%s (%s)", unique(dt_metrics[[cellline_name]]), unique(dt_metrics[[clid]])))
+  expect_equal(names(plts_1), unique(dt_metrics[[cellline_name]]))
+  expect_true(all(vapply(names(plts_1), 
+                         function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
   
   normalization_type <- "RV"
   plts_2 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
@@ -192,10 +192,11 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
                                            colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
   expect_is(plts_2, "list")
   plotted_ <- intersect(cellline_name_vec, unique(dt_metrics[[cellline_name]]))
-  expect_equal(names(plts_2), 
-               sprintf("%s (%s)", plotted_, unique(dt_metrics[get(cellline_name) %in% plotted_][[clid]])))
+  expect_equal(names(plts_2), plotted_)
   expect_true(all(vapply(seq_along(plts_2), 
                          function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
+  expect_true(all(vapply(names(plts_2), 
+                         function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
   
   cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
   drug_name_vec_2 <- c(drug_name_vec, "drug_100")
@@ -206,8 +207,7 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
                                            drug_name_vec = drug_name_vec_2)
   expect_is(plts_3, "list")
   plotted_ <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
-  expect_equal(names(plts_3), 
-               sprintf("%s (%s)", plotted_, unique(dt_metrics[get(cellline_name) %in% plotted_][[clid]])))
+  expect_equal(names(plts_3),  plotted_)
   plotted <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
   expect_true(all(vapply(seq_along(plts_3), 
                          function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
