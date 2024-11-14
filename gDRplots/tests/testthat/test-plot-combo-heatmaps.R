@@ -312,12 +312,22 @@ test_that("prep_hm_limits works as expected", {
   # RV smooth
   expect_equal(prep_hm_limits(vec, normalization_type = "RV"), c(0, 1.0089))
   
+  # GR smooth symmetric
+  expect_equal(prep_hm_limits(vec, symmetric = TRUE), c(-1.0089, 1.0089))
+  # RV smooth symmetric
+  expect_equal(prep_hm_limits(vec, normalization_type = "RV", symmetric = TRUE), c(-1.0089, 1.0089))
+  
   # hsa_excess
   vec <- c(-0.1016, -0.0647, 0.0021, 0.0328, 0.6824)
   expect_equal(prep_hm_limits(vec, metric = "hsa_excess"), c(-0.25, 0.6824))
+  # hsa_excess symmetric
+  expect_equal(prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE), c(-0.6824, 0.6824))
+  
   # bliss_excess
   vec <- c(-0.2651, -0.1289, 0.0051, 0.0202, 0.0394)
   expect_equal(prep_hm_limits(vec, metric = "bliss_excess"), c(-0.2651, 0.25))
+  # bliss_excess symmetric
+  expect_equal(prep_hm_limits(vec, metric = "bliss_excess", symmetric = TRUE), c(-0.2651, 0.2651))
   
   expect_error(prep_hm_limits(LETTERS[1:5]),
                "Assertion on 'num_vec' failed: Must be of type 'numeric'")

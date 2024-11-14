@@ -193,7 +193,8 @@ heatmap_combo_metrics <- function(
       # prep limits
       limits <- prep_hm_limits(dt_[[mx_name]],   
                                metric = mx_name,
-                               normalization_type = normalization_type)
+                               normalization_type = normalization_type,
+                               symmetric = mx_name != "smooth")
       
       # base plot
       plt <-
@@ -488,7 +489,8 @@ heatmap_combo_with_isoref <- function(
     # prep limits
     limits <- prep_hm_limits(dt_[[mx_name]],   
                              metric = mx_name,
-                             normalization_type = normalization_type)
+                             normalization_type = normalization_type,
+                             symmetric = mx_name != "smooth")
     
     # base plot
     plt <-
@@ -714,7 +716,8 @@ heatmap_combo_with_isoref_panel <- function(
   # prep limits
   limits <- prep_hm_limits(dt_tile[[mx_name]],   
                            metric = mx_name,
-                           normalization_type = normalization_type)
+                           normalization_type = normalization_type,
+                           symmetric = mx_name != "smooth")
   # legend title
   legend_title_fill <- sprintf("%s %s",
                                gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
@@ -811,10 +814,11 @@ heatmap_combo_with_isoref_panel <- function(
 #' Calculate limit for combo heatmap with gDR assumptions
 #'
 #' @param num_vec numeric vector
-#' @param metric string name of combo exccess metric;
+#' @param metric string name of combo excess metric;
 #'    one of: "smooth", "hsa_excess", "bliss_excess"
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param symmetric logical indicating if limits should be symmetric around 0
 #'
 #' @return capped limits (min and max) for given numeric vector
 #'
@@ -823,16 +827,18 @@ heatmap_combo_with_isoref_panel <- function(
 #' \dontrun{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 #' prep_hm_limits(vec)
-#' prep_hm_limits(vec, metric = "hsa_excess")
+#' prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
 #' }
 #' 
 prep_hm_limits <- function(num_vec,
                            metric = "smooth",
-                           normalization_type = "GR") {
+                           normalization_type = "GR",
+                           symmetric = FALSE) {
   
   checkmate::assert_numeric(num_vec)
   checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_logical(symmetric)
   
   vec_range <- range(num_vec, na.rm = TRUE, finite = TRUE)
   min_data <- min(vec_range)
@@ -849,6 +855,13 @@ prep_hm_limits <- function(num_vec,
   } else {
     ifelse(min_data > -0.25, -0.25, min_data)
   }
+  
+  if (symmetric) {
+    max_abs_val <- max(abs(c(min_val, max_val)))
+    min_val <- -max_abs_val
+    max_val <- max_abs_val
+  }
+  
   return(c(min_val, max_val))
 }
 
