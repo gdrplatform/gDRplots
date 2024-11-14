@@ -1,3 +1,6 @@
+## gDRplots 0.0.43 - 2024-11-14
+* add symmetric limits on the heatmaps for Bliss and HSA excesses
+
 ## gDRplots 0.0.42 - 2024-11-04
 * fix invalid title for dose-response curves for single-agent
 
