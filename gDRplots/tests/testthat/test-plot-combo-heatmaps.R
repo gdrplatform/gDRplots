@@ -116,6 +116,19 @@ test_that("heatmap_combo_metrics works as expected", {
   # check if names of the list are as expected
   expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
   
+  
+  # Check if switch axes work as expected
+  
+  plts_2_swap_axes <- heatmap_combo_metrics(dt_excess,
+                                            iso_levels = NULL,
+                                            dt_isobolograms = NULL,
+                                            drug1_name,
+                                            drug2_name,
+                                            cl_name,
+                                            as_panel = FALSE,
+                                            swap_axes = TRUE)
+  expect_equal(plts_2_swap_axes$smooth$labels$x, plts_2$smooth$labels$y)
+  expect_equal(plts_2_swap_axes$smooth$labels$y, plts_2$smooth$labels$x)
 })
 
 test_that("heatmap_combo_with_isoref works as expected", {
