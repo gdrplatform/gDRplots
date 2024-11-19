@@ -79,7 +79,7 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 iso_levels = c("0.25", "0.5"))
 
 
-#' heatmap_combo_with_isoref_panel(dt_excess,
+heatmap_combo_with_isoref_panel(dt_excess,
                                 dt_isobolograms,
                                 drug1_name, drug2_name,
                                 cl_names,
