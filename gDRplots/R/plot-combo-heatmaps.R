@@ -786,7 +786,8 @@ heatmap_combo_with_isoref_panel <- function(
       
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline,
-                           ggplot2::aes(x = if(swap_axes) pos_y else pos_x, y = if(swap_axes) pos_x else pos_y,
+                           ggplot2::aes(x = if(swap_axes) pos_y else pos_x, 
+                                        y = if(swap_axes) pos_x else pos_y,
                                         linetype = iso_source, color = iso_level),
                            linewidth = 1) +
         ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
