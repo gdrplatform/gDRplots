@@ -760,8 +760,10 @@ heatmap_combo_with_isoref_panel <- function(
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
                                                           mx_name = pmin(1.1, get(mx_name)),
-                                                          pos_y = transform_log_conc(if (swap_axes) get(conc_2) else get(conc)),
-                                                          pos_x = transform_log_conc(if (swap_axes) get(conc) else get(conc_2))
+                                                          pos_y = transform_log_conc(
+                                                            if (swap_axes) get(conc_2) else get(conc)),
+                                                          pos_x = transform_log_conc(
+                                                            if (swap_axes) get(conc) else get(conc_2))
                                                         ), 
                                                         by = cellline_name
   ][, .SD, .SDcols = -mx_name]
