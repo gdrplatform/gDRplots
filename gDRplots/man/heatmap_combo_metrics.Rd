@@ -49,7 +49,7 @@ for excess values; the default is a blue-light grey-red color scale}
 
 \item{as_panel}{logical flag whether return list of plot or panel}
 
-\item{swap_axes}{logical flag whether to swap the axes of the heatmap}
+\item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
 list or panel with heatmaps with value for excess assays for selected drugs and cell line with
@@ -86,6 +86,15 @@ heatmap_combo_metrics(dt_excess,
                       iso_levels = "0.5",
                       as_panel = FALSE)
                       
+heatmap_combo_metrics(dt_excess,
+                      dt_isobolograms,
+                      drug1_name, drug2_name,
+                      cl_name,
+                      normalization_type = "RV",
+                      iso_levels = NULL,
+                      as_panel = TRUE,
+                      swap_axes = FALSE)
+                                        
 heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
                       drug1_name, drug2_name,

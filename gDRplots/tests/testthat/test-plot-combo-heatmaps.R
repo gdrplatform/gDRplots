@@ -94,6 +94,15 @@ test_that("heatmap_combo_metrics works as expected", {
                                      normalization_type = "AB"),
                "Assertion on 'normalization_type' failed: Must be element of set")
   
+  expect_error(heatmap_combo_metrics(dt_excess = dt_excess,
+                                     dt_isobolograms = dt_isobolograms,
+                                     drug1_name = drug1_name,
+                                     drug2_name = drug2_name,
+                                     cl_name = cl_name,
+                                     swap_axes = "yes"),
+               "Assertion on 'swap_axes' failed: Must be of type 'logical flag'")
+  
+  
   
   # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
   # test with dt_isobolograms as NULL
@@ -117,7 +126,7 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
   
   
-  # Check if switch axes work as expected
+  # check if switch_axes works as expected
   
   plts_2_swap_axes <- heatmap_combo_metrics(dt_excess,
                                             iso_levels = NULL,

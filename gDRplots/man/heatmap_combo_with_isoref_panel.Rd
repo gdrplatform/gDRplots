@@ -45,7 +45,7 @@ the default is the dark purple-light grey palette}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{swap_axes}{logical flag whether to swap the axes of the heatmap}
+\item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
 panel with heatmaps for fitted values and reference data for isobolograms
@@ -78,6 +78,17 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 cl_names,
                                 iso_levels = c("0.25", "0.5"))
 
+
+#' heatmap_combo_with_isoref_panel(dt_excess,
+                                dt_isobolograms,
+                                drug1_name, drug2_name,
+                                cl_names,
+                                normalization_type = "RV",
+                                iso_levels = NULL,
+                                colors_vec = c("darkcyan", "snow", "darkorange"),
+                                swap_axes = FALSE)
+                                
+                                
 heatmap_combo_with_isoref_panel(dt_excess,
                                 dt_isobolograms,
                                 drug1_name, drug2_name,
