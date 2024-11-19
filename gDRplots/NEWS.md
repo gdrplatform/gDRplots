@@ -1,3 +1,6 @@
+## gDRplots 0.0.44 - 2024-11-18
+* add possibility for switching axes in the combo heatmaps
+
 ## gDRplots 0.0.43 - 2024-11-14
 * add symmetric limits on the heatmaps for Bliss and HSA excesses
 

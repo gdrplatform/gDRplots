@@ -1,9 +1,9 @@
 #' Plot heatmaps of fitted values for combination metrics data
 #'
-#' @param dt_excess data.table data.table representing data from the \code{excess} assay,
+#' @param dt_excess data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
 #'    and combo \code{SummarizedExperiment}
-#' @param dt_isobolograms data.table data.table representing data from the \code{isobolograms} assay,
+#' @param dt_isobolograms data.table representing data from the \code{isobolograms} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 #'    and combo \code{SummarizedExperiment}
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
@@ -18,6 +18,7 @@
 #'    for excess values; the default is a blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
 #' @param as_panel logical flag whether return list of plot or panel
+#' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
 #' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
@@ -57,7 +58,17 @@
 #'                       cl_name,
 #'                       normalization_type = "RV",
 #'                       iso_levels = NULL,
-#'                       as_panel = TRUE)
+#'                       as_panel = TRUE,
+#'                       swap_axes = FALSE)
+#'                                         
+#' heatmap_combo_metrics(dt_excess,
+#'                       dt_isobolograms,
+#'                       drug1_name, drug2_name,
+#'                       cl_name,
+#'                       normalization_type = "RV",
+#'                       iso_levels = NULL,
+#'                       as_panel = TRUE,
+#'                       swap_axes = TRUE)
 #'
 #' @export
 heatmap_combo_metrics <- function(
@@ -71,7 +82,8 @@ heatmap_combo_metrics <- function(
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
     no_breaks = 50,
-    as_panel = TRUE) {
+    as_panel = TRUE,
+    swap_axes = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -100,6 +112,7 @@ heatmap_combo_metrics <- function(
   stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
+  checkmate::assert_flag(swap_axes)
   
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -159,20 +172,28 @@ heatmap_combo_metrics <- function(
     
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
     
+    x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
+    y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+    
     if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
       plt <- 
         ggplot2::ggplot() +
-        ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                      y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+        ggplot2::labs(x = x_axis_lab,
+                      y = y_axis_lab,
                       title = plt_title) +
         ggplot2::theme_bw() +
         ggplot2::theme(aspect.ratio = 1)
     } else {
       dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-      dt_$pos_y <- transform_log_conc(dt_[[conc]])
-      dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
       
-      ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+      conc_y <- if (swap_axes) dt_[[conc_2]] else dt_[[conc]]
+      conc_x <- if (swap_axes) dt_[[conc]] else dt_[[conc_2]]
+      
+      dt_$pos_y <- transform_log_conc(conc_y)
+      dt_$pos_x <- transform_log_conc(conc_x)
+      
+      ls_axes <- gDRutils::define_matrix_grid_positions(conc_y, conc_x)
+
       drug1_axis <- ls_axes$axis_1
       drug2_axis <- ls_axes$axis_2
       tile_height <- .get_tile_size(drug1_axis$pos_y)
@@ -200,8 +221,8 @@ heatmap_combo_metrics <- function(
       plt <-
         ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
         ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
-        ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                      y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+        ggplot2::labs(x = x_axis_lab,
+                      y = y_axis_lab,
                       title = plt_title,
                       fill = legend_title_fill)  +
         ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
@@ -227,7 +248,10 @@ heatmap_combo_metrics <- function(
           # friendly for user with color vision deficiency
           plt <- plt +
             ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
-                               ggplot2::aes(x = pos_x, y = pos_y, color = iso_level, linetype = iso_level)) +
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            color = iso_level,
+                                            linetype = iso_level)) +
             ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                         breaks = available_iso_lvl,
                                         labels = legend_lbl_iso,
@@ -240,7 +264,9 @@ heatmap_combo_metrics <- function(
         } else {
           plt <- plt +
             ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
-                               ggplot2::aes(x = pos_x, y = pos_y, color = iso_level)) +
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            color = iso_level)) +
             ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                         breaks = available_iso_lvl,
                                         labels = legend_lbl_iso,
@@ -354,6 +380,7 @@ heatmap_combo_metrics <- function(
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap; 
 #'     the default is the dark purple-light grey palette
 #' @param no_breaks numeric number of breaks on scale
+#' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
 #' @return list or panel with heatmaps with values for excess assays for selected drugs and cell line with
 #'    selected isoline and comparison of iso levels
@@ -380,13 +407,22 @@ heatmap_combo_metrics <- function(
 #'                           cl_name,
 #'                           iso_levels = NULL,
 #'                           colors_vec = c("darkcyan", "snow", "darkorange"))                      
-#'                           
+#'  
 #' heatmap_combo_with_isoref(dt_excess,
 #'                           dt_isobolograms,
 #'                           drug1_name, drug2_name,
 #'                           cl_name,
 #'                           normalization_type = "RV",
-#'                           iso_levels = c("0.25", "0.75"))
+#'                           iso_levels = c("0.25", "0.75"),
+#'                           swap_axes = FALSE)
+#'                                                    
+#' heatmap_combo_with_isoref(dt_excess,
+#'                           dt_isobolograms,
+#'                           drug1_name, drug2_name,
+#'                           cl_name,
+#'                           normalization_type = "RV",
+#'                           iso_levels = c("0.25", "0.75"),
+#'                           swap_axes = TRUE)
 #'
 #' @export
 heatmap_combo_with_isoref <- function(
@@ -398,7 +434,8 @@ heatmap_combo_with_isoref <- function(
     normalization_type = "GR",
     iso_levels = "0.5",
     colors_vec = NULL,
-    no_breaks = 50) {
+    no_breaks = 50,
+    swap_axes = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -423,6 +460,7 @@ heatmap_combo_with_isoref <- function(
     stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   }
   checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(swap_axes)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -459,20 +497,27 @@ heatmap_combo_with_isoref <- function(
   # correction of NA for conc = 0 or conc_2 = 0
   dt_[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   
+  x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
+  y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+  
   if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
     plt <- 
       ggplot2::ggplot() +
-      ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                    y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+      ggplot2::labs(x = x_axis_lab,
+                    y = y_axis_lab,
                     title = plt_title) +
       ggplot2::theme_bw() +
       ggplot2::theme(aspect.ratio = 1)
   } else {
     dt_[[mx_name]] <- pmin(1.1, dt_[[mx_name]])
-    dt_$pos_y <- transform_log_conc(dt_[[conc]])
-    dt_$pos_x <- transform_log_conc(dt_[[conc_2]])
+    conc_y <- if (swap_axes) dt_[[conc_2]] else dt_[[conc]]
+    conc_x <- if (swap_axes) dt_[[conc]] else dt_[[conc_2]]
     
-    ls_axes <- gDRutils::define_matrix_grid_positions(dt_[[conc]], dt_[[conc_2]])
+    dt_$pos_y <- transform_log_conc(conc_y)
+    dt_$pos_x <- transform_log_conc(conc_x)
+    
+    ls_axes <- gDRutils::define_matrix_grid_positions(conc_y, conc_x)
+    
     drug1_axis <- ls_axes$axis_1
     drug2_axis <- ls_axes$axis_2
     tile_height <- .get_tile_size(drug1_axis$pos_y)
@@ -497,8 +542,8 @@ heatmap_combo_with_isoref <- function(
       ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
       ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
                          height = tile_height, width = tile_width, alpha = 0.90) +
-      ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                    y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+      ggplot2::labs(x = x_axis_lab,
+                    y = y_axis_lab,
                     title = plt_title,
                     fill = legend_title_fill) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
@@ -529,14 +574,19 @@ heatmap_combo_with_isoref <- function(
       if (NROW(available_iso_lvl) == 1) {
         plt <- plt +
           ggplot2::geom_path(data = tab_isoline,
-                             ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source),
+                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                          y = if (swap_axes) pos_x else pos_y,
+                                          linetype = iso_source),
                              linewidth = 1, color = iso_colors) +
           ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
                                          name = iso_label)
       } else {
         plt <- plt +
           ggplot2::geom_path(data = tab_isoline,
-                             ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
+                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                          y = if (swap_axes) pos_x else pos_y,
+                                          linetype = iso_source,
+                                          color = iso_level),
                              linewidth = 1) +
           ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
                                          name = normalization_type) +
@@ -549,11 +599,11 @@ heatmap_combo_with_isoref <- function(
     
     # final plot
     plt <- plt +
-      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                  labels = drug2_axis$marks_x,
+      ggplot2::scale_x_continuous(breaks = if (swap_axes) drug1_axis$pos_y else drug2_axis$pos_x,
+                                  labels = if (swap_axes) drug1_axis$marks_y else drug2_axis$marks_x,
                                   expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                  labels = drug1_axis$marks_y,
+      ggplot2::scale_y_continuous(breaks = if (swap_axes) drug1_axis$pos_x else drug2_axis$pos_y,
+                                  labels = if (swap_axes) drug1_axis$marks_x else drug2_axis$marks_y,
                                   expand = c(0, 0)) +
       ggplot2::theme_bw() +
       ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
@@ -570,13 +620,13 @@ heatmap_combo_with_isoref <- function(
   return(plt)
 }
 
-
 #' Plot panel of heatmaps with fitted and reference data for isobolograms
 #' to control quality of the data
 #'
 #' @inheritParams heatmap_combo_with_isoref
 #' @param cl_names character vector with cell line names to be plotted (Cell Line Name);
 #'    if \code{NULL} - all available cell lines will be plotted
+#' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'    
 #' @return panel with heatmaps for fitted values and reference data for isobolograms
 #'    for selected drug and co-drug by cell line names
@@ -605,13 +655,25 @@ heatmap_combo_with_isoref <- function(
 #'                                 cl_names,
 #'                                 iso_levels = c("0.25", "0.5"))
 #' 
+#' 
 #' heatmap_combo_with_isoref_panel(dt_excess,
 #'                                 dt_isobolograms,
 #'                                 drug1_name, drug2_name,
 #'                                 cl_names,
 #'                                 normalization_type = "RV",
 #'                                 iso_levels = NULL,
-#'                                 colors_vec = c("darkcyan", "snow", "darkorange"))
+#'                                 colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                 swap_axes = FALSE)
+#'                                 
+#'                                 
+#' heatmap_combo_with_isoref_panel(dt_excess,
+#'                                 dt_isobolograms,
+#'                                 drug1_name, drug2_name,
+#'                                 cl_names,
+#'                                 normalization_type = "RV",
+#'                                 iso_levels = NULL,
+#'                                 colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                 swap_axes = TRUE)
 #' 
 #' @export
 heatmap_combo_with_isoref_panel <- function(
@@ -623,7 +685,8 @@ heatmap_combo_with_isoref_panel <- function(
     normalization_type = "GR",
     iso_levels = "0.5",
     colors_vec = NULL,
-    no_breaks = 50) {
+    no_breaks = 50,
+    swap_axes = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -648,6 +711,7 @@ heatmap_combo_with_isoref_panel <- function(
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(swap_axes)
   
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
@@ -669,14 +733,14 @@ heatmap_combo_with_isoref_panel <- function(
   dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
   
   # filter data for combination cell line (drug x drug2)
-  selecteted_combination <-
+  selected_combination <-
     unique(dt_excess[get(cellline_name) %in% cl_names & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, 
                      .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
   
   dt_excess <-
-    dt_excess[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
+    dt_excess[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   dt_isobolograms <-
-    dt_isobolograms[selecteted_combination, on = c(cellline_name, drug_name, drug_name_2)]
+    dt_isobolograms[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   # prep hm color palette
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
@@ -684,7 +748,7 @@ heatmap_combo_with_isoref_panel <- function(
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
-
+  
   # prep panel elements
   mx_name <- "smooth"
   # prep plot data
@@ -692,19 +756,22 @@ heatmap_combo_with_isoref_panel <- function(
   # correction of NA for conc = 0 or conc_2 = 0
   dt_all[(get(conc) == 0 | get(conc_2) == 0) & is.na(get(mx_name))] <- 0
   
-  # prep data for heatmat
+  # prep data for heatmap
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
                                                           mx_name = pmin(1.1, get(mx_name)),
-                                                          pos_y = transform_log_conc(get(conc)),
-                                                          pos_x = transform_log_conc(get(conc_2))
+                                                          pos_y = transform_log_conc(
+                                                            if (swap_axes) get(conc_2) else get(conc)),
+                                                          pos_x = transform_log_conc(
+                                                            if (swap_axes) get(conc) else get(conc_2))
                                                         ), 
                                                         by = cellline_name
   ][, .SD, .SDcols = -mx_name]
   data.table::setnames(dt_tile, "mx_name", mx_name)
   
   # tiles positioning 
-  ls_axes_all <- gDRutils::define_matrix_grid_positions(dt_tile[[conc]], dt_all[[conc_2]])
+  ls_axes_all <- gDRutils::define_matrix_grid_positions(if (swap_axes) dt_tile[[conc_2]] else dt_tile[[conc]],
+                                                        if (swap_axes) dt_tile[[conc]] else dt_tile[[conc_2]])
   drug1_axis_all <- ls_axes_all$axis_1
   drug2_axis_all <- ls_axes_all$axis_2
   tile_height <- .get_tile_size(drug1_axis_all$pos_y)
@@ -723,12 +790,16 @@ heatmap_combo_with_isoref_panel <- function(
                                gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                                normalization_type)
   # base plot
+  x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
+  y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+  
   plt <-
-    ggplot2::ggplot(dt_tile, ggplot2::aes(x = pos_x, y = pos_y)) +
-    ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name), ), 
+    ggplot2::ggplot(dt_tile, ggplot2::aes(x = if (swap_axes) pos_y else pos_x, 
+                                          y = if (swap_axes) pos_x else pos_y)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), 
                        height = tile_height, width = tile_width, alpha = 0.90) +
-    ggplot2::labs(x = bquote(.(drug2_name) ~ "[" ~ mu * M ~ "]"),
-                  y = bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]"),
+    ggplot2::labs(x = x_axis_lab,
+                  y = y_axis_lab,
                   title = panel_title,
                   fill = legend_title_fill) +
     ggplot2::scale_fill_gradientn(colors = hm_color_palette,
@@ -773,7 +844,9 @@ heatmap_combo_with_isoref_panel <- function(
       
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline,
-                           ggplot2::aes(x = pos_x, y = pos_y, linetype = iso_source, color = iso_level),
+                           ggplot2::aes(x = if (swap_axes) pos_y else pos_x, 
+                                        y = if (swap_axes) pos_x else pos_y,
+                                        linetype = iso_source, color = iso_level),
                            linewidth = 1) +
         ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
                                        name = normalization_type) +

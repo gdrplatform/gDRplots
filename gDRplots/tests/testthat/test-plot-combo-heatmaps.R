@@ -94,6 +94,15 @@ test_that("heatmap_combo_metrics works as expected", {
                                      normalization_type = "AB"),
                "Assertion on 'normalization_type' failed: Must be element of set")
   
+  expect_error(heatmap_combo_metrics(dt_excess = dt_excess,
+                                     dt_isobolograms = dt_isobolograms,
+                                     drug1_name = drug1_name,
+                                     drug2_name = drug2_name,
+                                     cl_name = cl_name,
+                                     swap_axes = "yes"),
+               "Assertion on 'swap_axes' failed: Must be of type 'logical flag'")
+  
+  
   
   # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
   # test with dt_isobolograms as NULL
@@ -116,6 +125,19 @@ test_that("heatmap_combo_metrics works as expected", {
   # check if names of the list are as expected
   expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
   
+  
+  # check if switch_axes works as expected
+  
+  plts_2_swap_axes <- heatmap_combo_metrics(dt_excess,
+                                            iso_levels = NULL,
+                                            dt_isobolograms = NULL,
+                                            drug1_name,
+                                            drug2_name,
+                                            cl_name,
+                                            as_panel = FALSE,
+                                            swap_axes = TRUE)
+  expect_equal(plts_2_swap_axes$smooth$labels$x, plts_2$smooth$labels$y)
+  expect_equal(plts_2_swap_axes$smooth$labels$y, plts_2$smooth$labels$x)
 })
 
 test_that("heatmap_combo_with_isoref works as expected", {
@@ -196,8 +218,8 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                            cl_names)
   expect_is(plt_1, "gg")
   expect_true(grepl("GR", plt_1[["labels"]][["fill"]])) 
-  expect_true(grepl(drug1_name, plt_1[["labels"]][["y"]][2]))
-  expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]][2]))
+  expect_true(grepl(drug1_name, plt_1[["labels"]][["y"]]))
+  expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
   expect_length(plt_1[["layers"]], 2)
   expect_true(grepl(drug1_name, plt_1[["labels"]][["title"]]))
   expect_true(grepl(drug2_name, plt_1[["labels"]][["title"]]))
@@ -234,8 +256,8 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                            colors_vec = c("#003366", "#FFFAFA", "#FF8800"))
   expect_is(plt_4, "gg")
   expect_true(grepl(normalization_type, plt_4[["labels"]][["fill"]]))
-  expect_true(grepl(drug1_name, plt_4[["labels"]][["y"]][2]))
-  expect_true(grepl(drug2_name, plt_4[["labels"]][["x"]][2]))
+  expect_true(grepl(drug1_name, plt_4[["labels"]][["y"]]))
+  expect_true(grepl(drug2_name, plt_4[["labels"]][["x"]]))
   expect_length(plt_4[["layers"]], 1) # without isoline
   expect_true(grepl(drug1_name, plt_4[["labels"]][["title"]]))
   expect_true(grepl(drug2_name, plt_4[["labels"]][["title"]]))

@@ -15,15 +15,16 @@ heatmap_combo_metrics(
   colors_vec_smooth = NULL,
   colors_vec_excess = NULL,
   no_breaks = 50,
-  as_panel = TRUE
+  as_panel = TRUE,
+  swap_axes = FALSE
 )
 }
 \arguments{
-\item{dt_excess}{data.table data.table representing data from the \code{excess} assay,
+\item{dt_excess}{data.table representing data from the \code{excess} assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
 and combo \code{SummarizedExperiment}}
 
-\item{dt_isobolograms}{data.table data.table representing data from the \code{isobolograms} assay,
+\item{dt_isobolograms}{data.table representing data from the \code{isobolograms} assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "isobolograms")}
 and combo \code{SummarizedExperiment}}
 
@@ -47,6 +48,8 @@ for excess values; the default is a blue-light grey-red color scale}
 \item{no_breaks}{numeric number of breaks on scale}
 
 \item{as_panel}{logical flag whether return list of plot or panel}
+
+\item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
 list or panel with heatmaps with value for excess assays for selected drugs and cell line with
@@ -89,7 +92,17 @@ heatmap_combo_metrics(dt_excess,
                       cl_name,
                       normalization_type = "RV",
                       iso_levels = NULL,
-                      as_panel = TRUE)
+                      as_panel = TRUE,
+                      swap_axes = FALSE)
+                                        
+heatmap_combo_metrics(dt_excess,
+                      dt_isobolograms,
+                      drug1_name, drug2_name,
+                      cl_name,
+                      normalization_type = "RV",
+                      iso_levels = NULL,
+                      as_panel = TRUE,
+                      swap_axes = TRUE)
 
 }
 \keyword{combo_plots}
