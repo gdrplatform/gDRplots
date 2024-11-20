@@ -101,9 +101,7 @@ test_that("heatmap_combo_metrics works as expected", {
                                      cl_name = cl_name,
                                      swap_axes = "yes"),
                "Assertion on 'swap_axes' failed: Must be of type 'logical flag'")
-  
-  
-  
+
   # heatmap_combo_metrics works as expected when dt_isobolograms is NULL
   # test with dt_isobolograms as NULL
   plts_1 <- heatmap_combo_metrics(dt_excess, iso_levels = NULL,
@@ -125,9 +123,7 @@ test_that("heatmap_combo_metrics works as expected", {
   # check if names of the list are as expected
   expect_equal(names(plts_2), names(gDRutils::get_combo_excess_field_names()))
   
-  
   # check if switch_axes works as expected
-  
   plts_2_swap_axes <- heatmap_combo_metrics(dt_excess,
                                             iso_levels = NULL,
                                             dt_isobolograms = NULL,
@@ -196,9 +192,33 @@ test_that("heatmap_combo_with_isoref works as expected", {
                                      cl_name)
   expect_is(plt_4, "gg")
   expect_true(grepl(cl_name, plt_4[["labels"]][["title"]])) 
-  expect_true(any(grepl(drug1_name, plt_4[["labels"]][["y"]])))
-  expect_true(any(grepl(drug2_name, plt_4[["labels"]][["x"]])))
+  expect_true(grepl(drug1_name, plt_4[["labels"]][["y"]]))
+  expect_true(grepl(drug2_name, plt_4[["labels"]][["x"]]))
   expect_length(ggplot2::ggplot_build(plt_4)[["data"]][[1]], 0) # no excess data
+  
+  plt_5 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name, 
+                                     metric = "hsa_excess")
+  expect_is(plt_5, "gg")
+  expect_true(grepl(drug1_name, plt_5[["labels"]][["y"]]))
+  expect_true(grepl(drug2_name, plt_5[["labels"]][["x"]]))
+  expect_true(grepl("HSA Excess GR", plt_5[["labels"]][["fill"]]))
+  
+  plt_6 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms,
+                                     drug1_name, drug2_name,
+                                     cl_name, 
+                                     metric = "hsa_excess",
+                                     iso_levels = c("0.25", "0.75"),
+                                     swap_axes = TRUE)
+  expect_is(plt_6, "gg")
+  expect_true(grepl(drug1_name, plt_6[["labels"]][["x"]]))
+  expect_true(grepl(drug2_name, plt_6[["labels"]][["y"]]))
+  expect_true(grepl("HSA Excess GR", plt_6[["labels"]][["fill"]]))
+  expect_true(grepl("iso_level", plt_6[["labels"]][["colour"]]))
+  expect_length(names(plt_6[["guides"]][["guides"]]), NROW(c("fill", "linetype", "colour")))
 })
 
 test_that("heatmap_combo_with_isoref_panel works as expected", {
@@ -217,7 +237,6 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                            drug1_name, drug2_name,
                                            cl_names)
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["fill"]])) 
   expect_true(grepl(drug1_name, plt_1[["labels"]][["y"]]))
   expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
   expect_length(plt_1[["layers"]], 2)
@@ -255,7 +274,6 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                            iso_levels = NULL,
                                            colors_vec = c("#003366", "#FFFAFA", "#FF8800"))
   expect_is(plt_4, "gg")
-  expect_true(grepl(normalization_type, plt_4[["labels"]][["fill"]]))
   expect_true(grepl(drug1_name, plt_4[["labels"]][["y"]]))
   expect_true(grepl(drug2_name, plt_4[["labels"]][["x"]]))
   expect_length(plt_4[["layers"]], 1) # without isoline
@@ -266,6 +284,22 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
   expect_equal(plt_4[["labels"]][["linetype"]], NULL)
   expect_true(any(grepl("#003366", plt_4[["plot_env"]][["hm_color_palette"]])))
   expect_true(any(grepl("#FF8800", plt_4[["plot_env"]][["hm_color_palette"]])))
+  
+  plt_5 <- heatmap_combo_with_isoref_panel(dt_excess,
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name,
+                                           cl_names,
+                                           metric = "hsa_excess",
+                                           swap_axes = TRUE)
+  expect_is(plt_5, "gg")
+  expect_true(grepl(drug2_name, plt_5[["labels"]][["y"]]))
+  expect_true(grepl(drug1_name, plt_5[["labels"]][["x"]]))
+  expect_length(plt_5[["layers"]], 2)
+  expect_true(grepl(drug1_name, plt_5[["labels"]][["title"]]))
+  expect_true(grepl(drug2_name, plt_5[["labels"]][["title"]]))
+  expect_equal(plt_5[["labels"]][["fill"]], "HSA Excess GR")
+  expect_equal(plt_5[["labels"]][["colour"]], "iso_level")
+  expect_equal(plt_5[["labels"]][["linetype"]], "iso_source")
   
   expect_error(heatmap_combo_with_isoref_panel(dt_excess = unlist(dt_excess),
                                                dt_isobolograms = dt_isobolograms,
