@@ -11,6 +11,7 @@ heatmap_combo_with_isoref(
   drug2_name,
   cl_name,
   normalization_type = "GR",
+  metric = "smooth",
   iso_levels = "0.5",
   colors_vec = NULL,
   no_breaks = 50,
@@ -35,11 +36,17 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
+\item{metric}{string name of combo metric;
+one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
+"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
+("Bliss Excess GR" or "Bliss Excess RV")}
+
 \item{iso_levels}{character vector with  isobologram levels to be selected;
 when \code{NULL} - no isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
-the default is the dark purple-light grey palette}
+the default depend on \code{metric}: for "smooth" - the dark purple-light grey palette
+and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
@@ -71,6 +78,12 @@ heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
                           drug1_name, drug2_name,
                           cl_name,
+                          metric = "hsa_excess")
+                          
+heatmap_combo_with_isoref(dt_excess,
+                          dt_isobolograms,
+                          drug1_name, drug2_name,
+                          cl_name,
                           iso_levels = NULL,
                           colors_vec = c("darkcyan", "snow", "darkorange"))                      
  
@@ -90,5 +103,13 @@ heatmap_combo_with_isoref(dt_excess,
                           iso_levels = c("0.25", "0.75"),
                           swap_axes = TRUE)
 
+heatmap_combo_with_isoref(dt_excess,
+                          dt_isobolograms,
+                          drug1_name, drug2_name,
+                          cl_name,
+                          metric = "hsa_excess",
+                          iso_levels = c("0.25", "0.75"),
+                          swap_axes = FALSE)
+                          
 }
 \keyword{combo_plots}
