@@ -490,14 +490,7 @@ heatmap_combo_with_isoref <- function(
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-  
-  # isoline data
-  if (!is.null(dt_isobolograms$iso_level)) {
-    dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
-  }
-  available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
-  iso_colors <- .get_iso_colors(available_iso_lvl)
-  
+
   # prep hm color palette
   hm_color_palette <- 
     if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
@@ -547,6 +540,8 @@ heatmap_combo_with_isoref <- function(
     range_x <- c(min(drug2_axis$pos_x), max(drug2_axis$pos_x) + 0.5 * tile_width)
     range_y <- c(min(drug1_axis$pos_y), max(drug1_axis$pos_y) + 0.5 * tile_height)
     
+    range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
+    
     # legend title
     legend_title_fill <- sprintf("%s %s",
                                  gDRutils::prettify_flat_metrics(x = metric, human_readable = TRUE),
@@ -586,52 +581,68 @@ heatmap_combo_with_isoref <- function(
                      aspect.ratio = 1)
     
     # plot isobologram
-    if (NROW(available_iso_lvl)) { # add isolines - if there are such data
-      iso_label <- sprintf("%s%s",
-                           ifelse(normalization_type == "GR", "GR", "IC"),
-                           100 - 100 * as.numeric(available_iso_lvl))
-      names(iso_label) <- available_iso_lvl
+    if (!is.null(dt_isobolograms$iso_level) && !is.null(iso_levels)) { # add isolines - if there are such data
+      # iso level availability
+      dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
+      available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+      iso_levels <- iso_levels[iso_levels %in% available_iso_lvl]
       
-      tab_measured <- dt_isobolograms[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
-      tab_measured[, iso_source := "measured"]
-      tab_expected <- dt_isobolograms[, .SD, .SDcols = -c("pos_x", "pos_y")]
-      tab_expected[, iso_source := "expected"]
-      data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
-      
-      tab_isoline <- rbind(tab_measured, tab_expected)
-      # adjust isoline range to heatmap
-      tab_isoline <- 
-        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
-                      data.table::between(pos_y, range_x[1], range_x[2]), ]
-      tab_isoline <- tab_isoline[, c("pos_x", "pos_y", "iso_level", "iso_source"), with = FALSE]
-      
-      
-      if (NROW(available_iso_lvl) == 1) {
-        plt <- plt +
-          ggplot2::geom_path(data = tab_isoline,
-                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
-                                          y = if (swap_axes) pos_x else pos_y,
-                                          linetype = iso_source),
-                             linewidth = 1, color = iso_colors) +
-          ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
-                                         name = iso_label)
-      } else {
-        plt <- plt +
-          ggplot2::geom_path(data = tab_isoline,
-                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
-                                          y = if (swap_axes) pos_x else pos_y,
-                                          linetype = iso_source,
-                                          color = iso_level),
-                             linewidth = 1) +
-          ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
-                                         name = normalization_type) +
-          ggplot2::scale_color_manual(values = iso_colors,
-                                      label = iso_label,
-                                      breaks = available_iso_lvl,
-                                      name = "Iso Levels")
+      if (NROW(iso_levels)) {
+        # order iso level
+        iso_levels <- iso_levels[order(as.numeric(iso_levels))]
+        
+        req_cols <- c(cellline_name, drug_name, drug_name_2, gDRutils::get_header("iso_position"))
+        dt_iso <- 
+          dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
+        
+        # colors for isoline
+        iso_colors <- .get_iso_colors(available_iso_lvl)
+        
+        # plot
+        iso_label <- sprintf("%s%s",
+                             ifelse(normalization_type == "GR", "GR", "IC"),
+                             100 - 100 * as.numeric(available_iso_lvl))
+        names(iso_label) <- available_iso_lvl
+ 
+        tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
+        tab_measured[, iso_source := "measured"]
+        tab_expected <- dt_iso[, .SD, .SDcols = -c("pos_x", "pos_y")]
+        tab_expected[, iso_source := "expected"]
+        data.table::setnames(tab_expected, old = c("pos_x_ref", "pos_y_ref"), new = c("pos_x", "pos_y"))
+        
+        tab_isoline <- rbind(tab_measured, tab_expected)
+        # adjust isoline range to heatmap
+        tab_isoline <-
+          tab_isoline[data.table::between(pos_x, range_xy[1], range_xy[2]) &
+                        data.table::between(pos_y, range_xy[1], range_xy[2]), ]
+        
+        
+        if (NROW(iso_levels) == 1) {
+          plt <- plt +
+            ggplot2::geom_path(data = tab_isoline,
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            linetype = iso_source),
+                               linewidth = 1, color = iso_colors) +
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                           name = iso_label)
+        } else {
+          plt <- plt +
+            ggplot2::geom_path(data = tab_isoline,
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            linetype = iso_source,
+                                            color = iso_level),
+                               linewidth = 1) +
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+                                           name = normalization_type) +
+            ggplot2::scale_color_manual(values = iso_colors,
+                                        label = iso_label,
+                                        breaks = available_iso_lvl,
+                                        name = "Iso Levels")
+        }
       }
     }
-    
     # final plot
     plt <- plt +
       ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
@@ -794,21 +805,22 @@ heatmap_combo_with_isoref_panel <- function(
   # prep panel elements
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, metric), with = FALSE]
   
+  conc_y <- ifelse(swap_axes, conc_2, conc)
+  conc_x <- ifelse(swap_axes, conc, conc_2)
+  
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
                                                           metric = pmin(1.1, get(metric)),
-                                                          pos_y = transform_log_conc(
-                                                            if (swap_axes) get(conc_2) else get(conc)),
-                                                          pos_x = transform_log_conc(
-                                                            if (swap_axes) get(conc) else get(conc_2))
+                                                          pos_y = transform_log_conc(get(conc_y)),
+                                                          pos_x = transform_log_conc(get(conc_x))
                                                         ), 
                                                         by = cellline_name
   ][, .SD, .SDcols = -metric]
   data.table::setnames(dt_tile, "metric", metric)
   
   # tiles positioning 
-  ls_axes_all <- gDRutils::define_matrix_grid_positions(if (swap_axes) dt_tile[[conc_2]] else dt_tile[[conc]],
-                                                        if (swap_axes) dt_tile[[conc]] else dt_tile[[conc_2]])
+  ls_axes_all <- gDRutils::define_matrix_grid_positions(dt_tile[[conc_y]], dt_tile[[conc_x]])
+  
   drug1_axis_all <- ls_axes_all$axis_1
   drug2_axis_all <- ls_axes_all$axis_2
   tile_height <- .get_tile_size(drug1_axis_all$pos_y)
@@ -816,6 +828,8 @@ heatmap_combo_with_isoref_panel <- function(
   
   range_x <- c(min(drug2_axis_all$pos_x), max(drug2_axis_all$pos_x) + tile_width)
   range_y <- c(min(drug1_axis_all$pos_y), max(drug1_axis_all$pos_y) + tile_height)
+  
+  range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
   
   # prep limits
   limits <- prep_hm_limits(dt_tile[[metric]],   
@@ -831,18 +845,31 @@ heatmap_combo_with_isoref_panel <- function(
   y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
   
   plt <-
-    ggplot2::ggplot(dt_tile, ggplot2::aes(x = if (swap_axes) pos_y else pos_x, 
-                                          y = if (swap_axes) pos_x else pos_y)) +
+    ggplot2::ggplot(dt_tile,
+                    ggplot2::aes(x = pos_x, y = pos_y)) +
     ggplot2::geom_tile(ggplot2::aes(fill = get(metric)), 
                        height = tile_height, width = tile_width, alpha = 0.90) +
     ggplot2::labs(x = x_axis_lab,
                   y = y_axis_lab,
                   title = panel_title,
                   fill = legend_title_fill) +
+    ggplot2::scale_x_continuous(breaks = drug2_axis_all$pos_x,
+                                labels = drug2_axis_all$marks_x,
+                                expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(breaks = drug1_axis_all$pos_y,
+                                labels = drug1_axis_all$marks_y,
+                                expand = c(0, 0)) +
     ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                   limit = limits,
                                   labels = function(x) sprintf("%.2f", x),
-                                  na.value = "lightgrey")
+                                  na.value = "lightgrey") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid = ggplot2::element_blank(),
+                   legend.key.width = ggplot2::unit(2, "line"),
+                   aspect.ratio = 1)
   
   # isoline data
   if (!is.null(dt_isobolograms$iso_level) && !is.null(iso_levels)) {
@@ -877,8 +904,8 @@ heatmap_combo_with_isoref_panel <- function(
       tab_isoline <- rbind(tab_measured, tab_expected)
       # adjust isoline range to heatmap
       tab_isoline <- 
-        tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
-                      data.table::between(pos_y, range_x[1], range_x[2]), ]
+        tab_isoline[data.table::between(pos_x, range_xy[1], range_xy[2]) & 
+                      data.table::between(pos_y, range_xy[1], range_xy[2]), ]
       
       plt <- plt +
         ggplot2::geom_path(data = tab_isoline,
@@ -896,20 +923,6 @@ heatmap_combo_with_isoref_panel <- function(
   
   # final plot
   plt <- plt +
-    ggplot2::scale_x_continuous(breaks = drug2_axis_all$pos_x,
-                                labels = drug2_axis_all$marks_x,
-                                expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = drug1_axis_all$pos_x,
-                                labels = drug1_axis_all$marks_x,
-                                expand = c(0, 0)) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   legend.key.width = ggplot2::unit(2, "line"),
-                   legend.title = ggplot2::element_text(size = 8),
-                   aspect.ratio = 1) +
     ggplot2::facet_wrap(~get(cellline_name)) +
     ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
                     linetype = ggplot2::guide_legend(order = 2), 
