@@ -108,8 +108,6 @@ heatmap_combo_metrics <- function(
     checkmate::assert_numeric(as.numeric(iso_levels))
     checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   }
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec_smooth, is_valid_color, logical(1))))
-  stopifnot("Must be a valid color name" = all(vapply(colors_vec_excess, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_panel)
   checkmate::assert_flag(swap_axes)
@@ -149,17 +147,19 @@ heatmap_combo_metrics <- function(
                            100 - 100 * as.numeric(available_iso_lvl))
   
   # prep hm color palette
-  hm_color_palette_smooth <- if (is.null(colors_vec_smooth)) {
-    .get_smooth_palette(no_breaks)
-  } else {
-    grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
-  }
+  hm_color_palette_smooth <-
+    if (is.null(colors_vec_smooth)  || !all(vapply(colors_vec_smooth, is_valid_color, logical(1)))) {
+      .get_smooth_palette(no_breaks)
+    } else {
+      grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
+    }
   
-  hm_color_palette_excess <- if (is.null(colors_vec_excess)) {
-    .get_excess_palette(no_breaks)
-  } else {
-    grDevices::colorRampPalette(colors_vec_excess)(no_breaks + 1)
-  }
+  hm_color_palette_excess <- 
+    if (is.null(colors_vec_excess) || !all(vapply(colors_vec_excess, is_valid_color, logical(1)))) {
+      .get_excess_palette(no_breaks)
+    } else {
+      grDevices::colorRampPalette(colors_vec_excess)(no_breaks + 1)
+    }
   
   # plots
   mx_plts <- lapply(mx_names, function(mx_name) {
@@ -499,15 +499,16 @@ heatmap_combo_with_isoref <- function(
   iso_colors <- .get_iso_colors(available_iso_lvl)
   
   # prep hm color palette
-  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    if (metric == "smooth") {
-      .get_smooth_palette(no_breaks)
+  hm_color_palette <- 
+    if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      if (metric == "smooth") {
+        .get_smooth_palette(no_breaks)
+      } else {
+        .get_excess_palette(no_breaks)
+      }
     } else {
-      .get_excess_palette(no_breaks)
+      grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
     }
-  } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
-  }
   
   # panel title
   cl_clid <- unique(dt_excess[get(cellline_name) == cl_name, ][[clid]])
@@ -515,7 +516,7 @@ heatmap_combo_with_isoref <- function(
   
   # prep plot data
   dt_ <- dt_excess[, c(conc, conc_2, metric), with = FALSE]
-
+  
   x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
   y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
   
@@ -560,16 +561,29 @@ heatmap_combo_with_isoref <- function(
     # base plot
     plt <-
       ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
-      ggplot2::geom_tile(ggplot2::aes(fill = get(metric), ), 
+      ggplot2::geom_tile(ggplot2::aes(fill = get(metric)), 
                          height = tile_height, width = tile_width, alpha = 0.90) +
       ggplot2::labs(x = x_axis_lab,
                     y = y_axis_lab,
                     title = plt_title,
                     fill = legend_title_fill) +
+      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
+                                  labels = drug2_axis$marks_x,
+                                  expand = c(0, 0)) +
+      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
+                                  labels = drug1_axis$marks_y,
+                                  expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limits,
                                     labels = function(x) sprintf("%.2f", x),
-                                    na.value = "lightgrey")
+                                    na.value = "lightgrey") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 10),
+                     panel.grid = ggplot2::element_blank(),
+                     legend.key.width = ggplot2::unit(2, "line"),
+                     aspect.ratio = 1)
     
     # plot isobologram
     if (NROW(available_iso_lvl)) { # add isolines - if there are such data
@@ -589,8 +603,8 @@ heatmap_combo_with_isoref <- function(
       tab_isoline <- 
         tab_isoline[data.table::between(pos_x, range_x[1], range_x[2]) & 
                       data.table::between(pos_y, range_x[1], range_x[2]), ]
-      # colors for isoline
-      iso_colors <- .get_iso_colors(iso_levels)
+      tab_isoline <- tab_isoline[, c("pos_x", "pos_y", "iso_level", "iso_source"), with = FALSE]
+      
       
       if (NROW(available_iso_lvl) == 1) {
         plt <- plt +
@@ -620,22 +634,9 @@ heatmap_combo_with_isoref <- function(
     
     # final plot
     plt <- plt +
-      ggplot2::scale_x_continuous(breaks = if (swap_axes) drug1_axis$pos_y else drug2_axis$pos_x,
-                                  labels = if (swap_axes) drug1_axis$marks_y else drug2_axis$marks_x,
-                                  expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = if (swap_axes) drug1_axis$pos_x else drug2_axis$pos_y,
-                                  labels = if (swap_axes) drug1_axis$marks_x else drug2_axis$marks_y,
-                                  expand = c(0, 0)) +
-      ggplot2::theme_bw() +
       ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1),
                       linetype = ggplot2::guide_legend(order = 2), 
-                      color = ggplot2::guide_legend(order = 3)) +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
-                     axis.text.y = ggplot2::element_text(size = 8),
-                     plot.title = ggplot2::element_text(size = 10),
-                     panel.grid.minor = ggplot2::element_blank(),
-                     legend.key.width = ggplot2::unit(2, "line"),
-                     aspect.ratio = 1)
+                      color = ggplot2::guide_legend(order = 3))
   }
   
   return(plt)
@@ -779,19 +780,20 @@ heatmap_combo_with_isoref_panel <- function(
     dt_isobolograms[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
   # prep hm color palette
-  hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    if (metric == "smooth") {
-      .get_smooth_palette(no_breaks)
+  hm_color_palette <- 
+    if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      if (metric == "smooth") {
+        .get_smooth_palette(no_breaks)
+      } else {
+        .get_excess_palette(no_breaks)
+      }
     } else {
-      .get_excess_palette(no_breaks)
+      grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
     }
-  } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
-  }
   
   # prep panel elements
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, metric), with = FALSE]
-
+  
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
                                                           metric = pmin(1.1, get(metric)),
