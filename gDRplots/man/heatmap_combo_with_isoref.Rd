@@ -36,7 +36,7 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of combo metric;
+\item{metric}{string name of the combo metric;
 one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
 "hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
 ("Bliss Excess GR" or "Bliss Excess RV")}
@@ -45,7 +45,7 @@ one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{n
 when \code{NULL} - no isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
-the default depend on \code{metric}: for "smooth" - the dark purple-light grey palette
+the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
 and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}

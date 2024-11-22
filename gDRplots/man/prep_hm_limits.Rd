@@ -14,8 +14,10 @@ prep_hm_limits(
 \arguments{
 \item{num_vec}{numeric vector}
 
-\item{metric}{string name of combo excess metric;
-one of: "smooth", "hsa_excess", "bliss_excess"}
+\item{metric}{string name of the combo metric;
+one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
+"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
+("Bliss Excess GR" or "Bliss Excess RV")}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}

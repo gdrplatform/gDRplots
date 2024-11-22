@@ -5,7 +5,7 @@
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric;
+#' @param metric string name of the metric;
 #'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
 #'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
@@ -237,7 +237,7 @@ pheatmap_qc <- function(
 #'  and single-agent \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric;
+#' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
@@ -515,7 +515,7 @@ pheatmap_with_anno_sa <- function(
 #'  and co-dilution \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric;
+#' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
@@ -806,7 +806,7 @@ pheatmap_with_anno_cd <- function(
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
 #'   outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'   and combo \code{SummarizedExperiment}
-#' @param metric string name of combo metric;
+#' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
@@ -1060,7 +1060,7 @@ pheatmap_with_anno_combo <- function(
 #' 
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric
+#' @param metric string name of the metric
 #'    one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 #'    "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")
 #' @param dataset_name string name of dataset
