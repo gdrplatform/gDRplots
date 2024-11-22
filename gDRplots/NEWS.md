@@ -1,5 +1,5 @@
 ## gDRplots 0.0.46 - 2024-11-22
-* * refactor `heatmap_combo_metrics` function - split in single plot and panel
+* refactor `heatmap_combo_metrics` function - split in single plot and panel
 
 ## gDRplots 0.0.45 - 2024-11-20
 * add possibility for plotting isoline references for HSA Excess and Bliss Excess

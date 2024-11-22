@@ -219,6 +219,17 @@ heatmap_combo_metrics(dt_excess = dt_excess,
                       iso_levels = "0.5")
 ```
 
+The **plot_combination_index** function allows users to explore the dose-sparing effects. The Combination Index is displayed at different ratios of the two drugs.
+
+```{r plot_combination_index, warning = FALSE, message = FALSE}
+plot_combination_index(dt_excess = dt_excess,
+                          dt_isobolograms = dt_isobolograms,
+                          drug1_name = "drug_001", 
+                          drug2_name = "drug_026",
+                          cl_name = "cellline_NE",
+                          iso_levels = c("0.2", "0.5", "0.8"))
+```
+
 The **heatmap_combo_with_isoref** function allows users to explore the reference isobolograms (additive Loewe model) compared to the measured isobolograms on the background of smooth value of normalization type.
 
 Users can also use **heatmap_combo_with_isoref_panel** to get a panel with heatmap for selected drug name and co-drug name and list of cell line names.
