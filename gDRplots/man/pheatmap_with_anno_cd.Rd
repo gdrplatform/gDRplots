@@ -27,7 +27,7 @@ and co-dilution \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of metric;
+\item{metric}{string name of the metric;
 one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 

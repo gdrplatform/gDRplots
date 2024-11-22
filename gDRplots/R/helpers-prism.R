@@ -6,7 +6,7 @@
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric;
+#' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
@@ -80,7 +80,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of metric;
+#' @param metric string name of the metric;
 #'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
 #'    or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
@@ -151,7 +151,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of combo metric;
+#' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
@@ -218,7 +218,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of combo metric;
+#' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics

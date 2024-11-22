@@ -7,7 +7,7 @@
 get_hm_title(metric = "xc50", normalization_type = "GR", dataset_name = NULL)
 }
 \arguments{
-\item{metric}{string name of metric
+\item{metric}{string name of the metric
 one of: "xc50"("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or x_mean" ("GR Mean" or "RV Mean")}
 

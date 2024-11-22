@@ -12,6 +12,7 @@ heatmap_combo_with_isoref_panel(
   drug2_name,
   cl_names,
   normalization_type = "GR",
+  metric = "smooth",
   iso_levels = "0.5",
   colors_vec = NULL,
   no_breaks = 50,
@@ -37,11 +38,17 @@ if \code{NULL} - all available cell lines will be plotted}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
+\item{metric}{string name of the combo metric;
+one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
+"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
+("Bliss Excess GR" or "Bliss Excess RV")}
+
 \item{iso_levels}{character vector with  isobologram levels to be selected;
 when \code{NULL} - no isolines will be displayed}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
-the default is the dark purple-light grey palette}
+the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
+and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
@@ -57,7 +64,8 @@ to control quality of the data
 }
 \examples{
 cl_names <-
-  c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC", "cellline_FD")
+  c("cellline_AA", "cellline_EA", "cellline_IB", 
+  "cellline_MC", "cellline_BC", "cellline_FD")
 
 drug1_name <- "drug_001"
 drug2_name <- "drug_026"
@@ -77,7 +85,13 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 drug1_name, drug2_name,
                                 cl_names,
                                 iso_levels = c("0.25", "0.5"))
-
+                                
+heatmap_combo_with_isoref_panel(dt_excess,
+                                dt_isobolograms,
+                                drug1_name, drug2_name,
+                                cl_names,
+                                metric = "hsa_excess",
+                                iso_levels = c("0.25", "0.5"))
 
 heatmap_combo_with_isoref_panel(dt_excess,
                                 dt_isobolograms,
@@ -88,7 +102,6 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 colors_vec = c("darkcyan", "snow", "darkorange"),
                                 swap_axes = FALSE)
                                 
-                                
 heatmap_combo_with_isoref_panel(dt_excess,
                                 dt_isobolograms,
                                 drug1_name, drug2_name,
@@ -97,6 +110,14 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 iso_levels = NULL,
                                 colors_vec = c("darkcyan", "snow", "darkorange"),
                                 swap_axes = TRUE)
+
+heatmap_combo_with_isoref_panel(dt_excess,
+                                dt_isobolograms,
+                                drug1_name, drug2_name,
+                                cl_names,
+                                metric = "hsa_excess",
+                                iso_levels = NULL,
+                                swap_axes = FALSE)
 
 }
 \keyword{combo_plots}

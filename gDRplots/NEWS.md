@@ -1,3 +1,6 @@
+## gDRplots 0.0.45 - 2024-11-20
+* add possibility for plotting isoline references for HSA Excess and Bliss Excess
+
 ## gDRplots 0.0.44 - 2024-11-18
 * add possibility for switching axes in the combo heatmaps
 

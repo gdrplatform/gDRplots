@@ -22,7 +22,7 @@ and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of metric;
+\item{metric}{string name of the metric;
 one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
 or "x_std" (standard deviation)}
 
