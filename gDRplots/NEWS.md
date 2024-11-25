@@ -1,3 +1,6 @@
+## gDRplots 0.0.46 - 2024-11-25
+* update `plot_volcano_assoc_panel`
+
 ## gDRplots 0.0.45 - 2024-11-20
 * add possibility for plotting isoline references for HSA Excess and Bliss Excess
 
