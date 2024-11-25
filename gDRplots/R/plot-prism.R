@@ -513,8 +513,8 @@ plot_volcano_assoc_panel <- function(dt_response,
 
 #' Check data type
 #' 
-#' @param dt_ \code{data.table} with dependent variables data load from DepMap in wide format,
-#'    where rows are samples, columns are metadata or feature levels
+#' @param dt_ \code{data.table} with dependent variables data in the wide format,
+#'    where rows are samples, columns are feature levels
 #' @param desc_col a character vector with column names describing the data and which 
 #'    do not contain data itself
 #' 
