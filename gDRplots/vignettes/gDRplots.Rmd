@@ -358,6 +358,8 @@ with associations between the molecular features or the metadata and readout of 
 
 Note: It requires dedicated input calculated with `prep_dt_assoc` function.
 
+Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variable - accordingly to type of data.
+
 ![](plot_volcano.png)
 
 ![](plot_volcano_meta.png)
