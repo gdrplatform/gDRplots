@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-combo-heatmaps.R
 \name{heatmap_combo_metrics_panel}
 \alias{heatmap_combo_metrics_panel}
-\title{Plot heatmaps of fitted values for combination metrics data}
+\title{Plot panel of heatmaps of fitted values for combination metrics data}
 \usage{
 heatmap_combo_metrics_panel(
   dt_excess,
@@ -56,7 +56,7 @@ list or panel with heatmaps with value for excess assays for selected drugs and 
    selected isoline and comparison of iso levels
 }
 \description{
-Plot heatmaps of fitted values for combination metrics data
+Plot panel of heatmaps of fitted values for combination metrics data
 }
 \examples{
 cl_name <- "cellline_BC"

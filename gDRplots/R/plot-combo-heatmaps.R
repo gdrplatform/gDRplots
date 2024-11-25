@@ -1,4 +1,4 @@
-#' Plot heatmaps of fitted values for combination metrics data
+#' Plot panel of heatmaps of fitted values for combination metrics data
 #'
 #' @param dt_excess data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
