@@ -34,44 +34,44 @@
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "GR")
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "GR")
 #'                       
 #' cl_name <- "cellline_JE"
 #' drug1_name <- "drug_011"
 #' drug2_name <- "drug_026"
 #' 
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = "0.5",
-#'                       as_panel = FALSE)
-#'                       
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = NULL,
-#'                       as_panel = TRUE,
-#'                       swap_axes = FALSE)
-#'                                         
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = NULL,
-#'                       as_panel = TRUE,
-#'                       swap_axes = TRUE)
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = "0.5",
+#'                             as_panel = FALSE)
+#' 
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = NULL,
+#'                             as_panel = TRUE,
+#'                             swap_axes = FALSE)
+#' 
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = NULL,
+#'                             as_panel = TRUE,
+#'                             swap_axes = TRUE)
 #'
 #' @export
-heatmap_combo_metrics <- function(
+heatmap_combo_metrics_panel <- function(
     dt_excess,
     dt_isobolograms = NULL,
     drug1_name,
@@ -490,7 +490,7 @@ heatmap_combo_with_isoref <- function(
     dt_excess[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
   dt_isobolograms <-
     dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
-
+  
   # prep hm color palette
   hm_color_palette <- 
     if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
@@ -603,7 +603,7 @@ heatmap_combo_with_isoref <- function(
                              ifelse(normalization_type == "GR", "GR", "IC"),
                              100 - 100 * as.numeric(available_iso_lvl))
         names(iso_label) <- available_iso_lvl
- 
+        
         tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
         tab_measured[, iso_source := "measured"]
         tab_expected <- dt_iso[, .SD, .SDcols = -c("pos_x", "pos_y")]
