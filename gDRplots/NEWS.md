@@ -1,3 +1,6 @@
+## gDRplots 0.0.47 - 2024-11-26
+* add plate visualizations
+
 ## gDRplots 0.0.46 - 2024-11-25
 * update `plot_volcano_assoc_panel`
 * unify function name - rename `heatmap_combo_metrics` into `heatmap_combo_metrics_panel`
