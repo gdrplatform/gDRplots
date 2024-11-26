@@ -431,28 +431,30 @@ plot_boxplot_meta <- function(dt_response,
   return(plt)
 }
 
-#' Plot panel with volcano plot and scatter plots (top 4) features from DepMap
+#' Plot panel with volcano plot and according to the data type - scatter plots or box plots
 #'
 #' @param dt_response \code{data.table} with the experimental response data (rows are samples) 
 #'  for one metric outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
 #'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
 #'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
 #'  must have at least a column with \code{CellLineName} and a numeric column with metric values.
-#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one feature;
-#'  (rows are samples, columns are features). 
-#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
+#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap
+#'  where rows are samples, columns are features/metadata levels;
+#'  one of: data for one feature outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}} or data 
+#'  or data for one metadata outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
 #' @param selected_metric string name of the metric in \code{dt_response}
-#' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap}
+#' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
+#'  the name of the selected metadata from \code{dt_depmap} - respectively
 #'
 #' @return a panel with volcano plot and scatter plots with correlation for feature set
 #' 
 #' @keywords prism_plots
 #' 
 #' @export
-plot_volcano_corr_panel <- function(dt_response,
-                                    dt_depmap,
-                                    selected_metric,  
-                                    selected_feat_meta_col) {
+plot_volcano_assoc_panel <- function(dt_response,
+                                     dt_depmap,
+                                     selected_metric,  
+                                     selected_feat_meta_col) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -477,88 +479,63 @@ plot_volcano_corr_panel <- function(dt_response,
                                 selected_metric = obj_assoc[["selected_metric"]]) +
     ggplot2::labs(title = "")
   
-  # scatter plot with corr
-  top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
-  plt_corr <- plot_scatter_with_corr_panel(dt_response = dt_response_,
-                                           dt_depmap = dt_depmap,
-                                           selected_feats = top_4,
-                                           selected_feat_meta_col = selected_feat_meta_col) + 
-    ggplot2::labs(title = "", caption = "")
+  # checking type of data: numeric or categorical
+  data_type <- .get_data_type(dt_depmap, desc_col = c("ModelID", "CCLEName"))
+  
+  if (data_type == "categorical") {
+    # boxplot
+    plt_side <- plot_boxplot_meta(dt_response = dt_response_,
+                                  dt_depmap = dt_depmap,
+                                  selected_feat_meta_col = selected_feat_meta_col) +
+      ggplot2::labs(title = "", caption = "")
+  } else {  
+    # scatter plot with corr
+    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
+    plt_side <- plot_scatter_with_corr_panel(dt_response = dt_response_,
+                                             dt_depmap = dt_depmap,
+                                             selected_feats = top_4,
+                                             selected_feat_meta_col = selected_feat_meta_col) + 
+      ggplot2::labs(title = "", caption = "")
+  }
   
   # final panel
   panel_title <- 
     ifelse(is.null(obj_assoc[["condition_info"]]),
            sprintf("%s__%s", selected_metric, selected_feat_meta_col),
            sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]]))
+  
   panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = list(plt_vol, plt_corr), 
-                      widths = c(1, 1)),
+    ggpubr::ggarrange(plotlist = list(plt_vol, plt_side), widths = c(1, 1)),
     top = panel_title)
   
   return(panel)
 }
 
-#' Plot panel with volcano plot and boxplot for metric values grouped by metadata from DepMap
-#'
-#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
-#'  must have at least a column with \code{CellLineName} and a numeric column with metric values.
-#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap - for one metadata;
-#'  (rows are samples, columns are metadata levels);  
-#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
-#' @param selected_metric string name of the metric in \code{dt_response}
-#' @param selected_feat_meta_col string with the name of the selected metadata from \code{dt_depmap}
-#'
-#' @return a panel with volcano plot and boxplot for matadata levels
+#' Check data type
+#' 
+#' @param dt_ \code{data.table} with dependent variables data in the wide format,
+#'    where rows are samples, columns are feature levels
+#' @param desc_col a character vector with column names describing the data and which 
+#'    do not contain data itself
+#' 
+#' @return a string describing type of data - "numeric" or "categorical"
 #' 
 #' @keywords prism_plots
-#' 
-#' @export
-plot_volcano_box_panel <- function(dt_response,
-                                   dt_depmap,
-                                   selected_metric,  
-                                   selected_feat_meta_col) {
+.get_data_type <- function(dt_,
+                           desc_col = NULL) {
   
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  checkmate::assert_data_table(dt_)
+  checkmate::assert_character(desc_col, null.ok = TRUE)
   
-  checkmate::assert_data_table(dt_response)
-  checkmate::assert_data_table(dt_depmap)
-  checkmate::assert_string(selected_metric)
-  checkmate::assert_string(selected_feat_meta_col)
-  checkmate::assert_names(names(dt_response), must.include = c(cellline_name, selected_metric))
-  checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
+  ls_col <- names(dt_)[!names(dt_) %in% desc_col]
+  unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
   
-  # plot data
-  ls_cols <- intersect(names(dt_response), c("rId", "cId", cellline_name, selected_metric))
-  dt_response_ <- dt_response[, ls_cols, with = FALSE]
-  
-  obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
-                             dt_depmap = dt_depmap,
-                             selected_feat_meta_col = selected_feat_meta_col)
-  
-  # volcano plot
-  plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
-                                selected_feat_meta_col = obj_assoc[["selected_feat_meta_col"]],
-                                selected_metric = obj_assoc[["selected_metric"]]) +
-    ggplot2::labs(title = "")
-  
-  # boxplot
-  plt_box <- plot_boxplot_meta(dt_response = dt_response_,
-                               dt_depmap = dt_depmap,
-                               selected_feat_meta_col = selected_feat_meta_col) +
-    ggplot2::labs(title = "", caption = "")
-  
-  # final panel
-  panel_title <- 
-    ifelse(is.null(obj_assoc[["condition_info"]]),
-           sprintf("%s__%s", selected_metric, selected_feat_meta_col),
-           sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]]))
-  panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = list(plt_vol, plt_box), widths = c(1, 1)),
-    top = panel_title)
-  
-  return(panel)
+  data_type <- if (is.numeric(unique_val) && NROW(unique_val) > 3) {
+    "numeric"
+  } else if (is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
+    "categorical"
+  } else {
+    "unknown"
+  }
+  return(data_type)  
 }
