@@ -15,6 +15,7 @@ heatmap_combo_metrics(
   iso_levels = c("0.25", "0.5", "0.75"),
   colors_vec_smooth = NULL,
   colors_vec_excess = NULL,
+  limit = NULL,
   no_breaks = 50,
   swap_axes = FALSE
 )
@@ -49,6 +50,9 @@ for smooth values; the default is the dark purple-light grey palette}
 
 \item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap
 for excess values; the default is the blue-light grey-red color scale}
+
+\item{limit}{numeric vector of length two providing limits of the scale. 
+Use NA to refer to the existing minimum or maximumdescription}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
@@ -89,7 +93,8 @@ heatmap_combo_metrics(dt_excess,
                       drug1_name, drug2_name,
                       cl_name,
                       metric = "hsa_excess",
-                      normalization_type = "GR")                     
+                      normalization_type = "GR",
+                      limit = c(NA, 0.1))
                       
 cl_name <- "cellline_JE"
 drug1_name <- "drug_011"
