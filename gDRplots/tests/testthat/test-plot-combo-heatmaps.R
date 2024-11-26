@@ -24,7 +24,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         normalization_type, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
@@ -37,7 +37,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         iso_levels = iso_lvl, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_3, "list")
   expect_equal(names(plts_3), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_equal(NROW(unique(ggplot2::ggplot_build(plts_3[["smooth"]])[["data"]][[2]][["colour"]])),
@@ -55,7 +55,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         cl_name,
                                         iso_levels = NULL,
                                         colors_vec_smooth = ls_col_1,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_4, "list")
   expect_true(all(vapply(seq_along(plts_4), function(x) is(plts_4[[x]], "gg"), logical(1))))
   expect_length(plts_4, 3) # smooth, hsa_excess, bliss_excess
@@ -69,7 +69,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         colors_vec_excess = ls_col_2,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_5, "list")
   expect_true(all(vapply(seq_along(plts_5), function(x) is(plts_5[[x]], "gg"), logical(1))))
   expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
@@ -82,7 +82,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug1_name, 
                                         drug2_name, 
                                         cl_name,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_6, "list")
   expect_true(all(vapply(seq_along(plts_6), function(x) is(plts_6[[x]], "gg"), logical(1))))
   expect_true(all(vapply(names(gDRutils::get_combo_excess_field_names()), 
@@ -136,7 +136,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug1_name, 
                                         drug2_name, 
                                         cl_name, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   
   # check if the output is a list
   expect_is(plts_8, "list")
@@ -152,7 +152,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                                   drug1_name,
                                                   drug2_name,
                                                   cl_name,
-                                                  as_panel = FALSE,
+                                                  as_list = TRUE,
                                                   swap_axes = TRUE)
   expect_equal(plts_8_swap_axes[["smooth"]][["labels"]][["x"]], plts_8[["smooth"]][["labels"]][["y"]])
   expect_equal(plts_8_swap_axes[["smooth"]][["labels"]][["y"]], plts_8[["smooth"]][["labels"]][["x"]])

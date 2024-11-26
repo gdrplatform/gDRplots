@@ -17,7 +17,7 @@
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is the blue-light grey-red color scale
 #' @param no_breaks numeric number of breaks on scale
-#' @param as_panel logical flag whether return list of plot or panel
+#' @param as_list logical flag whether return list of plot or panel
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
 #' @return list or panel with heatmaps with value for excess assays for selected drugs and cell line with
@@ -50,7 +50,7 @@
 #'                             cl_name,
 #'                             normalization_type = "RV",
 #'                             iso_levels = "0.5",
-#'                             as_panel = FALSE)
+#'                             as_list = TRUE)
 #' 
 #' heatmap_combo_metrics_panel(dt_excess,
 #'                             dt_isobolograms,
@@ -58,7 +58,7 @@
 #'                             cl_name,
 #'                             normalization_type = "RV",
 #'                             iso_levels = NULL,
-#'                             as_panel = TRUE,
+#'                             as_list = FALSE,
 #'                             swap_axes = FALSE)
 #' 
 #' heatmap_combo_metrics_panel(dt_excess,
@@ -67,7 +67,7 @@
 #'                             cl_name,
 #'                             normalization_type = "RV",
 #'                             iso_levels = NULL,
-#'                             as_panel = TRUE,
+#'                             as_list = FALSE,
 #'                             swap_axes = TRUE)
 #'
 #' @export
@@ -82,7 +82,7 @@ heatmap_combo_metrics_panel <- function(
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
     no_breaks = 50,
-    as_panel = TRUE,
+    as_list = FALSE,
     swap_axes = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -109,7 +109,7 @@ heatmap_combo_metrics_panel <- function(
     checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   }
   checkmate::assert_int(no_breaks, lower = 2)
-  checkmate::assert_flag(as_panel)
+  checkmate::assert_flag(as_list)
   checkmate::assert_flag(swap_axes)
   
   # data filtering and processing
@@ -168,7 +168,7 @@ heatmap_combo_metrics_panel <- function(
                          gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
-    if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
+    if (as_list) plt_title <- paste(main_title, plt_title, sep = " : ")
     
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
     
@@ -285,7 +285,7 @@ heatmap_combo_metrics_panel <- function(
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
     
-    if (!as_panel) plt_title <- paste(main_title, plt_title, sep = " : ")
+    if (as_list) plt_title <- paste(main_title, plt_title, sep = " : ")
     # base plot
     plt_iso_compare <-
       ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
@@ -338,7 +338,10 @@ heatmap_combo_metrics_panel <- function(
     ls_plts <- mx_plts
   }
   
-  final_plot <- if (as_panel) {
+  final_plot <- if (as_list) {
+    ls_plts
+  } else {
+    # build panel
     ggpubr::annotate_figure(
       ggpubr::ggarrange(
         ggpubr::ggarrange(
@@ -356,9 +359,8 @@ heatmap_combo_metrics_panel <- function(
         common.legend = TRUE, nrow = 2),
       top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
-  } else {
-    ls_plts
   }
+  
   return(final_plot)
 }
 
