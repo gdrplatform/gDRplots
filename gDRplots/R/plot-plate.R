@@ -33,11 +33,16 @@ plot_plate_data <- function(data) {
   lapply(barcodes, function(x) {
     data_subset <- filter_data_by_barcode(data, x, barcode_idf)
     
-    has_combo <- "Concentration_2" %in% colnames(data_subset) && "Gnumber_2" %in% colnames(data_subset)
+    
+    conc_cols <- unlist(gDRutils::get_env_identifiers(c("concentration", "concentration2"),
+                                                      simplify = FALSE))
+    
+    has_combo <- conc_cols[["concentration2"]] %in% colnames(data_subset) &&
+      gDRutils::get_env_identifiers("drug2") %in% colnames(data_subset)
     color_mapping <- generate_color_mappings(data_subset)
     
     doses <- unique(unlist(data_subset[, intersect(names(data_subset),
-                                                   c("Concentration", "Concentration_2")), with = FALSE]))
+                                                   conc_cols), with = FALSE]))
     doses <- sort(doses)
     
     gradient_colors <- grDevices::colorRampPalette(c("#c6dbef", "white", "#08306b"))(length(doses))
@@ -77,7 +82,7 @@ plot_plate_data <- function(data) {
       ggrepel::geom_text_repel(data = data_subset, 
                                ggplot2::aes(x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)), 
                                color = "black", size = 3, bg.color = "white", bg.r = 0.05, force = 0, nudge_y = -0.3, segment.color = NA) +
-      ggplot2::scale_fill_manual(values = colors, name = "Concentration", limits = names(colors)) +
+      ggplot2::scale_fill_manual(values = colors, name = conc_cols[["concentration"]], limits = names(colors)) +
       ggplot2::scale_x_continuous(breaks = sort(unique(data_subset$WellColumn)), labels = sort(unique(data_subset$WellColumn)), position = "top") +
       ggplot2::labs(
         title = paste0(length(unique(data_subset$WellColumn)) * length(unique(data_subset$WellRow)), "-Well Visualization of Plate ", x),
