@@ -562,11 +562,47 @@ test_that("plot_boxplot_meta works as expected", {
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 
 
-test_that("plot_volcano_corr_panel works as expected", {
+test_that("plot_volcano_assoc_panel works as expected", {
   # TODO in GDR-2710
 })
 
-test_that("plot_volcano_box_panel works as expected", {
-  # TODO in GDR-2710
+test_that(".get_data_type works as expected", {
+  tab_cat <- data.table::data.table(
+    "A" = c(0, 0, 0, 1),
+    "B" = c(0, 1, 1, 0),
+    "C" = c(1, 0, 0, 0)
+  )
+  
+  tab_cat_na <- data.table::copy(tab_cat)
+  tab_cat_na[1:2, c(1, 2)] <- NA
+  
+  tab_num <- data.table::data.table(
+    "A" = 1:5,
+    "B" = 11:15,
+    "C" = 101:105
+  )
+  
+  tab_num_na <- data.table::copy(tab_num)
+  tab_num_na[1:2, c(1, 2)] <- NA
+  
+  tab_unkn <- data.table::copy(tab_cat) * 2
+  
+  tab_mix <- data.table::data.table(
+    "A" = LETTERS[1:5],
+    "B" = 11:15,
+    "C" = 101:105
+  )
+  
+  expect_equal(.get_data_type(tab_cat), "categorical")
+  expect_equal(.get_data_type(tab_cat_na), "categorical")
+  expect_equal(.get_data_type(tab_num), "numeric")
+  expect_equal(.get_data_type(tab_num_na), "numeric")
+  expect_equal(.get_data_type(tab_unkn), "unknown")
+  expect_equal(.get_data_type(tab_mix), "unknown")
+  expect_equal(.get_data_type(tab_mix, desc_col = "A"), "numeric")
+  
+  expect_error(.get_data_type(dt_ = NULL),
+               "Assertion on 'dt_' failed: Must be a data.table")
+  expect_error(.get_data_type(dt_ = tab_cat, desc_col = 1),
+               "Assertion on 'desc_col' failed: Must be of type 'character'")
 })
-

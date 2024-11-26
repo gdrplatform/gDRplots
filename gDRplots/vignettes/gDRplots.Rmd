@@ -204,19 +204,19 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
-For experiments with drug combinations, users can visualize the full response matrix in the panel by using **heatmap_combo_metrics** function. 
+For experiments with drug combinations, users can visualize the full response matrix in the panel by using **heatmap_combo_metrics_panel** function. 
 
 Users get at once a view with smooth value, HSA (highest single-agent) excess, and Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
 
 Note that by default, this function returns a panel, but it can also return a list with the panel's items.
 
-```{r heatmap_combo_metrics, warning = FALSE, message = FALSE}
-heatmap_combo_metrics(dt_excess = dt_excess,
-                      dt_isobolograms = dt_isobolograms,
-                      drug1_name = "drug_001", 
-                      drug2_name = "drug_026",
-                      cl_name = "cellline_NE",
-                      iso_levels = "0.5")
+```{r heatmap_combo_metrics_panel, warning = FALSE, message = FALSE}
+heatmap_combo_metrics_panel(dt_excess = dt_excess,
+                            dt_isobolograms = dt_isobolograms,
+                            drug1_name = "drug_001", 
+                            drug2_name = "drug_026",
+                            cl_name = "cellline_NE",
+                            iso_levels = "0.5")
 ```
 
 The **plot_combination_index** function allows users to explore the dose-sparing effects. The Combination Index is displayed at different ratios of the two drugs.
@@ -368,6 +368,8 @@ The **plot_volcano_assoc** function is dedicated to PRISM experiments. This func
 with associations between the molecular features or the metadata and readout of interest.
 
 Note: It requires dedicated input calculated with `prep_dt_assoc` function.
+
+Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data.
 
 ![](plot_volcano.png)
 

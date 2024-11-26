@@ -1,4 +1,4 @@
-#' Plot heatmaps of fitted values for combination metrics data
+#' Plot panel of heatmaps of fitted values for combination metrics data
 #'
 #' @param dt_excess data.table representing data from the \code{excess} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "excess")}
@@ -34,44 +34,44 @@
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "GR")
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "GR")
 #'                       
 #' cl_name <- "cellline_JE"
 #' drug1_name <- "drug_011"
 #' drug2_name <- "drug_026"
 #' 
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = "0.5",
-#'                       as_panel = FALSE)
-#'                       
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = NULL,
-#'                       as_panel = TRUE,
-#'                       swap_axes = FALSE)
-#'                                         
-#' heatmap_combo_metrics(dt_excess,
-#'                       dt_isobolograms,
-#'                       drug1_name, drug2_name,
-#'                       cl_name,
-#'                       normalization_type = "RV",
-#'                       iso_levels = NULL,
-#'                       as_panel = TRUE,
-#'                       swap_axes = TRUE)
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = "0.5",
+#'                             as_panel = FALSE)
+#' 
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = NULL,
+#'                             as_panel = TRUE,
+#'                             swap_axes = FALSE)
+#' 
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = NULL,
+#'                             as_panel = TRUE,
+#'                             swap_axes = TRUE)
 #'
 #' @export
-heatmap_combo_metrics <- function(
+heatmap_combo_metrics_panel <- function(
     dt_excess,
     dt_isobolograms = NULL,
     drug1_name,
@@ -364,7 +364,7 @@ heatmap_combo_metrics <- function(
 
 #' Plot line plot of combination index
 #'
-#' @inheritParams heatmap_combo_metrics
+#' @inheritParams heatmap_combo_metrics_panel
 #' @param colors_vec_iso character vector of colors (valid name or hex) used for the isolines; 
 #'     the default is the dark red-orange palette
 #'

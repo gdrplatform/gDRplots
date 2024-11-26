@@ -97,7 +97,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
-                                plot_volcano_corr_panel,
+                                plot_volcano_assoc_panel,
                                 dt_response = dt_response_sa,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
                                 selected_feat_meta_col = feat)
@@ -144,7 +144,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
-                                plot_volcano_box_panel,
+                                plot_volcano_assoc_panel,
                                 dt_response = dt_response_sa,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
                                 selected_feat_meta_col = meta)
@@ -278,7 +278,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
-                                plot_volcano_corr_panel,
+                                plot_volcano_assoc_panel,
                                 dt_response = dt_response_combo,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
                                 selected_feat_meta_col = feat)
@@ -330,7 +330,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
-                                plot_volcano_box_panel,
+                                plot_volcano_assoc_panel,
                                 dt_response = dt_response_combo,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
                                 selected_feat_meta_col = meta)
