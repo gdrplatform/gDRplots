@@ -3,6 +3,19 @@
 #' @param data The data table containing plate information
 #' 
 #' @return A list of ggplot objects for each barcode
+#' @keywords QC_plot
+#' @examples
+#' test_data <- data.table::data.table(
+#'   WellColumn = rep(1:12, each = 8),
+#'   clid = c("A", "A", "B", "B"),
+#'   WellRow = rep(LETTERS[1:8], times = 12),
+#'   Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+#'   Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+#'   Concentration = runif(96, min = 0, max = 100),
+#'   ReadoutValue = runif(96, min = 0, max = 100),
+#'   Barcode = rep(c("A", "B"), 48)
+#'   )
+#' plot_plate_data(test_data)[[1]]
 #' @export
 plot_plate_data <- function(data) {
   checkmate::assert_data_table(data)
@@ -63,7 +76,7 @@ plot_plate_data <- function(data) {
     p <- p +
       ggrepel::geom_text_repel(data = data_subset, 
                                ggplot2::aes(x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)), 
-                               color = "black", size = 3, bg.color = "white", bg.r = 0.05, force = 0, nudge_y = -0.3) +
+                               color = "black", size = 3, bg.color = "white", bg.r = 0.05, force = 0, nudge_y = -0.3, segment.color = NA) +
       ggplot2::scale_fill_manual(values = colors, name = "Concentration", limits = names(colors)) +
       ggplot2::scale_x_continuous(breaks = sort(unique(data_subset$WellColumn)), labels = sort(unique(data_subset$WellColumn)), position = "top") +
       ggplot2::labs(
@@ -90,6 +103,18 @@ plot_plate_data <- function(data) {
 #' @param column_name The name of the column to plot
 #' 
 #' @return A list of ggplot objects for each barcode and column
+#' @keywords QC_plot
+#' @examples
+#' test_data <- data.table::data.table(
+#'   WellColumn = rep(1:12, each = 8),
+#'   WellRow = rep(LETTERS[1:8], times = 12),
+#'   Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+#'   Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+#'   Concentration = runif(96, min = 0, max = 100),
+#'   ReadoutValue = runif(96, min = 0, max = 100),
+#'   Barcode = rep(c("A", "B"), 48)
+#'   )
+#' plot_plate_single_data(test_data, "Gnumber")[[1]]
 #' @export
 plot_plate_single_data <- function(data, column_name) {
   checkmate::assert_data_table(data)

@@ -15,3 +15,17 @@ A list of ggplot objects for each barcode
 \description{
 Plot plate data
 }
+\examples{
+test_data <- data.table::data.table(
+  WellColumn = rep(1:12, each = 8),
+  clid = c("A", "A", "B", "B"),
+  WellRow = rep(LETTERS[1:8], times = 12),
+  Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+  Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+  Concentration = runif(96, min = 0, max = 100),
+  ReadoutValue = runif(96, min = 0, max = 100),
+  Barcode = rep(c("A", "B"), 48)
+  )
+plot_plate_data(test_data)[[1]]
+}
+\keyword{QC_plot}

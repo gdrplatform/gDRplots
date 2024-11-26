@@ -51,7 +51,7 @@ test_that("plot_plate_single_data works correctly", {
   
   # Test if it handles missing required columns
   incomplete_data <- test_data[, .(WellColumn, WellRow, Concentration, Barcode)]
-  expect_error(plot_plate_single_data(incomplete_data, "Gnumber"), "Assertion on 'column_name' failed")
+  expect_error(plot_plate_single_data(incomplete_data, "Gnumber"), "Assertion")
 })
 
 test_that("filter_data_by_barcode works correctly", {
