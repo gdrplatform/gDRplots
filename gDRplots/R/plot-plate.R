@@ -49,9 +49,11 @@ plot_plate_data <- function(data) {
     colors <- gradient_colors
     names(colors) <- doses
     
-    data_subset$Concentration <- factor(data_subset$Concentration, levels = doses)
+    data_subset[[conc_cols[["concentration"]]]] <- factor(data_subset[[conc_cols[["concentration"]]]],
+                                                          levels = doses)
     if (has_combo) {
-      data_subset$Concentration_2 <- factor(data_subset$Concentration_2, levels = doses)
+      data_subset[[conc_cols[["concentration2"]]]] <- factor(data_subset[[conc_cols[["concentration2"]]]],
+                                                             levels = doses)
     }
     
     if (has_combo) {
