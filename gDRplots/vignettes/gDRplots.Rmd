@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
   
-```{r, include = FALSE}
+```{r set, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -204,22 +204,41 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
-For experiments with drug combinations, users can visualize the full response matrix in the panel by using **heatmap_combo_metrics_panel** function. 
+For experiments with drug combinations, users can visualize the full response matrix by using **heatmap_combo_metrics** function. 
 
-Users get at once a view with smooth value, HSA (highest single-agent) excess, and Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
+Users get at once a view with smooth value, HSA (highest single-agent) excess, or Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
+
+Users can also use **heatmap_combo_metrics_panel** to get a panel with heatmaps for all comobo metrics, with isobolograms overlaid. The CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
 
 Note that by default, this function returns a panel, but it can also return a list with the panel's items.
 
 ```{r heatmap_combo_metrics_panel, warning = FALSE, message = FALSE}
-heatmap_combo_metrics_panel(dt_excess = dt_excess,
-                            dt_isobolograms = dt_isobolograms,
-                            drug1_name = "drug_001", 
-                            drug2_name = "drug_026",
-                            cl_name = "cellline_NE",
-                            iso_levels = "0.5")
+heatmap_combo_metrics(dt_excess = dt_excess,
+                      dt_isobolograms = dt_isobolograms,
+                      drug1_name = "drug_001", 
+                      drug2_name = "drug_026",
+                      cl_name = "cellline_NE",
+                      iso_levels = "0.5",
+                      metric = "smooth")
+
+heatmap_combo_metrics(dt_excess = dt_excess,
+                      dt_isobolograms = dt_isobolograms,
+                      drug1_name = "drug_001", 
+                      drug2_name = "drug_026",
+                      cl_name = "cellline_NE",
+                      iso_levels = "0.5",
+                      metric = "hsa_excess")
+
+heatmap_combo_metrics(dt_excess = dt_excess,
+                      dt_isobolograms = dt_isobolograms,
+                      drug1_name = "drug_001", 
+                      drug2_name = "drug_026",
+                      cl_name = "cellline_NE",
+                      iso_levels = "0.5",
+                      metric = "bliss_excess")
 ```
 
-The **plot_combination_index** function allows users to explore the dose-sparing effects. The Combination Index is displayed at different ratios of the two drugs.
+The **plot_combination_index** function allows users to explore the dose-sparing effects for experiments with drug combinations. The Combination Index is displayed at different ratios of the two drugs.
 
 ```{r plot_combination_index, warning = FALSE, message = FALSE}
 plot_combination_index(dt_excess = dt_excess,
