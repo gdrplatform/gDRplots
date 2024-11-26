@@ -20,6 +20,8 @@
 #'    for smooth values; the default is the dark purple-light grey palette
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is the blue-light grey-red color scale
+#' @param limit numeric vector of length two providing limits of the scale. 
+#'    Use NA to refer to the existing minimum or maximumdescription
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
@@ -55,7 +57,8 @@
 #'                       drug1_name, drug2_name,
 #'                       cl_name,
 #'                       metric = "hsa_excess",
-#'                       normalization_type = "GR")                     
+#'                       normalization_type = "GR",
+#'                       limit = c(NA, 0.1))
 #'                       
 #' cl_name <- "cellline_JE"
 #' drug1_name <- "drug_011"
@@ -89,6 +92,7 @@ heatmap_combo_metrics <- function(
     iso_levels =  c("0.25", "0.5", "0.75"),
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
+    limit = NULL,
     no_breaks = 50,
     swap_axes = FALSE) {
   
@@ -115,6 +119,7 @@ heatmap_combo_metrics <- function(
     checkmate::assert_numeric(as.numeric(iso_levels))
     checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   }
+  checkmate::assert_numeric(limit, len = 2, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(swap_axes)
   
@@ -215,10 +220,14 @@ heatmap_combo_metrics <- function(
                                  normalization_type)
     
     # prep limits
-    limits <- prep_hm_limits(dt_[[metric]],   
-                             metric = metric,
-                             normalization_type = normalization_type,
-                             symmetric = metric != "smooth")
+    limit_fill <- if (is.null(limit)) {
+      prep_hm_limits(dt_[[metric]],   
+                     metric = metric,
+                     normalization_type = normalization_type,
+                     symmetric = metric != "smooth")
+    } else {
+      limit
+    }
     
     # base plot
     plt <-
@@ -235,7 +244,7 @@ heatmap_combo_metrics <- function(
                                   labels = drug1_axis$marks_y,
                                   expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
-                                    limit = limits,
+                                    limit = limit_fill,
                                     labels = function(x) sprintf("%.2f", x),
                                     na.value = "lightgrey") + 
       ggplot2::theme_bw() +
