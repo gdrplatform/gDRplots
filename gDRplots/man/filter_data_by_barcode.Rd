@@ -4,10 +4,10 @@
 \alias{filter_data_by_barcode}
 \title{Helper function to filter data by barcode and prepare it for plotting}
 \usage{
-filter_data_by_barcode(data, barcode, barcode_idf)
+filter_data_by_barcode(dt_plate, barcode, barcode_idf)
 }
 \arguments{
-\item{data}{The original data table}
+\item{dt_plate}{The original data table}
 
 \item{barcode}{The barcode to filter the data by}
 

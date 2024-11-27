@@ -5,12 +5,12 @@
 \title{Helper function to generate color mappings for Gnumber and Gnumber_2}
 \usage{
 generate_color_mappings(
-  data_subset,
+  dt_plate_subset,
   untrt_tag = gDRutils::get_env_identifiers("untreated_tag")
 )
 }
 \arguments{
-\item{data_subset}{The subset of data}
+\item{dt_plate_subset}{The subset of data}
 
 \item{untrt_tag}{Untreated tag identifier}
 }

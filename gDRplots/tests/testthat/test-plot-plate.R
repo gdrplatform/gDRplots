@@ -11,48 +11,48 @@ test_data <- data.table::data.table(
   Barcode = rep(c("A", "B"), 48)
 )
 
-test_that("plot_plate_data works correctly", {
+test_that("plot_plate_stack_info works correctly", {
   # Test if the function returns a list of ggplot objects
-  plots <- plot_plate_data(test_data)
+  plots <- plot_plate_stack_info(test_data)
   expect_length(plots, 2)
   expect_true(all(sapply(plots, inherits, what = "ggplot")))
   
   # Test if it handles data with a single barcode correctly
   single_barcode_data <- test_data[Barcode == "A"]
-  single_plots <- plot_plate_data(single_barcode_data)
+  single_plots <- plot_plate_stack_info(single_barcode_data)
   expect_length(single_plots, 1)
   expect_true(all(sapply(single_plots, inherits, what = "ggplot")))
   
   # Test if it handles empty data
   empty_data <- test_data[0]
-  empty_plots <- plot_plate_data(empty_data)
+  empty_plots <- plot_plate_stack_info(empty_data)
   expect_length(empty_plots, 0)
   
   # Test if it handles missing required columns
   incomplete_data <- test_data[, .(WellColumn, WellRow, Concentration, Gnumber, Barcode)]
-  expect_error(plot_plate_data(incomplete_data), "but is missing elements")
+  expect_error(plot_plate_stack_info(incomplete_data), "but is missing elements")
 })
 
-test_that("plot_plate_single_data works correctly", {
+test_that("plot_plate works correctly", {
   # Test if the function returns a list of ggplot objects
-  plots <- plot_plate_single_data(test_data, "Gnumber")
+  plots <- plot_plate(test_data, "Gnumber")
   expect_length(plots, 2)
   expect_true(all(sapply(plots, inherits, what = "ggplot")))
   
   # Test if it handles data with a single barcode correctly
   single_barcode_data <- test_data[Barcode == "A"]
-  single_plots <- plot_plate_single_data(single_barcode_data, "Gnumber")
+  single_plots <- plot_plate(single_barcode_data, "Gnumber")
   expect_length(single_plots, 1)
   expect_true(all(sapply(single_plots, inherits, what = "ggplot")))
   
   # Test if it handles empty data
   empty_data <- test_data[0]
-  empty_plots <- plot_plate_single_data(empty_data, "Gnumber")
+  empty_plots <- plot_plate(empty_data, "Gnumber")
   expect_length(empty_plots, 0)
   
   # Test if it handles missing required columns
   incomplete_data <- test_data[, .(WellColumn, WellRow, Concentration, Barcode)]
-  expect_error(plot_plate_single_data(incomplete_data, "Gnumber"), "Assertion")
+  expect_error(plot_plate(incomplete_data, "Gnumber"), "Assertion")
 })
 
 test_that("filter_data_by_barcode works correctly", {
