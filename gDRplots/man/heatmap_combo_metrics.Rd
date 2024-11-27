@@ -59,8 +59,8 @@ Use NA to refer to the existing minimum or maximumdescription}
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
-list or panel with heatmaps with value for excess assays for selected drugs and cell line with
-   selected isoline and comparison of iso levels
+\code{ggplot object} containing heatmap with the values for the selected combo metric 
+   for selected drugs and cell line with selected isoline (when chosen)
 }
 \description{
 Plot heatmaps of fitted values for combination metrics data

@@ -9,7 +9,7 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param with_table logical whether table with metric values should be shown next to the plot
 #'
-#' @return lollipop plot with stat value for each drug
+#' @return \code{ggplot object} containing lollipop plot with stat value for each drug
 #'
 #' @keywords QC_plot
 #' @examples
@@ -99,7 +99,7 @@ plot_var_stat_qc <- function(dt_assay,
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
-#' @return panel with lollipop plots with r2 and rss values for each drug
+#' @return \code{ggplot object} containing panel with lollipop plots with r2 and rss values for each drug
 #'
 #' @keywords QC_plot
 #' @examples
@@ -179,7 +179,7 @@ plot_fitting_acc <- function(dt_assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #'
-#' @return hetamap of mapping controls to treated
+#' @return \code{pheatmap object} containing hetamap of mapping controls to treated
 #'
 #' @keywords QC_plot
 #' @examples

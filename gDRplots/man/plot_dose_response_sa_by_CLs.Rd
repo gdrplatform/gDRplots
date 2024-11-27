@@ -38,7 +38,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{plot_fit_flag}{logical flag whether plot points with fitted values}
 }
 \value{
-list of plots with dose-response curves
+list of \code{ggplot objects} containing plots of dose-response curves
 }
 \description{
 Plot drug response curves for single-agent data for selected call lines and drugs

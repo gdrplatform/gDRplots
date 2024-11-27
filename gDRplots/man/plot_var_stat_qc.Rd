@@ -27,7 +27,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{with_table}{logical whether table with metric values should be shown next to the plot}
 }
 \value{
-lollipop plot with stat value for each drug
+\code{ggplot object} containing lollipop plot with stat value for each drug
 }
 \description{
 Lollipop plot for metric single-agent data to control quality of the data

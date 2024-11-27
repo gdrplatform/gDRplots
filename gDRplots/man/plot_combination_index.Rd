@@ -39,7 +39,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 the default is the dark red-orange palette}
 }
 \value{
-combination index plot at different ratios of the two drugs
+\code{ggplot object} containing combination index plot at different ratios of the two drugs
 }
 \description{
 Plot line plot of combination index

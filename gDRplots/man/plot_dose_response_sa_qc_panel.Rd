@@ -33,7 +33,8 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{fit_source}{string source name for metrics}
 }
 \value{
-panle with plot with dose-response curves for selected cell line by drugs
+\code{ggplot object} with panel with plots of dose-response curves for selected 
+   cell line by drugs (observed and fitted values)
 }
 \description{
 Plot panel with drug response curves for single-agent data to control quality of the data

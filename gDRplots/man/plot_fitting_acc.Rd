@@ -17,7 +17,7 @@ and single-agent \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 }
 \value{
-panel with lollipop plots with r2 and rss values for each drug
+\code{ggplot object} containing panel with lollipop plots with r2 and rss values for each drug
 }
 \description{
 Visualization for the quality control of the fitting for single-agent data
