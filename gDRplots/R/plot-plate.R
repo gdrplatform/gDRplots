@@ -36,6 +36,9 @@ plot_plate_data <- function(data) {
     
     conc_cols <- unlist(gDRutils::get_env_identifiers(c("concentration", "concentration2"),
                                                       simplify = FALSE))
+    drug_cols <- unlist(gDRutils::get_env_identifiers(c("drug", "drug2"),
+                                                      simplify = FALSE))
+    cl <- gDRutils::get_env_identifiers("cellline")
     
     has_combo <- conc_cols[["concentration2"]] %in% colnames(data_subset) &&
       gDRutils::get_env_identifiers("drug2") %in% colnames(data_subset)
@@ -59,24 +62,46 @@ plot_plate_data <- function(data) {
     if (has_combo) {
       p <- ggplot2::ggplot() +
         ggplot2::geom_rect(data = data_subset, 
-                           ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn, ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5, fill = Concentration), 
+                           ggplot2::aes(xmin = WellColumn - 0.5,
+                                        xmax = WellColumn,
+                                        ymin = as.numeric(WellRow) - 0.5,
+                                        ymax = as.numeric(WellRow) + 0.5,
+                                        fill = !!rlang::sym(conc_cols[["concentration"]])), 
                            color = "black", size = 0.2) + 
-        ggplot2::geom_rect(data = data_subset, ggplot2::aes(xmin = WellColumn, xmax = WellColumn + 0.5, ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5, fill = Concentration_2), 
+        ggplot2::geom_rect(data = data_subset,
+                           ggplot2::aes(xmin = WellColumn,
+                                        xmax = WellColumn + 0.5,
+                                        ymin = as.numeric(WellRow) - 0.5,
+                                        ymax = as.numeric(WellRow) + 0.5,
+                                        fill = !!rlang::sym(conc_cols[["concentration2"]])), 
                            color = "black", size = 0.2) +  
         ggplot2::geom_point(data = data_subset, 
-                            ggplot2::aes(x = WellColumn - 0.25, y = WellRow, color = Gnumber, shape = clid),
+                            ggplot2::aes(x = WellColumn - 0.25,
+                                         y = WellRow,
+                                         color = !!rlang::sym(drug_cols[["drug"]]),
+                                         shape = !!rlang::sym(cl)),
                             size = 3) +
         ggplot2::geom_point(data = data_subset, 
-                            ggplot2::aes(x = WellColumn + 0.25, y = WellRow, color = Gnumber_2, shape = clid),
+                            ggplot2::aes(x = WellColumn + 0.25,
+                                         y = WellRow,
+                                         color = !!rlang::sym(drug_cols[["drug2"]]),
+                                         shape = !!rlang::sym(cl)),
                             size = 3)
       
     } else {
       p <- ggplot2::ggplot() +
         ggplot2::geom_rect(data = data_subset, 
-                           ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn + 0.5, ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5, fill = Concentration), 
+                           ggplot2::aes(xmin = WellColumn - 0.5,
+                                        xmax = WellColumn + 0.5,
+                                        ymin = as.numeric(WellRow) - 0.5,
+                                        ymax = as.numeric(WellRow) + 0.5,
+                                        fill = !!rlang::sym(conc_cols[["concentration"]])), 
                            color = "black", size = 0.2) + 
         ggplot2::geom_point(data = data_subset, 
-                            ggplot2::aes(x = WellColumn, y = WellRow, color = Gnumber, shape = clid),
+                            ggplot2::aes(x = WellColumn,
+                                         y = WellRow,
+                                         color = !!rlang::sym(drug_cols[["drug"]]),
+                                         shape = !!rlang::sym(cl)),
                             size = 3)
     }
     
@@ -98,7 +123,7 @@ plot_plate_data <- function(data) {
         plot.subtitle = ggplot2::element_text(hjust = 0.5)
       ) +
       ggplot2::scale_color_manual(values = color_mapping) +
-      ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(data_subset$clid))))  # Automatically generate distinct shapes
+      ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(data_subset[[cl]]))))  # Automatically generate distinct shapes
     
     p + ggplot2::geom_tile(data = data_subset, ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", size = 0.5)
   })
