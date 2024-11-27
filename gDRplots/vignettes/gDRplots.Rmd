@@ -241,6 +241,38 @@ Users can control data quality at each processing step.
 
 Also, when using the gDR model, the same control might be performed for the corresponding assay.
 
+
+### Merging of Manifest, Treatment and Raw data using gDRimport
+
+Before running the gDR pipeline, data are imported using the gDRimport package. This package facilitates the loading of data from Envision, Tecan, and other technologies. More information about the supported technologies and examples of how to import data can be found in our documentation.
+
+The plot_plate_stack_info and plot_plate functions allow for visualizing the plate design of the experiment. The plot_plate_stack_info function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
+
+
+```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE, eval = FALSE}
+# Load test data using gDRimport
+td <- gDRimport::get_test_data()
+
+# Load data from manifest, template, and results files
+l_tbl <- gDRimport::load_data(
+  manifest_file = gDRimport::manifest_path(td), 
+  df_template_files = gDRimport::template_path(td), 
+  results_file = gDRimport::result_path(td)
+)
+
+# Merge the manifest, treatments, and raw data
+merged_data <- merge_data(
+  l_tbl$manifest, 
+  l_tbl$treatments, 
+  l_tbl$data
+)
+
+# Visualize the plate design of the experiment
+plot_plate_stack_info(merged_data)
+plot_plate(merged_data, "ReadoutValue")gDRplots/vignettes/gDRplots.Rmd
+```
+
+
 ### Mapping Controls to Treated
 
 The first stage of the gDR pipeline involves dispatching the raw data and controls into the appropriate nested tables.
