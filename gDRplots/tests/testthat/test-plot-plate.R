@@ -7,6 +7,7 @@ test_data <- data.table::data.table(
   Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
   Concentration = runif(96, min = 0, max = 100),
   ReadoutValue = runif(96, min = 0, max = 100),
+  clid = "CellLineA",
   Barcode = rep(c("A", "B"), 48)
 )
 

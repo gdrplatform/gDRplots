@@ -23,7 +23,7 @@ plot_plate_data <- function(data) {
                           must.include = c("WellColumn",
                                            "WellRow",
                                            "ReadoutValue",
-                                           unlist(gDRutils::get_env_identifiers(c("drug", "concentration"),
+                                           unlist(gDRutils::get_env_identifiers(c("drug", "concentration", "cellline"),
                                                                                 simplify = FALSE))))
   
   barcode_idf <- intersect(gDRutils::get_env_identifiers("barcode"), names(data))
@@ -154,7 +154,7 @@ plot_plate_single_data <- function(data, column_name) {
                           must.include = c("WellColumn",
                                            "WellRow",
                                            "ReadoutValue",
-                                           unlist(gDRutils::get_env_identifiers(c("drug", "concentration"),
+                                           unlist(gDRutils::get_env_identifiers(c("drug", "concentration", "cellline"),
                                                                                 simplify = FALSE))))
   checkmate::assert_choice(column_name, choices = names(data))
   
