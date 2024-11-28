@@ -53,7 +53,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
-    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]]) # TODO check: Inf & -Inf
+    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
       dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
@@ -270,7 +270,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
-    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]]) # TODO check: Inf & -Inf
+    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
       dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
