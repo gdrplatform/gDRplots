@@ -51,7 +51,7 @@ plot_boxplot_sa_metric_by_CLs(dt_metrics,
                               
 plot_boxplot_sa_metric_by_CLs(dt_metrics,
                               metric = "x_AOC",
-                              colors_vec = "lightblue")
+                              colors_vec = "darkgreen")
 
 plot_boxplot_sa_metric_by_CLs(
   dt_metrics,
