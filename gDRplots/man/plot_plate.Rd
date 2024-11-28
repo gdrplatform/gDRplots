@@ -12,7 +12,7 @@ plot_plate(dt_plate, column_name)
 \item{column_name}{The name of the column to plot}
 }
 \value{
-A list of ggplot objects for each barcode and column
+A named list of ggplot objects for each barcode and column
 }
 \description{
 Plot data from a specific column
@@ -28,6 +28,6 @@ test_data <- data.table::data.table(
   ReadoutValue = runif(96, min = 0, max = 100),
   Barcode = rep(c("A", "B"), 48)
   )
-plot_plate(test_data, "Gnumber")[[1]]
+plot_plate(test_data, "Gnumber")[["A"]]
 }
 \keyword{QC_plot}

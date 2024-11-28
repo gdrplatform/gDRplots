@@ -10,7 +10,7 @@ plot_plate_stack_info(dt_plate)
 \item{dt_plate}{The data table containing plate information}
 }
 \value{
-A list of ggplot objects for each barcode
+A named list of ggplot objects for each barcode
 }
 \description{
 Plot plate data
@@ -26,6 +26,6 @@ test_data <- data.table::data.table(
   ReadoutValue = runif(96, min = 0, max = 100),
   Barcode = rep(c("A", "B"), 48)
   )
-plot_plate_stack_info(test_data)[[1]]
+plot_plate_stack_info(test_data)[["A"]]
 }
 \keyword{QC_plot}

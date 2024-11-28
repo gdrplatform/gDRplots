@@ -249,7 +249,7 @@ Before running the gDR pipeline, data are imported using the gDRimport package. 
 The plot_plate_stack_info and plot_plate functions allow for visualizing the plate design of the experiment. The plot_plate_stack_info function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
 
 
-```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE, eval = FALSE}
+```{r plot_plate, warning = FALSE, message = FALSE, eval = FALSE}
 # Load test data using gDRimport
 td <- gDRimport::get_test_data()
 
@@ -261,16 +261,20 @@ l_tbl <- gDRimport::load_data(
 )
 
 # Merge the manifest, treatments, and raw data
-merged_data <- merge_data(
+merged_data <- gDRcore::merge_data(
   l_tbl$manifest, 
   l_tbl$treatments, 
   l_tbl$data
 )
 
 # Visualize the plate design of the experiment
-plot_plate_stack_info(merged_data)
-plot_plate(merged_data, "ReadoutValue")gDRplots/vignettes/gDRplots.Rmd
+plate_stack_vis <- plot_plate_stack_info(merged_data)
+plate_vis <- plot_plate(merged_data, "ReadoutValue")
+plate_stack_vis[["201904197a"]]
+plate_vis[["201904197a"]]
 ```
+![](plate_stack_vis.png)
+![](plate_vis.png)
 
 
 ### Mapping Controls to Treated

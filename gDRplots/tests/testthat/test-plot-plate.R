@@ -15,13 +15,13 @@ test_that("plot_plate_stack_info works correctly", {
   # Test if the function returns a list of ggplot objects
   plots <- plot_plate_stack_info(test_data)
   expect_length(plots, 2)
-  expect_true(all(sapply(plots, inherits, what = "ggplot")))
+  expect_true(all(vapply(plots, inherits, what = "ggplot", FUN.VALUE = logical(1))))
   
   # Test if it handles data with a single barcode correctly
   single_barcode_data <- test_data[Barcode == "A"]
   single_plots <- plot_plate_stack_info(single_barcode_data)
   expect_length(single_plots, 1)
-  expect_true(all(sapply(single_plots, inherits, what = "ggplot")))
+  expect_true(all(vapply(single_plots, inherits, what = "ggplot", FUN.VALUE = logical(1))))
   
   # Test if it handles empty data
   empty_data <- test_data[0]
@@ -37,13 +37,13 @@ test_that("plot_plate works correctly", {
   # Test if the function returns a list of ggplot objects
   plots <- plot_plate(test_data, "Gnumber")
   expect_length(plots, 2)
-  expect_true(all(sapply(plots, inherits, what = "ggplot")))
+  expect_true(all(vapply(plots, inherits, what = "ggplot", FUN.VALUE = logical(1))))
   
   # Test if it handles data with a single barcode correctly
   single_barcode_data <- test_data[Barcode == "A"]
   single_plots <- plot_plate(single_barcode_data, "Gnumber")
   expect_length(single_plots, 1)
-  expect_true(all(sapply(single_plots, inherits, what = "ggplot")))
+  expect_true(all(vapply(single_plots, inherits, what = "ggplot", FUN.VALUE = logical(1))))
   
   # Test if it handles empty data
   empty_data <- test_data[0]
