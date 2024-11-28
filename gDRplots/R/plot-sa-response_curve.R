@@ -196,8 +196,8 @@ plot_dose_response_sa <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams plot_dose_response_sa
-#' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
-#' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
+#' @param cellline_name_vec character vector with cell line names to be plotted (Cell Line Name)
+#' @param drug_name_vec character vector with drug names to be plotted (Drug Name)
 #'    
 #' @return list of \code{ggplot objects} containing plots of dose-response curves
 #' 
@@ -274,8 +274,8 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams plot_dose_response_sa
-#' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
-#' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
+#' @param cellline_name_vec character vector with cell line names to be plotted (Cell Line Name)
+#' @param drug_name_vec character vector with drug names to be plotted (Drug Name)
 #'    
 #' @return list of \code{ggplot objects} containing plots of dose-response curves
 #' 
