@@ -130,7 +130,7 @@ plot_plate_stack_info <- function(dt_plate) {
         ) +
         ggplot2::scale_color_manual(values = color_mapping) +
         ggplot2::scale_shape_manual(values = scales::shape_pal()
-                                    (length(unique(dt_plate_subset[[cellline]]))))  # Automatically generate distinct shapes
+                                    (length(unique(dt_plate_subset[[cellline]]))))
       
       p + ggplot2::geom_tile(data = dt_plate_subset,
                              ggplot2::aes(x = WellColumn,
