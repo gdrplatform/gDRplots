@@ -11,7 +11,7 @@
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
-#' @param colors_vec
+#' @param colors_vec character vector with colors (name or hex value) to color boxplots
 #' 
 #' @return \code{ggplot object} containing boxplots
 #' 
@@ -26,6 +26,10 @@
 #' 
 #' plot_boxplot_sa_metric_by_CLs(dt_metrics,
 #'                               grouped_flag = TRUE)
+#'                               
+#' plot_boxplot_sa_metric_by_CLs(dt_metrics,
+#'                               metric = "x_AOC",
+#'                               colors_vec = "lightblue")
 #' 
 #' plot_boxplot_sa_metric_by_CLs(
 #'   dt_metrics,
