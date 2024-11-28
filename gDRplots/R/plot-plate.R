@@ -109,13 +109,15 @@ plot_plate_stack_info <- function(dt_plate) {
       p <- p +
         ggrepel::geom_text_repel(data = dt_plate_subset, 
                                  ggplot2::aes(x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)), 
-                                 color = "black", size = 3, bg.color = "white", bg.r = 0.05, force = 0, nudge_y = -0.3, segment.color = NA) +
+                                 color = "black", size = 3, bg.color = "white", bg.r = 0.05,
+                                 force = 0, nudge_y = -0.3, segment.color = NA) +
         ggplot2::scale_fill_manual(values = gradient_colors, name = concentration, limits = names(gradient_colors)) +
         ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_subset$WellColumn)),
                                     labels = sort(unique(dt_plate_subset$WellColumn)),
                                     position = "top") +
         ggplot2::labs(
-          title = paste0(length(unique(dt_plate_subset$WellColumn)) * length(unique(dt_plate_subset$WellRow)), "-Well Visualization of Plate ", x),
+          title = paste0(length(unique(dt_plate_subset$WellColumn)) * length(unique(dt_plate_subset$WellRow)),
+                         "-Well Visualization of Plate ", x),
           x = "Column",
           y = "Row"
         ) +
@@ -127,7 +129,8 @@ plot_plate_stack_info <- function(dt_plate) {
           panel.grid.minor = ggplot2::element_blank()
         ) +
         ggplot2::scale_color_manual(values = color_mapping) +
-        ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(dt_plate_subset[[cellline]]))))  # Automatically generate distinct shapes
+        ggplot2::scale_shape_manual(values = scales::shape_pal()
+                                    (length(unique(dt_plate_subset[[cellline]]))))  # Automatically generate distinct shapes
       
       p + ggplot2::geom_tile(data = dt_plate_subset,
                              ggplot2::aes(x = WellColumn,
@@ -176,7 +179,8 @@ plot_plate <- function(dt_plate, column_name) {
                           must.include = c("WellColumn",
                                            "WellRow",
                                            "ReadoutValue",
-                                           concentration, concentration2, concentration3, drug, drug2, cellline, well_position))
+                                           concentration, concentration2, concentration3,
+                                           drug, drug2, cellline, well_position))
   checkmate::assert_choice(column_name, choices = names(dt_plate))
   
   barcode_idf <- intersect(barcode, names(dt_plate))
@@ -208,7 +212,10 @@ plot_plate <- function(dt_plate, column_name) {
       
       p <- ggplot2::ggplot() +
         ggplot2::geom_rect(data = dt_plate_subset, 
-                           ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn + 0.5, ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5, fill = .data[[column_name]]), 
+                           ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn + 0.5,
+                                        ymin = as.numeric(WellRow) - 0.5,
+                                        ymax = as.numeric(WellRow) + 0.5,
+                                        fill = .data[[column_name]]), 
                            color = "black",
                            linewidth = 0.2)
       
@@ -236,7 +243,9 @@ plot_plate <- function(dt_plate, column_name) {
       if (continuous) {
         p <- p + ggplot2::scale_fill_gradient(low =  "#c6dbef", high = "#08306b")
       } else {
-        p <- p + ggplot2::scale_fill_manual(values = gradient_colors, name = column_name, limits = names(gradient_colors))
+        p <- p + ggplot2::scale_fill_manual(values = gradient_colors,
+                                            name = column_name,
+                                            limits = names(gradient_colors))
       }
       
       p + ggplot2::geom_tile(data = dt_plate_subset,
