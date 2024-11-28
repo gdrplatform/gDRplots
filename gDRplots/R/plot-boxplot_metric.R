@@ -29,7 +29,7 @@
 #'                               
 #' plot_boxplot_sa_metric_by_CLs(dt_metrics,
 #'                               metric = "x_AOC",
-#'                               colors_vec = "lightblue")
+#'                               colors_vec = "darkgreen")
 #' 
 #' plot_boxplot_sa_metric_by_CLs(
 #'   dt_metrics,
@@ -133,7 +133,8 @@ plot_boxplot_sa_metric_by_CLs <- function(
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10))
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank())
   
   return(plt)
 }
