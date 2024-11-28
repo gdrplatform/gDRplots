@@ -30,7 +30,7 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 \item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
 colored by \code{Tissue}}
 
-\item{colors_vec}{}
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
 }
 \value{
 \code{ggplot object} containing boxplots
@@ -48,6 +48,10 @@ plot_boxplot_sa_metric_by_CLs(dt_metrics)
 
 plot_boxplot_sa_metric_by_CLs(dt_metrics,
                               grouped_flag = TRUE)
+                              
+plot_boxplot_sa_metric_by_CLs(dt_metrics,
+                              metric = "x_AOC",
+                              colors_vec = "lightblue")
 
 plot_boxplot_sa_metric_by_CLs(
   dt_metrics,
