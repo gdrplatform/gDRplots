@@ -9,7 +9,7 @@
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
-#' @return plot with violin for each drug
+#' @return \code{ggplot object} containing plot with violin for each drug
 #'
 #' @keywords QC_plot
 #' @examples

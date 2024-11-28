@@ -72,7 +72,7 @@ A named list with elements:
       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
     }
-  \item \code{heatmap} the heatmap itself.
+  \item \code{pheatmap object} containing the heatmap itself.
 }
 }
 \description{

@@ -36,7 +36,7 @@ and the last one - to the max of \code{Concentration_2}; the default is the oran
 for \code{Concentration_2} should be plotted on a single plot or separately}
 }
 \value{
-plot with dose-response curves for combo data
+\code{ggplot object} containing plot with dose-response curves for combo data
 }
 \description{
 Plot drug response curves for combo data

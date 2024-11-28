@@ -24,9 +24,9 @@ and single-agent \code{SummarizedExperiment}}
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 and single-agent \code{SummarizedExperiment}}
 
-\item{cellline_name_vec}{character vector with cell line to be plotted (Cell Line Name)}
+\item{cellline_name_vec}{character vector with cell line names to be plotted (Cell Line Name)}
 
-\item{drug_name_vec}{character vector with cell line to be plotted (Drug Name)}
+\item{drug_name_vec}{character vector with drug names to be plotted (Drug Name)}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -38,7 +38,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{plot_fit_flag}{logical flag whether plot points with fitted values}
 }
 \value{
-list of plots with dose-response curves
+list of \code{ggplot objects} containing plots of dose-response curves
 }
 \description{
 Plot drug response curves for single-agent data for selected call lines and drugs

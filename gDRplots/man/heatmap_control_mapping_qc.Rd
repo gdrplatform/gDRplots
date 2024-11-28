@@ -16,7 +16,7 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 }
 \value{
-hetamap of mapping controls to treated
+\code{pheatmap object} containing hetamap of mapping controls to treated
 }
 \description{
 Plot heatmap of mapping controls to treated for single-agent and combo data to control quality of the data
