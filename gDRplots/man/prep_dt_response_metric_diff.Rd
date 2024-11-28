@@ -6,12 +6,11 @@
 \usage{
 prep_dt_response_metric_diff(
   dt_metrics,
-  d_name = NULL,
-  d_name2 = NULL,
+  d_name,
+  d_name2,
   normalization_type = "RV",
   metric = "xc50",
-  fit_source = "gDR",
-  additional_cols = NULL
+  fit_source = "gDR"
 )
 }
 \arguments{
@@ -19,9 +18,9 @@ prep_dt_response_metric_diff(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and combo \code{SummarizedExperiment}}
 
-\item{d_name}{string with drug name to be plotted (identifiers \code{DrugName}), default is NULL}
+\item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
 
-\item{d_name2}{string with drug name to be plotted (identifiers \code{DrugName_2}), default is NULL}
+\item{d_name2}{string with drug name to be plotted (identifiers \code{DrugName_2})}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}

@@ -38,7 +38,7 @@ plot_plate_stack_info <- function(dt_plate) {
   if (NROW(barcode_idf) == 0) {
     ggplot2::ggplot()
   } else {
-    barcodes <- stringr::str_sort(unique(dt_plate[[barcode_idf]]), numeric = TRUE)
+    barcodes <- unique(dt_plate[[barcode_idf]])
     
     plate_list <- lapply(barcodes, function(x) {
       dt_plate_subset <- filter_data_by_barcode(dt_plate, x, barcode_idf)
@@ -190,7 +190,7 @@ plot_plate <- function(dt_plate, column_name) {
   if (NROW(barcode_idf) == 0) {
     ggplot2::ggplot()
   } else {
-    barcodes <- stringr::str_sort(unique(dt_plate[[barcode_idf]]), numeric = TRUE)
+    barcodes <- unique(dt_plate[[barcode_idf]])
     
     plate_list <- lapply(barcodes, function(x) {
       dt_plate_subset <- filter_data_by_barcode(dt_plate, x, barcode_idf)
@@ -218,7 +218,7 @@ plot_plate <- function(dt_plate, column_name) {
                            ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn + 0.5,
                                         ymin = as.numeric(WellRow) - 0.5,
                                         ymax = as.numeric(WellRow) + 0.5,
-                                        fill = .data[[column_name]]), 
+                                        fill = !!rlang::sym(column_name)), 
                            color = "black",
                            linewidth = 0.2)
       
