@@ -29,7 +29,10 @@ plot_plate_stack_info <- function(dt_plate) {
   checkmate::assert_data_table(dt_plate)
   checkmate::assert_names(names(dt_plate),
                           must.include = c("ReadoutValue",
-                                           concentration, concentration2, drug, drug2, cellline, well_position))
+                                           concentration,
+                                           drug,
+                                           cellline,
+                                           well_position))
   
   barcode_idf <- intersect(barcode, names(dt_plate))
   if (NROW(barcode_idf) == 0) {
@@ -176,11 +179,11 @@ plot_plate <- function(dt_plate, column_name) {
   
   checkmate::assert_data_table(dt_plate)
   checkmate::assert_names(names(dt_plate),
-                          must.include = c("WellColumn",
-                                           "WellRow",
-                                           "ReadoutValue",
-                                           concentration, concentration2, concentration3,
-                                           drug, drug2, cellline, well_position))
+                          must.include = c("ReadoutValue",
+                                           concentration,
+                                           drug,
+                                           cellline,
+                                           well_position))
   checkmate::assert_choice(column_name, choices = names(dt_plate))
   
   barcode_idf <- intersect(barcode, names(dt_plate))
