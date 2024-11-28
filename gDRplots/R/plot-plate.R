@@ -140,7 +140,7 @@ plot_plate_stack_info <- function(dt_plate) {
                                           y = WellRow),
                              fill = NA,
                              color = "black",
-                             size = 0.5)
+                             linewidth = 0.5)
     })
     names(plate_list) <- barcodes
     plate_list
@@ -256,7 +256,7 @@ plot_plate <- function(dt_plate, column_name) {
                                           y = WellRow),
                              fill = NA,
                              color = "black",
-                             size = 0.5)
+                             linewidth = 0.5)
     })
     names(plate_list) <- barcodes
     plate_list
