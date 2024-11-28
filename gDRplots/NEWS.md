@@ -1,3 +1,6 @@
+## gDRplots 0.0.48 - 2024-11-28
+* add boxplots for single-agent metrics
+
 ## gDRplots 0.0.47 - 2024-11-26
 * refactor `heatmap_combo_metrics_panel` function - split in single plot and panel
 * add `plot_combination_index` function
