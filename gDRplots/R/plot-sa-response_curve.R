@@ -18,7 +18,7 @@
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
 #'
-#' @return plot with dose-response curves
+#' @return \code{ggplot object} containing plot of dose-response curves
 #'
 #' @keywords single-agent_plots
 #' @examples
@@ -196,10 +196,10 @@ plot_dose_response_sa <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams plot_dose_response_sa
-#' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
-#' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
+#' @param cellline_name_vec character vector with cell line names to be plotted (Cell Line Name)
+#' @param drug_name_vec character vector with drug names to be plotted (Drug Name)
 #'    
-#' @return list of plots with dose-response curves
+#' @return list of \code{ggplot objects} containing plots of dose-response curves
 #' 
 #' @keywords single-agent_plots
 #' @examples
@@ -274,10 +274,10 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 #' Plot drug response curves for single-agent data for selected call lines and drugs
 #' 
 #' @inheritParams plot_dose_response_sa
-#' @param cellline_name_vec character vector with cell line to be plotted (Cell Line Name)
-#' @param drug_name_vec character vector with cell line to be plotted (Drug Name)
+#' @param cellline_name_vec character vector with cell line names to be plotted (Cell Line Name)
+#' @param drug_name_vec character vector with drug names to be plotted (Drug Name)
 #'    
-#' @return list of plots with dose-response curves
+#' @return list of \code{ggplot objects} containing plots of dose-response curves
 #' 
 #' @keywords single-agent_plots
 #' @examples
@@ -364,7 +364,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param fit_source string source name for metrics
 #'
-#' @return plot with dose-response curves
+#' @return \code{ggplot object} containing plot of dose-response curves (observed and fitted values)
 #'
 #' @keywords QC_plot
 #' @examples
@@ -512,7 +512,8 @@ plot_dose_response_sa_qc <- function(dt_metrics,
 #' @param d_names character vector with drug names to be plotted (Drug Name);
 #'    if NULL - all available drugs will be plotted
 #'
-#' @return panle with plot with dose-response curves for selected cell line by drugs
+#' @return \code{ggplot object} with panel with plots of dose-response curves for selected 
+#'    cell line by drugs (observed and fitted values)
 #'
 #' @keywords QC_plot
 #' @examples

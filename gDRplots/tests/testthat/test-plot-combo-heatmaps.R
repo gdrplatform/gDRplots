@@ -1,5 +1,122 @@
 context("Test combo_plots")
 
+test_that("heatmap_combo_metrics works as expected", {
+  cl_name <- "cellline_FD"
+  drug1_name <- "drug_011"
+  drug2_name <- "drug_026"
+  
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+  dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+  
+  dt_excess_sub <- 
+    dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name & CellLineName == cl_name, ]
+  
+  plt_1 <- heatmap_combo_metrics(dt_excess, 
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name, 
+                                 cl_name) # default
+  expect_is(plt_1, "gg")
+  expect_true(grepl("GR", plt_1[["labels"]][["title"]]))
+  expect_true(grepl("GR", plt_1[["labels"]][["fill"]]))
+  expect_true(grepl("Smooth", plt_1[["labels"]][["title"]]))
+  expect_true(grepl("Smooth", plt_1[["labels"]][["fill"]]))
+  expect_true(any(grepl(drug1_name, plt_1[["labels"]][["y"]])))
+  expect_true(any(grepl(drug2_name, plt_1[["labels"]][["x"]])))
+  expect_length(plt_1[["layers"]], 2) # heatmap + isobolograms # nolint
+  expect_length(unique(ggplot2::ggplot_build(plt_1)[["data"]][[2]][["colour"]]), 3) # iso_levels
+  default_lim <- round(prep_hm_limits(dt_excess_sub[normalization_type == "GR", ][["smooth"]]), 0)
+  expect_equal(range(as.numeric(ggplot2::get_guide_data(plt_1, "fill")[[".label"]])), default_lim)
+  
+  norm_type <- "RV"
+  plt_2 <- heatmap_combo_metrics(dt_excess, 
+                                 dt_isobolograms = NULL,
+                                 drug1_name, drug2_name, 
+                                 cl_name,
+                                 metric = "bliss_excess",
+                                 normalization_type = norm_type)
+  expect_is(plt_2, "gg")
+  expect_true(grepl(norm_type, plt_2[["labels"]][["title"]]))
+  expect_true(grepl(norm_type, plt_2[["labels"]][["fill"]]))
+  expect_true(grepl("Bliss Excess", plt_2[["labels"]][["title"]]))
+  expect_true(grepl("Bliss Excess", plt_2[["labels"]][["fill"]]))
+  expect_length(plt_2[["layers"]], 1) # heatmap # nolint
+  expect_length(ggplot2::ggplot_build(plt_2)[["data"]], 1)
+  
+  ls_col_1 <- c("#008B8B", "#FFA500", "#FFFFFF")
+  plt_3 <- heatmap_combo_metrics(dt_excess, 
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name, 
+                                 cl_name,
+                                 metric = "hsa_excess",
+                                 colors_vec_excess = ls_col_1,
+                                 limit = c(NA, NA),
+                                 iso_levels = NULL)
+  expect_is(plt_3, "gg")
+  expect_true(grepl("HSA Excess", plt_3[["labels"]][["title"]]))
+  expect_true(grepl("HSA Excess", plt_3[["labels"]][["fill"]]))
+  expect_length(plt_3[["layers"]], 1) # heatmap # nolint
+  expect_length(ggplot2::ggplot_build(plt_3)[["data"]], 1)
+  expect_true(any(ls_col_1 %in% unique(ggplot2::ggplot_build(plt_3)[["data"]][[1]][["fill"]])))
+  lim_fill <- round(range(dt_excess_sub[normalization_type == "GR", ] [["hsa_excess"]], na.rm = TRUE), 1)
+  expect_equal(range(as.numeric(ggplot2::get_guide_data(plt_3, "fill")[[".label"]])), lim_fill)
+  
+  plt_4 <- heatmap_combo_metrics(dt_excess, 
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name, 
+                                 cl_name,
+                                 colors_vec_excess = ls_col_1)
+  expect_false(any(ls_col_1 %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]][["fill"]])))
+  expect_true(any(.get_smooth_palette(50) %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]][["fill"]])))
+  
+  plt_5 <- heatmap_combo_metrics(dt_excess, 
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name, 
+                                 cl_name,
+                                 metric = "bliss_excess",
+                                 colors_vec_smooth = ls_col_1,
+                                 limit = c(-0.1, 0.1))
+  expect_false(any(ls_col_1 %in% unique(ggplot2::ggplot_build(plt_5)[["data"]][[1]][["fill"]])))
+  expect_true(any(.get_excess_palette(50) %in% unique(ggplot2::ggplot_build(plt_5)[["data"]][[1]][["fill"]])))
+  expect_equal(range(as.numeric(ggplot2::get_guide_data(plt_5, "fill")[[".label"]])), c(-0.1, 0.1))
+  
+  plt_1_swap_axes <- heatmap_combo_metrics(dt_excess, 
+                                           dt_isobolograms,
+                                           drug1_name, drug2_name, 
+                                           cl_name,
+                                           swap_axes = TRUE)
+  expect_true(any(grepl(drug1_name, plt_1_swap_axes[["labels"]][["x"]])))
+  expect_true(any(grepl(drug2_name, plt_1_swap_axes[["labels"]][["y"]])))
+  expect_equal(plt_1_swap_axes[["data"]][["pos_y"]], plt_1[["data"]][["pos_x"]])
+  expect_equal(plt_1_swap_axes[["data"]][["pos_x"]], plt_1[["data"]][["pos_y"]])
+  expect_equal(plt_1_swap_axes[["data"]][["smooth"]], plt_1[["data"]][["smooth"]])
+})
+
+test_that("plot_combination_index works as expected", {
+  cl_name <- "cellline_BC"
+  drug1_name <- "drug_001"
+  drug2_name <- "drug_026"
+  
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+  dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+  
+  plt_1 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name,
+                                  cl_name,
+                                  normalization_type = "GR")
+  expect_is(plt_1, "gg")
+  expect_true(grepl("GR", plt_1[["labels"]][["title"]]))
+  expect_true(grepl(drug1_name, plt_1[["labels"]][["x"]]))
+  expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
+  expect_true(grepl("CI", plt_1[["labels"]][["y"]]))
+  
+  
+})
+
 test_that("heatmap_combo_metrics_panel works as expected", {
   cl_name <- "cellline_FD"
   drug1_name <- "drug_011"
@@ -24,7 +141,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         normalization_type, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_true(all(vapply(seq_along(plts_2), 
@@ -37,7 +154,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         iso_levels = iso_lvl, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_3, "list")
   expect_equal(names(plts_3), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
   expect_equal(NROW(unique(ggplot2::ggplot_build(plts_3[["smooth"]])[["data"]][[2]][["colour"]])),
@@ -55,7 +172,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         cl_name,
                                         iso_levels = NULL,
                                         colors_vec_smooth = ls_col_1,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_4, "list")
   expect_true(all(vapply(seq_along(plts_4), function(x) is(plts_4[[x]], "gg"), logical(1))))
   expect_length(plts_4, 3) # smooth, hsa_excess, bliss_excess
@@ -69,7 +186,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug2_name, 
                                         cl_name,
                                         colors_vec_excess = ls_col_2,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_5, "list")
   expect_true(all(vapply(seq_along(plts_5), function(x) is(plts_5[[x]], "gg"), logical(1))))
   expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
@@ -82,7 +199,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug1_name, 
                                         drug2_name, 
                                         cl_name,
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   expect_is(plts_6, "list")
   expect_true(all(vapply(seq_along(plts_6), function(x) is(plts_6[[x]], "gg"), logical(1))))
   expect_true(all(vapply(names(gDRutils::get_combo_excess_field_names()), 
@@ -109,7 +226,6 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                            cl_name = cl_name,
                                            normalization_type = "AB"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-  
   expect_error(heatmap_combo_metrics_panel(dt_excess = dt_excess,
                                            dt_isobolograms = dt_isobolograms,
                                            drug1_name = drug1_name,
@@ -137,7 +253,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug1_name, 
                                         drug2_name, 
                                         cl_name, 
-                                        as_panel = FALSE)
+                                        as_list = TRUE)
   
   # check if the output is a list
   expect_is(plts_8, "list")
@@ -153,13 +269,99 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                                   drug1_name,
                                                   drug2_name,
                                                   cl_name,
-                                                  as_panel = FALSE,
+                                                  as_list = TRUE,
                                                   swap_axes = TRUE)
   expect_equal(plts_8_swap_axes[["smooth"]][["labels"]][["x"]], plts_8[["smooth"]][["labels"]][["y"]])
   expect_equal(plts_8_swap_axes[["smooth"]][["labels"]][["y"]], plts_8[["smooth"]][["labels"]][["x"]])
   expect_equal(plts_8_swap_axes[["smooth"]][["data"]][["pos_y"]], plts_8[["smooth"]][["data"]][["pos_x"]])
   expect_equal(plts_8_swap_axes[["smooth"]][["data"]][["pos_x"]], plts_8[["smooth"]][["data"]][["pos_y"]])
   expect_equal(plts_8_swap_axes[["smooth"]][["data"]][["smooth"]], plts_8[["smooth"]][["data"]][["smooth"]])
+})
+
+test_that("plot_combination_index works as expected", {
+  cl_name <- "cellline_BC"
+  drug1_name <- "drug_001"
+  drug2_name <- "drug_026"
+  
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+  dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+  
+  plt_1 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name,
+                                  cl_name)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 3)
+  expect_true(grepl(drug1_name, plt_1[["labels"]][["x"]]))
+  expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
+  expect_true(grepl("T=", plt_1[["labels"]][["title"]]))
+  expect_true(grepl("GR", plt_1[["labels"]][["title"]]))
+  
+  plt_2 <- plot_combination_index(dt_excess = NULL,
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name,
+                                  cl_name,
+                                  normalization_type = "RV", 
+                                  iso_levels = c("0.25", "0.75"),
+                                  colors_vec_iso = c("#00008B", "#008B8B"))
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 3)
+  expect_false(grepl("T=", plt_2[["labels"]][["title"]]))
+  expect_true(grepl("RV", plt_2[["labels"]][["title"]]))
+  expect_true(
+    all(c("#00008B", "#008B8B") %in% unique(ggplot2::ggplot_build(plt_2)[["data"]][[3]][["colour"]])))
+  
+  plt_3 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name,
+                                  cl_name,
+                                  iso_levels = c("0.85", "0.9")) # not avialable
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 2)
+  expect_true(grepl("T=", plt_3[["labels"]][["title"]]))
+  expect_true(grepl("GR", plt_3[["labels"]][["title"]]))
+  expect_false("colour" %in% names(plt_3[["labels"]])) # lack of `iso_levels`
+  
+  expect_error(plot_combination_index(dt_excess = unlist(dt_excess),
+                                      dt_isobolograms = dt_isobolograms,
+                                      drug1_name = drug1_name,
+                                      drug2_name = drug2_name,
+                                      cl_name = cl_name),
+               "Assertion on 'dt_excess' failed: Must be a data.table")
+  expect_error(plot_combination_index(dt_excess = dt_excess,
+                                      dt_isobolograms = unlist(dt_isobolograms),
+                                      drug1_name = drug1_name,
+                                      drug2_name = drug2_name,
+                                      cl_name = cl_name),
+               "Assertion on 'dt_isobolograms' failed: Must be a data.table")
+  expect_error(plot_combination_index(dt_excess = dt_excess,
+                                      dt_isobolograms = dt_isobolograms,
+                                      drug1_name = "unknown_drug",
+                                      drug2_name = drug2_name,
+                                      cl_name = cl_name),
+               "Assertion on 'drug1_name' failed: Must be element of set")
+  expect_error(plot_combination_index(dt_excess = dt_excess,
+                                      dt_isobolograms = dt_isobolograms,
+                                      drug1_name = drug1_name,
+                                      drug2_name = drug2_name,
+                                      cl_name = 1),
+               "Assertion on 'cl_name' failed: Must be of type 'string'")
+  expect_error(plot_combination_index(dt_excess = dt_excess,
+                                      dt_isobolograms = dt_isobolograms,
+                                      drug1_name = drug1_name,
+                                      drug2_name = drug2_name,
+                                      cl_name = cl_name,
+                                      normalization_type = "AB"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(plot_combination_index(dt_excess = dt_excess,
+                                      dt_isobolograms = dt_isobolograms,
+                                      drug1_name = drug1_name,
+                                      drug2_name = drug2_name,
+                                      cl_name = cl_name,
+                                      iso_levels = NULL),
+               "Assertion on 'iso_levels' failed: Must be of type 'character', not 'NULL'")
 })
 
 test_that("heatmap_combo_with_isoref works as expected", {

@@ -1,3 +1,7 @@
+## gDRplots 0.0.47 - 2024-11-26
+* refactor `heatmap_combo_metrics_panel` function - split in single plot and panel
+* add `plot_combination_index` function
+
 ## gDRplots 0.0.46 - 2024-11-25
 * update `plot_volcano_assoc_panel`
 * unify function name - rename `heatmap_combo_metrics` into `heatmap_combo_metrics_panel`
