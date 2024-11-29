@@ -311,7 +311,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'   metric = "hsa_score",
 #'   normalization_type = "RV",
 #'   grouped_flag = TRUE,
-#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue", "limegreen"))
+#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
 #' 
 #' @export
 plot_boxplot_metric_combo_by_CLs <- function(
