@@ -29,7 +29,7 @@
 #'                               
 #' plot_boxplot_metric_sa_by_CLs(dt_metrics,
 #'                               metric = "x_AOC",
-#'                               colors_vec = "darkgreen")
+#'                               colors_vec = "gold")
 #' 
 #' plot_boxplot_metric_sa_by_CLs(
 #'   dt_metrics,
@@ -119,6 +119,138 @@ plot_boxplot_metric_sa_by_CLs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::theme(legend.position = "none")
+  }
+  
+  # final
+  plt <- plt +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::labs(title = plt_title,
+                  y = sprintf("%s for %s", metric, normalization_type), 
+                  x = "") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank())
+  
+  return(plt)
+}
+
+#' Plot drug response curves for single-agent data grouped by drug names
+#' 
+#' @inheritParams plot_boxplot_metric_sa_by_CLs
+#' 
+#' @return \code{ggplot object} containing boxplots for selected single-agent grouped by drug names
+#' 
+#' @keywords single-agent_plots
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' 
+#' plot_boxplot_metric_sa_by_drugs(dt_metrics,
+#'                                 normalization_type = "RV")
+#' 
+#' plot_boxplot_metric_sa_by_drugs(dt_metrics,
+#'                                 normalization_type = "RV",
+#'                                 grouped_flag = TRUE)
+#'                               
+#' plot_boxplot_metric_sa_by_drugs(dt_metrics,
+#'                                 metric = "x_AOC",
+#'                                 colors_vec = "gold")
+#' 
+#' plot_boxplot_metric_sa_by_drugs(
+#'   dt_metrics,
+#'   metric = "x_max",
+#'   grouped_flag = TRUE)
+#' 
+#' plot_boxplot_metric_sa_by_drugs(
+#'   dt_metrics,
+#'   metric = "x_mean",
+#'   grouped_flag = TRUE,
+#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue", "limegreen"))
+#' 
+#' @export
+plot_boxplot_metric_sa_by_drugs <- function(
+    dt_metrics,
+    normalization_type = "GR",
+    metric = "xc50",
+    fit_source = "gDR",
+    grouped_flag = FALSE,
+    colors_vec = NULL
+) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_MOA <- gDRutils::get_env_identifiers("drug_moa")
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_flag(grouped_flag)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_met_norm <- dt_metrics[eval(filter_expr)]
+  
+  # take care of Inf and NaN values in IC50 metrics
+  if (metric == "xc50") {
+    inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
+    if (any(inf_xc50, na.rm = TRUE)) {
+      dt_met_norm[inf_xc50, ][["xc50"]] <- 10^dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
+      # check whether all metric are below 10 ^ maxlog10Concentration
+      over_xc50 <- dt_met_norm[["xc50"]] > 10^dt_met_norm[["maxlog10Concentration"]]
+      if (any(over_xc50, na.rm = TRUE)) {
+        dt_met_norm[over_xc50, ][["xc50"]] <- 10^dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
+      }
+    }
+  }
+  
+  dt_met <- dt_met_norm[, c(cellline_name, drug_MOA, drug_name, metric), with = FALSE]
+  
+  plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
+  
+  if (grouped_flag) {
+    data.table::setorderv(dt_met, drug_MOA)
+    dt_met[[drug_name]] <- factor(dt_met[[drug_name]], levels = unique(dt_met[[drug_name]]))
+    
+    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      get_qual_colors(NROW(unique(dt_met[[drug_MOA]])))
+    } else if (NROW(colors_vec) != NROW(unique(dt_met[[drug_MOA]]))) {
+      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[drug_MOA]])))
+    } else {
+      colors_vec
+    }
+    names(fill_colors) <- unique(dt_met[[drug_MOA]])
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25) +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
+                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
+      ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
+      ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
+    
+  } else {
+    fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      "#A6CEE3"
+    } else {
+      colors_vec[1]
+    }
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
       ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
       ggplot2::theme(legend.position = "none")
