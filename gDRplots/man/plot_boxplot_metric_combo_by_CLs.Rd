@@ -60,7 +60,7 @@ plot_boxplot_metric_combo_by_CLs(
   metric = "bliss_score",
   grouped_flag = TRUE)
 
-plot_boxplot_metric_combo_by_drugs(
+plot_boxplot_metric_combo_by_CLs(
   dt_scores,
   metric = "hsa_score",
   normalization_type = "RV",
