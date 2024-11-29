@@ -44,6 +44,7 @@ dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 plot_boxplot_metric_combo_by_drugs(dt_scores)
                               
 plot_boxplot_metric_combo_by_drugs(dt_scores,
+                                   normalization_type = "RV",
                                    colors_vec = "gold")
 
 }
