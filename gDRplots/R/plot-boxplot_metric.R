@@ -13,7 +13,7 @@
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
 #' 
-#' @return \code{ggplot object} containing boxplots
+#' @return \code{ggplot object} containing boxplots for selected single-agent grouped by cellline names
 #' 
 #' @keywords single-agent_plots
 #' @examples
@@ -22,28 +22,28 @@
 #' 
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 #' 
-#' plot_boxplot_sa_metric_by_CLs(dt_metrics)
+#' plot_boxplot_metric_sa_by_CLs(dt_metrics)
 #' 
-#' plot_boxplot_sa_metric_by_CLs(dt_metrics,
+#' plot_boxplot_metric_sa_by_CLs(dt_metrics,
 #'                               grouped_flag = TRUE)
 #'                               
-#' plot_boxplot_sa_metric_by_CLs(dt_metrics,
+#' plot_boxplot_metric_sa_by_CLs(dt_metrics,
 #'                               metric = "x_AOC",
 #'                               colors_vec = "darkgreen")
 #' 
-#' plot_boxplot_sa_metric_by_CLs(
+#' plot_boxplot_metric_sa_by_CLs(
 #'   dt_metrics,
 #'   metric = "x_max",
 #'   grouped_flag = TRUE)
 #' 
-#' plot_boxplot_sa_metric_by_CLs(
+#' plot_boxplot_metric_sa_by_CLs(
 #'   dt_metrics,
 #'   metric = "x_mean",
 #'   grouped_flag = TRUE,
 #'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
 #' 
 #' @export
-plot_boxplot_sa_metric_by_CLs <- function(
+plot_boxplot_metric_sa_by_CLs <- function(
     dt_metrics,
     normalization_type = "GR",
     metric = "xc50",
