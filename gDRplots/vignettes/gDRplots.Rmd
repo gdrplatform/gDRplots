@@ -216,6 +216,18 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
+The **plot_boxplot_metric_sa_by_CLs** and **plot_boxplot_metric_sa_by_drugs** functions are dedicated to single-agent experiments to generate boxplots grouped by `CellLineName` or combination of `DrugName` with `DrugName_2`, respectively.
+
+Additionally, for boxplots grouped by `CellLineName` user can colored boxplots by secondary variable - by `Tissue`.
+
+```{r plot_boxplot_metric_combo_by_CLs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_CLs(dt_scores)
+```
+
+```{r plot_boxplot_metric_combo_by_drugs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_drugs(dt_scores)
+```
+
 For experiments with drug combinations, users can visualize the full response matrix by using **heatmap_combo_metrics** function. 
 
 Users get at once a view with smooth value, HSA (highest single-agent) excess, or Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
