@@ -131,7 +131,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
                    plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank())
@@ -263,7 +263,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
                    plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank())
@@ -391,7 +391,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
                    plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank())
@@ -466,7 +466,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
                    plot.title = ggplot2::element_text(size = 10),
                    panel.grid.minor = ggplot2::element_blank())
