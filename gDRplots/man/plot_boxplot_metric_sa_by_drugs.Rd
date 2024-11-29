@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-boxplot_metric.R
 \name{plot_boxplot_metric_sa_by_drugs}
 \alias{plot_boxplot_metric_sa_by_drugs}
-\title{Plot drug response curves for single-agent data grouped by drug names}
+\title{Plot box plots for metric for single-agent data grouped by drug names}
 \usage{
 plot_boxplot_metric_sa_by_drugs(
   dt_metrics,
@@ -36,7 +36,7 @@ colored by \code{Tissue}}
 \code{ggplot object} containing boxplots for selected single-agent grouped by drug names
 }
 \description{
-Plot drug response curves for single-agent data grouped by drug names
+Plot box plots for metric for single-agent data grouped by drug names
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-boxplot_metric.R
 \name{plot_boxplot_metric_sa_by_CLs}
 \alias{plot_boxplot_metric_sa_by_CLs}
-\title{Plot a box plot for metric data for single-agent data grouped by cell line names}
+\title{Plot box plots for metric for single-agent data grouped by cell line names}
 \usage{
 plot_boxplot_metric_sa_by_CLs(
   dt_metrics,
@@ -36,7 +36,7 @@ colored by \code{Tissue}}
 \code{ggplot object} containing boxplots for selected single-agent grouped by cellline names
 }
 \description{
-Plot a box plot for metric data for single-agent data grouped by cell line names
+Plot box plots for metric for single-agent data grouped by cell line names
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
