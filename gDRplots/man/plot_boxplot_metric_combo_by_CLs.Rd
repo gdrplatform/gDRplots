@@ -33,7 +33,7 @@ colored by \code{Tissue}}
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
 }
 \value{
-\code{ggplot object} containing boxplots for selected combo grouped by drug names
+\code{ggplot} object containing boxplots for selected combo grouped by drug names
 }
 \description{
 Plot box plots for metric for combo data grouped by cell line names

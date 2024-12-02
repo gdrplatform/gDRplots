@@ -30,7 +30,7 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 \item{max_x_lbl_length}{numeric value for the maximum number of characters in the x-axis label}
 }
 \value{
-\code{ggplot object} containing boxplots for variable levels
+\code{ggplot} object containing boxplots for variable levels
 }
 \description{
 Plot boxplot for metric values grouped by metadata from DepMap

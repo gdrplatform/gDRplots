@@ -59,7 +59,7 @@ Use NA to refer to the existing minimum or maximumdescription}
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
-\code{ggplot object} containing heatmap with the values for the selected combo metric 
+\code{ggplot} object containing heatmap with the values for the selected combo metric 
    for selected drugs and cell line with selected isoline (when chosen)
 }
 \description{

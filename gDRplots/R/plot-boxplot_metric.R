@@ -13,7 +13,7 @@
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
 #' 
-#' @return \code{ggplot object} containing boxplots for selected single-agent grouped by cellline names
+#' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 
 #' @keywords single-agent_plots
 #' @examples
@@ -58,8 +58,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
-  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -73,11 +72,11 @@ plot_boxplot_metric_sa_by_CLs <- function(
   if (metric == "xc50") {
     inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10^dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
+      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10^dt_met_norm[["maxlog10Concentration"]]
+      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
       if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10^dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
+        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
       }
     }
   }
@@ -143,7 +142,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
 #' 
 #' @inheritParams plot_boxplot_metric_sa_by_CLs
 #' 
-#' @return \code{ggplot object} containing boxplots for selected single-agent grouped by drug names
+#' @return \code{ggplot} object containing boxplots for selected single-agent grouped by drug names
 #' 
 #' @keywords single-agent_plots
 #' @examples
@@ -205,11 +204,11 @@ plot_boxplot_metric_sa_by_drugs <- function(
   if (metric == "xc50") {
     inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10^dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
+      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10^dt_met_norm[["maxlog10Concentration"]]
+      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
       if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10^dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
+        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
       }
     }
   }
@@ -281,7 +280,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' 
-#' @return \code{ggplot object} containing boxplots for selected combo grouped by drug names
+#' @return \code{ggplot} object containing boxplots for selected combo grouped by drug names
 #' 
 #' @keywords combo_plots
 #' @examples
@@ -403,7 +402,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
 #' 
 #' @inheritParams plot_boxplot_metric_combo_by_CLs
 #' 
-#' @return \code{ggplot object} containing boxplots for selected combo grouped by drug names
+#' @return \code{ggplo} object containing boxplots for selected combo grouped by drug names
 #' 
 #' @keywords combo_plots
 #' @examples

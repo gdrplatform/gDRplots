@@ -33,7 +33,7 @@ colored by \code{Tissue}}
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
 }
 \value{
-\code{ggplot object} containing boxplots for selected single-agent grouped by cellline names
+\code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 }
 \description{
 Plot box plots for metric for single-agent data grouped by cell line names

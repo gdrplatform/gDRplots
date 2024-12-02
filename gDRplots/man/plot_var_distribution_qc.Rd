@@ -25,7 +25,7 @@ and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 }
 \value{
-\code{ggplot object} containing plot with violin for each drug
+\code{ggplot} object containing plot with violin for each drug
 }
 \description{
 Plot a violin plot for normalized or averaged data (single-agent and combo) to control the quality of the data

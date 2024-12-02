@@ -9,7 +9,7 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param with_table logical whether table with metric values should be shown next to the plot
 #'
-#' @return \code{ggplot object} containing lollipop plot with stat value for each drug
+#' @return \code{ggplot} object containing lollipop plot with stat value for each drug
 #'
 #' @keywords QC_plot
 #' @examples
@@ -99,7 +99,7 @@ plot_var_stat_qc <- function(dt_assay,
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #'
-#' @return \code{ggplot object} containing panel with lollipop plots with r2 and rss values for each drug
+#' @return \code{ggplot} object containing panel with lollipop plots with r2 and rss values for each drug
 #'
 #' @keywords QC_plot
 #' @examples

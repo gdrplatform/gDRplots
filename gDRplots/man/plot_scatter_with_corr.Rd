@@ -27,7 +27,7 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 (will be used as a plot title)}
 }
 \value{
-\code{ggplot object} containing a scatter plot with correlation
+\code{ggplot} object containing a scatter plot with correlation
 }
 \description{
 Plot scatter with correlation

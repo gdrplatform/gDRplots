@@ -55,11 +55,11 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   if (any(metric == "xc50")) {
     inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
-      dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
+      dt_response_metric[inf_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_response_metric[["xc50"]] > 10^dt_response_metric[["maxlog10Concentration"]]
+      over_xc50 <- dt_response_metric[["xc50"]] > 10 ^ dt_response_metric[["maxlog10Concentration"]]
       if (any(over_xc50, na.rm = TRUE)) {
-        dt_response_metric[over_xc50, ][["xc50"]] <- 10^dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
+        dt_response_metric[over_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
       }
     }
   }
@@ -272,11 +272,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   if (any(metric == "xc50")) {
     inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
     if (any(inf_xc50, na.rm = TRUE)) {
-      dt_response_metric[inf_xc50, ][["xc50"]] <- 10^dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
+      dt_response_metric[inf_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
       # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_response_metric[["xc50"]] > 10^dt_response_metric[["maxlog10Concentration"]]
+      over_xc50 <- dt_response_metric[["xc50"]] > 10 ^ dt_response_metric[["maxlog10Concentration"]]
       if (any(over_xc50, na.rm = TRUE)) {
-        dt_response_metric[over_xc50, ][["xc50"]] <- 10^dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
+        dt_response_metric[over_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
       }
     }
   }

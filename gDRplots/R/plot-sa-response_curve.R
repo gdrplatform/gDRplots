@@ -18,7 +18,7 @@
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
 #'
-#' @return \code{ggplot object} containing plot of dose-response curves
+#' @return \code{ggplot} object containing plot of dose-response curves
 #'
 #' @keywords single-agent_plots
 #' @examples
@@ -364,7 +364,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param fit_source string source name for metrics
 #'
-#' @return \code{ggplot object} containing plot of dose-response curves (observed and fitted values)
+#' @return \code{ggplot} object containing plot of dose-response curves (observed and fitted values)
 #'
 #' @keywords QC_plot
 #' @examples
@@ -512,7 +512,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
 #' @param d_names character vector with drug names to be plotted (Drug Name);
 #'    if NULL - all available drugs will be plotted
 #'
-#' @return \code{ggplot object} with panel with plots of dose-response curves for selected 
+#' @return \code{ggplot} object with panel with plots of dose-response curves for selected 
 #'    cell line by drugs (observed and fitted values)
 #'
 #' @keywords QC_plot

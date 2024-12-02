@@ -55,7 +55,7 @@ and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
-\code{ggplot object} containing panel with heatmaps for fitted values and reference data 
+\code{ggplot} object containing panel with heatmaps for fitted values and reference data 
    for isobolograms for selected drug and co-drug by list of cell lines
 }
 \description{

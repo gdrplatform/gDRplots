@@ -14,7 +14,7 @@
 #' @param split_by_conc split_by_conc logical flag indicating whether curves 
 #'    for \code{Concentration_2} should be plotted on a single plot or separately
 #'
-#' @return \code{ggplot object} containing plot with dose-response curves for combo data
+#' @return \code{ggplot} object containing plot with dose-response curves for combo data
 #'
 #' @keywords combo_plots
 #' @examples
@@ -158,7 +158,7 @@ plot_dose_response_combo <- function(dt_average,
 #' @param d_names character vector with drug names to be plotted (Drug Name);
 #'    if NULL - all available drugs will be plotted
 #'
-#' @return \code{ggplot object} containing panel with plot with dose-response curves 
+#' @return \code{ggplot} object containing panel with plot with dose-response curves 
 #'    for selected cell line by drugs
 #'
 #' @keywords combo_plots
