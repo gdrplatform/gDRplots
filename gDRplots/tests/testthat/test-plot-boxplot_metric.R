@@ -51,6 +51,8 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics,
                                              metric = "xxx"),
                "Assertion on 'metric' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics[, -c("CellLineName")]),
+               "Assertion on 'names(dt_metrics)' failed: Names must include the elements")
   expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics,
                                              fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
@@ -157,6 +159,8 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   expect_error(plot_boxplot_metric_combo_by_CLs(dt_scores = dt_scores,
                                                 metric = "xxx"),
                "Assertion on 'metric' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_combo_by_CLs(dt_scores = dt_scores[, -c("CellLineName")]),
+               "Assertion on 'names(dt_scores)' failed: Names must include the elements")
   expect_error(plot_boxplot_metric_combo_by_CLs(dt_scores = dt_scores,
                                                 fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
