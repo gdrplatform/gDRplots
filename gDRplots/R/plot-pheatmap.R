@@ -52,7 +52,7 @@
 #' 
 #' @keywords QC_plot
 #' 
-#' @return \code{pheatmap object} containing heatmap for selected metric with annotation - if given
+#' @return \code{pheatmap} object containing heatmap for selected metric with annotation - if given
 #' @export
 pheatmap_qc <- function(
     dt_average,
@@ -325,7 +325,7 @@ pheatmap_qc <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export
@@ -607,7 +607,7 @@ pheatmap_with_anno_sa <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export
@@ -880,7 +880,7 @@ pheatmap_with_anno_cd <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export

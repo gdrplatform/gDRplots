@@ -179,7 +179,7 @@ plot_fitting_acc <- function(dt_assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Controls")}
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #'
-#' @return \code{pheatmap object} containing hetamap of mapping controls to treated
+#' @return \code{pheatmap} object containing hetamap of mapping controls to treated
 #'
 #' @keywords QC_plot
 #' @examples
