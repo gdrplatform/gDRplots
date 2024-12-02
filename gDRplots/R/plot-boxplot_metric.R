@@ -7,7 +7,8 @@
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
+#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
+#'    but the values from any numeric colum can be displayed.
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
@@ -58,7 +59,8 @@ plot_boxplot_metric_sa_by_CLs <- function(
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("xc50", "x_max", "x_mean"))
+  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
