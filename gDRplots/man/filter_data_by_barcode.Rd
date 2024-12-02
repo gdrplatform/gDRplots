@@ -19,3 +19,4 @@ A subset of the data filtered by the specified barcode
 \description{
 Helper function to filter data by barcode and prepare it for plotting
 }
+\keyword{internal}

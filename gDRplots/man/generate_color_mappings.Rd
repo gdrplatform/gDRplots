@@ -20,3 +20,4 @@ A list containing color mappings for Gnumber and Gnumber_2
 \description{
 Helper function to generate color mappings for Gnumber and Gnumber_2
 }
+\keyword{internal}

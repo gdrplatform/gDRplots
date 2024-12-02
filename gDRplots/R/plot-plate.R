@@ -269,6 +269,7 @@ plot_plate <- function(dt_plate, column_name) {
 #' @param barcode The barcode to filter the data by
 #' @param barcode_idf The identifier for the barcode column
 #' 
+#' @keywords internal
 #' @return A subset of the data filtered by the specified barcode
 filter_data_by_barcode <- function(dt_plate, barcode, barcode_idf) {
   checkmate::assert_data_table(dt_plate)
@@ -290,6 +291,7 @@ filter_data_by_barcode <- function(dt_plate, barcode, barcode_idf) {
 #' @param dt_plate_subset The subset of data
 #' @param untrt_tag Untreated tag identifier
 #' 
+#' @keywords internal
 #' @return A list containing color mappings for Gnumber and Gnumber_2
 generate_color_mappings <- function(dt_plate_subset,
                                     untrt_tag = gDRutils::get_env_identifiers("untreated_tag")) {
