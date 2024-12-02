@@ -229,15 +229,16 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_equal(NROW(dt_response), NROW(res))
   
 })
-
-test_that("prep_dt_depmap_feat works as expected", {
-  # TODO in GDR-2710
-})
-
-test_that("prep_dt_depmap_meta works as expected", {
-  # TODO in GDR-2710
-})
-
-test_that("prep_dt_assoc works as expected", {
-  # TODO in GDR-2710
-})
+#nolint start
+# test_that("prep_dt_depmap_feat works as expected", {
+#   # TODO in GDR-2710
+# })
+# 
+# test_that("prep_dt_depmap_meta works as expected", {
+#   # TODO in GDR-2710
+# })
+# 
+# test_that("prep_dt_assoc works as expected", {
+#   # TODO in GDR-2710
+# })
+#nolint end

@@ -1,4 +1,8 @@
+## gDRplots 0.0.48 - 2024-11-28
+* add plate visualizations
+
 ## gDRplots 0.0.47 - 2024-11-26
+* add plate visualizations
 * refactor `heatmap_combo_metrics_panel` function - split in single plot and panel
 * add `plot_combination_index` function
 
