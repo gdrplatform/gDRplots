@@ -562,9 +562,12 @@ test_that("plot_boxplot_meta works as expected", {
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
 }) 
 
-test_that("plot_volcano_assoc_panel works as expected", {
-  # TODO in GDR-2710
-})
+#nolint start
+# test_that("plot_volcano_assoc_panel works as expected", {
+#   # TODO in GDR-2710
+# })
+#nolint end
+
 
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(

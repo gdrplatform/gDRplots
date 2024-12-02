@@ -34,7 +34,10 @@ utils::globalVariables(
     "N",
     "stat_sig",
     "q_value",
-    "value"
+    "value",
+    "ReadoutValue",
+    "WellColumn",
+    "WellRow"
   ),
   utils::packageName())
 
