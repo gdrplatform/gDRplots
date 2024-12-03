@@ -29,7 +29,7 @@ or data for one metadata outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}
 the name of the selected metadata from \code{dt_depmap} - respectively}
 }
 \value{
-\code{ggplot object} containing a panel with volcano plot and  depending on data type:
+\code{ggplot} object containing a panel with volcano plot and  depending on data type:
  a scatter plots with correlation for top 4 variables or boxplots for variable levels
 }
 \description{

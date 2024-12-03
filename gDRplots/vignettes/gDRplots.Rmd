@@ -128,11 +128,11 @@ plot_dose_response_combo(dt_average = dt_average_combo,
 
 ## Metrics plot
 
-A heat map built for all combinations of drugs and cell lines, colored according to the value of the selected metric, is a very common way to explore datasets.
+A heat map built for all combinations of drugs and cell lines, colored according to the value of the selected metric, is a very common way to explore datasets. Boxplots are also commonly used to explore the distribution of metric values across interest groups.
 
 ### Single-agent Data
 
-The **pheatmap_with_anno_sa** function is dedicated to single-agent experiments.
+The **pheatmap_with_anno_sa** function is dedicated to single-agent experiments to generate a heatmap.
 
 Additionally, rows are annotated by `Tissue` and columns - by `drug MOA`. Users can also use their own annotations.
 
@@ -154,9 +154,21 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
+The **plot_boxplot_metric_sa_by_CLs** and **plot_boxplot_metric_sa_by_drugs** functions are dedicated to single-agent experiments to generate boxplots grouped by `CellLineName` or `DrugName`, respectively.
+
+Additionally, user can colored boxplots by secondary variable - by `Tissue` or `drug MOA` respectively. 
+
+```{r plot_boxplot_metric_sa_by_CLs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_CLs(dt_metrics_sa)
+```
+
+```{r plot_boxplot_metric_sa_by_drugs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_drugs(dt_metrics_sa)
+```
+
 ### Co-dilution Data
 
-The **pheatmap_with_anno_cd** function is dedicated to co-dilution experiments.
+The **pheatmap_with_anno_cd** function is dedicated to co-dilution experiments to generate a heatmap.
 
 Additionally, rows are annotated by `Tissue` and columns - by `drug MOA` and `drug MOA 2`. Users can also use their own annotations.
 
@@ -181,7 +193,7 @@ knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 
 ### Combination Data
 
-The **pheatmap_with_anno_combo** function is dedicated to combination experiments.
+The **pheatmap_with_anno_combo** function is dedicated to combination experiments to generate a heatmap.
 
 Additionally, rows are annotated by `Tissue` and columns - by `drug MOA` and `co-drug MOA`. Users can also use their own annotations.
 
@@ -204,13 +216,25 @@ ggpubr::as_ggplot(hm[["gtable"]])
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
+The **plot_boxplot_metric_sa_by_CLs** and **plot_boxplot_metric_sa_by_drugs** functions are dedicated to single-agent experiments to generate boxplots grouped by `CellLineName` or combination of `DrugName` with `DrugName_2`, respectively.
+
+Additionally, for boxplots grouped by `CellLineName` user can colored boxplots by secondary variable - by `Tissue`.
+
+```{r plot_boxplot_metric_combo_by_CLs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_CLs(dt_scores)
+```
+
+```{r plot_boxplot_metric_combo_by_drugs, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_drugs(dt_scores)
+```
+
 For experiments with drug combinations, users can visualize the full response matrix by using **heatmap_combo_metrics** function. 
 
 Users get at once a view with smooth value, HSA (highest single-agent) excess, or Bliss excess for selected normalization type across combinations of concentrations, with isobolograms overlaid. Further, the CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
 
 Users can also use **heatmap_combo_metrics_panel** to get a panel with heatmaps for all combo metrics, with isobolograms overlaid. The CI plot is also shown (the Combination Index is displayed at different ratios of the two drugs).
 
-Note that by default, this function returns a panel, but it can also return a list with the panel's items.
+Note that by default, this function returns a panel, but it can also return a list with the panel's items (param `as_list = TRUE`).
 
 ```{r heatmap_combo_metrics_panel, warning = FALSE, message = FALSE}
 heatmap_combo_metrics(dt_excess = dt_excess,
@@ -242,11 +266,11 @@ The **plot_combination_index** function allows users to explore the dose-sparing
 
 ```{r plot_combination_index, warning = FALSE, message = FALSE}
 plot_combination_index(dt_excess = dt_excess,
-                          dt_isobolograms = dt_isobolograms,
-                          drug1_name = "drug_001", 
-                          drug2_name = "drug_026",
-                          cl_name = "cellline_NE",
-                          iso_levels = c("0.2", "0.5", "0.8"))
+                       dt_isobolograms = dt_isobolograms,
+                       drug1_name = "drug_001", 
+                       drug2_name = "drug_026",
+                       cl_name = "cellline_NE",
+                       iso_levels = c("0.2", "0.5", "0.8"))
 ```
 
 The **heatmap_combo_with_isoref** function allows users to explore the reference isobolograms (additive Loewe model) compared to the measured isobolograms on the background of smooth value of normalization type.

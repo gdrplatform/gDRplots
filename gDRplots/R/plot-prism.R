@@ -12,7 +12,7 @@
 #' @param max_N numeric value for limit the maximum number of non-statistically 
 #'     significant points to plot; for default \code{NULL} all points will be plotted.
 #'
-#' @return \code{ggplot object} containing a volcano plot with association
+#' @return \code{ggplot} object containing a volcano plot with association
 #' @keywords prism_plots
 #' 
 #' @export
@@ -103,7 +103,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #' @param selected_feat_meta_col string with the name of a feature column in DepMap 
 #'  (will be used as a plot title)
 #'
-#' @return \code{ggplot object} containing a scatter plot with correlation
+#' @return \code{ggplot} object containing a scatter plot with correlation
 #' @keywords prism_plots
 #' 
 #' @export
@@ -188,7 +188,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
 #'
-#' @return \code{ggplot object} containing panel of scatter plot with correlation for selected features
+#' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features
 #' @keywords prism_plots
 #' 
 #' @export
@@ -332,7 +332,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
 #' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
 #'
-#' @return \code{ggplot object} containing boxplots for variable levels
+#' @return \code{ggplot} object containing boxplots for variable levels
 #' 
 #' @keywords prism_plots
 #' 
@@ -446,7 +446,7 @@ plot_boxplot_meta <- function(dt_response,
 #' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
 #'  the name of the selected metadata from \code{dt_depmap} - respectively
 #'
-#' @return \code{ggplot object} containing a panel with volcano plot and  depending on data type:
+#' @return \code{ggplot} object containing a panel with volcano plot and  depending on data type:
 #'  a scatter plots with correlation for top 4 variables or boxplots for variable levels
 #' 
 #' @keywords prism_plots

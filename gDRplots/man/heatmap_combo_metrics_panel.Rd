@@ -52,9 +52,9 @@ for excess values; the default is the blue-light grey-red color scale}
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
-\code{ggplot object} containing panel with heatmaps with value for excess assays for 
+\code{ggplot} object containing panel with heatmaps with value for excess assays for 
    selected drugs and cell line with selected isoline and comparison of iso levels
-   or list of \code{ggplot object} containing these plots.
+   or list of \code{ggplot} object containing these plots.
 }
 \description{
 Plot panel of heatmaps of fitted values for combination metrics data

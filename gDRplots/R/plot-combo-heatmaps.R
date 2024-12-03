@@ -25,7 +25,7 @@
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
-#' @return \code{ggplot object} containing heatmap with the values for the selected combo metric 
+#' @return \code{ggplot} object containing heatmap with the values for the selected combo metric 
 #'    for selected drugs and cell line with selected isoline (when chosen)
 #' 
 #' @keywords combo_plots
@@ -294,9 +294,9 @@ heatmap_combo_metrics <- function(
 #' @inheritParams heatmap_combo_metrics
 #' @param as_list logical flag whether return list of plot or panel
 #'
-#' @return \code{ggplot object} containing panel with heatmaps with value for excess assays for 
+#' @return \code{ggplot} object containing panel with heatmaps with value for excess assays for 
 #'    selected drugs and cell line with selected isoline and comparison of iso levels
-#'    or list of \code{ggplot object} containing these plots.
+#'    or list of \code{ggplot} object containing these plots.
 #'    
 #' @keywords combo_plots
 #' @examples
@@ -645,7 +645,7 @@ heatmap_combo_metrics_panel <- function(
 #' @param colors_vec_iso character vector of colors (valid name or hex) used for the isolines; 
 #'     the default is the dark red-orange palette
 #'
-#' @return \code{ggplot object} containing combination index plot at different ratios of the two drugs
+#' @return \code{ggplot} object containing combination index plot at different ratios of the two drugs
 #'    
 #' @keywords combo_plots
 #' @examples
@@ -838,7 +838,7 @@ plot_combination_index <- function(
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
-#' @return \code{ggplot object} containing with heatmap for fitted values and reference data 
+#' @return \code{ggplot} object containing with heatmap for fitted values and reference data 
 #'    for isobolograms for selected drug and co-drug and selected cell line
 #'    
 #' @keywords combo_plots
@@ -1111,7 +1111,7 @@ heatmap_combo_with_isoref <- function(
 #' @param cl_names character vector with cell line names to be plotted (Cell Line Name);
 #'    if \code{NULL} - all available cell lines will be plotted
 #'    
-#' @return \code{ggplot object} containing panel with heatmaps for fitted values and reference data 
+#' @return \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
 #'    for isobolograms for selected drug and co-drug by list of cell lines
 #'    
 #' @keywords combo_plots

@@ -46,7 +46,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{fit_source}{string source name for metrics}
 }
 \value{
-\code{ggplot object} containing plot of dose-response curves
+\code{ggplot} object containing plot of dose-response curves
 }
 \description{
 Plot drug response curves for single-agent data

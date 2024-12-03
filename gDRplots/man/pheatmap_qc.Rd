@@ -47,7 +47,7 @@ the dendrogram will not be shown for the matrix with any NA value}
 \item{lbl_by_DrugName}{logical flag whether heatmap should be described by DrugName instead of Gnumber}
 }
 \value{
-\code{pheatmap object} containing heatmap for selected metric with annotation - if given
+\code{pheatmap} object containing heatmap for selected metric with annotation - if given
 }
 \description{
 Plot pretty heatmap for single-agent or combo data to control quality of the data
