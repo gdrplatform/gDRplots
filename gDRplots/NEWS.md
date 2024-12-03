@@ -1,3 +1,6 @@
+## gDRplots 0.0.50 - 2024-12-03
+* order subplots in `plot_scatter_with_corr_panel` according to given list
+
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics
 
