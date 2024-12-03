@@ -476,7 +476,12 @@ pheatmap_with_anno_sa <- function(
   if (min_val == max_val) {
     min_val <- min_val - 1
   }
-  
+
+  # protect against -Inf as the min value
+  if (min_val == -Inf) {
+    min_val <- 0
+  }
+ 
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
