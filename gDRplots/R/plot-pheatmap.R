@@ -479,8 +479,9 @@ pheatmap_with_anno_sa <- function(
   }
 
   # protect against -Inf as the min value
+  # TODO: remove once GDR-2793 is completed
   if (min_val == -Inf) {
-    min_val <- 0
+    min_val <- 0.00001
   }
  
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
