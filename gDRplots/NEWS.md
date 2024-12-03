@@ -1,3 +1,6 @@
+## gDRplots 0.0.50 - 2024-12-03
+* revert color palette for dose-response curves for combo data
+
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics
 
