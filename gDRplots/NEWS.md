@@ -1,11 +1,13 @@
-## gDRplots 0.0.49 - 2024-12-03
+## gDRplots 0.0.50 - 2024-12-03
 * fix for edge-case in pheatmap_with_anno_sa (-Inf)
+
+## gDRplots 0.0.49 - 2024-12-02
+* add boxplots for single-agent and combo metrics
 
 ## gDRplots 0.0.48 - 2024-11-28
 * add plate visualizations
 
 ## gDRplots 0.0.47 - 2024-11-26
-* add plate visualizations
 * refactor `heatmap_combo_metrics_panel` function - split in single plot and panel
 * add `plot_combination_index` function
 

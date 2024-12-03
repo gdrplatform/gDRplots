@@ -30,7 +30,7 @@ note that the first color will be assigned to the min value of \code{Concentrati
 and the last one - to the max of \code{Concentration_2}; the default is the orange-black palette}
 }
 \value{
-\code{ggplot object} containing panel with plot with dose-response curves 
+\code{ggplot} object containing panel with plot with dose-response curves 
    for selected cell line by drugs
 }
 \description{

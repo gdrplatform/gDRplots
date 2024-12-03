@@ -52,7 +52,7 @@
 #' 
 #' @keywords QC_plot
 #' 
-#' @return \code{pheatmap object} containing heatmap for selected metric with annotation - if given
+#' @return \code{pheatmap} object containing heatmap for selected metric with annotation - if given
 #' @export
 pheatmap_qc <- function(
     dt_average,
@@ -239,7 +239,8 @@ pheatmap_qc <- function(
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+#'  but the values from any numeric colum can be displayed.
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
@@ -324,7 +325,7 @@ pheatmap_qc <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export
@@ -611,7 +612,7 @@ pheatmap_with_anno_sa <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export
@@ -884,7 +885,7 @@ pheatmap_with_anno_cd <- function(
 #'       \item \code{annotation_row} a table with row annotations (for \code{DrugName}), if provided.
 #'       \item \code{annotation_col} a table with column annotations (for \code{CellLineName}), if provided.
 #'     }
-#'   \item \code{pheatmap object} containing the heatmap itself.
+#'   \item \code{pheatmap} object containing the heatmap itself.
 #' }
 #' 
 #' @export

@@ -34,7 +34,7 @@ to be labeled on the plot}
 significant points to plot; for default \code{NULL} all points will be plotted.}
 }
 \value{
-\code{ggplot object} containing a volcano plot with association
+\code{ggplot} object containing a volcano plot with association
 }
 \description{
 Volcano plot with association
