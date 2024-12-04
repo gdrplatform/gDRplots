@@ -284,6 +284,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(plt_7$gtable$grobs[[1]]$label, "X MAX")
   expect_true(is.na(plt_7[["tree_row"]])) # no dendrogram
   expect_true(is.na(plt_7[["tree_col"]])) # no dendrogram
+  expect_false(any(is.infinite(plt_7[["gtable"]][["grobs"]][[5]][["children"]][[2]][["label"]])))
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
