@@ -1,5 +1,8 @@
-## gDRplots 0.0.50 - 2024-12-03
+## gDRplots 0.0.51 - 2024-12-04
 * revert color palette for dose-response curves for combo data
+
+## gDRplots 0.0.50 - 2024-12-03
+* fix for edge-case in pheatmap_with_anno_sa (-Inf)
 
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics
