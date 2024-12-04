@@ -274,7 +274,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                  colors_vec = c("darkblue", "grey90"))
   expect_length(out_7, 2)
   expect_true(any(out_7$data$matrix == -Inf))
-  expect_equal(names(out_2), c("data", "heatmap"))
+  expect_equal(names(out_7), c("data", "heatmap"))
   data_7 <- out_7[["data"]]
   expect_is(data_7, "list")
   expect_equal(names(data_7), c("matrix", "annotation_col", "annotation_row"))
