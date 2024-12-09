@@ -471,13 +471,13 @@ pheatmap_with_anno_sa <- function(
   }
   
   # prep hm color palette
-  min_val <- min(t_mat_cvd, na.rm = TRUE)
+  min_val <- min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
   max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
   
   if (min_val == max_val) {
     min_val <- min_val - 1
   }
-  
+
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)

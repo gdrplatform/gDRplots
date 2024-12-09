@@ -249,6 +249,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_true(is.na(plt_5[["tree_row"]])) # no clustering due Inf
   expect_true(is.na(plt_5[["tree_col"]])) # no clustering due Inf
   
+  # scenario 6: rows are clustered, cols are not clustered
   out_6 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
                                  metric = "x_AOC_range",
                                  cluster_cols = FALSE)
@@ -262,6 +263,28 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_6, "pheatmap")
   expect_is(plt_6[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_6[["tree_col"]])) # cols aren't clustered
+
+  # scenario 7: selected metric & normalization_type and -Inf in the data
+  dt_metrics_inf <- data.table::copy(dt_metrics)
+  dt_metrics_inf[DrugName %in% c("drug_021", "drug_026")]$x_max <- -Inf
+  out_7 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_inf, 
+                                 normalization_type = "RV",
+                                 metric = "x_max",
+                                 hm_title = "X MAX",
+                                 colors_vec = c("darkblue", "grey90"))
+  expect_length(out_7, 2)
+  expect_true(any(out_7$data$matrix == -Inf))
+  expect_equal(names(out_7), c("data", "heatmap"))
+  data_7 <- out_7[["data"]]
+  expect_is(data_7, "list")
+  expect_equal(names(data_7), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_7[["matrix"]], "data.table")
+  plt_7 <- out_7[["heatmap"]]
+  expect_is(plt_7, "pheatmap")
+  expect_equal(plt_7$gtable$grobs[[1]]$label, "X MAX")
+  expect_true(is.na(plt_7[["tree_row"]])) # no dendrogram
+  expect_true(is.na(plt_7[["tree_col"]])) # no dendrogram
+  expect_false(any(is.infinite(plt_7[["gtable"]][["grobs"]][[5]][["children"]][[2]][["label"]])))
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
