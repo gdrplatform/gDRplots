@@ -228,6 +228,8 @@ plot_scatter_with_corr_panel <- function(dt_response,
       selected_feats <- tmp$selected_feats
     }
     
+    feat_lbl_levels <- selected_feats
+    
     for (selected_feat in selected_feats) {
       
       if (selected_feat %in% available_feats) {
@@ -256,13 +258,16 @@ plot_scatter_with_corr_panel <- function(dt_response,
           data.table::setnames(tab_plot, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
+          feat_lbl <- paste(selected_feat, ": all NAs")
+          feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+          
           tab_plot <- data.table::data.table(
             cellline_name = "",
             selected_metric = 0,
             feat_val = 0,
             label = "",
             col = "NA",
-            feat_lbl = paste(selected_feat, ": all NAs")
+            feat_lbl = feat_lbl
           )
           data.table::setnames(tab_plot, 
                                old = c("cellline_name", "selected_metric"), 
@@ -270,13 +275,16 @@ plot_scatter_with_corr_panel <- function(dt_response,
         }
       } else {
         # dummy data required for faceting
+        feat_lbl <- paste(selected_feat, ": all NAs")
+        feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+        
         tab_plot <- data.table::data.table(
           cellline_name = "",
           selected_metric = 0,
           feat_val = 0,
           label = "",
           col = "NA",
-          feat_lbl = paste(selected_feat, ": all NAs")
+          feat_lbl = feat_lbl
         )
         data.table::setnames(tab_plot, 
                              old = c("cellline_name", "selected_metric"), 
@@ -284,6 +292,8 @@ plot_scatter_with_corr_panel <- function(dt_response,
       }
       tab_plot_all <- rbind(tab_plot_all, tab_plot)
     }
+    # order vis as in selected_feats
+    tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     
     plt <-
       ggplot2::ggplot(
@@ -317,6 +327,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
   }
   return(plt)
 }
+
 
 #' Plot boxplot for metric values grouped by metadata from DepMap
 #'

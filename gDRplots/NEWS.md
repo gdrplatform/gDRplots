@@ -1,3 +1,6 @@
+## gDRplots 0.0.52 - 2024-12-09
+* order subplots in `plot_scatter_with_corr_panel` according to given list
+
 ## gDRplots 0.0.51 - 2024-12-04
 * revert color palette for dose-response curves for combo data
 
