@@ -114,7 +114,7 @@ plot_dose_response_sa <- function(dt_metrics,
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
   max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
   conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
-  # remove conc = 0
+  # handle conc = 0
   dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
   
   # prep fitted data

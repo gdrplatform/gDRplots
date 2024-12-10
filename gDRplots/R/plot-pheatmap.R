@@ -150,11 +150,11 @@ pheatmap_qc <- function(
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
-  # replace 0
+  # handle conc = 0
   min_val <-
     min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != 0])
   drug_annotation[drug_annotation == 0] <- min_val / 100
-  # log 10 conc
+  # log 10 (conc)
   drug_annotation <- log10(drug_annotation)
   
   # annotation coloring 
