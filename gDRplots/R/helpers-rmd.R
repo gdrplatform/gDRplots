@@ -61,7 +61,7 @@ prep_plot_chunk <- function(plt_list,
     group_name <- names(plt_list)[nm]
     
     if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
-      # Nested list - use tabset options
+      # nested list - use tabset options
       tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
       header <- sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
       
@@ -76,7 +76,7 @@ prep_plot_chunk <- function(plt_list,
       list(header = knitr::knit_expand(text = header), items = item_chunks)
       
     } else {
-      # Not nested - no tabset, access element by index
+      # not nested - no tabset, access element by index
       template <- c(
         sprintf("%s %s\n", lvl, group_name),
         sprintf("```{r %s_%s, echo = FALSE}\n", chunk_name, group_name),
