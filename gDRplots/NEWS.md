@@ -1,3 +1,6 @@
+## gDRplots 0.0.53 - 2024-12-10
+* refactor `prep_plot_chunk` to support simple nested lists of visualizations
+
 ## gDRplots 0.0.52 - 2024-12-09
 * order subplots in `plot_scatter_with_corr_panel` according to given list
 
