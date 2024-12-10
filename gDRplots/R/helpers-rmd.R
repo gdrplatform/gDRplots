@@ -1,14 +1,26 @@
-#' Prepare markdown chunk based on the plots list
+#' Prepare markdown chunk based on a list of plots
 #'
-#' Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
+#' Generates markdown code for displaying plots in a document using `knitr::knit()`.
+#' The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
+#' sections for grouped plots.
 #'
-#' @param plt_list named list with generated plots to be shown in tabs
-#'     (for list without name - only ordinal numbers will be generated)
-#' @param chunk_name string name of markdown chunk; preferable without spaces
-#' @param header_level numeric level of markdown header
+#' @param plt_list A named list of plots.  Names will be used as headings for plots/tab groups.
+#' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
+#' If a nested list is provided, the inner lists should also be named.
+#' @param chunk_name A character string specifying the base name for the generated code chunks.  Avoid spaces.
+#' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
+#' @param tabset_options A character vector of options for the tabset. This is only used when `plt_list` is a nested list.
+#' Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.
 #'
+#' @return A list of character vectors. Each element of the list corresponds to a plot or a
+#' group of plots (if `plt_list` is nested). Each character vector within the list represents the markdown
+#' code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
+#' and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
+#' is a list of markdown chunks for each tab.
+#' 
 #' @examples
 #' \dontrun{
+#' # Simple list of plots
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
 #'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -16,34 +28,67 @@
 #' names(plotlist) <- unique(iris$Species)
 #' 
 #' prep_plot_chunk(plotlist, "iris")
-#'
+#' 
+#' # Nested list of plots for tabbed output
+#' nested_plotlist <- list()
+#' for (species in unique(iris$Species)) {
+#'   nested_plotlist[[species]] <- list()
+#'   nested_plotlist[[species]][["Sepal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
+#'     aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+#'   nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
+#'     aes(x = Petal.Length, y = Petal.Width)) + geom_point()
 #' }
-#' @return list of character vector - input for \code{knitr::knit}
+#' 
+#' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
+#' }
 #' @keywords internal
-#' 
 #' @seealso \code{\link[knitr]{knit}}
-#' 
 #' @export
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
-                            header_level = 3) {
+                            header_level = 3,
+                            tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
+  
   checkmate::assert_list(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
+  checkmate::assert_character(tabset_options, null.ok = TRUE)
   
-  lvl <- paste0(rep("#", header_level), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
-  template <- c(
-    sprintf("%s `r names(%s)[{{nm}}]`\n", lvl, plt_list_name),
-    sprintf("```{r %s {{nm}}, echo = FALSE}\n", chunk_name),
-    sprintf("%s[[{{nm}}]] \n", plt_list_name),
-    "```\n",
-    "\n"
-  )
+  lvl <- paste0(rep("#", header_level), collapse = "")
+  
   lapply(seq_along(plt_list), function(nm) {
-    knitr::knit_expand(text = template)
+    group_name <- names(plt_list)[nm]
+    
+    if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
+      # Nested list - use tabset options
+      tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
+      header <- sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
+      
+      item_chunks <- lapply(names(plt_list[[nm]]), function(item_name) {
+        chunk <- sprintf(
+          "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s[[\"%s\"]][[\"%s\"]] \n```\n\n",
+          lvl, item_name, chunk_name, group_name, item_name, plt_list_name, group_name, item_name
+        )
+        knitr::knit_expand(text = chunk)
+      })
+      
+      list(header = knitr::knit_expand(text = header), items = item_chunks)
+      
+    } else {
+      # Not nested - no tabset, access element by index
+      template <- c(
+        sprintf("%s %s\n", lvl, group_name),
+        sprintf("```{r %s_%s, echo = FALSE}\n", chunk_name, group_name),
+        sprintf("%s[[%d]] \n", plt_list_name, nm),  # Use %d and nm directly
+        "```\n",
+        "\n"
+      )
+      knitr::knit_expand(text = template)
+    }
   })
 }
+
 
 #' Prepare markdown chunk based on the nested plots list
 #'
