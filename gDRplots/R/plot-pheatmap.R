@@ -153,7 +153,7 @@ pheatmap_qc <- function(
   # replace 0
   min_val <-
     min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != 0])
-  drug_annotation[drug_annotation == 0] <- min_val / 10
+  drug_annotation[drug_annotation == 0] <- min_val / 100
   # log 10 conc
   drug_annotation <- log10(drug_annotation)
   
