@@ -150,11 +150,12 @@ pheatmap_qc <- function(
   )
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
-  drug_annotation <- log10(drug_annotation)
   # replace 0
   min_val <-
-    min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != -Inf])
-  drug_annotation[drug_annotation == -Inf] <- min_val - 0.1 * min_val
+    min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != 0])
+  drug_annotation[drug_annotation == 0] <- min_val / 10
+  # log 10 conc
+  drug_annotation <- log10(drug_annotation)
   
   # annotation coloring 
   drug_to_colored <- names(drug_annotation)
@@ -477,7 +478,7 @@ pheatmap_with_anno_sa <- function(
   if (min_val == max_val) {
     min_val <- min_val - 1
   }
-
+  
   breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
@@ -497,6 +498,7 @@ pheatmap_with_anno_sa <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       na_col = "#A9A9A9",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
@@ -790,6 +792,7 @@ pheatmap_with_anno_cd <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       na_col = "#A9A9A9",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
@@ -1032,7 +1035,7 @@ pheatmap_with_anno_combo <- function(
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
- 
+  
   # display numbers - for readability, turn it off for matrices larger than 10x10
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
   
@@ -1045,6 +1048,7 @@ pheatmap_with_anno_combo <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       na_col = "#A9A9A9",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,

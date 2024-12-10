@@ -1,3 +1,6 @@
+## gDRplots 0.0.53 - 2024-12-10
+* refactor handling 0 in concentration column and -Inf and Inf for metrics
+
 ## gDRplots 0.0.52 - 2024-12-09
 * order subplots in `plot_scatter_with_corr_panel` according to given list
 
