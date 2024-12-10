@@ -115,13 +115,13 @@ plot_boxplot_metric_sa_by_CLs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::theme(legend.position = "none")
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
