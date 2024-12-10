@@ -70,29 +70,18 @@ plot_boxplot_metric_sa_by_CLs <- function(
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met_norm <- dt_metrics[eval(filter_expr)]
-  
-  # take care of Inf and NaN values in IC50 metrics
-  if (metric == "xc50") {
-    inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
-  }
-  
-  dt_met <- dt_met_norm[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
+  # handle -Inf (NA will be not shown on boxplots)
+  dt_met[[metric]] <- 
+    vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
   
   plt_title <- sprintf("Number of unique drugs: %s", NROW(unique(dt_met[[drug_name]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_met, tissue)
     dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]], levels = unique(dt_met[[cellline_name]]))
-    
+
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(unique(dt_met[[tissue]])))
     } else if (NROW(colors_vec) != NROW(unique(dt_met[[tissue]]))) {
@@ -106,13 +95,16 @@ plot_boxplot_metric_sa_by_CLs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25) +
+      ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)), 
                             color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
   } else {
+    data.table::setorderv(dt_met, cellline_name)
+    dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]])
+    
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       "#A6CEE3"
     } else {
@@ -204,29 +196,19 @@ plot_boxplot_metric_sa_by_drugs <- function(
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met_norm <- dt_metrics[eval(filter_expr)]
-  
-  # take care of Inf and NaN values in IC50 metrics
-  if (metric == "xc50") {
-    inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
-  }
-  
-  dt_met <- dt_met_norm[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
+
+  # handle -Inf (NA will be not shown on boxplots)
+  dt_met[[metric]] <- 
+    vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
   
   plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_met, drug_MOA)
     dt_met[[drug_name]] <- factor(dt_met[[drug_name]], levels = unique(dt_met[[drug_name]]))
-    
+
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(unique(dt_met[[drug_MOA]])))
     } else if (NROW(colors_vec) != NROW(unique(dt_met[[drug_MOA]]))) {
@@ -240,13 +222,16 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25) +
+      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
-                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
+                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE, na.rm = TRUE) +
       ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
   } else {
+    data.table::setorderv(dt_met, drug_name)
+    dt_met[[drug_name]] <- factor(dt_met[[drug_name]])
+
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       "#A6CEE3"
     } else {
@@ -257,13 +242,13 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::theme(legend.position = "none")
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
                   y = sprintf("%s for %s", metric, normalization_type), 
                   x = "") +
