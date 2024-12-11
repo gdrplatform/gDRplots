@@ -54,6 +54,9 @@ plot_boxplot_metric_sa_by_CLs(dt_metrics,
                               grouped_flag = TRUE)
                               
 plot_boxplot_metric_sa_by_CLs(dt_metrics,
+                              with_inf = TRUE)
+                              
+plot_boxplot_metric_sa_by_CLs(dt_metrics,
                               metric = "x_AOC",
                               colors_vec = "gold")
 
