@@ -13,6 +13,7 @@
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
+#' @param with_inf a logical flag whether the infinity valuse should be shown on boxplots or not
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 
@@ -50,7 +51,8 @@ plot_boxplot_metric_sa_by_CLs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
-    colors_vec = NULL
+    colors_vec = NULL,
+    with_inf = FALSE
 ) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -66,22 +68,26 @@ plot_boxplot_metric_sa_by_CLs <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_met <- dt_metrics[eval(filter_expr)]
   dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
-  # handle -Inf (NA will be not shown on boxplots)
-  dt_met[[metric]] <- 
-    vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+  
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[[metric]] <- 
+      vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+  }
   
   plt_title <- sprintf("Number of unique drugs: %s", NROW(unique(dt_met[[drug_name]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_met, tissue)
     dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]], levels = unique(dt_met[[cellline_name]]))
-
+    
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(unique(dt_met[[tissue]])))
     } else if (NROW(colors_vec) != NROW(unique(dt_met[[tissue]]))) {
@@ -176,7 +182,8 @@ plot_boxplot_metric_sa_by_drugs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
-    colors_vec = NULL
+    colors_vec = NULL,
+    with_inf = FALSE
 ) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -192,23 +199,26 @@ plot_boxplot_metric_sa_by_drugs <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_met <- dt_metrics[eval(filter_expr)]
   dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
-
-  # handle -Inf (NA will be not shown on boxplots)
-  dt_met[[metric]] <- 
-    vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+  
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[[metric]] <- 
+      vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+  }
   
   plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_met, drug_MOA)
     dt_met[[drug_name]] <- factor(dt_met[[drug_name]], levels = unique(dt_met[[drug_name]]))
-
+    
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(unique(dt_met[[drug_MOA]])))
     } else if (NROW(colors_vec) != NROW(unique(dt_met[[drug_MOA]]))) {
@@ -231,7 +241,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
   } else {
     data.table::setorderv(dt_met, drug_name)
     dt_met[[drug_name]] <- factor(dt_met[[drug_name]])
-
+    
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       "#A6CEE3"
     } else {

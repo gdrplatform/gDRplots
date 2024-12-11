@@ -43,6 +43,15 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
                 NROW(unique(ls_lbl_x[["Tissue"]])))
   expect_true(grepl(NROW(unique(dt_metrics[["DrugName"]])), plt_4[["labels"]][["title"]]))
   
+  plt_5 <- plot_boxplot_metric_sa_by_CLs(dt_metrics,
+                                         with_inf = TRUE) 
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 3)
+  expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]]),
+               sort(dt_metrics[normalization_type == "GR", ][["xc50"]]))
+  expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
+               sort(unique(dt_metrics[["CellLineName"]])))
+  
   expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
   expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics,
@@ -62,6 +71,9 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics,
                                              colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
+  expect_error(plot_boxplot_metric_sa_by_CLs(dt_metrics = dt_metrics,
+                                             with_inf = "yes"),
+               "Assertion on 'with_inf' failed: Must be of type 'logical flag'")
 })
 
 test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
@@ -108,6 +120,15 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   expect_length(unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]]), 
                 NROW(unique(ls_lbl_x[["drug_moa"]])))
   expect_true(all(c("#0000FF", "#00FF00") %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]])))
+  
+  plt_5 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
+                                           with_inf = TRUE) 
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 3)
+  expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]]),
+               sort(dt_metrics[normalization_type == "GR", ][["xc50"]]))
+  expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
+               sort(unique(dt_metrics[["DrugName"]])))
 })
 
 test_that("plot_boxplot_metric_combo_by_CLs works as expected", {

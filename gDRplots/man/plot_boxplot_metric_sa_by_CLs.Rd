@@ -10,7 +10,8 @@ plot_boxplot_metric_sa_by_CLs(
   metric = "xc50",
   fit_source = "gDR",
   grouped_flag = FALSE,
-  colors_vec = NULL
+  colors_vec = NULL,
+  with_inf = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ but the values from any numeric colum can be displayed.}
 colored by \code{Tissue}}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
+
+\item{with_inf}{a logical flag whether the infinity valuse should be shown on boxplots or not}
 }
 \value{
 \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
