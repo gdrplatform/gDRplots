@@ -994,8 +994,8 @@ heatmap_combo_with_isoref <- function(
     tile_height <- .get_tile_size(mrk_y)
     tile_width <- .get_tile_size(mrk_x)
     
-    range_x <- c(min(mrk_x) - 0.5 * tile_width, max(mrk_x) + 0.5 * tile_width)
-    range_y <- c(min(mrk_y) - 0.5 * tile_height, max(mrk_y) + 0.5 * tile_height)
+    range_x <- c(min(mrk_x) - 0.65 * tile_width, max(mrk_x) + 0.65 * tile_width)
+    range_y <- c(min(mrk_y) - 0.65 * tile_height, max(mrk_y) + 0.65 * tile_height)
     
     range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
     
@@ -1288,8 +1288,8 @@ heatmap_combo_with_isoref_panel <- function(
   tile_height <- .get_tile_size(mrk_y)
   tile_width <- .get_tile_size(mrk_x)
 
-  range_x <- c(min(mrk_x) - 0.5 * tile_width, max(mrk_x) + 0.5 * tile_width)
-  range_y <- c(min(mrk_y) - 0.5 * tile_height, max(mrk_y) + 0.5 * tile_height)
+  range_x <- c(min(mrk_x) - 0.65 * tile_width, max(mrk_x) + 0.65 * tile_width)
+  range_y <- c(min(mrk_y) - 0.65 * tile_height, max(mrk_y) + 0.65 * tile_height)
   
   range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
   
