@@ -200,13 +200,15 @@ heatmap_combo_metrics <- function(
     dt_$pos_y <- transform_log_conc(conc_y)
     dt_$pos_x <- transform_log_conc(conc_x)
     
-    ls_axes <- gDRutils::define_matrix_grid_positions(conc_y, conc_x)
+    lbl_y <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_y))))
+    mrk_y <- sort(unique(dt_$pos_y))
     
-    drug1_axis <- ls_axes$axis_1
-    drug2_axis <- ls_axes$axis_2
-    tile_height <- .get_tile_size(drug1_axis$pos_y)
-    tile_width <- .get_tile_size(drug2_axis$pos_x)
-    
+    lbl_x <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_x))))
+    mrk_x <- sort(unique(dt_$pos_x))
+
+    tile_height <- .get_tile_size(mrk_y)
+    tile_width <- .get_tile_size(mrk_x)
+
     # prep hm color palette
     hm_color_palette <- if (metric == "smooth") {
       hm_color_palette_smooth
@@ -237,11 +239,11 @@ heatmap_combo_metrics <- function(
                     y = y_axis_lab,
                     title = plt_title,
                     fill = legend_title_fill)  +
-      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                  labels = drug2_axis$marks_x,
+      ggplot2::scale_x_continuous(breaks = mrk_x,
+                                  labels = lbl_x,
                                   expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                  labels = drug1_axis$marks_y,
+      ggplot2::scale_y_continuous(breaks = mrk_y,
+                                  labels = lbl_y,
                                   expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limit_fill,
@@ -467,12 +469,14 @@ heatmap_combo_metrics_panel <- function(
       dt_$pos_y <- transform_log_conc(conc_y)
       dt_$pos_x <- transform_log_conc(conc_x)
       
-      ls_axes <- gDRutils::define_matrix_grid_positions(conc_y, conc_x)
+      lbl_y <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_y))))
+      mrk_y <- sort(unique(dt_$pos_y))
       
-      drug1_axis <- ls_axes$axis_1
-      drug2_axis <- ls_axes$axis_2
-      tile_height <- .get_tile_size(drug1_axis$pos_y)
-      tile_width <- .get_tile_size(drug2_axis$pos_x)
+      lbl_x <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_x))))
+      mrk_x <- sort(unique(dt_$pos_x))
+      
+      tile_height <- .get_tile_size(mrk_y)
+      tile_width <- .get_tile_size(mrk_x)
       
       # prep hm color palette
       hm_color_palette <- if (mx_name == "smooth") {
@@ -500,11 +504,11 @@ heatmap_combo_metrics_panel <- function(
                       y = y_axis_lab,
                       title = plt_title,
                       fill = legend_title_fill)  +
-        ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                    labels = drug2_axis$marks_x,
+        ggplot2::scale_x_continuous(breaks = mrk_x,
+                                    labels = lbl_x,
                                     expand = c(0, 0)) +
-        ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                    labels = drug1_axis$marks_y,
+        ggplot2::scale_y_continuous(breaks = mrk_y,
+                                    labels = lbl_y,
                                     expand = c(0, 0)) +
         ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                       limit = limits,
@@ -981,15 +985,17 @@ heatmap_combo_with_isoref <- function(
     dt_$pos_y <- transform_log_conc(conc_y)
     dt_$pos_x <- transform_log_conc(conc_x)
     
-    ls_axes <- gDRutils::define_matrix_grid_positions(conc_y, conc_x)
+    lbl_y <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_y))))
+    mrk_y <- sort(unique(dt_$pos_y))
     
-    drug1_axis <- ls_axes$axis_1
-    drug2_axis <- ls_axes$axis_2
-    tile_height <- .get_tile_size(drug1_axis$pos_y)
-    tile_width <- .get_tile_size(drug2_axis$pos_x)
+    lbl_x <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_x))))
+    mrk_x <- sort(unique(dt_$pos_x))
     
-    range_x <- c(min(drug2_axis$pos_x), max(drug2_axis$pos_x) + 0.5 * tile_width)
-    range_y <- c(min(drug1_axis$pos_y), max(drug1_axis$pos_y) + 0.5 * tile_height)
+    tile_height <- .get_tile_size(mrk_y)
+    tile_width <- .get_tile_size(mrk_x)
+    
+    range_x <- c(min(mrk_x) - 0.5 * tile_width, max(mrk_x) + 0.5 * tile_width)
+    range_y <- c(min(mrk_y) - 0.5 * tile_height, max(mrk_y) + 0.5 * tile_height)
     
     range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
     
@@ -1013,11 +1019,11 @@ heatmap_combo_with_isoref <- function(
                     y = y_axis_lab,
                     title = plt_title,
                     fill = legend_title_fill) +
-      ggplot2::scale_x_continuous(breaks = drug2_axis$pos_x,
-                                  labels = drug2_axis$marks_x,
+      ggplot2::scale_x_continuous(breaks = mrk_x,
+                                  labels = lbl_x,
                                   expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(breaks = drug1_axis$pos_y,
-                                  labels = drug1_axis$marks_y,
+      ggplot2::scale_y_continuous(breaks = mrk_y,
+                                  labels = lbl_y,
                                   expand = c(0, 0)) +
       ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                     limit = limits,
@@ -1270,15 +1276,20 @@ heatmap_combo_with_isoref_panel <- function(
   data.table::setnames(dt_tile, "metric", metric)
   
   # tiles positioning 
-  ls_axes_all <- gDRutils::define_matrix_grid_positions(dt_tile[[conc_y]], dt_tile[[conc_x]])
+  dt_tile$pos_y <- transform_log_conc(dt_tile[[conc_y]])
+  dt_tile$pos_x <- transform_log_conc(dt_tile[[conc_x]])
   
-  drug1_axis_all <- ls_axes_all$axis_1
-  drug2_axis_all <- ls_axes_all$axis_2
-  tile_height <- .get_tile_size(drug1_axis_all$pos_y)
-  tile_width <- .get_tile_size(drug2_axis_all$pos_x)
+  lbl_y <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(dt_tile[[conc_y]]))))
+  mrk_y <- sort(unique(dt_tile$pos_y))
   
-  range_x <- c(min(drug2_axis_all$pos_x), max(drug2_axis_all$pos_x) + tile_width)
-  range_y <- c(min(drug1_axis_all$pos_y), max(drug1_axis_all$pos_y) + tile_height)
+  lbl_x <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(dt_tile[[conc_x]]))))
+  mrk_x <- sort(unique(dt_tile$pos_x))
+  
+  tile_height <- .get_tile_size(mrk_y)
+  tile_width <- .get_tile_size(mrk_x)
+
+  range_x <- c(min(mrk_x) - 0.5 * tile_width, max(mrk_x) + 0.5 * tile_width)
+  range_y <- c(min(mrk_y) - 0.5 * tile_height, max(mrk_y) + 0.5 * tile_height)
   
   range_xy <- c(min(range_x[1], range_y[1]), max(range_x[2], range_y[2]))
   
@@ -1304,11 +1315,11 @@ heatmap_combo_with_isoref_panel <- function(
                   y = y_axis_lab,
                   title = panel_title,
                   fill = legend_title_fill) +
-    ggplot2::scale_x_continuous(breaks = drug2_axis_all$pos_x,
-                                labels = drug2_axis_all$marks_x,
+    ggplot2::scale_x_continuous(breaks = mrk_x,
+                                labels = lbl_x,
                                 expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = drug1_axis_all$pos_y,
-                                labels = drug1_axis_all$marks_y,
+    ggplot2::scale_y_continuous(breaks = mrk_y,
+                                labels = lbl_y,
                                 expand = c(0, 0)) +
     ggplot2::scale_fill_gradientn(colors = hm_color_palette,
                                   limit = limits,
@@ -1483,7 +1494,7 @@ transform_log_conc <- function(conc_vec) {
 .get_tile_size <- function(pos_vec) {
   checkmate::assert_numeric(pos_vec)
   
-  diff_ <- sort(unique(diff(sort(unique(pos_vec)))), decreasing = TRUE)
+  diff_ <- sort(unique(diff(sort(unique(round(pos_vec, 4))))), decreasing = TRUE)
   
   tile_size <- if (NROW(diff_) > 1) {
     diff_[2] # 1st in related to conc = 0 and and is not conclusive
