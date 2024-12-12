@@ -10,7 +10,7 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   
   expect_is(plt_1, "gg")
   expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
-  expect_true(grepl("xc50", plt_1[["labels"]][["y"]]))
+  expect_true(grepl("log10", plt_1[["labels"]][["y"]])) # xc50 in log10 scale
   expect_true(grepl("drug", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$get_labels()),
@@ -21,12 +21,12 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
                                          metric = "x_AOC",
                                          colors_vec = "darkgreen")
   expect_is(plt_2, "gg")
-  expect_true(grepl("RV", plt_2[["labels"]][["y"]]))
-  expect_true(grepl("x_AOC", plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], get_hm_title("x_AOC", "RV"))
   expect_length(plt_2[["layers"]], 3)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "darkgreen")
   
   plt_3 <- plot_boxplot_metric_sa_by_CLs(dt_metrics,
+                                         metric = "x_inf",
                                          colors_vec = c("blue", "yellow"))
   expect_is(plt_3, "gg")
   expect_equal(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]), "blue")
@@ -48,7 +48,7 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]]),
-               sort(dt_metrics[normalization_type == "GR", ][["xc50"]]))
+               sort(log10(dt_metrics[normalization_type == "GR", ][["xc50"]])))
   expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
                sort(unique(dt_metrics[["CellLineName"]])))
   
@@ -85,8 +85,7 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   plt_1 <- plot_boxplot_metric_sa_by_drugs(dt_metrics) # default
   
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
-  expect_true(grepl("xc50", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], get_hm_title("xc50", "GR"))
   expect_true(grepl("cellline", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$get_labels()),
@@ -97,8 +96,7 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
                                            metric = "x_AOC",
                                            colors_vec = "gold")
   expect_is(plt_2, "gg")
-  expect_true(grepl("RV", plt_2[["labels"]][["y"]]))
-  expect_true(grepl("x_AOC", plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], get_hm_title("x_AOC", "RV"))
   expect_length(plt_2[["layers"]], 3)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "gold")
   
@@ -126,7 +124,7 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]]),
-               sort(dt_metrics[normalization_type == "GR", ][["xc50"]]))
+               sort(log10(dt_metrics[normalization_type == "GR", ][["xc50"]])))
   expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
 })
@@ -139,10 +137,10 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
   
-  plt_1 <- plot_boxplot_metric_combo_by_CLs(dt_scores)
+  plt_1 <- plot_boxplot_metric_combo_by_CLs(dt_scores) # default
+  
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
-  expect_true(grepl("hsa_score", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], get_hm_title("hsa_score", "GR"))
   expect_true(grepl("drug", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$get_labels()),
@@ -153,8 +151,7 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
                                             grouped_flag = TRUE,
                                             colors_vec = "#FF0000")
   expect_is(plt_2, "gg")
-  expect_true(grepl("RV", plt_2[["labels"]][["y"]]))
-  expect_true(grepl("hsa_score", plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], get_hm_title("hsa_score", "RV"))
   expect_length(plt_2[["layers"]], 4)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "#FF0000")
   
@@ -201,11 +198,10 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
   
-  plt_1 <- plot_boxplot_metric_combo_by_drugs(dt_scores)
+  plt_1 <- plot_boxplot_metric_combo_by_drugs(dt_scores) # default
   
   expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
-  expect_true(grepl("hsa_score", plt_1[["labels"]][["y"]]))
+  expect_equal(plt_1[["labels"]][["y"]], get_hm_title("hsa_score", "GR"))
   expect_true(grepl("cellline", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$get_labels()), sort(ls_comb))
@@ -214,8 +210,7 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
                                               normalization_type = "RV",
                                               colors_vec = "gold")
   expect_is(plt_2, "gg")
-  expect_true(grepl("RV", plt_2[["labels"]][["y"]]))
-  expect_true(grepl("hsa_score", plt_2[["labels"]][["y"]]))
+  expect_equal(plt_2[["labels"]][["y"]], get_hm_title("hsa_score", "RV"))
   expect_length(plt_2[["layers"]], 3)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "gold")
   
@@ -225,7 +220,7 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
                                               colors_vec = c("#0000FF", "#00FF00"))
   
   expect_is(plt_4, "gg")
-  expect_true(grepl("bliss_score", plt_4[["labels"]][["y"]]))
+  expect_equal(plt_4[["labels"]][["y"]], get_hm_title("bliss_score", "RV"))
   expect_equal(ggplot2::layer_scales(plt_4)$x$get_labels(), ls_comb)
   expect_equal(unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]]), "#0000FF")
   expect_true(grepl(NROW(unique(dt_scores[["CellLineName"]])), plt_4[["labels"]][["title"]]))

@@ -79,6 +79,10 @@ plot_boxplot_metric_sa_by_CLs <- function(
   dt_met <- dt_metrics[eval(filter_expr)]
   dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
   
+  if (metric == "xc50") {
+    dt_met[[metric]] <- vapply(dt_met[[metric]], function(x) log10(x), numeric(1))
+  }
+  
   # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
   if (!with_inf) {
     dt_met[[metric]] <- 
@@ -132,7 +136,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
   plt <- plt +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -210,6 +214,10 @@ plot_boxplot_metric_sa_by_drugs <- function(
   dt_met <- dt_metrics[eval(filter_expr)]
   dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
   
+  if (metric == "xc50") {
+    dt_met[[metric]] <- vapply(dt_met[[metric]], function(x) log10(x), numeric(1))
+  }
+  
   # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
   if (!with_inf) {
     dt_met[[metric]] <- 
@@ -258,12 +266,12 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::theme(legend.position = "none")
   }
-  
+
   # final
   plt <- plt +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -393,7 +401,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
   plt <- plt +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -470,7 +478,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
     ggplot2::theme(legend.position = "none") +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
