@@ -34,9 +34,9 @@
 #' for (species in unique(iris$Species)) {
 #'   nested_plotlist[[species]] <- list()
 #'   nested_plotlist[[species]][["Sepal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-#'     aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+#'     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
 #'   nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-#'     aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+#'     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + geom_point()
 #' }
 #' 
 #' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
@@ -62,8 +62,12 @@ prep_plot_chunk <- function(plt_list,
     
     if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
       # nested list - use tabset options
-      tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
-      header <- sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
+      header <- if (is.null(tabset_options)) {
+        sprintf("%s %s\n\n", lvl, group_name)
+      } else {
+        tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
+        sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
+      }
       
       item_chunks <- lapply(names(plt_list[[nm]]), function(item_name) {
         chunk <- sprintf(

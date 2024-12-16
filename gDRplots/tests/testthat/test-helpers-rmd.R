@@ -22,10 +22,10 @@ test_that("prep_plot_chunk works as expected", {
   expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
   
-  plotlist2 <- list(someCategory = c(plotlist))
+  plotlist2 <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
   res_3 <- prep_plot_chunk(plt_list = plotlist2, chunk_name = "iris")
   expect_true(all(vapply(res_3, function(i) is.list(i), logical(1))))
-  expect_length(res_3, 1)
+  expect_length(res_3, 2)
   expect_true(all(purrr::map_lgl(res_3, ~ any(purrr::map_lgl(.x$items, ~ grepl("####", .x))))))
 })
 
