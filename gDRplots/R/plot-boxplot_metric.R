@@ -13,7 +13,7 @@
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
-#' @param with_inf a logical flag whether the infinity values should be shown on boxplots or not
+#' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 

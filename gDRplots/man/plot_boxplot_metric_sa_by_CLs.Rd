@@ -34,7 +34,7 @@ colored by \code{Tissue}}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
 
-\item{with_inf}{a logical flag whether the infinity values should be shown on boxplots or not}
+\item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
 \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
