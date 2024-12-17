@@ -8,12 +8,12 @@
 #' @param metric string name of the metric;
 #'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
-#'    but the values from any numeric colum can be displayed.
+#'    but the values from any numeric column can be displayed.
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
-#' @param with_inf a logical flag whether the infinity valuse should be shown on boxplots or not
+#' @param with_inf a logical flag whether the infinity values should be shown on boxplots or not
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 
