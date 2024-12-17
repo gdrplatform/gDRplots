@@ -80,13 +80,12 @@ plot_boxplot_metric_sa_by_CLs <- function(
   dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
   
   if (metric == "xc50") {
-    dt_met[[metric]] <- vapply(dt_met[[metric]], function(x) log10(x), numeric(1))
+    dt_met[, (metric) := log10(get(metric))]
   }
   
   # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
   if (!with_inf) {
-    dt_met[[metric]] <- 
-      vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
   }
   
   plt_title <- sprintf("Number of unique drugs: %s", NROW(unique(dt_met[[drug_name]])))
@@ -215,13 +214,12 @@ plot_boxplot_metric_sa_by_drugs <- function(
   dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
   
   if (metric == "xc50") {
-    dt_met[[metric]] <- vapply(dt_met[[metric]], function(x) log10(x), numeric(1))
+    dt_met[, (metric) := log10(get(metric))] 
   }
   
   # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
   if (!with_inf) {
-    dt_met[[metric]] <- 
-      vapply(dt_met[[metric]], function(x) ifelse(is.infinite(x), NA, x), numeric(1))
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
   }
   
   plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
