@@ -121,7 +121,7 @@ plot_dose_response_sa <- function(dt_metrics,
   dt_met <- dt_met[get(group_var) %in% group_names, ]
   dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
-  if (NROW(dt_met) == 0 | NROW(dt_avg) == 0) {
+  if (NROW(dt_met) == 0 || NROW(dt_avg) == 0) {
     plt <-
       ggplot2::ggplot() +
       ggplot2::theme(aspect.ratio = 1)
