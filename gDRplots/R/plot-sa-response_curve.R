@@ -107,86 +107,97 @@ plot_dose_response_sa <- function(dt_metrics,
     intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))), 
               group_names)
   }
-
-  # filter dat
+  
+  # plot title
+  dt_src <- 
+    unique(dt_metrics[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
+  plt_title <- sprintf(
+    "%s (%s)",
+    ifelse(group_var == cellline_name, unique(dt_src[[drug_name]]), unique(dt_src[[cellline_name]])),
+    ifelse(group_var == cellline_name, unique(dt_src[[gnumber]]), unique(dt_src[[clid]]))
+  )
+  
+  # filter data
   dt_met <- dt_met[get(group_var) %in% group_names, ]
   dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
-  # prep value ranges for plot
-  data_range <- c(min(min(dt_avg$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg$x, na.rm = TRUE), 1) + 0.05)
-  min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
-  max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
-  conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
-  # handle conc = 0
-  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
-  
-  # prep fitted data
-  sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
-  dt_fit <- data.table::data.table()
-  
-  for (grp_nm in group_names) {
-    sel_metrics <- dt_met[get(group_var) == grp_nm, ]
-    if (NROW(sel_metrics) == 0) next
-    dt_fit <- rbind(dt_fit,
-                    cbind(sel_metrics[, group_var, with = FALSE],
-                          data.table::data.table(
-                            conc_col = sel_conc,
-                            x = gDRutils::predict_efficacy_from_conc(sel_conc,
-                                                                     sel_metrics$x_inf,
-                                                                     sel_metrics$x_0,
-                                                                     sel_metrics$ec50,
-                                                                     sel_metrics$h)
-                          )
-                    )
-    )
-  }
-  dt_fit <- dt_fit[!is.na(x)]
-  data.table::setnames(dt_fit, "conc_col", conc)
-
-  # colors
-  color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    get_qual_colors(NROW(group_names))
-  } else if (NROW(colors_vec) != NROW(group_names)) {
-    grDevices::colorRampPalette(colors_vec)(NROW(group_names))
+  if (NROW(dt_met) == 0 | NROW(dt_avg) == 0) {
+    plt <-
+      ggplot2::ggplot() +
+      ggplot2::theme(aspect.ratio = 1)
   } else {
-    colors_vec
+    # prep value ranges for plot
+    data_range <- c(min(min(dt_avg$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg$x, na.rm = TRUE), 1) + 0.05)
+    min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
+    max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
+    conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
+    # handle conc = 0
+    dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
+    
+    # prep fitted data
+    sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
+    dt_fit <- data.table::data.table()
+    
+    for (grp_nm in group_names) {
+      sel_metrics <- dt_met[get(group_var) == grp_nm, ]
+      if (NROW(sel_metrics) == 0) next
+      dt_fit <- rbind(dt_fit,
+                      cbind(sel_metrics[, group_var, with = FALSE],
+                            data.table::data.table(
+                              conc_col = sel_conc,
+                              x = gDRutils::predict_efficacy_from_conc(sel_conc,
+                                                                       sel_metrics$x_inf,
+                                                                       sel_metrics$x_0,
+                                                                       sel_metrics$ec50,
+                                                                       sel_metrics$h)
+                            )
+                      )
+      )
+    }
+    dt_fit <- dt_fit[!is.na(x)]
+    data.table::setnames(dt_fit, "conc_col", conc)
+    
+    # colors
+    color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      get_qual_colors(NROW(group_names))
+    } else if (NROW(colors_vec) != NROW(group_names)) {
+      grDevices::colorRampPalette(colors_vec)(NROW(group_names))
+    } else {
+      colors_vec
+    }
+    names(color_values) <- group_names
+
+    # levels
+    dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
+    dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
+    
+    # final plot
+    plt <-
+      ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = group_var, group = group_var)) +
+      ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+      ggplot2::scale_color_manual(values = color_values,
+                                  name = ifelse(group_var == cellline_name, "Cell Line", "Drug")) +
+      ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
+      ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2)))
+    
+    if (plot_averaged_flag) {
+      plt <- plt + ggplot2::geom_point(data = dt_avg)
+    }
+    
+    if (plot_fit_flag) {
+      plt <- plt + ggplot2::geom_line(data = dt_fit)
+    }
+    
+    # define legend
+    plt <- plt +
+      ggplot2::guides(color = ggplot2::guide_legend(position = "left"))
   }
-  names(color_values) <- group_names
   
-  # levels
-  dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
-  dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
-  
-  plt_title <- sprintf(
-    "%s (%s)",
-    ifelse(group_var == cellline_name, unique(dt_met[[drug_name]]), unique(dt_met[[cellline_name]])),
-    ifelse(group_var == cellline_name, unique(dt_met[[gnumber]]), unique(dt_met[[clid]]))
-  )
-  
-  # final plot
-  plt <-
-    ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = group_var, group = group_var)) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
-    ggplot2::scale_color_manual(values = color_values,
-                                name = ifelse(group_var == cellline_name, "Cell Line", "Drug")) +
-    ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
-    ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
+  plt <- plt +
     ggplot2::xlab(bquote(.(conc) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(plt_title) +
-    ggplot2::theme_bw()
-  
-  if (plot_averaged_flag) {
-    plt <- plt + ggplot2::geom_point(data = dt_avg)
-  }
-  
-  if (plot_fit_flag) {
-    plt <- plt + ggplot2::geom_line(data = dt_fit)
-  }
-  
-  # define legend
-  plt <- plt +
-    ggplot2::guides(color = ggplot2::guide_legend(position = "left")) +
+    ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
                    plot.title = ggplot2::element_text(size = 10),
@@ -241,7 +252,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-
+  
   available_drugs <- unique(dt_metrics[[drug_name]])
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
     drug_name_vec  <- available_drugs
@@ -258,7 +269,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   
   plt_list <- list()
   for (d_name in drug_name_vec) {
-
+    
     plt_list[[d_name]] <-       
       plot_dose_response_sa(dt_metrics = dt_metrics,
                             dt_average = dt_average,
