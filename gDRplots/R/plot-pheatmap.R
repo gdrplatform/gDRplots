@@ -77,6 +77,9 @@ pheatmap_qc <- function(
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(lbl_by_CellLineName)
   checkmate::assert_flag(lbl_by_DrugName)
+  zero_conc_scaling_factor <- 
+    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -153,7 +156,7 @@ pheatmap_qc <- function(
   # handle conc = 0
   min_val <-
     min(unlist(drug_annotation)[!is.na(unlist(drug_annotation)) & unlist(drug_annotation) != 0])
-  drug_annotation[drug_annotation == 0] <- min_val / 100
+  drug_annotation[drug_annotation == 0] <- min_val / zero_conc_scaling_factor
   # log 10 (conc)
   drug_annotation <- log10(drug_annotation)
   

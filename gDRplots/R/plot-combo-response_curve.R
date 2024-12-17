@@ -59,6 +59,9 @@ plot_dose_response_combo <- function(dt_average,
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  zero_conc_scaling_factor <- 
+    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_average)
   checkmate::assert_choice(drug1_name, choices = unique(dt_average[[drug_name]]))
@@ -98,7 +101,7 @@ plot_dose_response_combo <- function(dt_average,
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
-  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
+  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
   
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])
@@ -190,6 +193,9 @@ plot_dose_response_combo_panel <- function(dt_average,
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  zero_conc_scaling_factor <- 
+    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_average)
   checkmate::assert_string(cl_name)
@@ -231,7 +237,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
-  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
+  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
   
   # colors
   ls_conc_2 <- unique(dt_avg[[conc_2]])

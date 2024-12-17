@@ -65,6 +65,9 @@ plot_dose_response_sa <- function(dt_metrics,
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
+  zero_conc_scaling_factor <- 
+    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average)
@@ -115,7 +118,7 @@ plot_dose_response_sa <- function(dt_metrics,
   max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
   conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
   # handle conc = 0
-  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / 100
+  dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
   
   # prep fitted data
   sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
