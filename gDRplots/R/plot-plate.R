@@ -52,7 +52,8 @@ plot_plate_stack_info <- function(dt_plate) {
     
     has_combo <- concentration2 %in% colnames(dt_plate_subset) && drug2 %in% colnames(dt_plate_subset)
     
-    doses <- sort(unique(unlist(dt_plate_subset[, intersect(names(dt_plate_subset), c(concentration, concentration2)), with = FALSE])))
+    doses <- sort(unique(unlist(dt_plate_subset[, intersect(names(dt_plate_subset),
+                                                            c(concentration, concentration2)), with = FALSE])))
     gradient_colors <- grDevices::colorRampPalette(c("#c6dbef", "white", "#08306b"))(length(doses))
     names(gradient_colors) <- doses
     
@@ -72,7 +73,8 @@ plot_plate_stack_info <- function(dt_plate) {
       ),
       color = "black", linewidth = 0.2
       ) +
-      {if (has_combo) ggplot2::geom_rect(ggplot2::aes(
+      {
+        if (has_combo) ggplot2::geom_rect(ggplot2::aes(
         xmin = WellColumn,
         xmax = WellColumn + 0.5,
         ymin = as.numeric(WellRow) - 0.5,
@@ -80,7 +82,9 @@ plot_plate_stack_info <- function(dt_plate) {
         fill = !!rlang::sym(concentration2)
       ),
       color = "black", linewidth = 0.2
-      )} +
+      )
+        }
+    +
       ggplot2::geom_point(ggplot2::aes(
         x = WellColumn + ifelse(has_combo, -0.25, 0),
         y = WellRow,
@@ -89,13 +93,16 @@ plot_plate_stack_info <- function(dt_plate) {
       ),
       size = 3
       ) +
-      {if (has_combo) ggplot2::geom_point(ggplot2::aes(
+      {
+        if (has_combo) ggplot2::geom_point(ggplot2::aes(
         x = WellColumn + 0.25,
         y = WellRow,
         color = !!rlang::sym(drug2)
       ),
       size = 3
-      )} +
+      )
+        }
+    +
       ggplot2::geom_text(ggplot2::aes(
         x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)
       ),

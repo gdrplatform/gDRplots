@@ -9,7 +9,8 @@
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks.  Avoid spaces.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
-#' @param tabset_options A character vector of options for the tabset. This is only used when `plt_list` is a nested list.
+#' @param tabset_options A character vector of options for the tabset. This is only used when `plt_list`
+#' is a nested list.
 #' Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.
 #'
 #' @return A list of character vectors. Each element of the list corresponds to a plot or a

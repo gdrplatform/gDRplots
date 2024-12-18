@@ -20,7 +20,8 @@ If a nested list is provided, the inner lists should also be named.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used when `plt_list` is a nested list.
+\item{tabset_options}{A character vector of options for the tabset. This is only used when `plt_list`
+is a nested list.
 Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.}
 }
 \value{
