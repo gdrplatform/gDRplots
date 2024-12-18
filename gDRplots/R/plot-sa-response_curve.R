@@ -127,7 +127,7 @@ plot_dose_response_sa <- function(dt_metrics,
       ggplot2::theme(aspect.ratio = 1)
   } else {
     # prep value ranges for plot
-    data_range <- c(min(min(dt_avg$x, na.rm = TRUE), 0) - 0.05, max(max(dt_avg$x, na.rm = TRUE), 1) + 0.05)
+    data_range <- c(min(min(dt_avg$x), 0, na.rm = TRUE) - 0.05, max(max(dt_avg$x), 1, na.rm = TRUE) + 0.05)
     min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
     max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
     conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
@@ -181,11 +181,11 @@ plot_dose_response_sa <- function(dt_metrics,
       ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2)))
     
     if (plot_averaged_flag) {
-      plt <- plt + ggplot2::geom_point(data = dt_avg)
+      plt <- plt + ggplot2::geom_point(data = dt_avg, na.rm = TRUE)
     }
     
     if (plot_fit_flag) {
-      plt <- plt + ggplot2::geom_line(data = dt_fit)
+      plt <- plt + ggplot2::geom_line(data = dt_fit, na.rm = TRUE)
     }
     
     # define legend
