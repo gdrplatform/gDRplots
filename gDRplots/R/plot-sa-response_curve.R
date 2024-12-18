@@ -82,10 +82,8 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # check input data
   if (group_var == cellline_name) {
-    checkmate::assert_choice(selection_name, choices = dt_metrics[[drug_name]])
     main_var <- drug_name
   } else if (group_var == drug_name) {
-    checkmate::assert_choice(selection_name, choices = dt_metrics[[cellline_name]])
     main_var <- cellline_name
   }
   stopifnot("empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
@@ -108,20 +106,25 @@ plot_dose_response_sa <- function(dt_metrics,
               group_names)
   }
   
-  # plot title
-  dt_src <- 
-    unique(dt_metrics[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
-  plt_title <- sprintf(
-    "%s (%s)",
-    ifelse(group_var == cellline_name, unique(dt_src[[drug_name]]), unique(dt_src[[cellline_name]])),
-    ifelse(group_var == cellline_name, unique(dt_src[[gnumber]]), unique(dt_src[[clid]]))
-  )
-  
   # filter data
   dt_met <- dt_met[get(group_var) %in% group_names, ]
   dt_avg <- dt_avg[get(group_var) %in% group_names, ]
   
-  if (NROW(dt_met) == 0 || NROW(dt_avg) == 0) {
+  # plot title 
+  if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
+    plt_title <- selected_celline
+  } else {
+    dt_src <- if (NROW(dt_met) == 0) dt_avg else dt_met
+    dt_src <- unique(dt_src[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
+    
+    plt_title <- sprintf(
+      "%s (%s)",
+      ifelse(group_var == cellline_name, unique(dt_src[[drug_name]]), unique(dt_src[[cellline_name]])),
+      ifelse(group_var == cellline_name, unique(dt_src[[gnumber]]), unique(dt_src[[clid]]))
+    )
+  }
+  
+  if (NROW(dt_met) == 0 || NROW(dt_avg) == 0 || all(is.na(unique(dt_avg[[conc]])))) {
     plt <-
       ggplot2::ggplot() +
       ggplot2::theme(aspect.ratio = 1)
@@ -166,7 +169,7 @@ plot_dose_response_sa <- function(dt_metrics,
       colors_vec
     }
     names(color_values) <- group_names
-
+    
     # levels
     dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
     dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
@@ -348,7 +351,7 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   
   plt_list <- list()
   for (cl_name in cellline_name_vec) {
-
+    
     plt_list[[cl_name]] <-
       plot_dose_response_sa(dt_metrics = dt_metrics,
                             dt_average = dt_average,
