@@ -22,7 +22,8 @@ test_data <- data.table::data.table(
   WellRow = rep(LETTERS[1:8], times = 12),
   Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
   Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Concentration = runif(96, min = 0, max = 100),
+  Concentration = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
+  Concentration_2 = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
   ReadoutValue = runif(96, min = 0, max = 100),
   Barcode = rep(c("A", "B"), 48)
   )
