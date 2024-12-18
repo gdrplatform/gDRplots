@@ -1,10 +1,13 @@
 context("Test sa_plots")
 
 test_that("plot_dose_response_sa works as expected", {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   
-  group_var <- gDRutils::get_env_identifiers("cellline_name")
+  group_var <- cellline_name
   selected_drug <- "drug_002"
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
@@ -12,17 +15,24 @@ test_that("plot_dose_response_sa works as expected", {
   plt_1 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var)
+                                 group_var = group_var) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
+  expect_true(grepl(selected_drug,  plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
+  expect_equal(ggplot2::get_guide_data(plt_1, "colour")[[".label"]],
+               unique(dt_average[[group_var]]))
+  expect_equal(plt_1[["labels"]][["colour"]], "group_var")
   
+  normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
                                  group_var = group_var,
+                                 normalization_type = normalization_type,
                                  colors_vec = rainbow(NROW(unique(dt_metrics[[group_var]]))))
   expect_is(plt_2, "gg")
+  expect_equal(plt_2[["labels"]][["y"]], normalization_type)
   expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[2]][["colour"]]),
                 NROW(unique(dt_metrics[[group_var]])))
   
@@ -41,24 +51,29 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_3[["labels"]][["y"]], "GR")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(names(plt_3[["guides"]][["guides"]]), "colour")
+  expect_equal(ggplot2::get_guide_data(plt_3, "colour")[[".label"]],
+               unique(dt_average[[group_var]]))
+  expect_length(ggplot2::ggplot_build(plt_3)$data[[3]], 0) # no data for curves
   
-  group_var <- gDRutils::get_env_identifiers("drug_name")
+  group_var <- drug_name
   selected_celline <- "cellline_BA"
   normalization_type <- "RV"
+  ls_col <- c("#5F9EA0", "#FFA500", "#00008B")
   
   plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_celline,
                                  group_var = group_var,
                                  normalization_type = normalization_type,
-                                 colors_vec = c("cadetblue", "orange", "darkblue"),
+                                 colors_vec = ls_col,
                                  plot_fit_flag = FALSE)
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], normalization_type)
   expect_true(grepl(selected_celline, plt_4[["labels"]][["title"]]))
   expect_length(plt_4[["layers"]], 2) # lack of fit lines
+  expect_true(all(ls_col[c(1, 3)] %in% unique(ggplot2::ggplot_build(plt_4)$data[[2]][["colour"]])))
   
-  # lack of metric data for selected `group_names`
+  # scenario: lack of metric data for selected `group_names`
   drug_name_subset <- c("drug_002", "drug_003", "drug_004", "drug_005", "drug_006")
   dt_metrics_lack <- data.table::copy(dt_metrics)[DrugName %in% drug_name_subset]
   drug_name_vec <- c("drug_005", "drug_006", "drug_007", "drug_008", "drug_009", "drug_010")
@@ -68,8 +83,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  selection_name = selected_celline,
                                  group_var = group_var,
                                  group_names = drug_name_vec,
-                                 normalization_type = normalization_type,
-                                 colors_vec = c("cadetblue", "orange", "darkblue"))
+                                 normalization_type = normalization_type)
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["colour"]])), 
@@ -77,9 +91,9 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["colour"]])), 
                NROW(intersect(drug_name_subset, drug_name_vec))) # metric 
   
-  # lack of metric data for selected `group_names`
+  # scenario: lack of metric data for selected `group_names`
   drug_name_subset <- c("drug_002", "drug_003", "drug_004", "drug_005", "drug_006")
-  dt_average_lack <- data.table::copy(dt_average)[DrugName %in% drug_name_subset]
+  dt_average_lack <- data.table::copy(dt_average)[get(drug_name) %in% drug_name_subset]
   drug_name_vec <- c("drug_005", "drug_006", "drug_007", "drug_008", "drug_009", "drug_010")
   
   plt_6 <- plot_dose_response_sa(dt_metrics = dt_metrics,
@@ -87,8 +101,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  selection_name = selected_celline,
                                  group_var = group_var,
                                  group_names = drug_name_vec,
-                                 normalization_type = normalization_type,
-                                 colors_vec = c("cadetblue", "orange", "darkblue"))
+                                 normalization_type = normalization_type)
   expect_is(plt_6, "gg")
   expect_length(plt_6[["layers"]], 3)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[2]][["colour"]])), 
@@ -96,6 +109,92 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])), 
                NROW(drug_name_vec)) # metric
   
+  # scenario: one drug is not available in data - plot for drugs
+  plt_7 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average,
+                                 selection_name = selected_celline,
+                                 group_var = group_var,
+                                 group_names = c(drug_name_vec, "drug_xx"))
+  expect_is(plt_7, "gg")
+  expect_equal(ggplot2::get_guide_data(plt_7, "colour")[[".label"]],
+               drug_name_vec) # without "drug_xx"
+  
+  # scenario: NA i concentration column
+  dt_average_NA <- data.table::copy(dt_average)
+  dt_average_NA[["Concentration"]] <- NA
+  
+  plt_8 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                 dt_average = dt_average_NA,
+                                 selection_name = selected_celline,
+                                 group_var = group_var)
+  expect_is(plt_8, "gg")
+  expect_equal(plt_8[["labels"]][["y"]], "GR")
+  expect_true(any(grepl("Concentration", plt_8[["labels"]][["x"]])))
+  expect_true(grepl(selected_celline, plt_8[["labels"]][["title"]]))
+  expect_length(ggplot2::ggplot_build(plt_8)$data[[1]], 0) # no data at all
+  
+  # scenario: values for drug are NAs for selected cell line
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
+  dt_metrics_NA[get(cellline_name) == selected_celline, (ls_col_met) := NA]
+  
+  dt_average_NA <- data.table::copy(dt_average)
+  ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
+  dt_average_NA[get(cellline_name) == selected_celline, (ls_col_avg) := NA]
+  
+  plt_9 <- plot_dose_response_sa(dt_metrics = dt_metrics_NA,
+                                 dt_average = dt_average_NA,
+                                 selection_name = selected_celline,
+                                 group_var = group_var,
+                                 group_names = drug_name_vec)
+  expect_is(plt_9, "gg")
+  expect_equal(plt_9[["labels"]][["y"]], "GR")
+  expect_true(any(grepl("Concentration", plt_9[["labels"]][["x"]])))
+  expect_true(grepl(selected_celline, plt_9[["labels"]][["title"]]))
+  expect_length(unique(ggplot2::ggplot_build(plt_9)$data[[2]][["colour"]]), 
+                NROW(drug_name_vec))
+  expect_true(all(is.na(ggplot2::ggplot_build(plt_9)$data[[2]][["y"]]))) 
+  expect_equal(ggplot2::get_guide_data(plt_9, "colour")[[".label"]],
+               drug_name_vec) # legend is present
+  
+  # scenario: there is no data in metrics for selected cell line
+  dt_metrics_miss <- data.table::copy(dt_metrics)
+  dt_metrics_miss <- dt_metrics_miss[get(cellline_name) != selected_celline, ]
+  
+  plt_10 <- plot_dose_response_sa(dt_metrics = dt_metrics_miss,
+                                  dt_average = dt_average,
+                                  selection_name = selected_celline,
+                                  group_var = group_var,
+                                  group_names = drug_name_vec)
+  
+  expect_is(plt_10, "gg")
+  expect_true(grepl(selected_celline, plt_10[["labels"]][["title"]]))
+  expect_length(ggplot2::ggplot_build(plt_10)$data[[1]], 0) # no data at all
+  
+  # scenario: there is no data in average for selected cell line
+  dt_average_miss <- data.table::copy(dt_average)
+  dt_average_miss <- dt_average_miss[get(cellline_name) != selected_celline, ]
+  
+  plt_11 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = dt_average_miss,
+                                  selection_name = selected_celline,
+                                  group_var = group_var,
+                                  group_names = drug_name_vec)
+  
+  expect_is(plt_11, "gg")
+  expect_true(grepl(selected_celline, plt_11[["labels"]][["title"]]))
+  expect_length(ggplot2::ggplot_build(plt_11)$data[[1]], 0) # no data at all
+  
+  # scenario: there is no data in metrics and average for selected cell line
+  plt_12 <- plot_dose_response_sa(dt_metrics = dt_metrics_miss,
+                                  dt_average = dt_average_miss,
+                                  selection_name = selected_celline,
+                                  group_var = group_var,
+                                  group_names = drug_name_vec)
+  
+  expect_is(plt_12, "gg")
+  expect_equal(plt_12[["labels"]][["title"]], selected_celline)
+  expect_length(ggplot2::ggplot_build(plt_12)$data[[1]], 0) # no data at all
   
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
@@ -148,6 +247,7 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                          function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
   
   
+  # scenario: selected cell line is not available in data
   cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
   drug_name_vec_2 <- c(drug_name_vec, "drug_100")
   
@@ -158,9 +258,30 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
   expect_is(plts_3, "list")
   plotted_ <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
   expect_equal(names(plts_3), plotted_)
-  plotted <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
+  plotted <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]])) # only available
   expect_true(all(vapply(seq_along(plts_3), 
                          function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
+  
+  # scenario: values for selected drug are NAs
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
+  dt_metrics_NA[get(drug_name) == drug_name_vec[1], (ls_col_met) := NA]
+  
+  dt_average_NA <- data.table::copy(dt_average)
+  ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
+  dt_average_NA[get(drug_name) == drug_name_vec[1], (ls_col_avg) := NA]
+  
+  plts_4 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics_NA, 
+                                         dt_average = dt_average_NA,
+                                         cellline_name_vec = cellline_name_vec,
+                                         drug_name_vec = drug_name_vec)
+  expect_is(plts_4, "list")
+  expect_equal(names(plts_4), drug_name_vec)
+  expect_length(unique(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[2]][["colour"]]),
+                NROW(cellline_name_vec))
+  expect_length(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[3]], 0) # no data
+  expect_equal(ggplot2::get_guide_data(plts_4[[drug_name_vec[1]]], "colour")[[".label"]],
+               cellline_name_vec) # legend is present
 })
 
 test_that("plot_dose_response_sa_by_drugs works as expected", {
@@ -212,8 +333,25 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
   expect_true(all(vapply(seq_along(plts_3), 
                          function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
   
-  dt_average_lack <- data.table::copy(dt_average)
+  # scenario: values for selected cell line are NAs
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
+  dt_metrics_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_met) := NA]
   
+  dt_average_NA <- data.table::copy(dt_average)
+  ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
+  dt_average_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_avg) := NA]
+  
+  plts_4 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics_NA, 
+                                           dt_average = dt_average_NA,
+                                           cellline_name_vec = cellline_name_vec,
+                                           drug_name_vec = drug_name_vec)
+  expect_equal(names(plts_4), cellline_name_vec)
+  expect_length(unique(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[2]][["colour"]]),
+                NROW(drug_name_vec))
+  expect_length(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[3]], 0) # no data
+  expect_equal(ggplot2::get_guide_data(plts_4[[cellline_name_vec[1]]], "colour")[[".label"]],
+               drug_name_vec) # legend is present
 })
 
 test_that("plot_dose_response_sa_qc works as expected", {
@@ -294,7 +432,7 @@ test_that("plot_dose_response_sa_qc works as expected", {
   
   ls_drug <- c(d_names, "drug_YY")
   no_comb_err <- NROW(unique(
-    dt_average[DrugName %in% ls_drug & CellLineName == cl_name, c("CellLineName", "DrugName"), with = FALSE]
+    dt_average[get(drug_name) %in% ls_drug & get(cellline_name) == cl_name, c(cellline_name, drug_name), with = FALSE]
   ))
   plt_3 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
                                           dt_average = dt_average,

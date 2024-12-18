@@ -25,5 +25,6 @@
     "#FB9C05",
     "#FDE251",
     "#D7F434"
-  ]
+  ],
+  "ZERO_CONC_SCALING_FACTOR": 100
 }
