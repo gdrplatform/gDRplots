@@ -112,7 +112,7 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # plot title 
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
-    plt_title <- selected_celline
+    plt_title <- selection_name
   } else {
     dt_src <- if (NROW(dt_met) == 0) dt_avg else dt_met
     dt_src <- unique(dt_src[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
