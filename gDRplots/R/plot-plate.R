@@ -35,32 +35,27 @@ plot_plate_stack_info <- function(dt_plate) {
                                            cellline,
                                            well_position))
   
-  # Pre-process data ENTIRELY outside the loop
   dt_plate[, WellColumn := as.numeric(WellColumn)]
   dt_plate[, WellRow := factor(WellRow, levels = sort(unique(WellRow), decreasing = TRUE))]
   
   barcode_idf <- intersect(barcode, names(dt_plate))
   if (NROW(barcode_idf) == 0) {
-    return(ggplot2::ggplot()) # Return early if no barcode is found
+    return(ggplot2::ggplot())
   }
   
-  # Generate overall color mapping (adjust if barcode-specific)
-  overall_color_mapping <- generate_color_mappings(dt_plate) # Make sure this function is defined
+  overall_color_mapping <- generate_color_mappings(dt_plate)
   
   plate_list <- lapply(unique(dt_plate[[barcode_idf]]), function(x) {
     dt_plate_subset <- dt_plate[get(barcode_idf) == x]
     
-    # Drop unused factor levels
     dt_plate_subset[, WellRow := droplevels(WellRow)]
     
     has_combo <- concentration2 %in% colnames(dt_plate_subset) && drug2 %in% colnames(dt_plate_subset)
     
-    # Calculate doses and gradient colors ONCE per subset
     doses <- sort(unique(unlist(dt_plate_subset[, intersect(names(dt_plate_subset), c(concentration, concentration2)), with = FALSE])))
     gradient_colors <- grDevices::colorRampPalette(c("#c6dbef", "white", "#08306b"))(length(doses))
     names(gradient_colors) <- doses
     
-    # Factor concentration columns ONCE per subset
     dt_plate_subset[, (concentration) := factor(get(concentration), levels = doses)]
     if (has_combo) {
       dt_plate_subset[, (concentration2) := factor(get(concentration2), levels = doses)]
@@ -73,7 +68,7 @@ plot_plate_stack_info <- function(dt_plate) {
         xmax = WellColumn + ifelse(has_combo, 0, 0.5),
         ymin = as.numeric(WellRow) - 0.5,
         ymax = as.numeric(WellRow) + 0.5,
-        fill = !!rlang::sym(concentration) # Always use concentration for the first rect
+        fill = !!rlang::sym(concentration)
       ),
       color = "black", linewidth = 0.2
       ) +
@@ -123,7 +118,7 @@ plot_plate_stack_info <- function(dt_plate) {
         plot.subtitle = ggplot2::element_text(hjust = 0.5),
         panel.grid.minor = ggplot2::element_blank()
       ) +
-      ggplot2::scale_color_manual(values = overall_color_mapping) +  # Assuming overall mapping
+      ggplot2::scale_color_manual(values = overall_color_mapping) +
       ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(dt_plate[[cellline]])))) +
       ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", linewidth = 0.5)
     
