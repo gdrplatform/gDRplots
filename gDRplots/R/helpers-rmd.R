@@ -34,9 +34,9 @@
 #' for (species in unique(iris$Species)) {
 #'   nested_plotlist[[species]] <- list()
 #'   nested_plotlist[[species]][["Sepal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-#'     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+#'     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
 #'   nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-#'     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+#'     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
 #' }
 #' 
 #' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
@@ -81,14 +81,14 @@ prep_plot_chunk <- function(plt_list,
       
     } else {
       # not nested - no tabset, access element by index
-      template <- c(
+      chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
         sprintf("```{r %s_%s, echo = FALSE}\n", chunk_name, group_name),
         sprintf("%s[[%d]] \n", plt_list_name, nm),  # Use %d and nm directly
         "```\n",
         "\n"
       )
-      knitr::knit_expand(text = template)
+      knitr::knit_expand(text = chunk)
     }
   })
 }
@@ -185,14 +185,14 @@ prep_nested_plot_chunk <- function(plt_list,
                       plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]', 
                                                plt_list_name, nm_1, nm_2, nm_norm)
                       
-                      template <- c(
+                      chunk <- c(
                         sprintf("%s {{nm_vis}} \n\n", lvl_4),
                         sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
                         sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
                         "```\n",
                         "\n"
                       )
-                      knitr::knit_expand(text = template)
+                      knitr::knit_expand(text = chunk)
                     })
                   )
                 )

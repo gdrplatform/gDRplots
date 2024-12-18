@@ -51,9 +51,9 @@ nested_plotlist <- list()
 for (species in unique(iris$Species)) {
   nested_plotlist[[species]] <- list()
   nested_plotlist[[species]][["Sepal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-    ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+    ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
   nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
-    ggplot2::aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+    ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
 }
 
 prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
