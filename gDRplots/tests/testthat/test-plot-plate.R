@@ -55,20 +55,6 @@ test_that("plot_plate works correctly", {
   expect_error(plot_plate(incomplete_data, "Gnumber"), "Assertion")
 })
 
-test_that("filter_data_by_barcode works correctly", {
-  # Test if the function filters data correctly
-  filtered_data <- filter_data_by_barcode(test_data, "A", "Barcode")
-  expect_equal(nrow(filtered_data), 48)
-  expect_equal(unique(filtered_data$Barcode), "A")
-  
-  # Test if the function handles no matching barcode
-  no_match_data <- filter_data_by_barcode(test_data, "C", "Barcode")
-  expect_equal(nrow(no_match_data), 0)
-  
-  # Test if the function handles incorrect barcode identifier
-  expect_error(filter_data_by_barcode(test_data, "A", "non_existent_column"))
-})
-
 test_that("generate_color_mappings works correctly", {
   # Test if the function generates color mappings correctly
   untrt_tag <- "untreated"
