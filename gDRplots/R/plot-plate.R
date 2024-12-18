@@ -72,8 +72,7 @@ plot_plate_stack_info <- function(dt_plate) {
         fill = !!rlang::sym(concentration)
       ),
       color = "black", linewidth = 0.2
-      ) +
-      {
+      ) + {
         if (has_combo) ggplot2::geom_rect(ggplot2::aes(
         xmin = WellColumn,
         xmax = WellColumn + 0.5,
@@ -92,8 +91,7 @@ plot_plate_stack_info <- function(dt_plate) {
         shape = !!rlang::sym(cellline)
       ),
       size = 3
-      ) +
-      {
+      ) + {
         if (has_combo) ggplot2::geom_point(ggplot2::aes(
         x = WellColumn + 0.25,
         y = WellRow,
