@@ -29,5 +29,6 @@
   "PLATE_PALETTE": [
     "#C6DBEF", 
     "#08306B"
-  ]
+  ],
+  "ZERO_CONC_SCALING_FACTOR": 100
 }

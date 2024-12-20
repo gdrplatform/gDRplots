@@ -8,11 +8,12 @@
 #' @param metric string name of the metric;
 #'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
-#'    but the values from any numeric colum can be displayed.
+#'    but the values from any numeric column can be displayed.
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
+#' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 
@@ -27,6 +28,9 @@
 #' 
 #' plot_boxplot_metric_sa_by_CLs(dt_metrics,
 #'                               grouped_flag = TRUE)
+#'                               
+#' plot_boxplot_metric_sa_by_CLs(dt_metrics,
+#'                               with_inf = TRUE)
 #'                               
 #' plot_boxplot_metric_sa_by_CLs(dt_metrics,
 #'                               metric = "x_AOC",
@@ -50,7 +54,8 @@ plot_boxplot_metric_sa_by_CLs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
-    colors_vec = NULL
+    colors_vec = NULL,
+    with_inf = FALSE
 ) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -66,26 +71,22 @@ plot_boxplot_metric_sa_by_CLs <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met_norm <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
   
-  # take care of Inf and NaN values in IC50 metrics
   if (metric == "xc50") {
-    inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
+    dt_met[, (metric) := log10(get(metric))]
   }
   
-  dt_met <- dt_met_norm[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
+  }
   
   plt_title <- sprintf("Number of unique drugs: %s", NROW(unique(dt_met[[drug_name]])))
   
@@ -106,13 +107,16 @@ plot_boxplot_metric_sa_by_CLs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25) +
+      ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)), 
                             color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
   } else {
+    data.table::setorderv(dt_met, cellline_name)
+    dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]])
+    
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       "#A6CEE3"
     } else {
@@ -123,15 +127,15 @@ plot_boxplot_metric_sa_by_CLs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::theme(legend.position = "none")
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -184,7 +188,8 @@ plot_boxplot_metric_sa_by_drugs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
-    colors_vec = NULL
+    colors_vec = NULL,
+    with_inf = FALSE
 ) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -200,26 +205,22 @@ plot_boxplot_metric_sa_by_drugs <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met_norm <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
   
-  # take care of Inf and NaN values in IC50 metrics
   if (metric == "xc50") {
-    inf_xc50 <- is.infinite(dt_met_norm[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_met_norm[inf_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_met_norm[["xc50"]] > 10 ^ dt_met_norm[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_met_norm[over_xc50, ][["xc50"]] <- 10 ^ dt_met_norm[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
+    dt_met[, (metric) := log10(get(metric))] 
   }
   
-  dt_met <- dt_met_norm[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
+  }
   
   plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
   
@@ -240,13 +241,16 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25) +
+      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
-                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
+                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE, na.rm = TRUE) +
       ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
   } else {
+    data.table::setorderv(dt_met, drug_name)
+    dt_met[[drug_name]] <- factor(dt_met[[drug_name]])
+    
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       "#A6CEE3"
     } else {
@@ -257,15 +261,15 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::theme(legend.position = "none")
   }
-  
+
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -395,7 +399,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
   plt <- plt +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
@@ -472,7 +476,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
     ggplot2::theme(legend.position = "none") +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
     ggplot2::labs(title = plt_title,
-                  y = sprintf("%s for %s", metric, normalization_type), 
+                  y = get_hm_title(metric, normalization_type), 
                   x = "") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
