@@ -1,14 +1,19 @@
+context("Test plot-plate")
+
+
 # Create test data
-set.seed(123)
-test_data <- data.table::data.table(
-  WellColumn = rep(1:12, each = 8),
-  WellRow = rep(LETTERS[1:8], times = 12),
-  Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Concentration = runif(96, min = 0, max = 100),
-  ReadoutValue = runif(96, min = 0, max = 100),
-  clid = "CellLineA",
-  Barcode = rep(c("A", "B"), 48)
+test_data <- withr::with_seed(
+  123,
+  data.table::data.table(
+    WellColumn = rep(1:12, each = 8),
+    WellRow = rep(LETTERS[1:8], times = 12),
+    Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+    Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+    Concentration = runif(96, min = 0, max = 100),
+    ReadoutValue = runif(96, min = 0, max = 100),
+    clid = "CellLineA",
+    Barcode = rep(c("A", "B"), 48)
+  )
 )
 
 test_that("plot_plate_stack_info works correctly", {

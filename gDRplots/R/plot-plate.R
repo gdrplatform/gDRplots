@@ -19,6 +19,8 @@
 #' plot_plate_stack_info(test_data)[["A"]]
 #' @export
 plot_plate_stack_info <- function(dt_plate) {
+  
+  dt_plate_copy <- data.table::copy(dt_plate)
   concentration <- gDRutils::get_env_identifiers("concentration")
   concentration2 <- gDRutils::get_env_identifiers("concentration2")
   drug <- gDRutils::get_env_identifiers("drug")
@@ -27,43 +29,47 @@ plot_plate_stack_info <- function(dt_plate) {
   well_position <- gDRutils::get_env_identifiers("well_position")
   barcode <- gDRutils::get_env_identifiers("barcode")
   
-  checkmate::assert_data_table(dt_plate)
-  checkmate::assert_names(names(dt_plate),
+  plate_palette <- gDRutils::get_settings_from_json(
+    "PLATE_PALETTE",
+    system.file(package = "gDRplots", "settings.json"))
+  
+  checkmate::assert_data_table(dt_plate_copy)
+  checkmate::assert_names(names(dt_plate_copy),
                           must.include = c("ReadoutValue",
                                            concentration,
                                            drug,
                                            cellline,
                                            well_position))
   
-  dt_plate[, WellColumn := as.numeric(WellColumn)]
-  dt_plate[, WellRow := factor(WellRow, levels = sort(unique(WellRow), decreasing = TRUE))]
+  dt_plate_copy[, WellColumn := as.numeric(WellColumn)]
+  dt_plate_copy[, WellRow := factor(WellRow, levels = sort(unique(WellRow), decreasing = TRUE))]
   
-  barcode_idf <- intersect(barcode, names(dt_plate))
+  barcode_idf <- intersect(barcode, names(dt_plate_copy))
   if (NROW(barcode_idf) == 0) {
-    return(ggplot2::ggplot())
+    return(ggplot2::ggplot() + ggplot2::theme_void())
   }
   
-  overall_color_mapping <- generate_color_mappings(dt_plate)
+  overall_color_mapping <- generate_color_mappings(dt_plate_copy) # Assuming this function exists
   
-  plate_list <- lapply(unique(dt_plate[[barcode_idf]]), function(x) {
-    dt_plate_subset <- dt_plate[get(barcode_idf) == x]
+  plate_list <- lapply(unique(dt_plate_copy[[barcode_idf]]), function(x) {
+    dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
     
-    dt_plate_subset[, WellRow := droplevels(WellRow)]
+    dt_plate_copy_subset[, WellRow := droplevels(WellRow)]
     
-    has_combo <- concentration2 %in% colnames(dt_plate_subset) && drug2 %in% colnames(dt_plate_subset)
+    has_combo <- concentration2 %in% colnames(dt_plate_copy_subset) && drug2 %in% colnames(dt_plate_copy_subset)
     
-    doses <- sort(unique(unlist(dt_plate_subset[, intersect(names(dt_plate_subset),
+    doses <- sort(unique(unlist(dt_plate_copy_subset[, intersect(names(dt_plate_copy_subset),
                                                             c(concentration, concentration2)), with = FALSE])))
-    gradient_colors <- grDevices::colorRampPalette(c("#c6dbef", "white", "#08306b"))(length(doses))
+    gradient_colors <- grDevices::colorRampPalette(plate_palette)(length(doses))
     names(gradient_colors) <- doses
     
-    dt_plate_subset[, (concentration) := factor(get(concentration), levels = doses)]
+    dt_plate_copy_subset[, (concentration) := factor(get(concentration), levels = doses)]
     if (has_combo) {
-      dt_plate_subset[, (concentration2) := factor(get(concentration2), levels = doses)]
+      dt_plate_copy_subset[, (concentration2) := factor(get(concentration2), levels = doses)]
     }
     
     
-    p <- ggplot2::ggplot(dt_plate_subset) +
+    p <- ggplot2::ggplot(dt_plate_copy_subset) +
       ggplot2::geom_rect(ggplot2::aes(
         xmin = WellColumn - 0.5,
         xmax = WellColumn + ifelse(has_combo, 0, 0.5),
@@ -72,18 +78,7 @@ plot_plate_stack_info <- function(dt_plate) {
         fill = !!rlang::sym(concentration)
       ),
       color = "black", linewidth = 0.2
-      ) + {
-        if (has_combo) ggplot2::geom_rect(ggplot2::aes(
-        xmin = WellColumn,
-        xmax = WellColumn + 0.5,
-        ymin = as.numeric(WellRow) - 0.5,
-        ymax = as.numeric(WellRow) + 0.5,
-        fill = !!rlang::sym(concentration2)
-      ),
-      color = "black", linewidth = 0.2
-      )
-        }
-    +
+      ) +
       ggplot2::geom_point(ggplot2::aes(
         x = WellColumn + ifelse(has_combo, -0.25, 0),
         y = WellRow,
@@ -91,27 +86,38 @@ plot_plate_stack_info <- function(dt_plate) {
         shape = !!rlang::sym(cellline)
       ),
       size = 3
-      ) + {
-        if (has_combo) ggplot2::geom_point(ggplot2::aes(
-        x = WellColumn + 0.25,
-        y = WellRow,
-        color = !!rlang::sym(drug2)
+      ) 
+    
+    if (has_combo) {
+      p <- p + ggplot2::geom_rect(ggplot2::aes(
+        xmin = WellColumn,
+        xmax = WellColumn + 0.5,
+        ymin = as.numeric(WellRow) - 0.5,
+        ymax = as.numeric(WellRow) + 0.5,
+        fill = !!rlang::sym(concentration2)
       ),
-      size = 3
-      )
-        }
-    +
-      ggplot2::geom_text(ggplot2::aes(
-        x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)
-      ),
-      color = "black", size = 3, vjust = 1.2
+      color = "black", linewidth = 0.2
       ) +
+        ggplot2::geom_point(ggplot2::aes(
+          x = WellColumn + 0.25,
+          y = WellRow,
+          color = !!rlang::sym(drug2)
+        ),
+        size = 3
+        )
+    }
+    
+    p <- p + # Continue adding layers outside the if block
+      ggrepel::geom_text_repel(data = dt_plate_copy_subset, 
+                               ggplot2::aes(x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)), 
+                               color = "black", size = 3, bg.color = "white", bg.r = 0.05,
+                               force = 0, nudge_y = -0.3, segment.color = NA) +
       ggplot2::scale_fill_manual(values = gradient_colors, name = concentration, limits = names(gradient_colors)) +
-      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_subset$WellColumn)),
-                                  labels = sort(unique(dt_plate_subset$WellColumn)),
+      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_copy_subset$WellColumn)),
+                                  labels = sort(unique(dt_plate_copy_subset$WellColumn)),
                                   position = "top") +
       ggplot2::labs(
-        title = paste0(length(unique(dt_plate_subset$WellColumn)) * length(unique(dt_plate_subset$WellRow)),
+        title = paste0(length(unique(dt_plate_copy_subset$WellColumn)) * length(unique(dt_plate_copy_subset$WellRow)),
                        "-Well Visualization of Plate ", x),
         x = "Column",
         y = "Row"
@@ -124,12 +130,15 @@ plot_plate_stack_info <- function(dt_plate) {
         panel.grid.minor = ggplot2::element_blank()
       ) +
       ggplot2::scale_color_manual(values = overall_color_mapping) +
-      ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(dt_plate[[cellline]])))) +
+      ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(dt_plate_copy[[cellline]])))) +
       ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", linewidth = 0.5)
+    
+    
+    p
     
   })
   
-  names(plate_list) <- unique(dt_plate[[barcode_idf]])
+  names(plate_list) <- unique(dt_plate_copy[[barcode_idf]])
   plate_list
 }
 
@@ -155,6 +164,8 @@ plot_plate_stack_info <- function(dt_plate) {
 #' plot_plate(test_data, "Gnumber")[["A"]]
 #' @export
 plot_plate <- function(dt_plate, column_name) {
+  
+  dt_plate_copy <- data.table::copy(dt_plate)
   concentration <- gDRutils::get_env_identifiers("concentration")
   concentration2 <- gDRutils::get_env_identifiers("concentration2")
   concentration3 <- gDRutils::get_env_identifiers("concentration3")
@@ -164,56 +175,62 @@ plot_plate <- function(dt_plate, column_name) {
   well_position <- gDRutils::get_env_identifiers("well_position")
   barcode <- gDRutils::get_env_identifiers("barcode")
   
-  checkmate::assert_data_table(dt_plate)
-  checkmate::assert_names(names(dt_plate),
+  plate_palette <- gDRutils::get_settings_from_json(
+    "PLATE_PALETTE",
+    system.file(package = "gDRplots", "settings.json"))
+  
+  checkmate::assert_data_table(dt_plate_copy)
+  checkmate::assert_names(names(dt_plate_copy),
                           must.include = c("ReadoutValue",
                                            concentration,
                                            drug,
                                            cellline,
                                            well_position))
-  checkmate::assert_choice(column_name, choices = names(dt_plate))
+  checkmate::assert_choice(column_name, choices = names(dt_plate_copy))
   
-  dt_plate[, WellColumn := as.numeric(WellColumn)]
-  dt_plate[, WellRow := factor(WellRow, levels = sort(unique(WellRow), decreasing = TRUE))]
+  dt_plate_copy[, WellColumn := as.numeric(WellColumn)]
+  dt_plate_copy[, WellRow := factor(WellRow, levels = sort(unique(WellRow), decreasing = TRUE))]
   
-  barcode_idf <- intersect(barcode, names(dt_plate))
+  barcode_idf <- intersect(barcode, names(dt_plate_copy))
   if (NROW(barcode_idf) == 0) {
-    return(ggplot2::ggplot())
+    return(ggplot2::ggplot() + ggplot2::theme_void())
   }
   
-  unique_val <- sort(unique(dt_plate[[column_name]]))
   continuous <- is.numeric(unique_val) && !column_name %in% c(concentration, concentration2, concentration3)
   
-  if (!continuous) {
-    gradient_colors <- grDevices::colorRampPalette(c("#c6dbef", "#08306b"))(length(unique_val))
-    names(gradient_colors) <- unique_val
-    dt_plate[, (column_name) := factor(get(column_name), levels = unique_val)]
+  dt_plate_copy[, (column_name) := if (is.numeric(.SD[[column_name]])) {
+    factor(round(.SD[[column_name]], 5))
   } else {
-    if (is.numeric(dt_plate[[column_name]])) {
-      dt_plate[, (column_name) := round(get(column_name), 5)]
+    factor(.SD[[column_name]])
+  }]
+  
+  plate_list <- lapply(unique(dt_plate_copy[[barcode_idf]]), function(x) {
+    dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
+    
+    dt_plate_copy_subset[, WellRow := droplevels(WellRow)]
+    dt_plate_copy_subset[, (column_name) := droplevels(get(column_name))]
+    
+    unique_val <- sort(unique(dt_plate_copy_subset[[column_name]]))
+    
+    if (!continuous) {
+      gradient_colors <- grDevices::colorRampPalette(plate_palette)(length(unique_val))
+      names(gradient_colors) <- unique_val
     }
-  }
-  
-  
-  plate_list <- lapply(unique(dt_plate[[barcode_idf]]), function(x) {
-    dt_plate_subset <- dt_plate[get(barcode_idf) == x]
     
-    dt_plate_subset[, WellRow := droplevels(WellRow)]
-    
-    p <- ggplot2::ggplot(dt_plate_subset) +
+    p <- ggplot2::ggplot(dt_plate_copy_subset) +
       ggplot2::geom_rect(ggplot2::aes(xmin = WellColumn - 0.5, xmax = WellColumn + 0.5,
                                       ymin = as.numeric(WellRow) - 0.5,
                                       ymax = as.numeric(WellRow) + 0.5,
                                       fill = !!rlang::sym(column_name)),
                          color = "black", linewidth = 0.2) +
-      ggrepel::geom_text_repel(data = dt_plate_subset, 
+      ggrepel::geom_text_repel(data = dt_plate_copy_subset, 
                                ggplot2::aes(x = WellColumn, y = WellRow, label = !!rlang::sym(column_name)), 
                                color = "black", size = 3, bg.color = "white", bg.r = 0.08, force = 0) +
-      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_subset$WellColumn)),
-                                  labels = sort(unique(dt_plate_subset$WellColumn)),
+      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_copy_subset$WellColumn)),
+                                  labels = sort(unique(dt_plate_copy_subset$WellColumn)),
                                   position = "top") +
       ggplot2::labs(
-        title = paste0(length(unique(dt_plate_subset$WellColumn)) * length(unique(dt_plate_subset$WellRow)),
+        title = paste0(length(unique(dt_plate_copy_subset$WellColumn)) * length(unique(dt_plate_copy_subset$WellRow)),
                        "-Well Visualization of Plate ", x, " for ", column_name),
         x = "Column",
         y = "Row"
@@ -228,7 +245,8 @@ plot_plate <- function(dt_plate, column_name) {
     
     
     if (continuous) {
-      p <- p + ggplot2::scale_fill_gradient(low =  "#c6dbef", high = "#08306b")
+      p <- p + ggplot2::scale_fill_gradient(low =  plate_palette[[1]],
+                                            high = plate_palette[[2]])
     } else {
       p <- p + ggplot2::scale_fill_manual(values = gradient_colors,
                                           name = column_name,
@@ -240,7 +258,7 @@ plot_plate <- function(dt_plate, column_name) {
     
   })
   
-  names(plate_list) <- unique(dt_plate[[barcode_idf]])
+  names(plate_list) <- unique(dt_plate_copy[[barcode_idf]])
   plate_list
 }
 
