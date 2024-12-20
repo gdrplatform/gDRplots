@@ -196,7 +196,7 @@ plot_plate <- function(dt_plate, column_name) {
     return(ggplot2::ggplot() + ggplot2::theme_void())
   }
   
-  continuous <- is.numeric(unique_val) && !column_name %in% c(concentration, concentration2, concentration3)
+  continuous <- is.numeric(dt_plate_copy[[column_name]]) && !column_name %in% c(concentration, concentration2, concentration3)
   
   dt_plate_copy[, (column_name) := if (is.numeric(.SD[[column_name]])) {
     factor(round(.SD[[column_name]], 5))
