@@ -199,17 +199,24 @@ plot_plate <- function(dt_plate, column_name) {
   continuous <- is.numeric(dt_plate_copy[[column_name]]) &&
     !column_name %in% c(concentration, concentration2, concentration3)
   
-  dt_plate_copy[, (column_name) := if (is.numeric(.SD[[column_name]])) {
-    factor(round(.SD[[column_name]], 5))
-  } else {
-    factor(.SD[[column_name]])
+  dt_plate_copy[, (column_name) := {
+    col <- .SD[[column_name]]
+    if (is.numeric(col) && !column_name %in% c(concentration, concentration2, concentration3)) {
+      round(col, 5)
+    } else if (is.numeric(col)) {
+      factor(round(col, 5))
+    } else {
+      factor(col)
+    }
   }]
   
   plate_list <- lapply(unique(dt_plate_copy[[barcode_idf]]), function(x) {
     dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
     
     dt_plate_copy_subset[, WellRow := droplevels(WellRow)]
-    dt_plate_copy_subset[, (column_name) := droplevels(get(column_name))]
+    if (!continuous) {
+      dt_plate_copy_subset[, (column_name) := droplevels(get(column_name))]
+    }
     
     unique_val <- sort(unique(dt_plate_copy_subset[[column_name]]))
     
