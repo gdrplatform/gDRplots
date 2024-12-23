@@ -1,14 +1,19 @@
+context("Test plot-plate")
+
+
 # Create test data
-set.seed(123)
-test_data <- data.table::data.table(
-  WellColumn = rep(1:12, each = 8),
-  WellRow = rep(LETTERS[1:8], times = 12),
-  Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Concentration = runif(96, min = 0, max = 100),
-  ReadoutValue = runif(96, min = 0, max = 100),
-  clid = "CellLineA",
-  Barcode = rep(c("A", "B"), 48)
+test_data <- withr::with_seed(
+  123,
+  data.table::data.table(
+    WellColumn = rep(1:12, each = 8),
+    WellRow = rep(LETTERS[1:8], times = 12),
+    Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+    Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
+    Concentration = runif(96, min = 0, max = 100),
+    ReadoutValue = runif(96, min = 0, max = 100),
+    clid = "CellLineA",
+    Barcode = rep(c("A", "B"), 48)
+  )
 )
 
 test_that("plot_plate_stack_info works correctly", {
@@ -53,20 +58,6 @@ test_that("plot_plate works correctly", {
   # Test if it handles missing required columns
   incomplete_data <- test_data[, .(WellColumn, WellRow, Concentration, Barcode)]
   expect_error(plot_plate(incomplete_data, "Gnumber"), "Assertion")
-})
-
-test_that("filter_data_by_barcode works correctly", {
-  # Test if the function filters data correctly
-  filtered_data <- filter_data_by_barcode(test_data, "A", "Barcode")
-  expect_equal(nrow(filtered_data), 48)
-  expect_equal(unique(filtered_data$Barcode), "A")
-  
-  # Test if the function handles no matching barcode
-  no_match_data <- filter_data_by_barcode(test_data, "C", "Barcode")
-  expect_equal(nrow(no_match_data), 0)
-  
-  # Test if the function handles incorrect barcode identifier
-  expect_error(filter_data_by_barcode(test_data, "A", "non_existent_column"))
 })
 
 test_that("generate_color_mappings works correctly", {

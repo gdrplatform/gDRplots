@@ -2,26 +2,43 @@
 % Please edit documentation in R/helpers-rmd.R
 \name{prep_plot_chunk}
 \alias{prep_plot_chunk}
-\title{Prepare markdown chunk based on the plots list}
+\title{Prepare markdown chunk based on a list of plots}
 \usage{
-prep_plot_chunk(plt_list, chunk_name, header_level = 3)
+prep_plot_chunk(
+  plt_list,
+  chunk_name,
+  header_level = 3,
+  tabset_options = c("unnumbered", "tabset", "tabset-dropdown")
+)
 }
 \arguments{
-\item{plt_list}{named list with generated plots to be shown in tabs
-(for list without name - only ordinal numbers will be generated)}
+\item{plt_list}{A named list of plots.  Names will be used as headings for plots/tab groups.
+If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
+If a nested list is provided, the inner lists should also be named.}
 
-\item{chunk_name}{string name of markdown chunk; preferable without spaces}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks.  Avoid spaces.}
 
-\item{header_level}{numeric level of markdown header}
+\item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
+
+\item{tabset_options}{A character vector of options for the tabset. This is only used when `plt_list`
+is a nested list.
+Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.}
 }
 \value{
-list of character vector - input for \code{knitr::knit}
+A list of character vectors. Each element of the list corresponds to a plot or a
+group of plots (if `plt_list` is nested). Each character vector within the list represents the markdown
+code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
+and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
+is a list of markdown chunks for each tab.
 }
 \description{
-Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
+Generates markdown code for displaying plots in a document using `knitr::knit()`.
+The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
+sections for grouped plots.
 }
 \examples{
 \dontrun{
+# Simple list of plots
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
@@ -30,6 +47,17 @@ names(plotlist) <- unique(iris$Species)
 
 prep_plot_chunk(plotlist, "iris")
 
+# Nested list of plots for tabbed output
+nested_plotlist <- list()
+for (species in unique(iris$Species)) {
+  nested_plotlist[[species]] <- list()
+  nested_plotlist[[species]][["Sepal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
+    ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
+  nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
+    ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
+}
+
+prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
 }
 }
 \seealso{
