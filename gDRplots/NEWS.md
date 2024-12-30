@@ -1,3 +1,6 @@
+## gDRplots 0.0.55 - 2024-12-30
+* add support for chemical genomics analysis
+
 ## gDRplots 0.0.54 - 2024-12-20
 * refactor `prep_plot_chunk` to support simple nested lists of visualizations
 * refactor plate visualizations to improve the performance
