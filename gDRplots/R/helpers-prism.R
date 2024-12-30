@@ -214,8 +214,8 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and combo \code{SummarizedExperiment}
-#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
-#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName}), default is NULL
+#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2}), default is NULL
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the combo metric;
@@ -240,33 +240,47 @@ prep_dt_response_scores <- function(dt_scores,
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
-                                         d_name,
-                                         d_name2,
+                                         d_name = NULL,
+                                         d_name2 = NULL,
                                          normalization_type = "RV",
                                          metric = "xc50",
-                                         fit_source = "gDR") {
+                                         fit_source = "gDR",
+                                         additional_cols = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::assert_string(d_name2)
-  checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+  checkmate::assert_string(normalization_type)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
+  
+  if (!is.null(d_name)) {
+    checkmate::assert_string(d_name)
+    checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  }
+  
+  if (!is.null(d_name2)) {
+    checkmate::assert_string(d_name2)
+    checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+  }
   
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_metric <- dt_metrics[eval(filter_expr)]
   
-  # select required drugs combination
-  dt_response_metric <- dt_response_metric[get(drug_name) == d_name & get(drug_name_2) == d_name2, ]
+  # select required drugs combination if specified
+  if (!is.null(d_name)) {
+    dt_response_metric <- dt_response_metric[get(drug_name) == d_name]
+  }
+  
+  if (!is.null(d_name2)) {
+    dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
+  }
   
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
@@ -282,7 +296,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   }
   
   # create entries of non-zero co-trt
-  meta_col <- c("rId", "cId", cellline_name)
+  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
@@ -307,13 +321,16 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
   data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
   
-  # final
+  # Concatenate meta_col into a single string with "+"
+  meta_col_str <- paste(meta_col, collapse = " + ")
+  
+  # Generate the formula using reformulate
+  dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  
   dt_combo_diff <- data.table::dcast(
     data = dt_combo_diff, 
-    formula = rId + cId + get(cellline_name) ~ cotrt_value + source, 
+    formula = dcast_formula, 
     value.var = ls_col_met_fin)
-  data.table::setnames(dt_combo_diff, "cellline_name", cellline_name)
-  data.table::setkey(dt_combo_diff, NULL)
   (dt_combo_diff)
 }
 
