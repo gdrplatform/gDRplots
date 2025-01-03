@@ -345,3 +345,35 @@ save_plot <- function(plt, path, format = "svg") {
   
   invisible(NULL)
 }
+
+#' extract path of the executed R file
+#' 
+#' @param test_mode should the function be run in the test mode?
+#' @param test_path string with the path to the test file 
+#' @export
+#' @return string with the path to the executed Rscript file
+#' @keywords internal
+get_r_file_path <-  function(test_mode = FALSE,
+                             test_path = system.file(package = "gDRplots", "DESCRIPTION")) {
+  checkmate::assert_flag(test_mode)
+  checkmate::assert_string(test_path)
+  
+  # on Rstudio
+  fpath <- if (.Platform$GUI == "RStudio" && !test_mode) {
+    rstudioapi::getActiveDocumentContext()$path
+    # in terminal
+  } else {
+    this_file <- if (test_mode) {
+      c("a",
+        "b=3",
+        paste0("--file=", test_path),
+        "--file-path-ext=1234")
+    } else {
+      commandArgs()
+    }
+    fpath <- strsplit(this_file[grepl("^--file=", this_file)], "=")[[1]][2]
+    tools::file_path_as_absolute(fpath)
+  }
+  checkmate::assert_file_exists(fpath)
+  fpath
+}
