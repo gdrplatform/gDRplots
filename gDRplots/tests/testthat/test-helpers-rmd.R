@@ -177,3 +177,20 @@ test_that("save_plot throws error for non-existent directory", {
   
   expect_error(save_plot(p, file_path, "svg"), "The specified directory does not exist.")
 })
+
+test_that("get_r_file_path", {
+  r_path <- "test-helpers-rmd.R"
+  a_path <- system.file(package = "gDRplots", "DESCRIPTION")
+  
+  fr_path <- get_r_file_path(test_mode = TRUE, test_path = r_path)
+  checkmate::test_file_exists(fr_path)
+  expect_identical(fr_path, tools::file_path_as_absolute(fr_path))
+  fa_path <- get_r_file_path(test_mode = TRUE, test_path = a_path)
+  checkmate::test_file_exists(fa_path)
+  expect_identical(fa_path, tools::file_path_as_absolute(fa_path))
+  
+  expect_error(get_r_file_path(test_mode = 1),
+               "Assertion on 'test_mode' failed")
+  expect_error(get_r_file_path(test_mode = TRUE, letters),
+               "Assertion on 'test_path' failed")
+})
