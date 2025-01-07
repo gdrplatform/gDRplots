@@ -2,22 +2,17 @@
 % Please edit documentation in R/helpers-rmd.R
 \name{get_r_file_path}
 \alias{get_r_file_path}
-\title{extract path of the executed R file}
+\title{Extract path of the executed R file}
 \usage{
-get_r_file_path(
-  test_mode = FALSE,
-  test_path = system.file(package = "gDRplots", "DESCRIPTION")
-)
+get_r_file_path(test_mode = FALSE)
 }
 \arguments{
-\item{test_mode}{should the function be run in the test mode?}
-
-\item{test_path}{string with the path to the test file}
+\item{test_mode}{logical flag whether the function be run in the test mode}
 }
 \value{
 string with the path to the executed Rscript file
 }
 \description{
-extract path of the executed R file
+Extract path of the executed R file
 }
 \keyword{internal}

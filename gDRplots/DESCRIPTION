@@ -32,6 +32,7 @@ Suggests:
     jsonlite,
     knitr,
     matrixStats,
+    mockery,
     purrr,
     rlang,
     scales,
