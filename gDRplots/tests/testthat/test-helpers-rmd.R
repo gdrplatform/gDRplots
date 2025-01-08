@@ -177,3 +177,44 @@ test_that("save_plot throws error for non-existent directory", {
   
   expect_error(save_plot(p, file_path, "svg"), "The specified directory does not exist.")
 })
+
+test_that("get_r_file_path", {
+     
+  r_path <- "test-helpers-rmd.R" 
+  ca1 <- c("a",
+           "b=3",
+           paste0("--file=", r_path),
+           "--file-path-ext=1234")
+  
+  a_path <- system.file(package = "gDRplots", "DESCRIPTION")
+  ca2 <- c("a", "b=3", paste0("--file=", a_path), "--file-path-ext=1234")
+  
+  mockery::stub(
+    where = get_r_file_path,
+    what = "commandArgs",
+    how = function() {
+      ca1
+    },
+    depth = 1
+  )
+  fr_path <- get_r_file_path(test_mode = TRUE)
+  checkmate::test_file_exists(fr_path)
+  expect_identical(fr_path, tools::file_path_as_absolute(fr_path))
+  expect_false(fr_path == r_path)
+  
+  mockery::stub(
+    where = get_r_file_path,
+    what = "commandArgs",
+    how = function() {
+      ca2
+    },
+    depth = 1
+  )
+  fa_path <- get_r_file_path(test_mode = TRUE)
+  checkmate::test_file_exists(fa_path)
+  expect_identical(fa_path, tools::file_path_as_absolute(fa_path))
+  expect_identical(fa_path, a_path)
+  
+  expect_error(get_r_file_path(test_mode = 1),
+               "Assertion on 'test_mode' failed")
+})

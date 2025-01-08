@@ -345,3 +345,25 @@ save_plot <- function(plt, path, format = "svg") {
   
   invisible(NULL)
 }
+
+#' Extract path of the executed R file
+#' 
+#' @param test_mode logical flag whether the function be run in the test mode
+#' @export
+#' @return string with the path to the executed Rscript file
+#' @keywords internal
+get_r_file_path <-  function(test_mode = FALSE) {
+  checkmate::assert_flag(test_mode)
+  
+  # on Rstudio
+  fpath <- if (.Platform$GUI == "RStudio" && !test_mode) {
+    rstudioapi::getActiveDocumentContext()$path
+  } else {
+    # in terminal/test mode
+    ca <- commandArgs()
+    fpath <- strsplit(ca[grepl("^--file=", ca)], "=")[[1]][2]
+    tools::file_path_as_absolute(fpath)
+  }
+  checkmate::assert_file_exists(fpath)
+  fpath
+}
