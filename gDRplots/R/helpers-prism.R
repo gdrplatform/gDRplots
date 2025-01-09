@@ -240,8 +240,8 @@ prep_dt_response_scores <- function(dt_scores,
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
-                                         d_name = NULL,
-                                         d_name2 = NULL,
+                                         d_name,
+                                         d_name2,
                                          normalization_type = "RV",
                                          metric = "xc50",
                                          fit_source = "gDR",
@@ -252,11 +252,12 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_string(normalization_type)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(additional_cols, choices = names(dt_metrics), null.ok = TRUE)
+  
   
   if (!is.null(d_name)) {
     checkmate::assert_string(d_name)

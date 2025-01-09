@@ -6,8 +6,8 @@
 \usage{
 prep_dt_response_metric_diff(
   dt_metrics,
-  d_name = NULL,
-  d_name2 = NULL,
+  d_name,
+  d_name2,
   normalization_type = "RV",
   metric = "xc50",
   fit_source = "gDR",
