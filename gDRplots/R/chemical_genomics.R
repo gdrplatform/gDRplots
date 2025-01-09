@@ -3,10 +3,13 @@
 #' This function analyzes chemical genomics (CGS) data, filters by compound mechanism of action (MOA),
 #' prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for specified cell lines and metrics.
 #'
-#' @param metrics_data A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`, and columns specified in the `metric` argument.
+#' @param metrics_data A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`,
+#' and columns specified in the `metric` argument.
 #' @param metrics A character vector specifying the response metrics to analyze (e.g., "xc50", "x_max").
-#' @param cell_line An optional character string specifying a single cell line to analyze. If NULL (default), all cell lines in the data are analyzed.
-#' @param normalization_type A character string specifying the normalization type. Default is "RV". Passed to `gDRplots::prep_dt_response_metric_diff`.
+#' @param cell_line An optional character string specifying a single cell line to analyze. If NULL (default),
+#' all cell lines in the data are analyzed.
+#' @param normalization_type A character string specifying the normalization type. Default is "RV". 
+#' Passed to `gDRplots::prep_dt_response_metric_diff`.
 #'
 #' @return A list of results, where each element corresponds to a cell line. Each cell line's results contain:
 #'   - `fgsea`: A list of GSEA results for each metric.
@@ -165,7 +168,7 @@ plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
                hjust = 0, color = current_color) +
       geom_segment(x = count_above_median - 0.5, xend = count_above_median - 0.5,
                    y = median_moa, yend = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.15 * yrange,
-                   color = current_color,) +
+                   color = current_color) +
       ggrepel::geom_text_repel(
         data = data.frame(x = count_above_median,
                           y = -(gsea_sign$y_pos[i] - 0.5) * 0.2 * yrange,

@@ -7,13 +7,16 @@
 analyze_cgs(metrics_data, metrics, cell_line = NULL, normalization_type = "RV")
 }
 \arguments{
-\item{metrics_data}{A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`, and columns specified in the `metric` argument.}
+\item{metrics_data}{A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`,
+and columns specified in the `metric` argument.}
 
 \item{metrics}{A character vector specifying the response metrics to analyze (e.g., "xc50", "x_max").}
 
-\item{cell_line}{An optional character string specifying a single cell line to analyze. If NULL (default), all cell lines in the data are analyzed.}
+\item{cell_line}{An optional character string specifying a single cell line to analyze. If NULL (default),
+all cell lines in the data are analyzed.}
 
-\item{normalization_type}{A character string specifying the normalization type. Default is "RV". Passed to `gDRplots::prep_dt_response_metric_diff`.}
+\item{normalization_type}{A character string specifying the normalization type. Default is "RV". 
+Passed to `gDRplots::prep_dt_response_metric_diff`.}
 }
 \value{
 A list of results, where each element corresponds to a cell line. Each cell line's results contain:
