@@ -119,7 +119,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   # asserts
   checkmate::assert_list(results)
   checkmate::assert_subset(cell_line, choices = names(results))
-  checkmate::assert_subset(metrics, choices = names(results[[cell_line]]$fgsea), empty.ok = FALSE)
+  checkmate::assert_subset(metric, choices = names(results[[cell_line]]$fgsea), empty.ok = FALSE)
   
   
   # extract relevant data
