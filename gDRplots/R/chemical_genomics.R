@@ -152,23 +152,23 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   mean_effect <- mean(stats)
   
   # create the ggplot object
-  plt <- ggplot(plot_data, aes(x = x_pos, y = !!sym(metric))) +
-    geom_col(color = "#777777") +
-    labs(title = cell_line,
+  plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!sym(metric))) +
+    ggplot2::geom_col(color = "#777777") +
+    ggplot2::labs(title = cell_line,
          y = paste0("\u0394 ", metric, " for ", norm_type),
          x = "Ranked drugs",
          caption = "Results with FDR < 0.1 are displayed. If none exist, the top 4 results by p-value are shown."
     ) +
-    theme_bw() +
-    geom_hline(yintercept = 0, color = "#555555") +
-    geom_hline(yintercept = mean_effect, color = "black") +
-    geom_segment(x = threshold_count, xend = threshold_count, 
+    ggplot2::theme_bw() +
+    ggplot2::geom_hline(yintercept = 0, color = "#555555") +
+    ggplot2::geom_hline(yintercept = mean_effect, color = "black") +
+    ggplot2::geom_segment(x = threshold_count, xend = threshold_count, 
                  y = 0, yend = mean_effect + 0.2 * yrange,
                  color = "black") +
-    annotate("text", x = threshold_count, y = mean_effect + 0.25 * yrange,
+    ggplot2::annotate("text", x = threshold_count, y = mean_effect + 0.25 * yrange,
              label = sprintf("Mean effect = %.2f", mean_effect),
              hjust = 0, color = "black") +
-    coord_cartesian(xlim = c(-2, nrow(plot_data) + 3),
+    ggplot2::coord_cartesian(xlim = c(-2, nrow(plot_data) + 3),
                     ylim = c(-1.01 * yrange - 0.15 * yrange * nrow(gsea_sign), yrange + 0.01),
                     expand = FALSE)
   
@@ -188,18 +188,22 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     current_color <- loop_colors[i]
     
     plt <- plt +
-      geom_segment(data = data.frame(x = x),
-                   aes(x = x, xend = x),
-                   y = -yrange - (0.15 * yrange * (i - 1)),
-                   yend = -yrange - (0.15 * yrange * i),
-                   size = 0.8, inherit.aes = FALSE, color = current_color) +
-      annotate("text", x = -2,
-               y = -yrange - (0.15 * yrange * (i - 0.5)),
-               label = sprintf("%s, NES=%.2f, FDR=%.2g", gsub("_", " ", pathway), gsea_sign$NES[i], gsea_sign$padj[i]),
-               hjust = 0, color = current_color) +
-      geom_segment(x = count_above_median - 0.5, xend = count_above_median - 0.5,
-                   y = median_moa, yend = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.15 * yrange,
-                   color = current_color) +
+      ggplot2::geom_segment(
+        data = data.frame(x = x),
+        aes(x = x, xend = x),
+        y = -yrange - (0.15 * yrange * (i - 1)),
+        yend = -yrange - (0.15 * yrange * i),
+        size = 0.8, inherit.aes = FALSE, color = current_color) +
+      ggplot2::annotate(
+        "text", x = -2,
+        y = -yrange - (0.15 * yrange * (i - 0.5)),
+        label = sprintf("%s, NES=%.2f, FDR=%.2g", gsub("_", " ", pathway), gsea_sign$NES[i], gsea_sign$padj[i]),
+        hjust = 0, color = current_color) +
+      ggplot2::geom_segment(
+        x = count_above_median - 0.5,
+        xend = count_above_median - 0.5,
+        y = median_moa, yend = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.15 * yrange,
+        color = current_color) +
       ggrepel::geom_text_repel(
         data = data.frame(x = count_above_median,
                           y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.185 * yrange,
