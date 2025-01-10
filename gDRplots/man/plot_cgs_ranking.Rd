@@ -4,7 +4,7 @@
 \alias{plot_cgs_ranking}
 \title{Plot Chemical Genomics Screen GSEA Results}
 \usage{
-plot_cgs_ranking(results, cell_line, metric, yrange = 0.7)
+plot_cgs_ranking(results, cell_line, metric)
 }
 \arguments{
 \item{results}{A list object returned from `analyze_cgs`.}

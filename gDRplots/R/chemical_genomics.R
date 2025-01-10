@@ -27,16 +27,23 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cl <- gDRutils::get_env_identifiers("cellline_name")
   
+  # asserts
+  checkmate::assert_choice(metrics_data, choices = c("GR", "RV"))
+  checkmate::assert_character(metrics, any.missing = FALSE)
+  checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
+  checkmate::assert_string(normalization_type, null.ok = TRUE)
+  checkmate::assert_subset(cell_line, choices = unique(metrics_data[[cl]]), empty.ok = TRUE)
+  
   # filter out unwanted drug moa
   metrics_data <- metrics_data[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
   
   # prepare the data with specified metric differences
-  metrics_diff <- gDRplots::prep_dt_response_metric_diff(metrics_data,
-                                                         metric = metrics,
-                                                         d_name = NULL,
-                                                         d_name2 = NULL,
-                                                         normalization_type = normalization_type,
-                                                         additional_cols = drug_moa)
+  metrics_diff <- prep_dt_response_metric_diff(metrics_data,
+                                               metric = metrics,
+                                               d_name = NULL,
+                                               d_name2 = NULL,
+                                               normalization_type = normalization_type,
+                                               additional_cols = drug_moa)
   
   original <- grep("diff", names(metrics_diff), value = TRUE)
   new <- gsub(".*gDR_(.*)_cotrt_diff.*", "\\1", original)
@@ -104,6 +111,12 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cl <- gDRutils::get_env_identifiers("cellline_name")
   norm_type <- gDRutils::get_env_identifiers("normalization_type")
+  
+  # asserts
+  checkmate::assert_list(results)
+  checkmate::assert_subset(cell_line, choices = names(results))
+  checkmate::assert_subset(metrics, choices = names(results[[cell_line]]$fgsea), empty.ok = FALSE)
+  
   
   # extract relevant data
   metrics_diff <- results[[cell_line]]$metrics_diff
@@ -185,7 +198,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
                    color = current_color) +
       ggrepel::geom_text_repel(
         data = data.frame(x = count_above_median,
-                          y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.175 * yrange,
+                          y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.185 * yrange,
                           label = sprintf(" %s median = %.2f ", pathway, median_moa)),
         aes(x = x, y = y, label = label),
         hjust = ifelse(gsea_sign$NES[i] < 0, 0, 1),
