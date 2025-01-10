@@ -159,7 +159,8 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     ggplot2::labs(title = cell_line,
          y = paste0("\u0394 ", metric, " for ", norm_type),
          x = "Ranked drugs",
-         caption = "Top 15 results with FDR < 0.1 are shown. If no results meet this threshold, the top 4 results by p-value are displayed."
+         caption = "Top 15 results with FDR < 0.1 are shown. If no results meet this threshold,
+         the top 4 results by p-value are displayed."
     ) +
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = 0, color = "#555555") +
