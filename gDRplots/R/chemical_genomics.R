@@ -28,11 +28,13 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   cl <- gDRutils::get_env_identifiers("cellline_name")
   
   # filter out unwanted drug moa
-  metrics_data <- metrics_data[!metrics_data[[drug_moa]] %in% c("unknown", "Unknown"), ]
+  metrics_data <- metrics_data[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
   
   # prepare the data with specified metric differences
   metrics_diff <- gDRplots::prep_dt_response_metric_diff(metrics_data,
                                                          metric = metrics,
+                                                         d_name = NULL,
+                                                         d_name2 = NULL,
                                                          normalization_type = normalization_type,
                                                          additional_cols = drug_moa)
   
@@ -54,7 +56,7 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   
   # Run fgsea analysis for each specified cell line
   results <- lapply(cell_lines, function(cl) {
-    data_subset <- metrics_diff[metrics_diff[[cl]] == cl & metrics_diff[[drug_moa]] %in% names(moa_list), ]
+    data_subset <- metrics_diff[eval(cl) == cl & eval(drug_moa) %in% names(moa_list), ]
     data_subset$normalization_type <- normalization_type
     list_results <- lapply(metrics, function(metric) {
       metric_values <- data_subset[[metric]]
@@ -95,7 +97,7 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
 #' results <- analyze_cgs(metrics_data, metrics = c("xc50"), cell_line = "A549")
 #' plot_cgs_ranking(results, cell_line = "A549", metric = "xc50")
 #' @export
-plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
+plot_cgs_ranking <- function(results, cell_line, metric) {
   
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
@@ -146,7 +148,7 @@ plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
     geom_segment(x = threshold_count, xend = threshold_count, 
                  y = 0, yend = mean_effect + 0.2 * yrange,
                  color = "black") +
-    annotate("text", x = threshold_count, y = mean_effect + 0.1 * yrange,
+    annotate("text", x = threshold_count, y = mean_effect + 0.25 * yrange,
              label = sprintf("Mean effect = %.2f", mean_effect),
              hjust = 0, color = "black") +
     coord_cartesian(xlim = c(-2, nrow(plot_data) + 3),
@@ -160,8 +162,8 @@ plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
   
   for (i in seq_len(nrow(gsea_sign))) {
     pathway <- gsea_sign$pathway[i]
-    x <- plot_data[plot_data[[drug_name]] %in% moa_groups_drugs[[pathway]]]$x_pos
-    stats_moa <- plot_data[plot_data[[drug_name]] %in% moa_groups_drugs[[pathway]]][[metric]]
+    x <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]]$x_pos
+    stats_moa <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]][[metric]]
     
     median_moa <- median(stats_moa)
     count_above_median <- sum(stats > median_moa)
@@ -183,7 +185,7 @@ plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
                    color = current_color) +
       ggrepel::geom_text_repel(
         data = data.frame(x = count_above_median,
-                          y = -(gsea_sign$y_pos[i] - 0.5) * 0.2 * yrange,
+                          y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.175 * yrange,
                           label = sprintf(" %s median = %.2f ", pathway, median_moa)),
         aes(x = x, y = y, label = label),
         hjust = ifelse(gsea_sign$NES[i] < 0, 0, 1),

@@ -218,9 +218,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2}), default is NULL
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param metric string name of the combo metric. x_mean, x_AOC_range, xc50, ec50, "x_max" are accepted.
 #' @param fit_source string source name for metrics
 #' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
@@ -254,7 +252,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
-  checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
+  checkmate::assert_subset(metric, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_choice(additional_cols, choices = names(dt_metrics), null.ok = TRUE)
   
