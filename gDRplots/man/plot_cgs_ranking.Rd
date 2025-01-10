@@ -11,9 +11,7 @@ plot_cgs_ranking(results, cell_line, metric)
 
 \item{cell_line}{A character string specifying the cell line to prepare data for.}
 
-\item{metric}{A character string specifying the metric to prepare data for.}
-
-\item{yrange}{A numeric value to adjust the y-axis range. Defaults to 0.7}
+\item{metric}{A character string specifying the metric to prepare data for.#'}
 }
 \value{
 A ggplot2 object. The plot is also printed to the console.
@@ -23,6 +21,6 @@ Generates a ggplot2 visualization of chemical genomics screening data, highlight
 }
 \examples{
 metrics_data <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-results <- analyze_cgs(metrics_data, metrics = c("xc50"), cell_line = "A549")
-plot_cgs_ranking(results, cell_line = "A549", metric = "xc50")
+results <- analyze_cgs(metrics_data, metrics = c("xc50"), cell_line = "CellLineName_1")
+plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50")
 }
