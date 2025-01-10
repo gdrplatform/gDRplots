@@ -324,7 +324,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   meta_col_str <- paste(meta_col, collapse = " + ")
   
   # Generate the formula using reformulate
-  dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  dcast_formula <- stats::as.formula(paste(meta_col_str, "~ cotrt_value + source"))
   
   dt_combo_diff <- data.table::dcast(
     data = dt_combo_diff, 

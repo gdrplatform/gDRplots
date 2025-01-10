@@ -74,7 +74,7 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
                                                     minSize = 4,
                                                     nPermSimple = 1e5))
       
-      median_values <- data_subset[, median(get(metric), na.rm = TRUE), by = drug_moa]$V1
+      median_values <- data_subset[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
       names(median_values) <- data_subset[, unique(drug_moa)]
       
       fgsea_result$median <- median_values[fgsea_result$pathway]
@@ -140,7 +140,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   if (NROW(gsea_sign) == 0) {
     gsea_sign <- fgsea_results[pval < sort(pval)[5]]
   } else if (NROW(gsea_sign) > 15) {
-    gsea_sign <- head(gsea_sign[order(padj)], 15)
+    gsea_sign <- utils::head(gsea_sign[order(padj)], 15)
   }
   gsea_sign[, y_pos := seq_len(.N)]
   gsea_sign[NES < 0, y_pos := -(seq_len(.N))]
@@ -185,7 +185,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     x <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]]$x_pos
     stats_moa <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]][[metric]]
     
-    median_moa <- median(stats_moa)
+    median_moa <- stats::median(stats_moa)
     count_above_median <- sum(stats > median_moa)
     
     current_color <- loop_colors[i]
