@@ -28,11 +28,11 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   cl <- gDRutils::get_env_identifiers("cellline_name")
   
   # asserts
-  checkmate::assert_choice(metrics_data, choices = c("GR", "RV"))
+  checkmate::assert_data_table(metrics_data)
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
-  checkmate::assert_string(normalization_type, null.ok = TRUE)
   checkmate::assert_subset(cell_line, choices = unique(metrics_data[[cl]]), empty.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   # filter out unwanted drug moa
   metrics_data <- metrics_data[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
@@ -68,7 +68,11 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
     list_results <- lapply(metrics, function(metric) {
       metric_values <- data_subset[[metric]]
       names(metric_values) <- data_subset[[drug_name]]
-      fgsea_result <- fgsea::fgsea(moa_list, metric_values, 500, minSize = 4, nPermSimple = 1e5)
+      fgsea_result <- suppressWarnings(fgsea::fgsea(moa_list,
+                                                    metric_values,
+                                                    500,
+                                                    minSize = 4,
+                                                    nPermSimple = 1e5))
       
       median_values <- data_subset[, median(get(metric), na.rm = TRUE), by = drug_moa]$V1
       names(median_values) <- data_subset[, unique(drug_moa)]
