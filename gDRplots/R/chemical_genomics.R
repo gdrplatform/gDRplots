@@ -152,7 +152,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   mean_effect <- mean(stats)
   
   # create the ggplot object
-  plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!sym(metric))) +
+  plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!rlang::sym(metric))) +
     ggplot2::geom_col(color = "#777777") +
     ggplot2::labs(title = cell_line,
          y = paste0("\u0394 ", metric, " for ", norm_type),
@@ -169,12 +169,16 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
              label = sprintf("Mean effect = %.2f", mean_effect),
              hjust = 0, color = "black") +
     ggplot2::coord_cartesian(xlim = c(-2, nrow(plot_data) + 3),
-                    ylim = c(-1.01 * yrange - 0.15 * yrange * nrow(gsea_sign), yrange + 0.01),
-                    expand = FALSE)
+                             ylim = c(-1.01 * yrange - 0.15 * yrange * nrow(gsea_sign), yrange + 0.01),
+                             expand = FALSE, clip = "off") +
+    ggplot2::theme(plot.margin = unit(c(1, 16, 1, 1), "lines"))
   
   # define color palettes for the loop (using both Set1 and Set2 if needed)
   n_colors_needed <- NROW(gsea_sign)
-  loop_colors <- c(RColorBrewer::brewer.pal(9, "Set1"), RColorBrewer::brewer.pal(8, "Set2"))
+  loop_colors <- c(RColorBrewer::brewer.pal(9, "Set1"),
+                   RColorBrewer::brewer.pal(8, "Set2"),
+                   RColorBrewer::brewer.pal(12, "Set3"),
+                   RColorBrewer::brewer.pal(8, "Accent"))
   loop_colors <- loop_colors[seq_len(n_colors_needed)]
   
   for (i in seq_len(nrow(gsea_sign))) {
@@ -195,7 +199,8 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
         yend = -yrange - (0.15 * yrange * i),
         size = 0.8, inherit.aes = FALSE, color = current_color) +
       ggplot2::annotate(
-        "text", x = -2,
+        "text",
+        x = max(plot_data$x_pos) + 10,
         y = -yrange - (0.15 * yrange * (i - 0.5)),
         label = sprintf("%s, NES=%.2f, FDR=%.2g", gsub("_", " ", pathway), gsea_sign$NES[i], gsea_sign$padj[i]),
         hjust = 0, color = current_color) +
@@ -204,19 +209,13 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
         xend = count_above_median - 0.5,
         y = median_moa, yend = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.15 * yrange,
         color = current_color) +
-      ggrepel::geom_text_repel(
-        data = data.frame(x = count_above_median,
-                          y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.185 * yrange,
-                          label = sprintf(" %s median = %.2f ", pathway, median_moa)),
-        aes(x = x, y = y, label = label),
-        hjust = ifelse(gsea_sign$NES[i] < 0, 0, 1),
-        direction = "y",
-        force = 0.2,
-        nudge_x = ifelse(gsea_sign$NES[i] < 0, -0.5, 0.5),
-        segment.size = 0.2,
-        color = current_color,
-        box.padding = unit(0.35, "lines")
-      )
+      ggplot2::annotate(
+        "text",
+        x = count_above_median,
+        y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.185 * yrange,
+        label = sprintf(" %s median = %.2f ", pathway, median_moa),
+        hjust = 1 * (gsea_sign$NES[i] < 0),
+        color = current_color)
   }
   return(plt)
 }
