@@ -129,7 +129,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   
   # prepare data for plotting
   plot_data <- data.table::copy(metrics_diff)
-  plot_data$x_pos <- nrow(plot_data) - rank(plot_data[[metric]]) + 1
+  plot_data$x_pos <- NROW(plot_data) - rank(plot_data[[metric]]) + 1
   stats <- plot_data[[metric]]
   stats <- pmin(2, pmax(-2, stats))
   names(stats) <- plot_data[[drug_name]]
@@ -139,8 +139,10 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   
   # filter significant GSEA results
   gsea_sign <- fgsea_results[padj < 0.1 & !pathway %in% c("", "unknown")]
-  if (nrow(gsea_sign) == 0) {
+  if (NROW(gsea_sign) == 0) {
     gsea_sign <- fgsea_results[pval < sort(pval)[5]]
+  } else if (NROW(gsea_sign) > 15) {
+    gsea_sign <- head(gsea_sign[order(padj)], 15)
   }
   gsea_sign[, y_pos := seq_len(.N)]
   gsea_sign[NES < 0, y_pos := -(seq_len(.N))]
@@ -157,7 +159,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     ggplot2::labs(title = cell_line,
          y = paste0("\u0394 ", metric, " for ", norm_type),
          x = "Ranked drugs",
-         caption = "Results with FDR < 0.1 are displayed. If none exist, the top 4 results by p-value are shown."
+         caption = "Top 15 results with FDR < 0.1 are shown. If no results meet this threshold, the top 4 results by p-value are displayed."
     ) +
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = 0, color = "#555555") +
@@ -168,20 +170,18 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     ggplot2::annotate("text", x = threshold_count, y = mean_effect + 0.25 * yrange,
              label = sprintf("Mean effect = %.2f", mean_effect),
              hjust = 0, color = "black") +
-    ggplot2::coord_cartesian(xlim = c(-2, nrow(plot_data) + 3),
-                             ylim = c(-1.01 * yrange - 0.15 * yrange * nrow(gsea_sign), yrange + 0.01),
+    ggplot2::coord_cartesian(xlim = c(-2, NROW(plot_data) + 3),
+                             ylim = c(-1.01 * yrange - 0.15 * yrange * NROW(gsea_sign), yrange + 0.01),
                              expand = FALSE, clip = "off") +
-    ggplot2::theme(plot.margin = unit(c(1, 16, 1, 1), "lines"))
+    ggplot2::theme(plot.margin = ggplot2::unit(c(1, 16, 1, 1), "lines"))
   
   # define color palettes for the loop (using both Set1 and Set2 if needed)
   n_colors_needed <- NROW(gsea_sign)
   loop_colors <- c(RColorBrewer::brewer.pal(9, "Set1"),
-                   RColorBrewer::brewer.pal(8, "Set2"),
-                   RColorBrewer::brewer.pal(12, "Set3"),
-                   RColorBrewer::brewer.pal(8, "Accent"))
-  loop_colors <- loop_colors[seq_len(n_colors_needed)]
+                   RColorBrewer::brewer.pal(8, "Set2"))
+  loop_colors <- loop_colors[-6][seq_len(n_colors_needed)]
   
-  for (i in seq_len(nrow(gsea_sign))) {
+  for (i in seq_len(NROW(gsea_sign))) {
     pathway <- gsea_sign$pathway[i]
     x <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]]$x_pos
     stats_moa <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]][[metric]]
@@ -194,7 +194,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
     plt <- plt +
       ggplot2::geom_segment(
         data = data.frame(x = x),
-        aes(x = x, xend = x),
+        ggplot2::aes(x = x, xend = x),
         y = -yrange - (0.15 * yrange * (i - 1)),
         yend = -yrange - (0.15 * yrange * i),
         size = 0.8, inherit.aes = FALSE, color = current_color) +
@@ -210,12 +210,13 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
         y = median_moa, yend = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.15 * yrange,
         color = current_color) +
       ggplot2::annotate(
-        "text",
+        "label",
         x = count_above_median,
         y = -(gsea_sign$y_pos[i] + 0.5 * sign(gsea_sign$y_pos[i])) * 0.185 * yrange,
         label = sprintf(" %s median = %.2f ", pathway, median_moa),
         hjust = 1 * (gsea_sign$NES[i] < 0),
-        color = current_color)
+        color = current_color,
+        fill = "white", alpha = 0.65)
   }
   return(plt)
 }
