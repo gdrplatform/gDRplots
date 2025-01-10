@@ -21,14 +21,20 @@
 #' @export
 #'
 analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_type = "RV") {
+  
+  # identifiers
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cl <- gDRutils::get_env_identifiers("cellline_name")
+  
   # filter out unwanted drug moa
-  metrics_data <- metrics_data[!metrics_data$drug_moa %in% c("unknown", "Unknown"), ]
+  metrics_data <- metrics_data[!metrics_data[[drug_moa]] %in% c("unknown", "Unknown"), ]
   
   # prepare the data with specified metric differences
   metrics_diff <- gDRplots::prep_dt_response_metric_diff(metrics_data,
                                                          metric = metrics,
                                                          normalization_type = normalization_type,
-                                                         additional_cols = "drug_moa")
+                                                         additional_cols = drug_moa)
   
   original <- grep("diff", names(metrics_diff), value = TRUE)
   new <- gsub(".*gDR_(.*)_cotrt_diff.*", "\\1", original)
@@ -36,26 +42,26 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   data.table::setnames(metrics_diff, original, new)
   
   # create a list of DrugNames grouped by drug_moa, filtering out those with less than 4 unique drugs
-  moa_list <- lapply(split(metrics_diff$DrugName, metrics_diff$drug_moa), unique)
+  moa_list <- lapply(split(metrics_diff[[drug_name]], metrics_diff[[drug_moa]]), unique)
   moa_list <- moa_list[vapply(moa_list, length, FUN.VALUE = numeric(1)) > 3]
   
   # determine which cell lines to analyze
   if (!is.null(cell_line)) {
     cell_lines <- cell_line
   } else {
-    cell_lines <- unique(metrics_diff$CellLineName)
+    cell_lines <- unique(metrics_diff[[cl]])
   }
   
   # Run fgsea analysis for each specified cell line
   results <- lapply(cell_lines, function(cl) {
-    data_subset <- metrics_diff[metrics_diff$CellLineName == cl & metrics_diff$drug_moa %in% names(moa_list), ]
+    data_subset <- metrics_diff[metrics_diff[[cl]] == cl & metrics_diff[[drug_moa]] %in% names(moa_list), ]
     data_subset$normalization_type <- normalization_type
     list_results <- lapply(metrics, function(metric) {
       metric_values <- data_subset[[metric]]
-      names(metric_values) <- data_subset$DrugName
+      names(metric_values) <- data_subset[[drug_name]]
       fgsea_result <- fgsea::fgsea(moa_list, metric_values, 500, minSize = 4, nPermSimple = 1e5)
       
-      median_values <- data_subset[, median(get(metric), na.rm = TRUE), by = "drug_moa"]$V1
+      median_values <- data_subset[, median(get(metric), na.rm = TRUE), by = drug_moa]$V1
       names(median_values) <- data_subset[, unique(drug_moa)]
       
       fgsea_result$median <- median_values[fgsea_result$pathway]
@@ -91,20 +97,26 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
 #' @export
 plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
   
+  # identifiers
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cl <- gDRutils::get_env_identifiers("cellline_name")
+  norm_type <- gDRutils::get_env_identifiers("normalization_type")
+  
   # extract relevant data
   metrics_diff <- results[[cell_line]]$metrics_diff
   fgsea_results <- results[[cell_line]]$fgsea[[metric]]
   moa_groups_drugs <- results[[cell_line]]$moa_list
   
   # prepare data for plotting
-  plot_data <- data.table::copy(metrics_diff) # Efficient copy for data.table
-  plot_data$x_pos <- nrow(plot_data) - rank(plot_data$xc50) + 1
+  plot_data <- data.table::copy(metrics_diff)
+  plot_data$x_pos <- nrow(plot_data) - rank(plot_data[[metric]]) + 1
   stats <- plot_data[[metric]]
   stats <- pmin(2, pmax(-2, stats))
-  names(stats) <- plot_data$DrugName
-  stats <- stats[!is.na(plot_data$drug_moa)]
+  names(stats) <- plot_data[[drug_name]]
+  stats <- stats[!is.na(plot_data[[drug_moa]])]
   
-  norm_type <- unique(metrics_diff$normalization_type)
+  norm_type <- unique(metrics_diff[[norm_type]])
   
   # filter significant GSEA results
   gsea_sign <- fgsea_results[padj < 0.1 & !pathway %in% c("", "unknown")]
@@ -148,8 +160,8 @@ plot_cgs_ranking <- function(results, cell_line, metric, yrange = 0.7) {
   
   for (i in seq_len(nrow(gsea_sign))) {
     pathway <- gsea_sign$pathway[i]
-    x <- plot_data[DrugName %in% moa_groups_drugs[[pathway]]]$x_pos
-    stats_moa <- plot_data[DrugName %in% moa_groups_drugs[[pathway]]][[metric]]
+    x <- plot_data[plot_data[[drug_name]] %in% moa_groups_drugs[[pathway]]]$x_pos
+    stats_moa <- plot_data[plot_data[[drug_name]] %in% moa_groups_drugs[[pathway]]][[metric]]
     
     median_moa <- median(stats_moa)
     count_above_median <- sum(stats > median_moa)
