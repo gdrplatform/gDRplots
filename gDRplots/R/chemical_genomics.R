@@ -198,7 +198,7 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
         ggplot2::aes(x = x, xend = x),
         y = -yrange - (0.15 * yrange * (i - 1)),
         yend = -yrange - (0.15 * yrange * i),
-        size = 0.8, inherit.aes = FALSE, color = current_color) +
+        linewidth = 0.8, inherit.aes = FALSE, color = current_color) +
       ggplot2::annotate(
         "text",
         x = max(plot_data$x_pos) + 10,
