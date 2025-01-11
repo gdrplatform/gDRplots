@@ -26,9 +26,11 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of the combo metric. x_mean, x_AOC_range, xc50, ec50, "x_max" are accepted.}
+\item{metric}{string name of the combo metric. x_mean, x_AOC_range, xc50, ec50, "x_max" are accepted}
 
 \item{fit_source}{string source name for metrics}
+
+\item{additional_cols}{character vector with additional cols that should be included in the output}
 }
 \value{
 \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
