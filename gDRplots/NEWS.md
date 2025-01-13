@@ -1,3 +1,6 @@
+## gDRplots 0.0.56 - 2022-01-13
+* move ggrepel from Suggests to Imports
+
 ## gDRplots 0.0.54 - 2024-12-20
 * refactor `prep_plot_chunk` to support simple nested lists of visualizations
 * refactor plate visualizations to improve the performance
