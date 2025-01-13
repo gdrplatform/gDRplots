@@ -1,5 +1,8 @@
-## gDRplots 0.0.56 - 2024-01-09
+## gDRplots 0.0.57 - 2024-01-13
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.56 - 2022-01-13
+* move ggrepel from Suggests to Imports
 
 ## gDRplots 0.0.55 - 2025-01-03
 * add `get_r_file_path` function
