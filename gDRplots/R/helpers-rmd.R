@@ -18,7 +18,7 @@
 #' code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
 #' and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
 #' is a list of markdown chunks for each tab.
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' # Simple list of plots
@@ -27,9 +27,9 @@
 #'   ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
 #' })
 #' names(plotlist) <- unique(iris$Species)
-#' 
+#'
 #' prep_plot_chunk(plotlist, "iris")
-#' 
+#'
 #' # Nested list of plots for tabbed output
 #' nested_plotlist <- list()
 #' for (species in unique(iris$Species)) {
@@ -39,7 +39,7 @@
 #'   nested_plotlist[[species]][["Petal"]] <- ggplot2::ggplot(iris[iris$Species == species, ],
 #'     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
 #' }
-#' 
+#'
 #' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
 #' }
 #' @keywords internal
@@ -49,18 +49,18 @@ prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             header_level = 3,
                             tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
-  
+
   checkmate::assert_list(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE)
-  
+
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-  
+
   lapply(seq_along(plt_list), function(nm) {
     group_name <- names(plt_list)[nm]
-    
+
     if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
       # nested list - use tabset options
       header <- if (is.null(tabset_options)) {
@@ -69,7 +69,7 @@ prep_plot_chunk <- function(plt_list,
         tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
         sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
       }
-      
+
       item_chunks <- lapply(names(plt_list[[nm]]), function(item_name) {
         chunk <- sprintf(
           "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s[[\"%s\"]][[\"%s\"]] \n```\n\n",
@@ -77,9 +77,9 @@ prep_plot_chunk <- function(plt_list,
         )
         knitr::knit_expand(text = chunk)
       })
-      
+
       list(header = knitr::knit_expand(text = header), items = item_chunks)
-      
+
     } else {
       # not nested - no tabset, access element by index
       chunk <- c(
@@ -99,9 +99,9 @@ prep_plot_chunk <- function(plt_list,
 #'
 #' Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
 #'
-#' @param plt_list named list with generated plots to be shown in tabs; list of plots in nested 
+#' @param plt_list named list with generated plots to be shown in tabs; list of plots in nested
 #'   hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
-#'   one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'     
+#'   one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'
 #' @param chunk_name string name of markdown chunk; preferable without spaces
 #' @param header_level numeric level of markdown header - only for the first level
 #'
@@ -110,7 +110,7 @@ prep_plot_chunk <- function(plt_list,
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-#' 
+#'
 #' # help function
 #' plot_col <- function(tab_plt, norm_type, col = "red") {
 #'   tab_plt <- data.table::melt(
@@ -120,34 +120,34 @@ prep_plot_chunk <- function(plt_list,
 #'     ggplot2::geom_col(fill = col)
 #'   return(plt)
 #' }
-#' 
+#'
 #' # creating nested list with plots
 #' plotlist <- list()
 #' ls_color <- c("darkred", "orange", "darkcyan")
 #' for (drug in unique(dt_metrics$DrugName)) {
 #'   for (cl in unique(dt_metrics$CellLineName)) {
 #'     tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
-#'     
+#'
 #'     plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
 #'     names(plt_GR) <- sprintf("%s_%s", "GR", ls_color)
 #'     plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
 #'     names(plt_RV) <- sprintf("%s_%s", "RV", ls_color)
-#'     
+#'
 #'     plotlist[[drug]][[cl]][["RV"]] <- plt_RV
 #'     plotlist[[drug]][[cl]][["GR"]] <- plt_GR
 #'   }
 #' }
-#' 
+#'
 #' prep_nested_plot_chunk(plotlist, "metric_value")
-#' 
+#'
 #' prep_nested_plot_chunk(plotlist, "metric_value")
-#' 
+#'
 #' }
 #' @return list of character vectors - input for \code{knitr::knit}
 #' @keywords internal
-#' 
+#'
 #' @seealso \code{\link[knitr]{knit}}
-#' 
+#'
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
@@ -156,13 +156,13 @@ prep_nested_plot_chunk <- function(plt_list,
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
-  
+
   lvl_1 <- paste0(rep("#", header_level), collapse =  "")
   lvl_2 <- paste0(rep("#", header_level + 1), collapse =  "")
   lvl_3 <- paste0(rep("#", header_level + 2), collapse =  "")
   lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
-  
+
   lapply(names(plt_list), function(nm_1) {
     c(
       sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
@@ -179,13 +179,13 @@ prep_nested_plot_chunk <- function(plt_list,
                   sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
-                      
+
                       chunk_name <- sprintf("%s__%s_%s_%s",
                                             chunk_name, nm_1, nm_2, nm_norm)
-                      
-                      plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]', 
+
+                      plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
                                                plt_list_name, nm_1, nm_2, nm_norm)
-                      
+
                       chunk <- c(
                         sprintf("%s {{nm_vis}} \n\n", lvl_4),
                         sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
@@ -222,7 +222,7 @@ prep_nested_plot_chunk <- function(plt_list,
 #' @export
 escape_special_characters <- function(x) {
   checkmate::assert_string(x)
-  if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
+  if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "[colon]", x = x)
   if (grepl("\\/", x)) x <- gsub(pattern = "\\/", replacement = "[slash]", x = x)
   if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
   x
@@ -237,7 +237,7 @@ escape_special_characters <- function(x) {
 #' neutralize_spaces("GDC-123|Abc x G01234")
 #' neutralize_spaces("MNO-321P 789R YY#1 ")
 #' neutralize_spaces("drug_001 x drug_002", ".")
-#' 
+#'
 #' @return String with spaces replaced by the specified character
 #' @keywords internal
 #'
@@ -258,17 +258,17 @@ neutralize_spaces <- function(x,
 #'
 #' @return named vector with optimal width and height used in \code{\link[ggplot2]{ggsave}} function
 #' @keywords internal
-#' 
+#'
 #' @examples
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 #' estimate_plot_size(p)
-#' 
+#'
 #' @export
 estimate_plot_size <- function(plt,
                                base_width = 10,
                                base_height = 6,
                                scale_factor = 0.5) {
-  
+
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_numeric(base_width, lower = 0, finite = TRUE)
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
@@ -302,7 +302,7 @@ estimate_plot_size <- function(plt,
 #'
 #' @return \code{NULL}
 #' @keywords internal
-#' 
+#'
 #' @seealso \code{\link[ggplot2]{ggsave}}
 #'
 #' @examples
@@ -310,29 +310,29 @@ estimate_plot_size <- function(plt,
 #' dir.create(tmp_dir, showWarnings = FALSE)
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 #' save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
-#' 
-#' @export 
+#'
+#' @export
 save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
-  
+
   # Check if the directory exists and has write access
   dir_path <- dirname(path)
   if (!dir.exists(dir_path)) {
     stop("The specified directory does not exist.")
   }
-  
+
   if (file.access(dir_path, 2) != 0) {
     stop("The specified directory does not have write access.")
   }
-  
+
   # Estimate plot size
   plot_size <- estimate_plot_size(plt)
-  
+
   filename <- paste(path, format, sep = ".")
-  
-  
+
+
   # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
                   plot = plt,
@@ -342,19 +342,19 @@ save_plot <- function(plt, path, format = "svg") {
                   dpi = 300,
                   limitsize = FALSE,
                   device = format)
-  
+
   invisible(NULL)
 }
 
 #' Extract path of the executed R file
-#' 
+#'
 #' @param test_mode logical flag whether the function be run in the test mode
 #' @export
 #' @return string with the path to the executed Rscript file
 #' @keywords internal
 get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
-  
+
   # on Rstudio
   fpath <- if (.Platform$GUI == "RStudio" && !test_mode) {
     rstudioapi::getActiveDocumentContext()$path
