@@ -1,4 +1,7 @@
-## gDRplots 0.0.56 - 2022-01-13
+## gDRplots 0.0.57 - 2025-01-21
+* add param double_colon_escape to escape_special_characters
+
+## gDRplots 0.0.56 - 2025-01-13
 * move ggrepel from Suggests to Imports
 
 ## gDRplots 0.0.54 - 2024-12-20
