@@ -209,10 +209,11 @@ prep_nested_plot_chunk <- function(plt_list,
 #' Escape colon and hash
 #'
 #' @param x String
-#' @param dubble_colon_escape logical flag whether colon should be escaped twice
+#' @param double_colon_escape logical flag whether colon should be escaped twice
 #'
 #' @examples
 #' escape_special_characters("ABC:123")
+#' escape_special_characters("ABC:123", double_colon_escape = TRUE)
 #' escape_special_characters("AD_12")
 #' escape_special_characters("AD#12")
 #' escape_special_characters("AD/12")
@@ -221,12 +222,12 @@ prep_nested_plot_chunk <- function(plt_list,
 #' @keywords internal
 #'
 #' @export
-escape_special_characters <- function(x, dubble_colon_escape = FALSE) {
+escape_special_characters <- function(x, double_colon_escape = FALSE) {
   checkmate::assert_string(x)
-  checkmate::assert_flag(dubble_colon_escape)
+  checkmate::assert_flag(double_colon_escape)
   if (grepl("\\:", x)) {
-    if (dubble_colon_escape) {
-      x <- gsub(pattern = "\\:", replacement = "\\\\\\:", x = x)
+    if (double_colon_escape) {
+      x <- gsub(pattern = "\\:", replacement = "\\\\\\\\:", x = x)
     } else {
       x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
     }
