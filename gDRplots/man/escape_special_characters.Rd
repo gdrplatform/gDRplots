@@ -4,13 +4,15 @@
 \alias{escape_special_characters}
 \title{Escape colon and hash}
 \usage{
-escape_special_characters(x)
+escape_special_characters(x, dubble_colon_escape = FALSE)
 }
 \arguments{
 \item{x}{String}
+
+\item{dubble_colon_escape}{logical flag whether colon should be escaped twice}
 }
 \value{
-Original string with \code{:}s and \code{#}s escaped
+Original string with \code{:}s and \code{#}s and \code{/}s escaped
 }
 \description{
 Escape colon and hash
