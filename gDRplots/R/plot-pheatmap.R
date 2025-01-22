@@ -1141,14 +1141,12 @@ change_NA_into_char <- function(x,
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
 #' @examples
-#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 #' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 #' 
 #' get_ann_color_map(dt_ann)
-#' }
 #' 
 #' @keywords utils_color
 #' @export 
