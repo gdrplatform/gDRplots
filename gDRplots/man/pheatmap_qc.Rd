@@ -44,7 +44,8 @@ the last one - to the max; for "x_std" - that will be reversed}
 the dendrogram will not be shown for the matrix with any dimension greater than 200.}
 
 \item{distfun}{function used to compute the distance (dissimilarity) between rows;
-used for the dendrogram when \code{cluster_rows} is set to TRUE}
+used for the dendrogram when \code{cluster_rows} is set to TRUE; 
+the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
 
 \item{lbl_by_CellLineName}{logical flag whether heatmap should be described by CellLineNames instead of clid}
 

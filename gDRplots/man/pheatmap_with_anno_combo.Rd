@@ -48,7 +48,8 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 the dendrogram will not be shown for the matrix with any dimension greater than 200.}
 
 \item{distfun}{function used to compute the distance (dissimilarity) between both rows and columns;
-used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE}
+used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
+the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation

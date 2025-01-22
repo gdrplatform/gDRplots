@@ -17,7 +17,7 @@
 \item{cluster_flag}{logical flag whether rows/should be clustered;}
 
 \item{distfun}{function used to compute the distance (dissimilarity) between rows;
-defaults to \code{\link[stats]{dist}}}
+defaults to \code{\link[stats]{dist}} using euclidean euclidean.}
 
 \item{additional_condition}{additional logical flag whether rows/columns should be clustered (will be included 
 as the logical sum of \code{cluster_flag} and \code{additional_condition})}
