@@ -209,7 +209,7 @@ prep_nested_plot_chunk <- function(plt_list,
 #' Escape colon and hash
 #'
 #' @param x String
-#' @param double_colon_escape logical flag whether colon should be escaped twice
+#' @param double_colon_escape Logical flag whether colon should be escaped twice
 #'
 #' @examples
 #' escape_special_characters("ABC:123")

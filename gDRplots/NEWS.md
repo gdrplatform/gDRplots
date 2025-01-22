@@ -1,5 +1,5 @@
 ## gDRplots 0.0.57 - 2025-01-21
-* add param double_colon_escape to escape_special_characters
+* update handling special characters in rmd (double colon escape)
 
 ## gDRplots 0.0.56 - 2025-01-13
 * move ggrepel from Suggests to Imports
