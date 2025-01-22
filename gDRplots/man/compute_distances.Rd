@@ -66,4 +66,4 @@ compute_distances(x)
 \author{
 Alboukadel Kassambara \email{alboukadel.kassambara@gmail.com}
 }
-\keyword{heatmaply}
+\keyword{utils}

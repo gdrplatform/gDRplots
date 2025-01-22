@@ -14,6 +14,7 @@ pheatmap_with_anno_cd(
   no_breaks = 50,
   cluster_rows = TRUE,
   cluster_cols = TRUE,
+  distfun = compute_distances,
   annotation_row = NULL,
   annotation_col = NULL,
   annotation_colors = NULL
@@ -41,10 +42,10 @@ note that the first color will be assigned to the min value, and the last one - 
 \item{no_breaks}{numeric number of breaks on scale}
 
 \item{cluster_rows}{logical flag whether indicating rows should be clustered;
-the dendrogram will not be shown for the matrix with any NA values}
+the dendrogram will not be shown for the matrix with any dimension greater than 200.}
 
 \item{cluster_cols}{logical flag indicating whether columns should be clustered;
-the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value}
+the dendrogram will not be shown for the matrix with any dimension greater than 200.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on the left side 
 of the heatmap.
