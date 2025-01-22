@@ -17,7 +17,8 @@
 #' @param cluster_rows logical flag whether rows should be clustered;
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
-#'   used for the dendrogram when \code{cluster_rows} is set to TRUE
+#'   used for the dendrogram when \code{cluster_rows} is set to TRUE; 
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
@@ -263,6 +264,7 @@ pheatmap_qc <- function(
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
 #'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -543,6 +545,9 @@ pheatmap_with_anno_sa <- function(
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param cluster_cols logical flag indicating whether columns should be clustered;
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
+#' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
+#'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -1275,7 +1280,7 @@ fill_ann_color_map <- function(dt_ann,
 #' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
 #' @param cluster_flag logical flag whether rows/should be clustered;
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
-#'   defaults to \code{\link[stats]{dist}}
+#'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
 #' @param additional_condition additional logical flag whether rows/columns should be clustered (will be included 
 #'   as the logical sum of \code{cluster_flag} and \code{additional_condition})
 #'
