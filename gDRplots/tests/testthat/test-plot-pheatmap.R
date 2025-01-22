@@ -88,7 +88,7 @@ test_that("pheatmap_qc works as expected", {
   expect_error(pheatmap_qc(dt_average = dt_average,
                            cluster_rows = 1),
                "Assertion on 'cluster_rows' failed: Must be of type 'logical flag'")
-  expect_error(pheatmap_qc(dt_metrics = dt_metrics,
+  expect_error(pheatmap_qc(dt_average = dt_average,
                            distfun = "distfun"),
                "Assertion on 'distfun' failed: Must be a function")
   expect_error(pheatmap_qc(dt_average = dt_average,
@@ -359,11 +359,11 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_equal(data_1[["annotation_row"]], NULL)
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
-  expect_equal(plt_1$gtable$grobs[[2]]$label, cdata[["CellLineName"]])
+  expect_equal(sort(plt_1$gtable$grobs[[4]]$label), sort(cdata[["CellLineName"]]))
   expect_equal(
-    sort(plt_1$gtable$grobs[[3]]$label),
+    sort(plt_1$gtable$grobs[[5]]$label),
     sort(paste(rdata[["DrugName"]], "x", paste0(rdata[["DrugName_2"]], "__", rdata[["Concentration_2"]]))))
-  expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
+  expect_true(all(vapply(plt_1$gtable$grobs[[3]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   
   annotation_manual_col <-
     unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -528,7 +528,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_2$gtable$grobs[[1]]$label, "RV Bliss Score")
   expect_equal(sort(plt_2$gtable$grobs[[5]]$label), sort(drug_combo_names))
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
-  expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered
+  expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
   
   # scenario 3: annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
@@ -556,7 +556,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
-  expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered
+  expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered due cluster_rows = FALSE
   expect_is(plt_3[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 4: incomplete annotations for row and incomplete color maps
@@ -589,6 +589,8 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
   expect_equal(plt_4$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2", "grp_B", "grp_C"))
+  expect_is(plt_4[["tree_row"]], "hclust") # rows are clustered
+  expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 5: incomplete annotations for row and incomplete color maps
   annotation_map <- list(
@@ -618,6 +620,8 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
   expect_equal(plt_5$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2"))
+  expect_is(plt_4[["tree_row"]], "hclust") # rows are clustered
+  expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 6: incomplete annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
@@ -678,7 +682,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         cluster_cols = "yes"),
                "Assertion on 'cluster_cols' failed: Must be of type 'logical flag'")
-  expect_error(pheatmap_with_anno_combo(dt_metrics = dt_metrics,
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
                                         distfun = "distfun"),
                "Assertion on 'distfun' failed: Must be a function")
   expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores,
@@ -823,3 +827,6 @@ test_that("fill_ann_color_map works", {
                "Assertion on 'map_ann' failed: Must be of type 'list'")
 })
 
+test_that(".pheatmap_cluster_param works as expected", {
+  # WIP
+})
