@@ -36,6 +36,7 @@ selected function used to compute the distance in \code{hclust} object
 To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
 }
 \examples{
+\dontrun{
 mat <- matrix(1:24, nrow = 4)
 rownames(mat) <- sprintf("row_\%s", 1:4)
 colnames(mat) <- sprintf("col_\%s", 1:6)
@@ -50,6 +51,7 @@ mat[2,1] <- Inf
 .pheatmap_cluster_param(t(mat), distfun = compute_distances)
 add_cond <- NCOL(mat) > 10
 .pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+}
 
 }
 \seealso{
