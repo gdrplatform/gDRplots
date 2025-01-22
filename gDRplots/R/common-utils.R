@@ -36,7 +36,7 @@
 #'
 #' @return Object of class \code{dist}. NA and NaN are substituted by the value of \code{dummy}.
 #'
-#' @keywords heatmaply
+#' @keywords utils
 #'
 #' @seealso [factoextra::get_dist()]
 #'
