@@ -806,5 +806,36 @@ test_that("fill_ann_color_map works", {
 })
 
 test_that(".pheatmap_cluster_param works as expected", {
-  # WIP
+  mat <- matrix(1:24, nrow = 4)
+  rownames(mat) <- sprintf("row_%s", 1:4)
+  colnames(mat) <- sprintf("col_%s", 1:6)
+  
+  out_1 <- .pheatmap_cluster_param(mat)
+  expect_is(out_1, "hclust")
+  expect_equal(out_1$labels, rownames(mat))
+  expect_equal(out_1$dist.method, "euclidean") # default for stats::dist
+  expect_equal(out_1$method, "complete")
+  
+  out_2 <- .pheatmap_cluster_param(t(mat))
+  expect_is(out_2, "hclust")
+  expect_equal(out_2$labels, colnames(mat))
+
+  out_3 <- .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+  expect_is(out_3, "hclust")
+  expect_equal(out_3$labels, colnames(mat))
+  expect_equal(out_3$dist.method, NULL) # hidden in compute_distances
+  expect_equal(out_3$method, "complete")
+  
+  add_cond <- any(dim(mat) > 10)
+  out_4 <- .pheatmap_cluster_param(t(mat), additional_condition = add_cond)
+  expect_is(out_4, "logical")
+  expect_equal(out_4, add_cond)
+  
+  # scenario: matrix with NA
+  mat_NA <- mat
+  mat_NA[2, ] <- NA
+ 
+  out_5 <- .pheatmap_cluster_param(mat_NA)
+  expect_is(out_5, "logical")
+  expect_false(out_5) # default stats::dist does not handle NAs
 })
