@@ -41,8 +41,8 @@ mat <- matrix(1:24, nrow = 4)
 rownames(mat) <- sprintf("row_\%s", 1:4)
 colnames(mat) <- sprintf("col_\%s", 1:6)
 .pheatmap_cluster_param(mat)
-.pheatmap_cluster_param(t(mat)) |> plot()
-.pheatmap_cluster_param(t(mat), distfun = compute_distances) |> plot()
+.pheatmap_cluster_param(t(mat))
+.pheatmap_cluster_param(t(mat), distfun = compute_distances)
 
 mat[2,2] <- NA
 mat[2,1] <- Inf
