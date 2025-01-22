@@ -1132,44 +1132,6 @@ change_NA_into_char <- function(x,
 }
 
 
-#' Create list of qualitative colors
-#'
-#' @param n number of required colors
-#'
-#' @return vector with hex colors from qualitative palettes
-#' 
-#' @examples
-#' get_qual_colors()
-#' get_qual_colors(0)
-#' get_qual_colors(5)
-#' get_qual_colors(35)
-#' 
-#' @keywords utils_color
-#' @export 
-get_qual_colors <- function(n = NULL) {
-  checkmate::assert_int(n, null.ok = TRUE, lower = 0)
-  
-  if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
-  
-  # list of colors: qualitative and friendly for user with color vision deficiency
-  qual_col_pals <- RColorBrewer::brewer.pal.info[
-    RColorBrewer::brewer.pal.info$category == "qual" &
-      RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
-  all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
-  
-  if (is.null(n)) return(all_colors)
-  
-  # make all_colors longer
-  if (n > length(all_colors)) {
-    ls_light <- colorspace::lighten(all_colors, 0.3)
-    ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
-    all_colors <- append(all_colors, values = c(ls_light, ls_dark))
-  }
-  
-  rep(all_colors, length.out = n)
-}
-
-
 #' Create color map for annotation
 #'
 #' @param dt_ann \code{data.table} with the annotations
@@ -1208,6 +1170,7 @@ get_ann_color_map <- function(dt_ann) {
   }
   annotation_colors
 }
+
 
 #' Fill missing values in the color map for annotation
 #'
@@ -1289,6 +1252,7 @@ fill_ann_color_map <- function(dt_ann,
 #' @seealso \code{\link{compute_distances}}
 #' 
 #' @examples
+#' \dontrun{
 #' mat <- matrix(1:24, nrow = 4)
 #' rownames(mat) <- sprintf("row_%s", 1:4)
 #' colnames(mat) <- sprintf("col_%s", 1:6)
@@ -1303,6 +1267,7 @@ fill_ann_color_map <- function(dt_ann,
 #' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
 #' add_cond <- NCOL(mat) > 10
 #' .pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' }
 #' 
 #' @keywords internal
 .pheatmap_cluster_param <- function(mat_to_cluster,
