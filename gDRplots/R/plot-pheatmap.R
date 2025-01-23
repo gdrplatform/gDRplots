@@ -177,11 +177,13 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendrogram
-  gDR_cluster_condition <- any(dim(mat_cvd) < 200)  # gDR standard
-  cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
-                                          cluster_flag = cluster_rows,
-                                          distfun = distfun,
-                                          additional_condition = gDR_cluster_condition)
+  if (cluster_rows) {
+    gDR_cluster_condition <- any(dim(mat_cvd) < 200)  # gDR standard
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
+  }
+  
   # heatmap labels
   if (lbl_by_CellLineName) {
     row_lbls <- tab_response[, unique(.SD), .SDcols = c(cellline_name, clid)][order(rownames(mat_cvd))]
@@ -471,14 +473,16 @@ pheatmap_with_anno_sa <- function(
   
   # dendrogram
   gDR_cluster_condition <- any(dim(t_mat_cvd) < 200)  # gDR standard
-  cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                          cluster_flag = cluster_rows,
-                                          distfun = distfun,
-                                          additional_condition = gDR_cluster_condition)
-  cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                          cluster_flag = cluster_cols,
-                                          distfun = distfun,
-                                          additional_condition = gDR_cluster_condition)
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
+  }
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
+  }
   
   # prep hm color palette
   min_val <- min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
@@ -765,14 +769,16 @@ pheatmap_with_anno_cd <- function(
   
   # dendrogram
   gDR_cluster_condition <- any(dim(t_mat_cvd) < 200)  # gDR standard
-  cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                          cluster_flag = cluster_rows,
-                                          distfun = distfun,
-                                          additional_condition = gDR_cluster_condition)
-  cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                          cluster_flag = cluster_cols,
-                                          distfun = distfun,
-                                          additional_condition = gDR_cluster_condition)
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
+  }
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
+  }
   
   # prep hm color palette
   min_val <- min(t_mat_cvd, na.rm = TRUE)
@@ -1239,11 +1245,9 @@ fill_ann_color_map <- function(dt_ann,
 #' To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
 #'
 #' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
-#' @param cluster_flag logical flag whether rows/should be clustered;
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
 #'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
-#' @param additional_condition additional logical flag whether rows/columns should be clustered (will be included 
-#'   as the logical sum of \code{cluster_flag} and \code{additional_condition})
+#' @param additional_condition additional logical flag whether rows/columns should be clustered 
 #'
 #' @return logical flag determining if rows should be clustered or \code{hclust} object.
 #' 
@@ -1269,16 +1273,14 @@ fill_ann_color_map <- function(dt_ann,
 #' 
 #' @keywords internal
 .pheatmap_cluster_param <- function(mat_to_cluster,
-                                    cluster_flag = TRUE,
                                     distfun = stats::dist,
                                     additional_condition = TRUE) {
-  
-  checkmate::assert_flag(cluster_flag)
+
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
   checkmate::assert_flag(additional_condition)
   
-  if (cluster_flag && additional_condition && NROW(mat_to_cluster) >= 2) {
+  if (additional_condition && NROW(mat_to_cluster) >= 2) {
     tryCatch(stats::hclust(distfun(mat_to_cluster)),
              error = function(e) return(FALSE)) # if any problem with distfun -> no clustering
   } else {
