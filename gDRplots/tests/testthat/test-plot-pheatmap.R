@@ -831,11 +831,64 @@ test_that(".pheatmap_cluster_param works as expected", {
   expect_is(out_4, "logical")
   expect_equal(out_4, add_cond)
   
+  out_5 <- .pheatmap_cluster_param(mat[1, , drop = FALSE]) # only one row
+  expect_is(out_5, "logical")
+  expect_false(out_5)
+  
+  out_6 <- .pheatmap_cluster_param(mat[, 1, drop = FALSE]) # only one row
+  expect_is(out_6, "hclust")
+  expect_equal(out_6$labels, rownames(mat))
+  
   # scenario: matrix with NA
   mat_NA <- mat
   mat_NA[2, ] <- NA
  
-  out_5 <- .pheatmap_cluster_param(mat_NA)
-  expect_is(out_5, "logical")
-  expect_false(out_5) # default stats::dist does not handle NAs
+  out_7 <- .pheatmap_cluster_param(mat_NA)
+  expect_is(out_7, "logical")
+  expect_false(out_7) # default stats::dist does not handle NAs
+  
+  out_8 <- .pheatmap_cluster_param(t(mat_NA), distfun = compute_distances)
+  expect_is(out_8, "hclust")
+  expect_equal(out_8$labels, colnames(mat))
+  
+  out_9 <- .pheatmap_cluster_param(mat_NA, distfun = compute_distances, additional_condition = add_cond)
+  expect_is(out_9, "logical")
+  expect_equal(out_9, add_cond)
+  
+  # scenario: matrix with -Inf/Inf
+  mat_inf <- mat
+  mat_inf[2, 2:3] <- Inf
+  mat_inf[4, 3:4] <- -Inf
+  
+  out_10 <- .pheatmap_cluster_param(mat_inf)
+  expect_is(out_10, "logical")
+  expect_false(out_10) # default stats::dist does not handle Inf
+  
+  out_11 <- .pheatmap_cluster_param(t(mat_inf), distfun = compute_distances)
+  expect_is(out_11, "hclust")
+  expect_equal(out_11$labels, colnames(mat))
+  
+  # scenario: matrix with -Inf/Inf and NAs
+  mat_inf_na <- mat_inf
+  mat_inf_na[3, 1:4] <- NA
+  
+  out_12 <- .pheatmap_cluster_param(mat_inf_na)
+  expect_is(out_12, "logical")
+  expect_false(out_12) # default stats::dist does not handle Inf and NA
+  
+  out_13 <- .pheatmap_cluster_param(t(mat_inf_na), distfun = compute_distances)
+  expect_is(out_13, "hclust")
+  expect_equal(out_13$labels, colnames(mat))
+  
+  # testing assertions
+  expect_error(.pheatmap_cluster_param(mat_to_cluster = list(mat)),
+               "Assertion on 'mat_to_cluster' failed: Must be of type 'matrix'")
+  expect_error(.pheatmap_cluster_param(mat_to_cluster = matrix(1:6, nrow = 3)),
+               "Assertion on 'mat_to_cluster' failed: Must have rownames")
+  expect_error(.pheatmap_cluster_param(mat_to_cluster = matrix(LETTERS[1:6], nrow = 3)),
+               "Assertion on 'mat_to_cluster' failed: Must store numerics")
+  expect_error(.pheatmap_cluster_param(mat_to_cluster = mat, distfun = "dist"),
+               "Assertion on 'distfun' failed: Must be a function")
+  expect_error(.pheatmap_cluster_param(mat_to_cluster = mat, additional_condition = "yes"),
+               "Assertion on 'additional_condition' failed: Must be of type 'logical flag'")
 })
