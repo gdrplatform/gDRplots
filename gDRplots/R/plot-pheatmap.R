@@ -177,8 +177,11 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendrogram
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    gDR_cluster_condition <- any(dim(mat_cvd) < 200)  # gDR standard
     cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
                                             distfun = distfun,
                                             additional_condition = gDR_cluster_condition)
@@ -472,7 +475,10 @@ pheatmap_with_anno_sa <- function(
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # dendrogram
-  gDR_cluster_condition <- any(dim(t_mat_cvd) < 200)  # gDR standard
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
                                             distfun = distfun,
@@ -768,7 +774,10 @@ pheatmap_with_anno_cd <- function(
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) purrr::quietly(qmfun)(x)$result, numeric(1))
   
   # dendrogram
-  gDR_cluster_condition <- any(dim(t_mat_cvd) < 200)  # gDR standard
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
                                             distfun = distfun,
