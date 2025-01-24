@@ -25,7 +25,7 @@ The `gDRplots` package belongs to the `gDR` suite app.
 
 # Content
 
-The `gDRplots` package is de to store functions for gDR static visualizations and their dedicated helpers. The package allows users to visualize different metrics for combinations of drugs and cell lines of interest, both during and after processing.
+The `gDRplots` package stores functions for gDR static visualizations and their dedicated helpers. The package allows users to visualize different metrics for combinations of drugs and cell lines of interest, both during and after processing.
 
 The `gDRplots` package supports the following metrics: 
 
@@ -34,7 +34,26 @@ The `gDRplots` package supports the following metrics:
 | **GR value** | Normalized Growth Rate (GR) value; calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 | **Relative Viability** | (RV); calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 
-*Note* All plot functions require as an input data.table representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). More details about the gDR data model user can find in the [gDRcore](https://www.bioconductor.org/packages/release/bioc/html/gDRcore.html){target="_blank"} package.
+
+**Assumptions**
+
+1. input data
+
+All plot functions require as an input data.table representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). such format is provided by the `gDRutils::convert_se_assay_to_dt` function.
+
+More details about the gDR data model user can find in the [gDRcore](https://www.bioconductor.org/packages/release/bioc/html/gDRcore.html){target="_blank"} package.
+
+2. function naming convention 
+
+If a function is dedicated to only one type of experiment - it will be marked in the name with the symbol **sa** for an experiment with a single-agent (e.g. `pheatmap_with_anno_sa`)
+or **combo** - for a combined experiment (e.g. `pheatmap_with_anno_combo`).
+
+3. function output
+
+Basically all functions return **a ggplot object**, except for a few that return **a pheatmap object**. But this is indicated in the function names and description, e.g. `pheatmap_qc`, `pheatmap_with_anno_sa`, and `pheatmap_with_anno_combo`.
+
+There is a group of functions that return **a panel** with a group of basic plots. The name of these functions always contains a word **panel**. E.g. a basic ggplot object - <u>one heatmap</u> for selected drug, co-drug and one cell line - is returned by `heatmap_combo_with_isoref`. And `heatmap_combo_with_isoref_panel` returns a ggplot object with <u>a panel with heatmaps</u> for selected drug, co-drug and list of cell lines.
+
 
 Used data:
 
