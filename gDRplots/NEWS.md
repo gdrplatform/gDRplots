@@ -1,7 +1,11 @@
-## gDRplots 0.0.57 - 2025-01-21
+## gDRplots 0.0.58 - 2025-01-24
 * update handling special characters in rmd (double colon escape)
 
-## gDRplots 0.0.56 - 2025-01-13
+## gDRplots 0.0.57 - 2025-01-13
+* move `compute_distances` from gDRiPlots package
+* turn on clustering in the heatmaps with infinite and NA values
+
+## gDRplots 0.0.56 - 2022-01-13
 * move ggrepel from Suggests to Imports
 
 ## gDRplots 0.0.54 - 2024-12-20
