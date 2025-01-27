@@ -579,6 +579,11 @@ test_that(".get_data_type works as expected", {
   tab_cat_na <- data.table::copy(tab_cat)
   tab_cat_na[1:2, c(1, 2)] <- NA
   
+  tab_cat_id <- cbind(
+    data.table::data.table(id = sprintf("ID_%s", seq_len(NROW(tab_cat)))),
+    tab_cat
+  )
+  
   tab_num <- data.table::data.table(
     "A" = 1:5,
     "B" = 11:15,
@@ -588,7 +593,15 @@ test_that(".get_data_type works as expected", {
   tab_num_na <- data.table::copy(tab_num)
   tab_num_na[1:2, c(1, 2)] <- NA
   
-  tab_unkn <- data.table::copy(tab_cat) * 2
+  tab_num_id <- cbind(
+    data.table::data.table(
+      id = sprintf("ID_%s", seq_len(NROW(tab_num))),
+      grp = LETTERS[seq_len(NROW(tab_num))]
+    ),
+    tab_num
+  )
+  
+  tab_not_cat <- data.table::copy(tab_cat) * 2
   
   tab_mix <- data.table::data.table(
     "A" = LETTERS[1:5],
@@ -596,16 +609,28 @@ test_that(".get_data_type works as expected", {
     "C" = 101:105
   )
   
-  expect_equal(.get_data_type(tab_cat), "categorical")
-  expect_equal(.get_data_type(tab_cat_na), "categorical")
-  expect_equal(.get_data_type(tab_num), "numeric")
-  expect_equal(.get_data_type(tab_num_na), "numeric")
-  expect_equal(.get_data_type(tab_unkn), "unknown")
-  expect_equal(.get_data_type(tab_mix), "unknown")
-  expect_equal(.get_data_type(tab_mix, desc_col = "A"), "numeric")
+  tab_fact <- data.table::data.table(
+    "A" = LETTERS[1:5],
+    "B" = factor(c(0, 1, 1, 0, 0)),
+    "C" = c(1, 0, 0, 1, 0)
+  )
+  
+  expect_equal(.get_data_type(dt_ = tab_cat), "categorical")
+  expect_equal(.get_data_type(dt_ = tab_cat_id, desc_col = "id"), "categorical")
+  expect_equal(.get_data_type(dt_ = tab_cat_na), "categorical")
+  expect_equal(.get_data_type(dt_ = tab_not_cat), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_num), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_num_na), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_num_id, desc_col = c("id", "grp")), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_mix), "unknown")
+  expect_equal(.get_data_type(dt_ = tab_mix, desc_col = "A"), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_fact), "unknown")
+  expect_equal(.get_data_type(dt_ = tab_fact, desc_col = "A"), "unknown")
   
   expect_error(.get_data_type(dt_ = NULL),
                "Assertion on 'dt_' failed: Must be a data.table")
   expect_error(.get_data_type(dt_ = tab_cat, desc_col = 1),
                "Assertion on 'desc_col' failed: Must be of type 'character'")
+  expect_error(.get_data_type(dt_ = tab_cat, desc_col = "str"),
+               "Assertion on 'desc_col' failed: Must be a subset")
 })
