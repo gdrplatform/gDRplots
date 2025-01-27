@@ -1,3 +1,6 @@
+## gDRplots 0.0.59 - 2025-01-27
+* update `.get_data_type` with check for relation number
+
 ## gDRplots 0.0.58 - 2025-01-24
 * update handling special characters in rmd (double colon escape)
 

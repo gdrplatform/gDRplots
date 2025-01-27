@@ -7,7 +7,7 @@
 prep_nested_plot_chunk(plt_list, chunk_name, header_level = 2)
 }
 \arguments{
-\item{plt_list}{named list with generated plots to be shown in tabs; list of plots in nested 
+\item{plt_list}{named list with generated plots to be shown in tabs; list of plots in nested
 hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
 one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'}
 
@@ -43,12 +43,12 @@ ls_color <- c("darkred", "orange", "darkcyan")
 for (drug in unique(dt_metrics$DrugName)) {
   for (cl in unique(dt_metrics$CellLineName)) {
     tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
-    
+
     plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
     names(plt_GR) <- sprintf("\%s_\%s", "GR", ls_color)
     plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
     names(plt_RV) <- sprintf("\%s_\%s", "RV", ls_color)
-    
+
     plotlist[[drug]][[cl]][["RV"]] <- plt_RV
     plotlist[[drug]][[cl]][["GR"]] <- plt_GR
   }
