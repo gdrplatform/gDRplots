@@ -9,7 +9,7 @@ escape_special_characters(x, double_colon_escape = FALSE)
 \arguments{
 \item{x}{String}
 
-\item{double_colon_escape}{logical flag whether colon should be escaped twice}
+\item{double_colon_escape}{Logical flag whether colon should be escaped twice}
 }
 \value{
 Original string with \code{:}s and \code{#}s and \code{/}s escaped
