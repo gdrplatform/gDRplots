@@ -566,7 +566,7 @@ plot_volcano_assoc_panel <- function(dt_response,
   if (!is.null(desc_col)) checkmate::assert_subset(desc_col, names(dt_))
   
   # column names with features
-  ls_col <- names(dt_)[!names(dt_) %in% desc_col]
+  ls_col <- names(dt_)[!names(dt_) %chin% desc_col]
   
   if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
     # checking whether relation in one-to-one or one-to-many
@@ -575,9 +575,9 @@ plot_volcano_assoc_panel <- function(dt_response,
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
     data_type <- if (one_to_one && is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
-      # assumption: the presence of a feature is described by 0-1; NA measne lack of information
+      # assumption: the presence of a feature is described by 0-1; NA means lack of information
       "categorical"
-    } else if (is.numeric(unique_val)) {
+    } else {
       "numeric"
     } 
   } else {
