@@ -29,7 +29,6 @@ tab_cat <- data.table::data.table(
 )
 .get_data_type(dt_ = tab_cat, desc_col = "ID")
 
-
 tab_feat <- data.table::data.table(
   ID = sprintf("ID_\%s", seq_len(5)),
   grp = LETTERS[seq_len(5)],
