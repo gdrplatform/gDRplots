@@ -19,4 +19,25 @@ a string describing type of data - "numeric" or "categorical"
 \description{
 Check data type
 }
+\examples{
+\dontrun{
+tab_cat <- data.table::data.table(
+  ID = sprintf("ID_\%s", seq_len(5)),
+  brown = c(0, 1, 1, 0, 0),
+  blue = c(1, 0, NA, 0, 1),
+  green = c(0, 0, 0, 1, 0)
+)
+.get_data_type(dt_ = tab_cat, desc_col = "ID")
+
+
+tab_feat <- data.table::data.table(
+  ID = sprintf("ID_\%s", seq_len(5)),
+  grp = LETTERS[seq_len(5)],
+  low = c(0, 1, 1, NA, 0),
+  med = c(1, 1, NA, 0, 1),
+  high = c(0, 1, 0, 1, 0)
+)
+.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
+}
+}
 \keyword{prism_plots}
