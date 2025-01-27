@@ -374,6 +374,12 @@ plot_boxplot_meta <- function(dt_response,
                      variable.name = selected_feat_meta_col, variable.factor = FALSE
     )[value == 1, !"value"]
   
+  if (NROW(dt_depmap_lng) > NROW(unique(dt_depmap_lng[, c("ModelID", "CCLEName")]))) {
+    warning(
+      "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
+    )
+  }
+  
   stopifnot("There is no data in `dt_depmap` (all `selected_feat_meta_col` is NA)." =
               NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) 
   stopifnot(
@@ -532,22 +538,51 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' 
 #' @return a string describing type of data - "numeric" or "categorical"
 #' 
+#' @examples 
+#' \dontrun{
+#' tab_cat <- data.table::data.table(
+#'   ID = sprintf("ID_%s", seq_len(5)),
+#'   brown = c(0, 1, 1, 0, 0),
+#'   blue = c(1, 0, NA, 0, 1),
+#'   green = c(0, 0, 0, 1, 0)
+#' )
+#' .get_data_type(dt_ = tab_cat, desc_col = "ID")
+#' 
+#' 
+#' tab_feat <- data.table::data.table(
+#'   ID = sprintf("ID_%s", seq_len(5)),
+#'   grp = LETTERS[seq_len(5)],
+#'   low = c(0, 1, 1, NA, 0),
+#'   med = c(1, 1, NA, 0, 1),
+#'   high = c(0, 1, 0, 1, 0)
+#' )
+#' .get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
+#' }
 #' @keywords prism_plots
 .get_data_type <- function(dt_,
                            desc_col = NULL) {
   
   checkmate::assert_data_table(dt_)
   checkmate::assert_character(desc_col, null.ok = TRUE)
+  if (!is.null(desc_col)) checkmate::assert_subset(desc_col, names(dt_))
   
+  # column names with features
   ls_col <- names(dt_)[!names(dt_) %in% desc_col]
-  unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
   
-  data_type <- if (is.numeric(unique_val) && NROW(unique_val) > 3) {
-    "numeric"
-  } else if (is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
-    "categorical"
+  if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
+    # checking whether relation in one-to-one or one-to-many
+    one_to_one <- !any(rowSums(dt_[, .SD, .SDcols = ls_col], na.rm = TRUE) > 1)
+    # unique values
+    unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
+    
+    data_type <- if (one_to_one && is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
+      # assumption: the presence of a feature is described by 0-1; NA measne lack of information
+      "categorical"
+    } else if (is.numeric(unique_val)) {
+      "numeric"
+    } 
   } else {
-    "unknown"
+    data_type <- "unknown"
   }
   return(data_type)  
 }
