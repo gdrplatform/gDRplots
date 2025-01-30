@@ -380,71 +380,66 @@ plot_boxplot_meta <- function(dt_response,
     )
   }
   
-  stopifnot("There is no data in `dt_depmap` (all `selected_feat_meta_col` is NA)." =
-              NROW(dt_depmap_lng) > 0 || !all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) 
-  stopifnot(
-    "It seems that `dt_depmap_lng` has too many categories for 
-    `selected_feat_meta_col` - try use `plot_scatter_with_corr()`." = 
-      all(
-        NROW(unique(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ][[selected_feat_meta_col]])) < 
-          NROW(dt_depmap_lng[!is.na(get(selected_feat_meta_col)), ]),
-        NROW(unique(dt_depmap_lng[get(selected_feat_meta_col) != "", ][[selected_feat_meta_col]])) < 
-          NROW(dt_depmap_lng[get(selected_feat_meta_col) != "", ])
-      )
-  )
-  
-  # prep table with data to plot
-  X_dt <- dt_depmap_lng[, c("CCLEName", selected_feat_meta_col), with = FALSE]
-  if (is.numeric(X_dt[[selected_feat_meta_col]])) {
-    X_dt[[selected_feat_meta_col]] <- as.factor(X_dt[[selected_feat_meta_col]])
-  }
-  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
-  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
-  # remove NA
-  tab_plot <- stats::na.omit(tab_plot)
-  
-  # plot without group with only on item
-  if (!with_1_item_grp) {
-    multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
-    tab_plot <- tab_plot[get(selected_feat_meta_col) %in% multi_item_grp, ]
-  }
-  
-  # final plt
-  plt <-        
-    ggplot2::ggplot(
-      data = tab_plot,
-      mapping =  ggplot2::aes(x = get(selected_feat_meta_col), y = get(selected_metric))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-    ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
-    ggplot2::labs(title = selected_feat_meta_col,
-                  y = selected_metric, 
-                  x = "",
-                  caption = unique(dt_response$rId)) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "none",
-                   axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
-  
-  if (!all(is.na(tab_plot[[selected_metric]])) && 
-      max(tab_plot[[selected_metric]], na.rm = TRUE) > 0.5) {
-    plt <- plt +
-      ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
-  }
-  
-  # some labels may be too long to see the boxes 
-  if (is.character(tab_plot[[selected_feat_meta_col]]) && 
-      any(nchar(unique(tab_plot[[selected_feat_meta_col]])) > max_x_lbl_length)) {
-    too_long_lbl <- which(nchar(tab_plot[[selected_feat_meta_col]]) > max_x_lbl_length)
+  if (NROW(dt_depmap_lng) == 0 || all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) {
+    plt <- 
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+                    x = "", 
+                    y = selected_metric) +
+      ggplot2::theme_bw()
+  } else {
+    # prep table with data to plot
+    X_dt <- dt_depmap_lng[, c("CCLEName", selected_feat_meta_col), with = FALSE]
+    if (is.numeric(X_dt[[selected_feat_meta_col]])) {
+      X_dt[[selected_feat_meta_col]] <- as.factor(X_dt[[selected_feat_meta_col]])
+    }
+    Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+    tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+    # remove NA
+    tab_plot <- stats::na.omit(tab_plot)
     
-    vec_lbl <- tab_plot[[selected_feat_meta_col]]
-    names(vec_lbl) <- tab_plot[[selected_feat_meta_col]]
-    vec_lbl[too_long_lbl] <- 
-      paste0(substr(tab_plot[too_long_lbl, ][[selected_feat_meta_col]], 1, max_x_lbl_length - 3), "...")
+    # plot without group with only on item
+    if (!with_1_item_grp) {
+      multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
+      tab_plot <- tab_plot[get(selected_feat_meta_col) %in% multi_item_grp, ]
+    }
+
+    # final plt
+    plt <-        
+      ggplot2::ggplot(
+        data = tab_plot,
+        mapping =  ggplot2::aes(x = get(selected_feat_meta_col), y = get(selected_metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::labs(title = selected_feat_meta_col,
+                    y = selected_metric, 
+                    x = "",
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(legend.position = "none",
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
     
-    plt <- plt + 
-      ggplot2::scale_x_discrete(labels = vec_lbl)
-  } 
-  
+    if (!all(is.na(tab_plot[[selected_metric]])) && 
+        max(tab_plot[[selected_metric]], na.rm = TRUE) > 0.5) {
+      plt <- plt +
+        ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
+    }
+    
+    # some labels may be too long to see the boxes 
+    if (is.character(tab_plot[[selected_feat_meta_col]]) && 
+        any(nchar(unique(tab_plot[[selected_feat_meta_col]])) > max_x_lbl_length)) {
+      too_long_lbl <- which(nchar(tab_plot[[selected_feat_meta_col]]) > max_x_lbl_length)
+      
+      vec_lbl <- tab_plot[[selected_feat_meta_col]]
+      names(vec_lbl) <- tab_plot[[selected_feat_meta_col]]
+      vec_lbl[too_long_lbl] <- 
+        paste0(substr(tab_plot[too_long_lbl, ][[selected_feat_meta_col]], 1, max_x_lbl_length - 3), "...")
+      
+      plt <- plt + 
+        ggplot2::scale_x_discrete(labels = vec_lbl)
+    } 
+  }
   return(plt)
 }
 
