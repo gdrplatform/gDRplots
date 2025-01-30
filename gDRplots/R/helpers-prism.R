@@ -352,7 +352,7 @@ prep_dt_depmap_feat <- function(
   # dt_depmap <- kaleidoscope::load_depmap_merged(
   #   feature_sets = feature_set,
   #   prefix = prefix,
-  #   metadata_columns = "CCLEName") 
+  #   metadata_columns = "CCLEName")
   # 
   # data.table::setkey(dt_depmap, NULL)
   # dt_depmap["CCLEName" != ""]
@@ -388,17 +388,22 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   #   feature_sets = "OmicsCNGene",
   #   prefix = "CN_",
   #   metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
-  ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
-  
-  dt_depmap <- data.table::data.table(
-    merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
-  )
-  data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
-  
-  data.table::setkey(dt_depmap, NULL)
-  dt_depmap["CCLEName" != ""]
-  
-  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
+  # ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
+  # 
+  # # temporary fix
+  # if (any(grepl("V1", colnames(ls_depmap[[metadata_col]])))) {
+  #   colnames(ls_depmap[[metadata_col]]) <- metadata_col
+  # }
+  # 
+  # dt_depmap <- data.table::data.table(
+  #   merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
+  # )
+  # data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
+  # 
+  # data.table::setkey(dt_depmap, NULL)
+  # dt_depmap <- stats::na.omit(dt_depmap["CCLEName" != ""])
+  # 
+  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
 }
 
 #' Prep table with calculated linear associations
@@ -475,7 +480,7 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # remove col with all NA
-    X <- X[, colSums(is.na(X)) != NROW(X)]
+    X <- X[, colSums(is.na(X)) != NROW(X), drop = FALSE]
  
     # association can only be calculated for conditions
     X_condition <- 
