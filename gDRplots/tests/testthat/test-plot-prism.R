@@ -614,7 +614,7 @@ test_that(".get_data_type works as expected", {
     data.table::data.table(id = sprintf("ID_%s", seq_len(NROW(tab_cat)))),
     tab_cat
   )
-  
+
   tab_num <- data.table::data.table(
     "A" = 1:5,
     "B" = 11:15,
@@ -634,6 +634,9 @@ test_that(".get_data_type works as expected", {
   
   tab_not_cat <- data.table::copy(tab_cat) * 2
   
+  tab_num_as_cat <- data.table::copy(tab_cat)
+  tab_num_as_cat$C <- 1
+  
   tab_mix <- data.table::data.table(
     "A" = LETTERS[1:5],
     "B" = 11:15,
@@ -650,6 +653,7 @@ test_that(".get_data_type works as expected", {
   expect_equal(.get_data_type(dt_ = tab_cat_id, desc_col = "id"), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_na), "categorical")
   expect_equal(.get_data_type(dt_ = tab_not_cat), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_num_as_cat), "num_as_cat")
   expect_equal(.get_data_type(dt_ = tab_num), "numeric")
   expect_equal(.get_data_type(dt_ = tab_num_na), "numeric")
   expect_equal(.get_data_type(dt_ = tab_num_id, desc_col = c("id", "grp")), "numeric")
