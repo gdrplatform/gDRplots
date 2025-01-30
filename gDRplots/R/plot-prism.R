@@ -374,7 +374,8 @@ plot_boxplot_meta <- function(dt_response,
                      variable.name = selected_feat_meta_col, variable.factor = FALSE
     )[value == 1, !"value"]
   
-  if (NROW(dt_depmap_lng) > NROW(unique(dt_depmap_lng[, c("ModelID", "CCLEName")]))) {
+  if (NROW(dt_depmap_lng) > NROW(unique(dt_depmap_lng[, c("ModelID", "CCLEName")]))
+      || typeof(unlist(dt_depmap[,-c("CCLEName", "ModelID"), with = FALSE])) != "integer") {
     warning(
       "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
     )
@@ -496,11 +497,20 @@ plot_volcano_assoc_panel <- function(dt_response,
   data_type <- .get_data_type(dt_depmap, desc_col = c("ModelID", "CCLEName"))
   
   if (data_type == "categorical") {
-    # boxplot
+    # boxplot for categorical
     plt_side <- plot_boxplot_meta(dt_response = dt_response_,
                                   dt_depmap = dt_depmap,
                                   selected_feat_meta_col = selected_feat_meta_col) +
       ggplot2::labs(title = "", caption = "")
+  } else if (data_type == "num_as_cat") {
+    # boxplot for numeric as categorical
+    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
+    plt_side <-  
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": WIP"),
+                    x = "", 
+                    y = selected_metric) +
+      ggplot2::theme_bw()
   } else {  
     # scatter plot with corr
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
@@ -569,9 +579,11 @@ plot_volcano_assoc_panel <- function(dt_response,
     # unique values
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
-    data_type <- if (one_to_one && is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
+    data_type <- if (is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
       # assumption: the presence of a feature is described by 0-1; NA means lack of information
-      "categorical"
+      #     categorical - when one id has only one cat
+      #     num_as_cat - when one id has many cat
+      ifelse(one_to_one, "categorical", "num_as_cat")
     } else {
       "numeric"
     } 
