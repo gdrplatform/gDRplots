@@ -544,24 +544,26 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_6[["labels"]][["y"]], selected_metric)
   expect_true(grepl(selected_meta, plt_6[["labels"]][["title"]]))
   expect_true(grepl("all NAs", plt_6[["labels"]][["title"]]))
-
-  # one-to-one relationship
+  
+  # lack oj one-to-one relationship
   dt_depmap_meta_multi <- data.table::copy(dt_depmap_meta)
   meta_name <- setdiff(names(dt_depmap_meta_multi), c("CCLEName", "ModelID"))
   dt_depmap_meta_multi <- dt_depmap_meta_multi[, (meta_name[1:2]) := 1]
   
-  plt_7 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap = dt_depmap_meta_multi, 
-                             selected_feat_meta_col = selected_meta)
-  expect_is(plt_7, "gg")
+  expect_warning({
+    plt_7 <- plot_boxplot_meta(dt_response = dt_response,
+                               dt_depmap = dt_depmap_meta_multi, 
+                               selected_feat_meta_col = selected_meta)
+    expect_is(plt_7, "gg")
+    expect_false(NROW(ggplot2::ggplot_build(plt_7)$data[[3]]) <= sum(grp_stat[!is.na(meta_xx), ]$N))
+  })
   expect_warning(
     plot_boxplot_meta(dt_response = dt_response,
                       dt_depmap = dt_depmap_meta_multi, 
                       selected_feat_meta_col = selected_meta),
     "The data does not appear to be categorical"
   )
-  expect_false(NROW(ggplot2::ggplot_build(plt_7)$data[[3]]) <= sum(grp_stat[!is.na(meta_xx), ]$N))
-
+  
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
                                  dt_depmap = dt_depmap_meta,
@@ -597,7 +599,6 @@ test_that("plot_boxplot_meta works as expected", {
 #   # TODO in GDR-2710
 # })
 #nolint end
-
 
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(
