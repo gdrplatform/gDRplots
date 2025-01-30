@@ -1,3 +1,6 @@
+## gDRplots 0.0.60 - 2025-01-30
+* update `plot_boxplot_meta` to handle edge cases 
+
 ## gDRplots 0.0.59 - 2025-01-27
 * update `.get_data_type` with check for relation number
 
@@ -25,7 +28,7 @@
 * revert color palette for dose-response curves for combo data
 
 ## gDRplots 0.0.50 - 2024-12-03
-* fix for edge-case in pheatmap_with_anno_sa (-Inf)
+* fix for edge-case in `pheatmap_with_anno_sa` (-Inf)
 
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics
