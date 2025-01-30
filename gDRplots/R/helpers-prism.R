@@ -355,7 +355,7 @@ prep_dt_depmap_feat <- function(
   #   metadata_columns = "CCLEName")
   # 
   # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap["CCLEName" != ""]
+  # dt_depmap <- dt_depmap[CCLEName != ""]
   # 
   # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
 }
@@ -387,7 +387,7 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   # ls_depmap <- kaleidoscope::load_depmap_list(
   #   feature_sets = "OmicsCNGene",
   #   prefix = "CN_",
-  #   metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
+  #   metadata_columns = unique(c(metadata_col, "CCLEName")))
   # ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
   # 
   # # temporary fix
@@ -401,9 +401,9 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   # data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
   # 
   # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap <- stats::na.omit(dt_depmap["CCLEName" != ""])
+  # dt_depmap <- stats::na.omit(dt_depmap)
   # 
-  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
+  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col)) # nolint end
 }
 
 #' Prep table with calculated linear associations
