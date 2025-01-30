@@ -375,7 +375,7 @@ plot_boxplot_meta <- function(dt_response,
     )[value == 1, !"value"]
   
   if (NROW(dt_depmap_lng) > NROW(unique(dt_depmap_lng[, c("ModelID", "CCLEName")]))
-      || typeof(unlist(dt_depmap[,-c("CCLEName", "ModelID"), with = FALSE])) != "integer") {
+      || typeof(unlist(dt_depmap[, -c("CCLEName", "ModelID"), with = FALSE])) != "integer") {
     warning(
       "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
     )
