@@ -532,6 +532,36 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
   expect_equal(ggplot2::layer_scales(plt_5)$x$range$range, names(lbl_)[lbl_])
   
+  # lack of the intersection
+  dt_depmap_meta_empty <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_empty), c("CCLEName", "ModelID"))
+  dt_depmap_meta_empty <- dt_depmap_meta_empty[, (meta_name) := 0]
+  
+  plt_6 <- plot_boxplot_meta(dt_response = dt_response,
+                             dt_depmap = dt_depmap_meta_empty, 
+                             selected_feat_meta_col = selected_meta)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["y"]], selected_metric)
+  expect_true(grepl(selected_meta, plt_6[["labels"]][["title"]]))
+  expect_true(grepl("all NAs", plt_6[["labels"]][["title"]]))
+
+  # one-to-one relationship
+  dt_depmap_meta_multi <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_multi), c("CCLEName", "ModelID"))
+  dt_depmap_meta_multi <- dt_depmap_meta_multi[, (meta_name[1:2]) := 1]
+  
+  plt_7 <- plot_boxplot_meta(dt_response = dt_response,
+                             dt_depmap = dt_depmap_meta_multi, 
+                             selected_feat_meta_col = selected_meta)
+  expect_is(plt_7, "gg")
+  expect_warning(
+    plot_boxplot_meta(dt_response = dt_response,
+                      dt_depmap = dt_depmap_meta_multi, 
+                      selected_feat_meta_col = selected_meta),
+    "The data does not appear to be categorical"
+  )
+  expect_false(NROW(ggplot2::ggplot_build(plt_7)$data[[3]]) <= sum(grp_stat[!is.na(meta_xx), ]$N))
+
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
                                  dt_depmap = dt_depmap_meta,
