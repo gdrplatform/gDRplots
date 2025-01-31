@@ -215,7 +215,7 @@ test_that("plot_dose_response_sa works as expected", {
   tab_avg = data.table::data.table(
     x = c(0.971, 0.989, 0.961, 0.985, 0.834, 0.933, 0.846, 0.938, 1,
           1, 1.012, 1.004, 0.884, 0.954, 0.926, 0.971, 0.026, 0.006),
-    normalization_type = rep(c("RV", "GR"), 8),
+    normalization_type = rep(c("RV", "GR"), 9),
     Concentration = rep(c(0.0008, 0.0023, 0.0069, 0.0206, 0.0617, 
                           0.1852, 0.5556, 1.6667, 5.0000), each = 2)
   )
