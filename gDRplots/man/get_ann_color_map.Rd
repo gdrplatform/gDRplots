@@ -16,14 +16,12 @@ list with color mapping for the annotations
 Create color map for annotation
 }
 \examples{
-\dontrun{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 
 get_ann_color_map(dt_ann)
-}
 
 }
 \seealso{

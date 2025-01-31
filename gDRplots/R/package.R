@@ -1,4 +1,5 @@
 #' @importFrom data.table :=
+#' @importFrom data.table %chin%
 NULL
 
 
