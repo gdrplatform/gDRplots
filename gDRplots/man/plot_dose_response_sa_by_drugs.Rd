@@ -12,7 +12,8 @@ plot_dose_response_sa_by_drugs(
   normalization_type = "GR",
   colors_vec = NULL,
   plot_averaged_flag = TRUE,
-  plot_fit_flag = TRUE
+  plot_fit_flag = TRUE,
+  fit_source = "gDR"
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 
 \item{plot_fit_flag}{logical flag whether plot points with fitted values}
+
+\item{fit_source}{string source name for metrics}
 }
 \value{
 list of \code{ggplot objects} containing plots of dose-response curves
