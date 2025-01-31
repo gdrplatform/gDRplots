@@ -151,9 +151,9 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_9[["labels"]][["y"]], "GR")
   expect_true(any(grepl("Concentration", plt_9[["labels"]][["x"]])))
   expect_true(grepl(selected_celline, plt_9[["labels"]][["title"]]))
-  expect_length(unique(ggplot2::ggplot_build(plt_9)$data[[2]][["colour"]]), 
+  expect_length(unique(ggplot2::ggplot_build(plt_9)$data[[2]][["colour"]]),
                 NROW(drug_name_vec))
-  expect_true(all(is.na(ggplot2::ggplot_build(plt_9)$data[[2]][["y"]]))) 
+  expect_true(all(is.na(ggplot2::ggplot_build(plt_9)$data[[2]][["y"]])))
   expect_equal(ggplot2::get_guide_data(plt_9, "colour")[[".label"]],
                drug_name_vec) # legend is present
   
@@ -210,6 +210,42 @@ test_that("plot_dose_response_sa works as expected", {
                                      selection_name = selected_celline,
                                      group_var = "str"),
                "Assertion on 'group_var' failed: Must be element of set")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     group_names = 1:3),
+               "Assertion on 'group_names' failed: Must be of type 'character'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     normalization_type = "str"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     colors_vec = 1:10),
+               "Assertion on 'colors_vec' failed: Must be of type 'character'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     plot_averaged_flag = "str"),
+               "Assertion on 'plot_averaged_flag' failed: Must be of type 'logical flag'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     plot_fit_flag = NULL),
+               "Assertion on 'plot_fit_flag' failed: Must be of type 'logical flag'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
 })
 
 test_that("plot_dose_response_sa_by_CLs works as expected", {
