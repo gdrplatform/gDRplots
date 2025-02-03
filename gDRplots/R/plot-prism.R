@@ -391,7 +391,7 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
       ggplot2::labs(title = selected_feat_meta_col,
-                    x = "",
+                    x = selected_feat,
                     y = selected_metric, 
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
