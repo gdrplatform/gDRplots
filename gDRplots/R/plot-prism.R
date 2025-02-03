@@ -232,7 +232,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
     
     for (selected_feat in selected_feats) {
       
-      if (selected_feat %in% available_feats) {
+      if (selected_feat %chin% available_feats) {
         # prep table with data to plot
         X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
         Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
@@ -416,7 +416,6 @@ plot_boxplot_num_panel <- function(dt_response,
                                    dt_depmap, 
                                    selected_feats,
                                    selected_feat_meta_col = NULL) {
-  
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
@@ -430,8 +429,15 @@ plot_boxplot_num_panel <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
+  # prep table with data to plot
+  available_feats <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+  X_dt <- dt_depmap[, c("CCLEName", selected_feats[selected_feats %in% available_feats]), with = FALSE]
+  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   
-  if (all(is.na(selected_feats))) {
+  if (all(is.na(selected_feats)) || 
+      all(vapply(selected_feats[selected_feats %in% available_feats], 
+                 function(nm) all(is.na(tab_plot[[nm]])), FUN.VALUE = logical(1)))) {
     plt <- 
       ggplot2::ggplot() + 
       ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
@@ -439,13 +445,17 @@ plot_boxplot_num_panel <- function(dt_response,
                     y = selected_metric) +
       ggplot2::theme_bw()
   } else {
-    available_feats <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+    # prep dummy values for x-axis
+    ls_lbl <- unique(as.vector(as.matrix(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])))
+    dummy_feat_val <- ls_lbl[!is.na(ls_lbl)][1]
+    if (is.na(dummy_feat_val)) dummy_feat_val <- 0
+    
     tab_plot_all <- data.table::data.table()
     
     if (sum(is.na(selected_feats)) > 1) {
       tmp <- data.table::data.table(selected_feats)
       tmp[, N := seq_len(.N), by = selected_feats]
-      tmp[, selected_feats := ifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
+      tmp[, selected_feats := data.table::fifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
       selected_feats <- tmp$selected_feats
     }
     
@@ -453,30 +463,26 @@ plot_boxplot_num_panel <- function(dt_response,
     
     for (selected_feat in selected_feats) {
       
-      if (selected_feat %in% available_feats) {
-        # prep table with data to plot
-        X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
-        Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
-        tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+      if (selected_feat %chin% available_feats) {
         # remove NA
-        tab_plot <- stats::na.omit(tab_plot)
+        tab_plot_tmp <- stats::na.omit(tab_plot[, c(cellline_name, selected_metric, selected_feat), with = FALSE])
         
-        if (NROW(tab_plot) > 0) { 
+        if (NROW(tab_plot_tmp) > 0) { 
           # add label 
-          tab_plot$feat_lbl <- selected_feat
-          data.table::setnames(tab_plot, selected_feat, "feat_val")
+          tab_plot_tmp$feat_lbl <- selected_feat
+          data.table::setnames(tab_plot_tmp, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
           feat_lbl <- paste(selected_feat, ": all NAs")
           feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
           
-          tab_plot <- data.table::data.table(
+          tab_plot_tmp <- data.table::data.table(
             cellline_name = "",
             selected_metric = NA,
-            feat_val = 0,
+            feat_val = dummy_feat_val,
             feat_lbl = feat_lbl
           )
-          data.table::setnames(tab_plot, 
+          data.table::setnames(tab_plot_tmp, 
                                old = c("cellline_name", "selected_metric"), 
                                new = c(cellline_name, selected_metric))
         }
@@ -485,17 +491,17 @@ plot_boxplot_num_panel <- function(dt_response,
         feat_lbl <- paste(selected_feat, ": all NAs")
         feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
         
-        tab_plot <- data.table::data.table(
+        tab_plot_tmp <- data.table::data.table(
           cellline_name = "",
           selected_metric = NA,
-          feat_val = 0,
+          feat_val = dummy_feat_val,
           feat_lbl = feat_lbl
         )
-        data.table::setnames(tab_plot, 
+        data.table::setnames(tab_plot_tmp, 
                              old = c("cellline_name", "selected_metric"), 
                              new = c(cellline_name, selected_metric))
       }
-      tab_plot_all <- rbind(tab_plot_all, tab_plot)
+      tab_plot_all <- rbind(tab_plot_all, tab_plot_tmp)
     }
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
@@ -603,7 +609,7 @@ plot_boxplot_meta <- function(dt_response,
     # plot without group with only on item
     if (!with_1_item_grp) {
       multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
-      tab_plot <- tab_plot[get(selected_feat_meta_col) %in% multi_item_grp, ]
+      tab_plot <- tab_plot[get(selected_feat_meta_col) %chin% multi_item_grp, ]
     }
     
     # final plt
