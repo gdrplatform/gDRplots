@@ -1,5 +1,8 @@
-## gDRplots 0.0.60 - 2024-01-31
+## gDRplots 0.0.61 - 2024-01-31
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.60 - 2025-01-31
+* fix y-axis range for dose-response curves
 
 ## gDRplots 0.0.59 - 2025-01-27
 * update `.get_data_type` with check for relation number

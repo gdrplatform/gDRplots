@@ -129,8 +129,7 @@ plot_dose_response_sa <- function(dt_metrics,
       ggplot2::ggplot() +
       ggplot2::theme(aspect.ratio = 1)
   } else {
-    # prep value ranges for plot
-    data_range <- c(min(min(dt_avg$x), 0, na.rm = TRUE) - 0.05, max(max(dt_avg$x), 1, na.rm = TRUE) + 0.05)
+    # prep value ranges for x-axis
     min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
     max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
     conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
@@ -160,7 +159,12 @@ plot_dose_response_sa <- function(dt_metrics,
     dt_fit <- dt_fit[!is.na(x)]
     data.table::setnames(dt_fit, "conc_col", conc)
     
-    # colors
+    # prep value ranges for y-axis
+    min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
+    max_val <- max(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) + 0.05
+    data_range <- c(min_val, max_val)
+
+    # prep color palette
     color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(group_names))
     } else if (NROW(colors_vec) != NROW(group_names)) {
@@ -242,7 +246,8 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
                                          normalization_type = "GR",
                                          colors_vec = NULL,
                                          plot_averaged_flag = TRUE,
-                                         plot_fit_flag = TRUE) {
+                                         plot_fit_flag = TRUE,
+                                         fit_source = "gDR") {
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average)
@@ -252,6 +257,7 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(plot_averaged_flag)
   checkmate::assert_flag(plot_fit_flag)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -321,7 +327,8 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
                                            normalization_type = "GR",
                                            colors_vec = NULL,
                                            plot_averaged_flag = TRUE,
-                                           plot_fit_flag = TRUE) {
+                                           plot_fit_flag = TRUE,
+                                           fit_source = "gDR") {
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average)
@@ -331,9 +338,16 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(plot_averaged_flag)
   checkmate::assert_flag(plot_fit_flag)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
+  # filter data for normalization_type and fit_source
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_metrics <- dt_metrics[eval(filter_expr)]
+  dt_average <- dt_average[eval(filter_expr)]
   
   available_cellline <- unique(dt_metrics[[cellline_name]])
   if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
@@ -575,18 +589,18 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
   
+  # filter data for normalization_type and fit_source
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_metrics <- dt_metrics[eval(filter_expr)]
+  dt_average <- dt_average[eval(filter_expr)]
+
   available_drugs <- unique(dt_metrics[get(cellline_name) %in% cl_name, ][[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
     d_names <- d_names[d_names %in% available_drugs]
   }
-  
-  # filter data for normalization_type and fit_source
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  dt_metrics <- dt_metrics[eval(filter_expr)]
-  dt_average <- dt_average[eval(filter_expr)]
   
   # filter data for min required data
   dt_metrics <-

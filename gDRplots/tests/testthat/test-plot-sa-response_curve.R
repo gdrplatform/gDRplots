@@ -151,9 +151,9 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_9[["labels"]][["y"]], "GR")
   expect_true(any(grepl("Concentration", plt_9[["labels"]][["x"]])))
   expect_true(grepl(selected_celline, plt_9[["labels"]][["title"]]))
-  expect_length(unique(ggplot2::ggplot_build(plt_9)$data[[2]][["colour"]]), 
+  expect_length(unique(ggplot2::ggplot_build(plt_9)$data[[2]][["colour"]]),
                 NROW(drug_name_vec))
-  expect_true(all(is.na(ggplot2::ggplot_build(plt_9)$data[[2]][["y"]]))) 
+  expect_true(all(is.na(ggplot2::ggplot_build(plt_9)$data[[2]][["y"]])))
   expect_equal(ggplot2::get_guide_data(plt_9, "colour")[[".label"]],
                drug_name_vec) # legend is present
   
@@ -196,6 +196,52 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_12[["labels"]][["title"]], selected_celline)
   expect_length(ggplot2::ggplot_build(plt_12)$data[[1]], 0) # no data at all
   
+  # scenario: fitted curve has bigger y-range than avg points
+  drug_nm <- "drug_0A"
+  cl_nm <- "cl_14"
+  tab_met <- data.table::data.table(
+    xc50 = c(2.688, 3.755),
+    x_inf = c(0, -1),
+    x_0 = c(1, 1),
+    ec50 = c(2.688, 5.016),
+    h = c(5.000, 3.794),
+    normalization_type = c("RV", "GR")
+  )
+  tab_met$DrugName <- drug_nm
+  tab_met$Gnumber <- "G0012"
+  tab_met$CellLineName <- cl_nm
+  tab_met$clid <- "CLXX"
+  
+  tab_avg <- data.table::data.table(
+    x = c(0.971, 0.989, 0.961, 0.985, 0.834, 0.933, 0.846, 0.938, 1,
+          1, 1.012, 1.004, 0.884, 0.954, 0.926, 0.971, 0.026, 0.006),
+    normalization_type = rep(c("RV", "GR"), 9),
+    Concentration = rep(c(0.0008, 0.0023, 0.0069, 0.0206, 0.0617, 
+                          0.1852, 0.5556, 1.6667, 5.0000), each = 2)
+  )
+  tab_avg$DrugName <- drug_nm
+  tab_avg$CellLineName <- cl_nm
+  
+  conc_range <- range(tab_avg[normalization_type == "GR", ]$Concentration)
+  sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
+  sel_metrics <- tab_met[normalization_type == "GR", ]
+  fitted_range <- range(gDRutils::predict_efficacy_from_conc(sel_conc,
+                                                             sel_metrics$x_inf,
+                                                             sel_metrics$x_0,
+                                                             sel_metrics$ec50,
+                                                             sel_metrics$h))
+  
+  plt_13 <- plot_dose_response_sa(dt_metrics = tab_met, 
+                                  dt_average = tab_avg,
+                                  selection_name = "drug_0A",
+                                  group_var = cellline_name,
+                                  group_names = "cl_14",
+                                  normalization_type = "GR")
+  expect_is(plt_13, "gg")
+  expect_true(grepl(drug_nm, plt_13[["labels"]][["title"]]))
+  plot_range <- range(as.numeric(ggplot2::layer_scales(plt_13)$y$get_labels()))
+  expect_true(all(data.table::between(fitted_range, plot_range[1], plot_range[2])))
+  
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
                                      selection_name = selected_celline,
@@ -210,6 +256,42 @@ test_that("plot_dose_response_sa works as expected", {
                                      selection_name = selected_celline,
                                      group_var = "str"),
                "Assertion on 'group_var' failed: Must be element of set")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     group_names = 1:3),
+               "Assertion on 'group_names' failed: Must be of type 'character'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     normalization_type = "str"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     colors_vec = 1:10),
+               "Assertion on 'colors_vec' failed: Must be of type 'character'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     plot_averaged_flag = "str"),
+               "Assertion on 'plot_averaged_flag' failed: Must be of type 'logical flag'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     plot_fit_flag = NULL),
+               "Assertion on 'plot_fit_flag' failed: Must be of type 'logical flag'")
+  expect_error(plot_dose_response_sa(dt_metrics = dt_metrics,
+                                     dt_average = dt_average,
+                                     selection_name = selected_celline,
+                                     group_var = group_var,
+                                     fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
 })
 
 test_that("plot_dose_response_sa_by_CLs works as expected", {
