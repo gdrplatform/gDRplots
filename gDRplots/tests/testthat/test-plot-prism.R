@@ -606,7 +606,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(ggplot2::ggplot_build(plt_2)[["data"]][[1]]), NROW(new_selected_feats))
   expect_equal(# check the uniqueness of points
-    unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & ! is.na(y),.N, by = "PANEL"]$N), 
+    unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & ! is.na(y), .N, by = "PANEL"]$N), 
     sum(stats::complete.cases(obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response[["CellLineName"]], ])))
 
   # only NAs in selected_feats 
