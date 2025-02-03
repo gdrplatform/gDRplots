@@ -455,7 +455,8 @@ plot_boxplot_num_panel <- function(dt_response,
     if (sum(is.na(selected_feats)) > 1) {
       tmp <- data.table::data.table(selected_feats)
       tmp[, N := seq_len(.N), by = selected_feats]
-      tmp[, selected_feats := data.table::fifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
+      tmp[, selected_feats := data.table::fifelse(
+        is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
       selected_feats <- tmp$selected_feats
     }
     
