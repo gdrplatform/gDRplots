@@ -329,6 +329,207 @@ plot_scatter_with_corr_panel <- function(dt_response,
 }
 
 
+#' Plot boxplot for categorical features
+#'
+#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
+#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
+#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
+#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one feature;
+#'  (rows are samples, columns are features). 
+#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
+#' @param selected_feat string with name of selected feature from \code{dt_depmap}
+#' @param selected_feat_meta_col string with the name of a feature column in DepMap (will be used as a plot title)
+#'  that has 0-1 values only (categorical character but without relation one-to-one for ids and feature)
+#'
+#' @return \code{ggplot} object containing boxplots for variable levels
+#' @keywords prism_plots
+#' 
+#' @export
+plot_boxplot_num <- function(dt_response,
+                             dt_depmap, 
+                             selected_feat,
+                             selected_feat_meta_col = NULL) {
+  
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_string(selected_feat)
+  checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, "rId", "cId"))
+  stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
+  
+  # prep table with data to plot
+  X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
+  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+  # remove NA
+  tab_plot <- stats::na.omit(tab_plot)
+  
+  if (NROW(tab_plot) == 0) {
+    plt <- 
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+                    x = selected_feat, 
+                    y = selected_metric,
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw()
+  } else {
+    tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
+    
+    plt <- 
+      ggplot2::ggplot(
+        data = tab_plot,
+        mapping =  ggplot2::aes(x = get(selected_feat), 
+                                y = get(selected_metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::labs(title = selected_feat_meta_col,
+                    x = "",
+                    y = selected_metric, 
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw() +
+      ggplot2::scale_x_discrete(drop = FALSE) +
+      ggplot2::theme(legend.position = "none",
+                     axis.text.x = ggplot2::element_text(size = 8))
+  }
+  return(plt)
+}
+
+
+#' Plot panel with scatter with correlation
+#' 
+#' @inheritParams plot_boxplot_num
+#' @param selected_feats character vector with names of selected features from \code{dt_depmap}
+#'
+#' @return \code{ggplot} object containing boxplots for variable levels (0-1)
+#' @keywords prism_plots
+#' 
+#' @export
+plot_boxplot_num_panel <- function(dt_response,
+                                   dt_depmap, 
+                                   selected_feats,
+                                   selected_feat_meta_col = NULL) {
+  
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_character(selected_feats)
+  checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  
+  selected_metric <- setdiff(names(dt_response), 
+                             c(cellline_name, "rId", "cId"))
+  stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
+  
+  
+  if (all(is.na(selected_feats))) {
+    plt <- 
+      ggplot2::ggplot() + 
+      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+                    x = "", 
+                    y = selected_metric) +
+      ggplot2::theme_bw()
+  } else {
+    available_feats <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+    tab_plot_all <- data.table::data.table()
+    
+    if (sum(is.na(selected_feats)) > 1) {
+      tmp <- data.table::data.table(selected_feats)
+      tmp[, N := seq_len(.N), by = selected_feats]
+      tmp[, selected_feats := ifelse(is.na(selected_feats), sprintf("%s_%s", selected_feats, N), selected_feats)]
+      selected_feats <- tmp$selected_feats
+    }
+    
+    feat_lbl_levels <- selected_feats
+    
+    for (selected_feat in selected_feats) {
+      
+      if (selected_feat %in% available_feats) {
+        # prep table with data to plot
+        X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
+        Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+        tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+        # remove NA
+        tab_plot <- stats::na.omit(tab_plot)
+        
+        if (NROW(tab_plot) > 0) { 
+          # add label 
+          tab_plot$feat_lbl <- selected_feat
+          data.table::setnames(tab_plot, selected_feat, "feat_val")
+        } else {
+          # dummy data when all data is NA
+          feat_lbl <- paste(selected_feat, ": all NAs")
+          feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+          
+          tab_plot <- data.table::data.table(
+            cellline_name = "",
+            selected_metric = NA,
+            feat_val = 0,
+            feat_lbl = feat_lbl
+          )
+          data.table::setnames(tab_plot, 
+                               old = c("cellline_name", "selected_metric"), 
+                               new = c(cellline_name, selected_metric))
+        }
+      } else {
+        # dummy data required for faceting
+        feat_lbl <- paste(selected_feat, ": all NAs")
+        feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+        
+        tab_plot <- data.table::data.table(
+          cellline_name = "",
+          selected_metric = NA,
+          feat_val = 0,
+          feat_lbl = feat_lbl
+        )
+        data.table::setnames(tab_plot, 
+                             old = c("cellline_name", "selected_metric"), 
+                             new = c(cellline_name, selected_metric))
+      }
+      tab_plot_all <- rbind(tab_plot_all, tab_plot)
+    }
+    # order vis as in selected_feats
+    tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
+    tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
+    
+    plt <- 
+      ggplot2::ggplot(
+        data = tab_plot_all,
+        mapping =  ggplot2::aes(x = feat_val, 
+                                y = get(selected_metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) + 
+      ggplot2::labs(title = selected_feat_meta_col,
+                    x = "",
+                    y = selected_metric, 
+                    caption = unique(dt_response$rId)) +
+      ggplot2::theme_bw() +
+      ggplot2::scale_x_discrete(drop = FALSE) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free") +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(size = 8),
+        axis.text.y = ggplot2::element_text(size = 8),
+        plot.title = ggplot2::element_text(size = 12),
+        panel.grid.minor = ggplot2::element_blank(), 
+        aspect.ratio = 1,
+        strip.background = ggplot2::element_blank(),
+        strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
+        legend.position = "none"
+      )
+  }
+  return(plt)
+}
+
 #' Plot boxplot for metric values grouped by metadata from DepMap
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
@@ -404,18 +605,19 @@ plot_boxplot_meta <- function(dt_response,
       multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
       tab_plot <- tab_plot[get(selected_feat_meta_col) %in% multi_item_grp, ]
     }
-
+    
     # final plt
     plt <-        
       ggplot2::ggplot(
         data = tab_plot,
-        mapping =  ggplot2::aes(x = get(selected_feat_meta_col), y = get(selected_metric))) +
+        mapping =  ggplot2::aes(x = get(selected_feat_meta_col), 
+                                y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
       ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
       ggplot2::labs(title = selected_feat_meta_col,
-                    y = selected_metric, 
                     x = "",
+                    y = selected_metric, 
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "none",
