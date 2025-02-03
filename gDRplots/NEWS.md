@@ -13,7 +13,6 @@
 ## gDRplots 0.0.57 - 2025-01-13
 * move `compute_distances` from gDRiPlots package
 * turn on clustering in the heatmaps with infinite and NA values
->>>>>>> main
 
 ## gDRplots 0.0.56 - 2022-01-13
 * move ggrepel from Suggests to Imports
