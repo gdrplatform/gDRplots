@@ -633,7 +633,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]]$PANEL)),
                NROW(selected_feats_with_NAs))
 
-  # NAs in response WIP 
+  # NAs in response
   dt_response_na <- data.table::copy(dt_response)
   dt_response_na[[selected_metric]] <- NA
   plt_5 <-
@@ -641,13 +641,11 @@ test_that("plot_boxplot_num_panel works as expected", {
                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
                            selected_feats = selected_feats)
   expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
   expect_equal(plt_5[["labels"]][["x"]], "")
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
-  expect_equal(plt_5[["labels"]][["title"]], NULL)
-  expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response$rId))
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_5)[["data"]][[1]]$PANEL)),
-               NROW(selected_feats))
-  expect_equal(NROW(ggplot2::ggplot_build(plt_5)[["data"]]), NROW(selected_feats))
+  expect_true(grepl("all NAs", plt_5[["labels"]][["title"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_5)[["data"]][[1]]), 0)
   
   # NAs in depmap
   dt_depmap_na <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
