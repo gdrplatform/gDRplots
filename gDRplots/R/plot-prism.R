@@ -416,6 +416,7 @@ plot_boxplot_num_panel <- function(dt_response,
                                    dt_depmap, 
                                    selected_feats,
                                    selected_feat_meta_col = NULL) {
+  
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
@@ -436,6 +437,7 @@ plot_boxplot_num_panel <- function(dt_response,
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   
   if (all(is.na(selected_feats)) || 
+      all(is.na(tab_plot[[selected_metric]])) ||
       all(vapply(selected_feats[selected_feats %in% available_feats], 
                  function(nm) all(is.na(tab_plot[[nm]])), FUN.VALUE = logical(1)))) {
     plt <- 
