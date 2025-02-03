@@ -57,6 +57,24 @@ obj_depmap_feat <- list(
   selected_feat_meta_col = "XZ_fatures"
 )
 
+dt_depmap_feat_2 <- data.table::data.table(
+  CCLEName = cell_lines,
+  "NU_X1QW" = withr::with_seed(42, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X2GH" = withr::with_seed(314, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X3OP" = withr::with_seed(271, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X4RT" = withr::with_seed(981, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X5BN" = rep(1, size = NROW(cell_lines))
+)
+dt_depmap_feat_2[CCLEName %in% c("cellline_FD", "cellline_NE"), 
+                 setdiff(names(dt_depmap_feat_2), "CCLEName") := NA]
+dt_depmap_feat_2 <- merge(dt_model, dt_depmap_feat_2, by = "CCLEName")
+data.table::setkey(dt_depmap_feat_2, NULL)
+
+obj_depmap_feat_2 <- list(
+  dt_depmap = dt_depmap_feat_2,
+  selected_feat_meta_col = "NU_fatures"
+)
+
 #_meta
 dt_depmap_meta_lng <- data.table::data.table(
   CCLEName = cell_lines,
@@ -459,6 +477,107 @@ test_that("plot_scatter_with_corr_panel works as expected", {
                "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
 })
 
+test_that("plot_boxplot_num works as expected", {
+  selected_feat <- "NU_X4RT"
+  selected_metric <- "RV_gDR_x_0.01"
+  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_1 <- 
+    plot_boxplot_num(dt_response = dt_response,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 3)
+  expect_equal(plt_1[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_1[["labels"]][["title"]], NULL)
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(
+    NROW(ggplot2::ggplot_build(plt_1)$data[[3]]), 
+    NROW(obj_depmap_feat_2[["dt_depmap"]][!is.na(get(selected_feat)) & CCLEName %in% dt_response[["CellLineName"]], ]))
+  
+  selected_feat_2 <- "NU_X5BN"
+  selected_metric_2 <- "RV_gDR_bliss_score"
+  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
+  
+  plt_2 <-
+    plot_boxplot_num(dt_response = dt_response_2,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat_2,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 3)
+  expect_equal(plt_2[["labels"]][["x"]], selected_feat_2)
+  expect_equal(plt_2[["labels"]][["y"]], selected_metric_2)
+  expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response_2$rId))
+  
+  plt_3 <-
+    plot_boxplot_num(dt_response = dt_response_2,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 3)
+  expect_equal(plt_3[["labels"]][["x"]], selected_feat)
+  
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_4 <- 
+    plot_boxplot_num(dt_response = dt_response_na,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], 
+               paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
+  dt_depmap_na[[selected_feat]] <- NA
+  plt_5 <- 
+    plot_boxplot_num(dt_response = dt_response,
+                     dt_depmap = dt_depmap_na, 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_5[["labels"]][["title"]], 
+               paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # testing assertions
+  expect_error(plot_boxplot_num(dt_response = unlist(dt_response),
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2, 
+                                selected_feat = selected_feat),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = 1),
+               "Assertion on 'selected_feat' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = "not_existen_feat"),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat,
+                                selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
+})
+
 test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
   selected_metric <- "RV_gDR_xc50"
@@ -614,7 +733,7 @@ test_that(".get_data_type works as expected", {
     data.table::data.table(id = sprintf("ID_%s", seq_len(NROW(tab_cat)))),
     tab_cat
   )
-
+  
   tab_num <- data.table::data.table(
     "A" = 1:5,
     "B" = 11:15,
