@@ -15,7 +15,10 @@
 #'    the last one - to the max; for "x_std" - that will be reversed
 #' @param no_breaks numeric number of breaks on scale
 #' @param cluster_rows logical flag whether rows should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA value
+#'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
+#' @param distfun function used to compute the distance (dissimilarity) between rows;
+#'   used for the dendrogram when \code{cluster_rows} is set to TRUE; 
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
@@ -63,6 +66,7 @@ pheatmap_qc <- function(
     colors_vec = c("black", "grey99"),
     no_breaks = 50,
     cluster_rows = TRUE,
+    distfun = compute_distances,
     lbl_by_CellLineName = FALSE,
     lbl_by_DrugName = FALSE) {
   
@@ -75,6 +79,7 @@ pheatmap_qc <- function(
   stopifnot("Must be a valid color name" = all(vapply(colors_vec, is_valid_color, logical(1))))
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
+  checkmate::assert_function(distfun)
   checkmate::assert_flag(lbl_by_CellLineName)
   checkmate::assert_flag(lbl_by_DrugName)
   zero_conc_scaling_factor <- 
@@ -172,10 +177,14 @@ pheatmap_qc <- function(
   names(drug_annotation_colors) <- drug_to_colored
   
   # dendrogram
-  cluster_rows <- if (cluster_rows && !any(is.na(mat_cvd)) && NROW(mat_cvd) >= 2) {
-    stats::hclust(stats::dist(mat_cvd))
-  } else {
-    FALSE
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
   
   # heatmap labels
@@ -255,9 +264,12 @@ pheatmap_qc <- function(
 #'   are matched using corresponding names from the required  \code{DrugName} column.
 #'   Note that color schemes takes into account if variable is continuous or discrete.
 #' @param cluster_rows logical flag whether rows should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA values
+#'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param cluster_cols logical flag whether columns should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value
+#'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
+#' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
+#'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -343,6 +355,7 @@ pheatmap_with_anno_sa <- function(
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
+    distfun = compute_distances,
     annotation_row = NULL,
     annotation_col = NULL,
     annotation_colors = NULL) {
@@ -360,6 +373,7 @@ pheatmap_with_anno_sa <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
+  checkmate::assert_function(distfun)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   if (!is.null(annotation_row)) {
     checkmate::assert_names(names(annotation_row), must.include = drug_name)
@@ -461,17 +475,19 @@ pheatmap_with_anno_sa <- function(
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
   
   # dendrogram
-  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    any(dim(t_mat_cvd) < 200) # gDR standard
-  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t_mat_cvd))
-  } else {
-    FALSE
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
-  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t(t_mat_cvd)))
-  } else {
-    FALSE
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -540,9 +556,12 @@ pheatmap_with_anno_sa <- function(
 #'   \code{DrugName_2} and \code{Concentration_2} columns.
 #'   Note that color schemes takes into account if the variable is continuous or discrete.
 #' @param cluster_rows logical flag whether indicating rows should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA values
+#'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param cluster_cols logical flag indicating whether columns should be clustered;
-#'   the dendrogram will not be shown for the matrix with any NA values or -Inf/Inf value
+#'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
+#' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
+#'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
+#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -630,6 +649,7 @@ pheatmap_with_anno_cd <- function(
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
+    distfun = compute_distances,
     annotation_row = NULL,
     annotation_col = NULL,
     annotation_colors = NULL) {
@@ -649,6 +669,7 @@ pheatmap_with_anno_cd <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
+  checkmate::assert_function(distfun)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   if (!is.null(annotation_row)) {
     checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2, conc_2))
@@ -757,17 +778,19 @@ pheatmap_with_anno_cd <- function(
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) purrr::quietly(qmfun)(x)$result, numeric(1))
   
   # dendrogram
-  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    any(dim(t_mat_cvd) < 200) # gDR standard
-  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t_mat_cvd))
-  } else {
-    FALSE
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
-  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t(t_mat_cvd)))
-  } else {
-    FALSE
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -904,6 +927,7 @@ pheatmap_with_anno_combo <- function(
     no_breaks = 50,
     cluster_rows = TRUE,
     cluster_cols = TRUE,
+    distfun = compute_distances,
     annotation_row = NULL,
     annotation_col = NULL,
     annotation_colors = NULL) {
@@ -921,6 +945,7 @@ pheatmap_with_anno_combo <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(cluster_rows)
   checkmate::assert_flag(cluster_cols)
+  checkmate::assert_function(distfun)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   if (!is.null(annotation_row)) {
     checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2))
@@ -1126,44 +1151,6 @@ change_NA_into_char <- function(x,
 }
 
 
-#' Create list of qualitative colors
-#'
-#' @param n number of required colors
-#'
-#' @return vector with hex colors from qualitative palettes
-#' 
-#' @examples
-#' get_qual_colors()
-#' get_qual_colors(0)
-#' get_qual_colors(5)
-#' get_qual_colors(35)
-#' 
-#' @keywords utils_color
-#' @export 
-get_qual_colors <- function(n = NULL) {
-  checkmate::assert_int(n, null.ok = TRUE, lower = 0)
-  
-  if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
-  
-  # list of colors: qualitative and friendly for user with color vision deficiency
-  qual_col_pals <- RColorBrewer::brewer.pal.info[
-    RColorBrewer::brewer.pal.info$category == "qual" &
-      RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
-  all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
-  
-  if (is.null(n)) return(all_colors)
-  
-  # make all_colors longer
-  if (n > length(all_colors)) {
-    ls_light <- colorspace::lighten(all_colors, 0.3)
-    ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
-    all_colors <- append(all_colors, values = c(ls_light, ls_dark))
-  }
-  
-  rep(all_colors, length.out = n)
-}
-
-
 #' Create color map for annotation
 #'
 #' @param dt_ann \code{data.table} with the annotations
@@ -1173,14 +1160,12 @@ get_qual_colors <- function(n = NULL) {
 #' @seealso \code{\link{pheatmap_qc}}
 #' 
 #' @examples
-#' \dontrun{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 #' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 #' 
 #' get_ann_color_map(dt_ann)
-#' }
 #' 
 #' @keywords utils_color
 #' @export 
@@ -1202,6 +1187,7 @@ get_ann_color_map <- function(dt_ann) {
   }
   annotation_colors
 }
+
 
 #' Fill missing values in the color map for annotation
 #'
@@ -1259,4 +1245,58 @@ fill_ann_color_map <- function(dt_ann,
     }
   }
   return(map_ann)
+}
+
+#' Compute value of param cluster_rows or cluster_cols in pheatmap::pheatmap
+#' 
+#' The \code{cluster_rows} and \code{cluster_cols} parameters  pheatmap::pheatmap may take values:
+#' - boolean determining if rows/columns should be clustered
+#' - \code{hclust} object,
+#' this function allows to calculate proper value taking into account matrix, additional condition and 
+#' selected function used to compute the distance in \code{hclust} object
+#' 
+#' To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
+#'
+#' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
+#' @param distfun function used to compute the distance (dissimilarity) between rows;
+#'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
+#' @param additional_condition additional logical flag whether rows/columns should be clustered 
+#'
+#' @return logical flag determining if rows should be clustered or \code{hclust} object.
+#' 
+#' @seealso \code{\link{compute_distances}}
+#' 
+#' @examples
+#' \dontrun{
+#' mat <- matrix(1:24, nrow = 4)
+#' rownames(mat) <- sprintf("row_%s", 1:4)
+#' colnames(mat) <- sprintf("col_%s", 1:6)
+#' .pheatmap_cluster_param(mat)
+#' .pheatmap_cluster_param(t(mat))
+#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' 
+#' mat[2,2] <- NA
+#' mat[2,1] <- Inf
+#' .pheatmap_cluster_param(mat)
+#' .pheatmap_cluster_param(mat, distfun = compute_distances)
+#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' add_cond <- NCOL(mat) > 10
+#' .pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' }
+#' 
+#' @keywords internal
+.pheatmap_cluster_param <- function(mat_to_cluster,
+                                    distfun = stats::dist,
+                                    additional_condition = TRUE) {
+
+  checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
+  checkmate::assert_function(distfun)
+  checkmate::assert_flag(additional_condition)
+  
+  if (additional_condition && NROW(mat_to_cluster) >= 2) {
+    tryCatch(stats::hclust(distfun(mat_to_cluster)),
+             error = function(e) return(FALSE)) # if any problem with distfun -> no clustering
+  } else {
+    FALSE
+  }
 }

@@ -1,5 +1,19 @@
-## gDRplots 0.0.56 - 2024-01-09
+## gDRplots 0.0.60 - 2024-01-31
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.59 - 2025-01-27
+* update `.get_data_type` with check for relation number
+
+## gDRplots 0.0.58 - 2025-01-24
+* update handling special characters in rmd (double colon escape)
+
+## gDRplots 0.0.57 - 2025-01-13
+* move `compute_distances` from gDRiPlots package
+* turn on clustering in the heatmaps with infinite and NA values
+>>>>>>> main
+
+## gDRplots 0.0.56 - 2022-01-13
+* move ggrepel from Suggests to Imports
 
 ## gDRplots 0.0.55 - 2025-01-03
 * add `get_r_file_path` function
