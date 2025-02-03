@@ -366,15 +366,15 @@ prep_dt_depmap_feat <- function(
   stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_set) == NROW(prefix))
   
   # TODO in GDR-2710 # nolint start
-  # dt_depmap <- kaleidoscope::load_depmap_merged(
-  #   feature_sets = feature_set,
-  #   prefix = prefix,
-  #   metadata_columns = "CCLEName") 
-  # 
-  # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap["CCLEName" != ""]
-  # 
-  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
+  dt_depmap <- kaleidoscope::load_depmap_merged(
+    feature_sets = feature_set,
+    prefix = prefix,
+    metadata_columns = "CCLEName")
+
+  data.table::setkey(dt_depmap, NULL)
+  dt_depmap["CCLEName" != ""]
+
+  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
 }
 
 #' Load DepMap merged data for one selected metadata
@@ -401,10 +401,10 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   checkmate::assert_string(metadata_col)
   
   # TODO in GDR-2710 # nolint start
-  # ls_depmap <- kaleidoscope::load_depmap_list(
-  #   feature_sets = "OmicsCNGene",
-  #   prefix = "CN_",
-  #   metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
+  ls_depmap <- kaleidoscope::load_depmap_list(
+    feature_sets = "OmicsCNGene",
+    prefix = "CN_",
+    metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
   ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
   
   dt_depmap <- data.table::data.table(
@@ -506,10 +506,10 @@ prep_dt_assoc <- function(dt_response,
     if (Y_condition && X_condition && XY_condition) {
       # create dt_assoc
       # TODO in GDR-2710
-      # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-      # 
-      # # final
-      # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+      dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
+
+      # final
+      obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
     }
   }
   # return

@@ -123,6 +123,11 @@ plot_fitting_acc <- function(dt_assay,
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  
+  if (all(is.na(dt_assay[get(cellline_name) == cl_name, "r2"]))) {
+    warning(sprintf("Missing data for %s in %s normalization type.", cl_name, normalization_type))
+    return(ggplot2::ggplot() + ggplot2::theme_void())
+  }
 
   r2 <- plot_var_stat_qc(dt_assay,
                          cl_name,
