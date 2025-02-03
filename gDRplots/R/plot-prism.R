@@ -713,12 +713,11 @@ plot_volcano_assoc_panel <- function(dt_response,
   } else if (data_type == "num_as_cat") {
     # boxplot for numeric as categorical
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
-    plt_side <-  
-      ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": WIP"),
-                    x = "", 
-                    y = selected_metric) +
-      ggplot2::theme_bw()
+    plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
+                                       dt_depmap = dt_depmap,
+                                       selected_feats = top_4,
+                                       selected_feat_meta_col = selected_feat_meta_col) + 
+      ggplot2::labs(title = "", caption = "")
   } else {  
     # scatter plot with corr
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
