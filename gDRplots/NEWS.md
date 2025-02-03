@@ -1,3 +1,6 @@
+## gDRplots 0.0.60 - 2025-01-31
+* fix y-axis range for dose-response curves
+
 ## gDRplots 0.0.59 - 2025-01-27
 * update `.get_data_type` with check for relation number
 
