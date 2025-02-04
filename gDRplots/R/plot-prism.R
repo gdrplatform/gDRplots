@@ -71,9 +71,11 @@ plot_volcano_assoc <- function(dt_assoc,
     
     # volcano plot
     plt <- 
-      ggplot2::ggplot(
-        data = tab_plot,
-        mapping = ggplot2::aes(x = get(x_lbl), y = get(y_lbl), label = label, color = stat_sig)) +
+      ggplot2::ggplot(data = tab_plot,
+                      mapping = ggplot2::aes(x = get(x_lbl), 
+                                             y = get(y_lbl), 
+                                             label = label, 
+                                             color = stat_sig)) +
       ggplot2::geom_point() +
       ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
                                   name = "Statistically Significant") +
@@ -86,7 +88,6 @@ plot_volcano_assoc <- function(dt_assoc,
       ggplot2::theme(legend.position = "bottom", 
                      legend.title = ggplot2::element_text(vjust = 0.5, hjust = 1))
   }
-  
   return(plt)
 }
 
@@ -161,11 +162,11 @@ plot_scatter_with_corr <- function(dt_response,
       sprintf("corr=%2.2f, slope=%2.2f, intercept=%2.2f", correlation, slope, intercept)
     
     plt <-        
-      ggplot2::ggplot(
-        data = tab_plot,
-        mapping =  ggplot2::aes(x = get(selected_feat), 
-                                y = get(selected_metric), 
-                                label = label, color = col)) +
+      ggplot2::ggplot(data = tab_plot,
+                      mapping =  ggplot2::aes(x = get(selected_feat), 
+                                              y = get(selected_metric), 
+                                              label = label, 
+                                              color = col)) +
       ggplot2::geom_point(shape = 21, fill = "black", size = 1, stroke = 1) +
       ggrepel::geom_text_repel(size = 3, max.overlaps = 20, color = "black") +
       ggplot2::geom_abline(intercept = intercept, slope = slope, color = "red") +   
@@ -178,7 +179,6 @@ plot_scatter_with_corr <- function(dt_response,
       ggplot2::guides(color = "none") +
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black"))
   } 
-  
   return(plt)
 }
 
@@ -296,12 +296,13 @@ plot_scatter_with_corr_panel <- function(dt_response,
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     
     plt <-
-      ggplot2::ggplot(
-        data = tab_plot_all,
-        mapping = ggplot2::aes(x = feat_val, 
-                               y = get(selected_metric), 
-                               label = label, color = col)) +
-      ggplot2::geom_point(ggplot2::aes(alpha = col), fill = "black", shape = 21, size = 1, stroke = 1) +
+      ggplot2::ggplot(data = tab_plot_all,
+                      mapping = ggplot2::aes(x = feat_val, 
+                                             y = get(selected_metric), 
+                                             label = label, 
+                                             color = col)) +
+      ggplot2::geom_point(mapping = ggplot2::aes(alpha = col), 
+                          fill = "black", shape = 21, size = 1, stroke = 1) +
       ggrepel::geom_text_repel(size = 3, max.overlaps = 20, color = "black") +
       ggplot2::labs(title = selected_feat_meta_col, 
                     x = "", 
@@ -312,18 +313,19 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
       ggplot2::facet_wrap(~feat_lbl, scales = "free") +
-      ggplot2::geom_smooth(ggplot2::aes(x = feat_val, y = get(selected_metric)), color = "red",
+      ggplot2::geom_smooth(ggplot2::aes(x = feat_val, 
+                                        y = get(selected_metric)), 
+                           color = "red",
                            formula = y ~ x, method = "lm", se = FALSE, inherit.aes = FALSE) +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(size = 8),
-        axis.text.y = ggplot2::element_text(size = 8),
-        plot.title = ggplot2::element_text(size = 12),
-        panel.grid.minor = ggplot2::element_blank(), 
-        aspect.ratio = 1,
-        strip.background = ggplot2::element_blank(),
-        strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
-        legend.position = "none"
-      )
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 12),
+                     panel.grid.minor = ggplot2::element_blank(), 
+                     aspect.ratio = 1,
+                     strip.background = ggplot2::element_blank(),
+                     strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, 
+                                                        margin = ggplot2::margin()),
+                     legend.position = "none")
   }
   return(plt)
 }
@@ -382,14 +384,21 @@ plot_boxplot_num <- function(dt_response,
   } else {
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
     
+    # prep the number of items in each category
+    tab_count <- tab_plot[, .N, by = selected_feat]
+    
     plt <- 
-      ggplot2::ggplot(
-        data = tab_plot,
-        mapping =  ggplot2::aes(x = get(selected_feat), 
-                                y = get(selected_metric))) +
+      ggplot2::ggplot(data = tab_plot,
+                      mapping =  ggplot2::aes(x = get(selected_feat), 
+                                              y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
       ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::geom_text(data = tab_count,
+                         mapping =  ggplot2::aes(x = get(selected_feat), 
+                                                 y = 0, 
+                                                 label = N), 
+                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
       ggplot2::labs(title = selected_feat_meta_col,
                     x = selected_feat,
                     y = selected_metric, 
@@ -407,6 +416,7 @@ plot_boxplot_num <- function(dt_response,
 #' 
 #' @inheritParams plot_boxplot_num
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
+#' @param ncol number of plot column in panel
 #'
 #' @return \code{ggplot} object containing boxplots for variable levels (0-1)
 #' @keywords prism_plots
@@ -415,7 +425,8 @@ plot_boxplot_num <- function(dt_response,
 plot_boxplot_num_panel <- function(dt_response,
                                    dt_depmap, 
                                    selected_feats,
-                                   selected_feat_meta_col = NULL) {
+                                   selected_feat_meta_col = NULL,
+                                   ncol = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -425,6 +436,7 @@ plot_boxplot_num_panel <- function(dt_response,
   checkmate::assert_character(selected_feats)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -510,30 +522,37 @@ plot_boxplot_num_panel <- function(dt_response,
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
     
+    # prep the number of items in each category
+    tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
+    
     plt <- 
-      ggplot2::ggplot(
-        data = tab_plot_all,
-        mapping =  ggplot2::aes(x = feat_val, 
-                                y = get(selected_metric))) +
+      ggplot2::ggplot(data = tab_plot_all,
+                      mapping =  ggplot2::aes(x = feat_val, 
+                                              y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
       ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) + 
+      ggplot2::geom_text(data = tab_count_all,
+                         mapping = ggplot2::aes(x = feat_val, 
+                                                y = 0, 
+                                                label = N), 
+                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
                     y = selected_metric, 
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::scale_x_discrete(drop = FALSE) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free") +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(size = 8),
-        axis.text.y = ggplot2::element_text(size = 8),
-        plot.title = ggplot2::element_text(size = 12),
-        panel.grid.minor = ggplot2::element_blank(), 
-        aspect.ratio = 1,
-        strip.background = ggplot2::element_blank(),
-        strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()),
-        legend.position = "none"
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 12),
+                     panel.grid.minor = ggplot2::element_blank(), 
+                     aspect.ratio = 1,
+                     strip.background = ggplot2::element_blank(),
+                     strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, 
+                                                        margin = ggplot2::margin()),
+                     legend.position = "none"
       )
   }
   return(plt)
@@ -615,6 +634,9 @@ plot_boxplot_meta <- function(dt_response,
       tab_plot <- tab_plot[get(selected_feat_meta_col) %chin% multi_item_grp, ]
     }
     
+    # prep the number of items in each category
+    tab_count <- tab_plot[, .N, by = selected_feat_meta_col]
+    
     # final plt
     plt <-        
       ggplot2::ggplot(
@@ -624,13 +646,18 @@ plot_boxplot_meta <- function(dt_response,
       ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
       ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::geom_text(data = tab_count,
+                         mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
+                                                y = 0, 
+                                                label = N), 
+                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
                     y = selected_metric, 
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "none",
-                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1))
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1))
     
     if (!all(is.na(tab_plot[[selected_metric]])) && 
         max(tab_plot[[selected_metric]], na.rm = TRUE) > 0.5) {
@@ -716,14 +743,19 @@ plot_volcano_assoc_panel <- function(dt_response,
   } else if (data_type == "num_as_cat") {
     # boxplot for numeric as categorical
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
+    top_4 <- top_4[!is.na(top_4)]
+    
     plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
                                        dt_depmap = dt_depmap,
                                        selected_feats = top_4,
-                                       selected_feat_meta_col = selected_feat_meta_col) + 
+                                       selected_feat_meta_col = selected_feat_meta_col,
+                                       ncol = 2) + 
       ggplot2::labs(title = "", caption = "")
   } else {  
     # scatter plot with corr
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
+    top_4 <- top_4[!is.na(top_4)]
+    
     plt_side <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
