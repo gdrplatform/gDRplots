@@ -487,7 +487,7 @@ test_that("plot_boxplot_num works as expected", {
                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
                      selected_feat = selected_feat)
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 3)
+  expect_length(plt_1[["layers"]], 4)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
@@ -507,7 +507,7 @@ test_that("plot_boxplot_num works as expected", {
                      selected_feat = selected_feat_2,
                      selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 3)
+  expect_length(plt_2[["layers"]], 4)
   expect_equal(plt_2[["labels"]][["x"]], selected_feat_2)
   expect_equal(plt_2[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat_2[["selected_feat_meta_col"]])
@@ -519,7 +519,7 @@ test_that("plot_boxplot_num works as expected", {
                      selected_feat = selected_feat,
                      selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 3)
+  expect_length(plt_3[["layers"]], 4)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat)
   
   # NAs in response
@@ -588,7 +588,7 @@ test_that("plot_boxplot_num_panel works as expected", {
                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
                            selected_feats = selected_feats)
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 3)
+  expect_length(plt_1[["layers"]], 4)
   expect_equal(plt_1[["labels"]][["x"]], "")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
@@ -602,7 +602,7 @@ test_that("plot_boxplot_num_panel works as expected", {
                            selected_feats = new_selected_feats,
                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 3)
+  expect_length(plt_2[["layers"]], 4)
   expect_equal(plt_2[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(ggplot2::ggplot_build(plt_2)[["data"]][[1]]), NROW(new_selected_feats))
   expect_equal(# check the uniqueness of points
@@ -626,12 +626,14 @@ test_that("plot_boxplot_num_panel works as expected", {
   plt_4 <- 
     plot_boxplot_num_panel(dt_response = dt_response,
                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
-                           selected_feats = selected_feats_with_NAs)
+                           selected_feats = selected_feats_with_NAs,
+                           ncol = 2)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 3)
+  expect_length(plt_4[["layers"]], 4)
   expect_equal(plt_4[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]]$PANEL)),
                NROW(selected_feats_with_NAs))
+  expect_equal(plt_4[["facet"]][["params"]][["ncol"]], 2)
 
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
@@ -653,11 +655,13 @@ test_that("plot_boxplot_num_panel works as expected", {
   plt_6 <- 
     plot_boxplot_num_panel(dt_response = dt_response,
                            dt_depmap = dt_depmap_na, 
-                           selected_feats = selected_feats)
+                           selected_feats = selected_feats,
+                           ncol = 1)
   expect_is(plt_6, "gg")
   expect_equal(plt_6[["labels"]][["x"]], "")
   expect_equal(plt_6[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(ggplot2::ggplot_build(plt_6)[["data"]][[1]]), NROW(selected_feats)) 
+  expect_equal(plt_6[["facet"]][["params"]][["ncol"]], 1)
   
   # testing assertions
   expect_error(plot_boxplot_num_panel(dt_response = unlist(dt_response),
@@ -677,6 +681,17 @@ test_that("plot_boxplot_num_panel works as expected", {
                                       selected_feats = selected_feats,
                                       selected_feat_meta_col = 1),
                "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats,
+                                      ncol = "1"),
+               "Assertion on 'ncol' failed: Must be of type 'single integerish value'")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats,
+                                      ncol = 2.5),
+               "Assertion on 'ncol' failed: Must be of type 'single integerish value'")
+  
 })
 
 test_that("plot_boxplot_meta works as expected", {
@@ -692,7 +707,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
-  expect_length(plt_1[["layers"]], 4)
+  expect_length(plt_1[["layers"]], 5)
   expect_length(ggplot2::ggplot_build(plt_1)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
@@ -703,7 +718,7 @@ test_that("plot_boxplot_meta works as expected", {
                              selected_feat_meta_col = selected_meta,
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 4)
+  expect_length(plt_2[["layers"]], 5)
   expect_length(ggplot2::ggplot_build(plt_2)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx) & N > 1]))
   expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
@@ -714,7 +729,7 @@ test_that("plot_boxplot_meta works as expected", {
                              selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 4)
+  expect_length(plt_3[["layers"]], 5)
   expect_length(ggplot2::ggplot_build(plt_3)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
@@ -732,7 +747,7 @@ test_that("plot_boxplot_meta works as expected", {
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
+  expect_length(plt_4[["layers"]], 4) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
