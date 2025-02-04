@@ -382,6 +382,9 @@ plot_boxplot_num <- function(dt_response,
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw()
   } else {
+    # prep value ranges for y-axis
+    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05
+    
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
     
     # prep the number of items in each category
@@ -396,9 +399,10 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
       ggplot2::geom_text(data = tab_count,
                          mapping =  ggplot2::aes(x = get(selected_feat), 
-                                                 y = 0, 
+                                                 y = min_val, 
                                                  label = N), 
                          vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+      ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = selected_feat,
                     y = selected_metric, 
@@ -518,6 +522,10 @@ plot_boxplot_num_panel <- function(dt_response,
       }
       tab_plot_all <- rbind(tab_plot_all, tab_plot_tmp)
     }
+    
+    # prep value ranges for y-axis
+    min_val <- min(c(tab_plot_all[[selected_metric]], 0), na.rm = TRUE) - 0.05
+    
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
@@ -534,9 +542,10 @@ plot_boxplot_num_panel <- function(dt_response,
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count_all,
                          mapping = ggplot2::aes(x = feat_val, 
-                                                y = 0, 
+                                                y = min_val, 
                                                 label = N), 
                          vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+      ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
                     y = selected_metric, 
@@ -597,20 +606,30 @@ plot_boxplot_meta <- function(dt_response,
                              c(cellline_name, "rId", "cId"))
   stopifnot("Provide `dt_response` for one metric." = NROW(selected_metric) == 1)
   
-  dt_depmap_lng <- 
-    data.table::melt(dt_depmap, 
-                     id.vars = c("ModelID", "CCLEName"), 
-                     variable.name = selected_feat_meta_col, variable.factor = FALSE
-    )[value == 1, !"value"]
+  # prep table with data to plot
+  available_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+  X_dt <- dt_depmap[, c("CCLEName", available_meta), with = FALSE]
+  Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+  tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   
-  if (NROW(dt_depmap_lng) > NROW(unique(dt_depmap_lng[, c("ModelID", "CCLEName")]))
-      || typeof(unlist(dt_depmap[, -c("CCLEName", "ModelID"), with = FALSE])) != "integer") {
+  check_lbl <- rowSums(tab_plot[, .SD, .SDcols = available_meta], na.rm = TRUE)
+  if (any(check_lbl > 1) ||
+      typeof(unlist(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])) != "integer") {
     warning(
       "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
     )
   }
+  if (any(check_lbl == 0)) {
+    tab_plot[["_NA"]] <- as.integer(!check_lbl)
+  }
   
-  if (NROW(dt_depmap_lng) == 0 || all(is.na(dt_depmap_lng[[selected_feat_meta_col]]))) {
+  tab_plot <- data.table::melt(tab_plot,
+                               id.vars = c(cellline_name, selected_metric),
+                               variable.name = selected_feat_meta_col,
+                               variable.factor = FALSE
+  )[value == 1, !"value"]
+  
+  if (NROW(tab_plot) == 0 || all(is.na(tab_plot[[selected_feat_meta_col]]))) {
     plt <- 
       ggplot2::ggplot() + 
       ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
@@ -618,13 +637,6 @@ plot_boxplot_meta <- function(dt_response,
                     y = selected_metric) +
       ggplot2::theme_bw()
   } else {
-    # prep table with data to plot
-    X_dt <- dt_depmap_lng[, c("CCLEName", selected_feat_meta_col), with = FALSE]
-    if (is.numeric(X_dt[[selected_feat_meta_col]])) {
-      X_dt[[selected_feat_meta_col]] <- as.factor(X_dt[[selected_feat_meta_col]])
-    }
-    Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
-    tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
     # remove NA
     tab_plot <- stats::na.omit(tab_plot)
     
@@ -633,7 +645,13 @@ plot_boxplot_meta <- function(dt_response,
       multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
       tab_plot <- tab_plot[get(selected_feat_meta_col) %chin% multi_item_grp, ]
     }
+
+    # prep value ranges for y-axis
+    range_y <- range(tab_plot[[selected_metric]])
+    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - (range_y[2] - range_y[1]) / 10
     
+    meta_lvl <- c(sort(available_meta[available_meta %chin% unique(tab_plot[[selected_feat_meta_col]])]), "_NA")
+    tab_plot[[selected_feat_meta_col]] <- factor(tab_plot[[selected_feat_meta_col]], levels = meta_lvl)
     # prep the number of items in each category
     tab_count <- tab_plot[, .N, by = selected_feat_meta_col]
     
@@ -648,9 +666,10 @@ plot_boxplot_meta <- function(dt_response,
       ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
       ggplot2::geom_text(data = tab_count,
                          mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
-                                                y = 0, 
+                                                y = min_val, 
                                                 label = N), 
                          vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+      ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
                     y = selected_metric, 
