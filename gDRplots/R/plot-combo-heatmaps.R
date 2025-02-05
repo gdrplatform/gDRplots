@@ -23,7 +23,8 @@
 #' @param limit numeric vector of length two providing limits of the scale. 
 #'    Use NA to refer to the existing minimum or maximumdescription
 #' @param no_breaks numeric number of breaks on scale
-#' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
+#' @param swap_axes logical flag indicating whether to swap the axes with drugs of the heatmap
+#' @param show_values logical flag indicating whether to show values of the metric on the heatmap
 #'
 #' @return \code{ggplot} object containing heatmap with the values for the selected combo metric 
 #'    for selected drugs and cell line with selected isoline (when chosen)
@@ -94,7 +95,8 @@ heatmap_combo_metrics <- function(
     colors_vec_excess = NULL,
     limit = NULL,
     no_breaks = 50,
-    swap_axes = FALSE) {
+    swap_axes = FALSE,
+    show_values = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -122,6 +124,7 @@ heatmap_combo_metrics <- function(
   checkmate::assert_numeric(limit, len = 2, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(swap_axes)
+  checkmate::assert_flag(show_values)
   
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -256,6 +259,14 @@ heatmap_combo_metrics <- function(
                      panel.grid = ggplot2::element_blank(),
                      aspect.ratio = 1)
     
+    if (show_values) {
+      plt <-  plt + 
+        ggplot2::geom_text(
+          ggplot2::aes(label = ifelse(is.na(get(metric)), "", sprintf("%.2f", get(metric)))),
+          size = 2,
+          color = "black")
+    }
+    
     # add isoline
     if (NROW(available_iso_lvl)) { # isobolograms as lines
       if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
@@ -360,7 +371,8 @@ heatmap_combo_metrics_panel <- function(
     colors_vec_excess = NULL,
     no_breaks = 50,
     as_list = FALSE,
-    swap_axes = FALSE) {
+    swap_axes = FALSE,
+    show_values = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -521,6 +533,14 @@ heatmap_combo_metrics_panel <- function(
                        panel.grid = ggplot2::element_blank(),
                        aspect.ratio = 1)
       
+      if (show_values) {
+        plt <- plt + 
+          ggplot2::geom_text(
+            ggplot2::aes(label = ifelse(is.na(get(mx_name)), "", sprintf("%.2f", get(mx_name)))),
+            size = 2,
+            color = "black")
+      }
+      
       # add isoline
       if (NROW(available_iso_lvl)) { # isobolograms as lines
         if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
@@ -621,7 +641,16 @@ heatmap_combo_metrics_panel <- function(
     ls_plts
   } else {
     # build panel
-    ggpubr::annotate_figure(
+    panel_plt <- 
+      if (is.null(ls_plts[["iso_compare"]])) {
+        ggpubr::ggarrange(
+          plotlist = list(
+            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
+            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
+          ),
+          ncol = 3, common.legend = FALSE, legend = "left")
+    } else {
       ggpubr::ggarrange(
         ggpubr::ggarrange(
           plotlist = list(
@@ -635,8 +664,9 @@ heatmap_combo_metrics_panel <- function(
             ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
           ),
           ncol = 2, common.legend = TRUE, legend = "left"),
-        common.legend = TRUE, nrow = 2),
-      top = main_title) +
+        common.legend = TRUE, nrow = 2)
+      } 
+    ggpubr::annotate_figure(panel_plt, top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
   }
   
@@ -1497,7 +1527,7 @@ transform_log_conc <- function(conc_vec) {
   diff_ <- sort(unique(diff(sort(unique(round(pos_vec, 4))))), decreasing = TRUE)
   
   tile_size <- if (NROW(diff_) > 1) {
-    diff_[2] # 1st in related to conc = 0 and and is not conclusive
+    max(diff_)
   } else if (NROW(diff_) == 1) {
     diff_
   } else { 
