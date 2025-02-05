@@ -370,7 +370,7 @@ plot_boxplot_num <- function(dt_response,
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
-
+  
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
   
@@ -386,7 +386,7 @@ plot_boxplot_num <- function(dt_response,
     # prep value ranges for y-axis
     range_y <- range(tab_plot[[selected_metric]])
     min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-
+    
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
     
     # prep the number of items in each category
@@ -418,7 +418,7 @@ plot_boxplot_num <- function(dt_response,
 }
 
 
-#' Plot panel with scatter with correlation
+#' Plot panel with boxplots
 #' 
 #' @inheritParams plot_boxplot_num
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
@@ -528,7 +528,7 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep value ranges for y-axis
     range_y <- range(tab_plot_all[[selected_metric]])
     min_val <- min(c(tab_plot_all[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-
+    
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
@@ -622,7 +622,7 @@ plot_boxplot_meta <- function(dt_response,
       "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
     )
   }
-
+  
   tab_plot <- data.table::melt(tab_plot,
                                id.vars = c(cellline_name, selected_metric),
                                variable.name = selected_feat_meta_col,
@@ -645,11 +645,11 @@ plot_boxplot_meta <- function(dt_response,
       multi_item_grp <- tab_plot[, .N, by = selected_feat_meta_col][N > 1, ][[selected_feat_meta_col]]
       tab_plot <- tab_plot[get(selected_feat_meta_col) %chin% multi_item_grp, ]
     }
-
+    
     # prep value ranges for y-axis
     range_y <- range(tab_plot[[selected_metric]])
     min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-
+    
     # prep the number of items in each category
     tab_count <- tab_plot[, .N, by = selected_feat_meta_col]
     
@@ -751,24 +751,7 @@ plot_volcano_assoc_panel <- function(dt_response,
   # checking type of data: numeric or categorical
   data_type <- .get_data_type(dt_depmap, desc_col = c("ModelID", "CCLEName"))
   
-  if (data_type == "categorical") {
-    # boxplot for categorical
-    plt_side <- plot_boxplot_meta(dt_response = dt_response_,
-                                  dt_depmap = dt_depmap,
-                                  selected_feat_meta_col = selected_feat_meta_col) +
-      ggplot2::labs(title = "", caption = "")
-  } else if (data_type == "num_as_cat") {
-    # boxplot for numeric as categorical
-    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
-    top_4 <- top_4[!is.na(top_4)]
-    
-    plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
-                                       dt_depmap = dt_depmap,
-                                       selected_feats = top_4,
-                                       selected_feat_meta_col = selected_feat_meta_col,
-                                       ncol = 2) + 
-      ggplot2::labs(title = "", caption = "")
-  } else {  
+  if (data_type == "numeric") {
     # scatter plot with corr
     top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
     top_4 <- top_4[!is.na(top_4)]
@@ -777,6 +760,17 @@ plot_volcano_assoc_panel <- function(dt_response,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
                                              selected_feat_meta_col = selected_feat_meta_col) + 
+      ggplot2::labs(title = "", caption = "")
+  } else {
+    # boxplot for categorical &  boxplot for numeric as categorical
+    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
+    top_4 <- top_4[!is.na(top_4)]
+    
+    plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
+                                       dt_depmap = dt_depmap,
+                                       selected_feats = top_4,
+                                       selected_feat_meta_col = selected_feat_meta_col,
+                                       ncol = 2) + 
       ggplot2::labs(title = "", caption = "")
   }
   

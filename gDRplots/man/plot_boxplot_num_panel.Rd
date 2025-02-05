@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-prism.R
 \name{plot_boxplot_num_panel}
 \alias{plot_boxplot_num_panel}
-\title{Plot panel with scatter with correlation}
+\title{Plot panel with boxplots}
 \usage{
 plot_boxplot_num_panel(
   dt_response,
@@ -33,6 +33,6 @@ that has 0-1 values only (categorical character but without relation one-to-one 
 \code{ggplot} object containing boxplots for variable levels (0-1)
 }
 \description{
-Plot panel with scatter with correlation
+Plot panel with boxplots
 }
 \keyword{prism_plots}
