@@ -262,7 +262,7 @@ heatmap_combo_metrics <- function(
     if (show_values) {
       plt <-  plt + 
         ggrepel::geom_label_repel(
-          aes(label = ifelse(is.na(get(metric)), "", sprintf("%.2f", get(metric)))),
+          ggplot2::aes(label = ifelse(is.na(get(metric)), "", sprintf("%.2f", get(metric)))),
           size = 2.5,
           force = 0,
           segment.color = NA,
@@ -541,7 +541,7 @@ heatmap_combo_metrics_panel <- function(
       if (show_values) {
         plt <-  plt + 
           ggrepel::geom_label_repel(
-            aes(label = ifelse(is.na(get(mx_name)), "", sprintf("%.2f", get(mx_name)))),
+            ggplot2::aes(label = ifelse(is.na(get(mx_name)), "", sprintf("%.2f", get(mx_name)))),
             size = 2.5,
             force = 0,
             label.size = 0,
