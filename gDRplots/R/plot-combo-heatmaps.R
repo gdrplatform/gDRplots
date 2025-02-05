@@ -634,7 +634,7 @@ heatmap_combo_metrics_panel <- function(
     # final plots
     ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
   } else {
-    ls_plts <- mx_pltsw
+    ls_plts <- mx_plts
   }
   
   final_plot <- if (as_list) {
