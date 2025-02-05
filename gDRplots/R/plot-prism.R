@@ -77,7 +77,7 @@ plot_volcano_assoc <- function(dt_assoc,
                                              label = label, 
                                              color = stat_sig)) +
       ggplot2::geom_point() +
-      ggplot2::scale_color_manual(values = list(yes = "black", no = "#A9A9A9"),
+      ggplot2::scale_color_manual(values = list(yes = "black", no = "darkgray"),
                                   name = "Statistically Significant") +
       ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE) +
       ggplot2::labs(title = plt_title, 
@@ -361,6 +361,21 @@ plot_boxplot_num <- function(dt_response,
   checkmate::assert_string(selected_feat)
   checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -396,9 +411,9 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::ggplot(data = tab_plot,
                       mapping =  ggplot2::aes(x = get(selected_feat), 
                                               y = get(selected_metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
-      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
       ggplot2::geom_text(data = tab_count,
                          mapping =  ggplot2::aes(x = get(selected_feat), 
                                                  y = min_val, 
@@ -443,6 +458,18 @@ plot_boxplot_num_panel <- function(dt_response,
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -540,9 +567,9 @@ plot_boxplot_num_panel <- function(dt_response,
       ggplot2::ggplot(data = tab_plot_all,
                       mapping =  ggplot2::aes(x = feat_val, 
                                               y = get(selected_metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
-      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) + 
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count_all,
                          mapping = ggplot2::aes(x = feat_val, 
                                                 y = min_val, 
@@ -604,6 +631,18 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_number(max_x_lbl_length, lower = 5)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -659,9 +698,9 @@ plot_boxplot_meta <- function(dt_response,
         data = tab_plot,
         mapping =  ggplot2::aes(x = get(selected_feat_meta_col), 
                                 y = get(selected_metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = "#A6CEE3", color = "#A9A9A9", alpha = 0.25) +
-      ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") + 
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
       ggplot2::geom_text(data = tab_count,
                          mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
                                                 y = min_val, 
@@ -679,7 +718,7 @@ plot_boxplot_meta <- function(dt_response,
     if (!all(is.na(tab_plot[[selected_metric]])) && 
         data.table::between(max(tab_plot[[selected_metric]], na.rm = TRUE), 0.5, 1.5)) {
       plt <- plt +
-        ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
+        ggplot2::geom_hline(yintercept = 1, color = hline_color, linetype = "dashed")
     }
     
     # some labels may be too long to see the boxes 

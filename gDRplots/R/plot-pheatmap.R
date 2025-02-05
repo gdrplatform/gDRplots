@@ -517,7 +517,7 @@ pheatmap_with_anno_sa <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
@@ -818,7 +818,7 @@ pheatmap_with_anno_cd <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
@@ -1076,7 +1076,7 @@ pheatmap_with_anno_combo <- function(
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
