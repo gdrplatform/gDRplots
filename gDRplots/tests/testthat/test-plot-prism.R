@@ -608,7 +608,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(# check the uniqueness of points
     unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & ! is.na(y), .N, by = "PANEL"]$N), #nolint
     sum(stats::complete.cases(obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response[["CellLineName"]], ])))
-
+  
   # only NAs in selected_feats 
   plt_3 <- 
     plot_boxplot_num_panel(dt_response = dt_response,
@@ -634,7 +634,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]]$PANEL)),
                NROW(selected_feats_with_NAs))
   expect_equal(plt_4[["facet"]][["params"]][["ncol"]], 2)
-
+  
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
   dt_response_na[[selected_metric]] <- NA
@@ -703,43 +703,43 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_1 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_feat_meta_col = selected_meta)
+                             selected_feat_meta_col = selected_meta) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
-  expect_length(plt_1[["layers"]], 5)
+  expect_length(plt_1[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_1)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
+  # scenario: plot without one-item-group
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta,
                              with_1_item_grp = FALSE)
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 5)
+  expect_length(plt_2[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_2)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx) & N > 1]))
   expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
+  # scenario: x-label with max 8 character
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 5)
-  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
+  expect_length(plt_3[["layers"]], 4)
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
   short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
   expect_true(all(grp_stat[!is.na(meta_xx) & nchar(meta_xx) < 8]$meta_xx %in% ls_x_lbl))
   expect_true(short_lbl %in% ls_x_lbl)
-  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
+  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
-  # combo plot
+  # scenario: plot with combo metric
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
@@ -752,7 +752,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
   
-  # numeric meta
+  # scenario: data with numeric levels
   dt_depmap_meta_numeric <- data.table::copy(dt_depmap_meta)
   meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
   names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
@@ -767,7 +767,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
   expect_equal(ggplot2::layer_scales(plt_5)$x$range$range, names(lbl_)[lbl_])
   
-  # lack of the intersection
+  # scenario: lack of the intersection (empty plot)
   dt_depmap_meta_empty <- data.table::copy(dt_depmap_meta)
   meta_name <- setdiff(names(dt_depmap_meta_empty), c("CCLEName", "ModelID"))
   dt_depmap_meta_empty <- dt_depmap_meta_empty[, (meta_name) := 0]
@@ -779,8 +779,9 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_6[["labels"]][["y"]], selected_metric)
   expect_true(grepl(selected_meta, plt_6[["labels"]][["title"]]))
   expect_true(grepl("all NAs", plt_6[["labels"]][["title"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)$data[[1]]), 0)
   
-  # lack oj one-to-one relationship
+  # scenario: lack of one-to-one relationship
   dt_depmap_meta_multi <- data.table::copy(dt_depmap_meta)
   meta_name <- setdiff(names(dt_depmap_meta_multi), c("CCLEName", "ModelID"))
   dt_depmap_meta_multi <- dt_depmap_meta_multi[, (meta_name[1:2]) := 1]
