@@ -370,6 +370,7 @@ plot_boxplot_num <- function(dt_response,
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
   
@@ -383,8 +384,9 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::theme_bw()
   } else {
     # prep value ranges for y-axis
-    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05
-    
+    range_y <- range(tab_plot[[selected_metric]])
+    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
+
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
     
     # prep the number of items in each category
@@ -401,7 +403,7 @@ plot_boxplot_num <- function(dt_response,
                          mapping =  ggplot2::aes(x = get(selected_feat), 
                                                  y = min_val, 
                                                  label = N), 
-                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+                         vjust = 0, size.unit = "pt", size = 8) +
       ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = selected_feat,
@@ -524,8 +526,9 @@ plot_boxplot_num_panel <- function(dt_response,
     }
     
     # prep value ranges for y-axis
-    min_val <- min(c(tab_plot_all[[selected_metric]], 0), na.rm = TRUE) - 0.05
-    
+    range_y <- range(tab_plot_all[[selected_metric]])
+    min_val <- min(c(tab_plot_all[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
+
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
     tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
@@ -544,7 +547,7 @@ plot_boxplot_num_panel <- function(dt_response,
                          mapping = ggplot2::aes(x = feat_val, 
                                                 y = min_val, 
                                                 label = N), 
-                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+                         vjust = 0, size.unit = "pt", size = 8) +
       ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
@@ -619,10 +622,7 @@ plot_boxplot_meta <- function(dt_response,
       "The data does not appear to be categorical because there is no one-to-one relationship between ids and features."
     )
   }
-  if (any(check_lbl == 0)) {
-    tab_plot[["_NA"]] <- as.integer(!check_lbl)
-  }
-  
+
   tab_plot <- data.table::melt(tab_plot,
                                id.vars = c(cellline_name, selected_metric),
                                variable.name = selected_feat_meta_col,
@@ -648,10 +648,8 @@ plot_boxplot_meta <- function(dt_response,
 
     # prep value ranges for y-axis
     range_y <- range(tab_plot[[selected_metric]])
-    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - (range_y[2] - range_y[1]) / 10
-    
-    meta_lvl <- c(sort(available_meta[available_meta %chin% unique(tab_plot[[selected_feat_meta_col]])]), "_NA")
-    tab_plot[[selected_feat_meta_col]] <- factor(tab_plot[[selected_feat_meta_col]], levels = meta_lvl)
+    min_val <- min(c(tab_plot[[selected_metric]], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
+
     # prep the number of items in each category
     tab_count <- tab_plot[, .N, by = selected_feat_meta_col]
     
@@ -668,7 +666,7 @@ plot_boxplot_meta <- function(dt_response,
                          mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
                                                 y = min_val, 
                                                 label = N), 
-                         vjust = 0, nudge_y = 0.02, size.unit = "pt", size = 8) +
+                         vjust = 0, size.unit = "pt", size = 8) +
       ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
@@ -679,7 +677,7 @@ plot_boxplot_meta <- function(dt_response,
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1))
     
     if (!all(is.na(tab_plot[[selected_metric]])) && 
-        max(tab_plot[[selected_metric]], na.rm = TRUE) > 0.5) {
+        data.table::between(max(tab_plot[[selected_metric]], na.rm = TRUE), 0.5, 1.5)) {
       plt <- plt +
         ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed")
     }
