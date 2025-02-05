@@ -377,7 +377,7 @@ heatmap_combo_metrics_panel <- function(
     no_breaks = 50,
     as_list = FALSE,
     swap_axes = FALSE,
-    show_value = FALSE) {
+    show_values = FALSE) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
