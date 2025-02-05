@@ -261,15 +261,10 @@ heatmap_combo_metrics <- function(
     
     if (show_values) {
       plt <-  plt + 
-        ggrepel::geom_label_repel(
+        ggplot2::geom_text(
           ggplot2::aes(label = ifelse(is.na(get(metric)), "", sprintf("%.2f", get(metric)))),
-          size = 2.5,
-          force = 0,
-          segment.color = NA,
-          label.size = 0,
-          color = "black",
-          fill = ggplot2::alpha("white", 0.5)
-        )
+          size = 2,
+          color = "black")
     }
     
     # add isoline
@@ -539,16 +534,11 @@ heatmap_combo_metrics_panel <- function(
                        aspect.ratio = 1)
       
       if (show_values) {
-        plt <-  plt + 
-          ggrepel::geom_label_repel(
+        plt <- plt + 
+          ggplot2::geom_text(
             ggplot2::aes(label = ifelse(is.na(get(mx_name)), "", sprintf("%.2f", get(mx_name)))),
-            size = 2.5,
-            force = 0,
-            label.size = 0,
-            segment.color = NA,
-            color = "black",
-            fill = ggplot2::alpha("white", 0.5)
-          )
+            size = 2,
+            color = "black")
       }
       
       # add isoline
@@ -644,7 +634,7 @@ heatmap_combo_metrics_panel <- function(
     # final plots
     ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
   } else {
-    ls_plts <- mx_plts
+    ls_plts <- mx_pltsw
   }
   
   final_plot <- if (as_list) {
