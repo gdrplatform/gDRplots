@@ -268,7 +268,7 @@ heatmap_combo_metrics <- function(
           segment.color = NA,
           label.size = 0,
           color = "black",
-          fill = alpha("white", 0.5)
+          fill = ggplot2::alpha("white", 0.5)
         )
     }
     
@@ -547,7 +547,7 @@ heatmap_combo_metrics_panel <- function(
             label.size = 0,
             segment.color = NA,
             color = "black",
-            fill = alpha("white", 0.5)
+            fill = ggplot2::alpha("white", 0.5)
           )
       }
       
