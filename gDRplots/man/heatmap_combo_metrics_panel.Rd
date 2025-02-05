@@ -16,7 +16,8 @@ heatmap_combo_metrics_panel(
   colors_vec_excess = NULL,
   no_breaks = 50,
   as_list = FALSE,
-  swap_axes = FALSE
+  swap_axes = FALSE,
+  show_value = FALSE
 )
 }
 \arguments{
@@ -49,7 +50,7 @@ for excess values; the default is the blue-light grey-red color scale}
 
 \item{as_list}{logical flag whether return list of plot or panel}
 
-\item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
+\item{swap_axes}{logical flag indicating whether to swap the axes with drugs of the heatmap}
 }
 \value{
 \code{ggplot} object containing panel with heatmaps with value for excess assays for 
