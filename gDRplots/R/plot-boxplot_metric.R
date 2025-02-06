@@ -121,7 +121,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)), 
-                            color = edge_color, alpha = 0.25, show.legend = FALSE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -140,7 +140,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = fill_color, 
-                            color = edge_color, alpha = 0.25, na.rm = TRUE) +
+                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
   
@@ -268,7 +268,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
-                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -287,7 +287,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = fill_color, 
-                            color = edge_color, alpha = 0.25, na.rm = TRUE) +
+                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
   
@@ -414,7 +414,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)),
-                            color = edge_color, alpha = 0.25, show.legend = FALSE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -429,7 +429,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
       ggplot2::ggplot(data = dt_sco,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
   
@@ -522,7 +522,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
     ggplot2::ggplot(data = dt_sco,
                     mapping = ggplot2::aes(x = DrugCombination, y = get(metric))) +
     ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-    ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25) +
+    ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
     ggplot2::theme(legend.position = "none") +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) +
     ggplot2::labs(title = plt_title,

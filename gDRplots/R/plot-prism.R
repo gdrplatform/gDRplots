@@ -413,7 +413,7 @@ plot_boxplot_num <- function(dt_response,
                       mapping =  ggplot2::aes(x = get(selected_feat), 
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, outliers = FALSE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
       ggplot2::geom_text(data = tab_count,
                          mapping =  ggplot2::aes(x = get(selected_feat), 
@@ -569,7 +569,7 @@ plot_boxplot_num_panel <- function(dt_response,
                       mapping =  ggplot2::aes(x = feat_val, 
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count_all,
                          mapping = ggplot2::aes(x = feat_val, 
@@ -700,7 +700,7 @@ plot_boxplot_meta <- function(dt_response,
         mapping =  ggplot2::aes(x = get(selected_feat_meta_col), 
                                 y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25) +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, outliers = FALSE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
       ggplot2::geom_text(data = tab_count,
                          mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
