@@ -932,9 +932,9 @@ test_that(".get_n_top_asssoc works as expected", {
   expect_equal(.get_n_top_asssoc(tab_assoc_alpha), tab_assoc_alpha[["feature"]][1:4])
   
   expect_error(.get_n_top_asssoc(dt_ = NULL),
-               "Assertion on 'dt_' failed: Must be a data.table")
+               "Assertion on 'dt_assoc' failed: Must be a data.table")
   expect_error(.get_n_top_asssoc(dt_ = tab_assoc[, 1:2]),
-               "Assertion on 'names(dt_assoc)' failed: Names must include the elements")
+               "failed: Names must include the elements")
   expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = "1"),
                "Assertion on 'n_top' failed: Must be of type 'number'")
   expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = 2:5),
