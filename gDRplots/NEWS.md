@@ -1,6 +1,9 @@
-## gDRplots 0.0.61 - 2025-02-03
+## gDRplots 0.0.62 - 2025-02-06
 * update `plot_boxplot_meta` to handle edge cases 
 * add `plot_boxplot_num` and `plot_boxplot_num_panel` functions
+
+## gDRplots 0.0.61 - 2025-02-05
+* add values to combo heatmaps and adjust position of plots in the panel
 
 ## gDRplots 0.0.60 - 2025-01-31
 * fix y-axis range for dose-response curves

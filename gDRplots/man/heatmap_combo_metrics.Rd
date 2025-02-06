@@ -17,7 +17,8 @@ heatmap_combo_metrics(
   colors_vec_excess = NULL,
   limit = NULL,
   no_breaks = 50,
-  swap_axes = FALSE
+  swap_axes = FALSE,
+  show_values = FALSE
 )
 }
 \arguments{
@@ -56,7 +57,9 @@ Use NA to refer to the existing minimum or maximumdescription}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
-\item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
+\item{swap_axes}{logical flag indicating whether to swap the axes with drugs of the heatmap}
+
+\item{show_values}{logical flag indicating whether to show values of the metric on the heatmap}
 }
 \value{
 \code{ggplot} object containing heatmap with the values for the selected combo metric 
