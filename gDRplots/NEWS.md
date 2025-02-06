@@ -1,6 +1,7 @@
 ## gDRplots 0.0.62 - 2025-02-06
 * update `plot_boxplot_meta` to handle edge cases 
 * add `plot_boxplot_num` and `plot_boxplot_num_panel` functions
+* add new logic for selecting n-top based on q-val and rho
 
 ## gDRplots 0.0.61 - 2025-02-05
 * add values to combo heatmaps and adjust position of plots in the panel
