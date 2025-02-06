@@ -782,6 +782,8 @@ plot_volcano_assoc_panel <- function(dt_response,
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_feat_meta_col)
+  top_4 <- .get_n_top_asssoc(obj_assoc[["dt_assoc"]])
+  
   # volcano plot
   plt_vol <- plot_volcano_assoc(dt_assoc = obj_assoc[["dt_assoc"]],
                                 selected_feat_meta_col = obj_assoc[["selected_feat_meta_col"]],
@@ -793,9 +795,6 @@ plot_volcano_assoc_panel <- function(dt_response,
   
   if (data_type == "numeric") {
     # scatter plot with corr
-    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
-    top_4 <- top_4[!is.na(top_4)]
-    
     plt_side <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
@@ -803,9 +802,6 @@ plot_volcano_assoc_panel <- function(dt_response,
       ggplot2::labs(title = "", caption = "")
   } else {
     # boxplot for categorical &  boxplot for numeric as categorical
-    top_4 <- data.table::setorderv(obj_assoc[["dt_assoc"]], cols = "q_value")[["feature"]][seq_len(4)]
-    top_4 <- top_4[!is.na(top_4)]
-    
     plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
                                        dt_depmap = dt_depmap,
                                        selected_feats = top_4,
@@ -884,4 +880,32 @@ plot_volcano_assoc_panel <- function(dt_response,
     data_type <- "unknown"
   }
   return(data_type)  
+}
+
+#' Get n-top linear associations
+#' 
+#' Currently, n-top linear associations are selected based on values of \code{q_value} 
+#' (column sorted increasing) and values of \code{rho} (column sorted decreasing)
+#' 
+#' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
+#'     outputted by \code{kaleidoscope::calc_assoc}
+#' @param n_top number of requested top linear associations
+#' 
+#' @return a vector with name of the n-top linear associations; 
+#'     when \code{n_top} will be higher than number of available features - only available will be returned.
+#' 
+#' @keywords prism_plots
+.get_n_top_asssoc <- function(dt_assoc,
+                              n_top = 4) {
+  
+  checkmate::assert_data_table(dt_assoc)
+  checkmate::assert_names(names(dt_assoc), must.include = c("feature", "q_value", "rho"))
+  checkmate::assert_number(n_top, lower = 1) 
+  
+  dt_ <- data.table::copy(dt_assoc)
+  dt_$abs_rho <- abs(dt_$rho)
+  dt_ <- data.table::setorderv(dt_, cols = c("q_value", "abs_rho"), order = c(1L, -1L))[, abs_rho := NULL]
+  top_n <- dt_[["feature"]][seq_len(n_top)]
+  
+  return(top_n[!is.na(top_n)])  
 }
