@@ -905,3 +905,38 @@ test_that(".get_data_type works as expected", {
   expect_error(.get_data_type(dt_ = tab_cat, desc_col = "str"),
                "Assertion on 'desc_col' failed: Must be a subset")
 })
+
+test_that(".get_n_top_asssoc works as expected", {
+  tab_assoc <- data.table::data.table(
+    feature = sprintf("ID_%02d", 1:12),
+    rho = c(0.216, 0.082, 0.079, 0.067, 0.059, 0.024, 
+            0.008, 0.002, -0.097, -0.166, -0.172, -0.245),
+    q_value = seq(0.68, 0.02, length.out = 12)
+  )
+  
+  expect_equal(.get_n_top_asssoc(tab_assoc), 
+               tab_assoc[order(q_value)][["feature"]][1:4]) # default
+  expect_equal(.get_n_top_asssoc(tab_assoc, 14), 
+               tab_assoc[order(q_value)][["feature"]])
+  expect_equal(.get_n_top_asssoc(tab_assoc[1:3, ]),
+               tab_assoc[1:3, ][order(q_value)][["feature"]])
+  
+  tab_assoc_rho <- data.table::copy(tab_assoc)
+  tab_assoc_rho$q_value <- 1
+  expect_equal(.get_n_top_asssoc(tab_assoc_rho), 
+               tab_assoc_rho[order(-abs(get("rho")))][["feature"]][1:4])
+  
+  tab_assoc_alpha <- data.table::copy(tab_assoc)
+  tab_assoc_alpha$q_value <- 1
+  tab_assoc_alpha$rho <- 0.2
+  expect_equal(.get_n_top_asssoc(tab_assoc_alpha), tab_assoc_alpha[["feature"]][1:4])
+  
+  expect_error(.get_n_top_asssoc(dt_ = NULL),
+               "Assertion on 'dt_' failed: Must be a data.table")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc[, 1:2]),
+               "Assertion on 'names(dt_assoc)' failed: Names must include the elements")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = "1"),
+               "Assertion on 'n_top' failed: Must be of type 'number'")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = 2:5),
+               "Assertion on 'n_top' failed: Must have length 1")
+})
