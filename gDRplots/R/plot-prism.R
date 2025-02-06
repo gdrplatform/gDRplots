@@ -219,6 +219,11 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::theme_bw()
   } else {
     available_feats <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+    # prep table with data to plot
+    X_dt <- dt_depmap[, c("CCLEName", selected_feats[selected_feats %in% available_feats]), with = FALSE]
+    Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
+    tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
+    
     tab_plot_all <- data.table::data.table()
     
     if (sum(is.na(selected_feats)) > 1) {
@@ -233,16 +238,12 @@ plot_scatter_with_corr_panel <- function(dt_response,
     for (selected_feat in selected_feats) {
       
       if (selected_feat %chin% available_feats) {
-        # prep table with data to plot
-        X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
-        Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
-        tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
         # remove NA
-        tab_plot <- stats::na.omit(tab_plot)
+        tab_plot_sel <- stats::na.omit(tab_plot[, c(cellline_name, selected_metric, selected_feat), with = FALSE])
         
-        if (NROW(tab_plot) > 0) { 
+        if (NROW(tab_plot_sel) > 0) { 
           # re-calculate correlation, slope and intercept
-          fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot)
+          fit <- stats::lm(get(selected_metric) ~ get(selected_feat), tab_plot_sel)
           intercept <- stats::coef(fit)[1]
           slope <- stats::coef(fit)[2]
           r_squared <- summary(fit)$r.squared
@@ -250,18 +251,18 @@ plot_scatter_with_corr_panel <- function(dt_response,
           # add label for points driving the correlation
           dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
           top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
-          tab_plot$label <- ""
-          tab_plot[top_driving_corr, ]$label <- tab_plot[top_driving_corr, ][[cellline_name]] 
-          tab_plot$col <- "no"
-          tab_plot[top_driving_corr, ]$col <- "yes"
-          tab_plot$feat_lbl <- selected_feat
-          data.table::setnames(tab_plot, selected_feat, "feat_val")
+          tab_plot_sel$label <- ""
+          tab_plot_sel[top_driving_corr, ]$label <- tab_plot_sel[top_driving_corr, ][[cellline_name]] 
+          tab_plot_sel$col <- "no"
+          tab_plot_sel[top_driving_corr, ]$col <- "yes"
+          tab_plot_sel$feat_lbl <- selected_feat
+          data.table::setnames(tab_plot_sel, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
           feat_lbl <- paste(selected_feat, ": all NAs")
           feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
           
-          tab_plot <- data.table::data.table(
+          tab_plot_sel <- data.table::data.table(
             cellline_name = "",
             selected_metric = 0,
             feat_val = 0,
@@ -269,7 +270,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
             col = "NA",
             feat_lbl = feat_lbl
           )
-          data.table::setnames(tab_plot, 
+          data.table::setnames(tab_plot_sel, 
                                old = c("cellline_name", "selected_metric"), 
                                new = c(cellline_name, selected_metric))
         }
@@ -278,7 +279,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
         feat_lbl <- paste(selected_feat, ": all NAs")
         feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
         
-        tab_plot <- data.table::data.table(
+        tab_plot_sel <- data.table::data.table(
           cellline_name = "",
           selected_metric = 0,
           feat_val = 0,
@@ -286,11 +287,11 @@ plot_scatter_with_corr_panel <- function(dt_response,
           col = "NA",
           feat_lbl = feat_lbl
         )
-        data.table::setnames(tab_plot, 
+        data.table::setnames(tab_plot_sel, 
                              old = c("cellline_name", "selected_metric"), 
                              new = c(cellline_name, selected_metric))
       }
-      tab_plot_all <- rbind(tab_plot_all, tab_plot)
+      tab_plot_all <- rbind(tab_plot_all, tab_plot_sel)
     }
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
