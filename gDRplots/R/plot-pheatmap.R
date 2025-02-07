@@ -227,7 +227,7 @@ pheatmap_qc <- function(
                            show_colnames = FALSE,
                            main = hm_title,
                            fontsize = 8,
-                           fontsize_row = ifelse(NROW(t_mat_cvd) > 40, 0.6 * 8, 8),
+                           fontsize_row = ifelse(NROW(mat_cvd) > 40, 0.6 * 8, 8),
                            na_col = "red",
                            annotation_legend = annotation_legend_flag,
                            # dendrogram
