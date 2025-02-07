@@ -220,13 +220,14 @@ pheatmap_qc <- function(
                            scale = "none",
                            display_numbers = FALSE,
                            number_color = "black",
-                           fontsize_number = 16,
+                           fontsize_number = 1.2 * 8,
                            color = hm_color_palette,
                            breaks = breaks,
                            angle_col = 45,
-                           fontsize = 10,
                            show_colnames = FALSE,
                            main = hm_title,
+                           fontsize = 8,
+                           fontsize_row = ifelse(NROW(t_mat_cvd) > 40, 0.6 * 8, 8),
                            na_col = "red",
                            annotation_legend = annotation_legend_flag,
                            # dendrogram
@@ -513,10 +514,13 @@ pheatmap_with_anno_sa <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -814,10 +818,13 @@ pheatmap_with_anno_cd <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -1072,10 +1079,13 @@ pheatmap_with_anno_combo <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -1284,7 +1294,7 @@ fill_ann_color_map <- function(dt_ann,
 .pheatmap_cluster_param <- function(mat_to_cluster,
                                     distfun = stats::dist,
                                     additional_condition = TRUE) {
-
+  
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
   checkmate::assert_flag(additional_condition)
