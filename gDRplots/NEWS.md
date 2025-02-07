@@ -1,5 +1,8 @@
-## gDRplots 0.0.61 - 2024-01-31
+## gDRplots 0.0.62 - 2024-02-07
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.61 - 2025-02-05
+* add values to combo heatmaps and adjust position of plots in the panel
 
 ## gDRplots 0.0.60 - 2025-01-31
 * fix y-axis range for dose-response curves

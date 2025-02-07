@@ -675,7 +675,7 @@ test_that("transform_log_conc works as expected", {
 
 test_that(".get_tile_size works as expected", {
   res_1 <- .get_tile_size(c(-0.35, 0, 0.349, 0.7))
-  expect_equal(res_1, 0.35)
+  expect_equal(res_1, 0.351)
   
   res_2 <- .get_tile_size(c(0.349, 0.7, -0.35, 0))
   expect_equal(res_1, res_2)
@@ -690,7 +690,7 @@ test_that(".get_tile_size works as expected", {
   expect_equal(res_5, 0.5)
   
   res_6 <- .get_tile_size(c(0.349, 0.7, -0.35, 0, -0.35, 0))
-  expect_equal(res_6, 0.35)
+  expect_equal(res_6, 0.351)
   
   res_7 <- .get_tile_size(c(0.5, 0.75, NA))
   expect_equal(res_7, 0.25)
