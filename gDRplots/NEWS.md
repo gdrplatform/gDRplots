@@ -1,3 +1,6 @@
+## gDRplots 0.0.62 - 2025-02-09
+* handle duplicated data in pheatmap_with_anno_sa
+
 ## gDRplots 0.0.61 - 2025-02-05
 * add values to combo heatmaps and adjust position of plots in the panel
 

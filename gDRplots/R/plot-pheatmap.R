@@ -400,10 +400,23 @@ pheatmap_with_anno_sa <- function(
                   identity)
   
   # prep data
+  ## check how duplicates should be handled (define fun.aggregate)
+  f_agg <- if (metric %in% gDRutils::get_header("metric_average_fields")$geometric_mean) {
+    function(x) {
+      gDRutils::geometric_mean(x, fixed = FALSE)
+    }
+  } else {
+    function(x) {
+      mean(x, na.rm = TRUE)
+    }
+  }
   tab_plot <- data.table::dcast(
     data = tab_response,
     formula = get(cellline_name) ~ get(drug_name),
-    value.var = metric)
+    value.var = metric,
+    fun.aggregate = f_agg
+  )
+  
   data.table::setnames(tab_plot, "cellline_name", cellline_name)
   
   # prep matrix
