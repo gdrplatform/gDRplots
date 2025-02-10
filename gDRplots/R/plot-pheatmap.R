@@ -189,7 +189,7 @@ pheatmap_qc <- function(
   
   # heatmap labels
   if (lbl_by_CellLineName) {
-    row_lbls <- tab_response[, unique(.SD), .SDcols = c(cellline_name, clid)][order(rownames(mat_cvd))]
+    row_lbls <- tab_response[match(rownames(mat_cvd), clid), unique(.SD), .SDcols = c(cellline_name, clid)]
     # re-label
     rownames(mat_cvd) <- row_lbls[[cellline_name]]
   }
@@ -201,9 +201,9 @@ pheatmap_qc <- function(
     col_lbls <- rbind(col_lbls, col_lbls_2)
     # re-label
     colnames(drug_annotation) <-
-      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][order(colnames(drug_annotation))][[drug_name]]
+      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][match(colnames(drug_annotation), get(gnumber)), ][[drug_name]]
     names(drug_annotation_colors) <-
-      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
+      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][match(names(drug_annotation_colors), get(gnumber)), ][[drug_name]]
   }
   
   annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
@@ -216,30 +216,31 @@ pheatmap_qc <- function(
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
-  hm <- pheatmap::pheatmap(mat = mat_cvd,
-                           scale = "none",
-                           display_numbers = FALSE,
-                           number_color = "black",
-                           fontsize_number = 1.2 * 8,
-                           color = hm_color_palette,
-                           breaks = breaks,
-                           angle_col = 45,
-                           show_colnames = FALSE,
-                           main = hm_title,
-                           fontsize = 8,
-                           fontsize_row = ifelse(NROW(mat_cvd) > 40, 0.6 * 8, 8),
-                           na_col = "red",
-                           annotation_legend = annotation_legend_flag,
-                           # dendrogram
-                           treeheight_row = 70,
-                           treeheight_col = 70,
-                           cluster_cols = FALSE,
-                           cluster_rows = cluster_rows,
-                           # manual annotation
-                           annotation_col = drug_annotation,
-                           annotation_colors = drug_annotation_colors,
-                           silent = TRUE
-  )
+  hm <- 
+    pheatmap::pheatmap(mat = mat_cvd,
+                       scale = "none",
+                       display_numbers = FALSE,
+                       number_color = "black",
+                       fontsize_number = 1.2 * 8,
+                       color = hm_color_palette,
+                       breaks = breaks,
+                       angle_col = 45,
+                       show_colnames = FALSE,
+                       main = hm_title,
+                       fontsize = 8,
+                       fontsize_row = ifelse(NROW(mat_cvd) > 40, 0.6 * 8, 8),
+                       na_col = "red",
+                       annotation_legend = annotation_legend_flag,
+                       # dendrogram
+                       treeheight_row = 70,
+                       treeheight_col = 70,
+                       cluster_cols = FALSE,
+                       cluster_rows = cluster_rows,
+                       # manual annotation
+                       annotation_col = drug_annotation,
+                       annotation_colors = drug_annotation_colors,
+                       silent = TRUE
+    )
   return(hm)
 }
 
