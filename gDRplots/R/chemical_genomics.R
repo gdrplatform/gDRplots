@@ -25,13 +25,13 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  cl <- gDRutils::get_env_identifiers("cellline_name")
+  cl_idf <- gDRutils::get_env_identifiers("cellline_name")
   
   # asserts
   checkmate::assert_data_table(metrics_data)
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
-  checkmate::assert_subset(cell_line, choices = unique(metrics_data[[cl]]), empty.ok = TRUE)
+  checkmate::assert_subset(cell_line, choices = unique(metrics_data[[cellline]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   # filter out unwanted drug moa
@@ -54,16 +54,18 @@ analyze_cgs <- function(metrics_data, metrics, cell_line = NULL, normalization_t
   moa_list <- lapply(split(metrics_diff[[drug_name]], metrics_diff[[drug_moa]]), unique)
   moa_list <- moa_list[vapply(moa_list, length, FUN.VALUE = numeric(1)) > 3]
   
+  metrics_diff <- metrics_diff[eval(drug_moa) %chin% names(moa_list)]
+  
   # determine which cell lines to analyze
   if (!is.null(cell_line)) {
     cell_lines <- cell_line
   } else {
-    cell_lines <- unique(metrics_diff[[cl]])
+    cell_lines <- unique(metrics_diff[[cl_idf]])
   }
   
   # Run fgsea analysis for each specified cell line
   results <- lapply(cell_lines, function(cl) {
-    data_subset <- metrics_diff[eval(cl) == cl & eval(drug_moa) %in% names(moa_list), ]
+    data_subset <- metrics_diff[get(cl_idf) == cl]
     data_subset$normalization_type <- normalization_type
     list_results <- lapply(metrics, function(metric) {
       metric_values <- data_subset[[metric]]
@@ -111,7 +113,6 @@ plot_cgs_ranking <- function(results, cell_line, metric) {
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  cl <- gDRutils::get_env_identifiers("cellline_name")
   norm_type <- gDRutils::get_env_identifiers("normalization_type")
   
   # asserts
