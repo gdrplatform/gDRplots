@@ -1,6 +1,6 @@
 ## gDRplots 0.0.63 - 2025-02-10
 * refactor `plot_dose_response_sa` to handle missing data consistently
-* fix lableing in `pheatmap_qc`
+* fix labeling in `pheatmap_qc`
 
 ## gDRplots 0.0.62 - 2025-02-06
 * update `plot_boxplot_meta` to handle edge cases 
