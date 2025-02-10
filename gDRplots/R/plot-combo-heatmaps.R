@@ -400,6 +400,10 @@ heatmap_combo_metrics_panel <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_list)
   checkmate::assert_flag(swap_axes)
+  checkmate::assert_flag(show_values)
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -590,7 +594,7 @@ heatmap_combo_metrics_panel <- function(
       ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
       ggplot2::geom_line(
         data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9")
+      ggplot2::geom_hline(yintercept = 0, color = hline_color)
     
     if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
       # friendly for user with color vision deficiency
@@ -744,6 +748,9 @@ plot_combination_index <- function(
   checkmate::assert_character(iso_levels)
   checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -778,7 +785,7 @@ plot_combination_index <- function(
     ggplot2::geom_line(
       data = data.table::data.table(log10_ratio_conc = c(-2, 2), 
                                     log2_CI = c(0, 0))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#A9A9A9")
+    ggplot2::geom_hline(yintercept = 0, color = hline_color)
   
   # check if isolines are available and adjust plotting logic accordingly
   if (NROW(available_iso_lvl) > 0) {

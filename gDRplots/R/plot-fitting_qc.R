@@ -51,7 +51,10 @@ plot_var_stat_qc <- function(dt_assay,
   checkmate::assert_choice(metric, choices = names(dt_assay))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_flag(with_table)
-
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
   
   # filter data for normalization type
@@ -65,8 +68,8 @@ plot_var_stat_qc <- function(dt_assay,
   
   plt <- ggplot2::ggplot(tab_subplot, 
                          ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
-    ggplot2::geom_hline(yintercept = 1, color = "#B3B3B3", linetype = "dashed") +
-    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+    ggplot2::geom_hline(yintercept = 1, color = hline_color, linetype = "dashed") +
+    ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
     ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
@@ -217,6 +220,9 @@ heatmap_control_mapping_qc <- function(dt_treat,
                                        dt_controls) {
   checkmate::assert_data_table(dt_treat)
   checkmate::assert_data_table(dt_controls)
+  qc_heatmap_palette <- 
+    gDRutils::get_settings_from_json("QC_HEATMAP_PALETTE",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # calculate the frequency of each (rID, cID) combination in Controls 
   frequency <- dt_controls[, .N, by = .(rId, cId)]
@@ -237,7 +243,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   minval <- min(c(0, min(result_matrix, na.rm = TRUE)))
   
   breaks <- seq(from = minval, to = maxval, by = 1)
-  hm_color_palette <- grDevices::colorRampPalette(c("#CEEFC8", "#76D364"))(NROW(breaks) - 1)
+  hm_color_palette <- grDevices::colorRampPalette(qc_heatmap_palette)(NROW(breaks) - 1)
   
   unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
   

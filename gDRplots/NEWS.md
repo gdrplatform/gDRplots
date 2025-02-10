@@ -1,5 +1,10 @@
-## gDRplots 0.0.62 - 2024-02-07
+## gDRplots 0.0.63 - 2024-02-10
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.62 - 2025-02-06
+* update `plot_boxplot_meta` to handle edge cases 
+* add `plot_boxplot_num` and `plot_boxplot_num_panel` functions
+* add new logic for selecting n-top based on q-val and rho
 
 ## gDRplots 0.0.61 - 2025-02-05
 * add values to combo heatmaps and adjust position of plots in the panel
@@ -37,7 +42,7 @@
 * revert color palette for dose-response curves for combo data
 
 ## gDRplots 0.0.50 - 2024-12-03
-* fix for edge-case in pheatmap_with_anno_sa (-Inf)
+* fix for edge-case in `pheatmap_with_anno_sa` (-Inf)
 
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics

@@ -57,6 +57,24 @@ obj_depmap_feat <- list(
   selected_feat_meta_col = "XZ_fatures"
 )
 
+dt_depmap_feat_2 <- data.table::data.table(
+  CCLEName = cell_lines,
+  "NU_X1QW" = withr::with_seed(42, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X2GH" = withr::with_seed(314, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X3OP" = withr::with_seed(271, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X4RT" = withr::with_seed(981, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X5BN" = rep(1, size = NROW(cell_lines))
+)
+dt_depmap_feat_2[CCLEName %in% c("cellline_FD", "cellline_NE"), 
+                 setdiff(names(dt_depmap_feat_2), "CCLEName") := NA]
+dt_depmap_feat_2 <- merge(dt_model, dt_depmap_feat_2, by = "CCLEName")
+data.table::setkey(dt_depmap_feat_2, NULL)
+
+obj_depmap_feat_2 <- list(
+  dt_depmap = dt_depmap_feat_2,
+  selected_feat_meta_col = "NU_fatures"
+)
+
 #_meta
 dt_depmap_meta_lng <- data.table::data.table(
   CCLEName = cell_lines,
@@ -434,7 +452,7 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   expect_equal(plt_7[["labels"]][["x"]], "")
   expect_equal(plt_7[["labels"]][["y"]], selected_metric)
   expect_equal(plt_7[["labels"]][["title"]], NULL)
-  expect_equal(plt_6[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(plt_7[["labels"]][["caption"]], unique(dt_response$rId))
   expect_equal(
     NROW(data.table::data.table(ggplot2::ggplot_build(plt_7)[["data"]][[1]])[alpha == 0, .N, by = PANEL]), # nolint 
     sum(vapply(selected_feats, function(nm) all(is.na(dt_depmap_na[[nm]])), logical(1)))) 
@@ -459,6 +477,223 @@ test_that("plot_scatter_with_corr_panel works as expected", {
                "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
 })
 
+test_that("plot_boxplot_num works as expected", {
+  selected_feat <- "NU_X4RT"
+  selected_metric <- "RV_gDR_x_0.01"
+  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_1 <- 
+    plot_boxplot_num(dt_response = dt_response,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 4)
+  expect_equal(plt_1[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_1[["labels"]][["title"]], NULL)
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+  expect_equal(# check the uniqueness of points
+    NROW(ggplot2::ggplot_build(plt_1)$data[[3]]), 
+    NROW(obj_depmap_feat_2[["dt_depmap"]][!is.na(get(selected_feat)) & CCLEName %in% dt_response[["CellLineName"]], ]))
+  
+  selected_feat_2 <- "NU_X5BN"
+  selected_metric_2 <- "RV_gDR_bliss_score"
+  dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
+  
+  plt_2 <-
+    plot_boxplot_num(dt_response = dt_response_2,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat_2,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 4)
+  expect_equal(plt_2[["labels"]][["x"]], selected_feat_2)
+  expect_equal(plt_2[["labels"]][["y"]], selected_metric_2)
+  expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response_2$rId))
+  
+  plt_3 <-
+    plot_boxplot_num(dt_response = dt_response_2,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 4)
+  expect_equal(plt_3[["labels"]][["x"]], selected_feat)
+  
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_4 <- 
+    plot_boxplot_num(dt_response = dt_response_na,
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 0) # empty plot
+  expect_equal(plt_4[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_4[["labels"]][["title"]], 
+               paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
+  dt_depmap_na[[selected_feat]] <- NA
+  plt_5 <- 
+    plot_boxplot_num(dt_response = dt_response,
+                     dt_depmap = dt_depmap_na, 
+                     selected_feat = selected_feat,
+                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], selected_feat)
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_5[["labels"]][["title"]], 
+               paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
+  expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
+  
+  # testing assertions
+  expect_error(plot_boxplot_num(dt_response = unlist(dt_response),
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2, 
+                                selected_feat = selected_feat),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = 1),
+               "Assertion on 'selected_feat' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = "not_existen_feat"),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+  expect_error(plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat,
+                                selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
+})
+
+test_that("plot_boxplot_num_panel works as expected", {
+  selected_feats <- c("NU_X1QW", "NU_X3OP", "NU_X5BN")
+  selected_metric <- "RV_gDR_x_10"
+  dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_1 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           selected_feats = selected_feats)
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 4)
+  expect_equal(plt_1[["labels"]][["x"]], "")
+  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_1[["labels"]][["title"]], NULL)
+  expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
+  
+  # selected feat is not present in dt_depmap
+  new_selected_feats <- c(selected_feats, "NU_non_avial")
+  plt_2 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           selected_feats = new_selected_feats,
+                           selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 4)
+  expect_equal(plt_2[["labels"]][["y"]], selected_metric)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_2)[["data"]][[1]]), NROW(new_selected_feats))
+  expect_equal(# check the uniqueness of points
+    unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & ! is.na(y), .N, by = "PANEL"]$N), #nolint
+    sum(stats::complete.cases(obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response[["CellLineName"]], ])))
+  
+  # only NAs in selected_feats 
+  plt_3 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           selected_feats = rep(NA, 2),
+                           selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_3, "gg")
+  expect_length(plt_3[["layers"]], 0) # empty plot
+  expect_equal(plt_3[["labels"]][["x"]], "")
+  expect_equal(plt_3[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_3[["labels"]][["title"]], "NU_fatures : all NAs")
+  
+  # some NAs in selected_feats 
+  selected_feats_with_NAs <- c(NA, selected_feats, NA) 
+  plt_4 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           selected_feats = selected_feats_with_NAs,
+                           ncol = 2)
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 4)
+  expect_equal(plt_4[["labels"]][["y"]], selected_metric)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]]$PANEL)),
+               NROW(selected_feats_with_NAs))
+  expect_equal(plt_4[["facet"]][["params"]][["ncol"]], 2)
+  
+  # NAs in response
+  dt_response_na <- data.table::copy(dt_response)
+  dt_response_na[[selected_metric]] <- NA
+  plt_5 <-
+    plot_boxplot_num_panel(dt_response = dt_response_na,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
+                           selected_feats = selected_feats)
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 0) # empty plot
+  expect_equal(plt_5[["labels"]][["x"]], "")
+  expect_equal(plt_5[["labels"]][["y"]], selected_metric)
+  expect_true(grepl("all NAs", plt_5[["labels"]][["title"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_5)[["data"]][[1]]), 0)
+  
+  # NAs in depmap
+  dt_depmap_na <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
+  dt_depmap_na[[selected_feats[2]]] <- NA
+  plt_6 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = dt_depmap_na, 
+                           selected_feats = selected_feats,
+                           ncol = 1)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["x"]], "")
+  expect_equal(plt_6[["labels"]][["y"]], selected_metric)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)[["data"]][[1]]), NROW(selected_feats)) 
+  expect_equal(plt_6[["facet"]][["params"]][["ncol"]], 1)
+  
+  # testing assertions
+  expect_error(plot_boxplot_num_panel(dt_response = unlist(dt_response),
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2, 
+                                      selected_feats = selected_feats),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = 1),
+               "Assertion on 'selected_feats' failed: Must be of type 'character'")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats,
+                                      selected_feat_meta_col = 1),
+               "Assertion on 'selected_feat_meta_col' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats,
+                                      ncol = "1"),
+               "Assertion on 'ncol' failed: Must be of type 'single integerish value'")
+  expect_error(plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats,
+                                      ncol = 2.5),
+               "Assertion on 'ncol' failed: Must be of type 'single integerish value'")
+  
+})
+
 test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
   selected_metric <- "RV_gDR_xc50"
@@ -468,7 +703,7 @@ test_that("plot_boxplot_meta works as expected", {
   
   plt_1 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
-                             selected_feat_meta_col = selected_meta)
+                             selected_feat_meta_col = selected_meta) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], selected_meta)
@@ -478,6 +713,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
+  # scenario: plot without one-item-group
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta,
@@ -489,22 +725,21 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range), 
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
+  # scenario: x-label with max 8 character
   plt_3 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
   short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
   expect_true(all(grp_stat[!is.na(meta_xx) & nchar(meta_xx) < 8]$meta_xx %in% ls_x_lbl))
   expect_true(short_lbl %in% ls_x_lbl)
-  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range), 
+  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
   
-  # combo plot
+  # scenario: plot with combo metric
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
@@ -512,12 +747,12 @@ test_that("plot_boxplot_meta works as expected", {
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 3) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
+  expect_length(plt_4[["layers"]], 4) # max(dt_response_2[["RV_gDR_bliss_score"]]) < 0.5 # nolint
   expect_equal(plt_4[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_4[["labels"]][["title"]], selected_meta)
   expect_equal(plt_4[["labels"]][["caption"]], unique(dt_response_2$rId))
   
-  # numeric meta
+  # scenario: data with numeric levels
   dt_depmap_meta_numeric <- data.table::copy(dt_depmap_meta)
   meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
   names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
@@ -531,6 +766,39 @@ test_that("plot_boxplot_meta works as expected", {
   expect_is(plt_5, "gg")
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
   expect_equal(ggplot2::layer_scales(plt_5)$x$range$range, names(lbl_)[lbl_])
+  
+  # scenario: lack of the intersection (empty plot)
+  dt_depmap_meta_empty <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_empty), c("CCLEName", "ModelID"))
+  dt_depmap_meta_empty <- dt_depmap_meta_empty[, (meta_name) := 0]
+  
+  plt_6 <- plot_boxplot_meta(dt_response = dt_response,
+                             dt_depmap = dt_depmap_meta_empty, 
+                             selected_feat_meta_col = selected_meta)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["y"]], selected_metric)
+  expect_true(grepl(selected_meta, plt_6[["labels"]][["title"]]))
+  expect_true(grepl("all NAs", plt_6[["labels"]][["title"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_6)$data[[1]]), 0)
+  
+  # scenario: lack of one-to-one relationship
+  dt_depmap_meta_multi <- data.table::copy(dt_depmap_meta)
+  meta_name <- setdiff(names(dt_depmap_meta_multi), c("CCLEName", "ModelID"))
+  dt_depmap_meta_multi <- dt_depmap_meta_multi[, (meta_name[1:2]) := 1]
+  
+  expect_warning({
+    plt_7 <- plot_boxplot_meta(dt_response = dt_response,
+                               dt_depmap = dt_depmap_meta_multi, 
+                               selected_feat_meta_col = selected_meta)
+    expect_is(plt_7, "gg")
+    expect_false(NROW(ggplot2::ggplot_build(plt_7)$data[[3]]) <= sum(grp_stat[!is.na(meta_xx), ]$N))
+  })
+  expect_warning(
+    plot_boxplot_meta(dt_response = dt_response,
+                      dt_depmap = dt_depmap_meta_multi, 
+                      selected_feat_meta_col = selected_meta),
+    "The data does not appear to be categorical"
+  )
   
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response),
@@ -568,7 +836,6 @@ test_that("plot_boxplot_meta works as expected", {
 # })
 #nolint end
 
-
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(
     "A" = c(0, 0, 0, 1),
@@ -603,6 +870,9 @@ test_that(".get_data_type works as expected", {
   
   tab_not_cat <- data.table::copy(tab_cat) * 2
   
+  tab_num_as_cat <- data.table::copy(tab_cat)
+  tab_num_as_cat$C <- 1
+  
   tab_mix <- data.table::data.table(
     "A" = LETTERS[1:5],
     "B" = 11:15,
@@ -619,6 +889,7 @@ test_that(".get_data_type works as expected", {
   expect_equal(.get_data_type(dt_ = tab_cat_id, desc_col = "id"), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_na), "categorical")
   expect_equal(.get_data_type(dt_ = tab_not_cat), "numeric")
+  expect_equal(.get_data_type(dt_ = tab_num_as_cat), "num_as_cat")
   expect_equal(.get_data_type(dt_ = tab_num), "numeric")
   expect_equal(.get_data_type(dt_ = tab_num_na), "numeric")
   expect_equal(.get_data_type(dt_ = tab_num_id, desc_col = c("id", "grp")), "numeric")
@@ -633,4 +904,39 @@ test_that(".get_data_type works as expected", {
                "Assertion on 'desc_col' failed: Must be of type 'character'")
   expect_error(.get_data_type(dt_ = tab_cat, desc_col = "str"),
                "Assertion on 'desc_col' failed: Must be a subset")
+})
+
+test_that(".get_n_top_asssoc works as expected", {
+  tab_assoc <- data.table::data.table(
+    feature = sprintf("ID_%02d", 1:12),
+    rho = c(0.216, 0.082, 0.079, 0.067, 0.059, 0.024, 
+            0.008, 0.002, -0.097, -0.166, -0.172, -0.245),
+    q_value = seq(0.68, 0.02, length.out = 12)
+  )
+  
+  expect_equal(.get_n_top_asssoc(tab_assoc), 
+               tab_assoc[order(q_value)][["feature"]][1:4]) # default
+  expect_equal(.get_n_top_asssoc(tab_assoc, 14), 
+               tab_assoc[order(q_value)][["feature"]])
+  expect_equal(.get_n_top_asssoc(tab_assoc[1:3, ]),
+               tab_assoc[1:3, ][order(q_value)][["feature"]])
+  
+  tab_assoc_rho <- data.table::copy(tab_assoc)
+  tab_assoc_rho$q_value <- 1
+  expect_equal(.get_n_top_asssoc(tab_assoc_rho), 
+               tab_assoc_rho[order(-abs(get("rho")))][["feature"]][1:4])
+  
+  tab_assoc_alpha <- data.table::copy(tab_assoc)
+  tab_assoc_alpha$q_value <- 1
+  tab_assoc_alpha$rho <- 0.2
+  expect_equal(.get_n_top_asssoc(tab_assoc_alpha), tab_assoc_alpha[["feature"]][1:4])
+  
+  expect_error(.get_n_top_asssoc(dt_ = NULL),
+               "Assertion on 'dt_assoc' failed: Must be a data.table")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc[, 1:2]),
+               "failed: Names must include the elements")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = "1"),
+               "Assertion on 'n_top' failed: Must be of type 'number'")
+  expect_error(.get_n_top_asssoc(dt_ = tab_assoc, n_top = 2:5),
+               "Assertion on 'n_top' failed: Must have length 1")
 })

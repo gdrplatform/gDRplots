@@ -12,6 +12,7 @@ utils::globalVariables(
     ".",
     ".N",
     ".SD",
+    "abs_rho",
     "iso_level",
     "log10_ratio_conc",
     "log2_CI",
