@@ -201,9 +201,11 @@ pheatmap_qc <- function(
     col_lbls <- rbind(col_lbls, col_lbls_2)
     # re-label
     colnames(drug_annotation) <-
-      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][match(colnames(drug_annotation), get(gnumber)), ][[drug_name]]
+      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][
+        match(colnames(drug_annotation), get(gnumber)), ][[drug_name]]
     names(drug_annotation_colors) <-
-      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][match(names(drug_annotation_colors), get(gnumber)), ][[drug_name]]
+      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][
+        match(names(drug_annotation_colors), get(gnumber)), ][[drug_name]]
   }
   
   annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
