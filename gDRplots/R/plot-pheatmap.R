@@ -525,6 +525,8 @@ pheatmap_with_anno_sa <- function(
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
@@ -829,6 +831,8 @@ pheatmap_with_anno_cd <- function(
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
@@ -1090,6 +1094,8 @@ pheatmap_with_anno_combo <- function(
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
