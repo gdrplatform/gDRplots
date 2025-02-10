@@ -72,6 +72,18 @@ plot_boxplot_metric_sa_by_CLs <- function(
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -106,10 +118,10 @@ plot_boxplot_metric_sa_by_CLs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)), 
-                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -118,7 +130,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
     dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]])
     
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      "#A6CEE3"
+      boxplot_fill
     } else {
       colors_vec[1]
     }
@@ -126,14 +138,15 @@ plot_boxplot_metric_sa_by_CLs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, 
+                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "") +
@@ -206,6 +219,18 @@ plot_boxplot_metric_sa_by_drugs <- function(
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -240,10 +265,10 @@ plot_boxplot_metric_sa_by_drugs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
-                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE, na.rm = TRUE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -252,7 +277,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
     dt_met[[drug_name]] <- factor(dt_met[[drug_name]])
     
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      "#A6CEE3"
+      boxplot_fill
     } else {
       colors_vec[1]
     }
@@ -260,14 +285,15 @@ plot_boxplot_metric_sa_by_drugs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, 
+                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
-
+  
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C", na.rm = TRUE) +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "") +
@@ -345,6 +371,18 @@ plot_boxplot_metric_combo_by_CLs <- function(
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -373,16 +411,16 @@ plot_boxplot_metric_combo_by_CLs <- function(
     plt <-
       ggplot2::ggplot(data = dt_sco,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)),
-                            color = "#A9A9A9", alpha = 0.25, show.legend = FALSE) +
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
   } else {
     fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      "#A6CEE3"
+      boxplot_fill
     } else {
       colors_vec[1]
     }
@@ -390,14 +428,14 @@ plot_boxplot_metric_combo_by_CLs <- function(
     plt <- 
       ggplot2::ggplot(data = dt_sco,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "") +
@@ -450,6 +488,18 @@ plot_boxplot_metric_combo_by_drugs <- function(
                           must.include = c(cellline_name, drug_name, drug_name_2, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -463,7 +513,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
   plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_sco[[cellline_name]])))
   
   fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-    "#A6CEE3"
+    boxplot_fill
   } else {
     colors_vec[1]
   }
@@ -471,10 +521,10 @@ plot_boxplot_metric_combo_by_drugs <- function(
   plt <- 
     ggplot2::ggplot(data = dt_sco,
                     mapping = ggplot2::aes(x = DrugCombination, y = get(metric))) +
-    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3", linetype = "solid") +
-    ggplot2::geom_boxplot(fill = fill_color, color = "#A9A9A9", alpha = 0.25) +
+    ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+    ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
     ggplot2::theme(legend.position = "none") +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = "#4C4C4C") +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "") +
