@@ -341,6 +341,14 @@ heatmap_combo_metrics <- function(
 #'                             normalization_type = "RV",
 #'                             iso_levels = "0.5",
 #'                             as_list = TRUE)
+#'                             
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = "0.5",
+#'                             one_row_panel = TRUE)
 #' 
 #' heatmap_combo_metrics_panel(dt_excess,
 #'                             dt_isobolograms,
