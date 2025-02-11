@@ -473,7 +473,7 @@ heatmap_combo_metrics_panel <- function(
     y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
     
     if (!NROW(dt_) > 1 || # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
-        all(is.na(dt_[Concentration != 0 & Concentration_2 != 0][[mx_name]]))) { 
+        all(is.na(dt_[get(conc) != 0 & get(conc_2) != 0][[mx_name]]))) { # lack of smooth & excess data
       plt <- 
         ggplot2::ggplot() +
         ggplot2::labs(x = x_axis_lab,
