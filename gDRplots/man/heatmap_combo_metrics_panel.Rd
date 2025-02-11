@@ -51,8 +51,8 @@ for excess values; the default is the blue-light grey-red color scale}
 
 \item{as_list}{logical flag whether return list of plot or panel}
 
-\item{one_row_panel}{logical flag whether return panel 2x2 (contain heatmaps for combination metrics and CI plot)
-or 3x1 (contain only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}}
+\item{one_row_panel}{logical flag whether return panel 2x2 (containing heatmaps for combination metrics and CI plot)
+or 3x1 (containing only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}}
 
 \item{swap_axes}{logical flag indicating whether to swap the axes with drugs of the heatmap}
 

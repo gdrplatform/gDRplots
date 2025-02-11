@@ -306,8 +306,8 @@ heatmap_combo_metrics <- function(
 #'
 #' @inheritParams heatmap_combo_metrics
 #' @param as_list logical flag whether return list of plot or panel
-#' @param one_row_panel logical flag whether return panel 2x2 (contain heatmaps for combination metrics and CI plot)
-#'    or 3x1 (contain only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}
+#' @param one_row_panel logical flag whether return panel 2x2 (containing heatmaps for combination metrics and CI plot)
+#'    or 3x1 (containing only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}
 #'
 #' @return \code{ggplot} object containing panel with heatmaps with value for excess assays for 
 #'    selected drugs and cell line with selected isoline and comparison of iso levels
