@@ -368,7 +368,7 @@ heatmap_combo_metrics_panel <- function(
     drug2_name,
     cl_name,
     normalization_type = "GR",
-    iso_levels =  c("0.25", "0.5", "0.75"),
+    iso_levels = c("0.25", "0.5", "0.75"),
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
     no_breaks = 50,
