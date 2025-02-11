@@ -1055,19 +1055,21 @@ pheatmap_with_anno_combo <- function(
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
-  
+
   # dendrogram
-  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    any(dim(t_mat_cvd) < 200)  # gDR standard
-  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t_mat_cvd))
-  } else {
-    FALSE
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
-  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t(t_mat_cvd)))
-  } else {
-    FALSE
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
