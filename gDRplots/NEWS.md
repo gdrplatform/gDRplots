@@ -1,5 +1,10 @@
-## gDRplots 0.0.63 - 2024-02-10
+# gDRplots 0.0.64 - 2024-02-11
 * add support for chemical genomics analysis
+
+## gDRplots 0.0.63 - 2025-02-10
+* refactor `plot_dose_response_sa` to handle missing data consistently
+* fix labeling in `pheatmap_qc`
+* refactor panel shape for `heatmap_combo_metrics_panel`
 
 ## gDRplots 0.0.62 - 2025-02-06
 * update `plot_boxplot_meta` to handle edge cases 

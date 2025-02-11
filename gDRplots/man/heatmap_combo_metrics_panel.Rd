@@ -16,6 +16,7 @@ heatmap_combo_metrics_panel(
   colors_vec_excess = NULL,
   no_breaks = 50,
   as_list = FALSE,
+  one_row_panel = FALSE,
   swap_axes = FALSE,
   show_values = FALSE
 )
@@ -49,6 +50,9 @@ for excess values; the default is the blue-light grey-red color scale}
 \item{no_breaks}{numeric number of breaks on scale}
 
 \item{as_list}{logical flag whether return list of plot or panel}
+
+\item{one_row_panel}{logical flag whether return panel 2x2 (containing heatmaps for combination metrics and CI plot)
+or 3x1 (containing only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}}
 
 \item{swap_axes}{logical flag indicating whether to swap the axes with drugs of the heatmap}
 
@@ -89,6 +93,14 @@ heatmap_combo_metrics_panel(dt_excess,
                             normalization_type = "RV",
                             iso_levels = "0.5",
                             as_list = TRUE)
+                            
+heatmap_combo_metrics_panel(dt_excess,
+                            dt_isobolograms,
+                            drug1_name, drug2_name,
+                            cl_name,
+                            normalization_type = "RV",
+                            iso_levels = "0.5",
+                            one_row_panel = TRUE)
 
 heatmap_combo_metrics_panel(dt_excess,
                             dt_isobolograms,

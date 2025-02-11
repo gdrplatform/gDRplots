@@ -208,10 +208,10 @@ heatmap_combo_metrics <- function(
     
     lbl_x <- sprintf("%.2g", gDRutils::round_concentration(sort(unique(conc_x))))
     mrk_x <- sort(unique(dt_$pos_x))
-
+    
     tile_height <- .get_tile_size(mrk_y)
     tile_width <- .get_tile_size(mrk_x)
-
+    
     # prep hm color palette
     hm_color_palette <- if (metric == "smooth") {
       hm_color_palette_smooth
@@ -306,6 +306,8 @@ heatmap_combo_metrics <- function(
 #'
 #' @inheritParams heatmap_combo_metrics
 #' @param as_list logical flag whether return list of plot or panel
+#' @param one_row_panel logical flag whether return panel 2x2 (containing heatmaps for combination metrics and CI plot)
+#'    or 3x1 (containing only heatmaps for combination metrics); it is working only for \code{as_list = TRUE}
 #'
 #' @return \code{ggplot} object containing panel with heatmaps with value for excess assays for 
 #'    selected drugs and cell line with selected isoline and comparison of iso levels
@@ -339,6 +341,14 @@ heatmap_combo_metrics <- function(
 #'                             normalization_type = "RV",
 #'                             iso_levels = "0.5",
 #'                             as_list = TRUE)
+#'                             
+#' heatmap_combo_metrics_panel(dt_excess,
+#'                             dt_isobolograms,
+#'                             drug1_name, drug2_name,
+#'                             cl_name,
+#'                             normalization_type = "RV",
+#'                             iso_levels = "0.5",
+#'                             one_row_panel = TRUE)
 #' 
 #' heatmap_combo_metrics_panel(dt_excess,
 #'                             dt_isobolograms,
@@ -366,11 +376,12 @@ heatmap_combo_metrics_panel <- function(
     drug2_name,
     cl_name,
     normalization_type = "GR",
-    iso_levels =  c("0.25", "0.5", "0.75"),
+    iso_levels = c("0.25", "0.5", "0.75"),
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
     no_breaks = 50,
     as_list = FALSE,
+    one_row_panel = FALSE,
     swap_axes = FALSE,
     show_values = FALSE) {
   
@@ -399,6 +410,7 @@ heatmap_combo_metrics_panel <- function(
   }
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(as_list)
+  checkmate::assert_flag(one_row_panel)
   checkmate::assert_flag(swap_axes)
   checkmate::assert_flag(show_values)
   hline_color <- 
@@ -468,7 +480,8 @@ heatmap_combo_metrics_panel <- function(
     x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
     y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
     
-    if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
+    if (!NROW(dt_) > 1 || # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
+        all(is.na(dt_[get(conc) != 0 & get(conc_2) != 0][[mx_name]]))) { # lack of smooth & excess data
       plt <- 
         ggplot2::ggplot() +
         ggplot2::labs(x = x_axis_lab,
@@ -643,18 +656,18 @@ heatmap_combo_metrics_panel <- function(
   
   final_plot <- if (as_list) {
     ls_plts
+  } else if (one_row_panel) {
+    # build panel 3x1
+    ggpubr::ggarrange(
+      plotlist = list(
+        ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
+        ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+        ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
+      ),
+      ncol = 3, common.legend = FALSE, legend = "left")
   } else {
-    # build panel
-    panel_plt <- 
-      if (is.null(ls_plts[["iso_compare"]])) {
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-          ),
-          ncol = 3, common.legend = FALSE, legend = "left")
-    } else {
+    # build panel 2x2
+    ggpubr::annotate_figure(
       ggpubr::ggarrange(
         ggpubr::ggarrange(
           plotlist = list(
@@ -668,12 +681,10 @@ heatmap_combo_metrics_panel <- function(
             ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
           ),
           ncol = 2, common.legend = TRUE, legend = "left"),
-        common.legend = TRUE, nrow = 2)
-      } 
-    ggpubr::annotate_figure(panel_plt, top = main_title) +
+        common.legend = TRUE, nrow = 2),
+      top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
   }
-  
   return(final_plot)
 }
 
@@ -1324,7 +1335,7 @@ heatmap_combo_with_isoref_panel <- function(
   
   tile_height <- .get_tile_size(mrk_y)
   tile_width <- .get_tile_size(mrk_x)
-
+  
   range_x <- c(min(mrk_x) - 0.65 * tile_width, max(mrk_x) + 0.65 * tile_width)
   range_y <- c(min(mrk_y) - 0.65 * tile_height, max(mrk_y) + 0.65 * tile_height)
   
