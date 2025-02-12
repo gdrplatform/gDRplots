@@ -372,7 +372,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'
 #' Generates markdown code for displaying tables in a document using `knitr::knit()`.
 #' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
-#' The inner header level (for metrics) is automatically set one level greater than the outer header level.
+#' The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 #'
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
 #'   and the inner lists represent metrics.  Names are used as headings.
