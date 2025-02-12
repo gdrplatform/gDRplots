@@ -26,7 +26,10 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of the combo metric. x_mean, x_AOC_range, xc50, ec50, "x_max" are accepted}
+\item{metric}{string name of the metric;
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+"x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
+or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")}
 
 \item{fit_source}{string source name for metrics}
 

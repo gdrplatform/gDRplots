@@ -392,7 +392,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
 #' 
 #' # Example using DT::datatable
-#' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset", options = list(pageLength = 5))
+#' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset")
 #' }
 #' @export
 prep_double_table_chunk <- function(tbl_list,
