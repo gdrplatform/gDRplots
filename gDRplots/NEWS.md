@@ -1,3 +1,6 @@
+## gDRplots 0.0.62 - 2025-02-12
+* downgrade reqs for Bioc pkgs
+
 ## gDRplots 0.0.62 - 2025-02-06
 * update `plot_boxplot_meta` to handle edge cases 
 * add `plot_boxplot_num` and `plot_boxplot_num_panel` functions
