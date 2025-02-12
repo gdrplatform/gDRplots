@@ -420,8 +420,22 @@ prep_double_table_chunk <- function(tbl_list,
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
       chunk <- sprintf(
-        "%s# %s\n```{r %s_%s_%s, echo = FALSE}\nDT::datatable(%s[[\"%s\"]][[\"%s\"]]) |> DT::formatRound(columns = names(Filter(is.numeric, %s[[\"%s\"]][[\"%s\"]])), digits = 5) \n```\n\n",
-        inner_lvl, metric, chunk_name, cell_line, metric, tbl_list_name, cell_line, metric, tbl_list_name, cell_line, metric
+        "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
+        inner_lvl, 
+        metric, 
+        chunk_name, 
+        cell_line, 
+        metric, 
+        paste0(
+          "DT::formatRound(",
+          "DT::datatable(", 
+          tbl_list_name, 
+          "[[\"", cell_line, "\"]][[\"", metric, "\"]]), ",
+          "columns = names(Filter(is.numeric, ", 
+          tbl_list_name, 
+          "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
+          "digits = 5)"
+        )
       )
       knitr::knit_expand(text = chunk)
     })
