@@ -87,7 +87,7 @@ test_that("prep_nested_plot_chunk works as expected", {
 })
 
 test_that("escape_special_characters works as expected", {
-  expect_equal(escape_special_characters("ABC:123"),"ABC[colon]123")
+  expect_equal(escape_special_characters("ABC:123"), "ABC[colon]123")
   expect_equal(escape_special_characters("AD_12"), "AD_12")
   expect_equal(escape_special_characters("AD#12"), "AD[hash]12")
   expect_equal(escape_special_characters("AD/12"), "AD[slash]12")
