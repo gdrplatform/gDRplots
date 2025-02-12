@@ -498,7 +498,7 @@ pheatmap_with_anno_sa <- function(
   min_val <- ifelse(
     all(is.infinite(t_mat_cvd) | is.na(t_mat_cvd)),
     -1,
-    min(t_mat_cvd, na.rm = TRUE)
+    min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
   )
   max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
   
