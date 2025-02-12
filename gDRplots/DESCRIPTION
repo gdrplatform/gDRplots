@@ -1,6 +1,6 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.63
+Version: 0.0.64
 Date: 2025-02-12
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),

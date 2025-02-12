@@ -111,7 +111,7 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # filter data
   dt_met <- dt_met[get(group_var) %in% group_names, ]
-  dt_avg <- dt_avg[get(group_var) %in% group_names, ]
+  dt_avg <- dt_avg[get(group_var) %in% group_names, ][!is.na(x), ]
   
   # plot title 
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {

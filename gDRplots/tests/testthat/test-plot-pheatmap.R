@@ -560,7 +560,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_3[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 4: incomplete annotations for row and incomplete color maps
-  annotation_map <- list(
+  annotation_map_4 <- list(
     grp_B = c("yes" = "black", "no" = "grey90"),
     grp_C = c("AA" = "yellow", "BB" = "blue")
   )
@@ -575,7 +575,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_4 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     annotation_row = annotation_manual_row,
-                                    annotation_colors = annotation_map)
+                                    annotation_colors = annotation_map_4)
   expect_length(out_4, 2)
   expect_equal(names(out_4), c("data", "heatmap"))
   data_4 <- out_4[["data"]]
@@ -593,7 +593,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
   
   # scenario 5: incomplete annotations for row and incomplete color maps
-  annotation_map <- list(
+  annotation_map_5 <- list(
     drug_moa = c(moa_A = "lightblue", moa_B = "steelblue"),
     drug_moa_2 = c(moa_D = "black", moa_E = "grey")
   )
@@ -607,7 +607,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   out_5 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
                                     annotation_row = annotation_manual_row_na,
-                                    annotation_colors = annotation_map)
+                                    annotation_colors = annotation_map_5)
   expect_length(out_5, 2)
   expect_equal(names(out_5), c("data", "heatmap"))
   data_5 <- out_5[["data"]]
@@ -654,6 +654,44 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_6$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
   expect_true(is.na(plt_6[["tree_row"]])) # rows aren't clustered
   expect_is(plt_6[["tree_col"]], "hclust") # cols are clustered
+  
+  # scenario 7: NA in matrix
+  dt_scores_NA <- data.table::copy(dt_scores)
+  dt_scores_NA[3:5, ][["bliss_score"]] <- NA
+  
+  out_7 <- pheatmap_with_anno_combo(dt_scores = dt_scores_NA, 
+                                    metric = "bliss_score",
+                                    normalization_type = "RV",
+                                    annotation_col = annotation_manual_col,
+                                    annotation_colors = annotation_map)
+  expect_length(out_7, 2)
+  expect_equal(names(out_7), c("data", "heatmap"))
+  data_7 <- out_7[["data"]]
+  expect_is(data_7, "list")
+  expect_equal(names(data_7), c("matrix", "annotation_col", "annotation_row"))
+  plt_7 <- out_7[["heatmap"]]
+  expect_is(plt_7, "pheatmap")
+  expect_is(plt_7[["tree_row"]], "hclust") # rows are clustered
+  expect_is(plt_7[["tree_col"]], "hclust") # cols are clustered
+  
+  # scenario 8: NA in matrix
+  dt_scores_Inf <- data.table::copy(dt_scores)
+  dt_scores_Inf[c(1:3, 5:7), ][["bliss_score"]] <- Inf
+  
+  out_8 <- pheatmap_with_anno_combo(dt_scores = dt_scores_Inf, 
+                                    metric = "bliss_score",
+                                    normalization_type = "RV",
+                                    annotation_col = annotation_manual_col,
+                                    annotation_colors = annotation_map)
+  expect_length(out_8, 2)
+  expect_equal(names(out_8), c("data", "heatmap"))
+  data_8 <- out_8[["data"]]
+  expect_is(data_8, "list")
+  expect_equal(names(data_8), c("matrix", "annotation_col", "annotation_row"))
+  plt_8 <- out_8[["heatmap"]]
+  expect_is(plt_8, "pheatmap")
+  expect_is(plt_8[["tree_row"]], "hclust") # rows are clustered
+  expect_is(plt_8[["tree_col"]], "hclust") # cols are clustered
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
