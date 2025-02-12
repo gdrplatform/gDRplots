@@ -1,3 +1,6 @@
+## gDRplots 0.0.64 - 2025-02-12
+* downgrade reqs for Bioc pkgs
+
 ## gDRplots 0.0.63 - 2025-02-10
 * refactor `plot_dose_response_sa` to handle missing data consistently
 * fix labeling in `pheatmap_qc`
