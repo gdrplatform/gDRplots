@@ -1,4 +1,7 @@
+context("Test plot-chemical_genomics")
+
 # Load test data
+
 metrics_data <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 
 test_that("analyze_cgs works correctly", {

@@ -367,3 +367,65 @@ get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_file_exists(fpath)
   fpath
 }
+
+#' Prepare markdown chunk based on a doubly nested list of tables
+#'
+#' Generates markdown code for displaying tables in a document using `knitr::knit()`.
+#' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
+#' The inner header level (for metrics) is automatically set one level greater than the outer header level.
+#'
+#' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
+#'   and the inner lists represent metrics.  Names are used as headings.
+#' @param chunk_name Base name for generated code chunks. Avoid spaces.
+#' @param header_level Markdown header level for the outer tabset (cell lines).
+#' @param tabset_options Options for the tabset. Can be "unnumbered", "tabset", "tabset-dropdown".
+#'
+#' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
+#'   represents markdown code for the cell line's tabset.
+#'
+#' @examples
+#' \dontrun{
+#' nested_tables <- list(
+#'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
+#'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
+#' )
+#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
+#' 
+#' # Example using DT::datatable
+#' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset", options = list(pageLength = 5))
+#' }
+#' @export
+prep_double_table_chunk <- function(tbl_list,
+                                    chunk_name,
+                                    header_level = 3,
+                                    tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
+  
+  checkmate::assert_list(tbl_list, min.len = 1)
+  checkmate::assert_string(chunk_name)
+  checkmate::assert_int(header_level, lower = 1)
+  checkmate::assert_character(tabset_options, null.ok = TRUE)
+  
+  tbl_list_name <- deparse(substitute(tbl_list))
+  lvl <- paste0(rep("#", header_level), collapse = "")
+  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
+  
+  lapply(names(tbl_list), function(cell_line) {
+    tabset_string <- if (is.null(tabset_options)) {
+      ""
+    } else {
+      paste0("{.", paste(tabset_options, collapse = " ."), "}")
+    }
+    
+    header <- sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string)
+    
+    item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
+      chunk <- sprintf(
+        "%s# %s\n```{r %s_%s_%s, echo = FALSE}\nDT::datatable(%s[[\"%s\"]][[\"%s\"]]) |> DT::formatRound(columns = names(Filter(is.numeric, %s[[\"%s\"]][[\"%s\"]])), digits = 5) \n```\n\n",
+        inner_lvl, metric, chunk_name, cell_line, metric, tbl_list_name, cell_line, metric, tbl_list_name, cell_line, metric
+      )
+      knitr::knit_expand(text = chunk)
+    })
+    
+    list(header = knitr::knit_expand(text = header), items = item_chunks)
+  })
+}

@@ -218,7 +218,10 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2}), default is NULL
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of the combo metric. x_mean, x_AOC_range, xc50, ec50, "x_max" are accepted
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
+#'  or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")
 #' @param fit_source string source name for metrics
 #' @param additional_cols character vector with additional cols that should be included in the output
 #' 
