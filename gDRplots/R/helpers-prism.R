@@ -514,10 +514,10 @@ prep_dt_assoc <- function(dt_response,
     if (Y_condition && X_condition && XY_condition) {
       # create dt_assoc
       # TODO in GDR-2710
-      dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
+      # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
 
       # final
-      obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+      # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
     }
   }
   # return
