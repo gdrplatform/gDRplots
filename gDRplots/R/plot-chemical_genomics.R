@@ -112,16 +112,22 @@ analyze_cgs <- function(dt_metrics,
 #' @param results A list object returned from `analyze_cgs`.
 #' @param cell_line A string specifying the cell line included in the \code{results} to prepare a visualization.
 #' @param metric A string specifying the metric included in the \code{results} to prepare a visualization.
+#' @param padj_threshold A numeric value specifying the threshold for filtering significant GSEA results based on adjusted p-value.
+#' @param top_results_no_sig A numeric value specifying the number of top results to plot if there are no significant values.
+#' @param max_results_with_sig A numeric value specifying the maximum number of results to plot when there are more than this number of significant values.
 #'
 #' @return A ggplot2 object with cgs results
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 #' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cell_line = "CellLineName_1")
-#' plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50")
+#' plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50", padj_threshold = 0.1, top_results_no_sig = 5, max_results_with_sig = 15)
 #' @export
 plot_cgs_ranking <- function(results,
                              cell_line,
-                             metric) {
+                             metric,
+                             padj_threshold = 0.1,
+                             top_results_no_sig = 5,
+                             max_results_with_sig = 15) {
   
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
@@ -152,13 +158,13 @@ plot_cgs_ranking <- function(results,
   norm_type <- unique(metrics_diff[[norm_type]])
   
   # filter significant GSEA results
-  gsea_sign <- fgsea_results[padj < 0.1 & !pathway %in% c("", "unknown")]
+  gsea_sign <- fgsea_results[padj < padj_threshold & !pathway %in% c("", "unknown")]
   if (NROW(gsea_sign) == 0) {
-    # if there are no significant values, plot only 5 top results
-    gsea_sign <- fgsea_results[pval < sort(pval)[5]]
-  } else if (NROW(gsea_sign) > 15) {
-    # if there are more than 15 significant values, plot only 15 top results
-    gsea_sign <- utils::head(gsea_sign[order(padj)], 15)
+    # if there are no significant values, plot only top_results_no_sig top results
+    gsea_sign <- fgsea_results[pval < sort(pval)[top_results_no_sig]]
+  } else if (NROW(gsea_sign) > max_results_with_sig) {
+    # if there are more than max_results_with_sig significant values, plot only max_results_with_sig top results
+    gsea_sign <- utils::head(gsea_sign[order(padj)], max_results_with_sig)
   }
   gsea_sign[, y_pos := seq_len(.N)]
   gsea_sign[NES < 0, y_pos := -(seq_len(.N))]
@@ -173,20 +179,21 @@ plot_cgs_ranking <- function(results,
   plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!rlang::sym(metric))) +
     ggplot2::geom_col(color = "#A9A9A9") +
     ggplot2::labs(title = cell_line,
-         y = paste0("\u0394 ", metric, " for ", norm_type),
-         x = "Ranked drugs",
-         caption = "Top 15 results with FDR < 0.1 are shown. If no results meet this threshold,
-         the top 4 results by p-value are displayed."
-    ) +
+                  y = paste0("\u0394 ", metric, " for ", norm_type),
+                  x = "Ranked drugs",
+                  caption = sprintf("Top results with FDR < %.2f are shown. If no results meet this threshold,
+                                    the top %d results by p-value are displayed.",
+                                    padj_threshold, top_results_no_sig)
+                  ) +
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3") +
     ggplot2::geom_hline(yintercept = mean_effect, color = "black") +
     ggplot2::geom_segment(x = threshold_count, xend = threshold_count, 
-                 y = 0, yend = mean_effect + 0.2 * yrange,
-                 color = "black") +
+                          y = 0, yend = mean_effect + 0.2 * yrange,
+                          color = "black") +
     ggplot2::annotate(geom = "text", x = threshold_count, y = mean_effect + 0.25 * yrange,
-             label = sprintf("Mean effect = %.2f", mean_effect),
-             hjust = 0, color = "black") +
+                      label = sprintf("Mean effect = %.2f", mean_effect),
+                      hjust = 0, color = "black") +
     ggplot2::coord_cartesian(xlim = c(-2, NROW(plot_data) + 3),
                              ylim = c(-1.01 * yrange - 0.15 * yrange * NROW(gsea_sign), yrange + 0.01),
                              expand = FALSE, clip = "off") +

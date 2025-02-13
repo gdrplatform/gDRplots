@@ -28,7 +28,7 @@ A list of character vectors. Each element corresponds to a cell line. Each chara
 \description{
 Generates markdown code for displaying tables in a document using `knitr::knit()`.
 Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
-The inner header level (for metrics) is automatically set one level greater than the outer header level.
+The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 }
 \examples{
 \dontrun{

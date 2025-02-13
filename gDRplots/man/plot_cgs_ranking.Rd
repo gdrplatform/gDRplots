@@ -4,7 +4,14 @@
 \alias{plot_cgs_ranking}
 \title{Plot Chemical Genomics Screen GSEA Results}
 \usage{
-plot_cgs_ranking(results, cell_line, metric)
+plot_cgs_ranking(
+  results,
+  cell_line,
+  metric,
+  padj_threshold = 0.1,
+  top_results_no_sig = 5,
+  max_results_with_sig = 15
+)
 }
 \arguments{
 \item{results}{A list object returned from `analyze_cgs`.}
@@ -12,6 +19,12 @@ plot_cgs_ranking(results, cell_line, metric)
 \item{cell_line}{A string specifying the cell line included in the \code{results} to prepare a visualization.}
 
 \item{metric}{A string specifying the metric included in the \code{results} to prepare a visualization.}
+
+\item{padj_threshold}{A numeric value specifying the threshold for filtering significant GSEA results based on adjusted p-value.}
+
+\item{top_results_no_sig}{A numeric value specifying the number of top results to plot if there are no significant values.}
+
+\item{max_results_with_sig}{A numeric value specifying the maximum number of results to plot when there are more than this number of significant values.}
 }
 \value{
 A ggplot2 object with cgs results
@@ -22,5 +35,5 @@ Generates a ggplot2 visualization of chemical genomics screening data, highlight
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cell_line = "CellLineName_1")
-plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50")
+plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50", padj_threshold = 0.1, top_results_no_sig = 5, max_results_with_sig = 15)
 }
