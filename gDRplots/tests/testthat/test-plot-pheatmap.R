@@ -930,3 +930,93 @@ test_that(".get_pheatmap_cluster_param works as expected", {
   expect_error(.get_pheatmap_cluster_param(mat_to_cluster = mat, additional_condition = "yes"),
                "Assertion on 'additional_condition' failed: Must be of type 'logical flag'")
 })
+
+test_that("prep_pheatmap_matrix works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                                 assay_name = "Metrics")
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                                assay_name = "scores")
+
+  mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
+  expect_is(mat_1, "matrix")
+  expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_1)), sort(unique(dt_metrics[["DrugName"]])))
+  expect_true(all(dt_metrics[normalization_type == "GR"][["xc50"]] %in% mat_1))
+  
+  mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                metric = "p_value")
+  expect_is(mat_2, "matrix")
+  expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
+  
+  # scenario: combo data
+  mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                metric = "hsa_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_3, "matrix")
+  expect_equal(sort(rownames(mat_3)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_3)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV"][["hsa_score"]] %in% mat_3))
+  
+  # scenario: codilution data
+  mae <- gDRutils::get_synthetic_data("combo_codilution_small")
+  se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                                    assay_name = "Metrics")
+  
+  mat_4 <- prep_pheatmap_matrix(dt_response = dt_metrics_cd,
+                                metric = "x_max",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("cd"))
+  expect_is(mat_4, "matrix")
+  expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
+  expect_equal(
+    sort(colnames(mat_4)), 
+    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
+  expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
+  
+  # scenario: NA-row
+  dt_scores_NA <- data.table::copy(dt_scores)
+  dt_scores_NA[CellLineName == "cellline_EA"][["bliss_score"]] <- NA
+  
+  mat_5 <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
+                                metric = "bliss_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_5, "matrix")
+  expect_false("cellline_EA" %in% rownames(mat_5))
+  expect_equal(sort(colnames(mat_5)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
+  
+  # scenario: matrix 0x0 (all values are NAs)
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
+  
+  mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
+  expect_is(mat_6, "matrix")
+  expect_equal(dim(mat_6), c(0, 0))
+  
+  # testing assertions
+  expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    metric = "IC50"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = 1),
+               "Assertion on 'experiment_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = "sa"),
+               "Assertion on 'experiment_type' failed: Must be element of set")
+})
