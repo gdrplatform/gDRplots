@@ -6,7 +6,7 @@ metrics_data <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplot
 
 test_that("analyze_cgs works correctly", {
   # test with a single cell line and single metric
-  results <- analyze_cgs(metrics_data, metrics = "xc50", cell_line = "CellLineName_1")
+  results <- analyze_cgs(metrics_data, metrics = "xc50", cl_name = "CellLineName_1")
   expect_is(results, "list")
   expect_equal(names(results), "CellLineName_1")
   expect_is(results$CellLineName_1$fgsea$xc50, "data.table")
