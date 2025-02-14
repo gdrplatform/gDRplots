@@ -382,7 +382,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
 #'   represents markdown code for the cell line's tabset.
-#'
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' nested_tables <- list(

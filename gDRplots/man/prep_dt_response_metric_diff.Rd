@@ -19,9 +19,11 @@ prep_dt_response_metric_diff(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and combo \code{SummarizedExperiment}}
 
-\item{d_name}{string with drug name to be plotted (identifiers \code{DrugName}), default is NULL}
+\item{d_name}{string representing the drug name to be plotted (identifier \code{DrugName}).
+If set to NULL, the function will return a table for all available DrugName}
 
-\item{d_name2}{string with drug name to be plotted (identifiers \code{DrugName_2}), default is NULL}
+\item{d_name2}{string representing the drug name to be plotted (identifier \code{DrugName_2}).
+If set to NULL, the function will return a table for all available DrugName_2}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}

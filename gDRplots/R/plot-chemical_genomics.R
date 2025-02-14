@@ -7,7 +7,7 @@
 #' and columns specified in the `metric` argument.
 #' @param metrics A character vector specifying the response metrics to analyze:
 #' "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".
-#' @param cell_line An optional string specifying a single cell line to analyze. If NULL (default),
+#' @param cl_name An optional string specifying a single cell line to analyze. If NULL (default),
 #' all cell lines in the data are analyzed.
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -23,12 +23,12 @@
 #' 
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-#' analyze_cgs(dt_metrics, metrics = c("xc50"), cell_line = "CellLineName_1")
+#' analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
 #' @export
 #'
 analyze_cgs <- function(dt_metrics,
                         metrics,
-                        cell_line = NULL,
+                        cl_name = NULL,
                         normalization_type = "RV") {
   
   # identifiers
@@ -41,8 +41,8 @@ analyze_cgs <- function(dt_metrics,
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_true(all(metrics %in% names(dt_metrics)))
-  checkmate::assert_string(cell_line)
-  checkmate::assert_subset(cell_line, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
+  checkmate::assert_string(cl_name)
+  checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   # filter out unwanted drug moa
@@ -68,8 +68,8 @@ analyze_cgs <- function(dt_metrics,
   metrics_diff <- metrics_diff[eval(drug_moa) %chin% names(moa_list)]
   
   # determine which cell lines to analyze
-  cell_lines <- if (!is.null(cell_line)) {
-    cell_line
+  cell_lines <- if (!is.null(cl_name)) {
+    cl_name
   } else {
     unique(metrics_diff[[cellline]])
   }
@@ -110,20 +110,29 @@ analyze_cgs <- function(dt_metrics,
 #' Generates a ggplot2 visualization of chemical genomics screening data, highlighting GSEA results.
 #'
 #' @param results A list object returned from `analyze_cgs`.
-#' @param cell_line A string specifying the cell line included in the \code{results} to prepare a visualization.
+#' @param cl_name A string specifying the cell line included in the \code{results} to prepare a visualization.
 #' @param metric A string specifying the metric included in the \code{results} to prepare a visualization.
-#' @param padj_threshold A numeric value specifying the threshold for filtering significant GSEA results based on adjusted p-value.
-#' @param top_results_no_sig A numeric value specifying the number of top results to plot if there are no significant values.
-#' @param max_results_with_sig A numeric value specifying the maximum number of results to plot when there are more than this number of significant values.
+#' @param padj_threshold A numeric value specifying the threshold for filtering significant GSEA results
+#' based on adjusted p-value.
+#' @param top_results_no_sig A numeric value specifying the number of top results to plot
+#' if there are no significant values.
+#' @param max_results_with_sig A numeric value specifying the maximum number of results
+#' to plot when there are more than this number of significant values.
 #'
 #' @return A ggplot2 object with cgs results
+#' @keywords cgs_plots
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-#' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cell_line = "CellLineName_1")
-#' plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50", padj_threshold = 0.1, top_results_no_sig = 5, max_results_with_sig = 15)
+#' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
+#' plot_cgs_ranking(results,
+#'   cl_name = "CellLineName_1",
+#'   metric = "xc50",
+#'   padj_threshold = 0.1,
+#'   top_results_no_sig = 5,
+#'   max_results_with_sig = 15)
 #' @export
 plot_cgs_ranking <- function(results,
-                             cell_line,
+                             cl_name,
                              metric,
                              padj_threshold = 0.1,
                              top_results_no_sig = 5,
@@ -136,16 +145,16 @@ plot_cgs_ranking <- function(results,
   
   # asserts
   checkmate::assert_list(results)
-  checkmate::assert_string(cell_line, null.ok = FALSE)
-  checkmate::assert_subset(cell_line, choices = names(results))
+  checkmate::assert_string(cl_name, null.ok = FALSE)
+  checkmate::assert_subset(cl_name, choices = names(results))
   checkmate::assert_string(metric, null.ok = FALSE)
-  checkmate::assert_subset(metric, choices = names(results[[cell_line]]$fgsea), empty.ok = FALSE)
+  checkmate::assert_subset(metric, choices = names(results[[cl_name]]$fgsea), empty.ok = FALSE)
   
   
   # extract relevant data
-  metrics_diff <- results[[cell_line]]$metrics_diff
-  fgsea_results <- results[[cell_line]]$fgsea[[metric]]
-  moa_groups_drugs <- results[[cell_line]]$moa_list
+  metrics_diff <- results[[cl_name]]$metrics_diff
+  fgsea_results <- results[[cl_name]]$fgsea[[metric]]
+  moa_groups_drugs <- results[[cl_name]]$moa_list
   
   # prepare data for plotting
   plot_data <- data.table::copy(metrics_diff)
@@ -177,8 +186,9 @@ plot_cgs_ranking <- function(results,
   
   # create the ggplot object
   plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!rlang::sym(metric))) +
-    ggplot2::geom_col(color = "#A9A9A9") +
-    ggplot2::labs(title = cell_line,
+    ggplot2::geom_col(color = gDRutils::get_settings_from_json("EDGE_COLOR",
+                                                               system.file(package = "gDRplots", "settings.json"))) +
+    ggplot2::labs(title = cl_name,
                   y = paste0("\u0394 ", metric, " for ", norm_type),
                   x = "Ranked drugs",
                   caption = sprintf("Top results with FDR < %.2f are shown. If no results meet this threshold,
@@ -186,7 +196,9 @@ plot_cgs_ranking <- function(results,
                                     padj_threshold, top_results_no_sig)
                   ) +
     ggplot2::theme_bw() +
-    ggplot2::geom_hline(yintercept = 0, color = "#B3B3B3") +
+    ggplot2::geom_hline(yintercept = 0,
+                        color = gDRutils::get_settings_from_json("HLINE_COLOR",
+                                                                 system.file(package = "gDRplots", "settings.json"))) +
     ggplot2::geom_hline(yintercept = mean_effect, color = "black") +
     ggplot2::geom_segment(x = threshold_count, xend = threshold_count, 
                           y = 0, yend = mean_effect + 0.2 * yrange,
@@ -199,7 +211,7 @@ plot_cgs_ranking <- function(results,
                              expand = FALSE, clip = "off") +
     ggplot2::theme(plot.margin = ggplot2::unit(c(1, 16, 1, 1), "lines"))
   
-  # define color palettes for the loop (using both Set1 and Set2 if needed)
+  # define color palettes for the loop
   loop_colors <- gDRplots::get_qual_colors(NROW(gsea_sign))
   
   for (i in seq_len(NROW(gsea_sign))) {

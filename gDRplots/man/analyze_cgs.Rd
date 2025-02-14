@@ -4,7 +4,7 @@
 \alias{analyze_cgs}
 \title{Analyze Chemical Genomics (CGS) Data and Perform GSEA}
 \usage{
-analyze_cgs(dt_metrics, metrics, cell_line = NULL, normalization_type = "RV")
+analyze_cgs(dt_metrics, metrics, cl_name = NULL, normalization_type = "RV")
 }
 \arguments{
 \item{dt_metrics}{A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`,
@@ -13,7 +13,7 @@ and columns specified in the `metric` argument.}
 \item{metrics}{A character vector specifying the response metrics to analyze:
 "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".}
 
-\item{cell_line}{An optional string specifying a single cell line to analyze. If NULL (default),
+\item{cl_name}{An optional string specifying a single cell line to analyze. If NULL (default),
 all cell lines in the data are analyzed.}
 
 \item{normalization_type}{string with normalization_types to be selected
@@ -34,6 +34,6 @@ prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for
 }
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-analyze_cgs(dt_metrics, metrics = c("xc50"), cell_line = "CellLineName_1")
+analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
 }
 \keyword{cgs_plots}
