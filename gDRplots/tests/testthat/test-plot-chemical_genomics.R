@@ -24,7 +24,7 @@ test_that("analyze_cgs works correctly", {
   expect_is(results$CellLineName_1$fgsea$x_max, "data.table")
   
   # test normalization type
-  results1 <- analyze_cgs(metrics_data, metrics = "xc50", cell_line = "CellLineName_1", normalization_type = "RV")
+  results1 <- analyze_cgs(metrics_data, metrics = "xc50", cl_name = "CellLineName_1", normalization_type = "RV")
   results2 <- analyze_cgs(metrics_data, metrics = "xc50", cell_line = "CellLineName_1", normalization_type = "GR")
   
   expect_false(identical(results1$CellLineName_1$metrics_diff$xc50, results2$CellLineName_1$metrics_diff$xc50)) 
