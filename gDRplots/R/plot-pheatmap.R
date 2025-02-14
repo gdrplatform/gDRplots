@@ -500,8 +500,8 @@ pheatmap_with_anno_sa <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
@@ -793,8 +793,8 @@ pheatmap_with_anno_cd <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
@@ -1044,8 +1044,8 @@ pheatmap_with_anno_combo <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
@@ -1351,21 +1351,22 @@ prep_pheatmap_matrix <- function(dt_response,
   
   # prep data
   tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
-    data.table::dcast(
+    purrr::quietly(data.table::dcast)(
       data = tab_response,
       formula = get(cellline_name) ~ get(drug_name),
-      value.var = metric)
+      value.var = metric)$result
   } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
-    data.table::dcast(
+    purrr::quietly(data.table::dcast)(
       data = tab_response,
       formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-      value.var = metric)
+      value.var = metric)$result
   } else {
-    data.table::dcast(
+    purrr::quietly(data.table::dcast)(
       data = tab_response,
       formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-      value.var = metric)
+      value.var = metric)$result
   }
+  data.table::setkey(tab_dcast, NULL)
   data.table::setnames(tab_dcast, "cellline_name", cellline_name)
   
   # prep matrix cellline vs drugs
