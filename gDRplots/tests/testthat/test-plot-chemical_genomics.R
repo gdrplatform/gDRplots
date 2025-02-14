@@ -32,12 +32,12 @@ test_that("analyze_cgs works correctly", {
 
 test_that("plot_cgs_ranking works correctly", {
   
-  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cell_line = "CellLineName_1")
+  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cl_name = "CellLineName_1")
   plt <- plot_cgs_ranking(results, cl_name = "CellLineName_1", metric = "xc50")
   expect_is(plt, "ggplot")
   
   # rest with a different metric
-  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cell_line = "CellLineName_1")
+  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cl_name = "CellLineName_1")
   plt <- plot_cgs_ranking(results, cl_name = "CellLineName_1", metric = "x_max")
   expect_is(plt, "ggplot")
   
