@@ -31,7 +31,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \item{metric}{string name of the metric;
 one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-but the values from any numeric colum can be displayed.}
+but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
 

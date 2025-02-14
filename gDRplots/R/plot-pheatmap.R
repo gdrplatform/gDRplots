@@ -182,9 +182,9 @@ pheatmap_qc <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # heatmap labels
@@ -471,14 +471,14 @@ pheatmap_with_anno_sa <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -766,14 +766,14 @@ pheatmap_with_anno_cd <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -1026,14 +1026,14 @@ pheatmap_with_anno_combo <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -1252,23 +1252,23 @@ fill_ann_color_map <- function(dt_ann,
 #' mat <- matrix(1:24, nrow = 4)
 #' rownames(mat) <- sprintf("row_%s", 1:4)
 #' colnames(mat) <- sprintf("col_%s", 1:6)
-#' .pheatmap_cluster_param(mat)
-#' .pheatmap_cluster_param(t(mat))
-#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(t(mat))
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
 #' 
 #' mat[2,2] <- NA
 #' mat[2,1] <- Inf
-#' .pheatmap_cluster_param(mat)
-#' .pheatmap_cluster_param(mat, distfun = compute_distances)
-#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances)
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
 #' add_cond <- NCOL(mat) > 10
-#' .pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
 #' }
 #' 
 #' @keywords internal
-.pheatmap_cluster_param <- function(mat_to_cluster,
-                                    distfun = stats::dist,
-                                    additional_condition = TRUE) {
+.get_pheatmap_cluster_param <- function(mat_to_cluster,
+                                        distfun = stats::dist,
+                                        additional_condition = TRUE) {
   
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
