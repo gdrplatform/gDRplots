@@ -38,7 +38,7 @@ test_that("plot_cgs_ranking works correctly", {
   
   # rest with a different metric
   results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cell_line = "CellLineName_1")
-  plt <- plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "x_max")
+  plt <- plot_cgs_ranking(results, cl_name = "CellLineName_1", metric = "x_max")
   expect_is(plt, "ggplot")
   
   # test case where no significant GSEA results exist (using a dummy metric)
