@@ -257,7 +257,7 @@ pheatmap_qc <- function(
 #' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-#'  but the values from any numeric colum can be displayed.
+#'  but the values from any numeric column can be displayed.
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
@@ -394,29 +394,16 @@ pheatmap_with_anno_sa <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # select data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_metrics[eval(filter_expr)]
-  
   qmfun <- switch(metric,
                   "xc50" = log10,
                   identity)
   
-  # prep data
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ get(drug_name),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                  normalization_type = normalization_type,
+                                  metric = metric,
+                                  fit_source = fit_source,
+                                  experiment_type = gDRutils::get_supported_experiments("sa"))
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -495,7 +482,11 @@ pheatmap_with_anno_sa <- function(
   }
   
   # prep hm color palette
-  min_val <- min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
+  min_val <- ifelse(
+    all(is.infinite(t_mat_cvd) | is.na(t_mat_cvd)),
+    -1,
+    min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
+  )
   max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
   
   if (min_val == max_val) {
@@ -691,29 +682,16 @@ pheatmap_with_anno_cd <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # select data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_metrics[eval(filter_expr)]
-  
   qmfun <- switch(metric,
                   "xc50" = log10,
                   identity)
   
-  # prep data
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                  normalization_type = normalization_type,
+                                  metric = metric,
+                                  fit_source = fit_source,
+                                  experiment_type = gDRutils::get_supported_experiments("cd"))
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -972,26 +950,12 @@ pheatmap_with_anno_combo <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # prep data
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_scores[eval(filter_expr)]
-  
-  # select data for normalization type
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  if (all(dim(mat_cvd) == c(0, 0)) || all(is.na(mat_cvd))) return("No data") # pheatmap does not handle <0 x 0 matrix>
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                  normalization_type = normalization_type,
+                                  metric = metric,
+                                  fit_source = fit_source,
+                                  experiment_type = gDRutils::get_supported_experiments("combo"))
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -1055,7 +1019,7 @@ pheatmap_with_anno_combo <- function(
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
-
+  
   # dendrogram
   max_dim_matrix_cluster <- 
     gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
@@ -1317,3 +1281,102 @@ fill_ann_color_map <- function(dt_ann,
     FALSE
   }
 }
+
+
+#' Plot matrix with metric value
+#'
+#' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  and single-agent \code{SummarizedExperiment} or 
+#'  \code{data.table} representing data from the \code{scores} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  and combo \code{SummarizedExperiment}
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+#'  but the values from any numeric column can be displayed.
+#' @param fit_source string source name for metrics
+#' @param experiment_type string with experiment name;
+#'                        one of: "single-agent", "combination" or "co-dilution"
+#' 
+#' @keywords pheat_ann
+#' 
+#' @return matrix with values for selected metric with \code{CellLinName} in the rows
+#'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_metrics,
+#'                             experiment_type = gDRutils::get_supported_experiments("sa"))
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "scores")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_scores,
+#'                             metric = "hsa_score",
+#'                             normalization_type = "RV",
+#'                             experiment_type = gDRutils::get_supported_experiments("combo"))
+#'                             
+#' @export                           
+prep_pheatmap_matrix <- function(dt_response,
+                                 normalization_type = "GR",
+                                 metric = "xc50",
+                                 fit_source = "gDR",
+                                 experiment_type = gDRutils::get_supported_experiments("sa")) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  numeric_columns <- names(dt_response)[vapply(dt_response, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(experiment_type, choices = gDRutils::get_supported_experiments())
+  
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- dt_response[eval(filter_expr)]
+  
+  # prep data
+  tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ get(drug_name),
+      value.var = metric)
+  } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
+      value.var = metric)
+  } else {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
+      value.var = metric)
+  }
+  data.table::setnames(tab_dcast, "cellline_name", cellline_name)
+  
+  # prep matrix cellline vs drugs
+  mat_cvd <- as.matrix(tab_dcast[, .SD, .SDcols = -cellline_name])
+  rownames(mat_cvd) <- tab_dcast[[cellline_name]]
+  # remove all-NA-rows and all-NA-columns
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  
+  return(mat_cvd)
+}
+

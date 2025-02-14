@@ -1,3 +1,6 @@
+## gDRplots 0.0.65 - 2025-02-14
+* add `prep_pheatmap_matrix` function
+
 ## gDRplots 0.0.64 - 2025-02-12
 * downgrade reqs for Bioc pkgs
 
