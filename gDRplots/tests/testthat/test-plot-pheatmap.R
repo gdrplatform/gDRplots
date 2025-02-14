@@ -939,7 +939,7 @@ test_that("prep_pheatmap_matrix works as expected", {
                                                  assay_name = "Metrics")
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
                                                 assay_name = "scores")
-
+  
   mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
   expect_is(mat_1, "matrix")
   expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
@@ -1000,6 +1000,16 @@ test_that("prep_pheatmap_matrix works as expected", {
   mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
   expect_is(mat_6, "matrix")
   expect_equal(dim(mat_6), c(0, 0))
+  
+  # scenario: duplicates
+  mat_7 <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                metric = "bliss_score")
+  expect_is(mat_7, "matrix")
+  expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_7)), sort(unique(dt_scores[["DrugName"]])))
+  expect_false(all(dt_scores[normalization_type == "GR"][["bliss_score"]] %in% mat_7))
+  expect_true(all(
+    dt_scores[normalization_type == "GR", .N, by = c("CellLineName", "DrugName")][["N"]] %in% mat_7))
   
   # testing assertions
   expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
