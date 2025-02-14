@@ -43,6 +43,6 @@ test_that("plot_cgs_ranking works correctly", {
   
   # test case where no significant GSEA results exist (using a dummy metric)
   results$CellLineName_1$fgsea$xc50$padj <- 1  # Set all padj values to 1 to simulate no significance
-  plt <- plot_cgs_ranking(results, cell_line = "CellLineName_1", metric = "xc50") # Should still produce a plot
+  plt <- plot_cgs_ranking(results, cl_name = "CellLineName_1", metric = "xc50") # Should still produce a plot
   expect_is(plt, "ggplot")
 })
