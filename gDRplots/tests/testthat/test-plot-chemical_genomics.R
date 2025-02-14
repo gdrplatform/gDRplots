@@ -18,7 +18,7 @@ test_that("analyze_cgs works correctly", {
   
   
   # test with multiple metrics
-  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cell_line = "CellLineName_1")
+  results <- analyze_cgs(metrics_data, metrics = c("xc50", "x_max"), cl_name = "CellLineName_1")
   expect_equal(names(results$CellLineName_1$fgsea), c("xc50", "x_max"))
   expect_is(results$CellLineName_1$fgsea$xc50, "data.table")
   expect_is(results$CellLineName_1$fgsea$x_max, "data.table")
