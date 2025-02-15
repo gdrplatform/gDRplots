@@ -10,7 +10,8 @@ prep_dt_response_metric_diff(
   d_name2,
   normalization_type = "RV",
   metric = "xc50",
-  fit_source = "gDR"
+  fit_source = "gDR",
+  additional_cols = NULL
 )
 }
 \arguments{
@@ -18,18 +19,23 @@ prep_dt_response_metric_diff(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and combo \code{SummarizedExperiment}}
 
-\item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
+\item{d_name}{string representing the drug name to be plotted (identifier \code{DrugName}).
+If set to NULL, the function will return a table for all available DrugName}
 
-\item{d_name2}{string with drug name to be plotted (identifiers \code{DrugName_2})}
+\item{d_name2}{string representing the drug name to be plotted (identifier \code{DrugName_2}).
+If set to NULL, the function will return a table for all available DrugName_2}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
+\item{metric}{string name of the metric;
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+"x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
+or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")}
 
 \item{fit_source}{string source name for metrics}
+
+\item{additional_cols}{character vector with additional cols that should be included in the output}
 }
 \value{
 \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}

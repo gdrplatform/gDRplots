@@ -209,11 +209,9 @@ prep_nested_plot_chunk <- function(plt_list,
 #' Escape colon and hash
 #'
 #' @param x String
-#' @param double_colon_escape Logical flag whether colon should be escaped twice
 #'
 #' @examples
 #' escape_special_characters("ABC:123")
-#' escape_special_characters("ABC:123", double_colon_escape = TRUE)
 #' escape_special_characters("AD_12")
 #' escape_special_characters("AD#12")
 #' escape_special_characters("AD/12")
@@ -222,16 +220,9 @@ prep_nested_plot_chunk <- function(plt_list,
 #' @keywords internal
 #'
 #' @export
-escape_special_characters <- function(x, double_colon_escape = FALSE) {
+escape_special_characters <- function(x) {
   checkmate::assert_string(x)
-  checkmate::assert_flag(double_colon_escape)
-  if (grepl("\\:", x)) {
-    if (double_colon_escape) {
-      x <- gsub(pattern = "\\:", replacement = "\\\\\\\\:", x = x)
-    } else {
-      x <- gsub(pattern = "\\:", replacement = "\\\\:", x = x)
-    }
-  }
+  if (grepl("\\:", x)) x <- gsub(pattern = "\\:", replacement = "[colon]", x = x)
   if (grepl("\\/", x)) x <- gsub(pattern = "\\/", replacement = "[slash]", x = x)
   if (grepl("#", x)) x <- gsub(pattern = "#", replacement = "[hash]", x = x)
   x
@@ -375,4 +366,80 @@ get_r_file_path <-  function(test_mode = FALSE) {
   }
   checkmate::assert_file_exists(fpath)
   fpath
+}
+
+#' Prepare markdown chunk based on a doubly nested list of tables
+#'
+#' Generates markdown code for displaying tables in a document using `knitr::knit()`.
+#' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
+#' The inner header level (for metrics) is automatically set to one level greater than the outer header level.
+#'
+#' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
+#'   and the inner lists represent metrics.  Names are used as headings.
+#' @param chunk_name Base name for generated code chunks. Avoid spaces.
+#' @param header_level Markdown header level for the outer tabset (cell lines).
+#' @param tabset_options Options for the tabset. Can be "unnumbered", "tabset", "tabset-dropdown".
+#'
+#' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
+#'   represents markdown code for the cell line's tabset.
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' nested_tables <- list(
+#'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
+#'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
+#' )
+#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
+#' 
+#' # Example using DT::datatable
+#' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset")
+#' }
+#' @export
+prep_double_table_chunk <- function(tbl_list,
+                                    chunk_name,
+                                    header_level = 3,
+                                    tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
+  
+  checkmate::assert_list(tbl_list, min.len = 1)
+  checkmate::assert_string(chunk_name)
+  checkmate::assert_int(header_level, lower = 1)
+  checkmate::assert_character(tabset_options, null.ok = TRUE)
+  
+  tbl_list_name <- deparse(substitute(tbl_list))
+  lvl <- paste0(rep("#", header_level), collapse = "")
+  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
+  
+  lapply(names(tbl_list), function(cell_line) {
+    tabset_string <- if (is.null(tabset_options)) {
+      ""
+    } else {
+      paste0("{.", paste(tabset_options, collapse = " ."), "}")
+    }
+    
+    header <- sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string)
+    
+    item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
+      chunk <- sprintf(
+        "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
+        inner_lvl, 
+        metric, 
+        chunk_name, 
+        cell_line, 
+        metric, 
+        paste0(
+          "DT::formatRound(",
+          "DT::datatable(", 
+          tbl_list_name, 
+          "[[\"", cell_line, "\"]][[\"", metric, "\"]]), ",
+          "columns = names(Filter(is.numeric, ", 
+          tbl_list_name, 
+          "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
+          "digits = 5)"
+        )
+      )
+      knitr::knit_expand(text = chunk)
+    })
+    
+    list(header = knitr::knit_expand(text = header), items = item_chunks)
+  })
 }
