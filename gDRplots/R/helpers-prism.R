@@ -214,14 +214,18 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and combo \code{SummarizedExperiment}
-#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
-#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
+#' @param d_name string representing the drug name to be plotted (identifier \code{DrugName}).
+#'  If set to NULL, the function will return a table for all available DrugName
+#' @param d_name2 string representing the drug name to be plotted (identifier \code{DrugName_2}).
+#'  If set to NULL, the function will return a table for all available DrugName_2
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
+#'  or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")
 #' @param fit_source string source name for metrics
+#' @param additional_cols character vector with additional cols that should be included in the output
 #' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' @keywords prism_plots
@@ -244,29 +248,44 @@ prep_dt_response_metric_diff <- function(dt_metrics,
                                          d_name2,
                                          normalization_type = "RV",
                                          metric = "xc50",
-                                         fit_source = "gDR") {
+                                         fit_source = "gDR",
+                                         additional_cols = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::assert_string(d_name2)
-  checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
-  checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
+  checkmate::assert_subset(metric, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(additional_cols, choices = names(dt_metrics), null.ok = TRUE)
+  
+  
+  if (!is.null(d_name)) {
+    checkmate::assert_string(d_name)
+    checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  }
+  
+  if (!is.null(d_name2)) {
+    checkmate::assert_string(d_name2)
+    checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+  }
   
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_metric <- dt_metrics[eval(filter_expr)]
   
-  # select required drugs combination
-  dt_response_metric <- dt_response_metric[get(drug_name) == d_name & get(drug_name_2) == d_name2, ]
+  # select required drugs combination if specified
+  if (!is.null(d_name)) {
+    dt_response_metric <- dt_response_metric[get(drug_name) == d_name]
+  }
+  
+  if (!is.null(d_name2)) {
+    dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
+  }
   
   # take care of Inf and NaN values in IC50 metrics
   if (any(metric == "xc50")) {
@@ -282,7 +301,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   }
   
   # create entries of non-zero co-trt
-  meta_col <- c("rId", "cId", cellline_name)
+  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
@@ -307,13 +326,16 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
   data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
   
-  # final
+  # Concatenate meta_col into a single string with "+"
+  meta_col_str <- paste(meta_col, collapse = " + ")
+  
+  # Generate the formula using reformulate
+  dcast_formula <- stats::as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  
   dt_combo_diff <- data.table::dcast(
     data = dt_combo_diff, 
-    formula = rId + cId + get(cellline_name) ~ cotrt_value + source, 
+    formula = dcast_formula, 
     value.var = ls_col_met_fin)
-  data.table::setnames(dt_combo_diff, "cellline_name", cellline_name)
-  data.table::setkey(dt_combo_diff, NULL)
   (dt_combo_diff)
 }
 
@@ -352,10 +374,10 @@ prep_dt_depmap_feat <- function(
   # dt_depmap <- kaleidoscope::load_depmap_merged(
   #   feature_sets = feature_set,
   #   prefix = prefix,
-  #   metadata_columns = "CCLEName") 
+  #   metadata_columns = "CCLEName")
   # 
   # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap["CCLEName" != ""]
+  # dt_depmap <- dt_depmap[CCLEName != ""]
   # 
   # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
 }
@@ -387,18 +409,23 @@ prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
   # ls_depmap <- kaleidoscope::load_depmap_list(
   #   feature_sets = "OmicsCNGene",
   #   prefix = "CN_",
-  #   metadata_columns = unique(c(metadata_col, "CCLEName"))) # nolint end
-  ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
-  
-  dt_depmap <- data.table::data.table(
-    merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
-  )
-  data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
-  
-  data.table::setkey(dt_depmap, NULL)
-  dt_depmap["CCLEName" != ""]
-  
-  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
+  #   metadata_columns = unique(c(metadata_col, "CCLEName")))
+  # ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
+  # 
+  # # temporary fix
+  # if (any(grepl("V1", colnames(ls_depmap[[metadata_col]])))) {
+  #   colnames(ls_depmap[[metadata_col]]) <- metadata_col
+  # }
+  # 
+  # dt_depmap <- data.table::data.table(
+  #   merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
+  # )
+  # data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
+  # 
+  # data.table::setkey(dt_depmap, NULL)
+  # dt_depmap <- stats::na.omit(dt_depmap)
+  # 
+  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col)) # nolint end
 }
 
 #' Prep table with calculated linear associations
@@ -475,7 +502,7 @@ prep_dt_assoc <- function(dt_response,
     )
     
     # remove col with all NA
-    X <- X[, colSums(is.na(X)) != NROW(X)]
+    X <- X[, colSums(is.na(X)) != NROW(X), drop = FALSE]
  
     # association can only be calculated for conditions
     X_condition <- 
@@ -490,8 +517,8 @@ prep_dt_assoc <- function(dt_response,
       # create dt_assoc
       # TODO in GDR-2710
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-      # 
-      # # final
+
+      # final
       # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
     }
   }

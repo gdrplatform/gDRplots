@@ -189,7 +189,7 @@ pheatmap_qc <- function(
   
   # heatmap labels
   if (lbl_by_CellLineName) {
-    row_lbls <- tab_response[, unique(.SD), .SDcols = c(cellline_name, clid)][order(rownames(mat_cvd))]
+    row_lbls <- tab_response[match(rownames(mat_cvd), clid), unique(.SD), .SDcols = c(cellline_name, clid)]
     # re-label
     rownames(mat_cvd) <- row_lbls[[cellline_name]]
   }
@@ -201,9 +201,11 @@ pheatmap_qc <- function(
     col_lbls <- rbind(col_lbls, col_lbls_2)
     # re-label
     colnames(drug_annotation) <-
-      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][order(colnames(drug_annotation))][[drug_name]]
+      col_lbls[get(gnumber) %in% colnames(drug_annotation), ][
+        match(colnames(drug_annotation), get(gnumber)), ][[drug_name]]
     names(drug_annotation_colors) <-
-      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][order(names(drug_annotation_colors))][[drug_name]]
+      col_lbls[get(gnumber) %in% names(drug_annotation_colors), ][
+        match(names(drug_annotation_colors), get(gnumber)), ][[drug_name]]
   }
   
   annotation_legend_flag <- NROW(drug_to_colored) <= 3 # TODO Find better solution
@@ -216,29 +218,31 @@ pheatmap_qc <- function(
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
-  hm <- pheatmap::pheatmap(mat = mat_cvd,
-                           scale = "none",
-                           display_numbers = FALSE,
-                           number_color = "black",
-                           fontsize_number = 16,
-                           color = hm_color_palette,
-                           breaks = breaks,
-                           angle_col = 45,
-                           fontsize = 10,
-                           show_colnames = FALSE,
-                           main = hm_title,
-                           na_col = "red",
-                           annotation_legend = annotation_legend_flag,
-                           # dendrogram
-                           treeheight_row = 70,
-                           treeheight_col = 70,
-                           cluster_cols = FALSE,
-                           cluster_rows = cluster_rows,
-                           # manual annotation
-                           annotation_col = drug_annotation,
-                           annotation_colors = drug_annotation_colors,
-                           silent = TRUE
-  )
+  hm <- 
+    pheatmap::pheatmap(mat = mat_cvd,
+                       scale = "none",
+                       display_numbers = FALSE,
+                       number_color = "black",
+                       fontsize_number = 1.2 * 8,
+                       color = hm_color_palette,
+                       breaks = breaks,
+                       angle_col = 45,
+                       show_colnames = FALSE,
+                       main = hm_title,
+                       fontsize = 8,
+                       fontsize_row = ifelse(NROW(mat_cvd) > 40, 0.6 * 8, 8),
+                       na_col = "red",
+                       annotation_legend = annotation_legend_flag,
+                       # dendrogram
+                       treeheight_row = 70,
+                       treeheight_col = 70,
+                       cluster_cols = FALSE,
+                       cluster_rows = cluster_rows,
+                       # manual annotation
+                       annotation_col = drug_annotation,
+                       annotation_colors = drug_annotation_colors,
+                       silent = TRUE
+    )
   return(hm)
 }
 
@@ -504,7 +508,11 @@ pheatmap_with_anno_sa <- function(
   }
   
   # prep hm color palette
-  min_val <- min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
+  min_val <- ifelse(
+    all(is.infinite(t_mat_cvd) | is.na(t_mat_cvd)),
+    -1,
+    min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
+  )
   max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
   
   if (min_val == max_val) {
@@ -526,14 +534,19 @@ pheatmap_with_anno_sa <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
@@ -827,14 +840,19 @@ pheatmap_with_anno_cd <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
@@ -1054,19 +1072,21 @@ pheatmap_with_anno_combo <- function(
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
-  
+
   # dendrogram
-  cluster_condition <- !any(is.na(t_mat_cvd)) && !any(is.infinite(t_mat_cvd)) && 
-    any(dim(t_mat_cvd) < 200)  # gDR standard
-  cluster_rows <- if (cluster_rows && cluster_condition && NROW(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t_mat_cvd))
-  } else {
-    FALSE
+  max_dim_matrix_cluster <- 
+    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                     system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
+  if (cluster_rows) {
+    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
-  cluster_cols <- if (cluster_cols && cluster_condition && NCOL(t_mat_cvd) >= 2) {
-    stats::hclust(stats::dist(t(t_mat_cvd)))
-  } else {
-    FALSE
+  if (cluster_cols) {
+    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                            distfun = distfun,
+                                            additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -1085,14 +1105,19 @@ pheatmap_with_anno_combo <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
+                       fontsize_number = 1.2 * 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
                        main = hm_title,
-                       na_col = "#A9A9A9",
+                       fontsize = 8,
+                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
                        cluster_cols = cluster_cols,
+                       treeheight_row = 25,
+                       treeheight_col = 25,
                        # manual annotation
                        annotation_row = annotation_row,
                        annotation_col = annotation_col,
@@ -1297,7 +1322,7 @@ fill_ann_color_map <- function(dt_ann,
 .pheatmap_cluster_param <- function(mat_to_cluster,
                                     distfun = stats::dist,
                                     additional_condition = TRUE) {
-
+  
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
   checkmate::assert_flag(additional_condition)

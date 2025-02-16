@@ -12,6 +12,7 @@ utils::globalVariables(
     ".",
     ".N",
     ".SD",
+    "abs_rho",
     "iso_level",
     "log10_ratio_conc",
     "log2_CI",
@@ -38,7 +39,12 @@ utils::globalVariables(
     "value",
     "ReadoutValue",
     "WellColumn",
-    "WellRow"
+    "WellRow",
+    "NES",
+    "padj",
+    "pval",
+    "x_pos",
+    "y_pos"
   ),
   utils::packageName())
 

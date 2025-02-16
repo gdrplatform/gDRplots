@@ -1,5 +1,21 @@
-## gDRplots 0.0.62 - 2025-02-09
+## gDRplots 0.0.66 - 2025-02-17
 * handle duplicated data in pheatmap_with_anno_sa
+
+# gDRplots 0.0.65 - 2024-02-12
+* add support for chemical genomics analysis
+
+## gDRplots 0.0.64 - 2025-02-12
+* downgrade reqs for Bioc pkgs
+
+## gDRplots 0.0.63 - 2025-02-10
+* refactor `plot_dose_response_sa` to handle missing data consistently
+* fix labeling in `pheatmap_qc`
+* refactor panel shape for `heatmap_combo_metrics_panel`
+
+## gDRplots 0.0.62 - 2025-02-06
+* update `plot_boxplot_meta` to handle edge cases 
+* add `plot_boxplot_num` and `plot_boxplot_num_panel` functions
+* add new logic for selecting n-top based on q-val and rho
 
 ## gDRplots 0.0.61 - 2025-02-05
 * add values to combo heatmaps and adjust position of plots in the panel
@@ -20,6 +36,9 @@
 ## gDRplots 0.0.56 - 2022-01-13
 * move ggrepel from Suggests to Imports
 
+## gDRplots 0.0.55 - 2025-01-03
+* add `get_r_file_path` function
+
 ## gDRplots 0.0.54 - 2024-12-20
 * refactor `prep_plot_chunk` to support simple nested lists of visualizations
 * refactor plate visualizations to improve the performance
@@ -34,7 +53,7 @@
 * revert color palette for dose-response curves for combo data
 
 ## gDRplots 0.0.50 - 2024-12-03
-* fix for edge-case in pheatmap_with_anno_sa (-Inf)
+* fix for edge-case in `pheatmap_with_anno_sa` (-Inf)
 
 ## gDRplots 0.0.49 - 2024-12-02
 * add boxplots for single-agent and combo metrics

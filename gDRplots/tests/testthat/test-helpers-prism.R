@@ -191,9 +191,14 @@ test_that("prep_dt_response_metric_diff works as expected", {
                  normalization_type == "RV", ][!is.na(cotrt_value)]
   # Inf -> 10^dt_metrics[["maxlog10Concentration"]] # nolint
   subset[, xc50 := ifelse(is.infinite(xc50), 10^maxlog10Concentration, xc50)]
-  res <- data.table::dcast(subset, formula = rId + cId + get(cellline_name) ~ cotrt_value + source, 
+  
+  meta_col_str <- paste(c("rId", "cId", gDRutils::get_env_identifiers("cellline_name")), collapse = " + ")
+  
+  dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  
+  
+  res <- data.table::dcast(subset, formula = dcast_formula, 
                            value.var = "xc50")
-  data.table::setnames(res, "cellline_name", cellline_name)
   ls_col_diff <- setdiff(colnames(res), meta_col)
   ls_col_diff_fin <- ls_col_diff[!grepl("0_", ls_col_diff)]
   sel_met <- c("xc50", "x_mean", "x_max")
@@ -203,7 +208,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_is(dt_response, "data.table")
   expect_true(all(
     names(dt_response) %in% 
-      c(meta_col, 
+      c(meta_col, drug_name, drug_name_2,
         do.call(paste0, expand.grid(sprintf("RV_gDR_xc50_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response), NROW(res))
@@ -223,7 +228,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_is(dt_response, "data.table")
   expect_true(all(
     names(dt_response) %in% 
-      c(meta_col, 
+      c(meta_col, drug_name, drug_name_2,
         do.call(paste0, expand.grid(sprintf("GR_gDR_%s", sel_met), sprintf("_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response), NROW(res))

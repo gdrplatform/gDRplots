@@ -68,6 +68,9 @@ plot_dose_response_sa <- function(dt_metrics,
   zero_conc_scaling_factor <- 
     gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
                                      system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average)
@@ -108,7 +111,7 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # filter data
   dt_met <- dt_met[get(group_var) %in% group_names, ]
-  dt_avg <- dt_avg[get(group_var) %in% group_names, ]
+  dt_avg <- dt_avg[get(group_var) %in% group_names, ][!is.na(x), ]
   
   # plot title 
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
@@ -181,7 +184,7 @@ plot_dose_response_sa <- function(dt_metrics,
     # final plot
     plt <-
       ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = group_var, group = group_var)) +
-      ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+      ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
       ggplot2::scale_color_manual(values = color_values,
                                   name = ifelse(group_var == cellline_name, "Cell Line", "Drug")) +
       ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
@@ -437,6 +440,9 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
   checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
   checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -488,7 +494,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
     # plot
     plt <-
       ggplot2::ggplot() +
-      ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+      ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
       ggplot2::geom_line(
         data = dt_reconstructed_fit,
         ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve", group = "Fitted Curve")) +
@@ -588,6 +594,9 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   
   checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -655,7 +664,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   
   plt <- 
     ggplot2::ggplot() + 
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#B3B3B3") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
     ggplot2::geom_line(
       data = dt_reconstructed_fit,
       ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +

@@ -71,6 +71,9 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(split_by_conc)
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   # check input data
   drugs_combination <-
@@ -120,7 +123,7 @@ plot_dose_response_combo <- function(dt_average,
   plt <-
     ggplot2::ggplot(dt_avg,
                     ggplot2::aes(x = get(conc), y = x, color = get(conc_2), group = get(conc_2))) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#A9A9A9") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
@@ -196,6 +199,9 @@ plot_dose_response_combo_panel <- function(dt_average,
   zero_conc_scaling_factor <- 
     gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
                                      system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_average)
   checkmate::assert_string(cl_name)
@@ -203,6 +209,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   checkmate::assert_character(d_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
@@ -256,7 +263,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   plt <-
     ggplot2::ggplot(dt_avg,
                     ggplot2::aes(x = get(conc), y = x, color = get(conc_2), group = get(conc_2))) +
-    ggplot2::geom_hline(yintercept = c(0, 1), color = "#A9A9A9") +
+    ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
