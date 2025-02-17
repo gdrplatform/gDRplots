@@ -6,6 +6,7 @@
 \usage{
 pheatmap_with_anno_sa(
   dt_metrics,
+  dt_metrics_capped = NULL,
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
@@ -24,6 +25,9 @@ pheatmap_with_anno_sa(
 \item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
+
+\item{dt_metrics_capped}{\code{data.table} representing data from the \code{Metrics} assay,
+the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}

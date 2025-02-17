@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{prep_pheatmap_matrix}
 \alias{prep_pheatmap_matrix}
-\title{Plot matrix with metric value}
+\title{Prep matrix with metric value based on the Metrics assay}
 \usage{
 prep_pheatmap_matrix(
   dt_response,
@@ -38,7 +38,7 @@ matrix with values for selected metric with \code{CellLinName} in the rows
    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
 }
 \description{
-Plot matrix with metric value
+Prep matrix with metric value based on the Metrics assay
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
