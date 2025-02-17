@@ -252,6 +252,8 @@ pheatmap_qc <- function(
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
+#' @param dt_metrics_capped \code{data.table} representing data from the \code{Metrics} assay,
+#'  the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
@@ -351,6 +353,7 @@ pheatmap_qc <- function(
 #' @export
 pheatmap_with_anno_sa <- function(
     dt_metrics,
+    dt_metrics_capped = NULL,
     normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
@@ -368,9 +371,14 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_metrics_capped, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
   checkmate::assert_choice(metric, choices = numeric_columns)
+  if (!is.null(dt_metrics_capped)) {
+    numeric_columns <- names(dt_metrics_capped)[vapply(dt_metrics_capped, is.numeric, logical(1))]
+    checkmate::assert_choice(metric, choices = numeric_columns)
+  }
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -399,57 +407,51 @@ pheatmap_with_anno_sa <- function(
                   identity)
   
   # prep matrix
-  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics,
-                                  normalization_type = normalization_type,
-                                  metric = metric,
-                                  fit_source = fit_source,
-                                  experiment_type = gDRutils::get_supported_experiments("sa"))
+  mat_cvd_raw <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                      normalization_type = normalization_type,
+                                      metric = metric,
+                                      fit_source = fit_source,
+                                      experiment_type = gDRutils::get_supported_experiments("sa"))
+  
+  mat_cvd <- if (is.null(dt_metrics_capped)) {
+    mat_cvd_raw
+  } else {
+    prep_pheatmap_matrix(dt_response = dt_metrics_capped,
+                         normalization_type = normalization_type,
+                         metric = metric,
+                         fit_source = fit_source,
+                         experiment_type = gDRutils::get_supported_experiments("sa"))
+  }
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", cellline_name)
-      
-      annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-    data.table::setorderv(annotation_col, cols = cols, na.last = TRUE)
-    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- .fill_pheatmap_annotation(dt_anno = annotation_col,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = cellline_name)
     ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
+    if (!is.null(dt_metrics_capped)) {
+      mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
+    }
   }
   
   if (!is.null(annotation_row)) {
-    if (!all(colnames(mat_cvd) %in% annotation_row[[drug_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = colnames(mat_cvd)[!colnames(mat_cvd) %in% annotation_row[[drug_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", drug_name)
-      
-      annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_row)[names(annotation_row) != drug_name]
-    data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
-    annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
+    annotation_row <- .fill_pheatmap_annotation(dt_anno = annotation_row,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = drug_name)
     ls_output[["data"]][["annotation_row"]] <- annotation_row
     
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
+    if (!is.null(dt_metrics_capped)) {
+      mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
+    }
   }
   
   # filling missing values
@@ -1283,7 +1285,7 @@ fill_ann_color_map <- function(dt_ann,
 }
 
 
-#' Plot matrix with metric value
+#' Prep matrix with metric value based on the Metrics assay
 #'
 #' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
@@ -1381,3 +1383,49 @@ prep_pheatmap_matrix <- function(dt_response,
   return(mat_cvd)
 }
 
+
+#' Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
+#' 
+#' @param dt_anno \code{data.table} that specifies the annotations shown on left side of the heatmap 
+#'   or shown above the heatmap - depending on the \code{anno_var}.
+#'   Each row defines the features for a specific row. The rows in the data and in the annotation
+#'   are matched using corresponding names from the required \code{anno_var} column.
+#' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
+#' @param anno_var string with variable describing annotation dimension:
+#'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
+#'
+#' @return \code{data.table} with 
+#' 
+#' @keywords internal
+.fill_pheatmap_annotation <- function(dt_anno,
+                                      mat_with_metric,
+                                      anno_var = gDRutils::get_env_identifiers("cellline_name")) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
+  checkmate::assert_data_table(dt_anno)
+  checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
+  checkmate::assert_choice(anno_var, choices = c(cellline_name, drug_name))
+  
+  fun_names <- if (anno_var == cellline_name) rownames else colnames
+  
+  # check completeness of annotation
+  if (!all(fun_names(mat_with_metric) %in% dt_anno[[anno_var]])) {
+    tab_missing_ann <- data.table::data.table(
+      missing = fun_names(mat_with_metric)[!fun_names(mat_with_metric) %in% dt_anno[[anno_var]]]
+    )
+    data.table::setnames(tab_missing_ann, "missing", anno_var)
+    
+    dt_anno <- data.table::rbindlist(list(dt_anno, tab_missing_ann), fill = TRUE)
+  }
+  
+  # foll missing values (note: data.table::nafill does not support character)
+  cols <- names(dt_anno)[names(dt_anno) != anno_var]
+  data.table::setorderv(dt_anno, cols = cols, na.last = TRUE)
+  dt_anno[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
+  # select annotation acc to matrix
+  dt_anno <- dt_anno[get(anno_var) %in% fun_names(mat_with_metric), ]
+  
+  return(dt_anno)
+}
