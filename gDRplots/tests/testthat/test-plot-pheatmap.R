@@ -1,4 +1,4 @@
-context("Test qc_heatmap")
+context("Test pheatmap with anno")
 
 test_that("pheatmap_qc works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
