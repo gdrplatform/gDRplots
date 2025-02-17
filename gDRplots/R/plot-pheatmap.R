@@ -1351,20 +1351,20 @@ prep_pheatmap_matrix <- function(dt_response,
   
   # prep data
   tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
-    purrr::quietly(data.table::dcast)(
+    data.table::dcast(
       data = tab_response,
-      formula = get(cellline_name) ~ get(drug_name),
-      value.var = metric)$result
+      formula = get(cellline_name) ~ paste(get(drug_name)),
+      value.var = metric)
   } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
-    purrr::quietly(data.table::dcast)(
+    data.table::dcast(
       data = tab_response,
       formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-      value.var = metric)$result
+      value.var = metric)
   } else {
-    purrr::quietly(data.table::dcast)(
+    data.table::dcast(
       data = tab_response,
       formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-      value.var = metric)$result
+      value.var = metric)
   }
   data.table::setkey(tab_dcast, NULL)
   data.table::setnames(tab_dcast, "cellline_name", cellline_name)
