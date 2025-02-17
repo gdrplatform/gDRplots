@@ -1,5 +1,8 @@
-## gDRplots 0.0.66 - 2025-02-17
+## gDRplots 0.0.67 - 2025-02-17
 * handle duplicated data in pheatmap_with_anno_sa
+
+# gDRplots 0.0.66 - 2024-02-15
+* update `ls_selected_met` for PRISM data
 
 # gDRplots 0.0.65 - 2024-02-12
 * add support for chemical genomics analysis

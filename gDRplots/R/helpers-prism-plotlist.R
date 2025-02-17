@@ -274,7 +274,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           } else {
             dt_response_scores
           }
-          ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo), id_col))
+          ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo),
+                                                            c(id_col, drug_name, drug_name_2)))
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
@@ -326,7 +327,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           } else {
             dt_response_scores
           }
-          ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo), id_col))
+          ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo),
+                                                            c(id_col, drug_name, drug_name_2)))
           
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
