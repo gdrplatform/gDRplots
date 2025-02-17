@@ -31,3 +31,7 @@ reference:
   desc:  Utils function
 - contents:
   - has_keyword("utils")
+- title: Chemical genomics visualisation
+  desc:  Functions to plot chemical genomics visualisation with helpers
+- contents:
+  - has_keyword("cgs_plots")

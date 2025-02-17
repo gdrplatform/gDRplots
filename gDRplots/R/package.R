@@ -39,7 +39,12 @@ utils::globalVariables(
     "value",
     "ReadoutValue",
     "WellColumn",
-    "WellRow"
+    "WellRow",
+    "NES",
+    "padj",
+    "pval",
+    "x_pos",
+    "y_pos"
   ),
   utils::packageName())
 

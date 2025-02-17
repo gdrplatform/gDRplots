@@ -1,5 +1,11 @@
-## gDRplots 0.0.65 - 2025-02-14
+## gDRplots 0.0.67 - 2025-02-17
 * add `prep_pheatmap_matrix` function
+
+## gDRplots 0.0.66 - 2024-02-15
+* update `ls_selected_met` for PRISM data
+
+## gDRplots 0.0.65 - 2024-02-12
+* add support for chemical genomics analysis
 
 ## gDRplots 0.0.64 - 2025-02-12
 * downgrade reqs for Bioc pkgs
@@ -32,6 +38,9 @@
 
 ## gDRplots 0.0.56 - 2022-01-13
 * move ggrepel from Suggests to Imports
+
+## gDRplots 0.0.55 - 2025-01-03
+* add `get_r_file_path` function
 
 ## gDRplots 0.0.54 - 2024-12-20
 * refactor `prep_plot_chunk` to support simple nested lists of visualizations
