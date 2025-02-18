@@ -103,6 +103,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+  dt_metrics_capped <- 
+    gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+                                   assay_dt = dt_metrics,
+                                   experiment_name = gDRutils::get_supported_experiments("sa"),
+                                   capping_fold = 5)
   
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
@@ -158,7 +164,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_2[["tree_row"]], "hclust") # dendrogram
   expect_is(plt_2[["tree_col"]], "hclust") # dendrogram
   
-  # scenario 3: annotations for row and col
+  # scenario 3: annotations for row and col and capped metrics
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
     mut_A = c(1, 0),
@@ -174,6 +180,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
   
   out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
+                                 dt_metrics_capped = dt_metrics_capped,
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
   expect_length(out_3, 2)
@@ -190,13 +197,15 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(data_3[["matrix"]], "data.table")
   expect_equal(data_3[["matrix"]], 
                res_1[order(match(CellLineName, anno_col_3$CellLineName)), 
-                     c("CellLineName", anno_row_3$DrugName), with = FALSE])
+                     c("CellLineName", anno_row_3$DrugName), with = FALSE]) # origin data
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[7]]$label, c("mut_A", "mut_B", "mut_C"))
   expect_equal(plt_3$gtable$grobs[[9]]$label, c("group"))
   expect_is(plt_3[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_3[["tree_col"]], "hclust") # clustering despite Inf
+  expect_false(any(is.infinite(as.numeric(
+    plt_3[["gtable"]][["grobs"]][[3]][["children"]][[2]][["label"]])))) # capped data
   
   # scenario 4: incomplete annotations for col and color maps
   annotation_map <- list(
@@ -294,6 +303,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     dt_metrics_capped = unlist(dt_metrics_capped)),
+               "Assertion on 'dt_metrics_capped' failed: Must be a data.table")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
