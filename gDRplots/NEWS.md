@@ -1,6 +1,7 @@
 ## gDRplots 0.0.67 - 2025-02-17
 * add `prep_pheatmap_matrix` function
 * add `dt_metrics_capped` param to `pheatmap_with_anno_sa` function
+* update xc50 capping logic for PRISM inputs
 
 ## gDRplots 0.0.66 - 2024-02-15
 * update `ls_selected_met` for PRISM data

@@ -24,6 +24,19 @@
 #' dt_response <-
 #'   prep_dt_response_metric_sa(dt_metrics, d_name,
 #'                              metric = c("xc50", "x_mean", "x_max"))
+#'                              
+#' dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                 assay_name = "Averaged")
+#' dt_metrics_capped <- 
+#'   gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+#'                                  assay_dt = dt_metrics,
+#'                                  experiment_name = gDRutils::get_supported_experiments("sa"),
+#'                                  capping_fold = 5)
+#' d_name <- "drug_026"
+#' dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
+#' dt_response <-
+#'   prep_dt_response_metric_sa(dt_metrics, d_name,
+#'                              metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_sa <- function(dt_metrics,
@@ -50,19 +63,6 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   
   # select required drug
   dt_response_metric <- dt_response_metric[get(drug_name) == d_name, ]
-  
-  # take care of Inf and NaN values in IC50 metrics
-  if (any(metric == "xc50")) {
-    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_response_metric[inf_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_response_metric[["xc50"]] > 10 ^ dt_response_metric[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_response_metric[over_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
-  }
   
   # final
   meta_col <- c("rId", "cId", cellline_name)
