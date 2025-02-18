@@ -434,7 +434,7 @@ pheatmap_with_anno_sa <- function(
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
-    if (!is.null(dt_metrics_capped)) {
+    if (!is.null(dt_metrics_capped)) { # order raw as capped
       mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
     }
   }
@@ -449,7 +449,7 @@ pheatmap_with_anno_sa <- function(
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
-    if (!is.null(dt_metrics_capped)) {
+    if (!is.null(dt_metrics_capped)) {  # order raw as capped
       mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
     }
   }
@@ -462,7 +462,12 @@ pheatmap_with_anno_sa <- function(
     annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
   
-  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  ls_output[["data"]][["matrix"]] <- if (is.null(dt_metrics_capped)) {
+    data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  } else {
+    data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
+  }
+  
   # flip
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
