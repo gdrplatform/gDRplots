@@ -400,7 +400,7 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::theme_bw()
   } else {
     # prep value ranges for y-axis
-    range_y <- range(tab_plot[!is.infinite(get(selected_metric)),][[selected_metric]])
+    range_y <- range(tab_plot[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
     
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
@@ -554,7 +554,7 @@ plot_boxplot_num_panel <- function(dt_response,
     }
     
     # prep value ranges for y-axis
-    range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)),][[selected_metric]])
+    range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
     
     # order vis as in selected_feats
@@ -687,7 +687,7 @@ plot_boxplot_meta <- function(dt_response,
     }
     
     # prep value ranges for y-axis
-    range_y <- range(tab_plot[!is.infinite(get(selected_metric)),][[selected_metric]])
+    range_y <- range(tab_plot[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
     
     # prep the number of items in each category
