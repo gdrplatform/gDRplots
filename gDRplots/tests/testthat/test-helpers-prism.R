@@ -11,10 +11,10 @@ test_that("prep_dt_response_metric_sa works as expected", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Metrics")
-  dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                   assay_name = "Averaged")
   dt_metrics_capped <-
-    gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+    gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
                                    assay_dt = dt_metrics,
                                    experiment_name = gDRutils::get_supported_experiments("sa"),
                                    capping_fold = 5)
@@ -77,45 +77,45 @@ test_that("prep_dt_response_metric_sa works as expected", {
 test_that("prep_dt_response_dose_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                   assay_name = "Averaged")
   d_name <- "drug_004"
-  ls_conc <- sprintf("%s", unique(dt_averaged[[conc]]))
+  ls_conc <- sprintf("%s", unique(dt_average[[conc]]))
   res <- data.table::dcast(
-    dt_averaged[get(drug_name) == d_name & normalization_type == "RV", ],
+    dt_average[get(drug_name) == d_name & normalization_type == "RV", ],
     formula = get(cellline_name) ~ get(conc),
     metric = "x")
   
-  dt_response <- prep_dt_response_dose_sa(dt_averaged, d_name) # default
+  dt_response <- prep_dt_response_dose_sa(dt_average, d_name) # default
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("RV_gDR_x_%s", ls_conc)))
   expect_equal(NROW(dt_response), NROW(res))
   
-  dt_response <- prep_dt_response_dose_sa(dt_averaged, d_name,
+  dt_response <- prep_dt_response_dose_sa(dt_average, d_name,
                                           normalization_type = "GR",
                                           metric = "x_std")
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("GR_gDR_x_std_%s", ls_conc)))
   
   # testing assertions
-  expect_error(prep_dt_response_dose_sa(dt_averaged = unlist(dt_averaged),
+  expect_error(prep_dt_response_dose_sa(dt_average = unlist(dt_average),
                                         d_name = d_name),
-               "Assertion on 'dt_averaged' failed: Must be a data.table")
-  expect_error(prep_dt_response_dose_sa(dt_averaged = dt_averaged,
+               "Assertion on 'dt_average' failed: Must be a data.table")
+  expect_error(prep_dt_response_dose_sa(dt_average = dt_average,
                                         d_name = 1),
                "Assertion on 'd_name' failed: Must be of type 'string'")
-  expect_error(prep_dt_response_dose_sa(dt_averaged = dt_averaged,
+  expect_error(prep_dt_response_dose_sa(dt_average = dt_average,
                                         d_name = "drug_xx"),
                "Assertion on 'd_name' failed: Must be element of set")
-  expect_error(prep_dt_response_dose_sa(dt_averaged = dt_averaged,
+  expect_error(prep_dt_response_dose_sa(dt_average = dt_average,
                                         d_name = d_name, 
                                         normalization_type = "str"),
                "Assertion on 'normalization_type' failed: Must be element of set")
-  expect_error(prep_dt_response_dose_sa(dt_averaged = dt_averaged,
+  expect_error(prep_dt_response_dose_sa(dt_average = dt_average,
                                         d_name = d_name, 
                                         metric = "str"),
                "Assertion on 'metric' failed: Must be element of set")
-  expect_error(prep_dt_response_dose_sa(dt_averaged = dt_averaged,
+  expect_error(prep_dt_response_dose_sa(dt_average = dt_average,
                                         d_name = d_name, 
                                         fit_source = 123),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
