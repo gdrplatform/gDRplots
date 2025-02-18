@@ -48,6 +48,19 @@ analyze_cgs <- function(dt_metrics,
   # filter out unwanted drug moa
   dt_metrics <- dt_metrics[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
   
+  # take care of Inf and NaN values in IC50 metrics # update after GDR-2856.
+  if (any(metrics == "xc50")) {
+    inf_xc50 <- is.infinite(dt_metrics[["xc50"]])
+    if (any(inf_xc50, na.rm = TRUE)) {
+      dt_metrics[inf_xc50, ][["xc50"]] <- 10 ^ dt_metrics[inf_xc50, ][["maxlog10Concentration"]]
+      # check whether all metric are below 10 ^ maxlog10Concentration
+      over_xc50 <- dt_metrics[["xc50"]] > 10 ^ dt_metrics[["maxlog10Concentration"]]
+      if (any(over_xc50, na.rm = TRUE)) {
+        dt_metrics[over_xc50, ][["xc50"]] <- 10 ^ dt_metrics[over_xc50, ][["maxlog10Concentration"]]
+      }
+    }
+  }
+  
   # prepare the data with specified metric differences
   metrics_diff <- prep_dt_response_metric_diff(dt_metrics,
                                                metric = metrics,

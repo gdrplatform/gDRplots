@@ -286,20 +286,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   if (!is.null(d_name2)) {
     dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
   }
-  
-  # take care of Inf and NaN values in IC50 metrics
-  if (any(metric == "xc50")) {
-    inf_xc50 <- is.infinite(dt_response_metric[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_response_metric[inf_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_response_metric[["xc50"]] > 10 ^ dt_response_metric[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_response_metric[over_xc50, ][["xc50"]] <- 10 ^ dt_response_metric[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
-  }
-  
+
   # create entries of non-zero co-trt
   meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
