@@ -1395,11 +1395,11 @@ prep_pheatmap_matrix <- function(dt_response,
 #'   or shown above the heatmap - depending on the \code{anno_var}.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required \code{anno_var} column.
-#' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
+#' @param mat_with_metric numeric matrix with metric values
 #' @param anno_var string with variable describing annotation dimension:
 #'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
 #'
-#' @return \code{data.table} with 
+#' @return \code{data.table} with annotation updatet to \code{mat_with_metric}
 #' 
 #' @keywords internal
 .fill_pheatmap_annotation <- function(dt_anno,
