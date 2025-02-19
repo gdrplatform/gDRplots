@@ -113,7 +113,6 @@ plot_scatter_with_corr <- function(dt_response,
                                    selected_feat,
                                    selected_feat_meta_col = NULL) {
   
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -196,8 +195,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
                                          dt_depmap, 
                                          selected_feats,
                                          selected_feat_meta_col = NULL) {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -354,7 +352,6 @@ plot_boxplot_num <- function(dt_response,
                              selected_feat,
                              selected_feat_meta_col = NULL) {
   
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -386,7 +383,7 @@ plot_boxplot_num <- function(dt_response,
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
-  
+
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
   
@@ -413,8 +410,9 @@ plot_boxplot_num <- function(dt_response,
                       mapping =  ggplot2::aes(x = get(selected_feat), 
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, outliers = FALSE) +
-      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, 
+                            outliers = FALSE, na.rm = TRUE) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count,
                          mapping =  ggplot2::aes(x = get(selected_feat), 
                                                  y = min_val, 
@@ -449,8 +447,7 @@ plot_boxplot_num_panel <- function(dt_response,
                                    selected_feats,
                                    selected_feat_meta_col = NULL,
                                    ncol = NULL) {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -569,7 +566,8 @@ plot_boxplot_num_panel <- function(dt_response,
                       mapping =  ggplot2::aes(x = feat_val, 
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, 
+                            outliers = FALSE, na.rm = TRUE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count_all,
                          mapping = ggplot2::aes(x = feat_val, 
@@ -611,6 +609,7 @@ plot_boxplot_num_panel <- function(dt_response,
 #'  (will be used as a plot title)
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
 #' @param max_x_lbl_length numeric value for the maximum number of characters in the x-axis label
+#' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
 #'
 #' @return \code{ggplot} object containing boxplots for variable levels
 #' 
@@ -621,9 +620,9 @@ plot_boxplot_meta <- function(dt_response,
                               dt_depmap, 
                               selected_feat_meta_col,
                               with_1_item_grp = TRUE,
-                              max_x_lbl_length = 60) {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
+                              max_x_lbl_length = 60,
+                              with_inf = FALSE) {
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -632,6 +631,7 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_flag(with_1_item_grp)
   checkmate::assert_number(max_x_lbl_length, lower = 5)
+  checkmate::assert_flag(with_inf)
   boxplot_fill <- 
     gDRutils::get_settings_from_json("BOXPLOT_FILL",
                                      system.file(package = "gDRplots", "settings.json"))
@@ -669,6 +669,11 @@ plot_boxplot_meta <- function(dt_response,
                                variable.factor = FALSE
   )[value == 1, !"value"]
   
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    tab_plot[is.infinite(get(selected_metric)), (selected_metric) := NA] 
+  }
+  
   if (NROW(tab_plot) == 0 || all(is.na(tab_plot[[selected_feat_meta_col]]))) {
     plt <- 
       ggplot2::ggplot() + 
@@ -700,8 +705,9 @@ plot_boxplot_meta <- function(dt_response,
         mapping =  ggplot2::aes(x = get(selected_feat_meta_col), 
                                 y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, outliers = FALSE) +
-      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) + 
+      ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, 
+                            outliers = FALSE, na.rm = TRUE) +
+      ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
       ggplot2::geom_text(data = tab_count,
                          mapping = ggplot2::aes(x = get(selected_feat_meta_col), 
                                                 y = min_val, 
@@ -764,8 +770,7 @@ plot_volcano_assoc_panel <- function(dt_response,
                                      dt_depmap,
                                      selected_metric,  
                                      selected_feat_meta_col) {
-  
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
