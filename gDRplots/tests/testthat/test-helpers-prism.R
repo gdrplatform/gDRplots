@@ -12,7 +12,7 @@ test_that("prep_dt_response_metric_sa works as expected", {
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                  assay_name = "Averaged")
+                                                 assay_name = "Averaged")
   dt_metrics_capped <-
     gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
                                    assay_dt = dt_metrics,
@@ -78,7 +78,7 @@ test_that("prep_dt_response_dose_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                  assay_name = "Averaged")
+                                                 assay_name = "Averaged")
   d_name <- "drug_004"
   ls_conc <- sprintf("%s", unique(dt_average[[conc]]))
   res <- data.table::dcast(
