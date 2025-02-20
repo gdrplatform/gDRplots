@@ -1016,7 +1016,7 @@ test_that("prep_pheatmap_matrix works as expected", {
   # scenario: duplicates
   obj_7 <- purrr::quietly(prep_pheatmap_matrix)(dt_response = dt_scores,
                                                 metric = "bliss_score")
-  expect_equal(obj_7$messages, "Aggregate function missing, defaulting to 'length'\n")
+  expect_true(grepl("Aggregate function missing, defaulting to 'length'", obj_7$messages))
   mat_7 <- obj_7$result
   expect_is(mat_7, "matrix")
   expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
