@@ -22,7 +22,7 @@ are matched using corresponding names from the required \code{anno_var} column.}
 one of: \code{CellLineName} for rows or \code{DrugName} for column.}
 }
 \value{
-\code{data.table} with
+\code{data.table} with annotation updatet to \code{mat_with_metric}
 }
 \description{
 Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
