@@ -93,8 +93,21 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
+dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                assay_name = "Averaged")
+dt_metrics_capped <- 
+  gDRutils::cap_assay_infinities(conc_assay_dt = dt_metrics,
+                                 assay_dt = dt_averaged,
+                                 experiment_name = sa_name,
+                                 col = "xc50",
+                                 capping_fold = 5)
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
+hm_0 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_0[["gtable"]])
+
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,)
+                                dt_metrics_capped = dt_metrics_capped)
 hm_1 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_1[["gtable"]])
 
