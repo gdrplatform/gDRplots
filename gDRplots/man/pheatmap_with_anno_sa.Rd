@@ -107,7 +107,7 @@ output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 hm_0 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_0[["gtable"]])
 
-output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,)
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 dt_metrics_capped = dt_metrics_capped)
 hm_1 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_1[["gtable"]])
