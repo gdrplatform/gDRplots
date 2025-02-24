@@ -217,13 +217,13 @@ pheatmap_qc <- function(
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
-  
+
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
                        scale = "none",
                        display_numbers = FALSE,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 45,
@@ -515,7 +515,7 @@ pheatmap_with_anno_sa <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
@@ -808,7 +808,7 @@ pheatmap_with_anno_cd <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
@@ -1059,7 +1059,7 @@ pheatmap_with_anno_combo <- function(
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
