@@ -296,12 +296,13 @@ pheatmap_qc <- function(
 #'                                                assay_name = "Metrics")
 #' dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                 assay_name = "Averaged")
-#' dt_metrics_capped <- 
-#'   gDRutils::cap_assay_infinities(conc_assay_dt = dt_metrics,
-#'                                  assay_dt = dt_averaged,
-#'                                  experiment_name = sa_name,
-#'                                  col = "xc50",
-#'                                  capping_fold = 5)
+#' dt_metrics_capped <-
+#'   gDRutils::cap_assay_infinities(
+#'     conc_assay_dt = dt_metrics,
+#'     assay_dt = dt_averaged,
+#'     experiment_name = gDRutils::get_supported_experiments("sa"),
+#'     col = "xc50",
+#'     capping_fold = 5)
 #'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 #' hm_0 <- output[["heatmap"]]
