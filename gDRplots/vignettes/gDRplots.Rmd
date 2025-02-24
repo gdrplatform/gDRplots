@@ -59,7 +59,8 @@ Used data:
 
 ```{r sa_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_matrix")
-se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+sa_name <- gDRutils::get_supported_experiments("sa")
+se_sa <- mae[[sa_name]]
 
 dt_norm_sa <- 
   gDRutils::convert_se_assay_to_dt(se = se_sa,
@@ -73,14 +74,15 @@ dt_average_sa <-
 dt_metrics_sa_capped <-
  gDRutils::cap_assay_infinities(conc_assay_dt = dt_average_sa,
                                 assay_dt = dt_metrics_sa,
-                                experiment_name = gDRutils::get_supported_experiments("sa"),
+                                experiment_name = sa_name,
                                 col = "xc50",
                                 capping_fold = 5)
 ```
 
 ```{r cd_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_codilution_small")
-se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+cd_name <- gDRutils::get_supported_experiments("cd")
+se_cd <- mae[[cd_name]]
 
 dt_norm_cd <- 
   gDRutils::convert_se_assay_to_dt(se = se_cd,
@@ -95,7 +97,8 @@ dt_average_cd <-
 
 ```{r combo_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_matrix")
-se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+combo_name <- gDRutils::get_supported_experiments("combo")
+se_combo <- mae[[combo_name]]
 
 dt_norm_combo <- 
   gDRutils::convert_se_assay_to_dt(se = se_combo,
