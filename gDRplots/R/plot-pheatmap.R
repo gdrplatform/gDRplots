@@ -298,8 +298,8 @@ pheatmap_qc <- function(
 #'                                                 assay_name = "Averaged")
 #' dt_metrics_capped <-
 #'   gDRutils::cap_assay_infinities(
-#'     conc_assay_dt = dt_metrics,
-#'     assay_dt = dt_averaged,
+#'     conc_assay_dt = dt_averaged,
+#'     assay_dt = dt_metrics,
 #'     experiment_name = gDRutils::get_supported_experiments("sa"),
 #'     col = "xc50",
 #'     capping_fold = 5)
