@@ -9,7 +9,8 @@ plot_boxplot_meta(
   dt_depmap,
   selected_feat_meta_col,
   with_1_item_grp = TRUE,
-  max_x_lbl_length = 60
+  max_x_lbl_length = 60,
+  with_inf = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}}
 \item{with_1_item_grp}{logical flag indicating whether to show group with only one item}
 
 \item{max_x_lbl_length}{numeric value for the maximum number of characters in the x-axis label}
+
+\item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
 \code{ggplot} object containing boxplots for variable levels

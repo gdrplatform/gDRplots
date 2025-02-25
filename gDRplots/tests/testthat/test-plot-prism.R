@@ -7,6 +7,11 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
                                                assay_name = "Metrics")
 dt_average <- gDRutils::convert_se_assay_to_dt(se = se_sa,
                                                assay_name = "Averaged")
+dt_metrics_capped <-
+  gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
+                                 assay_dt = dt_metrics,
+                                 experiment_name = gDRutils::get_supported_experiments("sa"),
+                                 capping_fold = 5)
 
 se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_metrics_combo <- gDRutils::convert_se_assay_to_dt(se = se_combo,
@@ -18,6 +23,9 @@ d_name <- "drug_002"
 d_name2 <- "drug_026"
 dt_response_met <- 
   prep_dt_response_metric_sa(dt_metrics, d_name,
+                             metric = c("xc50", "x_mean", "x_max"))
+dt_response_met_capped <- 
+  prep_dt_response_metric_sa(dt_metrics_capped, d_name,
                              metric = c("xc50", "x_mean", "x_max"))
 dt_response_dose <- 
   prep_dt_response_dose_sa(dt_average, d_name)
@@ -484,7 +492,7 @@ test_that("plot_boxplot_num works as expected", {
   
   plt_1 <- 
     plot_boxplot_num(dt_response = dt_response,
-                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
                      selected_feat = selected_feat)
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 4)
@@ -554,6 +562,27 @@ test_that("plot_boxplot_num works as expected", {
                paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
   expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
   
+  # capped
+  selected_metric <- "RV_gDR_xc50"
+  dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  dt_response_capped <- 
+    dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_6_raw <- plot_boxplot_num(dt_response = dt_response,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat)
+  plt_6_cap <- plot_boxplot_num(dt_response = dt_response_capped,
+                                dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                selected_feat = selected_feat)
+  expect_is(plt_6_raw, "gg")
+  expect_is(plt_6_cap, "gg")
+  expect_length(plt_6_raw[["layers"]], 4)
+  expect_length(plt_6_cap[["layers"]], 4)
+  expect_equal(plt_6_raw[["labels"]][["x"]], plt_6_cap[["labels"]][["x"]])
+  expect_equal(plt_6_raw[["labels"]][["y"]], plt_6_cap[["labels"]][["y"]])
+  expect_true(any(is.infinite(ggplot2::ggplot_build(plt_6_raw)$data[[3]]$y)))
+  expect_false(any(is.infinite(ggplot2::ggplot_build(plt_6_cap)$data[[3]]$y)))
+  
   # testing assertions
   expect_error(plot_boxplot_num(dt_response = unlist(dt_response),
                                 dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
@@ -606,7 +635,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(ggplot2::ggplot_build(plt_2)[["data"]][[1]]), NROW(new_selected_feats))
   expect_equal(# check the uniqueness of points
-    unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & ! is.na(y), .N, by = "PANEL"]$N), #nolint
+    unique(data.table::data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[!is.na(x) & !is.na(y), .N, by = "PANEL"]$N), #nolint
     sum(stats::complete.cases(obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response[["CellLineName"]], ])))
   
   # only NAs in selected_feats 
@@ -663,6 +692,27 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(NROW(ggplot2::ggplot_build(plt_6)[["data"]][[1]]), NROW(selected_feats)) 
   expect_equal(plt_6[["facet"]][["params"]][["ncol"]], 1)
   
+  # capped
+  selected_metric <- "RV_gDR_xc50"
+  dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  dt_response_capped <- 
+    dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  
+  plt_7_raw <- plot_boxplot_num_panel(dt_response = dt_response,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats)
+  plt_7_cap <- plot_boxplot_num_panel(dt_response = dt_response_capped,
+                                      dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                                      selected_feats = selected_feats)
+  expect_is(plt_7_raw, "gg")
+  expect_is(plt_7_cap, "gg")
+  expect_length(plt_7_raw[["layers"]], 4)
+  expect_length(plt_7_cap[["layers"]], 4)
+  expect_equal(plt_7_raw[["labels"]][["x"]], plt_7_cap[["labels"]][["x"]])
+  expect_equal(plt_7_raw[["labels"]][["y"]], plt_7_cap[["labels"]][["y"]])
+  expect_true(any(is.infinite(ggplot2::ggplot_build(plt_7_raw)$data[[3]]$y)))
+  expect_false(any(is.infinite(ggplot2::ggplot_build(plt_7_cap)$data[[3]]$y)))
+  
   # testing assertions
   expect_error(plot_boxplot_num_panel(dt_response = unlist(dt_response),
                                       dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
@@ -698,20 +748,55 @@ test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
   selected_metric <- "RV_gDR_xc50"
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  dt_response_capped <- 
+    dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
+  common_cellline <- merge(dt_response, 
+                           dt_depmap_meta_lng[!is.na(meta_xx)], 
+                           by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   
-  plt_1 <- plot_boxplot_meta(dt_response = dt_response,
+  plt_0 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta) # default
-  expect_is(plt_1, "gg")
-  expect_equal(plt_1[["labels"]][["y"]], selected_metric)
-  expect_equal(plt_1[["labels"]][["title"]], selected_meta)
-  expect_length(plt_1[["layers"]], 4)
-  expect_length(ggplot2::ggplot_build(plt_1)$data[[2]]$xid,
+  expect_is(plt_0, "gg")
+  expect_equal(plt_0[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_0[["labels"]][["title"]], selected_meta)
+  expect_length(plt_0[["layers"]], 4)
+  expect_length(ggplot2::ggplot_build(plt_0)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
-  expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
+  expect_equal(sort(ggplot2::layer_scales(plt_0)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+  expect_equal(
+    sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y), 
+    sort(dt_response[CellLineName %in% common_cellline & !is.infinite(get(selected_metric))][[selected_metric]]))
+  
+  plt_1_inf <- plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap = dt_depmap_meta, 
+                                 selected_feat_meta_col = selected_meta, 
+                                 with_inf = TRUE)
+  expect_is(plt_1_inf, "gg")
+  
+  expect_length(ggplot2::ggplot_build(plt_1_inf)$data[[2]]$xid,
+                NROW(grp_stat[!is.na(meta_xx)]))
+  expect_equal(sort(ggplot2::layer_scales(plt_1_inf)$x$range$range),
+               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y), 
+               sort(dt_response[CellLineName %in% common_cellline, ][[selected_metric]]))
+  
+  plt_1_cap <- plot_boxplot_meta(dt_response = dt_response_capped,
+                             dt_depmap = dt_depmap_meta, 
+                             selected_feat_meta_col = selected_meta) # default
+  expect_is(plt_1_cap, "gg")
+  expect_equal(plt_1_cap[["labels"]][["y"]], selected_metric)
+  expect_equal(plt_1_cap[["labels"]][["title"]], selected_meta)
+  expect_length(plt_1_cap[["layers"]], 4)
+  expect_length(ggplot2::ggplot_build(plt_1_cap)$data[[2]]$xid,
+                NROW(grp_stat[!is.na(meta_xx)]))
+  expect_equal(sort(ggplot2::layer_scales(plt_1_cap)$x$range$range),
+               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y), 
+               sort(dt_response_capped[CellLineName %in% common_cellline][[selected_metric]]))
   
   # scenario: plot without one-item-group
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
@@ -828,6 +913,11 @@ test_that("plot_boxplot_meta works as expected", {
                                  selected_feat_meta_col = selected_meta,
                                  max_x_lbl_length = 1:5),
                "Assertion on 'max_x_lbl_length' failed: Must have length 1")
+  expect_error(plot_boxplot_meta(dt_response = dt_response,
+                                 dt_depmap = dt_depmap_meta, 
+                                 selected_feat_meta_col = selected_meta,
+                                 with_inf = "yes"),
+               "Assertion on 'with_inf' failed: Must be of type 'logical flag'")
 }) 
 
 #nolint start

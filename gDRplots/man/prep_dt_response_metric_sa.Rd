@@ -44,6 +44,19 @@ dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
 dt_response <-
   prep_dt_response_metric_sa(dt_metrics, d_name,
                              metric = c("xc50", "x_mean", "x_max"))
+                             
+dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                assay_name = "Averaged")
+dt_metrics_capped <- 
+  gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+                                 assay_dt = dt_metrics,
+                                 experiment_name = gDRutils::get_supported_experiments("sa"),
+                                 capping_fold = 5)
+d_name <- "drug_026"
+dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
+dt_response <-
+  prep_dt_response_metric_sa(dt_metrics, d_name,
+                             metric = c("xc50", "x_mean", "x_max"))
 
 }
 \keyword{prism_plots}

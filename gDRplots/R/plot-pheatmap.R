@@ -182,9 +182,9 @@ pheatmap_qc <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # heatmap labels
@@ -217,13 +217,13 @@ pheatmap_qc <- function(
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
   hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
-  
+
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
                        scale = "none",
                        display_numbers = FALSE,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 45,
@@ -252,12 +252,14 @@ pheatmap_qc <- function(
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
+#' @param dt_metrics_capped \code{data.table} representing data from the \code{Metrics} assay,
+#'  the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-#'  but the values from any numeric colum can be displayed.
+#'  but the values from any numeric column can be displayed.
 #' @param fit_source string source name for metrics
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
@@ -292,8 +294,22 @@ pheatmap_qc <- function(
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                                assay_name = "Metrics")
-#' 
+#' dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                 assay_name = "Averaged")
+#' dt_metrics_capped <-
+#'   gDRutils::cap_assay_infinities(
+#'     conc_assay_dt = dt_averaged,
+#'     assay_dt = dt_metrics,
+#'     experiment_name = gDRutils::get_supported_experiments("sa"),
+#'     col = "xc50",
+#'     capping_fold = 5)
+#'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
+#' hm_0 <- output[["heatmap"]]
+#' ggpubr::as_ggplot(hm_0[["gtable"]])
+#' 
+#' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+#'                                 dt_metrics_capped = dt_metrics_capped)
 #' hm_1 <- output[["heatmap"]]
 #' ggpubr::as_ggplot(hm_1[["gtable"]])
 #' 
@@ -351,6 +367,7 @@ pheatmap_qc <- function(
 #' @export
 pheatmap_with_anno_sa <- function(
     dt_metrics,
+    dt_metrics_capped = NULL,
     normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
@@ -368,9 +385,14 @@ pheatmap_with_anno_sa <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   
   checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_metrics_capped, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
   checkmate::assert_choice(metric, choices = numeric_columns)
+  if (!is.null(dt_metrics_capped)) {
+    numeric_columns <- names(dt_metrics_capped)[vapply(dt_metrics_capped, is.numeric, logical(1))]
+    checkmate::assert_choice(metric, choices = numeric_columns)
+  }
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -394,75 +416,56 @@ pheatmap_with_anno_sa <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # select data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_metrics[eval(filter_expr)]
-  
   qmfun <- switch(metric,
                   "xc50" = log10,
                   identity)
   
-  # prep data
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ get(drug_name),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd_raw <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                      normalization_type = normalization_type,
+                                      metric = metric,
+                                      fit_source = fit_source,
+                                      experiment_type = gDRutils::get_supported_experiments("sa"))
+  
+  mat_cvd <- if (is.null(dt_metrics_capped)) {
+    mat_cvd_raw
+  } else {
+    prep_pheatmap_matrix(dt_response = dt_metrics_capped,
+                         normalization_type = normalization_type,
+                         metric = metric,
+                         fit_source = fit_source,
+                         experiment_type = gDRutils::get_supported_experiments("sa"))
+  }
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", cellline_name)
-      
-      annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-    data.table::setorderv(annotation_col, cols = cols, na.last = TRUE)
-    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- .fill_pheatmap_annotation(dt_anno = annotation_col,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = cellline_name)
     ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
+    if (!is.null(dt_metrics_capped)) { # order raw as capped
+      mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
+    }
   }
   
   if (!is.null(annotation_row)) {
-    if (!all(colnames(mat_cvd) %in% annotation_row[[drug_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = colnames(mat_cvd)[!colnames(mat_cvd) %in% annotation_row[[drug_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", drug_name)
-      
-      annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_row)[names(annotation_row) != drug_name]
-    data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
-    annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_row <- annotation_row[get(drug_name) %in% colnames(mat_cvd), ]
+    annotation_row <- .fill_pheatmap_annotation(dt_anno = annotation_row,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = drug_name)
     ls_output[["data"]][["annotation_row"]] <- annotation_row
     
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     annotation_row <- annotation_row[, .SD, .SDcol = -drug_name]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
+    if (!is.null(dt_metrics_capped)) {  # order raw as capped
+      mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
+    }
   }
   
   # filling missing values
@@ -473,7 +476,12 @@ pheatmap_with_anno_sa <- function(
     annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
   
-  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  ls_output[["data"]][["matrix"]] <- if (is.null(dt_metrics_capped)) {
+    data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  } else {
+    data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
+  }
+  
   # flip
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
@@ -484,14 +492,14 @@ pheatmap_with_anno_sa <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -513,15 +521,15 @@ pheatmap_with_anno_sa <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
@@ -695,29 +703,16 @@ pheatmap_with_anno_cd <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # select data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_metrics[eval(filter_expr)]
-  
   qmfun <- switch(metric,
                   "xc50" = log10,
                   identity)
   
-  # prep data
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                  normalization_type = normalization_type,
+                                  metric = metric,
+                                  fit_source = fit_source,
+                                  experiment_type = gDRutils::get_supported_experiments("cd"))
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -792,14 +787,14 @@ pheatmap_with_anno_cd <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -819,15 +814,15 @@ pheatmap_with_anno_cd <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
@@ -976,26 +971,12 @@ pheatmap_with_anno_combo <- function(
                                 annotation_row = NULL),
                     heatmap = NULL)
   
-  # prep data
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_scores[eval(filter_expr)]
-  
-  # select data for normalization type
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-    value.var = metric)
-  data.table::setnames(tab_plot, "cellline_name", cellline_name)
-  
   # prep matrix
-  mat_cvd <- as.matrix(tab_plot[, .SD, .SDcols = -cellline_name])
-  if (all(dim(mat_cvd) == c(0, 0)) || all(is.na(mat_cvd))) return("No data") # pheatmap does not handle <0 x 0 matrix>
-  rownames(mat_cvd) <- tab_plot[[cellline_name]]
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  mat_cvd <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                  normalization_type = normalization_type,
+                                  metric = metric,
+                                  fit_source = fit_source,
+                                  experiment_type = gDRutils::get_supported_experiments("combo"))
   
   # check completeness of annotation - TODO wrap in separate function
   if (!is.null(annotation_col)) {
@@ -1059,21 +1040,21 @@ pheatmap_with_anno_combo <- function(
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
-
+  
   # dendrogram
   max_dim_matrix_cluster <- 
     gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
                                      system.file(package = "gDRplots", "settings.json"))
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
-    cluster_rows <- .pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   if (cluster_cols) {
-    cluster_cols <- .pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
-                                            distfun = distfun,
-                                            additional_condition = gDR_cluster_condition)
+    cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
+                                                distfun = distfun,
+                                                additional_condition = gDR_cluster_condition)
   }
   
   # prep hm color palette
@@ -1084,15 +1065,15 @@ pheatmap_with_anno_combo <- function(
     grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
   }
   
-  # display numbers - for readability, turn it off for matrices larger than 10x10
-  display_numbers_flag <- !any(dim(t_mat_cvd) > c(10, 10))
+  # display numbers - for readability, turn it off for matrices larger than 15x15
+  display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
                        number_color = "black",
-                       fontsize_number = 1.2 * 8,
+                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 90,
@@ -1292,23 +1273,23 @@ fill_ann_color_map <- function(dt_ann,
 #' mat <- matrix(1:24, nrow = 4)
 #' rownames(mat) <- sprintf("row_%s", 1:4)
 #' colnames(mat) <- sprintf("col_%s", 1:6)
-#' .pheatmap_cluster_param(mat)
-#' .pheatmap_cluster_param(t(mat))
-#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(t(mat))
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
 #' 
 #' mat[2,2] <- NA
 #' mat[2,1] <- Inf
-#' .pheatmap_cluster_param(mat)
-#' .pheatmap_cluster_param(mat, distfun = compute_distances)
-#' .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances)
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
 #' add_cond <- NCOL(mat) > 10
-#' .pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
 #' }
 #' 
 #' @keywords internal
-.pheatmap_cluster_param <- function(mat_to_cluster,
-                                    distfun = stats::dist,
-                                    additional_condition = TRUE) {
+.get_pheatmap_cluster_param <- function(mat_to_cluster,
+                                        distfun = stats::dist,
+                                        additional_condition = TRUE) {
   
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
@@ -1320,4 +1301,150 @@ fill_ann_color_map <- function(dt_ann,
   } else {
     FALSE
   }
+}
+
+
+#' Prep matrix with metric value based on the Metrics assay
+#'
+#' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  and single-agent \code{SummarizedExperiment} or 
+#'  \code{data.table} representing data from the \code{scores} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  and combo \code{SummarizedExperiment}
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+#'  but the values from any numeric column can be displayed.
+#' @param fit_source string source name for metrics
+#' @param experiment_type string with experiment name;
+#'                        one of: "single-agent", "combination" or "co-dilution"
+#' 
+#' @keywords pheat_ann
+#' 
+#' @return matrix with values for selected metric with \code{CellLinName} in the rows
+#'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_metrics,
+#'                             experiment_type = gDRutils::get_supported_experiments("sa"))
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "scores")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_scores,
+#'                             metric = "hsa_score",
+#'                             normalization_type = "RV",
+#'                             experiment_type = gDRutils::get_supported_experiments("combo"))
+#'                             
+#' @export                           
+prep_pheatmap_matrix <- function(dt_response,
+                                 normalization_type = "GR",
+                                 metric = "xc50",
+                                 fit_source = "gDR",
+                                 experiment_type = gDRutils::get_supported_experiments("sa")) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  numeric_columns <- names(dt_response)[vapply(dt_response, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(experiment_type, choices = gDRutils::get_supported_experiments())
+  
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- dt_response[eval(filter_expr)]
+  
+  # prep data
+  tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name)),
+      value.var = metric)
+  } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
+      value.var = metric)
+  } else {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
+      value.var = metric)
+  }
+  data.table::setkey(tab_dcast, NULL)
+  data.table::setnames(tab_dcast, "cellline_name", cellline_name)
+  
+  # prep matrix cellline vs drugs
+  mat_cvd <- as.matrix(tab_dcast[, .SD, .SDcols = -cellline_name])
+  rownames(mat_cvd) <- tab_dcast[[cellline_name]]
+  # remove all-NA-rows and all-NA-columns
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  
+  return(mat_cvd)
+}
+
+
+#' Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
+#' 
+#' @param dt_anno \code{data.table} that specifies the annotations shown on left side of the heatmap 
+#'   or shown above the heatmap - depending on the \code{anno_var}.
+#'   Each row defines the features for a specific row. The rows in the data and in the annotation
+#'   are matched using corresponding names from the required \code{anno_var} column.
+#' @param mat_with_metric numeric matrix with metric values
+#' @param anno_var string with variable describing annotation dimension:
+#'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
+#'
+#' @return \code{data.table} with annotation updatet to \code{mat_with_metric}
+#' 
+#' @keywords internal
+.fill_pheatmap_annotation <- function(dt_anno,
+                                      mat_with_metric,
+                                      anno_var = gDRutils::get_env_identifiers("cellline_name")) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  
+  checkmate::assert_data_table(dt_anno)
+  checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
+  checkmate::assert_choice(anno_var, choices = c(cellline_name, drug_name))
+  
+  fun_names <- if (anno_var == cellline_name) rownames else colnames
+  
+  # check completeness of annotation
+  if (!all(fun_names(mat_with_metric) %in% dt_anno[[anno_var]])) {
+    tab_missing_ann <- data.table::data.table(
+      missing = fun_names(mat_with_metric)[!fun_names(mat_with_metric) %in% dt_anno[[anno_var]]]
+    )
+    data.table::setnames(tab_missing_ann, "missing", anno_var)
+    
+    dt_anno <- data.table::rbindlist(list(dt_anno, tab_missing_ann), fill = TRUE)
+  }
+  
+  # foll missing values (note: data.table::nafill does not support character)
+  cols <- names(dt_anno)[names(dt_anno) != anno_var]
+  data.table::setorderv(dt_anno, cols = cols, na.last = TRUE)
+  dt_anno[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
+  # select annotation acc to matrix
+  dt_anno <- dt_anno[get(anno_var) %in% fun_names(mat_with_metric), ]
+  
+  return(dt_anno)
 }

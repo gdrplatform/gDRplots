@@ -6,6 +6,7 @@
 \usage{
 pheatmap_with_anno_sa(
   dt_metrics,
+  dt_metrics_capped = NULL,
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
@@ -25,13 +26,16 @@ pheatmap_with_anno_sa(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
 
+\item{dt_metrics_capped}{\code{data.table} representing data from the \code{Metrics} assay,
+the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}}
+
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
 one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-but the values from any numeric colum can be displayed.}
+but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
 
@@ -89,8 +93,22 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
+dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                assay_name = "Averaged")
+dt_metrics_capped <-
+  gDRutils::cap_assay_infinities(
+    conc_assay_dt = dt_averaged,
+    assay_dt = dt_metrics,
+    experiment_name = gDRutils::get_supported_experiments("sa"),
+    col = "xc50",
+    capping_fold = 5)
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
+hm_0 <- output[["heatmap"]]
+ggpubr::as_ggplot(hm_0[["gtable"]])
+
+output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                dt_metrics_capped = dt_metrics_capped)
 hm_1 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_1[["gtable"]])
 

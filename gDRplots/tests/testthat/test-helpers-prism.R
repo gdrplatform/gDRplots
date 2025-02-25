@@ -11,6 +11,13 @@ test_that("prep_dt_response_metric_sa works as expected", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                 assay_name = "Averaged")
+  dt_metrics_capped <-
+    gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
+                                   assay_dt = dt_metrics,
+                                   experiment_name = gDRutils::get_supported_experiments("sa"),
+                                   capping_fold = 5)
   d_name <- "drug_004"
   
   res <- dt_metrics[get(drug_name) == d_name & normalization_type == "RV", ]
@@ -19,6 +26,13 @@ test_that("prep_dt_response_metric_sa works as expected", {
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "RV_gDR_xc50"))
   expect_equal(NROW(dt_response), NROW(res))
+  
+  d_name <- "drug_021"
+  dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name, metric = "xc50")
+  dt_response_capped <- prep_dt_response_metric_sa(dt_metrics_capped, d_name, metric = "xc50")
+  expect_identical(dt_response[, c(meta_col)], dt_response_capped[, c(meta_col)])
+  expect_true(all(is.infinite(dt_response$RV_gDR_xc50)))
+  expect_false(all(is.infinite(dt_response_capped$RV_gDR_xc50)))
   
   dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name,
                                             normalization_type = "GR",
@@ -189,13 +203,8 @@ test_that("prep_dt_response_metric_diff works as expected", {
   subset <- 
     dt_metrics[get(drug_name) == d_name & get(drug_name_2) == d_name2 & 
                  normalization_type == "RV", ][!is.na(cotrt_value)]
-  # Inf -> 10^dt_metrics[["maxlog10Concentration"]] # nolint
-  subset[, xc50 := ifelse(is.infinite(xc50), 10^maxlog10Concentration, xc50)]
-  
   meta_col_str <- paste(c("rId", "cId", gDRutils::get_env_identifiers("cellline_name")), collapse = " + ")
-  
   dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + source"))
-  
   
   res <- data.table::dcast(subset, formula = dcast_formula, 
                            value.var = "xc50")
@@ -233,7 +242,9 @@ test_that("prep_dt_response_metric_diff works as expected", {
   ))
   expect_equal(NROW(dt_response), NROW(res))
   
+  # TODO add tests for capped combo (GDR-2856)
 })
+
 #nolint start
 # test_that("prep_dt_depmap_feat works as expected", {
 #   # TODO in GDR-2710

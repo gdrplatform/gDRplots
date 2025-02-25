@@ -1,4 +1,4 @@
-context("Test qc_heatmap")
+context("Test pheatmap with anno")
 
 test_that("pheatmap_qc works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -103,6 +103,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+  dt_metrics_capped <- 
+    gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+                                   assay_dt = dt_metrics,
+                                   experiment_name = gDRutils::get_supported_experiments("sa"),
+                                   capping_fold = 5)
   
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
@@ -158,7 +164,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_2[["tree_row"]], "hclust") # dendrogram
   expect_is(plt_2[["tree_col"]], "hclust") # dendrogram
   
-  # scenario 3: annotations for row and col
+  # scenario 3: annotations for row and col and capped metrics
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
     mut_A = c(1, 0),
@@ -174,6 +180,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
   
   out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
+                                 dt_metrics_capped = dt_metrics_capped,
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
   expect_length(out_3, 2)
@@ -190,13 +197,15 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(data_3[["matrix"]], "data.table")
   expect_equal(data_3[["matrix"]], 
                res_1[order(match(CellLineName, anno_col_3$CellLineName)), 
-                     c("CellLineName", anno_row_3$DrugName), with = FALSE])
+                     c("CellLineName", anno_row_3$DrugName), with = FALSE]) # origin data
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[7]]$label, c("mut_A", "mut_B", "mut_C"))
   expect_equal(plt_3$gtable$grobs[[9]]$label, c("group"))
   expect_is(plt_3[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_3[["tree_col"]], "hclust") # clustering despite Inf
+  expect_false(any(is.infinite(as.numeric(
+    plt_3[["gtable"]][["grobs"]][[3]][["children"]][[2]][["label"]])))) # capped data
   
   # scenario 4: incomplete annotations for col and color maps
   annotation_map <- list(
@@ -294,6 +303,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     dt_metrics_capped = unlist(dt_metrics_capped)),
+               "Assertion on 'dt_metrics_capped' failed: Must be a data.table")
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
@@ -843,53 +855,53 @@ test_that("fill_ann_color_map works", {
                "Assertion on 'map_ann' failed: Must be of type 'list'")
 })
 
-test_that(".pheatmap_cluster_param works as expected", {
+test_that(".get_pheatmap_cluster_param works as expected", {
   mat <- matrix(1:24, nrow = 4)
   rownames(mat) <- sprintf("row_%s", 1:4)
   colnames(mat) <- sprintf("col_%s", 1:6)
   
-  out_1 <- .pheatmap_cluster_param(mat)
+  out_1 <- .get_pheatmap_cluster_param(mat)
   expect_is(out_1, "hclust")
   expect_equal(out_1$labels, rownames(mat))
   expect_equal(out_1$dist.method, "euclidean") # default for stats::dist
   expect_equal(out_1$method, "complete")
   
-  out_2 <- .pheatmap_cluster_param(t(mat))
+  out_2 <- .get_pheatmap_cluster_param(t(mat))
   expect_is(out_2, "hclust")
   expect_equal(out_2$labels, colnames(mat))
-
-  out_3 <- .pheatmap_cluster_param(t(mat), distfun = compute_distances)
+  
+  out_3 <- .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
   expect_is(out_3, "hclust")
   expect_equal(out_3$labels, colnames(mat))
   expect_equal(out_3$dist.method, NULL) # hidden in compute_distances
   expect_equal(out_3$method, "complete")
   
   add_cond <- any(dim(mat) > 10)
-  out_4 <- .pheatmap_cluster_param(t(mat), additional_condition = add_cond)
+  out_4 <- .get_pheatmap_cluster_param(t(mat), additional_condition = add_cond)
   expect_is(out_4, "logical")
   expect_equal(out_4, add_cond)
   
-  out_5 <- .pheatmap_cluster_param(mat[1, , drop = FALSE]) # only one row
+  out_5 <- .get_pheatmap_cluster_param(mat[1, , drop = FALSE]) # only one row
   expect_is(out_5, "logical")
   expect_false(out_5)
   
-  out_6 <- .pheatmap_cluster_param(mat[, 1, drop = FALSE]) # only one row
+  out_6 <- .get_pheatmap_cluster_param(mat[, 1, drop = FALSE]) # only one row
   expect_is(out_6, "hclust")
   expect_equal(out_6$labels, rownames(mat))
   
   # scenario: matrix with NA
   mat_NA <- mat
   mat_NA[2, ] <- NA
- 
-  out_7 <- .pheatmap_cluster_param(mat_NA)
+  
+  out_7 <- .get_pheatmap_cluster_param(mat_NA)
   expect_is(out_7, "logical")
   expect_false(out_7) # default stats::dist does not handle NAs
   
-  out_8 <- .pheatmap_cluster_param(t(mat_NA), distfun = compute_distances)
+  out_8 <- .get_pheatmap_cluster_param(t(mat_NA), distfun = compute_distances)
   expect_is(out_8, "hclust")
   expect_equal(out_8$labels, colnames(mat))
   
-  out_9 <- .pheatmap_cluster_param(mat_NA, distfun = compute_distances, additional_condition = add_cond)
+  out_9 <- .get_pheatmap_cluster_param(mat_NA, distfun = compute_distances, additional_condition = add_cond)
   expect_is(out_9, "logical")
   expect_equal(out_9, add_cond)
   
@@ -898,11 +910,11 @@ test_that(".pheatmap_cluster_param works as expected", {
   mat_inf[2, 2:3] <- Inf
   mat_inf[4, 3:4] <- -Inf
   
-  out_10 <- .pheatmap_cluster_param(mat_inf)
+  out_10 <- .get_pheatmap_cluster_param(mat_inf)
   expect_is(out_10, "logical")
   expect_false(out_10) # default stats::dist does not handle Inf
   
-  out_11 <- .pheatmap_cluster_param(t(mat_inf), distfun = compute_distances)
+  out_11 <- .get_pheatmap_cluster_param(t(mat_inf), distfun = compute_distances)
   expect_is(out_11, "hclust")
   expect_equal(out_11$labels, colnames(mat))
   
@@ -910,23 +922,123 @@ test_that(".pheatmap_cluster_param works as expected", {
   mat_inf_na <- mat_inf
   mat_inf_na[3, 1:4] <- NA
   
-  out_12 <- .pheatmap_cluster_param(mat_inf_na)
+  out_12 <- .get_pheatmap_cluster_param(mat_inf_na)
   expect_is(out_12, "logical")
   expect_false(out_12) # default stats::dist does not handle Inf and NA
   
-  out_13 <- .pheatmap_cluster_param(t(mat_inf_na), distfun = compute_distances)
+  out_13 <- .get_pheatmap_cluster_param(t(mat_inf_na), distfun = compute_distances)
   expect_is(out_13, "hclust")
   expect_equal(out_13$labels, colnames(mat))
   
   # testing assertions
-  expect_error(.pheatmap_cluster_param(mat_to_cluster = list(mat)),
+  expect_error(.get_pheatmap_cluster_param(mat_to_cluster = list(mat)),
                "Assertion on 'mat_to_cluster' failed: Must be of type 'matrix'")
-  expect_error(.pheatmap_cluster_param(mat_to_cluster = matrix(1:6, nrow = 3)),
+  expect_error(.get_pheatmap_cluster_param(mat_to_cluster = matrix(1:6, nrow = 3)),
                "Assertion on 'mat_to_cluster' failed: Must have rownames")
-  expect_error(.pheatmap_cluster_param(mat_to_cluster = matrix(LETTERS[1:6], nrow = 3)),
+  expect_error(.get_pheatmap_cluster_param(mat_to_cluster = matrix(LETTERS[1:6], nrow = 3)),
                "Assertion on 'mat_to_cluster' failed: Must store numerics")
-  expect_error(.pheatmap_cluster_param(mat_to_cluster = mat, distfun = "dist"),
+  expect_error(.get_pheatmap_cluster_param(mat_to_cluster = mat, distfun = "dist"),
                "Assertion on 'distfun' failed: Must be a function")
-  expect_error(.pheatmap_cluster_param(mat_to_cluster = mat, additional_condition = "yes"),
+  expect_error(.get_pheatmap_cluster_param(mat_to_cluster = mat, additional_condition = "yes"),
                "Assertion on 'additional_condition' failed: Must be of type 'logical flag'")
+})
+
+test_that("prep_pheatmap_matrix works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                                 assay_name = "Metrics")
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                                assay_name = "scores")
+  
+  mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
+  expect_is(mat_1, "matrix")
+  expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_1)), sort(unique(dt_metrics[["DrugName"]])))
+  expect_true(all(dt_metrics[normalization_type == "GR"][["xc50"]] %in% mat_1))
+  
+  mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                metric = "p_value")
+  expect_is(mat_2, "matrix")
+  expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
+  
+  # scenario: combo data
+  mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                metric = "hsa_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_3, "matrix")
+  expect_equal(sort(rownames(mat_3)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_3)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV"][["hsa_score"]] %in% mat_3))
+  
+  # scenario: codilution data
+  mae <- gDRutils::get_synthetic_data("combo_codilution_small")
+  se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                                    assay_name = "Metrics")
+  
+  mat_4 <- prep_pheatmap_matrix(dt_response = dt_metrics_cd,
+                                metric = "x_max",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("cd"))
+  expect_is(mat_4, "matrix")
+  expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
+  expect_equal(
+    sort(colnames(mat_4)), 
+    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
+  expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
+  
+  # scenario: NA-row
+  dt_scores_NA <- data.table::copy(dt_scores)
+  dt_scores_NA[CellLineName == "cellline_EA"][["bliss_score"]] <- NA
+  
+  mat_5 <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
+                                metric = "bliss_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_5, "matrix")
+  expect_false("cellline_EA" %in% rownames(mat_5))
+  expect_equal(sort(colnames(mat_5)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
+  
+  # scenario: matrix 0x0 (all values are NAs)
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
+  
+  mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
+  expect_is(mat_6, "matrix")
+  expect_equal(dim(mat_6), c(0, 0))
+  
+  # scenario: duplicates
+  mat_7 <- purrr::quietly(prep_pheatmap_matrix)(dt_response = dt_scores,
+                                                metric = "bliss_score")$result
+  expect_is(mat_7, "matrix")
+  expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_7)), sort(unique(dt_scores[["DrugName"]])))
+  expect_false(all(dt_scores[normalization_type == "GR"][["bliss_score"]] %in% mat_7))
+  expect_true(all(
+    dt_scores[normalization_type == "GR", .N, by = c("CellLineName", "DrugName")][["N"]] %in% mat_7))
+  
+  # testing assertions
+  expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    metric = "IC50"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = 1),
+               "Assertion on 'experiment_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = "sa"),
+               "Assertion on 'experiment_type' failed: Must be element of set")
 })
