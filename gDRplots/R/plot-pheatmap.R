@@ -262,7 +262,7 @@ pheatmap_qc <- function(
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
 #'   note that the first color will be assigned to the min value, and the last one - to the max
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{DrugName} column.
