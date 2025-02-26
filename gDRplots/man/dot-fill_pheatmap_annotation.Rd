@@ -16,13 +16,13 @@ or shown above the heatmap - depending on the \code{anno_var}.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from the required \code{anno_var} column.}
 
-\item{mat_with_metric}{numeric matrix with metric values}
+\item{mat_with_metric}{numeric matrix with metric values; must have named rows and columns}
 
 \item{anno_var}{string with variable describing annotation dimension:
 one of: \code{CellLineName} for rows or \code{DrugName} for column.}
 }
 \value{
-\code{data.table} with annotation updatet to \code{mat_with_metric}
+\code{data.table} with annotation updated to \code{mat_with_metric}
 }
 \description{
 Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
