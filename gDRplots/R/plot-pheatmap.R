@@ -1492,7 +1492,7 @@ fill_ann_color_map <- function(dt_ann,
 #' @param mat_with_metric numeric matrix with metric values; must have named rows and columns
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
 #'   must to be one item shorter than \code{no_breaks}
-#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
+#' @param breaks numeric vector of breaks on scale used for mapping values to colors
 #' @param dark_color_font string with valid color name of font for field with dark background
 #' @param light_color_font string with valid color name of font for field without dark background
 #'
