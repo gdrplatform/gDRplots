@@ -13,7 +13,7 @@
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #'    note that for \code{metric} "x" the first color will be assigned to the min value, and 
 #'    the last one - to the max; for "x_std" - that will be reversed
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param cluster_rows logical flag whether rows should be clustered;
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
@@ -214,16 +214,14 @@ pheatmap_qc <- function(
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
   minval <- min(c(0, round(min(mat_cvd, na.rm = TRUE), digits = 2)))
   
-  breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  breaks <- seq(from = minval, to = maxval, length.out = no_breaks + 1)
+  hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
-
+  
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
                        scale = "none",
                        display_numbers = FALSE,
-                       number_color = "black",
-                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 45,
@@ -514,24 +512,36 @@ pheatmap_with_anno_sa <- function(
     min_val <- min_val - 1
   }
   
-  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
+  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
+      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
-                       number_color = "black",
+                       number_color = number_color,
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -565,7 +575,7 @@ pheatmap_with_anno_sa <- function(
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
 #'   note that the first color will be assigned to the min value, and the last one - to the max
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param annotation_row \code{data.table} that specifies the annotations shown on the left side 
 #'   of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -807,24 +817,36 @@ pheatmap_with_anno_cd <- function(
     min_val <- max_val / 100
   }
   
-  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
+  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
+      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
-                       number_color = "black",
+                       number_color = number_color,
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -1058,15 +1080,26 @@ pheatmap_with_anno_combo <- function(
   }
   
   # prep hm color palette
-  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
+  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_excess_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
+      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
@@ -1076,6 +1109,7 @@ pheatmap_with_anno_combo <- function(
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -1093,6 +1127,7 @@ pheatmap_with_anno_combo <- function(
                        silent = TRUE)
   return(ls_output)
 }
+
 
 # helpers ----
 #' Get Legend Title
@@ -1136,6 +1171,106 @@ get_hm_title <- function(metric = "xc50",
   }
   return(hm_title)
 }
+
+
+#' Prep matrix with metric value based on the Metrics assay
+#'
+#' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  and single-agent \code{SummarizedExperiment} or 
+#'  \code{data.table} representing data from the \code{scores} assay,
+#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  and combo \code{SummarizedExperiment}
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+#'  but the values from any numeric column can be displayed.
+#' @param fit_source string source name for metrics
+#' @param experiment_type string with experiment name;
+#'                        one of: "single-agent", "combination" or "co-dilution"
+#' 
+#' @keywords pheat_ann
+#' 
+#' @return matrix with values for selected metric with \code{CellLinName} in the rows
+#'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_metrics,
+#'                             experiment_type = gDRutils::get_supported_experiments("sa"))
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "scores")
+#'
+#' mat <- prep_pheatmap_matrix(dt_response = dt_scores,
+#'                             metric = "hsa_score",
+#'                             normalization_type = "RV",
+#'                             experiment_type = gDRutils::get_supported_experiments("combo"))
+#'                             
+#' @export                           
+prep_pheatmap_matrix <- function(dt_response,
+                                 normalization_type = "GR",
+                                 metric = "xc50",
+                                 fit_source = "gDR",
+                                 experiment_type = gDRutils::get_supported_experiments("sa")) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  numeric_columns <- names(dt_response)[vapply(dt_response, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(experiment_type, choices = gDRutils::get_supported_experiments())
+  
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  tab_response <- dt_response[eval(filter_expr)]
+  
+  # prep data
+  tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name)),
+      value.var = metric)
+  } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
+      value.var = metric)
+  } else {
+    data.table::dcast(
+      data = tab_response,
+      formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
+      value.var = metric)
+  }
+  data.table::setkey(tab_dcast, NULL)
+  data.table::setnames(tab_dcast, "cellline_name", cellline_name)
+  
+  # prep matrix cellline vs drugs
+  mat_cvd <- as.matrix(tab_dcast[, .SD, .SDcols = -cellline_name])
+  rownames(mat_cvd) <- tab_dcast[[cellline_name]]
+  # remove all-NA-rows and all-NA-columns
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  
+  return(mat_cvd)
+}
+
 
 #' Change NA into given string
 #'
@@ -1249,6 +1384,7 @@ fill_ann_color_map <- function(dt_ann,
   return(map_ann)
 }
 
+
 #' Compute value of param cluster_rows or cluster_cols in pheatmap::pheatmap
 #' 
 #' The \code{cluster_rows} and \code{cluster_cols} parameters  pheatmap::pheatmap may take values:
@@ -1304,116 +1440,17 @@ fill_ann_color_map <- function(dt_ann,
 }
 
 
-#' Prep matrix with metric value based on the Metrics assay
-#'
-#' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#'  and single-agent \code{SummarizedExperiment} or 
-#'  \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
-#'  and combo \code{SummarizedExperiment}
-#' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param metric string name of the metric;
-#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-#'  but the values from any numeric column can be displayed.
-#' @param fit_source string source name for metrics
-#' @param experiment_type string with experiment name;
-#'                        one of: "single-agent", "combination" or "co-dilution"
-#' 
-#' @keywords pheat_ann
-#' 
-#' @return matrix with values for selected metric with \code{CellLinName} in the rows
-#'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
-#' 
-#' @examples
-#' mae <- gDRutils::get_synthetic_data("combo_matrix")
-#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                                assay_name = "Metrics")
-#'
-#' mat <- prep_pheatmap_matrix(dt_response = dt_metrics,
-#'                             experiment_type = gDRutils::get_supported_experiments("sa"))
-#' 
-#' mae <- gDRutils::get_synthetic_data("combo_matrix")
-#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
-#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
-#'                                               assay_name = "scores")
-#'
-#' mat <- prep_pheatmap_matrix(dt_response = dt_scores,
-#'                             metric = "hsa_score",
-#'                             normalization_type = "RV",
-#'                             experiment_type = gDRutils::get_supported_experiments("combo"))
-#'                             
-#' @export                           
-prep_pheatmap_matrix <- function(dt_response,
-                                 normalization_type = "GR",
-                                 metric = "xc50",
-                                 fit_source = "gDR",
-                                 experiment_type = gDRutils::get_supported_experiments("sa")) {
-  
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  conc_2 <- gDRutils::get_env_identifiers("concentration2")
-  
-  checkmate::assert_data_table(dt_response)
-  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  numeric_columns <- names(dt_response)[vapply(dt_response, is.numeric, logical(1))]
-  checkmate::assert_choice(metric, choices = numeric_columns)
-  checkmate::assert_string(fit_source, null.ok = TRUE)
-  checkmate::assert_choice(experiment_type, choices = gDRutils::get_supported_experiments())
-  
-  # select data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  tab_response <- dt_response[eval(filter_expr)]
-  
-  # prep data
-  tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name)),
-      value.var = metric)
-  } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-      value.var = metric)
-  } else {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-      value.var = metric)
-  }
-  data.table::setkey(tab_dcast, NULL)
-  data.table::setnames(tab_dcast, "cellline_name", cellline_name)
-  
-  # prep matrix cellline vs drugs
-  mat_cvd <- as.matrix(tab_dcast[, .SD, .SDcols = -cellline_name])
-  rownames(mat_cvd) <- tab_dcast[[cellline_name]]
-  # remove all-NA-rows and all-NA-columns
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
-  
-  return(mat_cvd)
-}
-
-
 #' Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
 #' 
 #' @param dt_anno \code{data.table} that specifies the annotations shown on left side of the heatmap 
 #'   or shown above the heatmap - depending on the \code{anno_var}.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required \code{anno_var} column.
-#' @param mat_with_metric numeric matrix with metric values
+#' @param mat_with_metric numeric matrix with metric values; must have named rows and columns
 #' @param anno_var string with variable describing annotation dimension:
 #'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
 #'
-#' @return \code{data.table} with annotation updatet to \code{mat_with_metric}
+#' @return \code{data.table} with annotation updated to \code{mat_with_metric}
 #' 
 #' @keywords internal
 .fill_pheatmap_annotation <- function(dt_anno,
@@ -1447,4 +1484,88 @@ prep_pheatmap_matrix <- function(dt_response,
   dt_anno <- dt_anno[get(anno_var) %in% fun_names(mat_with_metric), ]
   
   return(dt_anno)
+}
+
+
+#' Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
+#'
+#' @param mat_with_metric numeric matrix with metric values; must have named rows and columns
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
+#'   must to be one item shorter than \code{no_breaks}
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
+#' @param dark_color_font string with valid color name of font for field with dark background
+#' @param light_color_font string with valid color name of font for field without dark background
+#'
+#' @return named \code{matrix} with number color
+#' @examples
+#' mat <- matrix(-14:30, ncol = 5,
+#'               dimnames = list(letters[1:9], LETTERS[1:5]))
+#' no_breaks <- 15
+#' breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
+#' colors_vec <- c("limegreen", "darkblue", "orange")
+#' hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
+#' 
+#' number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
+#' 
+#' pheatmap::pheatmap(mat,
+#'                    breaks = breaks,
+#'                    color = hm_colors,
+#'                    display_numbers = TRUE,
+#'                    number_color = number_color,
+#'                    cluster_rows = FALSE,
+#'                    cluster_cols = FALSE)
+#' 
+#' @keywords internal
+.get_pheatmap_number_color <- function(mat_with_metric,
+                                       colors_vec,
+                                       breaks,
+                                       dark_color_font = "white",
+                                       light_color_font = "black") {
+  
+  checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
+  checkmate::assert_numeric(breaks, any.missing = FALSE, min.len = 2)
+  checkmate::assert_character(colors_vec, len = NROW(breaks) - 1) # required by pheatmap::pheatmap
+  checkmate::assert_string(dark_color_font)
+  checkmate::assert_string(light_color_font)
+  
+  # preserve some buggy name for font
+  if (!is_valid_color(dark_color_font)) dark_color_font <- "white"
+  if (!is_valid_color(light_color_font)) dark_color_font <- "black"
+  
+  # fast end end when colors_vec does not contain valid color names
+  if (!all(vapply(colors_vec, is_valid_color, logical(1)))) return(light_color_font)
+  
+  # check dark colors
+  ls_dark_breaks <- which(vapply(colors_vec, is_color_dark, logical(1)))
+  first <- min(ls_dark_breaks)
+  last <- max(ls_dark_breaks)
+  # if the dark colors are in the middle of palette 
+  middle <- if (any(diff(ls_dark_breaks) > 1)) {
+    which(diff(ls_dark_breaks) > 1)
+  } else {
+    NULL
+  }
+  # final dark ranges (index of colors in hm_color_palette)
+  dark_ranges <- c(first, ls_dark_breaks[middle - 1], ls_dark_breaks[middle + 1], last)
+  # dark breaks (numeric value for dark range)
+  breaks[1] <- -Inf
+  breaks[NROW(breaks)] <- Inf
+  dark_ranges <- breaks[dark_ranges]
+  
+  # check whether matrix values are in dark ranges
+  ls_range_condition <- list()
+  for (i in seq_len(NROW(dark_ranges) / 2)) {
+    mat_min <- matrix(dark_ranges[2*i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    mat_max <- matrix(dark_ranges[2*i], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    # check range
+    mat_comparison <- mat_with_metric >= mat_min & mat_with_metric <= mat_max
+    ls_range_condition[[i]] <- mat_comparison
+  }
+  
+  # prepare the final matrix with color names
+  mat_number_color <- Reduce(pmax, ls_range_condition)
+  mat_number_color[] <- 
+    vapply(mat_number_color, function(x) ifelse(x, dark_color_font, light_color_font), character(1))
+  
+  return(mat_number_color)
 }
