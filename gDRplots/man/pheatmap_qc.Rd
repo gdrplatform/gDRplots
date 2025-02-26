@@ -38,7 +38,7 @@ or "x_std" (standard deviation)}
 note that for \code{metric} "x" the first color will be assigned to the min value, and 
 the last one - to the max; for "x_std" - that will be reversed}
 
-\item{no_breaks}{numeric number of breaks on scale}
+\item{no_breaks}{numeric number of breaks on scale used for mapping values to colors}
 
 \item{cluster_rows}{logical flag whether rows should be clustered;
 the dendrogram will not be shown for the matrix with any dimension greater than 200.}
