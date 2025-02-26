@@ -1498,6 +1498,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @return named \code{matrix} with number color
 #' @examples
+#' \dontrun{
 #' mat <- matrix(-14:30, ncol = 5,
 #'               dimnames = list(letters[1:9], LETTERS[1:5]))
 #' no_breaks <- 15
@@ -1514,6 +1515,7 @@ fill_ann_color_map <- function(dt_ann,
 #'                    number_color = number_color,
 #'                    cluster_rows = FALSE,
 #'                    cluster_cols = FALSE)
+#' }
 #' 
 #' @keywords internal
 .get_pheatmap_number_color <- function(mat_with_metric,
@@ -1523,47 +1525,53 @@ fill_ann_color_map <- function(dt_ann,
                                        light_color_font = "black") {
   
   checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
-  checkmate::assert_numeric(breaks, any.missing = FALSE, min.len = 2)
+  checkmate::assert_numeric(breaks, any.missing = FALSE, min.len = 3)
   checkmate::assert_character(colors_vec, len = NROW(breaks) - 1) # required by pheatmap::pheatmap
   checkmate::assert_string(dark_color_font)
   checkmate::assert_string(light_color_font)
   
   # preserve some buggy name for font
   if (!is_valid_color(dark_color_font)) dark_color_font <- "white"
-  if (!is_valid_color(light_color_font)) dark_color_font <- "black"
+  if (!is_valid_color(light_color_font)) light_color_font <- "black"
   
-  # fast end end when colors_vec does not contain valid color names
-  if (!all(vapply(colors_vec, is_valid_color, logical(1)))) return(light_color_font)
+  # fast end end when colors_vec does not contain valid color names or contain not dark colors only
+  if (!all(vapply(colors_vec, is_valid_color, logical(1))) ||
+           !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
   
   # check dark colors
   ls_dark_breaks <- which(vapply(colors_vec, is_color_dark, logical(1)))
-  first <- min(ls_dark_breaks)
-  last <- max(ls_dark_breaks)
-  # if the dark colors are in the middle of palette 
-  middle <- if (any(diff(ls_dark_breaks) > 1)) {
-    which(diff(ls_dark_breaks) > 1)
+  if (NROW(ls_dark_breaks) == 1) {
+    possible_range <- list(c(-Inf, breaks[2]), c(breaks[2], Inf)) 
+    dark_ranges <- possible_range[[ls_dark_breaks]]
   } else {
-    NULL
+    first <- min(ls_dark_breaks)
+    last <- max(ls_dark_breaks)
+    # if the dark colors are in the middle of palette 
+    middle <- if (any(diff(ls_dark_breaks) > 1)) {
+      which(diff(ls_dark_breaks) > 1)
+    } else {
+      NULL
+    }
+    # final dark ranges (index of colors in hm_color_palette)
+    dark_ranges <- c(first, ls_dark_breaks[middle - 1], ls_dark_breaks[middle + 1], last)
+    # dark breaks (numeric value for dark range)
+    breaks[1] <- -Inf
+    breaks[NROW(breaks)] <- Inf
+    dark_ranges <- breaks[dark_ranges]
   }
-  # final dark ranges (index of colors in hm_color_palette)
-  dark_ranges <- c(first, ls_dark_breaks[middle - 1], ls_dark_breaks[middle + 1], last)
-  # dark breaks (numeric value for dark range)
-  breaks[1] <- -Inf
-  breaks[NROW(breaks)] <- Inf
-  dark_ranges <- breaks[dark_ranges]
-  
   # check whether matrix values are in dark ranges
   ls_range_condition <- list()
   for (i in seq_len(NROW(dark_ranges) / 2)) {
-    mat_min <- matrix(dark_ranges[2*i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
-    mat_max <- matrix(dark_ranges[2*i], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    mat_min <- matrix(dark_ranges[2 * i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    mat_max <- matrix(dark_ranges[2 * i], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
     # check range
-    mat_comparison <- mat_with_metric >= mat_min & mat_with_metric <= mat_max
+    mat_comparison <- mat_with_metric > mat_min & mat_with_metric <= mat_max
     ls_range_condition[[i]] <- mat_comparison
   }
   
   # prepare the final matrix with color names
   mat_number_color <- Reduce(pmax, ls_range_condition)
+  mat_number_color[is.na(mat_number_color)] <- 0 # light_color_font for NA field (assumption: grey)
   mat_number_color[] <- 
     vapply(mat_number_color, function(x) ifelse(x, dark_color_font, light_color_font), character(1))
   
