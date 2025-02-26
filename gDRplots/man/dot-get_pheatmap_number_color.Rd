@@ -18,11 +18,11 @@
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap;
 must to be one item shorter than \code{no_breaks}}
 
+\item{breaks}{numeric vector of breaks on scale used for mapping values to colors}
+
 \item{dark_color_font}{string with valid color name of font for field with dark background}
 
 \item{light_color_font}{string with valid color name of font for field without dark background}
-
-\item{no_breaks}{numeric number of breaks on scale used for mapping values to colors}
 }
 \value{
 named \code{matrix} with number color
