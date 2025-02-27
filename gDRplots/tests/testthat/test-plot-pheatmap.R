@@ -1224,9 +1224,10 @@ test_that(".get_pheatmap_number_color works as expected", {
                                           breaks = breaks,
                                           light_color_font = "darkly"), number_color)
   expect_equal(unique(c(number_color)), c("black", "white"))
-  dark_range <- range(breaks[vapply(hm_colors, is_color_dark, logical(1))])
+  ls_dark <- which(vapply(hm_colors, is_color_dark, logical(1)))
+  dark_range <- breaks[c(min(ls_dark), max(ls_dark) + 1)]
   res <- vapply(c(mat), function(i) {
-    data.table::between(i, dark_range[1], dark_range[2])
+    dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color), ifelse(res, "white", "black"))
   
