@@ -1045,6 +1045,162 @@ test_that(".get_pheatmap_cluster_param works as expected", {
 })
 
 test_that(".fill_pheatmap_annotation works as expected", {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  
+  # single-agent ----
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa, assay_name = "Metrics")
+  
+  cl_names <- unique(dt_metrics[[cellline_name]])
+  d_names <- unique(dt_metrics[[drug_name]])
+  
+  mat_sa <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                 normalization_type = "GR",
+                                 metric = "x_mean",
+                                 experiment_type = gDRutils::get_supported_experiments("sa"))
+  annotation_manual_row <-
+    unique(dt_metrics[, c(drug_name, "drug_moa"), with = FALSE])
+  
+  annotation_1 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = drug_name) # default
+  expect_equal(annotation_1, annotation_manual_row)
+  
+  annotation_manual_col <-
+    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
+  
+  annotation_2 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name) # default
+  expect_equal(annotation_2, annotation_manual_col)
+  
+  # scenario: incomplete annotations for columns
+  annotation_manual_col_na <- data.table::copy(annotation_manual_col)[c(4:8), ]
+  
+  annotation_3 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_na,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name)
+  res_3 <- data.table::copy(annotation_manual_col)
+  res_3[!get(cellline_name) %in% annotation_manual_col_na[[cellline_name]], ][["Tissue"]] <- NA
+  res_3[["Tissue"]] <- change_NA_into_char(res_3[["Tissue"]])
+  expect_equal(annotation_3[order(get(cellline_name)), ], res_3[order(get(cellline_name)), ])
+  
+  # scenario: annotation with extra items
+  annotation_manual_col_lng <- data.table::data.table(
+    CellLineName = c("cellline_XX", "cellline_YY", cl_names),
+    mut_A = rep(c(1, 0, 1), length.out = NROW(cl_names) + 2),
+    mut_B = rep(c("yes", "no"), length.out = NROW(cl_names) + 2)
+  )
+  annotation_4 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_lng,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name)
+  expect_equal(annotation_4[order(get(cellline_name)), ], 
+               annotation_manual_col_lng[get(cellline_name) %in% cl_names, ][order(get(cellline_name)), ])
+  
+  # codilution ----
+  mae <- gDRutils::get_synthetic_data("combo_codilution_small")
+  se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_cd, assay_name = "Metrics")
+  
+  mat_cd <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                 normalization_type = "GR",
+                                 metric = "x_max",
+                                 experiment_type = gDRutils::get_supported_experiments("cd"))
+  annotation_manual_cd_col <-
+    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
+  
+  annotation_5 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_cd_col,
+                                            mat_with_metric = mat_cd,
+                                            anno_var = cellline_name) # default
+  expect_equal(annotation_5, annotation_manual_cd_col)
+  
+  annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+                                                    "drug_moa", "drug_moa_2"),
+                                                with = FALSE])
+  # annotation_6 # WIP
+  
+  annotation_manual_cd_row_na <- data.table::copy(annotation_manual_cd_row)[1:20, ]
+  
+  # annotation_7 # WIP
+  
+  # combo ----
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo, assay_name = "scores")
+  
+  cl_names_combo <- unique(dt_scores[[cellline_name]])
+  
+  mat_combo <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                    normalization_type = "GR",
+                                    metric = "bliss_score",
+                                    experiment_type = gDRutils::get_supported_experiments("combo"))
+  drug_combo_names <- sprintf("%s x %s",
+                              unique(dt_scores[, c(drug_name, drug_name_2), with = FALSE])[[drug_name]],
+                              unique(dt_scores[, c(drug_name, drug_name_2), with = FALSE])[[drug_name_2]])
+  annotation_manual_combo_row <-
+    unique(dt_scores[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), with = FALSE])
+  
+  annotation_8 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = drug_name) 
+  
+  # scenario: missing anno
+  annotation_manual_combo_col_na <- data.table::data.table(
+    CellLineName =
+      c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+    mut_A = c(1, 1, 1, 0, 0),
+    mut_B = c("yes", "yes", "no", "no", "no")
+  )
+  
+  annotation_9 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_col_na,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = cellline_name)
+  res_9 <- rbind(
+    data.table::copy(annotation_manual_combo_col_na), 
+    data.table::data.table(
+      CellLineName = cl_names_combo[!cl_names_combo %in% annotation_manual_combo_col_na[[cellline_name]]]),
+    fill = TRUE
+  )
+  res_9[, (c("mut_A", "mut_B")) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = c("mut_A", "mut_B")]
+  expect_equal(annotation_9[order(get(cellline_name)), ], res_9[order(get(cellline_name)), ])
+  
+  # scenario: incomplete annotations for columns
+  annotation_manual_combo_row_na <- data.table::copy(annotation_manual_combo_row)[c(4:8), ]
+  
+  annotation_10 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row_na,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = drug_name)
+  # WIP
+  
+  # testing assertions
+  expect_error(.fill_pheatmap_annotation(dt_anno = as.list(annotation_manual_row),
+                                         mat_with_metric = mat_sa,
+                                         anno_var = drug_name),
+               "Assertion on 'dt_anno' failed: Must be a data.table")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = data.table::data.table(mat_sa),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must be of type 'matrix'")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = matrix(1:48, nrow = 8),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must have rownames")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = matrix(1:48, nrow = 8,
+                                                                  dimnames = list(letters[1:8], NULL)),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must have colnames")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = mat_sa,
+                                         anno_var = "str"),
+               "Assertion on 'anno_var' failed: Must be element of set")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = mat_sa,
+                                         anno_var = cellline_name),
+               "Assertion on 'anno_var' failed: Must be a subset of")
 })
 
 test_that(".get_pheatmap_number_color works as expected", {
@@ -1128,7 +1284,7 @@ test_that(".get_pheatmap_number_color works as expected", {
     if (is.na(i)) {
       FALSE
     } else {
-    dark_range[1] < i & i <= dark_range[2]
+      dark_range[1] < i & i <= dark_range[2]
     }
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_6), ifelse(res_6, "white", "black"))
