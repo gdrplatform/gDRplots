@@ -526,8 +526,8 @@ pheatmap_with_anno_sa <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
-      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -831,8 +831,8 @@ pheatmap_with_anno_cd <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
-      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -1094,8 +1094,8 @@ pheatmap_with_anno_combo <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (class(cluster_rows) == "hclust") mat_ <- mat_[cluster_rows$order, ]
-      if (class(cluster_cols) == "hclust") mat_ <- mat_[, cluster_cols$order]
+      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -1453,9 +1453,10 @@ fill_ann_color_map <- function(dt_ann,
 #' @return \code{data.table} with annotation updated to \code{mat_with_metric}
 #' 
 #' @keywords internal
-.fill_pheatmap_annotation <- function(dt_anno,
-                                      mat_with_metric,
-                                      anno_var = gDRutils::get_env_identifiers("cellline_name")) {
+.fill_pheatmap_annotation <- function(
+    dt_anno,
+    mat_with_metric,
+    anno_var = gDRutils::get_env_identifiers("cellline_name")) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -1463,6 +1464,7 @@ fill_ann_color_map <- function(dt_ann,
   checkmate::assert_data_table(dt_anno)
   checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
   checkmate::assert_choice(anno_var, choices = c(cellline_name, drug_name))
+  checkmate::assert_subset(anno_var, choices = names(dt_anno))
   
   fun_names <- if (anno_var == cellline_name) rownames else colnames
   
@@ -1536,7 +1538,7 @@ fill_ann_color_map <- function(dt_ann,
   
   # fast end end when colors_vec does not contain valid color names or contain not dark colors only
   if (!all(vapply(colors_vec, is_valid_color, logical(1))) ||
-           !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
+      !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
   
   # check dark colors
   ls_dark_breaks <- which(vapply(colors_vec, is_color_dark, logical(1)))
