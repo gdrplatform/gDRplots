@@ -1115,6 +1115,36 @@ test_that(".get_pheatmap_number_color works as expected", {
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_5), ifelse(res_5, "white", "black"))
   
+  # scenario: NA in metric matrix
+  mat_NA <- mat
+  mat_NA[1, 1] <- NA
+  mat_NA[1, 5] <- NA
+  number_color_6 <- .get_pheatmap_number_color(mat_with_metric = mat_NA, 
+                                               colors_vec = hm_col_short,
+                                               breaks = min_breaks)
+  dark_range <- list(c(-Inf, min_breaks[2]), 
+                     c(min_breaks[2], Inf))[[which(vapply(hm_col_short, is_color_dark, logical(1)))]]
+  res_6 <- vapply(c(mat_NA), function(i) {
+    if (is.na(i)) {
+      FALSE
+    } else {
+    dark_range[1] < i & i <= dark_range[2]
+    }
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_6), ifelse(res_6, "white", "black"))
+  
+  # scenario: Inf in metric matrix
+  mat_Inf <- mat
+  mat_Inf[3, 2:4] <- Inf # color for max value
+  mat_Inf[8:9, 5] <- -Inf # color for min value
+  number_color_7 <- .get_pheatmap_number_color(mat_with_metric = mat_Inf, 
+                                               colors_vec = hm_col_short,
+                                               breaks = min_breaks)
+  res_7 <- vapply(c(mat_Inf), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_7), ifelse(res_7, "white", "black"))
+  
   expect_error(.get_pheatmap_number_color(data.table::data.table(),
                                           colors_vec = hm_colors,
                                           breaks = breaks),
