@@ -36,8 +36,8 @@ mat <- matrix(-14:30, ncol = 5,
               dimnames = list(letters[1:9], LETTERS[1:5]))
 no_breaks <- 15
 breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
-colors_vec <- c("limegreen", "darkblue", "orange")
-hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
+ls_colors <- c("limegreen", "darkblue", "orange")
+hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
 
 number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
 

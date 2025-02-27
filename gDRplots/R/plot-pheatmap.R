@@ -526,8 +526,8 @@ pheatmap_with_anno_sa <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
-      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -831,8 +831,8 @@ pheatmap_with_anno_cd <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
-      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -1094,8 +1094,8 @@ pheatmap_with_anno_combo <- function(
       mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
                                          colors_vec = hm_color_palette,
                                          breaks = breaks)
-      if (methods::is(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
-      if (methods::is(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
       mat_
     } else {
       "black"
@@ -1505,8 +1505,8 @@ fill_ann_color_map <- function(dt_ann,
 #'               dimnames = list(letters[1:9], LETTERS[1:5]))
 #' no_breaks <- 15
 #' breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
-#' colors_vec <- c("limegreen", "darkblue", "orange")
-#' hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
+#' ls_colors <- c("limegreen", "darkblue", "orange")
+#' hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
 #' 
 #' number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
 #' 
@@ -1555,21 +1555,18 @@ fill_ann_color_map <- function(dt_ann,
       NULL
     }
     # final dark ranges (index of colors in hm_color_palette)
-    dark_ranges <- c(first, ls_dark_breaks[middle - 1], ls_dark_breaks[middle + 1], last)
+    dark_ranges <- c(first, ls_dark_breaks[middle] + 1, ls_dark_breaks[middle + 1], last + 1)
     # dark breaks (numeric value for dark range)
     breaks[1] <- -Inf
     breaks[NROW(breaks)] <- Inf
     dark_ranges <- breaks[dark_ranges]
   }
   # check whether matrix values are in dark ranges
-  ls_range_condition <- list()
-  for (i in seq_len(NROW(dark_ranges) / 2)) {
+  ls_range_condition <- lapply(seq_len(NROW(dark_ranges) / 2), function(i) {
     mat_min <- matrix(dark_ranges[2 * i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
     mat_max <- matrix(dark_ranges[2 * i], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
-    # check range
-    mat_comparison <- mat_with_metric > mat_min & mat_with_metric <= mat_max
-    ls_range_condition[[i]] <- mat_comparison
-  }
+    mat_with_metric > mat_min & mat_with_metric <= mat_max
+  })
   
   # prepare the final matrix with color names
   mat_number_color <- Reduce(pmax, ls_range_condition)
