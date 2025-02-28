@@ -134,10 +134,11 @@ pheatmap_qc <- function(
     tab_plot <- data.table::dcast(
       data = tab_response,
       formula = clid ~ col_pivot_name,
-      fun.aggregate = .stop_on_aggregation,
       value.var = metric
     )
-  }, message = .stop_on_aggregation)
+  }, message = function(m) {
+    .stop_on_aggregation("pheatmap_qc")
+  })
   data.table::setcolorder(tab_plot, c(clid, unique(tab_response$col_pivot_name)))
   
   # prep matrix
@@ -160,7 +161,9 @@ pheatmap_qc <- function(
       formula = col_pivot_name ~ get(gnumber),
       value.var = conc
     )
-  }, message = .stop_on_aggregation)
+    }, message = function(m) {
+      .stop_on_aggregation("pheatmap_qc")
+    })
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   # handle conc = 0
@@ -1383,7 +1386,10 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = get(cellline_name) ~ paste(get(drug_name)),
         value.var = metric
       )
-    }, message = .stop_on_aggregation)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix")
+    })
+    
   } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
     tryCatch({
       data.table::dcast(
@@ -1391,7 +1397,9 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
         value.var = metric
       )
-    }, message = .stop_on_aggregation)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix")
+    })
   } else {
     tryCatch({
       data.table::dcast(
@@ -1399,7 +1407,9 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
         value.var = metric
       )
-    }, message = .stop_on_aggregation)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix")
+    })
   }
   data.table::setkey(tab_dcast, NULL)
   data.table::setnames(tab_dcast, "cellline_name", cellline_name)
@@ -1466,6 +1476,6 @@ prep_pheatmap_matrix <- function(dt_response,
 #' stop wrapper for `data.table::dcast` to handle unexpected aggregation
 #' idea from: https://github.com/Rdatatable/data.table/issues/5386
 #' @keywords internal
-.stop_on_aggregation <- function() {
-  stop("Unexpected data aggregation")
+.stop_on_aggregation <- function(fname) {
+  stop(sprintf("Unexpected data aggregation in function: '%s'", fname))
 }
