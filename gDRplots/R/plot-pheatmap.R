@@ -1541,25 +1541,28 @@ fill_ann_color_map <- function(dt_ann,
       !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
   
   # check dark colors
-  ls_dark_breaks <- which(vapply(colors_vec, is_color_dark, logical(1)))
-  if (NROW(ls_dark_breaks) == 1) {
+  ls_dark_area <- which(vapply(colors_vec, is_color_dark, logical(1)))
+  if (NROW(ls_dark_area) == 1) {
     possible_range <- list(c(-Inf, breaks[2]), c(breaks[2], Inf)) 
-    dark_ranges <- possible_range[[ls_dark_breaks]]
+    dark_ranges <- possible_range[[ls_dark_area]]
   } else {
-    first <- min(ls_dark_breaks)
-    last <- max(ls_dark_breaks)
+    first <- min(ls_dark_area)
+    last <- max(ls_dark_area)
     # if the dark colors are in the middle of palette 
-    middle <- if (any(diff(ls_dark_breaks) > 1)) {
-      which(diff(ls_dark_breaks) > 1)
+    middle <- if (any(diff(ls_dark_area) > 1)) {
+      which(diff(ls_dark_area) > 1)
     } else {
       NULL
     }
     # final dark ranges (index of colors in hm_color_palette)
-    dark_ranges <- c(first, ls_dark_breaks[middle] + 1, ls_dark_breaks[middle + 1], last + 1)
+    # final dark ranges (index of colors in hm_color_palette)
+    # colors_vec:  | color_1 | color_2 | color_3 | ... | color_n |
+    # breaks:      1         2         3         4     n        n+1
+    dark_idx <- c(first, ls_dark_area[middle] + 1, ls_dark_area[middle + 1], last + 1)
     # dark breaks (numeric value for dark range)
     breaks[1] <- -Inf
     breaks[NROW(breaks)] <- Inf
-    dark_ranges <- breaks[dark_ranges]
+    dark_ranges <- breaks[dark_idx]
   }
   # check whether matrix values are in dark ranges
   ls_range_condition <- lapply(seq_len(NROW(dark_ranges) / 2), function(i) {
