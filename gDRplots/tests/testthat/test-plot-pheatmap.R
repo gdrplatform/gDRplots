@@ -1120,11 +1120,11 @@ test_that(".fill_pheatmap_annotation works as expected", {
   annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
                                                     "drug_moa", "drug_moa_2"),
                                                 with = FALSE])
-  # annotation_6 # WIP
+  # TODO GDR-2791 annotation_6
   
   annotation_manual_cd_row_na <- data.table::copy(annotation_manual_cd_row)[1:20, ]
   
-  # annotation_7 # WIP
+  # TODO GDR-2791 annotation_7
   
   # combo ----
   mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -1173,7 +1173,7 @@ test_that(".fill_pheatmap_annotation works as expected", {
   annotation_10 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row_na,
                                             mat_with_metric = mat_combo,
                                             anno_var = drug_name)
-  # WIP
+  # TODO GDR-2791 
   
   # testing assertions
   expect_error(.fill_pheatmap_annotation(dt_anno = as.list(annotation_manual_row),
