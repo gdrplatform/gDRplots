@@ -1,3 +1,7 @@
+## gDRplots 0.0.68 - 2025-02-25
+* move `is_color_dark` from gDRiPlots package
+* add `.get_pheatmap_number_color` function
+
 ## gDRplots 0.0.67 - 2025-02-17
 * add `prep_pheatmap_matrix` function
 * add `dt_metrics_capped` param to `pheatmap_with_anno_sa` function

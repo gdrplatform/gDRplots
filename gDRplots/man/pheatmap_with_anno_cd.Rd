@@ -39,7 +39,7 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap;
 note that the first color will be assigned to the min value, and the last one - to the max}
 
-\item{no_breaks}{numeric number of breaks on scale}
+\item{no_breaks}{numeric number of breaks on scale used for mapping values to colors}
 
 \item{cluster_rows}{logical flag whether indicating rows should be clustered;
 the dendrogram will not be shown for the matrix with any dimension greater than 200.}

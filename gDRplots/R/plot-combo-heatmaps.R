@@ -1600,7 +1600,7 @@ transform_log_conc <- function(conc_vec) {
   grDevices::colorRampPalette(
     gDRutils::get_settings_from_json("SMOOTH_PALETTE",
                                      system.file(package = "gDRplots", "settings.json"))
-  )(no_breaks + 1)
+  )(no_breaks)
 }
 
 #' Get color palette for the excess values
@@ -1620,5 +1620,5 @@ transform_log_conc <- function(conc_vec) {
   grDevices::colorRampPalette(
     gDRutils::get_settings_from_json("EXCESS_PALETTE",
                                      system.file(package = "gDRplots", "settings.json"))
-  )(no_breaks + 1)
+  )(no_breaks)
 }
