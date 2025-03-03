@@ -1536,6 +1536,7 @@ fill_ann_color_map <- function(dt_ann,
       formula
     )
   )
+}
 
 #' Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
 #'
