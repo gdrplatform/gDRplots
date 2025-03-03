@@ -849,15 +849,34 @@ test_that("prep_pheatmap_matrix works as expected", {
   expect_is(mat_6, "matrix")
   expect_equal(dim(mat_6), c(0, 0))
   
-  # scenario: duplicates
-  mat_7 <- purrr::quietly(prep_pheatmap_matrix)(dt_response = dt_scores,
-                                                metric = "bliss_score")$result
-  expect_is(mat_7, "matrix")
-  expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
-  expect_equal(sort(colnames(mat_7)), sort(unique(dt_scores[["DrugName"]])))
-  expect_false(all(dt_scores[normalization_type == "GR"][["bliss_score"]] %in% mat_7))
-  expect_true(all(
-    dt_scores[normalization_type == "GR", .N, by = c("CellLineName", "DrugName")][["N"]] %in% mat_7))
+  # scenario: error is thrown on duplicates
+  ## single-agent data
+  expect_error(
+    prep_pheatmap_matrix(dt_response = dt_scores, metric = "bliss_score"),
+    "Unexpected data aggregation"
+  )
+  
+  ## combination data
+  dt_scores_dup <- data.table::rbindlist(list(dt_scores, dt_scores))
+  expect_error(
+    prep_pheatmap_matrix(
+      dt_response = dt_scores_dup,
+      metric = "bliss_score",
+      experiment_type = "combination"
+    ),
+    "Unexpected data aggregation"
+  )
+  
+  ## co-dilution data
+  dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
+  expect_error(
+    prep_pheatmap_matrix(
+      dt_response = dt_average_dup,
+      metric = "x",
+      experiment_type = "co-dilution"
+    ),
+    "Unexpected data aggregation"
+  )
   
   # testing assertions
   expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
@@ -1180,36 +1199,6 @@ test_that(".fill_pheatmap_annotation works as expected", {
                                             anno_var = drug_name)
   # TODO GDR-2791 
   
-
-  # scenario: error is thrown on duplicates
-  ## single-agent data
-  expect_error(
-    prep_pheatmap_matrix(dt_response = dt_scores, metric = "bliss_score"),
-    "Unexpected data aggregation"
-  )
-  
-  ## combination data
-  dt_scores_dup <- data.table::rbindlist(list(dt_scores, dt_scores))
-  expect_error(
-    prep_pheatmap_matrix(
-      dt_response = dt_scores_dup,
-      metric = "bliss_score",
-      experiment_type = "combination"
-    ),
-    "Unexpected data aggregation"
-  )
-  
-  ## co-dilution data
-  dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
-  expect_error(
-    prep_pheatmap_matrix(
-      dt_response = dt_average_dup,
-      metric = "x",
-      experiment_type = "co-dilution"
-    ),
-    "Unexpected data aggregation"
-  )
-
   # testing assertions
   expect_error(.fill_pheatmap_annotation(dt_anno = as.list(annotation_manual_row),
                                          mat_with_metric = mat_sa,
