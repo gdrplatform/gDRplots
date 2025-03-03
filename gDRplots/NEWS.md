@@ -1,7 +1,11 @@
-## gDRplots 0.0.68 - 2025-02-17
+## gDRplots 0.0.69 - 2025-03-03
 * protect against unexpected data aggregation in `data.table::dcast`
 
-# gDRplots 0.0.67 - 2024-02-15
+## gDRplots 0.0.68 - 2025-02-25
+* move `is_color_dark` from gDRiPlots package
+* add `.get_pheatmap_number_color` function
+
+## gDRplots 0.0.67 - 2025-02-17
 * add `prep_pheatmap_matrix` function
 * add `dt_metrics_capped` param to `pheatmap_with_anno_sa` function
 * update xc50 capping logic for PRISM inputs

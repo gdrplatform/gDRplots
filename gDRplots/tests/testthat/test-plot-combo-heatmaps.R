@@ -801,7 +801,7 @@ test_that(".get_smooth_palette works as expected", {
   
   no_br <- 25
   res <- .get_smooth_palette(no_br)
-  ls_col <- grDevices::colorRampPalette(ls_smooth)(no_br + 1)
+  ls_col <- grDevices::colorRampPalette(ls_smooth)(no_br)
   expect_length(res, NROW(ls_col))
   expect_true(all(res %in% ls_col))
   
@@ -818,7 +818,7 @@ test_that(".get_excess_palette works as expected", {
   
   no_br <- 2
   res <- .get_excess_palette(no_br)
-  ls_col <- grDevices::colorRampPalette(ls_excess)(no_br + 1)
+  ls_col <- grDevices::colorRampPalette(ls_excess)(no_br)
   expect_length(res, NROW(ls_col))
   expect_true(all(res %in% ls_col))
   

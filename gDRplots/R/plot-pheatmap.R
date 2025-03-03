@@ -13,7 +13,7 @@
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap
 #'    note that for \code{metric} "x" the first color will be assigned to the min value, and 
 #'    the last one - to the max; for "x_std" - that will be reversed
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param cluster_rows logical flag whether rows should be clustered;
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
@@ -224,16 +224,14 @@ pheatmap_qc <- function(
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
   minval <- min(c(0, round(min(mat_cvd, na.rm = TRUE), digits = 2)))
   
-  breaks <- seq(from = minval, to = maxval, length.out = no_breaks)
-  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+  breaks <- seq(from = minval, to = maxval, length.out = no_breaks + 1)
+  hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
-
+  
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
                        scale = "none",
                        display_numbers = FALSE,
-                       number_color = "black",
-                       fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
                        angle_col = 45,
@@ -274,7 +272,7 @@ pheatmap_qc <- function(
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
 #'   note that the first color will be assigned to the min value, and the last one - to the max
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{DrugName} column.
@@ -524,24 +522,36 @@ pheatmap_with_anno_sa <- function(
     min_val <- min_val - 1
   }
   
-  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
+  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
-                       number_color = "black",
+                       number_color = number_color,
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -575,7 +585,7 @@ pheatmap_with_anno_sa <- function(
 #' @param hm_title string plot title
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
 #'   note that the first color will be assigned to the min value, and the last one - to the max
-#' @param no_breaks numeric number of breaks on scale
+#' @param no_breaks numeric number of breaks on scale used for mapping values to colors
 #' @param annotation_row \code{data.table} that specifies the annotations shown on the left side 
 #'   of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -817,24 +827,36 @@ pheatmap_with_anno_cd <- function(
     min_val <- max_val / 100
   }
   
-  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks)
+  breaks <- seq(from = min_val, to = max_val, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
                        display_numbers = display_numbers_flag,
-                       number_color = "black",
+                       number_color = number_color,
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -1068,15 +1090,26 @@ pheatmap_with_anno_combo <- function(
   }
   
   # prep hm color palette
-  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks)
+  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks + 1)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_excess_palette(no_breaks)
   } else {
-    grDevices::colorRampPalette(colors_vec)(no_breaks + 1)
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
   }
   
   # display numbers - for readability, turn it off for matrices larger than 15x15
   display_numbers_flag <- !any(dim(t_mat_cvd) > c(15, 15))
+  number_color <- 
+    if (any(vapply(hm_color_palette, is_color_dark, logical(1))) && display_numbers_flag) {
+      mat_ <- .get_pheatmap_number_color(mat_with_metric = t_mat_cvd,
+                                         colors_vec = hm_color_palette,
+                                         breaks = breaks)
+      if (inherits(cluster_rows, "hclust")) mat_ <- mat_[cluster_rows$order, ]
+      if (inherits(cluster_cols, "hclust")) mat_ <- mat_[, cluster_cols$order]
+      mat_
+    } else {
+      "black"
+    }
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
@@ -1086,6 +1119,7 @@ pheatmap_with_anno_combo <- function(
                        fontsize_number = 8,
                        color = hm_color_palette,
                        breaks = breaks,
+                       border_color = "lightgrey",
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
@@ -1103,6 +1137,7 @@ pheatmap_with_anno_combo <- function(
                        silent = TRUE)
   return(ls_output)
 }
+
 
 # helpers ----
 #' Get Legend Title
@@ -1145,172 +1180,6 @@ get_hm_title <- function(metric = "xc50",
     title_metric
   }
   return(hm_title)
-}
-
-#' Change NA into given string
-#'
-#' @param x vector with items suspected of being NA
-#' @param lbl_NA string - replacement for NA - as default "NA"
-#'
-#' @return character (for NA -> given string)
-#' @keywords internal
-change_NA_into_char <- function(x,
-                                lbl_NA = "NA") {
-  
-  checkmate::assert_string(lbl_NA)
-  
-  ifelse(is.na(x), lbl_NA, as.character(x))
-}
-
-
-#' Create color map for annotation
-#'
-#' @param dt_ann \code{data.table} with the annotations
-#'
-#' @return list with color mapping for the annotations
-#' 
-#' @seealso \code{\link{pheatmap_qc}}
-#' 
-#' @examples
-#' mae <- gDRutils::get_synthetic_data("small")
-#' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-#' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
-#' 
-#' get_ann_color_map(dt_ann)
-#' 
-#' @keywords utils_color
-#' @export 
-get_ann_color_map <- function(dt_ann) {
-  checkmate::assert_data_table(dt_ann)
-  
-  n_unique_ann <- sum(
-    vapply(names(dt_ann), function(nm) NROW(unique(dt_ann[[nm]])), FUN.VALUE = numeric(1)))
-  ls_colors <- get_qual_colors(n_unique_ann)
-  
-  annotation_colors <- list()
-  for (ann in names(dt_ann)) {
-    lvl <- as.character(unique(dt_ann[[ann]]))
-    col_map <- ls_colors[seq_along(lvl)]
-    names(col_map) <- lvl
-    
-    ls_colors <- ls_colors[-seq_along(lvl)]
-    annotation_colors[[ann]] <- col_map
-  }
-  annotation_colors
-}
-
-
-#' Fill missing values in the color map for annotation
-#'
-#' @param dt_ann \code{data.table} with the annotations
-#' @param map_ann \code{list} with the annotations
-#'
-#' @return list with color mapping for the annotations with missing items filled in
-#' 
-#' @seealso \code{\link{pheatmap_with_anno_sa}} \code{\link{pheatmap_with_anno_combo}}
-#' 
-#' @examples
-#' annotation_manual <- data.table::data.table(
-#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
-#'   mut_A = c(0, 0, 1, 2, 3),
-#'   mut_B = c("yes", "yes", "no", NA, NA),
-#'   mut_C = c("AA", "AA", "AB", NA, "B")
-#' )
-#' 
-#' annotation_map <- list(
-#'   mut_A = c("1" = "coral", "0" = "cadetblue"),
-#'   mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"),
-#'   mut_C = c("AA" = "red", "AB" = "orange", "B" = "yellow")
-#' )
-#' 
-#' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
-#' 
-#' @keywords utils_color
-#' @export 
-fill_ann_color_map <- function(dt_ann,
-                               map_ann) {
-  checkmate::assert_data_table(dt_ann)
-  checkmate::assert_list(map_ann)
-  
-  dt_ann <- dt_ann[, lapply(.SD, change_NA_into_char)] # annotation has to be character type without NA
-  
-  ls_ann_with_colors <- names(dt_ann)[names(dt_ann) %in% names(map_ann)]
-  
-  if (NROW(ls_ann_with_colors) > 0) {
-    for (ann in ls_ann_with_colors) {
-      required_lvl <- unique(dt_ann[[ann]])
-      available_lvl <- names(map_ann[[ann]])
-      missing_lvl <- required_lvl[!required_lvl %in% available_lvl]
-      
-      if (any(required_lvl == "NA")) {
-        required_lvl <- c(required_lvl[required_lvl != "NA"], "NA")
-      }
-      
-      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(map_ann[[ann]] %in% c("black", "#000000")), "darkred", "black")
-        map_ann[[ann]] <- c(map_ann[[ann]], "NA" = col_na)
-      } else if (NROW(missing_lvl) > 0) {
-        map_ann[[ann]] <- NULL # allow default coloring
-      }
-      map_ann[[ann]] <- map_ann[[ann]][required_lvl]
-    }
-  }
-  return(map_ann)
-}
-
-#' Compute value of param cluster_rows or cluster_cols in pheatmap::pheatmap
-#' 
-#' The \code{cluster_rows} and \code{cluster_cols} parameters  pheatmap::pheatmap may take values:
-#' - boolean determining if rows/columns should be clustered
-#' - \code{hclust} object,
-#' this function allows to calculate proper value taking into account matrix, additional condition and 
-#' selected function used to compute the distance in \code{hclust} object
-#' 
-#' To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
-#'
-#' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
-#' @param distfun function used to compute the distance (dissimilarity) between rows;
-#'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
-#' @param additional_condition additional logical flag whether rows/columns should be clustered 
-#'
-#' @return logical flag determining if rows should be clustered or \code{hclust} object.
-#' 
-#' @seealso \code{\link{compute_distances}}
-#' 
-#' @examples
-#' \dontrun{
-#' mat <- matrix(1:24, nrow = 4)
-#' rownames(mat) <- sprintf("row_%s", 1:4)
-#' colnames(mat) <- sprintf("col_%s", 1:6)
-#' .get_pheatmap_cluster_param(mat)
-#' .get_pheatmap_cluster_param(t(mat))
-#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
-#' 
-#' mat[2,2] <- NA
-#' mat[2,1] <- Inf
-#' .get_pheatmap_cluster_param(mat)
-#' .get_pheatmap_cluster_param(mat, distfun = compute_distances)
-#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
-#' add_cond <- NCOL(mat) > 10
-#' .get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
-#' }
-#' 
-#' @keywords internal
-.get_pheatmap_cluster_param <- function(mat_to_cluster,
-                                        distfun = stats::dist,
-                                        additional_condition = TRUE) {
-  
-  checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
-  checkmate::assert_function(distfun)
-  checkmate::assert_flag(additional_condition)
-  
-  if (additional_condition && NROW(mat_to_cluster) >= 2) {
-    tryCatch(stats::hclust(distfun(mat_to_cluster)),
-             error = function(e) return(FALSE)) # if any problem with distfun -> no clustering
-  } else {
-    FALSE
-  }
 }
 
 
@@ -1432,22 +1301,191 @@ prep_pheatmap_matrix <- function(dt_response,
 }
 
 
+#' Change NA into given string
+#'
+#' @param x vector with items suspected of being NA
+#' @param lbl_NA string - replacement for NA - as default "NA"
+#'
+#' @return character (for NA -> given string)
+#' @keywords internal
+change_NA_into_char <- function(x,
+                                lbl_NA = "NA") {
+  
+  checkmate::assert_string(lbl_NA)
+  
+  ifelse(is.na(x), lbl_NA, as.character(x))
+}
+
+
+#' Create color map for annotation
+#'
+#' @param dt_ann \code{data.table} with the annotations
+#'
+#' @return list with color mapping for the annotations
+#' 
+#' @seealso \code{\link{pheatmap_qc}}
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
+#' dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
+#' 
+#' get_ann_color_map(dt_ann)
+#' 
+#' @keywords utils_color
+#' @export 
+get_ann_color_map <- function(dt_ann) {
+  checkmate::assert_data_table(dt_ann)
+  
+  n_unique_ann <- sum(
+    vapply(names(dt_ann), function(nm) NROW(unique(dt_ann[[nm]])), FUN.VALUE = numeric(1)))
+  ls_colors <- get_qual_colors(n_unique_ann)
+  
+  annotation_colors <- list()
+  for (ann in names(dt_ann)) {
+    lvl <- as.character(unique(dt_ann[[ann]]))
+    col_map <- ls_colors[seq_along(lvl)]
+    names(col_map) <- lvl
+    
+    ls_colors <- ls_colors[-seq_along(lvl)]
+    annotation_colors[[ann]] <- col_map
+  }
+  annotation_colors
+}
+
+
+#' Fill missing values in the color map for annotation
+#'
+#' @param dt_ann \code{data.table} with the annotations
+#' @param map_ann \code{list} with the annotations
+#'
+#' @return list with color mapping for the annotations with missing items filled in
+#' 
+#' @seealso \code{\link{pheatmap_with_anno_sa}} \code{\link{pheatmap_with_anno_combo}}
+#' 
+#' @examples
+#' annotation_manual <- data.table::data.table(
+#'   CellLineName = c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+#'   mut_A = c(0, 0, 1, 2, 3),
+#'   mut_B = c("yes", "yes", "no", NA, NA),
+#'   mut_C = c("AA", "AA", "AB", NA, "B")
+#' )
+#' 
+#' annotation_map <- list(
+#'   mut_A = c("1" = "coral", "0" = "cadetblue"),
+#'   mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"),
+#'   mut_C = c("AA" = "red", "AB" = "orange", "B" = "yellow")
+#' )
+#' 
+#' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
+#' 
+#' @keywords utils_color
+#' @export 
+fill_ann_color_map <- function(dt_ann,
+                               map_ann) {
+  checkmate::assert_data_table(dt_ann)
+  checkmate::assert_list(map_ann)
+  
+  dt_ann <- dt_ann[, lapply(.SD, change_NA_into_char)] # annotation has to be character type without NA
+  
+  ls_ann_with_colors <- names(dt_ann)[names(dt_ann) %in% names(map_ann)]
+  
+  if (NROW(ls_ann_with_colors) > 0) {
+    for (ann in ls_ann_with_colors) {
+      required_lvl <- unique(dt_ann[[ann]])
+      available_lvl <- names(map_ann[[ann]])
+      missing_lvl <- required_lvl[!required_lvl %in% available_lvl]
+      
+      if (any(required_lvl == "NA")) {
+        required_lvl <- c(required_lvl[required_lvl != "NA"], "NA")
+      }
+      
+      if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
+        col_na <- ifelse(any(map_ann[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        map_ann[[ann]] <- c(map_ann[[ann]], "NA" = col_na)
+      } else if (NROW(missing_lvl) > 0) {
+        map_ann[[ann]] <- NULL # allow default coloring
+      }
+      map_ann[[ann]] <- map_ann[[ann]][required_lvl]
+    }
+  }
+  return(map_ann)
+}
+
+
+#' Compute value of param cluster_rows or cluster_cols in pheatmap::pheatmap
+#' 
+#' The \code{cluster_rows} and \code{cluster_cols} parameters  pheatmap::pheatmap may take values:
+#' - boolean determining if rows/columns should be clustered
+#' - \code{hclust} object,
+#' this function allows to calculate proper value taking into account matrix, additional condition and 
+#' selected function used to compute the distance in \code{hclust} object
+#' 
+#' To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
+#'
+#' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
+#' @param distfun function used to compute the distance (dissimilarity) between rows;
+#'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
+#' @param additional_condition additional logical flag whether rows/columns should be clustered 
+#'
+#' @return logical flag determining if rows should be clustered or \code{hclust} object.
+#' 
+#' @seealso \code{\link{compute_distances}}
+#' 
+#' @examples
+#' \dontrun{
+#' mat <- matrix(1:24, nrow = 4)
+#' rownames(mat) <- sprintf("row_%s", 1:4)
+#' colnames(mat) <- sprintf("col_%s", 1:6)
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(t(mat))
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' 
+#' mat[2,2] <- NA
+#' mat[2,1] <- Inf
+#' .get_pheatmap_cluster_param(mat)
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances)
+#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' add_cond <- NCOL(mat) > 10
+#' .get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' }
+#' 
+#' @keywords internal
+.get_pheatmap_cluster_param <- function(mat_to_cluster,
+                                        distfun = stats::dist,
+                                        additional_condition = TRUE) {
+  
+  checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
+  checkmate::assert_function(distfun)
+  checkmate::assert_flag(additional_condition)
+  
+  if (additional_condition && NROW(mat_to_cluster) >= 2) {
+    tryCatch(stats::hclust(distfun(mat_to_cluster)),
+             error = function(e) return(FALSE)) # if any problem with distfun -> no clustering
+  } else {
+    FALSE
+  }
+}
+
+
 #' Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
 #' 
 #' @param dt_anno \code{data.table} that specifies the annotations shown on left side of the heatmap 
 #'   or shown above the heatmap - depending on the \code{anno_var}.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required \code{anno_var} column.
-#' @param mat_with_metric numeric matrix with metric values
+#' @param mat_with_metric numeric matrix with metric values; must have named rows and columns
 #' @param anno_var string with variable describing annotation dimension:
 #'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
 #'
-#' @return \code{data.table} with annotation updatet to \code{mat_with_metric}
+#' @return \code{data.table} with annotation updated to \code{mat_with_metric}
 #' 
 #' @keywords internal
-.fill_pheatmap_annotation <- function(dt_anno,
-                                      mat_with_metric,
-                                      anno_var = gDRutils::get_env_identifiers("cellline_name")) {
+.fill_pheatmap_annotation <- function(
+    dt_anno,
+    mat_with_metric,
+    anno_var = gDRutils::get_env_identifiers("cellline_name")) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -1455,6 +1493,7 @@ prep_pheatmap_matrix <- function(dt_response,
   checkmate::assert_data_table(dt_anno)
   checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
   checkmate::assert_choice(anno_var, choices = c(cellline_name, drug_name))
+  checkmate::assert_subset(anno_var, choices = names(dt_anno))
   
   fun_names <- if (anno_var == cellline_name) rownames else colnames
   
@@ -1497,4 +1536,94 @@ prep_pheatmap_matrix <- function(dt_response,
       formula
     )
   )
+
+#' Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
+#'
+#' @param mat_with_metric numeric matrix with metric values; must have named rows and columns
+#' @param colors_vec character vector of colors (valid name or hex) used in heatmap;
+#'   must to be one item shorter than \code{no_breaks}
+#' @param breaks numeric vector of breaks on scale used for mapping values to colors
+#' @param dark_color_font string with valid color name of font for field with dark background
+#' @param light_color_font string with valid color name of font for field without dark background
+#'
+#' @return named \code{matrix} with number color
+#' @examples
+#' \dontrun{
+#' mat <- matrix(-14:30, ncol = 5,
+#'               dimnames = list(letters[1:9], LETTERS[1:5]))
+#' no_breaks <- 15
+#' breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
+#' ls_colors <- c("limegreen", "darkblue", "orange")
+#' hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
+#' 
+#' number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
+#' 
+#' pheatmap::pheatmap(mat,
+#'                    breaks = breaks,
+#'                    color = hm_colors,
+#'                    display_numbers = TRUE,
+#'                    number_color = number_color,
+#'                    cluster_rows = FALSE,
+#'                    cluster_cols = FALSE)
+#' }
+#' 
+#' @keywords internal
+.get_pheatmap_number_color <- function(mat_with_metric,
+                                       colors_vec,
+                                       breaks,
+                                       dark_color_font = "white",
+                                       light_color_font = "black") {
+  
+  checkmate::assert_matrix(mat_with_metric, mode = "numeric", row.names = "unique", col.names = "unique")
+  checkmate::assert_numeric(breaks, any.missing = FALSE, min.len = 3)
+  checkmate::assert_character(colors_vec, len = NROW(breaks) - 1) # required by pheatmap::pheatmap
+  checkmate::assert_string(dark_color_font)
+  checkmate::assert_string(light_color_font)
+  
+  # preserve some buggy name for font
+  if (!is_valid_color(dark_color_font)) dark_color_font <- "white"
+  if (!is_valid_color(light_color_font)) light_color_font <- "black"
+  
+  # fast end end when colors_vec does not contain valid color names or contain not dark colors only
+  if (!all(vapply(colors_vec, is_valid_color, logical(1))) ||
+      !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
+  
+  # check dark colors
+  ls_dark_area <- which(vapply(colors_vec, is_color_dark, logical(1)))
+  if (NROW(ls_dark_area) == 1) {
+    possible_range <- list(c(-Inf, breaks[2]), c(breaks[2], Inf)) 
+    dark_ranges <- possible_range[[ls_dark_area]]
+  } else {
+    first <- min(ls_dark_area)
+    last <- max(ls_dark_area)
+    # if the dark colors are in the middle of palette 
+    middle <- if (any(diff(ls_dark_area) > 1)) {
+      which(diff(ls_dark_area) > 1)
+    } else {
+      NULL
+    }
+    # final dark ranges (index of colors in hm_color_palette)
+    # final dark ranges (index of colors in hm_color_palette)
+    # colors_vec:  | color_1 | color_2 | color_3 | ... | color_n |
+    # breaks:      1         2         3         4     n        n+1
+    dark_idx <- c(first, ls_dark_area[middle] + 1, ls_dark_area[middle + 1], last + 1)
+    # dark breaks (numeric value for dark range)
+    breaks[1] <- -Inf
+    breaks[NROW(breaks)] <- Inf
+    dark_ranges <- breaks[dark_idx]
+  }
+  # check whether matrix values are in dark ranges
+  ls_range_condition <- lapply(seq_len(NROW(dark_ranges) / 2), function(i) {
+    mat_min <- matrix(dark_ranges[2 * i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    mat_max <- matrix(dark_ranges[2 * i], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
+    mat_with_metric > mat_min & mat_with_metric <= mat_max
+  })
+  
+  # prepare the final matrix with color names
+  mat_number_color <- Reduce(pmax, ls_range_condition)
+  mat_number_color[is.na(mat_number_color)] <- 0 # light_color_font for NA field (assumption: grey)
+  mat_number_color[] <- 
+    vapply(mat_number_color, function(x) ifelse(x, dark_color_font, light_color_font), character(1))
+  
+  return(mat_number_color)
 }

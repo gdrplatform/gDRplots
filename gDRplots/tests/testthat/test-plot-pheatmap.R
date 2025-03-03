@@ -778,6 +778,107 @@ test_that("get_hm_title works as expected", {
   expect_equal(get_hm_title(metric, normalization_type), "Aggregated IC50")
 })
 
+
+test_that("prep_pheatmap_matrix works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                                 assay_name = "Metrics")
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                                assay_name = "scores")
+  
+  mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
+  expect_is(mat_1, "matrix")
+  expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_1)), sort(unique(dt_metrics[["DrugName"]])))
+  expect_true(all(dt_metrics[normalization_type == "GR"][["xc50"]] %in% mat_1))
+  
+  mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                metric = "p_value")
+  expect_is(mat_2, "matrix")
+  expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
+  
+  # scenario: combo data
+  mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                metric = "hsa_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_3, "matrix")
+  expect_equal(sort(rownames(mat_3)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_3)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV"][["hsa_score"]] %in% mat_3))
+  
+  # scenario: codilution data
+  mae <- gDRutils::get_synthetic_data("combo_codilution_small")
+  se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
+                                                    assay_name = "Metrics")
+  
+  mat_4 <- prep_pheatmap_matrix(dt_response = dt_metrics_cd,
+                                metric = "x_max",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("cd"))
+  expect_is(mat_4, "matrix")
+  expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
+  expect_equal(
+    sort(colnames(mat_4)), 
+    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
+  expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
+  
+  # scenario: NA-row
+  dt_scores_NA <- data.table::copy(dt_scores)
+  dt_scores_NA[CellLineName == "cellline_EA"][["bliss_score"]] <- NA
+  
+  mat_5 <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
+                                metric = "bliss_score",
+                                normalization_type = "RV",
+                                experiment_type = gDRutils::get_supported_experiments("combo"))
+  expect_is(mat_5, "matrix")
+  expect_false("cellline_EA" %in% rownames(mat_5))
+  expect_equal(sort(colnames(mat_5)), 
+               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
+  expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
+  
+  # scenario: matrix 0x0 (all values are NAs)
+  dt_metrics_NA <- data.table::copy(dt_metrics)
+  dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
+  
+  mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
+  expect_is(mat_6, "matrix")
+  expect_equal(dim(mat_6), c(0, 0))
+  
+  # scenario: duplicates
+  mat_7 <- purrr::quietly(prep_pheatmap_matrix)(dt_response = dt_scores,
+                                                metric = "bliss_score")$result
+  expect_is(mat_7, "matrix")
+  expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
+  expect_equal(sort(colnames(mat_7)), sort(unique(dt_scores[["DrugName"]])))
+  expect_false(all(dt_scores[normalization_type == "GR"][["bliss_score"]] %in% mat_7))
+  expect_true(all(
+    dt_scores[normalization_type == "GR", .N, by = c("CellLineName", "DrugName")][["N"]] %in% mat_7))
+  
+  # testing assertions
+  expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    metric = "IC50"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = 1),
+               "Assertion on 'experiment_type' failed: Must be element of set")
+  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
+                                    experiment_type = "sa"),
+               "Assertion on 'experiment_type' failed: Must be element of set")
+})
+
 test_that("change_NA_into_char works", {
   test_vec <- list(11, " ", NA, "A", NULL)
   
@@ -948,76 +1049,138 @@ test_that(".get_pheatmap_cluster_param works as expected", {
                "Assertion on 'additional_condition' failed: Must be of type 'logical flag'")
 })
 
-test_that("prep_pheatmap_matrix works as expected", {
+test_that(".fill_pheatmap_annotation works as expected", {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  
+  # single-agent ----
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
-  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                                 assay_name = "Metrics")
-  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                                assay_name = "scores")
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa, assay_name = "Metrics")
   
-  mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
-  expect_is(mat_1, "matrix")
-  expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
-  expect_equal(sort(colnames(mat_1)), sort(unique(dt_metrics[["DrugName"]])))
-  expect_true(all(dt_metrics[normalization_type == "GR"][["xc50"]] %in% mat_1))
+  cl_names <- unique(dt_metrics[[cellline_name]])
+  d_names <- unique(dt_metrics[[drug_name]])
   
-  mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
-                                metric = "p_value")
-  expect_is(mat_2, "matrix")
-  expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
+  mat_sa <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                 normalization_type = "GR",
+                                 metric = "x_mean",
+                                 experiment_type = gDRutils::get_supported_experiments("sa"))
+  annotation_manual_row <-
+    unique(dt_metrics[, c(drug_name, "drug_moa"), with = FALSE])
   
-  # scenario: combo data
-  mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,
-                                metric = "hsa_score",
-                                normalization_type = "RV",
-                                experiment_type = gDRutils::get_supported_experiments("combo"))
-  expect_is(mat_3, "matrix")
-  expect_equal(sort(rownames(mat_3)), sort(unique(dt_scores[["CellLineName"]])))
-  expect_equal(sort(colnames(mat_3)), 
-               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
-  expect_true(all(dt_scores[normalization_type == "RV"][["hsa_score"]] %in% mat_3))
+  annotation_1 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = drug_name) # default
+  expect_equal(annotation_1, annotation_manual_row)
   
-  # scenario: codilution data
+  annotation_manual_col <-
+    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
+  
+  annotation_2 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name) # default
+  expect_equal(annotation_2, annotation_manual_col)
+  
+  # scenario: incomplete annotations for columns
+  annotation_manual_col_na <- data.table::copy(annotation_manual_col)[c(4:8), ]
+  
+  annotation_3 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_na,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name)
+  res_3 <- data.table::copy(annotation_manual_col)
+  res_3[!get(cellline_name) %in% annotation_manual_col_na[[cellline_name]], ][["Tissue"]] <- NA
+  res_3[["Tissue"]] <- change_NA_into_char(res_3[["Tissue"]])
+  expect_equal(annotation_3[order(get(cellline_name)), ], res_3[order(get(cellline_name)), ])
+  
+  # scenario: annotation with extra items
+  annotation_manual_col_lng <- data.table::data.table(
+    CellLineName = c("cellline_XX", "cellline_YY", cl_names),
+    mut_A = rep(c(1, 0, 1), length.out = NROW(cl_names) + 2),
+    mut_B = rep(c("yes", "no"), length.out = NROW(cl_names) + 2)
+  )
+  annotation_4 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_lng,
+                                            mat_with_metric = mat_sa,
+                                            anno_var = cellline_name)
+  expect_equal(annotation_4[order(get(cellline_name)), ], 
+               annotation_manual_col_lng[get(cellline_name) %in% cl_names, ][order(get(cellline_name)), ])
+  
+  # codilution ----
   mae <- gDRutils::get_synthetic_data("combo_codilution_small")
   se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
-  dt_metrics_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                                    assay_name = "Metrics")
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_cd, assay_name = "Metrics")
   
-  mat_4 <- prep_pheatmap_matrix(dt_response = dt_metrics_cd,
-                                metric = "x_max",
-                                normalization_type = "RV",
-                                experiment_type = gDRutils::get_supported_experiments("cd"))
-  expect_is(mat_4, "matrix")
-  expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
-  expect_equal(
-    sort(colnames(mat_4)), 
-    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
-  expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
+  mat_cd <- prep_pheatmap_matrix(dt_response = dt_metrics,
+                                 normalization_type = "GR",
+                                 metric = "x_max",
+                                 experiment_type = gDRutils::get_supported_experiments("cd"))
+  annotation_manual_cd_col <-
+    unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
   
-  # scenario: NA-row
-  dt_scores_NA <- data.table::copy(dt_scores)
-  dt_scores_NA[CellLineName == "cellline_EA"][["bliss_score"]] <- NA
+  annotation_5 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_cd_col,
+                                            mat_with_metric = mat_cd,
+                                            anno_var = cellline_name) # default
+  expect_equal(annotation_5, annotation_manual_cd_col)
   
-  mat_5 <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
-                                metric = "bliss_score",
-                                normalization_type = "RV",
-                                experiment_type = gDRutils::get_supported_experiments("combo"))
-  expect_is(mat_5, "matrix")
-  expect_false("cellline_EA" %in% rownames(mat_5))
-  expect_equal(sort(colnames(mat_5)), 
-               sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
-  expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
+  annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+                                                    "drug_moa", "drug_moa_2"),
+                                                with = FALSE])
+  # TODO GDR-2791 annotation_6
   
-  # scenario: matrix 0x0 (all values are NAs)
-  dt_metrics_NA <- data.table::copy(dt_metrics)
-  dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
+  annotation_manual_cd_row_na <- data.table::copy(annotation_manual_cd_row)[1:20, ]
   
-  mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
-  expect_is(mat_6, "matrix")
-  expect_equal(dim(mat_6), c(0, 0))
+  # TODO GDR-2791 annotation_7
   
+  # combo ----
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo, assay_name = "scores")
+  
+  cl_names_combo <- unique(dt_scores[[cellline_name]])
+  
+  mat_combo <- prep_pheatmap_matrix(dt_response = dt_scores,
+                                    normalization_type = "GR",
+                                    metric = "bliss_score",
+                                    experiment_type = gDRutils::get_supported_experiments("combo"))
+  drug_combo_names <- sprintf("%s x %s",
+                              unique(dt_scores[, c(drug_name, drug_name_2), with = FALSE])[[drug_name]],
+                              unique(dt_scores[, c(drug_name, drug_name_2), with = FALSE])[[drug_name_2]])
+  annotation_manual_combo_row <-
+    unique(dt_scores[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), with = FALSE])
+  
+  annotation_8 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = drug_name) 
+  
+  # scenario: missing anno
+  annotation_manual_combo_col_na <- data.table::data.table(
+    CellLineName =
+      c("cellline_AA", "cellline_EA", "cellline_IB", "cellline_MC", "cellline_BC"),
+    mut_A = c(1, 1, 1, 0, 0),
+    mut_B = c("yes", "yes", "no", "no", "no")
+  )
+  
+  annotation_9 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_col_na,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = cellline_name)
+  res_9 <- rbind(
+    data.table::copy(annotation_manual_combo_col_na), 
+    data.table::data.table(
+      CellLineName = cl_names_combo[!cl_names_combo %in% annotation_manual_combo_col_na[[cellline_name]]]),
+    fill = TRUE
+  )
+  res_9[, (c("mut_A", "mut_B")) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = c("mut_A", "mut_B")]
+  expect_equal(annotation_9[order(get(cellline_name)), ], res_9[order(get(cellline_name)), ])
+  
+  # scenario: incomplete annotations for columns
+  annotation_manual_combo_row_na <- data.table::copy(annotation_manual_combo_row)[c(4:8), ]
+  
+  annotation_10 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row_na,
+                                            mat_with_metric = mat_combo,
+                                            anno_var = drug_name)
+  # TODO GDR-2791 
+  
+
   # scenario: error is thrown on duplicates
   ## single-agent data
   expect_error(
@@ -1046,23 +1209,167 @@ test_that("prep_pheatmap_matrix works as expected", {
     ),
     "Unexpected data aggregation"
   )
-  
+
   # testing assertions
-  expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
-               "Assertion on 'dt_response' failed: Must be a data.table")
-  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
-                                    normalization_type = "XX"),
-               "Assertion on 'normalization_type' failed: Must be element of set")
-  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
-                                    metric = "IC50"),
-               "Assertion on 'metric' failed: Must be element of set")
-  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
-                                    fit_source = 1),
-               "Assertion on 'fit_source' failed: Must be of type 'string'")
-  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
-                                    experiment_type = 1),
-               "Assertion on 'experiment_type' failed: Must be element of set")
-  expect_error(prep_pheatmap_matrix(dt_response = dt_metrics,
-                                    experiment_type = "sa"),
-               "Assertion on 'experiment_type' failed: Must be element of set")
+  expect_error(.fill_pheatmap_annotation(dt_anno = as.list(annotation_manual_row),
+                                         mat_with_metric = mat_sa,
+                                         anno_var = drug_name),
+               "Assertion on 'dt_anno' failed: Must be a data.table")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = data.table::data.table(mat_sa),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must be of type 'matrix'")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = matrix(1:48, nrow = 8),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must have rownames")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = matrix(1:48, nrow = 8,
+                                                                  dimnames = list(letters[1:8], NULL)),
+                                         anno_var = drug_name),
+               "Assertion on 'mat_with_metric' failed: Must have colnames")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = mat_sa,
+                                         anno_var = "str"),
+               "Assertion on 'anno_var' failed: Must be element of set")
+  expect_error(.fill_pheatmap_annotation(dt_anno = annotation_manual_row,
+                                         mat_with_metric = mat_sa,
+                                         anno_var = cellline_name),
+               "Assertion on 'anno_var' failed: Must be a subset of")
+})
+
+test_that(".get_pheatmap_number_color works as expected", {
+  mat <- matrix(-14:30, ncol = 5,
+                dimnames = list(letters[1:9], LETTERS[1:5]))
+  no_breaks <- 15
+  breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
+  colors_vec <- c("limegreen", "darkblue", "orange")
+  hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
+  
+  number_color <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                             colors_vec = hm_colors, 
+                                             breaks = breaks) # default
+  
+  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat, 
+                                          colors_vec = hm_colors, 
+                                          breaks = breaks,
+                                          dark_color_font = "pinki"), number_color)
+  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat, 
+                                          colors_vec = hm_colors, 
+                                          breaks = breaks,
+                                          light_color_font = "darkly"), number_color)
+  expect_equal(unique(c(number_color)), c("black", "white"))
+  ls_dark <- which(vapply(hm_colors, is_color_dark, logical(1)))
+  dark_range <- breaks[c(min(ls_dark), max(ls_dark) + 1)]
+  res <- vapply(c(mat), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color), ifelse(res, "white", "black"))
+  
+  number_color_1 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_colors, 
+                                               breaks = breaks,
+                                               dark_color_font = "yellow",
+                                               light_color_font = "blue4")
+  expect_equal(c(number_color_1), ifelse(res, "yellow", "blue4"))
+  
+  # scenario: invalid colors in colors_vec
+  hm_col_invalid <- gsub("#", "", hm_colors)
+  number_color_2 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_col_invalid, 
+                                               breaks = breaks)
+  expect_equal(number_color_2, "black")
+  
+  number_color_3 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_col_invalid, 
+                                               breaks = breaks,
+                                               light_color_font = "blue4")
+  expect_equal(number_color_3, "blue4")
+  
+  # scenario: only not dark colors in colors_vec
+  hm_col_light <- grDevices::colorRampPalette(c("deeppink", "lightblue"))(no_breaks)
+  number_color_4 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_col_light, 
+                                               breaks = breaks)
+  expect_equal(number_color_4, "black")
+  
+  # scenario: short breaks list
+  min_no_breaks <- 2
+  min_breaks <- seq(from = min(mat), to = max(mat), length.out = min_no_breaks + 1)
+  hm_col_short <- grDevices::colorRampPalette(c("deeppink", "navyblue"))(min_no_breaks)
+  number_color_5 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_col_short,
+                                               breaks = min_breaks)
+  dark_range <- list(c(-Inf, min_breaks[2]), 
+                     c(min_breaks[2], Inf))[[which(vapply(hm_col_short, is_color_dark, logical(1)))]]
+  res_5 <- vapply(c(mat), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_5), ifelse(res_5, "white", "black"))
+  
+  # scenario: NA in metric matrix
+  mat_NA <- mat
+  mat_NA[1, 1] <- NA
+  mat_NA[1, 5] <- NA
+  number_color_6 <- .get_pheatmap_number_color(mat_with_metric = mat_NA, 
+                                               colors_vec = hm_col_short,
+                                               breaks = min_breaks)
+  dark_range <- list(c(-Inf, min_breaks[2]), 
+                     c(min_breaks[2], Inf))[[which(vapply(hm_col_short, is_color_dark, logical(1)))]]
+  res_6 <- vapply(c(mat_NA), function(i) {
+    if (is.na(i)) {
+      FALSE
+    } else {
+      dark_range[1] < i & i <= dark_range[2]
+    }
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_6), ifelse(res_6, "white", "black"))
+  
+  # scenario: Inf in metric matrix
+  mat_Inf <- mat
+  mat_Inf[3, 2:4] <- Inf # color for max value
+  mat_Inf[8:9, 5] <- -Inf # color for min value
+  number_color_7 <- .get_pheatmap_number_color(mat_with_metric = mat_Inf, 
+                                               colors_vec = hm_col_short,
+                                               breaks = min_breaks)
+  res_7 <- vapply(c(mat_Inf), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_7), ifelse(res_7, "white", "black"))
+  
+  expect_error(.get_pheatmap_number_color(data.table::data.table(),
+                                          colors_vec = hm_colors,
+                                          breaks = breaks),
+               "Assertion on 'mat_with_metric' failed: Must be of type 'matrix'")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = matrix(-14:30, ncol = 5),
+                                          colors_vec = hm_colors,
+                                          breaks = breaks),
+               "Assertion on 'mat_with_metric' failed: Must have rownames.")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = matrix(-14:30, ncol = 5,
+                                                                   dimnames = list(letters[1:9], NULL)),
+                                          colors_vec = hm_colors,
+                                          breaks = breaks),
+               "Assertion on 'mat_with_metric' failed: Must have colnames")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = LETTERS[seq_along(breaks)],
+                                          breaks = breaks),
+               "Assertion on 'colors_vec' failed: Must have length")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
+                                          breaks = 2),
+               "Assertion on 'breaks' failed: Must have length")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
+                                          breaks = "ten"),
+               "Assertion on 'breaks' failed: Must be of type 'numeric'")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
+                                          breaks = breaks,
+                                          dark_color_font = 123),
+               "Assertion on 'dark_color_font' failed: Must be of type 'string'")
+  expect_error(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
+                                          breaks = breaks,
+                                          light_color_font = 123),
+               "Assertion on 'light_color_font' failed: Must be of type 'string'")
 })

@@ -112,3 +112,57 @@ get_qual_colors <- function(n = NULL) {
   
   rep(all_colors, length.out = n)
 }
+
+
+#' Determine whether or not a color is dark
+#' 
+#' @param col_name string representing a valid color
+#' 
+#' @examples
+#' is_color_dark("blue")
+#' is_color_dark("red")
+#' is_color_dark("#000000")
+#' 
+#' @keywords utils_color
+#' @return logical flag
+#' 
+#' @export
+is_color_dark <- function(col_name) {
+  checkmate::assert_string(col_name)
+  stopifnot("Must be a valid color name" = gDRplots::is_valid_color(col_name))
+  
+  get_col_luminance(col_name) <= 0.22
+}
+
+
+#' Calculate the luminance of a color
+#'
+#' @param col_name string representing a valid color
+#' 
+#' @examples
+#' get_col_luminance("blue")
+#' get_col_luminance("red")
+#' get_col_luminance("#000000")
+#' get_col_luminance("#906090")
+#' get_col_luminance("#906090F2")
+#'
+#' @keywords utils_color
+#' @return single element numeric vector
+#' 
+#' @export
+get_col_luminance <- function(col_name) {
+  checkmate::assert_string(col_name)
+  stopifnot("Must be a valid color name" = gDRplots::is_valid_color(col_name))
+  
+  colrgb <- grDevices::col2rgb(col_name)
+  lum <- lapply(colrgb, function(x) {
+    x <- x / 255
+    if (x <= 0.03928) {
+      x <- x / 12.92
+    } else {
+      x <- ((x + 0.055) / 1.055)^2.4
+    }
+  })
+  lum <- lum[[1]] * 0.2326 + lum[[2]] * 0.6952 + lum[[3]] * 0.0722
+  lum
+}
