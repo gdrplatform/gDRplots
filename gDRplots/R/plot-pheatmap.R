@@ -1518,11 +1518,11 @@ fill_ann_color_map <- function(dt_ann,
 }
 
 #' stop wrapper for `data.table::dcast` to handle unexpected aggregation
-
+#' 
 #' idea from: https://github.com/Rdatatable/data.table/issues/5386
 #' 
-#' @param fname string with the name of the funcion that failed to the `data.table::dcast` aggregation
-#' @param formula string with the formula used in `data.table::dcast`
+#' @param fname string with the name of the function that failed to the \code{data.table::dcast} aggregation
+#' @param formula string with the formula used in \code{data.table::dcast}
 #' 
 #' @keywords internal
 .stop_on_aggregation <- function(fname, formula) {
