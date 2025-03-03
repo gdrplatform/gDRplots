@@ -2,11 +2,18 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{.stop_on_aggregation}
 \alias{.stop_on_aggregation}
-\title{stop wrapper for `data.table::dcast` to handle unexpected aggregation}
+\title{stop wrapper for `data.table::dcast` to handle unexpected aggregation
+idea from: https://github.com/Rdatatable/data.table/issues/5386}
 \usage{
-.stop_on_aggregation()
+.stop_on_aggregation(fname, formula)
+}
+\arguments{
+\item{fname}{string with the name of the funcion that failed to the `data.table::dcast` aggregation}
+
+\item{formula}{string with the formula used in `data.table::dcast`}
 }
 \description{
 stop wrapper for `data.table::dcast` to handle unexpected aggregation
+idea from: https://github.com/Rdatatable/data.table/issues/5386
 }
 \keyword{internal}
