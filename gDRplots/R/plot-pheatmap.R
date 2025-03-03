@@ -1525,6 +1525,8 @@ fill_ann_color_map <- function(dt_ann,
 #' @param formula string with the formula used in \code{data.table::dcast}
 #' 
 #' @keywords internal
+#'
+#' @return \code{NULL}
 .stop_on_aggregation <- function(fname, formula) {
   checkmate::assert_string(fname)
   checkmate::assert_string(formula)
@@ -1536,6 +1538,7 @@ fill_ann_color_map <- function(dt_ann,
       formula
     )
   )
+  invisible(NULL)
 }
 
 #' Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
