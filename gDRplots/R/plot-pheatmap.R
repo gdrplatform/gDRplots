@@ -137,6 +137,8 @@ pheatmap_qc <- function(
       formula = stats::as.formula(fm_string),
       value.var = metric
     )
+  }, warning = function(w) {
+    .stop_on_aggregation("pheatmap_qc", fm_string)
   }, message = function(m) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
   })
@@ -163,6 +165,8 @@ pheatmap_qc <- function(
       formula = stats::as.formula(fm_string),
       value.var = conc
     )
+    }, warning = function(w) {
+      .stop_on_aggregation("pheatmap_qc", fm_string)
     }, message = function(m) {
       .stop_on_aggregation("pheatmap_qc", fm_string)
     })
@@ -1258,6 +1262,8 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = stats::as.formula(fm_string),
         value.var = metric
       )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     }, message = function(m) {
       .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     })
@@ -1270,6 +1276,8 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = stats::as.formula(fm_string),
         value.var = metric
       )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     }, message = function(m) {
       .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     })
@@ -1281,6 +1289,8 @@ prep_pheatmap_matrix <- function(dt_response,
         formula = stats::as.formula(fm_string),
         value.var = metric
       )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     }, message = function(m) {
       .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
     })
