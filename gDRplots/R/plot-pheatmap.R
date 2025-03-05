@@ -137,8 +137,10 @@ pheatmap_qc <- function(
       formula = stats::as.formula(fm_string),
       value.var = metric
     )
+  # data.table  >= 1.17.0
   }, warning = function(w) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
+  # data.table  < 1.17.0
   }, message = function(m) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
   })
