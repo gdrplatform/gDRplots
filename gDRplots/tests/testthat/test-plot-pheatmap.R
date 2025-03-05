@@ -851,8 +851,12 @@ test_that("prep_pheatmap_matrix works as expected", {
   
   # scenario: error is thrown on duplicates
   ## single-agent data
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_metrics_dup <- data.table::rbindlist(list(dt_metrics, dt_metrics))
   expect_error(
-    prep_pheatmap_matrix(dt_response = dt_scores, metric = "bliss_score"),
+    prep_pheatmap_matrix(dt_response = dt_metrics_dup, metric = "xc50"),
     "Unexpected data aggregation"
   )
   
@@ -870,12 +874,12 @@ test_that("prep_pheatmap_matrix works as expected", {
   ## co-dilution data
   mae <- gDRutils::get_synthetic_data("combo_codilution")
   se <- mae[[gDRutils::get_supported_experiments("cd")]]
-  dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-  dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_metrics_dup <- data.table::rbindlist(list(dt_metrics, dt_metrics))
   expect_error(
     prep_pheatmap_matrix(
-      dt_response = dt_average_dup,
-      metric = "x",
+      dt_response = dt_metrics_dup,
+      metric = "x_mean",
       experiment_type = "co-dilution"
     ),
     "Unexpected data aggregation"
