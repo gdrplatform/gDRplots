@@ -130,11 +130,20 @@ pheatmap_qc <- function(
                                          tab_response[[conc]],
                                          tab_response[[conc_2]])
   col_pivot_name <- "col_pivot_name"
-  tab_plot <- data.table::dcast(
-    data = tab_response,
-    formula = clid ~ col_pivot_name,
-    value.var = metric
-  )
+  tryCatch({
+    fm_string <- "clid ~ col_pivot_name"
+    tab_plot <- data.table::dcast(
+      data = tab_response,
+      formula = stats::as.formula(fm_string),
+      value.var = metric
+    )
+  # data.table  >= 1.17.0
+  }, warning = function(w) {
+    .stop_on_aggregation("pheatmap_qc", fm_string)
+  # data.table  < 1.17.0
+  }, message = function(m) {
+    .stop_on_aggregation("pheatmap_qc", fm_string)
+  })
   data.table::setcolorder(tab_plot, c(clid, unique(tab_response$col_pivot_name)))
   
   # prep matrix
@@ -151,11 +160,18 @@ pheatmap_qc <- function(
   info_drug_2 <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber_2, conc_2)])
   data.table::setnames(info_drug_2, old = c(gnumber_2, conc_2), new = c(gnumber, conc))
   info_drug <- rbind(info_drug, info_drug_2)[get(gnumber) != "untreated"]
-  drug_annotation <- data.table::dcast(
-    data = info_drug,
-    formula = col_pivot_name ~ get(gnumber),
-    value.var = conc
-  )
+  tryCatch({
+    fm_string <- "col_pivot_name ~ get(gnumber)"
+    drug_annotation <- data.table::dcast(
+      data = info_drug,
+      formula = stats::as.formula(fm_string),
+      value.var = conc
+    )
+    }, warning = function(w) {
+      .stop_on_aggregation("pheatmap_qc", fm_string)
+    }, message = function(m) {
+      .stop_on_aggregation("pheatmap_qc", fm_string)
+    })
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   # handle conc = 0
@@ -1241,20 +1257,45 @@ prep_pheatmap_matrix <- function(dt_response,
   
   # prep data
   tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name)),
-      value.var = metric)
+    tryCatch({
+     fm_string <- "get(cellline_name) ~ paste(get(drug_name))"
+      data.table::dcast(
+        data = tab_response,
+        formula = stats::as.formula(fm_string),
+        value.var = metric
+      )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    })
+    
   } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2))),
-      value.var = metric)
+    tryCatch({
+      fm_string <- 'get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2)))'
+      data.table::dcast(
+        data = tab_response,
+        formula = stats::as.formula(fm_string),
+        value.var = metric
+      )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    })
   } else {
-    data.table::dcast(
-      data = tab_response,
-      formula = get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2)),
-      value.var = metric)
+    tryCatch({
+      fm_string <- 'get(cellline_name) ~ paste(get(drug_name), "x", get(drug_name_2))'
+      data.table::dcast(
+        data = tab_response,
+        formula = stats::as.formula(fm_string),
+        value.var = metric
+      )
+    }, warning = function(w) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    }, message = function(m) {
+      .stop_on_aggregation("prep_pheatmap_matrix", fm_string)
+    })
   }
   data.table::setkey(tab_dcast, NULL)
   data.table::setnames(tab_dcast, "cellline_name", cellline_name)
@@ -1488,6 +1529,29 @@ fill_ann_color_map <- function(dt_ann,
   return(dt_anno)
 }
 
+#' stop wrapper for `data.table::dcast` to handle unexpected aggregation
+#' 
+#' idea from: https://github.com/Rdatatable/data.table/issues/5386
+#' 
+#' @param fname string with the name of the function that failed to the \code{data.table::dcast} aggregation
+#' @param formula string with the formula used in \code{data.table::dcast}
+#' 
+#' @keywords internal
+#'
+#' @return \code{NULL}
+.stop_on_aggregation <- function(fname, formula) {
+  checkmate::assert_string(fname)
+  checkmate::assert_string(formula)
+  
+  stop(
+    sprintf(
+      "Unexpected data aggregation in function: '%s' with formula: '%s'",
+      fname,
+      formula
+    )
+  )
+  invisible(NULL)
+}
 
 #' Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
 #'

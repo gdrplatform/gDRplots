@@ -1,3 +1,6 @@
+## gDRplots 0.0.69 - 2025-03-03
+* protect against unexpected data aggregation in `data.table::dcast`
+
 ## gDRplots 0.0.68 - 2025-02-25
 * move `is_color_dark` from gDRiPlots package
 * add `.get_pheatmap_number_color` function

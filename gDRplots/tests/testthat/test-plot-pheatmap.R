@@ -60,6 +60,11 @@ test_that("pheatmap_qc works as expected", {
                          grepl(sprintf("%s_%s_%s_", min_val$Gnumber, min_val$Gnumber_2, min_val$Concentration), 
                                colnames(hm_5_data))],
                ls_col[2]) # check rev
+
+  # scenario: error is thrown on duplicates
+  dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
+  expect_error(pheatmap_qc(dt_average = dt_average_dup),
+               "Unexpected data aggregation")
   
   # testing assertions
   expect_error(pheatmap_qc(dt_average = unlist(dt_average)),
@@ -844,15 +849,41 @@ test_that("prep_pheatmap_matrix works as expected", {
   expect_is(mat_6, "matrix")
   expect_equal(dim(mat_6), c(0, 0))
   
-  # scenario: duplicates
-  mat_7 <- purrr::quietly(prep_pheatmap_matrix)(dt_response = dt_scores,
-                                                metric = "bliss_score")$result
-  expect_is(mat_7, "matrix")
-  expect_equal(sort(rownames(mat_7)), sort(unique(dt_scores[["CellLineName"]])))
-  expect_equal(sort(colnames(mat_7)), sort(unique(dt_scores[["DrugName"]])))
-  expect_false(all(dt_scores[normalization_type == "GR"][["bliss_score"]] %in% mat_7))
-  expect_true(all(
-    dt_scores[normalization_type == "GR", .N, by = c("CellLineName", "DrugName")][["N"]] %in% mat_7))
+  # scenario: error is thrown on duplicates
+  ## single-agent data
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_metrics_dup <- data.table::rbindlist(list(dt_metrics, dt_metrics))
+  expect_error(
+    prep_pheatmap_matrix(dt_response = dt_metrics_dup, metric = "xc50"),
+    "Unexpected data aggregation"
+  )
+  
+  ## combination data
+  dt_scores_dup <- data.table::rbindlist(list(dt_scores, dt_scores))
+  expect_error(
+    prep_pheatmap_matrix(
+      dt_response = dt_scores_dup,
+      metric = "bliss_score",
+      experiment_type = "combination"
+    ),
+    "Unexpected data aggregation"
+  )
+  
+  ## co-dilution data
+  mae <- gDRutils::get_synthetic_data("combo_codilution")
+  se <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  dt_metrics_dup <- data.table::rbindlist(list(dt_metrics, dt_metrics))
+  expect_error(
+    prep_pheatmap_matrix(
+      dt_response = dt_metrics_dup,
+      metric = "x_mean",
+      experiment_type = "co-dilution"
+    ),
+    "Unexpected data aggregation"
+  )
   
   # testing assertions
   expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
