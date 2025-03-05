@@ -868,6 +868,9 @@ test_that("prep_pheatmap_matrix works as expected", {
   )
   
   ## co-dilution data
+  mae <- gDRutils::get_synthetic_data("combo_codilution")
+  se <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
   dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
   expect_error(
     prep_pheatmap_matrix(
