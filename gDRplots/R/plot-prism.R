@@ -783,7 +783,9 @@ plot_volcano_assoc_panel <- function(dt_response,
   # plot data
   ls_cols <- intersect(names(dt_response), c("rId", "cId", cellline_name, selected_metric))
   dt_response_ <- dt_response[, ls_cols, with = FALSE]
-
+  # take care of Inf and NaN values in IC50 metrics # update after GDR-2856.
+  dt_response_ <- dt_response_[!is.infinite(get(selected_metric)), ]
+  
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_feat_meta_col)
