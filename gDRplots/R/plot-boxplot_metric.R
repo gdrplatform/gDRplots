@@ -1,8 +1,9 @@
-#' Plot box plots for metric for single-agent data grouped by cell line names
+#' Plot box plots for metric for single-agent data grouped by selected variable
 #' 
 #' @param dt_metrics data.table representing data from the \code{Metrics} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'    and single-agent \code{SummarizedExperiment}
+#' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
@@ -14,6 +15,163 @@
 #'    colored by \code{Tissue}
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots
 #' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
+#' 
+#' @return \code{ggplot} object containing boxplots for selected single-agent grouped by \code{group_var}
+#' 
+#' @keywords single-agent_plots
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' 
+#' plot_boxplot_metric_sa(dt_metrics,
+#'                        group_var = "CellLineName")
+#' 
+#' plot_boxplot_metric_sa(dt_metrics,
+#'                        group_var = "DrugName")
+#' 
+#' plot_boxplot_metric_sa(dt_metrics,
+#'                        group_var = "CellLineName",
+#'                        metric = "x_max",
+#'                        grouped_flag = TRUE)
+#' 
+#' plot_boxplot_metric_sa(dt_metrics,
+#'                        group_var = "DrugName",
+#'                        metric = "x_max",
+#'                        grouped_flag = TRUE)
+#' 
+#' @export
+plot_boxplot_metric_sa <- function(
+    dt_metrics,
+    group_var,
+    normalization_type = "GR",
+    metric = "xc50",
+    fit_source = "gDR",
+    grouped_flag = FALSE,
+    colors_vec = NULL,
+    with_inf = FALSE
+) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  tissue <- gDRutils::get_env_identifiers("cellline_tissue")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_MOA <- gDRutils::get_env_identifiers("drug_moa")
+  
+  # check input data
+  if (group_var == cellline_name) {
+    point_var <- drug_name
+    col_var <- tissue
+  } else if (group_var == drug_name) {
+    point_var <- cellline_name
+    col_var <- drug_MOA
+  }
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_choice(group_var, choices = c(cellline_name, drug_name))
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_names(names(dt_metrics), 
+                          must.include = c(cellline_name, drug_name, col_var, metric))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_flag(grouped_flag)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(group_var, point_var, col_var, metric), with = FALSE]
+  
+  if (metric == "xc50") {
+    dt_met[, (metric) := log10(get(metric))] 
+  }
+  
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
+  }
+  
+  plt_title <- sprintf("Number of unique %s: %s", 
+                       ifelse(point_var == cellline_name, "celllines", "drugs"),
+                       NROW(unique(dt_met[[point_var]])))
+  
+  if (grouped_flag) {
+    data.table::setorderv(dt_met, col_var)
+    dt_met[[group_var]] <- factor(dt_met[[group_var]], levels = unique(dt_met[[group_var]]))
+    
+    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      get_qual_colors(NROW(unique(dt_met[[col_var]])))
+    } else if (NROW(colors_vec) != NROW(unique(dt_met[[col_var]]))) {
+      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[col_var]])))
+    } else {
+      colors_vec
+    }
+    names(fill_colors) <- unique(dt_met[[col_var]])
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(group_var), y = get(metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_point(ggplot2::aes(fill = get(col_var)), size = -1, alpha = 0.25, na.rm = TRUE) +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = get(col_var)), 
+                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE, outliers = FALSE) +
+      ggplot2::scale_fill_manual(name = col_var, values = fill_colors) +
+      ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
+    
+  } else {
+    data.table::setorderv(dt_met, group_var)
+    dt_met[[group_var]] <- factor(dt_met[[group_var]])
+    
+    fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      boxplot_fill
+    } else {
+      colors_vec[1]
+    }
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(group_var), y = get(metric))) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, 
+                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
+      ggplot2::theme(legend.position = "none")
+  }
+  
+  # final
+  plt <- plt +
+    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
+    ggplot2::labs(title = plt_title,
+                  y = get_hm_title(metric, normalization_type), 
+                  x = "") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank())
+  
+  return(plt)
+}
+
+
+
+#' Plot box plots for metric for single-agent data grouped by cell line names
+#' 
+#' @inheritParams plot_boxplot_metric_sa
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by cellline names
 #' 
@@ -72,96 +230,25 @@ plot_boxplot_metric_sa_by_CLs <- function(
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
-  boxplot_fill <- 
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
-  hline_color <- 
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
-  jitter_poinst_color <- 
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
-  edge_color <- 
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
   
-  # filter data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met <- dt_metrics[eval(filter_expr)]
-  dt_met <- dt_met[, c(cellline_name, tissue, drug_name, metric), with = FALSE]
-  
-  if (metric == "xc50") {
-    dt_met[, (metric) := log10(get(metric))]
-  }
-  
-  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
-  if (!with_inf) {
-    dt_met[is.infinite(get(metric)), (metric) := NA] 
-  }
-  
-  plt_title <- sprintf("Number of unique drugs: %s", NROW(unique(dt_met[[drug_name]])))
-  
-  if (grouped_flag) {
-    data.table::setorderv(dt_met, tissue)
-    dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]], levels = unique(dt_met[[cellline_name]]))
-    
-    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      get_qual_colors(NROW(unique(dt_met[[tissue]])))
-    } else if (NROW(colors_vec) != NROW(unique(dt_met[[tissue]]))) {
-      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[tissue]])))
-    } else {
-      colors_vec
-    }
-    names(fill_colors) <- unique(dt_met[[tissue]])
-    
-    plt <- 
-      ggplot2::ggplot(data = dt_met,
-                      mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25, na.rm = TRUE) +
-      ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)), 
-                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
-      ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
-      ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
-    
-  } else {
-    data.table::setorderv(dt_met, cellline_name)
-    dt_met[[cellline_name]] <- factor(dt_met[[cellline_name]])
-    
-    fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      boxplot_fill
-    } else {
-      colors_vec[1]
-    }
-    
-    plt <- 
-      ggplot2::ggplot(data = dt_met,
-                      mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, 
-                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
-      ggplot2::theme(legend.position = "none")
-  }
-  
-  # final
-  plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
-    ggplot2::labs(title = plt_title,
-                  y = get_hm_title(metric, normalization_type), 
-                  x = "") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10),
-                   panel.grid.minor = ggplot2::element_blank())
+  plt <- 
+    plot_boxplot_metric_sa(
+      dt_metrics = dt_metrics,
+      group_var = cellline_name,
+      normalization_type = normalization_type,
+      metric = metric,
+      fit_source = fit_source,
+      grouped_flag = grouped_flag,
+      colors_vec = colors_vec,
+      with_inf = with_inf
+    )
   
   return(plt)
 }
 
 #' Plot box plots for metric for single-agent data grouped by drug names
 #' 
-#' @inheritParams plot_boxplot_metric_sa_by_CLs
+#' @inheritParams plot_boxplot_metric_sa
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by drug names
 #' 
@@ -219,89 +306,18 @@ plot_boxplot_metric_sa_by_drugs <- function(
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
-  boxplot_fill <- 
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
-  hline_color <- 
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
-  jitter_poinst_color <- 
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
-  edge_color <- 
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
   
-  # filter data for normalization type
-  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
-                            list(norm_type = normalization_type, fit_src = fit_source))
-  dt_met <- dt_metrics[eval(filter_expr)]
-  dt_met <- dt_met[, c(cellline_name, drug_name, drug_MOA, metric), with = FALSE]
-  
-  if (metric == "xc50") {
-    dt_met[, (metric) := log10(get(metric))] 
-  }
-  
-  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
-  if (!with_inf) {
-    dt_met[is.infinite(get(metric)), (metric) := NA] 
-  }
-  
-  plt_title <- sprintf("Number of unique celllines: %s", NROW(unique(dt_met[[cellline_name]])))
-  
-  if (grouped_flag) {
-    data.table::setorderv(dt_met, drug_MOA)
-    dt_met[[drug_name]] <- factor(dt_met[[drug_name]], levels = unique(dt_met[[drug_name]]))
-    
-    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      get_qual_colors(NROW(unique(dt_met[[drug_MOA]])))
-    } else if (NROW(colors_vec) != NROW(unique(dt_met[[drug_MOA]]))) {
-      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[drug_MOA]])))
-    } else {
-      colors_vec
-    }
-    names(fill_colors) <- unique(dt_met[[drug_MOA]])
-    
-    plt <- 
-      ggplot2::ggplot(data = dt_met,
-                      mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_point(ggplot2::aes(fill = get(drug_MOA)), size = -1, alpha = 0.25, na.rm = TRUE) +
-      ggplot2::geom_boxplot(ggplot2::aes(fill = get(drug_MOA)), 
-                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE, outliers = FALSE) +
-      ggplot2::scale_fill_manual(name = drug_MOA, values = fill_colors) +
-      ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
-    
-  } else {
-    data.table::setorderv(dt_met, drug_name)
-    dt_met[[drug_name]] <- factor(dt_met[[drug_name]])
-    
-    fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      boxplot_fill
-    } else {
-      colors_vec[1]
-    }
-    
-    plt <- 
-      ggplot2::ggplot(data = dt_met,
-                      mapping = ggplot2::aes(x = get(drug_name), y = get(metric))) +
-      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, 
-                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
-      ggplot2::theme(legend.position = "none")
-  }
-  
-  # final
-  plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
-    ggplot2::labs(title = plt_title,
-                  y = get_hm_title(metric, normalization_type), 
-                  x = "") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10),
-                   panel.grid.minor = ggplot2::element_blank())
+  plt <- 
+    plot_boxplot_metric_sa(
+      dt_metrics = dt_metrics,
+      group_var = drug_name,
+      normalization_type = normalization_type,
+      metric = metric,
+      fit_source = fit_source,
+      grouped_flag = grouped_flag,
+      colors_vec = colors_vec,
+      with_inf = with_inf
+    )
   
   return(plt)
 }
