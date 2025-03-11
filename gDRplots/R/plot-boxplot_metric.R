@@ -33,11 +33,13 @@
 #' 
 #' plot_boxplot_metric_sa(dt_metrics,
 #'                        group_var = "CellLineName",
+#'                        normalization_type = "RV",
 #'                        metric = "x_max",
 #'                        grouped_flag = TRUE)
 #' 
 #' plot_boxplot_metric_sa(dt_metrics,
 #'                        group_var = "DrugName",
+#'                        normalization_type = "RV",
 #'                        metric = "x_max",
 #'                        grouped_flag = TRUE)
 #' 
@@ -166,8 +168,6 @@ plot_boxplot_metric_sa <- function(
   
   return(plt)
 }
-
-
 
 #' Plot box plots for metric for single-agent data grouped by cell line names
 #' 
