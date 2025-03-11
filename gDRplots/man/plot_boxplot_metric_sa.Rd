@@ -59,11 +59,13 @@ plot_boxplot_metric_sa(dt_metrics,
 
 plot_boxplot_metric_sa(dt_metrics,
                        group_var = "CellLineName",
+                       normalization_type = "RV",
                        metric = "x_max",
                        grouped_flag = TRUE)
 
 plot_boxplot_metric_sa(dt_metrics,
                        group_var = "DrugName",
+                       normalization_type = "RV",
                        metric = "x_max",
                        grouped_flag = TRUE)
 
