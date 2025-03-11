@@ -1,3 +1,6 @@
+## gDRplots 0.0.70 - 2025-03-11
+* add coloring points in metric boxplots
+
 ## gDRplots 0.0.69 - 2025-03-03
 * protect against unexpected data aggregation in `data.table::dcast`
 
