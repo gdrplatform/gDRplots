@@ -4,6 +4,7 @@ conc <- gDRutils::get_env_identifiers("concentration")
 drug_name <- gDRutils::get_env_identifiers("drug_name")
 drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
 cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
 meta_col <- c("rId", "cId", cellline_name)
 
 test_that("prep_dt_response_metric_sa works as expected", {
@@ -277,10 +278,17 @@ test_that("prep_dt_response_metric_diff works as expected", {
     vapply(ls_col_inf, function(nm) all(is.infinite(dt_response_cap[[nm]])), logical(1))))
   ls_col_equal <- names(dt_response)[!grepl("_diff", names(dt_response))]
   ls_col_equal <- ls_col_equal[!ls_col_equal %in% ls_col_inf]
-  expect_equal(dt_response[, ls_col_equal, with = FALSE], 
-               dt_response_cap[, ls_col_equal, with = FALSE])
+  expect_equal(dt_response_cap[, ls_col_equal, with = FALSE], 
+               dt_response[, ls_col_equal, with = FALSE])
   
   # scenario: additional column
+  dt_response_addcol <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped, 
+                                                     d_name = d_name, 
+                                                     d_name2 = d_name2,
+                                                     additional_cols = drug_moa_2)
+  expect_is(dt_response_addcol, "data.table")
+  expect_equal(setdiff(names(dt_response_addcol), names(dt_response)), drug_moa_2)
+  expect_equal(dt_response_addcol[, -drug_moa_2, with = FALSE], dt_response_cap)
   
   # testing assertions
   expect_error(prep_dt_response_metric_diff(dt_metrics = unlist(dt_metrics),
