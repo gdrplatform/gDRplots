@@ -101,7 +101,7 @@ plot_boxplot_metric_sa <- function(
     gDRutils::get_settings_from_json("EDGE_COLOR",
                                      system.file(package = "gDRplots", "settings.json"))
   
-  if (grouped_flag & colored_pts_flag) {
+  if (grouped_flag && colored_pts_flag) {
     message("Please, choose only one coloring options: or `grouped_flag` or `colored_pts_flag.")
   }
   
