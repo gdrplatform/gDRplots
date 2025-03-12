@@ -28,9 +28,11 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 \item{fit_source}{string source name for metrics}
 
 \item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue}}
+colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+and \code{drug_moa} - for \code{"DrugName"}}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+for \code{grouped_flag} set as FALSE only first from vector will be used.}
 }
 \value{
 \code{ggplot} object containing boxplots for selected combo grouped by drug names

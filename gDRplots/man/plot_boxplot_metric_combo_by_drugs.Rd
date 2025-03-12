@@ -26,7 +26,8 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{fit_source}{string source name for metrics}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+for \code{grouped_flag} set as FALSE only first from vector will be used.}
 }
 \value{
 \code{ggplo} object containing boxplots for selected combo grouped by drug names
