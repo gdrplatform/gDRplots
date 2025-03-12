@@ -41,24 +41,17 @@ analyze_cgs <- function(dt_metrics,
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_true(all(metrics %in% names(dt_metrics)))
-  checkmate::assert_string(cl_name)
+  checkmate::assert_string(cl_name, null.ok = TRUE)
   checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
   # filter out unwanted drug moa
   dt_metrics <- dt_metrics[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
   
-  # take care of Inf and NaN values in IC50 metrics # update after GDR-2856.
-  if (any(metrics == "xc50")) {
-    inf_xc50 <- is.infinite(dt_metrics[["xc50"]])
-    if (any(inf_xc50, na.rm = TRUE)) {
-      dt_metrics[inf_xc50, ][["xc50"]] <- 10 ^ dt_metrics[inf_xc50, ][["maxlog10Concentration"]]
-      # check whether all metric are below 10 ^ maxlog10Concentration
-      over_xc50 <- dt_metrics[["xc50"]] > 10 ^ dt_metrics[["maxlog10Concentration"]]
-      if (any(over_xc50, na.rm = TRUE)) {
-        dt_metrics[over_xc50, ][["xc50"]] <- 10 ^ dt_metrics[over_xc50, ][["maxlog10Concentration"]]
-      }
-    }
+  # take care of Inf and NaN values in IC50 metrics
+  if (any(is.infinite(dt_metrics$xc50))) {
+    message("In `dt_metrics` some xc50 values are infinite.")
+    dt_metrics <- dt_metrics[!is.infinite(get("xc50")), ]
   }
   
   # prepare the data with specified metric differences
@@ -202,7 +195,7 @@ plot_cgs_ranking <- function(results,
     ggplot2::geom_col(color = gDRutils::get_settings_from_json("EDGE_COLOR",
                                                                system.file(package = "gDRplots", "settings.json"))) +
     ggplot2::labs(title = cl_name,
-                  y = paste0("\u0394 ", metric, " for ", norm_type),
+                  y = bquote(~ Delta ~ .(metric) ~ "for" ~ .(norm_type)),
                   x = "Ranked drugs",
                   caption = sprintf("Top results with FDR < %.2f are shown. If no results meet this threshold,
                                     the top %d results by p-value are displayed.",

@@ -4,6 +4,7 @@ conc <- gDRutils::get_env_identifiers("concentration")
 drug_name <- gDRutils::get_env_identifiers("drug_name")
 drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
 cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
 meta_col <- c("rId", "cId", cellline_name)
 
 test_that("prep_dt_response_metric_sa works as expected", {
@@ -213,7 +214,11 @@ test_that("prep_dt_response_metric_diff works as expected", {
   sel_met <- c("xc50", "x_mean", "x_max")
   comb <- c(c("cotrt_zero", "cotrt", "cotrt_diff"))
   
-  dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2) # default
+  # scenario: default
+  dt_response <- 
+    prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                 d_name = d_name,
+                                 d_name2 = d_name2) # default
   expect_is(dt_response, "data.table")
   expect_true(all(
     names(dt_response) %in% 
@@ -228,21 +233,100 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_equal(dt_response[["RV_gDR_xc50_cotrt_0.00316_row_fittings"]], 
                res[["0.00316_row_fittings"]]) 
   
-  dt_response <-
-    prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+  # scenario: "GR" and list of metrics
+  dt_response_GR <-
+    prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                 d_name = d_name,
+                                 d_name2 = d_name2,
                                  normalization_type = "GR",
                                  metric = c("xc50", "x_mean", "x_max"))
   
-  expect_is(dt_response, "data.table")
-  expect_is(dt_response, "data.table")
+  expect_is(dt_response_GR, "data.table")
   expect_true(all(
-    names(dt_response) %in% 
+    names(dt_response_GR) %in% 
       c(meta_col, drug_name, drug_name_2,
         do.call(paste0, expand.grid(sprintf("GR_gDR_%s", sel_met), sprintf("_%s_", comb), ls_col_diff_fin)))
   ))
-  expect_equal(NROW(dt_response), NROW(res))
+  expect_equal(NROW(dt_response_GR), NROW(res))
   
-  # TODO add tests for capped combo (GDR-2856)
+  # scenario: capped values
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                 assay_name = "Averaged")
+  dt_metrics_capped <- 
+    gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
+                                   assay_dt = dt_metrics,
+                                   experiment_name = gDRutils::get_supported_experiments("combo"))
+  
+  dt_response_cap <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped, 
+                                                  d_name = d_name, 
+                                                  d_name2 = d_name2) # default
+  expect_is(dt_response_cap, "data.table")
+  expect_true(all(
+    names(dt_response_cap) %in% 
+      c(meta_col, drug_name, drug_name_2,
+        do.call(paste0, expand.grid(sprintf("RV_gDR_xc50_%s_", comb), ls_col_diff_fin)))
+  ))
+  expect_equal(NROW(dt_response_cap), NROW(res))
+  expect_equal(dt_response_cap[["RV_gDR_xc50_cotrt_zero_0.001_col_fittings"]], 
+               res[["0_col_fittings"]])
+  expect_equal(dt_response_cap[["RV_gDR_xc50_cotrt_0.001_col_fittings"]], 
+               res[["0.001_col_fittings"]])
+  
+  ls_col_inf <- names(dt_response)[
+    vapply(names(dt_response), function(nm) all(is.infinite(dt_response[[nm]])), logical(1))]
+  expect_false(all(
+    vapply(ls_col_inf, function(nm) all(is.infinite(dt_response_cap[[nm]])), logical(1))))
+  ls_col_equal <- names(dt_response)[!grepl("_diff", names(dt_response))]
+  ls_col_equal <- ls_col_equal[!ls_col_equal %in% ls_col_inf]
+  expect_equal(dt_response_cap[, ls_col_equal, with = FALSE], 
+               dt_response[, ls_col_equal, with = FALSE])
+  
+  # scenario: additional column
+  dt_response_addcol <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped, 
+                                                     d_name = d_name, 
+                                                     d_name2 = d_name2,
+                                                     additional_cols = drug_moa_2)
+  expect_is(dt_response_addcol, "data.table")
+  expect_equal(setdiff(names(dt_response_addcol), names(dt_response)), drug_moa_2)
+  expect_equal(dt_response_addcol[, -drug_moa_2, with = FALSE], dt_response_cap)
+  
+  # testing assertions
+  expect_error(prep_dt_response_metric_diff(dt_metrics = unlist(dt_metrics),
+                                            d_name = d_name,
+                                            d_name2 = d_name2),
+               "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = 1,
+                                            d_name2 = d_name2),
+               "Assertion on 'd_name' failed: Must be of type 'string'")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = "drug_xx",
+                                            d_name2 = d_name2),
+               "Assertion on 'd_name' failed: Must be element of set")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = d_name,
+                                            d_name2 = d_name2,
+                                            normalization_type = "str"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = d_name, 
+                                            metric = 123),
+               "Assertion on 'metric' failed: Must be of type 'character'")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = d_name,
+                                            d_name2 = d_name2,
+                                            metric = "str"),
+               "Assertion on 'metric' failed: Must be a subset of")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = d_name,
+                                            d_name2 = d_name2,
+                                            fit_source = 123),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(prep_dt_response_metric_diff(dt_metrics = dt_metrics,
+                                            d_name = d_name,
+                                            d_name2 = d_name2,
+                                            additional_cols = 123),
+               "Assertion on 'additional_cols' failed: Must be element of set")
 })
 
 #nolint start

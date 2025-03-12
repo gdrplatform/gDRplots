@@ -1,5 +1,8 @@
-## gDRplots 0.0.70 - 2025-03-11
+## gDRplots 0.0.71 - 2025-03-12
 * add coloring points in metric boxplots
+
+## gDRplots 0.0.70 - 2025-03-10
+* update xc50 capping logic for combo PRISM inputs
 
 ## gDRplots 0.0.69 - 2025-03-03
 * protect against unexpected data aggregation in `data.table::dcast`
