@@ -12,8 +12,13 @@
 #'    but the values from any numeric column can be displayed.
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
-#'    colored by \code{Tissue}
-#' @param colors_vec character vector with colors (name or hex value) to color boxplots
+#'    colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+#'    and \code{drug_moa} - for \code{"DrugName"}
+#' @param colored_pts_flag a logical flag whether the points should be colored by grouped variable -
+#'    for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
+#'    and similarly vice versa
+#' @param colors_vec character vector with colors (name or hex value) to color boxplots; 
+#'    for \code{grouped_flag} set as FALSE only first from vector will be used.
 #' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent grouped by \code{group_var}
@@ -32,15 +37,16 @@
 #'                        group_var = "DrugName")
 #' 
 #' plot_boxplot_metric_sa(dt_metrics,
+#'                        group_var = "DrugName",
+#'                        metric = "x_AOC_range",
+#'                        colors_vec = "grey",
+#'                        colored_pts_flag = TRUE)
+#' 
+#' plot_boxplot_metric_sa(dt_metrics,
 #'                        group_var = "CellLineName",
 #'                        normalization_type = "RV",
 #'                        metric = "x_max",
-#'                        grouped_flag = TRUE)
-#' 
-#' plot_boxplot_metric_sa(dt_metrics,
-#'                        group_var = "DrugName",
-#'                        normalization_type = "RV",
-#'                        metric = "x_max",
+#'                        colors_vec = c("gold", "darkorange", "darkcyan", "darkblue"),
 #'                        grouped_flag = TRUE)
 #' 
 #' @export
@@ -51,6 +57,7 @@ plot_boxplot_metric_sa <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
+    colored_pts_flag = FALSE,
     colors_vec = NULL,
     with_inf = FALSE
 ) {
@@ -78,6 +85,7 @@ plot_boxplot_metric_sa <- function(
                           must.include = c(cellline_name, drug_name, col_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
+  checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   boxplot_fill <- 
@@ -92,6 +100,10 @@ plot_boxplot_metric_sa <- function(
   edge_color <- 
     gDRutils::get_settings_from_json("EDGE_COLOR",
                                      system.file(package = "gDRplots", "settings.json"))
+  
+  if (grouped_flag & colored_pts_flag) {
+    message("Please, choose only one coloring options: or `grouped_flag` or `colored_pts_flag.")
+  }
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -131,7 +143,8 @@ plot_boxplot_metric_sa <- function(
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(col_var)), size = -1, alpha = 0.25, na.rm = TRUE) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(col_var)), 
-                            color = edge_color, alpha = 0.25, show.legend = FALSE, na.rm = TRUE, outliers = FALSE) +
+                            color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                            na.rm = TRUE, outliers = FALSE, show.legend = FALSE) +
       ggplot2::scale_fill_manual(name = col_var, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -150,13 +163,31 @@ plot_boxplot_metric_sa <- function(
                       mapping = ggplot2::aes(x = get(group_var), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = fill_color, 
-                            color = edge_color, alpha = 0.25, na.rm = TRUE, outliers = FALSE) +
+                            color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                            na.rm = TRUE, outliers = FALSE) +
       ggplot2::theme(legend.position = "none")
+  }
+  
+  # validation for coloring points
+  if (colored_pts_flag) {
+    if (NROW(unique(dt_met[[point_var]])) >= 10) colored_pts_flag <- FALSE
+  }
+  # jitter point
+  if (colored_pts_flag) {
+    color_points <- get_qual_colors(NROW(unique(dt_met[[point_var]])))
+    names(color_points) <- unique(dt_met[[point_var]])
+    
+    plt <- plt +
+      ggplot2::geom_jitter(mapping = ggplot2::aes(color = get(point_var)), size = 2,
+                           width = 0.2, height = 0, na.rm = TRUE) +
+      ggplot2::scale_color_manual(name = drug_name, values = color_points)
+  } else {
+    plt <- plt +
+      ggplot2::geom_jitter(color = jitter_poinst_color, width = 0.2, height = 0, na.rm = TRUE)
   }
   
   # final
   plt <- plt +
-    ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "") +
@@ -212,6 +243,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
+    colored_pts_flag = FALSE,
     colors_vec = NULL,
     with_inf = FALSE
 ) {
@@ -228,6 +260,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
                           must.include = c(cellline_name, tissue, drug_name, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
+  checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   
@@ -239,6 +272,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
       metric = metric,
       fit_source = fit_source,
       grouped_flag = grouped_flag,
+      colored_pts_flag = colored_pts_flag,
       colors_vec = colors_vec,
       with_inf = with_inf
     )
@@ -288,6 +322,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
     metric = "xc50",
     fit_source = "gDR",
     grouped_flag = FALSE,
+    colored_pts_flag = FALSE,
     colors_vec = NULL,
     with_inf = FALSE
 ) {
@@ -304,6 +339,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
                           must.include = c(cellline_name, drug_name, drug_MOA, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
+  checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   
@@ -315,6 +351,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
       metric = metric,
       fit_source = fit_source,
       grouped_flag = grouped_flag,
+      colored_pts_flag = colored_pts_flag,
       colors_vec = colors_vec,
       with_inf = with_inf
     )
@@ -430,7 +467,8 @@ plot_boxplot_metric_combo_by_CLs <- function(
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_point(ggplot2::aes(fill = get(tissue)), size = -1, alpha = 0.25) +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(tissue)),
-                            color = edge_color, alpha = 0.25, show.legend = FALSE, outliers = FALSE) +
+                            color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                            na.rm = TRUE, outliers = FALSE, show.legend = FALSE) +
       ggplot2::scale_fill_manual(name = tissue, values = fill_colors) +
       ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(shape = 22, size = 10)))
     
@@ -445,7 +483,9 @@ plot_boxplot_metric_combo_by_CLs <- function(
       ggplot2::ggplot(data = dt_sco,
                       mapping = ggplot2::aes(x = get(cellline_name), y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-      ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
+      ggplot2::geom_boxplot(fill = fill_color, 
+                            color = edge_color, alpha = 0.25, 
+                            outliers = FALSE, staplewidth = 0.5) +
       ggplot2::theme(legend.position = "none")
   }
   
@@ -538,7 +578,9 @@ plot_boxplot_metric_combo_by_drugs <- function(
     ggplot2::ggplot(data = dt_sco,
                     mapping = ggplot2::aes(x = DrugCombination, y = get(metric))) +
     ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
-    ggplot2::geom_boxplot(fill = fill_color, color = edge_color, alpha = 0.25, outliers = FALSE) +
+    ggplot2::geom_boxplot(fill = fill_color, 
+                          color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                          outliers = FALSE) +
     ggplot2::theme(legend.position = "none") +
     ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color) +
     ggplot2::labs(title = plt_title,
