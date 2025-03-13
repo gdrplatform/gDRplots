@@ -30,7 +30,8 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 for \code{grouped_flag} set as FALSE only first from vector will be used.}
 }
 \value{
-\code{ggplo} object containing boxplots for selected combo grouped by drug names
+\code{ggplot} object containing boxplots for selected combo metric
+   grouped by drug names
 }
 \description{
 Plot box plots for metric for combo data grouped by drug names

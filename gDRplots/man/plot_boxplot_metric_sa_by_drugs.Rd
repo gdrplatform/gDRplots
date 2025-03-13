@@ -44,7 +44,8 @@ for \code{grouped_flag} set as FALSE only first from vector will be used.}
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
-\code{ggplot} object containing boxplots for selected single-agent grouped by drug names
+\code{ggplot} object containing boxplots for selected single-agent metric
+   grouped by drug names
 }
 \description{
 Plot box plots for metric for single-agent data grouped by drug names
