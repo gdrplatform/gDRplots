@@ -20,7 +20,9 @@ plot_boxplot_metric_combo(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 and combo \code{SummarizedExperiment}}
 
-\item{group_var}{string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}}
+\item{group_var}{string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"};
+for \code{group_var} set as  \code{"DrugName"} points will be grouped by drug 
+combinations \code{"DrugName"} x \code{"DrugName_2"}}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
