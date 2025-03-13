@@ -232,7 +232,7 @@ plot_boxplot_metric_sa <- function(
 #' plot_boxplot_metric_sa_by_CLs(
 #'   dt_metrics,
 #'   metric = "x_max",
-#'   grouped_flag = TRUE)
+#'   colored_pts_flag = TRUE)
 #' 
 #' plot_boxplot_metric_sa_by_CLs(
 #'   dt_metrics,
@@ -312,7 +312,7 @@ plot_boxplot_metric_sa_by_CLs <- function(
 #' plot_boxplot_metric_sa_by_drugs(
 #'   dt_metrics,
 #'   metric = "x_max",
-#'   grouped_flag = TRUE)
+#'   colored_pts_flag = TRUE)
 #' 
 #' plot_boxplot_metric_sa_by_drugs(
 #'   dt_metrics,
@@ -364,7 +364,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
   return(plt)
 }
 
-#' Plot box plots for metric for single-agent data grouped by selected variable
+#' Plot box plots for metric for combo data grouped by selected variable
 #' 
 #' @inheritParams plot_boxplot_metric_sa
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
@@ -407,7 +407,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'   group_var = "CellLineName",
 #'   metric = "hsa_score",
 #'   grouped_flag = TRUE,
-#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
+#'   colors_vec = c("deeppink", "darkblue"))
 #' 
 #' @export
 plot_boxplot_metric_combo <- function(
@@ -587,7 +587,7 @@ plot_boxplot_metric_combo <- function(
 #'   metric = "hsa_score",
 #'   normalization_type = "RV",
 #'   grouped_flag = TRUE,
-#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
+#'   colors_vec = c("tomato", "darkgreen", "orange", "darkblue"))
 #' 
 #' @export
 plot_boxplot_metric_combo_by_CLs <- function(
