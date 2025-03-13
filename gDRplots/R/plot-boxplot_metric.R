@@ -574,6 +574,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
     metric = "hsa_score",
     fit_source = "gDR",
     grouped_flag = FALSE,
+    colored_pts_flag = FALSE,
     colors_vec = NULL
 ) {
   
@@ -589,6 +590,7 @@ plot_boxplot_metric_combo_by_CLs <- function(
                           must.include = c(cellline_name, tissue, drug_name, drug_name_2, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_flag(grouped_flag)
+  checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <- 
     gDRutils::get_settings_from_json("BOXPLOT_FILL",
