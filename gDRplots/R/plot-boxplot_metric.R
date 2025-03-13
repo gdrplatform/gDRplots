@@ -435,7 +435,7 @@ plot_boxplot_metric_combo <- function(
   } else if (group_var == drug_name) {
     point_var <- cellline_name
     group_var <- "DrugCombination"
-    if(grouped_flag) message("Coloring box by group is not available for this scenario.")
+    if (grouped_flag) message("Coloring box by group is not available for this scenario.")
     grouped_flag <- FALSE
     col_var <- NULL
   }
