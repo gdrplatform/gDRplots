@@ -3,7 +3,6 @@ context("Test boxplot_metric")
 test_that("plot_boxplot_metric_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   
   plt_1 <- plot_boxplot_metric_sa(dt_metrics, 
@@ -42,7 +41,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
     "Please, choose only one coloring options"
   )
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 4)
+  expect_length(plt_4[["layers"]], 4) # grouped_flag
   expect_true(grepl("col_var", plt_4[["labels"]][["fill"]]))
   expect_true(grepl("point_var", plt_4[["labels"]][["colour"]]))
   
@@ -54,6 +53,41 @@ test_that("plot_boxplot_metric_sa works as expected", {
                sort(log10(dt_metrics[normalization_type == "GR", ][["xc50"]])))
   expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
+  
+  plt_6 <- plot_boxplot_metric_sa(dt_metrics,
+                                  group_var = "CellLineName",
+                                  metric = "x_AOC",
+                                  colored_pts_flag = TRUE)
+  expect_is(plt_6, "gg")
+  expect_length(plt_6[["layers"]], 3)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])),
+               NROW(unique(dt_metrics[["DrugName"]])))
+  
+  mae <- gDRutils::get_synthetic_data("medium")
+  se_2 <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics_2 <- gDRutils::convert_se_assay_to_dt(se_2, "Metrics")
+  
+  plt_7 <- plot_boxplot_metric_sa(dt_metrics_2,
+                                  group_var = "CellLineName",
+                                  metric = "x_mean",
+                                  normalization_type = "RV",
+                                  colored_pts_flag = TRUE)
+  expect_is(plt_7, "gg")
+  expect_length(plt_7[["layers"]], 3)
+  expect_equal(sort(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["y"]]),
+               sort(dt_metrics_2[normalization_type == "RV", ][["x_mean"]]))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])), 
+               1) # too many points to be colored
+  
+  plt_8 <- plot_boxplot_metric_sa(dt_metrics_2,
+                                  group_var = "DrugName",
+                                  metric = "x_mean",
+                                  normalization_type = "RV",
+                                  colored_pts_flag = TRUE)
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 3)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_8)[["data"]][[3]][["colour"]])), 
+               1) # too many points to be colored
   
   expect_error(plot_boxplot_metric_sa(dt_metrics = unlist(dt_metrics),
                                       group_var = "CellLineName"),
@@ -97,7 +131,6 @@ test_that("plot_boxplot_metric_sa works as expected", {
 test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   
   plt_1 <- plot_boxplot_metric_sa_by_CLs(dt_metrics) # default
@@ -172,7 +205,6 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
 test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   
   plt_1 <- plot_boxplot_metric_sa_by_drugs(dt_metrics) # default
@@ -254,7 +286,6 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
 test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
@@ -315,7 +346,6 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
 test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
