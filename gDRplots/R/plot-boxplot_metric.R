@@ -386,12 +386,25 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'                                               assay_name = "scores")
 #' 
 #' plot_boxplot_metric_combo(dt_scores,
-#'                           group_var = "DrugeName)
+#'                           group_var = "DrugName")
+#' 
+#' plot_boxplot_metric_combo(dt_scores,
+#'                           group_var = "DrugName", 
+#'                           colored_pts_flag = TRUE,
+#'                           colors_vec = "grey")
 #' 
 #' plot_boxplot_metric_combo(dt_scores,
 #'                           group_var = "CellLineName",
+#'                           metric = "hsa_score",
 #'                           normalization_type = "RV",
 #'                           grouped_flag = TRUE)
+#' 
+#' plot_boxplot_metric_combo(
+#'   dt_scores,
+#'   group_var = "CellLineName",
+#'   metric = "hsa_score",
+#'   grouped_flag = TRUE,
+#'   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
 #' 
 #' @export
 plot_boxplot_metric_combo <- function(
@@ -419,7 +432,7 @@ plot_boxplot_metric_combo <- function(
   } else if (group_var == drug_name) {
     point_var <- cellline_name
     group_var <- "DrugCombination"
-    message("Coloring box by group is not available for this scenario.")
+    if(grouped_flag) message("Coloring box by group is not available for this scenario.")
     grouped_flag <- FALSE
     col_var <- NULL
   }
@@ -556,7 +569,7 @@ plot_boxplot_metric_combo <- function(
 #' plot_boxplot_metric_combo_by_CLs(dt_scores,
 #'                                  normalization_type = "RV",
 #'                                  grouped_flag = TRUE)
-#'                               
+#' 
 #' plot_boxplot_metric_combo_by_CLs(dt_scores,
 #'                                  metric = "bliss_score",
 #'                                  colors_vec = "gold")
@@ -564,7 +577,7 @@ plot_boxplot_metric_combo <- function(
 #' plot_boxplot_metric_combo_by_CLs(
 #'   dt_scores,
 #'   metric = "bliss_score",
-#'   grouped_flag = TRUE)
+#'   colored_pts_flag = TRUE)
 #' 
 #' plot_boxplot_metric_combo_by_CLs(
 #'   dt_scores,
@@ -642,10 +655,15 @@ plot_boxplot_metric_combo_by_CLs <- function(
 #'                                               assay_name = "scores")
 #' 
 #' plot_boxplot_metric_combo_by_drugs(dt_scores)
-#'                               
+#' 
 #' plot_boxplot_metric_combo_by_drugs(dt_scores,
 #'                                    normalization_type = "RV",
 #'                                    colors_vec = "gold")
+#' 
+#' plot_boxplot_metric_combo_by_drugs(dt_scores,
+#'                                    metric = "bliss_score",
+#'                                    normalization_type = "RV",
+#'                                    colored_pts_flag = TRUE)
 #' 
 #' @export
 plot_boxplot_metric_combo_by_drugs <- function(
