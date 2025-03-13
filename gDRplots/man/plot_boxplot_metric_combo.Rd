@@ -49,4 +49,33 @@ for \code{grouped_flag} set as FALSE only first from vector will be used.}
 \description{
 Plot box plots for metric for single-agent data grouped by selected variable
 }
+\examples{
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+
+dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+                                              assay_name = "scores")
+
+plot_boxplot_metric_combo(dt_scores,
+                          group_var = "DrugName")
+
+plot_boxplot_metric_combo(dt_scores,
+                          group_var = "DrugName", 
+                          colored_pts_flag = TRUE,
+                          colors_vec = "grey")
+
+plot_boxplot_metric_combo(dt_scores,
+                          group_var = "CellLineName",
+                          metric = "hsa_score",
+                          normalization_type = "RV",
+                          grouped_flag = TRUE)
+
+plot_boxplot_metric_combo(
+  dt_scores,
+  group_var = "CellLineName",
+  metric = "hsa_score",
+  grouped_flag = TRUE,
+  colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
+
+}
 \keyword{combo_plots}

@@ -49,10 +49,15 @@ dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
 
 plot_boxplot_metric_combo_by_drugs(dt_scores)
-                              
+
 plot_boxplot_metric_combo_by_drugs(dt_scores,
                                    normalization_type = "RV",
                                    colors_vec = "gold")
+
+plot_boxplot_metric_combo_by_drugs(dt_scores,
+                                   metric = "bliss_score",
+                                   normalization_type = "RV",
+                                   colored_pts_flag = TRUE)
 
 }
 \keyword{combo_plots}

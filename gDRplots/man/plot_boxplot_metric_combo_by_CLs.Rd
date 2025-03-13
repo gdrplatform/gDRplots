@@ -58,7 +58,7 @@ plot_boxplot_metric_combo_by_CLs(dt_scores)
 plot_boxplot_metric_combo_by_CLs(dt_scores,
                                  normalization_type = "RV",
                                  grouped_flag = TRUE)
-                              
+
 plot_boxplot_metric_combo_by_CLs(dt_scores,
                                  metric = "bliss_score",
                                  colors_vec = "gold")
@@ -66,7 +66,7 @@ plot_boxplot_metric_combo_by_CLs(dt_scores,
 plot_boxplot_metric_combo_by_CLs(
   dt_scores,
   metric = "bliss_score",
-  grouped_flag = TRUE)
+  colored_pts_flag = TRUE)
 
 plot_boxplot_metric_combo_by_CLs(
   dt_scores,
