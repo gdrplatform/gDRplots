@@ -70,7 +70,7 @@ plot_boxplot_metric_sa_by_drugs(dt_metrics,
 plot_boxplot_metric_sa_by_drugs(
   dt_metrics,
   metric = "x_max",
-  grouped_flag = TRUE)
+  colored_pts_flag = TRUE)
 
 plot_boxplot_metric_sa_by_drugs(
   dt_metrics,

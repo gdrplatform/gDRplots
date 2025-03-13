@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-boxplot_metric.R
 \name{plot_boxplot_metric_combo}
 \alias{plot_boxplot_metric_combo}
-\title{Plot box plots for metric for single-agent data grouped by selected variable}
+\title{Plot box plots for metric for combo data grouped by selected variable}
 \usage{
 plot_boxplot_metric_combo(
   dt_scores,
@@ -49,7 +49,7 @@ for \code{grouped_flag} set as FALSE only first from vector will be used.}
   grouped by \code{group_var}
 }
 \description{
-Plot box plots for metric for single-agent data grouped by selected variable
+Plot box plots for metric for combo data grouped by selected variable
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -77,7 +77,7 @@ plot_boxplot_metric_combo(
   group_var = "CellLineName",
   metric = "hsa_score",
   grouped_flag = TRUE,
-  colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
+  colors_vec = c("deeppink", "darkblue"))
 
 }
 \keyword{combo_plots}
