@@ -370,6 +370,9 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
 #'   outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'   and combo \code{SummarizedExperiment}
+#' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"};
+#'   for \code{group_var} set as  \code{"DrugName"} points will be grouped by drug 
+#'   combinations \code{"DrugName"} x \code{"DrugName_2"}
 #' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
