@@ -45,14 +45,18 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_true(grepl("col_var", plt_4[["labels"]][["fill"]]))
   expect_true(grepl("point_var", plt_4[["labels"]][["colour"]]))
   
+  ls_moa_col <- c("deeppink", "darkcyan", "orange", "darkblue", "gold")
   plt_5 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
-                                           with_inf = TRUE) 
+                                           with_inf = TRUE,
+                                           grouped_flag = TRUE,
+                                           colors_vec = ls_moa_col) 
   expect_is(plt_5, "gg")
-  expect_length(plt_5[["layers"]], 3)
-  expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]]),
+  expect_length(plt_5[["layers"]], 4)
+  expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[4]][["y"]]),
                sort(log10(dt_metrics[normalization_type == "GR", ][["xc50"]])))
   expect_equal(sort(ggplot2::layer_scales(plt_5)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
+  expect_equal(unique(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]]), ls_moa_col)
   
   plt_6 <- plot_boxplot_metric_sa(dt_metrics,
                                   group_var = "CellLineName",
