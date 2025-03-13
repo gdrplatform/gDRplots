@@ -35,14 +35,19 @@ test_that("heatmap_combo_metrics works as expected", {
                                  drug1_name, drug2_name, 
                                  cl_name,
                                  metric = "bliss_excess",
-                                 normalization_type = norm_type)
+                                 normalization_type = norm_type,
+                                 show_values = TRUE)
   expect_is(plt_2, "gg")
   expect_true(grepl(norm_type, plt_2[["labels"]][["title"]]))
   expect_true(grepl(norm_type, plt_2[["labels"]][["fill"]]))
   expect_true(grepl("Bliss Excess", plt_2[["labels"]][["title"]]))
   expect_true(grepl("Bliss Excess", plt_2[["labels"]][["fill"]]))
-  expect_length(plt_2[["layers"]], 1) # heatmap # nolint
-  expect_length(ggplot2::ggplot_build(plt_2)[["data"]], 1)
+  expect_length(plt_2[["layers"]], 2) # heatmap + numbers # nolint
+  expect_length(ggplot2::ggplot_build(plt_2)[["data"]], 2)
+  expect_equal(
+    NROW(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["label"]]),
+    NROW(dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name & CellLineName == cl_name &
+                     normalization_type == norm_type]$bliss_excess))
   
   ls_col_1 <- c("#008B8B", "#FFA500", "#FFFFFF")
   plt_3 <- heatmap_combo_metrics(dt_excess, 
@@ -66,9 +71,13 @@ test_that("heatmap_combo_metrics works as expected", {
                                  dt_isobolograms,
                                  drug1_name, drug2_name, 
                                  cl_name,
+                                 iso_levels = c("0.2", "0.4"),
                                  colors_vec_excess = ls_col_1)
   expect_false(any(ls_col_1 %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]][["fill"]])))
   expect_true(any(.get_smooth_palette(50) %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]][["fill"]])))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["colour"]])),
+               NROW(c("0.2", "0.4")))
+  expect_equal(plt_4[["labels"]][["colour"]], "iso_level")
   
   plt_5 <- heatmap_combo_metrics(dt_excess, 
                                  dt_isobolograms,
@@ -142,14 +151,20 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                         drug1_name, 
                                         drug2_name, 
                                         cl_name,
-                                        normalization_type, 
+                                        normalization_type,
+                                        show_values = TRUE,
                                         as_list = TRUE)
   expect_is(plts_2, "list")
   expect_equal(names(plts_2), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
-  expect_true(all(vapply(seq_along(plts_2), 
-                         function(i) grepl(normalization_type, plts_2[[i]]$labels$title), logical(1))))
-  expect_true(all(vapply(seq_along(plts_2), 
-                         function(i) grepl("iso_level", plts_2[[i]]$labels$linetype), logical(1))))
+  expect_true(all(vapply(
+    seq_along(plts_2), 
+    function(i) grepl(normalization_type, plts_2[[i]]$labels$title), logical(1))))
+  expect_true(all(vapply(
+    seq_along(plts_2), 
+    function(i) grepl("iso_level", plts_2[[i]]$labels$linetype), logical(1))))
+  expect_true(all(vapply(
+    names(gDRutils::get_combo_excess_field_names()),
+    function(i) "label" %in% names(ggplot2::ggplot_build(plts_2[[i]])[["data"]][[2]]), logical(1))))
   
   # scenario: list with defined isolines
   iso_lvl <- c("0.2", "0.4")

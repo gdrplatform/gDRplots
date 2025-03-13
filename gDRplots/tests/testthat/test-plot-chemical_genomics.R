@@ -28,6 +28,11 @@ test_that("analyze_cgs works correctly", {
   results2 <- analyze_cgs(metrics_data, metrics = "xc50", cl_name = "CellLineName_1", normalization_type = "GR")
   
   expect_false(identical(results1$CellLineName_1$metrics_diff$xc50, results2$CellLineName_1$metrics_diff$xc50)) 
+  
+  # no cell lien selection
+  results3 <- analyze_cgs(metrics_data, metrics = "xc50", cl_name = NULL)
+  expect_is(results3, "list")
+  expect_equal(names(results3), unique(metrics_data$CellLineName))
 })
 
 test_that("plot_cgs_ranking works correctly", {
