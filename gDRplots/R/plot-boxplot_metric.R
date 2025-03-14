@@ -104,7 +104,7 @@ plot_boxplot_metric_sa <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   
   if (grouped_flag && colored_pts_flag) {
-    message("Please, choose only one coloring options: or `grouped_flag` or `colored_pts_flag`.")
+    message("Please, choose only one coloring option: either `grouped_flag` or `colored_pts_flag`.")
   }
   
   # filter data for normalization type
@@ -462,7 +462,7 @@ plot_boxplot_metric_combo <- function(
                                      system.file(package = "gDRplots", "settings.json"))
   
   if (grouped_flag && colored_pts_flag) {
-    message("Please, choose only one coloring options: or `grouped_flag` or `colored_pts_flag`.")
+    message("Please, choose only one coloring option: either `grouped_flag` or `colored_pts_flag`.")
   }
   
   # filter data for normalization type

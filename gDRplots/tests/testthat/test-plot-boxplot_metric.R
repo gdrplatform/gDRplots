@@ -38,7 +38,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
                                     normalization_type = "RV",
                                     grouped_flag = TRUE,
                                     colored_pts_flag = TRUE),
-    "Please, choose only one coloring options"
+    "Please, choose only one coloring option"
   )
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4) # grouped_flag
@@ -282,7 +282,7 @@ test_that("plot_boxplot_metric_combo works as expected", {
                                        normalization_type = "RV",
                                        grouped_flag = TRUE,
                                        colored_pts_flag = TRUE),
-    "Please, choose only one coloring options"
+    "Please, choose only one coloring option"
   )
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4) # grouped_flag
