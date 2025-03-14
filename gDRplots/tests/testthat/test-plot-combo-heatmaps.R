@@ -100,30 +100,16 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_equal(plt_1_swap_axes[["data"]][["pos_y"]], plt_1[["data"]][["pos_x"]])
   expect_equal(plt_1_swap_axes[["data"]][["pos_x"]], plt_1[["data"]][["pos_y"]])
   expect_equal(plt_1_swap_axes[["data"]][["smooth"]], plt_1[["data"]][["smooth"]])
-})
-
-test_that("plot_combination_index works as expected", {
-  cl_name <- "cellline_BC"
-  drug1_name <- "drug_001"
-  drug2_name <- "drug_026"
   
-  mae <- gDRutils::get_synthetic_data("combo_matrix")
-  se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
-  dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
-  
-  plt_1 <- plot_combination_index(dt_excess,
-                                  dt_isobolograms,
-                                  drug1_name, drug2_name,
-                                  cl_name,
-                                  normalization_type = "GR")
-  expect_is(plt_1, "gg")
-  expect_true(grepl("GR", plt_1[["labels"]][["title"]]))
-  expect_true(grepl(drug1_name, plt_1[["labels"]][["x"]]))
-  expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
-  expect_true(grepl("CI", plt_1[["labels"]][["y"]]))
-  
-  
+  # lack of data
+  plt_6 <- heatmap_combo_metrics(dt_excess[normalization_type == "RV"], 
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name, 
+                                 cl_name)
+  expect_is(plt_6, "gg")
+  expect_true(any(grepl(drug1_name, plt_6[["labels"]][["y"]])))
+  expect_true(any(grepl(drug2_name, plt_6[["labels"]][["x"]])))
+  expect_length(ggplot2::ggplot_build(plt_6)[["data"]][[1]], 0)
 })
 
 test_that("heatmap_combo_metrics_panel works as expected", {
@@ -386,14 +372,14 @@ test_that("plot_combination_index works as expected", {
   plt_1 <- plot_combination_index(dt_excess,
                                   dt_isobolograms,
                                   drug1_name, drug2_name,
-                                  cl_name)
+                                  cl_name) # default
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_true(grepl(drug1_name, plt_1[["labels"]][["x"]]))
   expect_true(grepl(drug2_name, plt_1[["labels"]][["x"]]))
   expect_true(grepl("T=", plt_1[["labels"]][["title"]]))
   expect_true(grepl("GR", plt_1[["labels"]][["title"]]))
-  
+
   plt_2 <- plot_combination_index(dt_excess = NULL,
                                   dt_isobolograms,
                                   drug1_name, drug2_name,
@@ -418,6 +404,17 @@ test_that("plot_combination_index works as expected", {
   expect_true(grepl("T=", plt_3[["labels"]][["title"]]))
   expect_true(grepl("GR", plt_3[["labels"]][["title"]]))
   expect_false("colour" %in% names(plt_3[["labels"]])) # lack of `iso_levels`
+  
+  plt_4 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms,
+                                  drug1_name, drug2_name,
+                                  cl_name,
+                                  normalization_type = "RV",
+                                  iso_levels = c("0.2", "0.4"))
+  expect_is(plt_4, "gg")
+  expect_true(grepl("RV", plt_4[["labels"]][["title"]]))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[3]][["colour"]])),
+               NROW(c("0.2", "0.4")))
   
   expect_error(plot_combination_index(dt_excess = unlist(dt_excess),
                                       dt_isobolograms = dt_isobolograms,
