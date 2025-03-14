@@ -137,10 +137,10 @@ pheatmap_qc <- function(
       formula = stats::as.formula(fm_string),
       value.var = metric
     )
-  # data.table  >= 1.17.0
+    # data.table  >= 1.17.0
   }, warning = function(w) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
-  # data.table  < 1.17.0
+    # data.table  < 1.17.0
   }, message = function(m) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
   })
@@ -167,11 +167,11 @@ pheatmap_qc <- function(
       formula = stats::as.formula(fm_string),
       value.var = conc
     )
-    }, warning = function(w) {
-      .stop_on_aggregation("pheatmap_qc", fm_string)
-    }, message = function(m) {
-      .stop_on_aggregation("pheatmap_qc", fm_string)
-    })
+  }, warning = function(w) {
+    .stop_on_aggregation("pheatmap_qc", fm_string)
+  }, message = function(m) {
+    .stop_on_aggregation("pheatmap_qc", fm_string)
+  })
   rownames(drug_annotation) <- drug_annotation$col_pivot_name # required by pheatmap::pheatmap
   drug_annotation <- drug_annotation[, .SD, .SDcol = -col_pivot_name]
   # handle conc = 0
@@ -451,7 +451,7 @@ pheatmap_with_anno_sa <- function(
                          experiment_type = gDRutils::get_supported_experiments("sa"))
   }
   
-  # check completeness of annotation - TODO wrap in separate function
+  # check completeness of annotation
   if (!is.null(annotation_col)) {
     annotation_col <- .fill_pheatmap_annotation(dt_anno = annotation_col,
                                                 mat_with_metric = mat_cvd,
@@ -740,22 +740,11 @@ pheatmap_with_anno_cd <- function(
                                   fit_source = fit_source,
                                   experiment_type = gDRutils::get_supported_experiments("cd"))
   
-  # check completeness of annotation - TODO wrap in separate function
+  # check completeness of annotation
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", cellline_name)
-      
-      annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-    data.table::setorderv(annotation_col, cols = cols, na.last = TRUE)
-    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- .fill_pheatmap_annotation(dt_anno = annotation_col,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = cellline_name)
     ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
@@ -1016,22 +1005,11 @@ pheatmap_with_anno_combo <- function(
                                   fit_source = fit_source,
                                   experiment_type = gDRutils::get_supported_experiments("combo"))
   
-  # check completeness of annotation - TODO wrap in separate function
+  # check completeness of annotation
   if (!is.null(annotation_col)) {
-    if (!all(rownames(mat_cvd) %in% annotation_col[[cellline_name]])) {
-      tab_missing_ann <- data.table::data.table(
-        missing = rownames(mat_cvd)[!rownames(mat_cvd) %in% annotation_col[[cellline_name]]]
-      )
-      data.table::setnames(tab_missing_ann, "missing", cellline_name)
-      
-      annotation_col <- data.table::rbindlist(list(annotation_col, tab_missing_ann), fill = TRUE)
-    }
-    # data.table::nafill does not support character
-    cols <- names(annotation_col)[names(annotation_col) != cellline_name]
-    data.table::setorderv(annotation_col, cols = cols, na.last = TRUE)
-    annotation_col[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols]
-    # select annotation acc to matrix
-    annotation_col <- annotation_col[get(cellline_name) %in% rownames(mat_cvd), ]
+    annotation_col <- .fill_pheatmap_annotation(dt_anno = annotation_col,
+                                                mat_with_metric = mat_cvd,
+                                                anno_var = cellline_name)
     ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
@@ -1258,7 +1236,7 @@ prep_pheatmap_matrix <- function(dt_response,
   # prep data
   tab_dcast <- if (experiment_type == gDRutils::get_supported_experiments("sa")) {
     tryCatch({
-     fm_string <- "get(cellline_name) ~ paste(get(drug_name))"
+      fm_string <- "get(cellline_name) ~ paste(get(drug_name))"
       data.table::dcast(
         data = tab_response,
         formula = stats::as.formula(fm_string),
