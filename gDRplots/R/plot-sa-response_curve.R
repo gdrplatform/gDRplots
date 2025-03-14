@@ -166,7 +166,7 @@ plot_dose_response_sa <- function(dt_metrics,
     min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
     max_val <- max(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) + 0.05
     data_range <- c(min_val, max_val)
-
+    
     # prep color palette
     color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(group_names))
@@ -461,8 +461,8 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   data.table::setnames(selected_combination, c("cellline_name", "drug_name"), c(cellline_name, drug_name))
   
   # tab_plots
-  dt_average_plot <- dt_average[selected_combination, on = c(cellline_name, drug_name)]
-  dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name)]
+  dt_average_plot <- dt_average[selected_combination, on = c(cellline_name, drug_name), nomatch = NULL]
+  dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name), nomatch = NULL]
   
   if (NROW(dt_metrics_plot) > 0) {
     
@@ -527,17 +527,13 @@ plot_dose_response_sa_qc <- function(dt_metrics,
                                              "Averaged Data" = "black",
                                              "Fitted Curve" = "red"))
   } else {
-    txt_err <- sprintf(
-      "Dose response curve \nfor Drug Name: %s (%s) and CellLine: %s (%s) \n could not be calculated.",
-      dt_metrics_plot[[drug_name]],
-      dt_metrics_plot[[gnumber]],
-      dt_metrics_plot[[cellline_name]],
-      dt_metrics_plot[[clid]])
-    plt <-
+    plt <- 
       ggplot2::ggplot() +
-      ggplot2::geom_text(ggplot2::aes(x = 0, y = 0, label = txt_err),
-                         color = "darkred", size = 5) +
-      ggplot2::theme_void()
+      ggplot2::labs(x = bquote(.(conc) ~ "[" ~ mu * M ~ "]"),
+                    y = normalization_type,
+                    title = cl_name) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(aspect.ratio = 1)
   }
   
   return(plt)
@@ -603,7 +599,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_metrics <- dt_metrics[eval(filter_expr)]
   dt_average <- dt_average[eval(filter_expr)]
-
+  
   available_drugs <- unique(dt_metrics[get(cellline_name) %in% cl_name, ][[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
     d_names  <- available_drugs
