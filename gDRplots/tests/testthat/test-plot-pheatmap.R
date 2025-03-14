@@ -499,6 +499,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
                            mut_B = rep(c(NA, "NA", "yes", "no"), length.out = NROW(annotation_manual_col)),
                            mut_C = rep(c("AA", "BB"), length.out = NROW(annotation_manual_col)))
   )
+  ls_anno_cat <- names(annotation_manual_col_na)[names(annotation_manual_col_na) != "CellLineName"]
   
   out_4 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
                                  annotation_col = annotation_manual_col_na,
@@ -515,14 +516,13 @@ test_that("pheatmap_with_anno_cd works as expected", {
                res_1[order(match(CellLineName, anno_4$CellLineName))])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
-  expect_equal(plt_4$gtable$grobs[[7]]$label, c("mut_A", "mut_B", "mut_C"))
+  expect_equal(plt_4$gtable$grobs[[7]]$label, ls_anno_cat) # col_annotation_names 
   expect_is(plt_4[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_4[["tree_col"]], "hclust") # clustering despite Inf
   expect_true(all(
     vapply(c(1, 4, 7, 10), 
            function(i) plt_4[["gtable"]][["grobs"]][[8]][["children"]][[i]][["label"]], 
-           character(1)) %in%
-      names(annotation_manual_col_na)[names(annotation_manual_col_na) != "CellLineName"]))
+           character(1)) %in% ls_anno_cat)) # annotation_legend
   expect_true("NA" %in% plt_4$gtable$grobs[[8]]$children[[6]]$label) # filled mut_B
   
   # testing assertions
