@@ -44,6 +44,7 @@ plot_volcano_assoc <- function(dt_assoc,
     plt <- 
       ggplot2::ggplot() + 
       ggplot2::labs(title = paste(plt_title, ": all NAs"),
+                    subtitle = condition_info,
                     x = x_lbl,
                     y = y_lbl) +
       ggplot2::theme_bw()
