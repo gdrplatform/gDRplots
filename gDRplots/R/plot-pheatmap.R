@@ -445,11 +445,11 @@ pheatmap_with_anno_sa <- function(
     mat_cvd <- mat_cvd_raw
     mat_cvd_raw <- NULL
   } else {
-    mat_cvd<- prep_pheatmap_matrix(dt_response = dt_metrics_capped,
-                                   normalization_type = normalization_type,
-                                   metric = metric,
-                                   fit_source = fit_source,
-                                   experiment_type = gDRutils::get_supported_experiments("sa"))
+    mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics_capped,
+                                    normalization_type = normalization_type,
+                                    metric = metric,
+                                    fit_source = fit_source,
+                                    experiment_type = gDRutils::get_supported_experiments("sa"))
   }
   
   # check completeness of annotation
@@ -1606,7 +1606,7 @@ fill_ann_color_map <- function(dt_ann,
   breaks[1] <- -Inf
   breaks[NROW(breaks)] <- Inf
   dark_ranges <- breaks[dark_idx]
-
+  
   # check whether matrix values are in dark ranges
   ls_range_condition <- lapply(seq_len(NROW(dark_ranges) / 2), function(i) {
     mat_min <- matrix(dark_ranges[2 * i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
