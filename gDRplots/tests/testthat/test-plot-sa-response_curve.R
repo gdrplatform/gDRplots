@@ -56,6 +56,16 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(sort(ggplot2::get_guide_data(plt_3, "colour")[[".label"]]), sort(sel_grp_names))
   expect_length(unique(ggplot2::ggplot_build(plt_3)$data[[3]]$colour), 1) # curve data only for 1 cell line
   
+  plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
+                                 dt_average = dt_average,
+                                 selection_name = selected_drug,
+                                 group_var = group_var)
+  expect_is(plt_4, "gg")
+  expect_equal(plt_4[["labels"]][["y"]], "GR")
+  expect_true(any(grepl("Concentration", plt_4[["labels"]][["x"]])))
+  expect_length(plt_4[["layers"]], 0)
+  expect_length(ggplot2::ggplot_build(plt_4)$data[[1]], 0)
+  
   group_var <- drug_name
   selected_celline <- "cellline_BA"
   normalization_type <- "RV"
@@ -482,9 +492,20 @@ test_that("plot_dose_response_sa_qc works as expected", {
                                     d_name = d_name)
   expect_is(plt_4, "gg")
   expect_length(ggplot2::ggplot_build(plt_4)$data[[2]], 0) # no "Fitted Curve"
+  
+  # empty plot
+  plt_5 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics[normalization_type == "RV", ],
+                                    dt_average = dt_average[normalization_type == "RV", ],
+                                    cl_name = cl_name,
+                                    d_name = d_name)
+  expect_is(plt_5, "gg")
+  expect_equal(plt_5[["labels"]][["y"]], "GR")
+  expect_true(grepl(cl_name, plt_5[["labels"]][["title"]]))
+  expect_true(any(grepl("Concentration", plt_5[["labels"]][["x"]])))
+  expect_length(ggplot2::ggplot_build(plt_5)[["data"]][[1]], 0)
 })
 
-test_that("plot_dose_response_sa_qc works as expected", {
+test_that("plot_dose_response_sa_qc_panel works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   

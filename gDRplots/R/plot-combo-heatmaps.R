@@ -1129,7 +1129,7 @@ heatmap_combo_with_isoref <- function(
                                             y = if (swap_axes) pos_x else pos_y,
                                             linetype = iso_source),
                                linewidth = 1, color = iso_colors) +
-            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
                                            name = iso_label)
         } else {
           plt <- plt +
@@ -1139,7 +1139,7 @@ heatmap_combo_with_isoref <- function(
                                             linetype = iso_source,
                                             color = iso_level),
                                linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
                                            name = normalization_type) +
             ggplot2::scale_color_manual(values = iso_colors,
                                         label = iso_label,
@@ -1423,7 +1423,7 @@ heatmap_combo_with_isoref_panel <- function(
                                         y = if (swap_axes) pos_x else pos_y,
                                         linetype = iso_source, color = iso_level),
                            linewidth = 1) +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "dashed"),
+        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
                                        name = normalization_type) +
         ggplot2::scale_color_manual(values = iso_colors,
                                     label = iso_label,

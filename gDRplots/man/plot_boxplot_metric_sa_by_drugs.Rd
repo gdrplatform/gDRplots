@@ -10,6 +10,7 @@ plot_boxplot_metric_sa_by_drugs(
   metric = "xc50",
   fit_source = "gDR",
   grouped_flag = FALSE,
+  colored_pts_flag = FALSE,
   colors_vec = NULL,
   with_inf = FALSE
 )
@@ -30,14 +31,21 @@ but the values from any numeric column can be displayed.}
 \item{fit_source}{string source name for metrics}
 
 \item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue}}
+colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+and \code{drug_moa} - for \code{"DrugName"}}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
+\item{colored_pts_flag}{a logical flag whether the points should be colored by grouped variable -
+for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
+and similarly vice versa}
+
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+for \code{grouped_flag} set as FALSE only first from vector will be used.}
 
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
-\code{ggplot} object containing boxplots for selected single-agent grouped by drug names
+\code{ggplot} object containing boxplots for selected single-agent metric
+   grouped by drug names
 }
 \description{
 Plot box plots for metric for single-agent data grouped by drug names
@@ -62,7 +70,7 @@ plot_boxplot_metric_sa_by_drugs(dt_metrics,
 plot_boxplot_metric_sa_by_drugs(
   dt_metrics,
   metric = "x_max",
-  grouped_flag = TRUE)
+  colored_pts_flag = TRUE)
 
 plot_boxplot_metric_sa_by_drugs(
   dt_metrics,

@@ -9,6 +9,7 @@ plot_boxplot_metric_combo_by_drugs(
   normalization_type = "GR",
   metric = "hsa_score",
   fit_source = "gDR",
+  colored_pts_flag = FALSE,
   colors_vec = NULL
 )
 }
@@ -26,10 +27,16 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{fit_source}{string source name for metrics}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots}
+\item{colored_pts_flag}{a logical flag whether the points should be colored by grouped variable -
+for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
+and similarly vice versa}
+
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+for \code{grouped_flag} set as FALSE only first from vector will be used.}
 }
 \value{
-\code{ggplo} object containing boxplots for selected combo grouped by drug names
+\code{ggplot} object containing boxplots for selected combo metric
+   grouped by drug names
 }
 \description{
 Plot box plots for metric for combo data grouped by drug names
@@ -42,10 +49,15 @@ dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
 
 plot_boxplot_metric_combo_by_drugs(dt_scores)
-                              
+
 plot_boxplot_metric_combo_by_drugs(dt_scores,
                                    normalization_type = "RV",
                                    colors_vec = "gold")
+
+plot_boxplot_metric_combo_by_drugs(dt_scores,
+                                   metric = "bliss_score",
+                                   normalization_type = "RV",
+                                   colored_pts_flag = TRUE)
 
 }
 \keyword{combo_plots}
