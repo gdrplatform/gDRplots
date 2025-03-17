@@ -1426,6 +1426,22 @@ test_that(".get_pheatmap_number_color works as expected", {
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_7), ifelse(res_7, "white", "black"))
   
+  # scenario: one range with one dark color
+  no_breaks_short <- 5
+  breaks_short <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
+  colors_vec <- c("gold", "limegreen", "darkblue", "orange", "lightblue")
+  hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
+  
+  number_color_8 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                             colors_vec = hm_colors, 
+                                             breaks = breaks_short)
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+                  breaks_short[which(colors_vec == "darkblue") + 1])
+  res_8 <- vapply(c(mat), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_8), ifelse(res_8, "white", "black"))
+  
   expect_error(.get_pheatmap_number_color(data.table::data.table(),
                                           colors_vec = hm_colors,
                                           breaks = breaks),
