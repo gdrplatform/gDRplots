@@ -189,8 +189,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   data.table::setorderv(annotation_manual_na, cols = "group", na.last = TRUE)
   annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
   
-  out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
-                                 dt_metrics_capped = dt_metrics_capped,
+  dt_metrics_one_val <- data.table::copy(dt_metrics)
+  dt_metrics_one_val$xc50 <- 1
+  res_3 <- data.table::dcast(dt_metrics_one_val[normalization_type == "RV", ], 
+                             formula = CellLineName ~ DrugName, 
+                             value.var = "xc50")
+  data.table::setkey(res_3, NULL)
+  
+  out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_one_val,
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
   expect_length(out_3, 2)
@@ -206,8 +212,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(anno_row_3, annotation_manual_na)
   expect_is(data_3[["matrix"]], "data.table")
   expect_equal(data_3[["matrix"]], 
-               res_1[order(match(CellLineName, anno_col_3$CellLineName)), 
-                     c("CellLineName", anno_row_3$DrugName), with = FALSE]) # origin data
+               res_3[, .SD, .SDcols = names(data_3[["matrix"]])][
+                 order(match(CellLineName, data_3[["matrix"]]$CellLineName)), ])
   plt_3 <- out_3[["heatmap"]]
   expect_is(plt_3, "pheatmap")
   expect_equal(plt_3$gtable$grobs[[7]]$label, c("mut_A", "mut_B", "mut_C"))
@@ -238,7 +244,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_col_na)
   expect_equal(data_4[["matrix"]], 
-               res_1[order(match(CellLineName, anno_4$CellLineName))])
+               res_1[order(match(CellLineName, anno_4$CellLineName))][])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
   expect_equal(plt_4$gtable$grobs[[7]]$label, c("mut_A", "mut_B", "mut_C"))
@@ -1459,8 +1465,8 @@ test_that(".get_pheatmap_number_color works as expected", {
   hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
   
   number_color_10 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_colors_short, 
-                                               breaks = breaks_short)
+                                                colors_vec = hm_colors_short, 
+                                                breaks = breaks_short)
   dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
                   breaks_short[which(colors_vec == "darkblue") + 1])
   dark_range[1] <- -Inf
