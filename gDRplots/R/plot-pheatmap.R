@@ -441,14 +441,15 @@ pheatmap_with_anno_sa <- function(
                                       fit_source = fit_source,
                                       experiment_type = gDRutils::get_supported_experiments("sa"))
   
-  mat_cvd <- if (is.null(dt_metrics_capped)) {
-    mat_cvd_raw
+  if (is.null(dt_metrics_capped)) {
+    mat_cvd <- mat_cvd_raw
+    mat_cvd_raw <- NULL
   } else {
-    prep_pheatmap_matrix(dt_response = dt_metrics_capped,
-                         normalization_type = normalization_type,
-                         metric = metric,
-                         fit_source = fit_source,
-                         experiment_type = gDRutils::get_supported_experiments("sa"))
+    mat_cvd<- prep_pheatmap_matrix(dt_response = dt_metrics_capped,
+                                   normalization_type = normalization_type,
+                                   metric = metric,
+                                   fit_source = fit_source,
+                                   experiment_type = gDRutils::get_supported_experiments("sa"))
   }
   
   # check completeness of annotation
@@ -1582,30 +1583,30 @@ fill_ann_color_map <- function(dt_ann,
   if (!all(vapply(colors_vec, is_valid_color, logical(1))) ||
       !any(vapply(colors_vec, is_color_dark, logical(1)))) return(light_color_font)
   
+  # breaks must be arranged in ascending order
+  breaks <- sort(breaks)
+  
   # check dark colors
   ls_dark_area <- which(vapply(colors_vec, is_color_dark, logical(1)))
-  if (NROW(ls_dark_area) == 1) {
-    possible_range <- list(c(-Inf, breaks[2]), c(breaks[2], Inf)) 
-    dark_ranges <- possible_range[[ls_dark_area]]
+  # dark color stars...
+  first <- min(ls_dark_area)
+  last <- max(ls_dark_area) # dark color ends.
+  # if the dark colors are in the middle of palette 
+  middle <- if (any(diff(ls_dark_area) > 1)) {
+    which(diff(ls_dark_area) > 1)
   } else {
-    first <- min(ls_dark_area)
-    last <- max(ls_dark_area)
-    # if the dark colors are in the middle of palette 
-    middle <- if (any(diff(ls_dark_area) > 1)) {
-      which(diff(ls_dark_area) > 1)
-    } else {
-      NULL
-    }
-    # final dark ranges (index of colors in hm_color_palette)
-    # final dark ranges (index of colors in hm_color_palette)
-    # colors_vec:  | color_1 | color_2 | color_3 | ... | color_n |
-    # breaks:      1         2         3         4     n        n+1
-    dark_idx <- c(first, ls_dark_area[middle] + 1, ls_dark_area[middle + 1], last + 1)
-    # dark breaks (numeric value for dark range)
-    breaks[1] <- -Inf
-    breaks[NROW(breaks)] <- Inf
-    dark_ranges <- breaks[dark_idx]
+    NULL
   }
+  # final dark ranges (index of colors in hm_color_palette)
+  # final dark ranges (index of colors in hm_color_palette)
+  # colors_vec:  | color_1 | color_2 | color_3 | ... | color_n |
+  # breaks:      1         2         3         4     n        n+1
+  dark_idx <- c(first, ls_dark_area[middle] + 1, ls_dark_area[middle + 1], last + 1)
+  # dark breaks (numeric value for dark range)
+  breaks[1] <- -Inf
+  breaks[NROW(breaks)] <- Inf
+  dark_ranges <- breaks[dark_idx]
+
   # check whether matrix values are in dark ranges
   ls_range_condition <- lapply(seq_len(NROW(dark_ranges) / 2), function(i) {
     mat_min <- matrix(dark_ranges[2 * i - 1], nrow = NROW(mat_with_metric), ncol = NCOL(mat_with_metric))
