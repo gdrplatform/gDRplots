@@ -1430,10 +1430,10 @@ test_that(".get_pheatmap_number_color works as expected", {
   no_breaks_short <- 5
   breaks_short <- seq(from = min(mat), to = max(mat), length.out = no_breaks_short + 1)
   colors_vec <- c("gold", "limegreen", "darkblue", "orange", "lightblue")
-  hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
+  hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
   
   number_color_8 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_colors, 
+                                               colors_vec = hm_colors_short, 
                                                breaks = breaks_short)
   dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
                   breaks_short[which(colors_vec == "darkblue") + 1])
@@ -1441,6 +1441,33 @@ test_that(".get_pheatmap_number_color works as expected", {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_8), ifelse(res_8, "white", "black"))
+  
+  colors_vec <- c("orange", "lightblue", "gold", "limegreen", "darkblue")
+  hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
+  
+  number_color_9 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_colors_short, 
+                                               breaks = breaks_short)
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+                  breaks_short[which(colors_vec == "darkblue") + 1])
+  res_9 <- vapply(c(mat), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_9), ifelse(res_9, "white", "black"))
+  
+  colors_vec <- c("darkblue", "orange", "lightblue", "gold", "limegreen")
+  hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
+  
+  number_color_10 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+                                               colors_vec = hm_colors_short, 
+                                               breaks = breaks_short)
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+                  breaks_short[which(colors_vec == "darkblue") + 1])
+  dark_range[1] <- -Inf
+  res_10 <- vapply(c(mat), function(i) {
+    dark_range[1] < i & i <= dark_range[2]
+  }, FUN.VALUE = logical(1))
+  expect_equal(c(number_color_10), ifelse(res_10, "white", "black"))
   
   expect_error(.get_pheatmap_number_color(data.table::data.table(),
                                           colors_vec = hm_colors,
