@@ -460,6 +460,7 @@ prep_dt_assoc <- function(dt_response,
   # 1) length (shared lines) < 6 
   # 2) all/one of the association calculation inputs will have only NA values
   # 3) selected_metric values have no variance (due to cdsrmodels::lin_associations)
+  # otherwise association will be calculated
   obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
                                                       response = character(0),
                                                       rho = numeric(0),
@@ -467,6 +468,9 @@ prep_dt_assoc <- function(dt_response,
                     condition_info = unique(dt_response[["rId"]]),
                     selected_metric = selected_metric,
                     selected_feat_meta_col = selected_feat_meta_col)
+  
+  # association will not be calculated if there are any Inf values in the selected_metric column
+  dt_response <- dt_response[!is.infinite(get(selected_metric)), ]
   
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
@@ -504,8 +508,7 @@ prep_dt_assoc <- function(dt_response,
       # create dt_assoc
       # TODO in GDR-2710
       # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-
-      # final
+      # # final
       # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
     }
   }
