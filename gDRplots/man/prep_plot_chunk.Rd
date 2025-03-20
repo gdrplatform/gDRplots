@@ -7,21 +7,25 @@
 prep_plot_chunk(
   plt_list,
   chunk_name,
+  link_list = NULL,
   header_level = 3,
-  tabset_options = c("unnumbered", "tabset", "tabset-dropdown")
+  tabset_options = c("tabset", "tabset-dropdown")
 )
 }
 \arguments{
-\item{plt_list}{A named list of plots.  Names will be used as headings for plots/tab groups.
+\item{plt_list}{A named list of plots. Names will be used as headings for plots/tab groups.
 If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 If a nested list is provided, the inner lists should also be named.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks.  Avoid spaces.}
 
+\item{link_list}{A named list of link to location where plots are saved. Names must be the same
+as for \code{plt_list}.}
+
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used when `plt_list`
-is a nested list.
+\item{tabset_options}{A character vector of options for the tabset. This is only used 
+when \code{plt_list} is a nested list.
 Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.}
 }
 \value{
