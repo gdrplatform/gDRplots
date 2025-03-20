@@ -76,12 +76,13 @@ prep_plot_chunk <- function(plt_list,
       }
       
       item_chunks <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
-        item_name <- ifelse(is.null(names(plt_list)[nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
+        item_name <- 
+          ifelse(is.null(names(plt_list)[nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
-          if (!is.null(link_list)) sprintf('<a href=\"%s\" target=\"_blank\">link</a>\n',
-                                           link_list[[nm]][[item_name]]),
+          if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">link</a>\n",
+                                           link_list[[nm]][[i_nm]]),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
@@ -94,7 +95,7 @@ prep_plot_chunk <- function(plt_list,
       # not nested - no tabset, access element by index
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
-        if (!is.null(link_list)) sprintf('<a href=\"%s\" target=\"_blank\">link</a>\n',
+        if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">link</a>\n",
                                          link_list[[nm]]),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
