@@ -17,10 +17,10 @@ prep_plot_chunk(
 If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 If a nested list is provided, the inner lists should also be named.}
 
-\item{chunk_name}{A character string specifying the base name for the generated code chunks.  Avoid spaces.}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{link_list}{A named list of link to location where plots are saved. Names must be the same
-as for \code{plt_list}.}
+\item{link_list}{A named list of link to location where plots are saved. 
+It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
