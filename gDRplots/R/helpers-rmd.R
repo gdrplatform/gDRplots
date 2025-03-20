@@ -4,13 +4,15 @@
 #' The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
 #' sections for grouped plots.
 #'
-#' @param plt_list A named list of plots.  Names will be used as headings for plots/tab groups.
+#' @param plt_list A named list of plots. Names will be used as headings for plots/tab groups.
 #' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks.  Avoid spaces.
+#' @param link_list A named list of link to location where plots are saved. Names must be the same
+#' as for \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
-#' @param tabset_options A character vector of options for the tabset. This is only used when `plt_list`
-#' is a nested list.
+#' @param tabset_options A character vector of options for the tabset. This is only used 
+#' when \code{plt_list} is a nested list.
 #' Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.
 #'
 #' @return A list of character vectors. Each element of the list corresponds to a plot or a
@@ -47,20 +49,23 @@
 #' @export
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
+                            link_list = NULL,
                             header_level = 3,
                             tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
-
+  
   checkmate::assert_list(plt_list)
+  checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE)
-
+  
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-
+  if (NROW(link_list) == 0) link_list <- NULL
+  
   lapply(seq_along(plt_list), function(nm) {
-    group_name <- names(plt_list)[nm]
-
+    group_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
+    
     if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
       # nested list - use tabset options
       header <- if (is.null(tabset_options)) {
@@ -69,25 +74,30 @@ prep_plot_chunk <- function(plt_list,
         tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
         sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
       }
-
-      item_chunks <- lapply(names(plt_list[[nm]]), function(item_name) {
-        chunk <- sprintf(
-          "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s[[\"%s\"]][[\"%s\"]] \n```\n\n",
-          lvl, item_name, chunk_name, group_name, item_name, plt_list_name, group_name, item_name
+      
+      item_chunks <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
+        item_name <- ifelse(is.null(names(plt_list)[nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
+        
+        chunk <- c(
+          sprintf("%s# %s\n", lvl, item_name),
+          if (!is.null(link_list)) sprintf('<a href=\"%s\" target=\"_blank\">link</a>\n',
+                                           link_list[[nm]][[item_name]]),
+          sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[\"%s\"]][[\"%s\"]] \n```\n\n",
+                  chunk_name, group_name, item_name, plt_list_name, group_name, item_name)
         )
         knitr::knit_expand(text = chunk)
       })
-
-      list(header = knitr::knit_expand(text = header), items = item_chunks)
-
+      
+      c(knitr::knit_expand(text = header), unlist(item_chunks))
+      
     } else {
       # not nested - no tabset, access element by index
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
-        sprintf("```{r %s_%s, echo = FALSE}\n", chunk_name, group_name),
-        sprintf("%s[[%d]] \n", plt_list_name, nm),  # Use %d and nm directly
-        "```\n",
-        "\n"
+        if (!is.null(link_list)) sprintf('<a href=\"%s\" target=\"_blank\">link</a>\n',
+                                         link_list[[nm]]),
+        sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
+                chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
       knitr::knit_expand(text = chunk)
     }
@@ -156,13 +166,13 @@ prep_nested_plot_chunk <- function(plt_list,
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
-
+  
   lvl_1 <- paste0(rep("#", header_level), collapse =  "")
   lvl_2 <- paste0(rep("#", header_level + 1), collapse =  "")
   lvl_3 <- paste0(rep("#", header_level + 2), collapse =  "")
   lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
-
+  
   lapply(names(plt_list), function(nm_1) {
     c(
       sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
@@ -179,13 +189,13 @@ prep_nested_plot_chunk <- function(plt_list,
                   sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
-
+                      
                       chunk_name <- sprintf("%s__%s_%s_%s",
                                             chunk_name, nm_1, nm_2, nm_norm)
-
+                      
                       plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
                                                plt_list_name, nm_1, nm_2, nm_norm)
-
+                      
                       chunk <- c(
                         sprintf("%s {{nm_vis}} \n\n", lvl_4),
                         sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
@@ -268,12 +278,12 @@ estimate_plot_size <- function(plt,
                                base_width = 10,
                                base_height = 6,
                                scale_factor = 0.5) {
-
+  
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_numeric(base_width, lower = 0, finite = TRUE)
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
-
+  
   if (inherits(plt, "ggplot")) {
     # For ggplot2 objects
     plot_data <- ggplot2::ggplot_build(plt)$data
@@ -316,23 +326,23 @@ save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
-
+  
   # Check if the directory exists and has write access
   dir_path <- dirname(path)
   if (!dir.exists(dir_path)) {
     stop("The specified directory does not exist.")
   }
-
+  
   if (file.access(dir_path, 2) != 0) {
     stop("The specified directory does not have write access.")
   }
-
+  
   # Estimate plot size
   plot_size <- estimate_plot_size(plt)
-
+  
   filename <- paste(path, format, sep = ".")
-
-
+  
+  
   # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
                   plot = plt,
@@ -342,7 +352,7 @@ save_plot <- function(plt, path, format = "svg") {
                   dpi = 300,
                   limitsize = FALSE,
                   device = format)
-
+  
   invisible(NULL)
 }
 
@@ -354,7 +364,7 @@ save_plot <- function(plt, path, format = "svg") {
 #' @keywords internal
 get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
-
+  
   # on Rstudio
   fpath <- if (.Platform$GUI == "RStudio" && !test_mode) {
     rstudioapi::getActiveDocumentContext()$path

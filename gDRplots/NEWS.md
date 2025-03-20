@@ -1,3 +1,6 @@
+## gDRplots 0.0.72 - 2025-03-21
+* add link param in `prep_plot_chunk`
+
 ## gDRplots 0.0.71 - 2025-03-12
 * add coloring points in metric boxplots
 
