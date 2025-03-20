@@ -6,27 +6,111 @@ test_that("prep_plot_chunk works as expected", {
       ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
   })
   names(plotlist) <- unique(iris$Species)
+  linklist <- lapply(unique(iris$Species), function(iris_name) {
+    file.path("plot", paste0(iris_name, ".png"))
+  })
+  names(linklist) <- unique(iris$Species)
   
   res_1 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris")
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_true(all(vapply(seq_along(res_1), function(i) grepl("###", res_1[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_1), 
+                         function(i) grepl(unique(iris$Species)[i], res_1[[i]]), logical(1))))
   
-  res_2 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = 2)
+  res_2 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", 
+                           link_list = linklist, header_level = 2)
   expect_true(all(vapply(seq_along(res_2), function(i) grepl("##", res_2[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl("a href", res_2[[i]]), logical(1))))
+  
+  # scenario: incomplete list of links
+  res_3 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", 
+                           link_list = linklist[1:2], header_level = 2)
+  expect_false(all(vapply(seq_along(res_3), function(i) grepl("a href", res_3[[i]]), logical(1))))
+  
+  # scenario: plotlist without names
+  plotlist_noname <- plotlist
+  names(plotlist_noname) <- NULL
+  
+  res_4 <- prep_plot_chunk(plt_list = plotlist_noname, chunk_name = "iris")
+  expect_is(res_4, "list")
+  expect_length(res_4, NROW(plotlist))
+  expect_true(all(vapply(seq_along(res_4), 
+                         function(i) grepl(sprintf("### %s", i), res_4[[i]]), logical(1))))
+  
+  # scenario: both - plotlist and linklist - without names
+  linklist_noname <- linklist
+  names(linklist_noname) <- NULL
+  
+  res_5 <- prep_plot_chunk(plt_list = plotlist_noname, 
+                           link_list = linklist_noname, 
+                           chunk_name = "iris")
+  expect_is(res_5, "list")
+  expect_length(res_5, NROW(plotlist))
+  expect_true(all(vapply(seq_along(res_5), 
+                         function(i) grepl(sprintf("### %s", i), res_5[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_5), function(i) grepl("a href", res_5[[i]]), logical(1))))
   
   expect_error(prep_plot_chunk(plt_list = iris, chunk_name = "iris"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
-  expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", header_level = "1"), 
+  expect_error(prep_plot_chunk(plt_list = plotlist, 
+                               chunk_name = "iris", 
+                               link_list = unique(iris$Species)), 
+               "Assertion on 'link_list' failed: Must be of type 'list'")
+  expect_error(prep_plot_chunk(plt_list = plotlist, 
+                               chunk_name = "iris", 
+                               header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
   
-  plotlist2 <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
-  res_3 <- prep_plot_chunk(plt_list = plotlist2, chunk_name = "iris")
-  expect_true(all(vapply(res_3, function(i) is.character(i), logical(1))))
-  expect_length(res_3, 2)
-  expect_equal(unlist(lapply(seq_along(res_3), function(i) sum(grepl("####", res_3[[i]])))), c(3, 3))
+  # nested plotlist
+  plotlist_nest <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
+  linklist_nest <- list(someCategory = c(linklist), anotherCategory = c(linklist))
+  
+  res_6 <- prep_plot_chunk(plt_list = plotlist_nest, chunk_name = "iris")
+  expect_is(res_6, "list")
+  expect_length(res_6, NROW(plotlist_nest))
+  expect_true(all(vapply(res_6, function(i) is.character(i), logical(1))))
+  expect_length(res_6, NROW(plotlist_nest))
+  expect_equal(unlist(lapply(seq_along(res_6), function(i) sum(grepl("####", res_6[[i]])))), 
+               c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
+  expect_equal(sum(unlist(lapply(seq_along(res_6), 
+                                 function(i) grepl("\\{.tabset .tabset-dropdown\\}", res_6[[i]])))),
+               NROW(plotlist_nest))
+  
+  res_7 <- prep_plot_chunk(plt_list = plotlist_nest, 
+                           link_list = linklist_nest,
+                           chunk_name = "iris")
+  expect_equal(unlist(lapply(seq_along(res_7), function(i) sum(grepl("####", res_7[[i]])))), 
+               c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
+  expect_equal(unlist(lapply(seq_along(res_7), function(i) sum(grepl("a href", res_7[[i]])))), 
+               c(NROW(linklist_nest[[1]]), NROW(linklist_nest[[2]])))
+  
+  # scenario: incomplete list of links
+  linklist_nest_incom <- list(someCategory = c(linklist[2:3]), anotherCategory = c(linklist))
+  res_8 <- prep_plot_chunk(plt_list = plotlist_nest, 
+                           link_list = linklist_nest_incom,
+                           chunk_name = "iris")
+  expect_equal(unlist(lapply(seq_along(res_8), function(i) sum(grepl("####", res_8[[i]])))), 
+               c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
+  expect_equal(unlist(lapply(seq_along(res_8), function(i) sum(grepl("a href", res_8[[i]])))), 
+               c(0, 0))
+  
+  # scenario: plotlist without names (partially)
+  plotlist_nest_noname <- plotlist_nest
+  names(plotlist_nest_noname) <- NULL
+  res_9 <- prep_plot_chunk(plt_list = plotlist_nest, 
+                           link_list = linklist_nest,
+                           chunk_name = "iris",
+                           tabset_options = "unnumbered")
+  expect_equal(unlist(lapply(seq_along(res_9), function(i) sum(grepl("####", res_9[[i]])))), 
+               c(NROW(plotlist_nest_noname[[1]]), NROW(plotlist_nest_noname[[2]])))
+  expect_equal(unlist(lapply(seq_along(res_9), function(i) sum(grepl("a href", res_9[[i]])))), 
+               c(NROW(linklist_nest[[1]]), NROW(linklist_nest[[2]])))
+  expect_equal(sum(unlist(lapply(seq_along(res_9), 
+                                 function(i) grepl("\\{.unnumbered\\}", res_9[[i]])))),
+               NROW(plotlist_nest_noname))
 })
 
 test_that("prep_nested_plot_chunk works as expected", {
@@ -60,7 +144,7 @@ test_that("prep_nested_plot_chunk works as expected", {
       plotlist[[drug]][[cl]][["GR"]] <- plt_GR
     }
   }
-
+  
   res_1 <- prep_nested_plot_chunk(plt_list = plotlist, 
                                   chunk_name = "metric_col")
   expect_is(res_1, "list")
@@ -179,7 +263,7 @@ test_that("save_plot throws error for non-existent directory", {
 })
 
 test_that("get_r_file_path", {
-     
+  
   r_path <- "test-helpers-rmd.R" 
   ca1 <- c("a",
            "b=3",
