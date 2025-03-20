@@ -51,7 +51,7 @@ prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             link_list = NULL,
                             header_level = 3,
-                            tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
+                            tabset_options = c("tabset", "tabset-dropdown")) {
   
   checkmate::assert_list(plt_list)
   checkmate::assert_list(link_list, null.ok = TRUE)
@@ -66,7 +66,7 @@ prep_plot_chunk <- function(plt_list,
   lapply(seq_along(plt_list), function(nm) {
     group_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
     
-    if (inherits(plt_list[[nm]], "list") && !is.null(names(plt_list[[nm]]))) {
+    if (inherits(plt_list[[nm]], "list")) {
       # nested list - use tabset options
       header <- if (is.null(tabset_options)) {
         sprintf("%s %s\n\n", lvl, group_name)
@@ -82,8 +82,8 @@ prep_plot_chunk <- function(plt_list,
           sprintf("%s# %s\n", lvl, item_name),
           if (!is.null(link_list)) sprintf('<a href=\"%s\" target=\"_blank\">link</a>\n',
                                            link_list[[nm]][[item_name]]),
-          sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[\"%s\"]][[\"%s\"]] \n```\n\n",
-                  chunk_name, group_name, item_name, plt_list_name, group_name, item_name)
+          sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
+                  chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
         knitr::knit_expand(text = chunk)
       })
