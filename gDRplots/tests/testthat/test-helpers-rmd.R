@@ -24,9 +24,9 @@ test_that("prep_plot_chunk works as expected", {
   
   plotlist2 <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
   res_3 <- prep_plot_chunk(plt_list = plotlist2, chunk_name = "iris")
-  expect_true(all(vapply(res_3, function(i) is.list(i), logical(1))))
+  expect_true(all(vapply(res_3, function(i) is.character(i), logical(1))))
   expect_length(res_3, 2)
-  expect_true(all(purrr::map_lgl(res_3, ~ any(purrr::map_lgl(.x$items, ~ grepl("####", .x))))))
+  expect_equal(unlist(lapply(seq_along(res_3), function(i) sum(grepl("####", res_3[[i]])))), c(3, 3))
 })
 
 test_that("prep_nested_plot_chunk works as expected", {
