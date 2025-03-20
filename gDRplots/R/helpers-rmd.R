@@ -61,7 +61,15 @@ prep_plot_chunk <- function(plt_list,
   
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-  if (NROW(link_list) == 0) link_list <- NULL
+  
+  # checking if the structure of plt_list and link_list is identical
+  structure_condition <- if (inherits(plt_list[[1]], "list")) {
+    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) == 
+          unlist(lapply(seq_along(link_list), function(i) NROW(link_list[[i]]))))
+  } else {
+    NROW(plt_list) == NROW(link_list)
+  }
+  if (!structure_condition) link_list <- NULL
   
   lapply(seq_along(plt_list), function(nm) {
     group_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
