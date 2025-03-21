@@ -16,8 +16,8 @@
 #' Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.
 #'
 #' @return A list of character vectors. Each element of the list corresponds to a plot or a
-#' group of plots (if `plt_list` is nested). Each character vector within the list represents the markdown
-#' code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
+#' group of plots (if \code{plt_list} is nested). Each character vector within the list represents the markdown
+#' code to be processed by \code{knitr::knit()}. For nested lists, each element will contain a "header" element
 #' and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
 #' is a list of markdown chunks for each tab.
 #'
@@ -57,7 +57,8 @@ prep_plot_chunk <- function(plt_list,
   checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
-  checkmate::assert_character(tabset_options, null.ok = TRUE)
+  checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
+                              pattern = "unnumbered|tabset|tabset-dropdown")
   
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
@@ -89,7 +90,7 @@ prep_plot_chunk <- function(plt_list,
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
-          if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D</a>\n",
+          if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
                                            link_list[[nm]][[i_nm]]),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
@@ -103,7 +104,7 @@ prep_plot_chunk <- function(plt_list,
       # not nested - no tabset, access element by index
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
-        if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D</a>\n",
+        if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
                                          link_list[[nm]]),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
