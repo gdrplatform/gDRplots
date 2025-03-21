@@ -30,8 +30,8 @@ Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other suppo
 }
 \value{
 A list of character vectors. Each element of the list corresponds to a plot or a
-group of plots (if `plt_list` is nested). Each character vector within the list represents the markdown
-code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
+group of plots (if \code{plt_list} is nested). Each character vector within the list represents the markdown
+code to be processed by \code{knitr::knit()}. For nested lists, each element will contain a "header" element
 and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
 is a list of markdown chunks for each tab.
 }
