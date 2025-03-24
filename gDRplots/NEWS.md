@@ -1,5 +1,8 @@
-## gDRplots 0.0.72 - 2025-03-21
+## gDRplots 0.0.73 - 2025-03-25
 * add link param in `prep_plot_chunk`
+
+## gDRplots 0.0.72 - 2025-03-24
+* change xc50 to log10 for PRISM analysis
 
 ## gDRplots 0.0.71 - 2025-03-12
 * add coloring points in metric boxplots

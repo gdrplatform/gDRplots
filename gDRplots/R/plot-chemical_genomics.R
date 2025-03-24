@@ -61,9 +61,12 @@ analyze_cgs <- function(dt_metrics,
                                                d_name2 = NULL,
                                                normalization_type = normalization_type,
                                                additional_cols = drug_moa)
-  
-  original <- grep("diff", names(metrics_diff), value = TRUE)
-  new <- gsub(".*gDR_(.*)_cotrt_diff.*", "\\1", original)
+  to_remove <- names(metrics_diff)[grepl("_fittings$", names(metrics_diff))]
+  to_remove <- to_remove[!grepl("cotrt_diff", to_remove)]
+  metrics_diff <- metrics_diff[, -c(to_remove), with = FALSE]
+ 
+  original <- grep("cotrt_diff", names(metrics_diff), value = TRUE)
+  new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*", "\\2", original)
   
   data.table::setnames(metrics_diff, original, new)
   
