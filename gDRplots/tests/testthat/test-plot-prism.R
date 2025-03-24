@@ -563,7 +563,7 @@ test_that("plot_boxplot_num works as expected", {
   expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
   
   # capped
-  selected_metric <- "RV_gDR_xc50"
+  selected_metric <- "RV_gDR_log10_xc50"
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   dt_response_capped <- 
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
@@ -693,7 +693,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(plt_6[["facet"]][["params"]][["ncol"]], 1)
   
   # capped
-  selected_metric <- "RV_gDR_xc50"
+  selected_metric <- "RV_gDR_log10_xc50"
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   dt_response_capped <- 
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
@@ -746,7 +746,7 @@ test_that("plot_boxplot_num_panel works as expected", {
 
 test_that("plot_boxplot_meta works as expected", {
   selected_meta <- "meta_xx"
-  selected_metric <- "RV_gDR_xc50"
+  selected_metric <- "RV_gDR_log10_xc50"
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   dt_response_capped <- 
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
