@@ -8,6 +8,7 @@ prep_plot_chunk(
   plt_list,
   chunk_name,
   link_list = NULL,
+  dwn_list = NULL,
   header_level = 3,
   tabset_options = c("tabset", "tabset-dropdown")
 )
@@ -19,7 +20,10 @@ If a nested list is provided, the inner lists should also be named.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{link_list}{A named list of link to location where plots are saved. 
+\item{link_list}{A named list of link to location where plots are saved to b shown in new browser tab. 
+It must have the same structure as \code{plt_list}.}
+
+\item{dwn_list}{A named list of link to location where table or plots are saved to be downloaded. 
 It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
