@@ -340,8 +340,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   if (any(metric == "xc50")) {
     xc50_col <- grep("xc50", names(dt_combo_diff))
     new_xc50_names <- vapply(names(dt_combo_diff)[xc50_col], 
-                             function(i) 
-                               gsub("xc50", "log10_xc50", i), character(1), USE.NAMES = FALSE)
+                             function(i) gsub("xc50", "log10_xc50", i), character(1), USE.NAMES = FALSE)
     data.table::setnames(dt_combo_diff,
                          old = names(dt_combo_diff)[xc50_col],
                          new = new_xc50_names)
