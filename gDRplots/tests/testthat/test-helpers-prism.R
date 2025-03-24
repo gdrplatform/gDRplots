@@ -280,7 +280,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
     vapply(names(dt_response), function(nm) all(is.na(dt_response[[nm]])), logical(1))]
   expect_false(all(
     vapply(ls_col_inf, function(nm) all(is.na(dt_response_cap[[nm]])), logical(1))))
-  ls_col_equal <- names(dt_response)[!ls_col_equal %in% c(ls_col_inf, ls_col_na)]
+  ls_col_equal <- names(dt_response)[!names(dt_response) %in% c(ls_col_inf, ls_col_na)]
   ls_col_equal <- ls_col_equal[!grepl("_row_fittings", ls_col_equal)]
   expect_equal(dt_response_cap[, ls_col_equal, with = FALSE], 
                dt_response[, ls_col_equal, with = FALSE])
