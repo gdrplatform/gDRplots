@@ -335,6 +335,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
     data = dt_combo_diff, 
     formula = dcast_formula, 
     value.var = ls_col_met_fin)
+  data.table::setkey(dt_combo_diff, NULL)
   
   # change name fo xc50 to inform about log10
   if (any(metric == "xc50")) {
