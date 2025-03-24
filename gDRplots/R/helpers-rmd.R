@@ -8,7 +8,9 @@
 #' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks. Avoid spaces.
-#' @param link_list A named list of link to location where plots are saved. 
+#' @param link_list A named list of link to location where plots are saved to b shown in new browser tab. 
+#' It must have the same structure as \code{plt_list}.
+#' @param dwn_list A named list of link to location where table or plots are saved to be downloaded. 
 #' It must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
 #' @param tabset_options A character vector of options for the tabset. This is only used 
@@ -50,11 +52,13 @@
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             link_list = NULL,
+                            dwn_list = NULL,
                             header_level = 3,
                             tabset_options = c("tabset", "tabset-dropdown")) {
   
   checkmate::assert_list(plt_list)
   checkmate::assert_list(link_list, null.ok = TRUE)
+  checkmate::assert_list(dwn_list, null.ok = TRUE)
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
@@ -64,13 +68,22 @@ prep_plot_chunk <- function(plt_list,
   lvl <- paste0(rep("#", header_level), collapse = "")
   
   # checking if the structure of plt_list and link_list is identical
-  structure_condition <- if (inherits(plt_list[[1]], "list")) {
+  link_structure_condition <- if (inherits(plt_list[[1]], "list")) {
     all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) == 
           unlist(lapply(seq_along(link_list), function(i) NROW(link_list[[i]]))))
   } else {
     NROW(plt_list) == NROW(link_list)
   }
-  if (!structure_condition) link_list <- NULL
+  if (!link_structure_condition) link_list <- NULL
+  
+  # checking if the structure of plt_list and dwn_list is identical
+  dwn_structure_condition <- if (inherits(plt_list[[1]], "list")) {
+    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) == 
+          unlist(lapply(seq_along(dwn_list), function(i) NROW(dwn_list[[i]]))))
+  } else {
+    NROW(plt_list) == NROW(dwn_list)
+  }
+  if (!dwn_structure_condition) dwn_list <- NULL
   
   lapply(seq_along(plt_list), function(nm) {
     group_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
@@ -92,6 +105,8 @@ prep_plot_chunk <- function(plt_list,
           sprintf("%s# %s\n", lvl, item_name),
           if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
                                            link_list[[nm]][[i_nm]]),
+          if (!is.null(dwn_list)) sprintf("<a href=\"%s\" download>\U0001F4BE Download table</a>\n",
+                                          dwn_list[[nm]][[i_nm]]),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
@@ -106,6 +121,8 @@ prep_plot_chunk <- function(plt_list,
         sprintf("%s %s\n", lvl, group_name),
         if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
                                          link_list[[nm]]),
+        if (!is.null(dwn_list)) sprintf("<a href=\"%s\" download>\U0001F4BE Download table</a>\n",
+                                        dwn_list[[nm]]),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
