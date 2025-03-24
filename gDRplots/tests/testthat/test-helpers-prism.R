@@ -25,27 +25,27 @@ test_that("prep_dt_response_metric_sa works as expected", {
   
   dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name) # default
   expect_is(dt_response, "data.table")
-  expect_named(dt_response, c(meta_col, "RV_gDR_xc50"))
+  expect_named(dt_response, c(meta_col, "RV_gDR_log10_xc50"))
   expect_equal(NROW(dt_response), NROW(res))
   
   d_name <- "drug_021"
   dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name, metric = "xc50")
   dt_response_capped <- prep_dt_response_metric_sa(dt_metrics_capped, d_name, metric = "xc50")
   expect_identical(dt_response[, c(meta_col)], dt_response_capped[, c(meta_col)])
-  expect_true(all(is.infinite(dt_response$RV_gDR_xc50)))
-  expect_false(all(is.infinite(dt_response_capped$RV_gDR_xc50)))
+  expect_true(all(is.infinite(dt_response$RV_gDR_log10_xc50)))
+  expect_false(all(is.infinite(dt_response_capped$RV_gDR_log10_xc50)))
   
   dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name,
                                             normalization_type = "GR",
-                                            metric = "x_mean") 
+                                            metric = c("xc50", "x_mean"))
   expect_is(dt_response, "data.table")
-  expect_named(dt_response, c(meta_col, "GR_gDR_x_mean"))
+  expect_named(dt_response, c(meta_col, "GR_gDR_log10_xc50", "GR_gDR_x_mean"))
   
   sel_met <- c("xc50", "x_mean", "x_max")
   dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name,
                                             metric = sel_met)
   expect_is(dt_response, "data.table")
-  expect_named(dt_response, c(meta_col, sprintf("RV_gDR_%s", sel_met)))
+  expect_named(dt_response, c(meta_col, "RV_gDR_log10_xc50", sprintf("RV_gDR_%s", sel_met[2:3])))
   
   # testing assertions
   expect_error(prep_dt_response_metric_sa(dt_metrics = unlist(dt_metrics),
@@ -223,15 +223,15 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_true(all(
     names(dt_response) %in% 
       c(meta_col, drug_name, drug_name_2,
-        do.call(paste0, expand.grid(sprintf("RV_gDR_xc50_%s_", comb), ls_col_diff_fin)))
+        do.call(paste0, expand.grid(sprintf("RV_gDR_log10_xc50_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response), NROW(res))
-  expect_equal(dt_response[["RV_gDR_xc50_cotrt_zero_0.001_col_fittings"]], 
-               res[["0_col_fittings"]])
-  expect_equal(dt_response[["RV_gDR_xc50_cotrt_0.001_col_fittings"]], 
-               res[["0.001_col_fittings"]])
-  expect_equal(dt_response[["RV_gDR_xc50_cotrt_0.00316_row_fittings"]], 
-               res[["0.00316_row_fittings"]]) 
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_zero_0.001_col_fittings"]], 
+               log10(res[["0_col_fittings"]]))
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.001_col_fittings"]], 
+               log10(res[["0.001_col_fittings"]]))
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.00316_row_fittings"]], 
+               log10(res[["0.00316_row_fittings"]]))
   
   # scenario: "GR" and list of metrics
   dt_response_GR <-
@@ -239,7 +239,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
                                  d_name = d_name,
                                  d_name2 = d_name2,
                                  normalization_type = "GR",
-                                 metric = c("xc50", "x_mean", "x_max"))
+                                 metric = c("x_mean", "x_max"))
   
   expect_is(dt_response_GR, "data.table")
   expect_true(all(
@@ -264,20 +264,24 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_true(all(
     names(dt_response_cap) %in% 
       c(meta_col, drug_name, drug_name_2,
-        do.call(paste0, expand.grid(sprintf("RV_gDR_xc50_%s_", comb), ls_col_diff_fin)))
+        do.call(paste0, expand.grid(sprintf("RV_gDR_log10_xc50_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response_cap), NROW(res))
-  expect_equal(dt_response_cap[["RV_gDR_xc50_cotrt_zero_0.001_col_fittings"]], 
-               res[["0_col_fittings"]])
-  expect_equal(dt_response_cap[["RV_gDR_xc50_cotrt_0.001_col_fittings"]], 
-               res[["0.001_col_fittings"]])
+  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_zero_0.001_col_fittings"]], 
+               log10(res[["0_col_fittings"]]))
+  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_0.001_col_fittings"]], 
+               log10(res[["0.001_col_fittings"]]))
   
   ls_col_inf <- names(dt_response)[
     vapply(names(dt_response), function(nm) all(is.infinite(dt_response[[nm]])), logical(1))]
   expect_false(all(
     vapply(ls_col_inf, function(nm) all(is.infinite(dt_response_cap[[nm]])), logical(1))))
-  ls_col_equal <- names(dt_response)[!grepl("_diff", names(dt_response))]
-  ls_col_equal <- ls_col_equal[!ls_col_equal %in% ls_col_inf]
+  ls_col_na <- names(dt_response)[
+    vapply(names(dt_response), function(nm) all(is.na(dt_response[[nm]])), logical(1))]
+  expect_false(all(
+    vapply(ls_col_inf, function(nm) all(is.na(dt_response_cap[[nm]])), logical(1))))
+  ls_col_equal <- names(dt_response)[!ls_col_equal %in% c(ls_col_inf, ls_col_na)]
+  ls_col_equal <- ls_col_equal[!grepl("_row_fittings", ls_col_equal)]
   expect_equal(dt_response_cap[, ls_col_equal, with = FALSE], 
                dt_response[, ls_col_equal, with = FALSE])
   
