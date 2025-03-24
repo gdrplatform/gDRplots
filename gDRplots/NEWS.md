@@ -1,3 +1,6 @@
+## gDRplots 0.0.72 - 2025-03-24
+* handle edge-case in `pheatmap_with_anno_combo`
+
 ## gDRplots 0.0.71 - 2025-03-12
 * add coloring points in metric boxplots
 
