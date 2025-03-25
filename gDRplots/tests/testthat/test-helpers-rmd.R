@@ -10,46 +10,80 @@ test_that("prep_plot_chunk works as expected", {
     file.path("plot", paste0(iris_name, ".png"))
   })
   names(linklist) <- unique(iris$Species)
+  dwnlist <- lapply(unique(iris$Species), function(iris_name) {
+    file.path("tables", paste0(iris_name, ".xlsx"))
+  })
+  names(dwnlist) <- unique(iris$Species)
   
-  res_1 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris")
+  res_1 <- prep_plot_chunk(plt_list = plotlist,
+                           chunk_name = "iris")
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_true(all(vapply(seq_along(res_1), function(i) grepl("###", res_1[[i]]), logical(1))))
   expect_true(all(vapply(seq_along(res_1), 
                          function(i) grepl(unique(iris$Species)[i], res_1[[i]]), logical(1))))
   
-  res_2 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", 
-                           link_list = linklist, header_level = 2)
+  res_2 <- prep_plot_chunk(plt_list = plotlist, 
+                           chunk_name = "iris", 
+                           link_list = linklist, 
+                           dwn_list = dwnlist,
+                           header_level = 2)
   expect_true(all(vapply(seq_along(res_2), function(i) grepl("##", res_2[[i]]), logical(1))))
-  expect_true(all(vapply(seq_along(res_2), function(i) grepl("a href", res_2[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl("_blank", res_2[[i]]), logical(1)))) # link_list
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl("download>", res_2[[i]]), logical(1)))) # dwn_list
   
   # scenario: incomplete list of links
-  res_3 <- prep_plot_chunk(plt_list = plotlist, chunk_name = "iris", 
-                           link_list = linklist[1:2], header_level = 2)
-  expect_false(all(vapply(seq_along(res_3), function(i) grepl("a href", res_3[[i]]), logical(1))))
+  res_3 <- prep_plot_chunk(plt_list = plotlist, 
+                           chunk_name = "iris", 
+                           link_list = linklist[1:2], 
+                           dwn_list = dwnlist,
+                           header_level = 2)
+  expect_false(all(vapply(seq_along(res_3), function(i) grepl("_blank", res_3[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_3), function(i) grepl("download>", res_3[[i]]), logical(1))))
   
   # scenario: plotlist without names
   plotlist_noname <- plotlist
   names(plotlist_noname) <- NULL
   
-  res_4 <- prep_plot_chunk(plt_list = plotlist_noname, chunk_name = "iris")
+  res_4 <- prep_plot_chunk(plt_list = plotlist_noname, 
+                           chunk_name = "iris")
   expect_is(res_4, "list")
   expect_length(res_4, NROW(plotlist))
   expect_true(all(vapply(seq_along(res_4), 
                          function(i) grepl(sprintf("### %s", i), res_4[[i]]), logical(1))))
   
-  # scenario: both - plotlist and linklist - without names
+  # scenario: all - plotlist, linklist and dwn_list - without names
   linklist_noname <- linklist
   names(linklist_noname) <- NULL
+  dwnlist_noname <- dwnlist
+  names(dwnlist_noname) <- NULL
   
   res_5 <- prep_plot_chunk(plt_list = plotlist_noname, 
                            link_list = linklist_noname, 
+                           dwn_list = dwnlist_noname, 
                            chunk_name = "iris")
   expect_is(res_5, "list")
   expect_length(res_5, NROW(plotlist))
   expect_true(all(vapply(seq_along(res_5), 
                          function(i) grepl(sprintf("### %s", i), res_5[[i]]), logical(1))))
-  expect_true(all(vapply(seq_along(res_5), function(i) grepl("a href", res_5[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_5), function(i) grepl("_blank", res_5[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_5), function(i) grepl("download>", res_5[[i]]), logical(1))))
+  
+  # scenario: linklist with NA
+  dwnlist_NA <- dwnlist
+  dwnlist_NA[2] <- NA
+  res_6 <- prep_plot_chunk(plt_list = plotlist, 
+                           chunk_name = "iris", 
+                           link_list = linklist, 
+                           dwn_list = dwnlist_NA,
+                           header_level = 2)
+  expect_is(res_6, "list")
+  expect_length(res_6, NROW(plotlist))
+  expect_true(all(vapply(seq_along(res_6), 
+                         function(i) grepl(sprintf("## %s", names(plotlist)[i]), res_6[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_6), function(i) grepl("_blank", res_6[[i]]), logical(1))))
+  expect_equal(sum(vapply(seq_along(res_6), function(i) grepl("download>", res_6[[i]]), logical(1))), 2)
+  
   
   expect_error(prep_plot_chunk(plt_list = iris, chunk_name = "iris"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
@@ -314,9 +348,14 @@ test_that("create_zoom_link works as expected", {
   
   res_2 <- create_zoom_link(img_path = i_path, link_txt = zoom_txt)
   expect_true(grepl(i_path, res_2))
-  expect_true(grepl("a href", res_2))
+  expect_true(grepl("_blank", res_2))
   expect_true(grepl(zoom_txt, res_2))
-
+  
+  res_3 <- create_zoom_link(img_path = NA, link_txt = zoom_txt)
+  expect_equal(res_3, "")
+  expect_false(grepl("_blank", res_3))
+  expect_false(grepl(zoom_txt, res_3))
+  
   expect_error(create_zoom_link(img_path = 1),
                "Assertion on 'img_path' failed: Must be of type 'string'")
   expect_error(create_zoom_link(img_path = c("A", "B")),
@@ -339,6 +378,11 @@ test_that("create_download_link works as expected", {
   expect_true(grepl(file_path, res_2))
   expect_true(grepl("download", res_2))
   expect_true(grepl(dwn_txt, res_2))
+  
+  res_3 <- create_download_link(dwn_path = NA, link_txt = dwn_txt)
+  expect_equal(res_3, "")
+  expect_false(grepl("download", res_3))
+  expect_false(grepl(dwn_txt, res_3))
     
   expect_error(create_download_link(dwn_path = 1),
                "Assertion on 'dwn_path' failed: Must be of type 'string'")
