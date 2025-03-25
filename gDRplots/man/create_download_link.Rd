@@ -4,10 +4,10 @@
 \alias{create_download_link}
 \title{Prepare markdown chunk with download link}
 \usage{
-create_download_link(img_path, link_txt = "Download Table")
+create_download_link(dwn_path, link_txt = "Download Table")
 }
 \arguments{
-\item{img_path}{string with relative path to file with plot that will be downloaded}
+\item{dwn_path}{string with relative path to file with plot that will be downloaded}
 
 \item{link_txt}{string with text describing link}
 }
