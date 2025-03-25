@@ -41,5 +41,6 @@ prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset
 # Example using DT::datatable
 prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset")
 }
+
 }
 \keyword{internal}

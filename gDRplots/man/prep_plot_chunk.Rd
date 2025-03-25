@@ -20,17 +20,17 @@ If a nested list is provided, the inner lists should also be named.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{link_list}{A named list of link to location where plots are saved to b shown in new browser tab. 
-It must have the same structure as \code{plt_list}.}
+\item{link_list}{A named list of links to the location where plots are saved, which when clicked, 
+will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.}
 
-\item{dwn_list}{A named list of link to location where table or plots are saved to be downloaded. 
-It must have the same structure as \code{plt_list}.}
+\item{dwn_list}{A named list of link to location where table or plots are saved, which when clocked,
+will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
 \item{tabset_options}{A character vector of options for the tabset. This is only used 
 when \code{plt_list} is a nested list.
-Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.}
+Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 }
 \value{
 A list of character vectors. Each element of the list corresponds to a plot or a
@@ -40,7 +40,7 @@ and an "items" element. The "header" element is the markdown for the tabset head
 is a list of markdown chunks for each tab.
 }
 \description{
-Generates markdown code for displaying plots in a document using `knitr::knit()`.
+Generates markdown code for displaying plots in a document using \code{knitr::knit()}.
 The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
 sections for grouped plots.
 }
