@@ -262,7 +262,7 @@ test_that("save_plot throws error for non-existent directory", {
   expect_error(save_plot(p, file_path, "svg"), "The specified directory does not exist.")
 })
 
-test_that("get_r_file_path", {
+test_that("get_r_file_path works as expected", {
   
   r_path <- "test-helpers-rmd.R" 
   ca1 <- c("a",
@@ -301,4 +301,50 @@ test_that("get_r_file_path", {
   
   expect_error(get_r_file_path(test_mode = 1),
                "Assertion on 'test_mode' failed")
+})
+
+test_that("create_zoom_link works as expected", {
+  i_path <- "./folder/file.png"
+  zoom_txt <- "Click to see bigger picture"
+  
+  res_1 <- create_zoom_link(img_path = i_path) # default
+  expect_true(grepl(i_path, res_1))
+  expect_true(grepl("a href", res_1))
+  expect_true(grepl("Zoom In for Details", res_1))
+  
+  res_2 <- create_zoom_link(img_path = i_path, link_txt = zoom_txt)
+  expect_true(grepl(i_path, res_2))
+  expect_true(grepl("a href", res_2))
+  expect_true(grepl(zoom_txt, res_2))
+
+  expect_error(create_zoom_link(img_path = 1),
+               "Assertion on 'img_path' failed: Must be of type 'string'")
+  expect_error(create_zoom_link(img_path = c("A", "B")),
+               "Assertion on 'img_path' failed: Must have length 1")
+  expect_error(create_zoom_link(img_path = i_path,
+                                link_txt = 123),
+               "Assertion on 'link_txt' failed: Must be of type 'string'")
+})
+
+test_that("create_download_link works as expected", {
+  file_path <- "./folder/file.xlsx"
+  dwn_txt <- "Click to download"
+  
+  res_1 <- create_download_link(dwn_path = file_path) # default
+  expect_true(grepl(file_path, res_1))
+  expect_true(grepl("download", res_1))
+  expect_true(grepl("Download Table", res_1))
+  
+  res_2 <- create_download_link(dwn_path = file_path, link_txt = dwn_txt)
+  expect_true(grepl(file_path, res_2))
+  expect_true(grepl("download", res_2))
+  expect_true(grepl(dwn_txt, res_2))
+    
+  expect_error(create_download_link(dwn_path = 1),
+               "Assertion on 'dwn_path' failed: Must be of type 'string'")
+  expect_error(create_download_link(dwn_path = c("A", "B")),
+               "Assertion on 'dwn_path' failed: Must have length 1")
+  expect_error(create_download_link(dwn_path = file_path,
+                                    link_txt = 123),
+               "Assertion on 'link_txt' failed: Must be of type 'string'")
 })
