@@ -1,6 +1,6 @@
 #' Prepare markdown chunk based on a list of plots
 #'
-#' Generates markdown code for displaying plots in a document using `knitr::knit()`.
+#' Generates markdown code for displaying plots in a document using \code{knitr::knit()}.
 #' The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
 #' sections for grouped plots.
 #'
@@ -8,14 +8,14 @@
 #' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks. Avoid spaces.
-#' @param link_list A named list of link to location where plots are saved to b shown in new browser tab. 
-#' It must have the same structure as \code{plt_list}.
-#' @param dwn_list A named list of link to location where table or plots are saved to be downloaded. 
-#' It must have the same structure as \code{plt_list}.
+#' @param link_list A named list of links to the location where plots are saved, which when clicked, 
+#' will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.
+#' @param dwn_list A named list of link to location where table or plots are saved, which when clocked,
+#' will be downloaded. It must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
 #' @param tabset_options A character vector of options for the tabset. This is only used 
 #' when \code{plt_list} is a nested list.
-#' Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.
+#' Possible values are "unnumbered", "tabset", and "tabset-dropdown".
 #'
 #' @return A list of character vectors. Each element of the list corresponds to a plot or a
 #' group of plots (if \code{plt_list} is nested). Each character vector within the list represents the markdown
@@ -48,6 +48,7 @@
 #' }
 #' @keywords internal
 #' @seealso \code{\link[knitr]{knit}}
+#' 
 #' @export
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
@@ -103,10 +104,8 @@ prep_plot_chunk <- function(plt_list,
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
-          if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
-                                           link_list[[nm]][[i_nm]]),
-          if (!is.null(dwn_list)) sprintf("<a href=\"%s\" download>\U0001F4BE Download table</a>\n",
-                                          dwn_list[[nm]][[i_nm]]),
+          if (!is.null(link_list)) create_zoom_link(link_list[[nm]][[i_nm]]),
+          if (!is.null(dwn_list)) create_download_link(dwn_list[[nm]][[i_nm]]),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
@@ -119,10 +118,8 @@ prep_plot_chunk <- function(plt_list,
       # not nested - no tabset, access element by index
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
-        if (!is.null(link_list)) sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D Zoom In for Details</a>\n",
-                                         link_list[[nm]]),
-        if (!is.null(dwn_list)) sprintf("<a href=\"%s\" download>\U0001F4BE Download table</a>\n",
-                                        dwn_list[[nm]]),
+        if (!is.null(link_list)) create_zoom_link(link_list[[nm]]),
+        if (!is.null(dwn_list)) create_download_link(dwn_list[[nm]]),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
@@ -181,10 +178,10 @@ prep_plot_chunk <- function(plt_list,
 #'
 #' }
 #' @return list of character vectors - input for \code{knitr::knit}
+#' 
 #' @keywords internal
-#'
 #' @seealso \code{\link[knitr]{knit}}
-#'
+#' 
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
@@ -254,6 +251,7 @@ prep_nested_plot_chunk <- function(plt_list,
 #' escape_special_characters("AD/12")
 #'
 #' @return Original string with \code{:}s and \code{#}s and \code{/}s escaped
+#' 
 #' @keywords internal
 #'
 #' @export
@@ -276,6 +274,7 @@ escape_special_characters <- function(x) {
 #' neutralize_spaces("drug_001 x drug_002", ".")
 #'
 #' @return String with spaces replaced by the specified character
+#' 
 #' @keywords internal
 #'
 #' @export
@@ -294,12 +293,13 @@ neutralize_spaces <- function(x,
 #' @param scale_factor an integer with default scale_factor
 #'
 #' @return named vector with optimal width and height used in \code{\link[ggplot2]{ggsave}} function
-#' @keywords internal
 #'
 #' @examples
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 #' estimate_plot_size(p)
 #'
+#' @keywords internal
+#' 
 #' @export
 estimate_plot_size <- function(plt,
                                base_width = 10,
@@ -338,16 +338,16 @@ estimate_plot_size <- function(plt,
 #' @param format A string specifying the format for saving the plot; either "svg", "png", or "pdf". Default is "svg".
 #'
 #' @return \code{NULL}
-#' @keywords internal
-#'
-#' @seealso \code{\link[ggplot2]{ggsave}}
-#'
+#' 
 #' @examples
 #' tmp_dir <- file.path(tempdir(), "plot_dir")
 #' dir.create(tmp_dir, showWarnings = FALSE)
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 #' save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
 #'
+#' @keywords internal
+#' @seealso \code{\link[ggplot2]{ggsave}}
+#' 
 #' @export
 save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
@@ -386,9 +386,12 @@ save_plot <- function(plt, path, format = "svg") {
 #' Extract path of the executed R file
 #'
 #' @param test_mode logical flag whether the function be run in the test mode
-#' @export
+#' 
 #' @return string with the path to the executed Rscript file
+#' 
 #' @keywords internal
+#' 
+#' @export
 get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
   
@@ -419,7 +422,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
 #'   represents markdown code for the cell line's tabset.
-#' @keywords internal
+#'   
 #' @examples
 #' \dontrun{
 #' nested_tables <- list(
@@ -431,6 +434,9 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' # Example using DT::datatable
 #' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset")
 #' }
+#' 
+#' @keywords internal
+#' 
 #' @export
 prep_double_table_chunk <- function(tbl_list,
                                     chunk_name,
@@ -479,4 +485,50 @@ prep_double_table_chunk <- function(tbl_list,
     
     list(header = knitr::knit_expand(text = header), items = item_chunks)
   })
+}
+
+#' Prepare markdown chunk with zoom link
+#' 
+#' Generate markdown code for html link item which when clicked opens plot in new browser.
+#' The function output should be wrapped in \code{knitr::knit()}.
+#'
+#' @param img_path string with relative path to file with plot that will be shown
+#' @param link_txt string with text describing link
+#'
+#' @return string with html link code
+#'
+#' @keywords internal
+#' @seealso \code{\link[knitr]{knit}}
+#' 
+#' @export
+create_zoom_link <- function(img_path,
+                             link_txt = "Zoom In for Details") {
+  checkmate::assert_string(img_path)
+  checkmate::assert_string(link_txt)
+  
+  sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D %s</a>\n",
+          img_path, link_txt)
+}
+
+#' Prepare markdown chunk with download link
+#' 
+#' Generate markdown code with a html link item that, when clicked, downloads a file.
+#' The function output should be wrapped in \code{knitr::knit()}.
+#'
+#' @param img_path string with relative path to file with plot that will be downloaded
+#' @param link_txt string with text describing link
+#'
+#' @return string with html download code
+#'
+#' @keywords internal
+#' @seealso \code{\link[knitr]{knit}}
+#' 
+#' @export
+create_download_link <- function(img_path,
+                                 link_txt = "Download Table") {
+  checkmate::assert_string(img_path)
+  checkmate::assert_string(link_txt)
+  
+  sprintf("<a href=\"%s\" download>\U0001F4BE %s</a>\n",
+          img_path, link_txt)
 }
