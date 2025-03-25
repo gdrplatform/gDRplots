@@ -196,7 +196,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
                                          dt_depmap, 
                                          selected_feats,
                                          selected_feat_meta_col = NULL) {
-
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -384,7 +384,7 @@ plot_boxplot_num <- function(dt_response,
   X_dt <- dt_depmap[, c("CCLEName", selected_feat), with = FALSE]
   Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
-
+  
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
   
@@ -404,7 +404,9 @@ plot_boxplot_num <- function(dt_response,
     tab_plot[[selected_feat]] <- factor(tab_plot[[selected_feat]])
     
     # prep the number of items in each category
-    tab_count <- tab_plot[, .N, by = selected_feat]
+    tab_count <- tab_plot[, .N, by = selected_feat][, xlbl := sprintf("%s (%s)", get(selected_feat), N)]
+    xlbl <- tab_count$xlbl
+    names(xlbl) <- tab_count[[selected_feat]]
     
     plt <- 
       ggplot2::ggplot(data = tab_plot,
@@ -414,18 +416,13 @@ plot_boxplot_num <- function(dt_response,
       ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, staplewidth = 0.5, 
                             outliers = FALSE, na.rm = TRUE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
-      ggplot2::geom_text(data = tab_count,
-                         mapping =  ggplot2::aes(x = get(selected_feat), 
-                                                 y = min_val, 
-                                                 label = N), 
-                         vjust = 0, size.unit = "pt", size = 8) +
       ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = selected_feat,
                     y = selected_metric, 
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
-      ggplot2::scale_x_discrete(drop = FALSE) +
+      ggplot2::scale_x_discrete(labels = xlbl, drop = FALSE) +
       ggplot2::theme(legend.position = "none",
                      axis.text.x = ggplot2::element_text(size = 8))
   }
@@ -448,7 +445,7 @@ plot_boxplot_num_panel <- function(dt_response,
                                    selected_feats,
                                    selected_feat_meta_col = NULL,
                                    ncol = NULL) {
-
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -493,8 +490,8 @@ plot_boxplot_num_panel <- function(dt_response,
   } else {
     # prep dummy values for x-axis
     ls_lbl <- unique(as.vector(as.matrix(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])))
-    dummy_feat_val <- ls_lbl[!is.na(ls_lbl)][1]
-    if (is.na(dummy_feat_val)) dummy_feat_val <- 0
+    dummy_feat_val <- ls_lbl[!is.na(ls_lbl)]
+    if (all(is.na(dummy_feat_val))) dummy_feat_val <- 0
     
     tab_plot_all <- data.table::data.table()
     
@@ -562,19 +559,27 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep the number of items in each category
     tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
     
+    # fill lacking labels
+    lack_feat_lbl <- feat_lbl_levels[!feat_lbl_levels %in% tab_count_all$feat_lbl]
+    if (NROW(lack_feat_lbl) > 0) {
+      tab_count_all <- rbind(tab_count_all,
+                             expand.grid(feat_val = unique(tab_count_all$feat_val),
+                                         feat_lbl = lack_feat_lbl,
+                                         N = 0))
+    }
+    xlbl <- NULL # fix check
+    tab_count_all[, xlbl := sprintf("%s (%s)", feat_val, N)]
+    
+    tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all.x = TRUE)
+    
     plt <- 
       ggplot2::ggplot(data = tab_plot_all,
-                      mapping =  ggplot2::aes(x = feat_val, 
+                      mapping =  ggplot2::aes(x = xlbl, 
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, staplewidth = 0.5, 
                             outliers = FALSE, na.rm = TRUE) +
       ggplot2::geom_jitter(width = 0.2, height = 0, color = jitter_poinst_color, na.rm = TRUE) + 
-      ggplot2::geom_text(data = tab_count_all,
-                         mapping = ggplot2::aes(x = feat_val, 
-                                                y = min_val, 
-                                                label = N), 
-                         vjust = 0, size.unit = "pt", size = 8) +
       ggplot2::scale_y_continuous(limits = c(min_val, NA)) + 
       ggplot2::labs(title = selected_feat_meta_col,
                     x = "",
@@ -591,8 +596,7 @@ plot_boxplot_num_panel <- function(dt_response,
                      strip.background = ggplot2::element_blank(),
                      strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, 
                                                         margin = ggplot2::margin()),
-                     legend.position = "none"
-      )
+                     legend.position = "none")
   }
   return(plt)
 }
@@ -623,7 +627,7 @@ plot_boxplot_meta <- function(dt_response,
                               with_1_item_grp = TRUE,
                               max_x_lbl_length = 60,
                               with_inf = FALSE) {
-
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -771,7 +775,7 @@ plot_volcano_assoc_panel <- function(dt_response,
                                      dt_depmap,
                                      selected_metric,  
                                      selected_feat_meta_col) {
-
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_response)
@@ -784,7 +788,7 @@ plot_volcano_assoc_panel <- function(dt_response,
   # plot data
   ls_cols <- intersect(names(dt_response), c("rId", "cId", cellline_name, selected_metric))
   dt_response_ <- dt_response[, ls_cols, with = FALSE]
-
+  
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_feat_meta_col)

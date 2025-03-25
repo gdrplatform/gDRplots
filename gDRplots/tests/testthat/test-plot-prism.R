@@ -273,10 +273,9 @@ test_that("plot_scatter_with_corr works as expected", {
   selected_metric <- "RV_gDR_x_0.01"
   dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
-  plt_1 <- 
-    plot_scatter_with_corr(dt_response = dt_response,
-                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                           selected_feat = selected_feat)
+  plt_1 <- plot_scatter_with_corr(dt_response = dt_response,
+                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                  selected_feat = selected_feat)
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
@@ -286,11 +285,10 @@ test_that("plot_scatter_with_corr works as expected", {
   expect_true(all(vapply(c("corr", "slope", "intercept"), 
                          function(i) grepl(i, plt_1[["labels"]][["subtitle"]]), logical(1))))
   
-  plt_2 <- 
-    plot_scatter_with_corr(dt_response = dt_response,
-                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                           selected_feat = selected_feat,
-                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_2 <- plot_scatter_with_corr(dt_response = dt_response,
+                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                  selected_feat = selected_feat,
+                                  selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat[["selected_feat_meta_col"]])
@@ -299,11 +297,10 @@ test_that("plot_scatter_with_corr works as expected", {
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
-  plt_3 <-
-    plot_scatter_with_corr(dt_response = dt_response_2,
-                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                           selected_feat = selected_feat_2,
-                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_3 <- plot_scatter_with_corr(dt_response = dt_response_2,
+                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                  selected_feat = selected_feat_2,
+                                  selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat_2)
@@ -314,11 +311,10 @@ test_that("plot_scatter_with_corr works as expected", {
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
   dt_response_na[[selected_metric]] <- NA
-  plt_4 <- 
-    plot_scatter_with_corr(dt_response = dt_response_na,
-                           dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                           selected_feat = selected_feat,
-                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_4 <- plot_scatter_with_corr(dt_response = dt_response_na,
+                                  dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                  selected_feat = selected_feat,
+                                  selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 0) # empty plot
   expect_equal(plt_4[["labels"]][["x"]], selected_feat)
@@ -330,11 +326,10 @@ test_that("plot_scatter_with_corr works as expected", {
   # NAs in depmap
   dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
   dt_depmap_na[[selected_feat]] <- NA
-  plt_5 <- 
-    plot_scatter_with_corr(dt_response = dt_response,
-                           dt_depmap = dt_depmap_na, 
-                           selected_feat = selected_feat,
-                           selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_5 <- plot_scatter_with_corr(dt_response = dt_response,
+                                  dt_depmap = dt_depmap_na, 
+                                  selected_feat = selected_feat,
+                                  selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 0) # empty plot
   expect_equal(plt_5[["labels"]][["x"]], selected_feat)
@@ -372,10 +367,9 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   selected_metric <- "RV_gDR_x_10"
   dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
-  plt_1 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = selected_feats)
+  plt_1 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = selected_feats)
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], "")
@@ -383,11 +377,10 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
   
-  plt_2 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = selected_feats[1],
-                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_2 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = selected_feats[1],
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["title"]], "XZ_fatures")
@@ -395,10 +388,9 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   
   # selected feat is not present in dt_depmap
   new_selected_feats <- c(selected_feats, "XZ_non_avial")
-  plt_3 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = new_selected_feats)
+  plt_3 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = new_selected_feats)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["y"]], selected_metric)
@@ -407,11 +399,10 @@ test_that("plot_scatter_with_corr_panel works as expected", {
     NROW(new_selected_feats[!new_selected_feats %in% names(obj_depmap_feat[["dt_depmap"]])])) 
   
   # only NAs in selected_feats 
-  plt_4 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = rep(NA, 2),
-                                 selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  plt_4 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = rep(NA, 2),
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 0) # empty plot
   expect_equal(plt_4[["labels"]][["x"]], "")
@@ -420,10 +411,9 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   
   # some NAs in selected_feats 
   selected_feats_with_NAs <- c(NA, selected_feats, NA) 
-  plt_5 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = selected_feats_with_NAs)
+  plt_5 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = selected_feats_with_NAs)
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3)
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
@@ -436,10 +426,9 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
   dt_response_na[[selected_metric]] <- NA
-  plt_6 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response_na,
-                                 dt_depmap = obj_depmap_feat[["dt_depmap"]], 
-                                 selected_feats = selected_feats)
+  plt_6 <- plot_scatter_with_corr_panel(dt_response = dt_response_na,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]], 
+                                        selected_feats = selected_feats)
   expect_is(plt_6, "gg")
   expect_equal(plt_6[["labels"]][["x"]], "")
   expect_equal(plt_6[["labels"]][["y"]], selected_metric)
@@ -452,10 +441,9 @@ test_that("plot_scatter_with_corr_panel works as expected", {
   # NAs in depmap
   dt_depmap_na <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
   dt_depmap_na[[selected_feats[2]]] <- NA
-  plt_7 <- 
-    plot_scatter_with_corr_panel(dt_response = dt_response,
-                                 dt_depmap = dt_depmap_na, 
-                                 selected_feats = selected_feats)
+  plt_7 <- plot_scatter_with_corr_panel(dt_response = dt_response,
+                                        dt_depmap = dt_depmap_na, 
+                                        selected_feats = selected_feats)
   expect_is(plt_7, "gg")
   expect_equal(plt_7[["labels"]][["x"]], "")
   expect_equal(plt_7[["labels"]][["y"]], selected_metric)
@@ -490,12 +478,11 @@ test_that("plot_boxplot_num works as expected", {
   selected_metric <- "RV_gDR_x_0.01"
   dt_response <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
-  plt_1 <- 
-    plot_boxplot_num(dt_response = dt_response,
-                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
-                     selected_feat = selected_feat)
+  plt_1 <- plot_boxplot_num(dt_response = dt_response,
+                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
+                            selected_feat = selected_feat) # default
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 4)
+  expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], selected_feat)
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
@@ -505,39 +492,41 @@ test_that("plot_boxplot_num works as expected", {
     NROW(ggplot2::ggplot_build(plt_1)$data[[3]]), 
     NROW(obj_depmap_feat_2[["dt_depmap"]][!is.na(get(selected_feat)) & CCLEName %in% dt_response[["CellLineName"]], ]))
   
+  # scenario: only one level
   selected_feat_2 <- "NU_X5BN"
   selected_metric_2 <- "RV_gDR_bliss_score"
   dt_response_2 <- dt_response_score[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
-  plt_2 <-
-    plot_boxplot_num(dt_response = dt_response_2,
-                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
-                     selected_feat = selected_feat_2,
-                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  plt_2 <- plot_boxplot_num(dt_response = dt_response_2,
+                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                            selected_feat = selected_feat_2,
+                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 4)
+  expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["x"]], selected_feat_2)
   expect_equal(plt_2[["labels"]][["y"]], selected_metric_2)
   expect_equal(plt_2[["labels"]][["title"]], obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_equal(plt_2[["labels"]][["caption"]], unique(dt_response_2$rId))
   
-  plt_3 <-
-    plot_boxplot_num(dt_response = dt_response_2,
-                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
-                     selected_feat = selected_feat,
-                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  res_count_3 <- obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response_2$CellLineName]
+  res_count_3 <- 
+    res_count_3[!is.na(get(selected_feat)), .N, by = selected_feat][, lbl := sprintf("%s (%s)", get(selected_feat), N)]
+  plt_3 <- plot_boxplot_num(dt_response = dt_response_2,
+                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                            selected_feat = selected_feat,
+                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 4)
+  expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat)
+  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$get_labels()), sort(res_count_3$lbl))
   
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
   dt_response_na[[selected_metric]] <- NA
-  plt_4 <- 
-    plot_boxplot_num(dt_response = dt_response_na,
-                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
-                     selected_feat = selected_feat,
-                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  plt_4 <- plot_boxplot_num(dt_response = dt_response_na,
+                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                            selected_feat = selected_feat,
+                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 0) # empty plot
   expect_equal(plt_4[["labels"]][["x"]], selected_feat)
@@ -549,11 +538,10 @@ test_that("plot_boxplot_num works as expected", {
   # NAs in depmap
   dt_depmap_na <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
   dt_depmap_na[[selected_feat]] <- NA
-  plt_5 <- 
-    plot_boxplot_num(dt_response = dt_response,
-                     dt_depmap = dt_depmap_na, 
-                     selected_feat = selected_feat,
-                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  plt_5 <- plot_boxplot_num(dt_response = dt_response,
+                            dt_depmap = dt_depmap_na, 
+                            selected_feat = selected_feat,
+                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 0) # empty plot
   expect_equal(plt_5[["labels"]][["x"]], selected_feat)
@@ -562,12 +550,16 @@ test_that("plot_boxplot_num works as expected", {
                paste(obj_depmap_feat_2[["selected_feat_meta_col"]], ": all NAs"))
   expect_equal(plt_5[["labels"]][["caption"]], unique(dt_response_na$rId))
   
-  # capped
+  # scenario: xc50 capped
   selected_metric <- "RV_gDR_log10_xc50"
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   dt_response_capped <- 
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
+  res_count_6 <- obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response$CellLineName]
+  res_count_6 <- 
+    res_count_6[!is.na(get(selected_feat)), .N, by = selected_feat][, lbl := sprintf("%s (%s)", get(selected_feat), N)]
+
   plt_6_raw <- plot_boxplot_num(dt_response = dt_response,
                                 dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
                                 selected_feat = selected_feat)
@@ -576,12 +568,14 @@ test_that("plot_boxplot_num works as expected", {
                                 selected_feat = selected_feat)
   expect_is(plt_6_raw, "gg")
   expect_is(plt_6_cap, "gg")
-  expect_length(plt_6_raw[["layers"]], 4)
-  expect_length(plt_6_cap[["layers"]], 4)
+  expect_length(plt_6_raw[["layers"]], 3)
+  expect_length(plt_6_cap[["layers"]], 3)
   expect_equal(plt_6_raw[["labels"]][["x"]], plt_6_cap[["labels"]][["x"]])
   expect_equal(plt_6_raw[["labels"]][["y"]], plt_6_cap[["labels"]][["y"]])
   expect_true(any(is.infinite(ggplot2::ggplot_build(plt_6_raw)$data[[3]]$y)))
   expect_false(any(is.infinite(ggplot2::ggplot_build(plt_6_cap)$data[[3]]$y)))
+  expect_equal(sort(ggplot2::layer_scales(plt_6_raw)$x$get_labels()), sort(res_count_6$lbl))
+  expect_equal(sort(ggplot2::layer_scales(plt_6_cap)$x$get_labels()), sort(res_count_6$lbl))
   
   # testing assertions
   expect_error(plot_boxplot_num(dt_response = unlist(dt_response),
@@ -615,9 +609,9 @@ test_that("plot_boxplot_num_panel works as expected", {
   plt_1 <- 
     plot_boxplot_num_panel(dt_response = dt_response,
                            dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
-                           selected_feats = selected_feats)
+                           selected_feats = selected_feats) # default
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 4)
+  expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["x"]], "")
   expect_equal(plt_1[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1[["labels"]][["title"]], NULL)
@@ -631,7 +625,7 @@ test_that("plot_boxplot_num_panel works as expected", {
                            selected_feats = new_selected_feats,
                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
-  expect_length(plt_2[["layers"]], 4)
+  expect_length(plt_2[["layers"]], 3)
   expect_equal(plt_2[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(ggplot2::ggplot_build(plt_2)[["data"]][[1]]), NROW(new_selected_feats))
   expect_equal(# check the uniqueness of points
@@ -658,7 +652,7 @@ test_that("plot_boxplot_num_panel works as expected", {
                            selected_feats = selected_feats_with_NAs,
                            ncol = 2)
   expect_is(plt_4, "gg")
-  expect_length(plt_4[["layers"]], 4)
+  expect_length(plt_4[["layers"]], 3)
   expect_equal(plt_4[["labels"]][["y"]], selected_metric)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[1]]$PANEL)),
                NROW(selected_feats_with_NAs))
@@ -706,8 +700,8 @@ test_that("plot_boxplot_num_panel works as expected", {
                                       selected_feats = selected_feats)
   expect_is(plt_7_raw, "gg")
   expect_is(plt_7_cap, "gg")
-  expect_length(plt_7_raw[["layers"]], 4)
-  expect_length(plt_7_cap[["layers"]], 4)
+  expect_length(plt_7_raw[["layers"]], 3)
+  expect_length(plt_7_cap[["layers"]], 3)
   expect_equal(plt_7_raw[["labels"]][["x"]], plt_7_cap[["labels"]][["x"]])
   expect_equal(plt_7_raw[["labels"]][["y"]], plt_7_cap[["labels"]][["y"]])
   expect_true(any(is.infinite(ggplot2::ggplot_build(plt_7_raw)$data[[3]]$y)))
@@ -785,8 +779,8 @@ test_that("plot_boxplot_meta works as expected", {
                sort(dt_response[CellLineName %in% common_cellline, ][[selected_metric]]))
   
   plt_1_cap <- plot_boxplot_meta(dt_response = dt_response_capped,
-                             dt_depmap = dt_depmap_meta, 
-                             selected_feat_meta_col = selected_meta) # default
+                                 dt_depmap = dt_depmap_meta, 
+                                 selected_feat_meta_col = selected_meta) # default
   expect_is(plt_1_cap, "gg")
   expect_equal(plt_1_cap[["labels"]][["y"]], selected_metric)
   expect_equal(plt_1_cap[["labels"]][["title"]], selected_meta)
