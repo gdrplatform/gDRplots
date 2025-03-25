@@ -104,8 +104,8 @@ prep_plot_chunk <- function(plt_list,
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
-          if (!is.null(link_list)) create_zoom_link(link_list[[nm]][[i_nm]]),
-          if (!is.null(dwn_list)) create_download_link(dwn_list[[nm]][[i_nm]]),
+          if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]][[i_nm]]), "\n"),
+          if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]][[i_nm]]), "\n"),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
@@ -118,8 +118,8 @@ prep_plot_chunk <- function(plt_list,
       # not nested - no tabset, access element by index
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
-        if (!is.null(link_list)) create_zoom_link(link_list[[nm]]),
-        if (!is.null(dwn_list)) create_download_link(dwn_list[[nm]]),
+        if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]]), "\n"),
+        if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]]), "\n"),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
@@ -503,11 +503,15 @@ prep_double_table_chunk <- function(tbl_list,
 #' @export
 create_zoom_link <- function(img_path,
                              link_txt = "Zoom In for Details") {
-  checkmate::assert_string(img_path)
+  checkmate::assert_string(img_path, na.ok = TRUE)
   checkmate::assert_string(link_txt)
   
-  sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D %s</a>\n",
-          img_path, link_txt)
+  if (is.na(img_path)) {
+    ""
+  } else {
+    sprintf("<a href=\"%s\" target=\"_blank\">\U1F50D %s</a>",
+            img_path, link_txt)
+  }
 }
 
 #' Prepare markdown chunk with download link
@@ -526,9 +530,14 @@ create_zoom_link <- function(img_path,
 #' @export
 create_download_link <- function(dwn_path,
                                  link_txt = "Download Table") {
-  checkmate::assert_string(dwn_path)
+  checkmate::assert_string(dwn_path, na.ok = TRUE)
   checkmate::assert_string(link_txt)
   
-  sprintf("<a href=\"%s\" download>\U0001F4BE %s</a>\n",
-          dwn_path, link_txt)
+  if (is.na(dwn_path)) {
+    ""
+  } else {
+    sprintf("<a href=\"%s\" download>\U0001F4BE %s</a>",
+            dwn_path, link_txt)
+  }
 }
+
