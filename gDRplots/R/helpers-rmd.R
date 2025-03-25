@@ -515,7 +515,7 @@ create_zoom_link <- function(img_path,
 #' Generate markdown code with a html link item that, when clicked, downloads a file.
 #' The function output should be wrapped in \code{knitr::knit()}.
 #'
-#' @param img_path string with relative path to file with plot that will be downloaded
+#' @param dwn_path string with relative path to file with plot that will be downloaded
 #' @param link_txt string with text describing link
 #'
 #' @return string with html download code
@@ -524,11 +524,11 @@ create_zoom_link <- function(img_path,
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
-create_download_link <- function(img_path,
+create_download_link <- function(dwn_path,
                                  link_txt = "Download Table") {
-  checkmate::assert_string(img_path)
+  checkmate::assert_string(dwn_path)
   checkmate::assert_string(link_txt)
   
   sprintf("<a href=\"%s\" download>\U0001F4BE %s</a>\n",
-          img_path, link_txt)
+          dwn_path, link_txt)
 }
