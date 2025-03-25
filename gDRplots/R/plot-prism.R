@@ -567,6 +567,7 @@ plot_boxplot_num_panel <- function(dt_response,
                                          feat_lbl = lack_feat_lbl,
                                          N = 0))
     }
+    xlbl <- NULL # fix check
     tab_count_all[, xlbl := sprintf("%s (%s)", feat_val, N)]
     
     tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all.x = TRUE)
