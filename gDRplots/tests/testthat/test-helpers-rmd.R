@@ -426,7 +426,55 @@ test_that("prep_filename_path works as expected", {
   expect_true(all(vapply(seq_along(res_3), function(i) grepl(prefix_i, res_3[[i]]), logical(1))))
   expect_true(all(vapply(seq_along(res_3), function(i) grepl(format_i, res_3[[i]]), logical(1))))
   
-  expect_error(prep_filename_path(plt_list = data.table()),
+  # nested list
+  nested_plotlist <- list()
+  for (species in unique(iris$Species)) {
+    nested_plotlist[[species]] <- list()
+    nested_plotlist[[species]][["Sepal"]] <-
+      ggplot2::ggplot(iris[iris$Species == species, ],
+                      ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
+    nested_plotlist[[species]][["Petal"]] <-
+      ggplot2::ggplot(iris[iris$Species == species, ],
+                      ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
+  }
+  
+  res_4 <- prep_filename_path(plt_list = nested_plotlist)
+  expect_equal(names(res_4), names(nested_plotlist))
+  expect_true(all(
+    vapply(seq_along(res_4), 
+           function(i) all(names(res_4[[i]]) == names(nested_plotlist[[i]])), logical(1))))
+  expect_true(all(
+    vapply(seq_along(res_4), 
+           function(i) all(names(res_4[[i]]) == unlist(res_4[[i]], use.names = FALSE)), logical(1))))
+  
+  path_t <- file.path(".", "tables")
+  format_t <- "xlsx"
+  res_5 <- prep_filename_path(plt_list = nested_plotlist,
+                              path_file = path_t,
+                              file_format = format_t)
+  expect_equal(names(res_5), names(nested_plotlist))
+  expect_true(all(vapply(seq_along(unlist(res_5)), function(i) grepl(path_t, unlist(res_5)[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(unlist(res_5)), function(i) grepl(format_t, unlist(res_5)[[i]]), logical(1))))
+ 
+  # scenario: list without name
+  noname_nested_plotlist <- nested_plotlist
+  names(noname_nested_plotlist) <- NULL
+  res_6 <- prep_filename_path(plt_list = noname_nested_plotlist,
+                              prefix = prefix_i)
+  expect_equal(names(res_6), as.character(seq_along(nested_plotlist)))
+  expect_true(all(vapply(seq_along(unlist(res_6)), function(i) grepl(prefix_i, unlist(res_6)[[i]]), logical(1))))
+  
+  # scenario: nested level without names
+  noname_nested_plotlist_2 <- nested_plotlist
+  names(noname_nested_plotlist_2[[3]]) <- NULL
+  names(noname_nested_plotlist_2) <- LETTERS[1:3]
+  res_7 <- prep_filename_path(plt_list = noname_nested_plotlist_2)
+  expect_equal(names(res_7), names(noname_nested_plotlist_2))
+  expect_true(all(
+    vapply(seq_along(res_7), 
+           function(i) all(names(res_7[[i]]) == as.character(names(noname_nested_plotlist_2[[i]]))), logical(1))))
+
+  expect_error(prep_filename_path(plt_list = data.table::data.table()),
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_filename_path(plt_list = plotlist,
                                   prefix = 1),
