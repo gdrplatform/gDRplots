@@ -1005,6 +1005,11 @@ pheatmap_with_anno_combo <- function(
                                   metric = metric,
                                   fit_source = fit_source,
                                   experiment_type = gDRutils::get_supported_experiments("combo"))
+
+  # edge-case (no valid data in the matrix, usually matrix with NAs only)  
+  if (NROW(mat_cvd) == 0) {
+    return(ls_output)
+  }
   
   # check completeness of annotation
   if (!is.null(annotation_col)) {
@@ -1053,7 +1058,7 @@ pheatmap_with_anno_combo <- function(
   if (!is.null(annotation_row) && !is.null(annotation_colors)) {
     annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
-  
+ 
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)

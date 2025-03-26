@@ -1,6 +1,13 @@
-## gDRplots 0.0.73 - 2025-03-25
+## gDRplots 0.0.75 - 2025-03-27
 * add link param in `prep_plot_chunk`
 * add download feature in `prep_plot_chunk`
+
+## gDRplots 0.0.74 - 2025-03-26
+* handle edge-case in `pheatmap_with_anno_combo`
+
+## gDRplots 0.0.73 - 2025-03-25
+* fix readability of number for PRISM boxplots
+>>>>>>> main
 
 ## gDRplots 0.0.72 - 2025-03-24
 * change xc50 to log10 for PRISM analysis

@@ -808,6 +808,27 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_8, "pheatmap")
   expect_is(plt_8[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_8[["tree_col"]], "hclust") # cols are clustered
+ 
+  # scenario 9: only NAs in matrix
+  dt_scores_NA <- data.table::copy(dt_scores)
+  dt_scores_NA[["bliss_score"]] <- NA_integer_
+  dt_scores_NA[["hsa_score"]] <- NA_integer_
+  out_9 <- pheatmap_with_anno_combo(
+    dt_scores = dt_scores_NA,
+    metric = "bliss_score",
+    normalization_type = "RV",
+    annotation_col = annotation_manual_col,
+    annotation_colors = annotation_map
+  )
+  
+  expect_length(out_9, 2)
+  expect_equal(names(out_9), c("data", "heatmap"))
+  data_9 <- out_9[["data"]]
+  expect_is(data_9, "list")
+  expect_equal(names(data_9),
+               c("matrix", "annotation_col", "annotation_row"))
+  plt_9 <- out_9[["heatmap"]]
+  expect_null(plt_9)
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
