@@ -16,14 +16,22 @@ prep_filename_path(
 If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 If a nested list is provided, the inner lists should also be named.}
 
-\item{prefix}{string}
+\item{prefix}{string to be added as prefix to the name of file}
 
-\item{path_file}{string}
+\item{path_file}{string path to directory, where data will be read from}
 
-\item{file_format}{string}
+\item{file_format}{string specifying the format of file}
+}
+\value{
+list of strings describing names or paths depending on the input; the list is structured 
+like the input \code{plt_list}, it also has the same names \code{playlist}.
 }
 \description{
-Prepare list of names or paths
+Function can create lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
+param \code{link_list} and \code{dwn_list}. 
+Depending on the inputs, outputted string will have a format:
+\emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
+Note: An unnamed item in the list will be numbered.
 }
 \examples{
 \dontrun{
