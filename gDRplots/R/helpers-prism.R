@@ -67,9 +67,17 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   # final
   meta_col <- c("rId", "cId", cellline_name)
   dt_response_metric <- dt_response_metric[, c(meta_col, metric), with = FALSE]
-  data.table::setnames(dt_response_metric, 
-                       old = metric, 
-                       new = sprintf("%s_%s_%s", normalization_type, fit_source, metric))
+  
+  # for xc50 - metric should be in log10 scale
+  if (any(metric == "xc50")) {
+    dt_response_metric[["xc50"]] <- purrr::quietly(log10)(dt_response_metric[["xc50"]])$result
+  }
+  data.table::setnames(
+    dt_response_metric, 
+    old = metric, 
+    new = sprintf("%s_%s_%s", normalization_type, fit_source, 
+                  ifelse(metric == "xc50", "log10_xc50", metric)))
+  dt_response_metric
 }
 
 #' Prep table with metric values by doses for single-agent experiment
@@ -286,7 +294,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   if (!is.null(d_name2)) {
     dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
   }
-
+  
+  # for xc50 - metric should be in log10 scale
+  if (any(metric == "xc50")) {
+    dt_response_metric[["xc50"]] <- purrr::quietly(log10)(dt_response_metric[["xc50"]])$result
+  }
   # create entries of non-zero co-trt
   meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
@@ -313,17 +325,28 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
   data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
   
-  # Concatenate meta_col into a single string with "+"
+  # concatenate meta_col into a single string with "+"
   meta_col_str <- paste(meta_col, collapse = " + ")
   
-  # Generate the formula using reformulate
+  # generate the formula using reformulate
   dcast_formula <- stats::as.formula(paste(meta_col_str, "~ cotrt_value + source"))
   
   dt_combo_diff <- data.table::dcast(
     data = dt_combo_diff, 
     formula = dcast_formula, 
     value.var = ls_col_met_fin)
-  (dt_combo_diff)
+  data.table::setkey(dt_combo_diff, NULL)
+  
+  # change name fo xc50 to inform about log10
+  if (any(metric == "xc50")) {
+    xc50_col <- grep("xc50", names(dt_combo_diff))
+    new_xc50_names <- vapply(names(dt_combo_diff)[xc50_col], 
+                             function(i) gsub("xc50", "log10_xc50", i), character(1), USE.NAMES = FALSE)
+    data.table::setnames(dt_combo_diff,
+                         old = names(dt_combo_diff)[xc50_col],
+                         new = new_xc50_names)
+  }
+  dt_combo_diff
 }
 
 #' Load DepMap merged data for one selected feature
@@ -472,6 +495,7 @@ prep_dt_assoc <- function(dt_response,
   # association will not be calculated if there are any Inf values in the selected_metric column
   dt_response <- dt_response[!is.infinite(get(selected_metric)), ]
   
+  
   # shared cell line
   depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
   response_lines <- dt_response[[cellline_name]]
@@ -494,7 +518,7 @@ prep_dt_assoc <- function(dt_response,
     
     # remove col with all NA
     X <- X[, colSums(is.na(X)) != NROW(X), drop = FALSE]
- 
+    
     # association can only be calculated for conditions
     X_condition <- 
       # cdsr_models does not handle 1 feat

@@ -1,5 +1,11 @@
-## gDRplots 0.0.72 - 2025-03-24
+## gDRplots 0.0.74 - 2025-03-26
 * handle edge-case in `pheatmap_with_anno_combo`
+
+## gDRplots 0.0.73 - 2025-03-25
+* fix readability of number for PRISM boxplots
+
+## gDRplots 0.0.72 - 2025-03-24
+* change xc50 to log10 for PRISM analysis
 
 ## gDRplots 0.0.71 - 2025-03-12
 * add coloring points in metric boxplots
