@@ -606,7 +606,6 @@ prep_filename_path <- function(plt_list,
                             neutralize_spaces(as.character(
                               ifelse(is.null(file_format), lvl2_name,
                                      paste(lvl2_name, file_format, sep = ".")))))
-        print(file_name)
         # path
         ifelse(is.null(path_file), file_name, file.path(path_file, file_name))
       })
