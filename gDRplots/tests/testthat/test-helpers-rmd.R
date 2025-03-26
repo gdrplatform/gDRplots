@@ -383,7 +383,7 @@ test_that("create_download_link works as expected", {
   expect_equal(res_3, "")
   expect_false(grepl("download", res_3))
   expect_false(grepl(dwn_txt, res_3))
-    
+  
   expect_error(create_download_link(dwn_path = 1),
                "Assertion on 'dwn_path' failed: Must be of type 'string'")
   expect_error(create_download_link(dwn_path = c("A", "B")),
@@ -391,4 +391,53 @@ test_that("create_download_link works as expected", {
   expect_error(create_download_link(dwn_path = file_path,
                                     link_txt = 123),
                "Assertion on 'link_txt' failed: Must be of type 'string'")
+})
+
+test_that("prep_filename_path works as expected", {
+  # simple list
+  plotlist <- lapply(unique(iris$Species), function(iris_name) {
+    ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+      ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
+  })
+  names(plotlist) <- unique(iris$Species)
+  
+  
+  res_1 <- prep_filename_path(plt_list = plotlist) # default 
+  expect_equal(names(res_1), names(plotlist))
+  expect_equal(unlist(res_1, use.names = FALSE), names(plotlist))
+  
+  prefix_i <- "iris__"
+  path_i <- file.path(".", "plots")
+  format_i <- "png"
+  res_2 <- prep_filename_path(plt_list = plotlist,
+                              prefix = prefix_i,
+                              path_file = path_i)
+  expect_equal(names(res_2), names(plotlist))
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl(prefix_i, res_2[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_2), function(i) grepl(path_i, res_2[[i]]), logical(1))))
+  
+  # scenario: list without name
+  noname_plotlist <- plotlist
+  names(noname_plotlist) <- NULL
+  res_3 <- prep_filename_path(plt_list = noname_plotlist,
+                              prefix = prefix_i,
+                              file_format = format_i)
+  expect_equal(names(res_3), as.character(seq_along(plotlist)))
+  expect_true(all(vapply(seq_along(res_3), function(i) grepl(prefix_i, res_3[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_3), function(i) grepl(format_i, res_3[[i]]), logical(1))))
+  
+  expect_error(prep_filename_path(plt_list = data.table()),
+               "Assertion on 'plt_list' failed: Must be of type 'list'")
+  expect_error(prep_filename_path(plt_list = plotlist,
+                                  prefix = 1),
+               "Assertion on 'prefix' failed: Must be of type 'string'")
+  expect_error(prep_filename_path(plt_list = plotlist,
+                                  path_file = file.path()),
+               "Assertion on 'path_file' failed: Must have length 1.")
+  expect_error(prep_filename_path(plt_list = plotlist,
+                                  path_file = 123),
+               "Assertion on 'path_file' failed: Must be of type 'string'")
+  expect_error(prep_filename_path(plt_list = plotlist,
+                                  file_format = TRUE),
+               "Assertion on 'file_format' failed: Must be of type 'string'")
 })
