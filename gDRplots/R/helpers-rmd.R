@@ -100,7 +100,7 @@ prep_plot_chunk <- function(plt_list,
       
       item_chunks <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
         item_name <- 
-          ifelse(is.null(names(plt_list)[nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
+          ifelse(is.null(names(plt_list[[nm]])[i_nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
@@ -541,3 +541,99 @@ create_download_link <- function(dwn_path,
   }
 }
 
+
+#' Prepare list of names or paths
+#'
+#' @inheritParams prep_plot_chunk
+#' @param prefix string
+#' @param path_file string
+#' @param file_format string
+#'
+#' @return
+#'
+#' @examples
+#' \dontrun{
+#' # Simple list of plots
+#' plotlist <- lapply(unique(iris$Species), function(iris_name) {
+#'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
+#'     ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
+#' })
+#' 
+#' prep_filename_path(plt_list = plotlist,
+#'                    prefix = "iris__",
+#'                    path_file = file.path(".", "plots"))
+#'
+#' # Nested list of plots for tabbed output
+#' nested_plotlist <- list()
+#' for (species in unique(iris$Species)) {
+#'   nested_plotlist[[species]] <- list()
+#'   nested_plotlist[[species]][["Sepal"]] <- 
+#'     ggplot2::ggplot(iris[iris$Species == species, ],
+#'                     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
+#'   nested_plotlist[[species]][["Petal"]] <- 
+#'     ggplot2::ggplot(iris[iris$Species == species, ],
+#'                     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
+#' }
+#' 
+#' prep_filename_path(plt_list = nested_plotlist, 
+#'                    file_format = "png")
+#' }
+#'
+#' @keywords internal
+#' @seealso \code{\link[gDRplots]{prep_plot_chunk}}
+#' 
+#' @export
+prep_filename_path <- function(plt_list,
+                               prefix = NULL,
+                               path_file = NULL,
+                               file_format = NULL) {
+  
+  checkmate::assert_list(plt_list)
+  checkmate::assert_string(prefix, null.ok = TRUE)
+  checkmate::assert_string(path_file, null.ok = TRUE)
+  checkmate::assert_string(file_format, null.ok = TRUE)
+  
+  ls_file_name <- lapply(seq_along(plt_list), function(nm) {
+    lvl1_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
+    
+    if (inherits(plt_list[[nm]], "list")) {
+      
+      ls_nested <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
+        lvl2_name <-
+          ifelse(is.null(names(plt_list[[nm]])[i_nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
+        # file name
+        file_name <- paste0(prefix,
+                            neutralize_spaces(as.character(
+                              ifelse(is.null(file_format), lvl2_name,
+                                     paste(lvl2_name, file_format, sep = ".")))))
+        print(file_name)
+        # path
+        ifelse(is.null(path_file), file_name, file.path(path_file, file_name))
+      })
+      
+      if (is.null(names(plt_list[[nm]]))) {
+        names(ls_nested) <- seq_along(plt_list[[nm]])
+      } else {
+        names(ls_nested) <- names(plt_list[[nm]])
+      }
+      
+      ls_nested
+    } else {
+      # file name
+      file_name <- paste0(prefix,
+                          neutralize_spaces(as.character(
+                            ifelse(is.null(file_format), lvl1_name,
+                                   paste(lvl1_name, file_format, sep = ".")))))
+      # path
+      ifelse(is.null(path_file), file_name, file.path(path_file, file_name))
+    }
+  })
+  
+  if (is.null(names(plt_list))) {
+    names(ls_file_name) <- seq_along(plt_list)
+  } else {
+    names(ls_file_name) <- names(plt_list)
+  }
+  # final
+  ls_file_name
+} 
