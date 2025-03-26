@@ -1,3 +1,6 @@
+## gDRplots 0.0.74 - 2025-03-26
+* handle edge-case in `pheatmap_with_anno_combo`
+
 ## gDRplots 0.0.73 - 2025-03-25
 * fix readability of number for PRISM boxplots
 
