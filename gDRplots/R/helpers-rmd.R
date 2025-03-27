@@ -428,9 +428,6 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 #' )
 #' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
-#' 
-#' # Example using DT::datatable
-#' prep_double_table_chunk(nested_tables, "dt_tables", header_level = 2, tabset_options = "tabset")
 #' }
 #' 
 #' @keywords internal
