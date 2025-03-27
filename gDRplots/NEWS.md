@@ -1,6 +1,6 @@
 ## gDRplots 0.0.75 - 2025-03-27
 * add link param in `prep_plot_chunk`
-* add download feature in `prep_plot_chunk`
+* add download feature in `prep_plot_chunk` and `prep_double_table_chunk`
 
 ## gDRplots 0.0.74 - 2025-03-26
 * handle edge-case in `pheatmap_with_anno_combo`
