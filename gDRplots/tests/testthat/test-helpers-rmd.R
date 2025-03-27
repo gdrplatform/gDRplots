@@ -84,7 +84,6 @@ test_that("prep_plot_chunk works as expected", {
   expect_true(all(vapply(seq_along(res_6), function(i) grepl("_blank", res_6[[i]]), logical(1))))
   expect_equal(sum(vapply(seq_along(res_6), function(i) grepl("download>", res_6[[i]]), logical(1))), 2)
   
-  
   expect_error(prep_plot_chunk(plt_list = iris, chunk_name = "iris"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_plot_chunk(plt_list = plotlist, chunk_name = 123), 
@@ -97,6 +96,10 @@ test_that("prep_plot_chunk works as expected", {
                                chunk_name = "iris", 
                                header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
+  expect_error(prep_plot_chunk(plt_list = plotlist, 
+                               chunk_name = "iris", 
+                               tabset_options = 2), 
+               "Assertion on 'tabset_options' failed: Must be of type 'character'")
   
   # nested plotlist
   plotlist_nest <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
@@ -337,6 +340,79 @@ test_that("get_r_file_path works as expected", {
                "Assertion on 'test_mode' failed")
 })
 
+test_that("prep_double_table_chunk works as expected", {
+  nested_tables <- list(
+    CellLine1 = list(MetricA = mtcars[1:5, ], 
+                     MetricB = mtcars[6:10, ]),
+    CellLine2 = list(MetricC = iris[1:5, ], 
+                     MetricD = iris[6:10, ])
+  )
+  
+  download_link <- list()
+  for (nm in names(nested_tables)) {
+    ls_ <- lapply(seq_along(nested_tables[[nm]]), function(i) {
+      file.path("tables", paste0(names(nested_tables[[nm]])[i], ".xlsx"))
+    })
+    names(ls_) <- names(nested_tables[[nm]])
+    download_link[[nm]] <- ls_
+  }
+  
+  res_1 <- prep_double_table_chunk(tbl_list = nested_tables, 
+                                   chunk_name = "nested_tables")
+  expect_is(res_1, "list")
+  expect_length(res_1, NROW(nested_tables))
+  expect_true(all(vapply(seq_along(res_1), function(i) all(grepl("###", res_1[[i]])), logical(1))))
+  expect_equal(
+    vapply(seq_along(res_1), 
+           function(i) sum(grepl(sprintf("### %s", names(nested_tables)[i]), res_1[[i]])), numeric(1)),
+    c(1, 1)) # headers
+  expect_equal(
+    vapply(seq_along(res_1),
+           function(i) sum(grepl("DT::formatRound", res_1[[i]])), numeric(1)),
+    vapply(seq_along(nested_tables), function(i) NROW(nested_tables[[i]]), numeric(1)))
+  
+  res_2 <- prep_double_table_chunk(tbl_list = nested_tables, 
+                                   chunk_name = "nested_tables", 
+                                   header_level = 4, 
+                                   tabset_options = "tabset")
+  expect_is(res_2, "list")
+  expect_true(all(vapply(seq_along(res_1), function(i) all(grepl("####", res_2[[i]])), logical(1))))
+  expect_equal(
+    vapply(seq_along(res_2), 
+           function(i) sum(grepl("\\{\\.tabset\\}", res_2[[i]])), numeric(1)), c(1, 1)) # headers
+  
+  res_3 <- prep_double_table_chunk(nested_tables, 
+                                   chunk_name = "dt_tables", 
+                                   dwn_list = download_link,
+                                   header_level = 2, 
+                                   tabset_options = NULL)
+  expect_is(res_3, "list")
+  expect_equal(
+    vapply(seq_along(res_3), 
+           function(i) sum(grepl(sprintf("## %s \n\n", names(nested_tables)[i]), res_3[[i]])), numeric(1)),
+    c(1, 1)) # headers
+  expect_equal(
+    vapply(seq_along(res_3), function(i) sum(grepl("download>", res_3[[i]])), numeric(1)),
+    vapply(seq_along(nested_tables), function(i) NROW(nested_tables[[i]]), numeric(1))) # dwn_list
+  
+  expect_error(prep_double_table_chunk(tbl_list = data.table::data.table(iris), chunk_name = "iris"), 
+               "Assertion on 'tbl_list' failed: Must be of type 'list'")
+  expect_error(prep_double_table_chunk(tbl_list = nested_tables, chunk_name = 123), 
+               "Assertion on 'chunk_name' failed: Must be of type 'string'")
+  expect_error(prep_double_table_chunk(tbl_list = nested_tables, 
+                                       chunk_name = "nested_tables",
+                                       dwn_list = unique(iris$Species)), 
+               "Assertion on 'dwn_list' failed: Must be of type 'list'")
+  expect_error(prep_double_table_chunk(tbl_list = nested_tables, 
+                                       chunk_name = "nested_tables",
+                                       header_level = "1"), 
+               "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
+  expect_error(prep_double_table_chunk(tbl_list = nested_tables, 
+                                       chunk_name = "nested_tables",
+                                       tabset_options = 2), 
+               "Assertion on 'tabset_options' failed: Must be of type 'character'")
+})
+
 test_that("create_zoom_link works as expected", {
   i_path <- "./folder/file.png"
   zoom_txt <- "Click to see bigger picture"
@@ -455,7 +531,7 @@ test_that("prep_filename_path works as expected", {
   expect_equal(names(res_5), names(nested_plotlist))
   expect_true(all(vapply(seq_along(unlist(res_5)), function(i) grepl(path_t, unlist(res_5)[[i]]), logical(1))))
   expect_true(all(vapply(seq_along(unlist(res_5)), function(i) grepl(format_t, unlist(res_5)[[i]]), logical(1))))
- 
+  
   # scenario: list without name
   noname_nested_plotlist <- nested_plotlist
   names(noname_nested_plotlist) <- NULL
@@ -473,7 +549,7 @@ test_that("prep_filename_path works as expected", {
   expect_true(all(
     vapply(seq_along(res_7), 
            function(i) all(names(res_7[[i]]) == as.character(names(noname_nested_plotlist_2[[i]]))), logical(1))))
-
+  
   expect_error(prep_filename_path(plt_list = data.table::data.table()),
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_filename_path(plt_list = plotlist,
