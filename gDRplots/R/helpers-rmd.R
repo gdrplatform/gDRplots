@@ -414,12 +414,10 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
 #' The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 #'
+#' @inheritParams prep_plot_chunk
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
 #'   and the inner lists represent metrics.  Names are used as headings.
-#' @param chunk_name Base name for generated code chunks. Avoid spaces.
-#' @param header_level Markdown header level for the outer tabset (cell lines).
-#' @param tabset_options Options for the tabset. Can be "unnumbered", "tabset", "tabset-dropdown".
-#'
+#'   
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
 #'   represents markdown code for the cell line's tabset.
 #'   
@@ -440,13 +438,16 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' @export
 prep_double_table_chunk <- function(tbl_list,
                                     chunk_name,
+                                    dwn_list = NULL,
                                     header_level = 3,
-                                    tabset_options = c("unnumbered", "tabset", "tabset-dropdown")) {
+                                    tabset_options = c("tabset", "tabset-dropdown")) {
   
   checkmate::assert_list(tbl_list, min.len = 1)
   checkmate::assert_string(chunk_name)
+  checkmate::assert_list(dwn_list, null.ok = TRUE)
   checkmate::assert_int(header_level, lower = 1)
-  checkmate::assert_character(tabset_options, null.ok = TRUE)
+  checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
+                              pattern = "unnumbered|tabset|tabset-dropdown")
   
   tbl_list_name <- deparse(substitute(tbl_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
@@ -462,10 +463,10 @@ prep_double_table_chunk <- function(tbl_list,
     header <- sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string)
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
-      chunk <- sprintf(
-        "%s# %s\n```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
-        inner_lvl, 
-        metric, 
+      chunk <- c(
+        sprintf("%s# %s\n", inner_lvl, metric),
+        if (!is.null(dwn_list)) c(create_download_link(dwn_list[[cell_line]][[metric]]), "\n"),
+        sprintf("```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
         chunk_name, 
         cell_line, 
         metric, 
@@ -477,13 +478,13 @@ prep_double_table_chunk <- function(tbl_list,
           "columns = names(Filter(is.numeric, ", 
           tbl_list_name, 
           "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
-          "digits = 5)"
+          "digits = 5)")
         )
       )
       knitr::knit_expand(text = chunk)
     })
-    
-    list(header = knitr::knit_expand(text = header), items = item_chunks)
+
+    c(knitr::knit_expand(text = header), unlist(item_chunks))
   })
 }
 
