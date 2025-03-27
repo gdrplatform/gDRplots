@@ -7,19 +7,25 @@
 prep_double_table_chunk(
   tbl_list,
   chunk_name,
+  dwn_list = NULL,
   header_level = 3,
-  tabset_options = c("unnumbered", "tabset", "tabset-dropdown")
+  tabset_options = c("tabset", "tabset-dropdown")
 )
 }
 \arguments{
 \item{tbl_list}{A doubly nested named list of tables. The outer list represents cell lines,
 and the inner lists represent metrics.  Names are used as headings.}
 
-\item{chunk_name}{Base name for generated code chunks. Avoid spaces.}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{header_level}{Markdown header level for the outer tabset (cell lines).}
+\item{dwn_list}{A named list of link to location where table or plots are saved, which when clocked,
+will be downloaded. It must have the same structure as \code{plt_list}.}
 
-\item{tabset_options}{Options for the tabset. Can be "unnumbered", "tabset", "tabset-dropdown".}
+\item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
+
+\item{tabset_options}{A character vector of options for the tabset. This is only used 
+when \code{plt_list} is a nested list.
+Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 }
 \value{
 A list of character vectors. Each element corresponds to a cell line. Each character vector
