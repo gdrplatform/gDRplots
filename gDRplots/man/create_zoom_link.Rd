@@ -7,7 +7,7 @@
 create_zoom_link(img_path, link_txt = "Zoom In for Details")
 }
 \arguments{
-\item{img_path}{string with relative path to file with plot that will be shown}
+\item{img_path}{string with relative path to file with plot to be shown}
 
 \item{link_txt}{string with text describing link}
 }

@@ -8,10 +8,10 @@
 #' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks. Avoid spaces.
-#' @param link_list A named list of links to the location where plots are saved, which when clicked, 
-#' will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.
-#' @param dwn_list A named list of link to location where table or plots are saved, which when clocked,
-#' will be downloaded. It must have the same structure as \code{plt_list}.
+#' @param link_list A named list of links to the location (relative paths) where plots are saved, 
+#' which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.
+#' @param dwn_list A named list of links to location (relative paths) where table or plots are saved, 
+#' which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
 #' @param tabset_options A character vector of options for the tabset. This is only used 
 #' when \code{plt_list} is a nested list.
@@ -490,7 +490,7 @@ prep_double_table_chunk <- function(tbl_list,
 #' Generate markdown code for html link item which when clicked opens plot in new browser.
 #' The function output should be wrapped in \code{knitr::knit()}.
 #'
-#' @param img_path string with relative path to file with plot that will be shown
+#' @param img_path string with relative path to file with plot to be shown
 #' @param link_txt string with text describing link
 #'
 #' @return string with html link code
@@ -517,7 +517,7 @@ create_zoom_link <- function(img_path,
 #' Generate markdown code with a html link item that, when clicked, downloads a file.
 #' The function output should be wrapped in \code{knitr::knit()}.
 #'
-#' @param dwn_path string with relative path to file with plot that will be downloaded
+#' @param dwn_path string with relative path to file with plot to be downloaded
 #' @param link_txt string with text describing link
 #'
 #' @return string with html download code
@@ -542,7 +542,7 @@ create_download_link <- function(dwn_path,
 
 #' Prepare list of names or paths
 #' 
-#' Function can create lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
+#' This function can creates lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
 #' param \code{link_list} and \code{dwn_list}. 
 #' Depending on the inputs, outputted string will have a format:
 #' \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
@@ -554,7 +554,7 @@ create_download_link <- function(dwn_path,
 #' @param file_format string specifying the format of file
 #'
 #' @return list of strings describing names or paths depending on the input; the list is structured 
-#' like the input \code{plt_list}, it also has the same names \code{playlist}.
+#' like the input \code{plt_list} and retains the same names as \code{plt_list}.
 #'
 #' @examples
 #' \dontrun{

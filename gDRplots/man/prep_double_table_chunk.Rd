@@ -18,8 +18,8 @@ and the inner lists represent metrics.  Names are used as headings.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{dwn_list}{A named list of link to location where table or plots are saved, which when clocked,
-will be downloaded. It must have the same structure as \code{plt_list}.}
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 

@@ -7,7 +7,7 @@
 create_download_link(dwn_path, link_txt = "Download Table")
 }
 \arguments{
-\item{dwn_path}{string with relative path to file with plot that will be downloaded}
+\item{dwn_path}{string with relative path to file with plot to be downloaded}
 
 \item{link_txt}{string with text describing link}
 }

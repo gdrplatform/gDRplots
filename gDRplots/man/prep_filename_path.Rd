@@ -24,10 +24,10 @@ If a nested list is provided, the inner lists should also be named.}
 }
 \value{
 list of strings describing names or paths depending on the input; the list is structured 
-like the input \code{plt_list}, it also has the same names \code{playlist}.
+like the input \code{plt_list} and retains the same names as \code{plt_list}.
 }
 \description{
-Function can create lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
+This function can creates lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
 param \code{link_list} and \code{dwn_list}. 
 Depending on the inputs, outputted string will have a format:
 \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
