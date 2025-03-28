@@ -197,7 +197,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   data.table::setkey(res_3, NULL)
   
   out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_one_val,
-                                 colors_vec = c("darkblue","darkred"),
+                                 colors_vec = c("darkblue", "darkred"),
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
   expect_length(out_3, 2)
