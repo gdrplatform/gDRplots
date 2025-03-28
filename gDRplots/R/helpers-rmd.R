@@ -325,8 +325,6 @@ estimate_plot_size <- function(plt,
     num_cols <- matrix_dim[[2]]
     estimated_width <- base_width + num_cols * scale_factor
     estimated_height <- base_height + num_rows * scale_factor
-  } else {
-    stop("Unsupported plot type. Only ggplot2 and pheatmap objects are supported.")
   }
   return(c(width = estimated_width, height = estimated_height))
 }

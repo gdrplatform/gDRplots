@@ -105,48 +105,54 @@ test_that("prep_plot_chunk works as expected", {
   plotlist_nest <- list(someCategory = c(plotlist), anotherCategory = c(plotlist))
   linklist_nest <- list(someCategory = c(linklist), anotherCategory = c(linklist))
   
-  res_6 <- prep_plot_chunk(plt_list = plotlist_nest, chunk_name = "iris")
-  expect_is(res_6, "list")
-  expect_length(res_6, NROW(plotlist_nest))
-  expect_true(all(vapply(res_6, function(i) is.character(i), logical(1))))
-  expect_length(res_6, NROW(plotlist_nest))
-  expect_equal(unlist(lapply(seq_along(res_6), function(i) sum(grepl("####", res_6[[i]])))), 
+  res_1n <- prep_plot_chunk(plt_list = plotlist_nest, 
+                           chunk_name = "iris") # default
+  expect_is(res_1n, "list")
+  expect_length(res_1n, NROW(plotlist_nest))
+  expect_true(all(vapply(res_1n, function(i) is.character(i), logical(1))))
+  expect_length(res_1n, NROW(plotlist_nest))
+  expect_equal(unlist(lapply(seq_along(res_1n), function(i) sum(grepl("####", res_1n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
-  expect_equal(sum(unlist(lapply(seq_along(res_6), 
-                                 function(i) grepl("\\{.tabset .tabset-dropdown\\}", res_6[[i]])))),
+  expect_equal(sum(unlist(lapply(seq_along(res_1n), 
+                                 function(i) grepl("\\{.tabset .tabset-dropdown\\}", res_1n[[i]])))),
                NROW(plotlist_nest))
   
-  res_7 <- prep_plot_chunk(plt_list = plotlist_nest, 
+  res_2n <- prep_plot_chunk(plt_list = plotlist_nest, 
                            link_list = linklist_nest,
-                           chunk_name = "iris")
-  expect_equal(unlist(lapply(seq_along(res_7), function(i) sum(grepl("####", res_7[[i]])))), 
+                           chunk_name = "iris",
+                           tabset_options = NULL)
+  expect_equal(unlist(lapply(seq_along(res_2n), function(i) sum(grepl("####", res_2n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
-  expect_equal(unlist(lapply(seq_along(res_7), function(i) sum(grepl("a href", res_7[[i]])))), 
+  expect_equal(unlist(lapply(seq_along(res_2n), function(i) sum(grepl("a href", res_2n[[i]])))), 
                c(NROW(linklist_nest[[1]]), NROW(linklist_nest[[2]])))
+  expect_equal(
+    vapply(seq_along(res_2n), 
+           function(i) sum(grepl(sprintf("### %s\n\n", names(plotlist_nest)[i]), res_2n[[i]])), numeric(1)),
+    c(1, 1)) # headers
   
   # scenario: incomplete list of links
   linklist_nest_incom <- list(someCategory = c(linklist[2:3]), anotherCategory = c(linklist))
-  res_8 <- prep_plot_chunk(plt_list = plotlist_nest, 
+  res_3n <- prep_plot_chunk(plt_list = plotlist_nest, 
                            link_list = linklist_nest_incom,
                            chunk_name = "iris")
-  expect_equal(unlist(lapply(seq_along(res_8), function(i) sum(grepl("####", res_8[[i]])))), 
+  expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("####", res_3n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
-  expect_equal(unlist(lapply(seq_along(res_8), function(i) sum(grepl("a href", res_8[[i]])))), 
+  expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("a href", res_3n[[i]])))), 
                c(0, 0))
   
   # scenario: plotlist without names (partially)
   plotlist_nest_noname <- plotlist_nest
   names(plotlist_nest_noname) <- NULL
-  res_9 <- prep_plot_chunk(plt_list = plotlist_nest, 
+  res_4n <- prep_plot_chunk(plt_list = plotlist_nest, 
                            link_list = linklist_nest,
                            chunk_name = "iris",
                            tabset_options = "unnumbered")
-  expect_equal(unlist(lapply(seq_along(res_9), function(i) sum(grepl("####", res_9[[i]])))), 
+  expect_equal(unlist(lapply(seq_along(res_4n), function(i) sum(grepl("####", res_4n[[i]])))), 
                c(NROW(plotlist_nest_noname[[1]]), NROW(plotlist_nest_noname[[2]])))
-  expect_equal(unlist(lapply(seq_along(res_9), function(i) sum(grepl("a href", res_9[[i]])))), 
+  expect_equal(unlist(lapply(seq_along(res_4n), function(i) sum(grepl("a href", res_4n[[i]])))), 
                c(NROW(linklist_nest[[1]]), NROW(linklist_nest[[2]])))
-  expect_equal(sum(unlist(lapply(seq_along(res_9), 
-                                 function(i) grepl("\\{.unnumbered\\}", res_9[[i]])))),
+  expect_equal(sum(unlist(lapply(seq_along(res_4n), 
+                                 function(i) grepl("\\{.unnumbered\\}", res_4n[[i]])))),
                NROW(plotlist_nest_noname))
 })
 
