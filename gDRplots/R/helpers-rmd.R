@@ -223,7 +223,8 @@ prep_nested_plot_chunk <- function(plt_list,
                       
                       chunk <- c(
                         sprintf("%s {{nm_vis}} \n\n", lvl_4),
-                        if (!is.null(link_list)) c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n"),
+                        if (!is.null(link_list)) 
+                          c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n"),
                         sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
                         sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
                         "```\n",
@@ -464,23 +465,23 @@ prep_double_table_chunk <- function(tbl_list,
         sprintf("%s# %s\n", inner_lvl, metric),
         if (!is.null(dwn_list)) c(create_download_link(dwn_list[[cell_line]][[metric]]), "\n"),
         sprintf("```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
-        chunk_name, 
-        cell_line, 
-        metric, 
-        paste0(
-          "DT::formatRound(",
-          "DT::datatable(", 
-          tbl_list_name, 
-          "[[\"", cell_line, "\"]][[\"", metric, "\"]]), ",
-          "columns = names(Filter(is.numeric, ", 
-          tbl_list_name, 
-          "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
-          "digits = 5)")
+                chunk_name, 
+                cell_line, 
+                metric, 
+                paste0(
+                  "DT::formatRound(",
+                  "DT::datatable(", 
+                  tbl_list_name, 
+                  "[[\"", cell_line, "\"]][[\"", metric, "\"]]), ",
+                  "columns = names(Filter(is.numeric, ", 
+                  tbl_list_name, 
+                  "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
+                  "digits = 5)")
         )
       )
       knitr::knit_expand(text = chunk)
     })
-
+    
     c(knitr::knit_expand(text = header), unlist(item_chunks))
   })
 }
