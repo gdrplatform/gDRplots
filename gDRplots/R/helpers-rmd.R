@@ -136,8 +136,7 @@ prep_plot_chunk <- function(plt_list,
 #' @param plt_list named list with generated plots to be shown in tabs; list of plots in nested
 #'   hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
 #'   one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'
-#' @param chunk_name string name of markdown chunk; preferable without spaces
-#' @param header_level numeric level of markdown header - only for the first level
+#' @inheritParams prep_plot_chunk
 #'
 #' @examples
 #' \dontrun{
@@ -185,10 +184,12 @@ prep_plot_chunk <- function(plt_list,
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
+                                   link_list = NULL,
                                    header_level = 2) {
   checkmate::assert_list(plt_list)
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
+  checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_int(header_level, lower = 1)
   
   lvl_1 <- paste0(rep("#", header_level), collapse =  "")
@@ -222,6 +223,7 @@ prep_nested_plot_chunk <- function(plt_list,
                       
                       chunk <- c(
                         sprintf("%s {{nm_vis}} \n\n", lvl_4),
+                        if (!is.null(link_list)) c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n"),
                         sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
                         sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
                         "```\n",
