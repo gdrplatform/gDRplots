@@ -7,32 +7,40 @@
 prep_plot_chunk(
   plt_list,
   chunk_name,
+  link_list = NULL,
+  dwn_list = NULL,
   header_level = 3,
-  tabset_options = c("unnumbered", "tabset", "tabset-dropdown")
+  tabset_options = c("tabset", "tabset-dropdown")
 )
 }
 \arguments{
-\item{plt_list}{A named list of plots.  Names will be used as headings for plots/tab groups.
+\item{plt_list}{A named list of plots. Names will be used as headings for plots/tab groups.
 If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 If a nested list is provided, the inner lists should also be named.}
 
-\item{chunk_name}{A character string specifying the base name for the generated code chunks.  Avoid spaces.}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
+
+\item{link_list}{A named list of links to the location (relative paths) where plots are saved, 
+which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.}
+
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used when `plt_list`
-is a nested list.
-Possible values are "unnumbered", "tabset", and "tabset-dropdown" or other supported by RMarkdown.}
+\item{tabset_options}{A character vector of options for the tabset. This is only used 
+when \code{plt_list} is a nested list.
+Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 }
 \value{
 A list of character vectors. Each element of the list corresponds to a plot or a
-group of plots (if `plt_list` is nested). Each character vector within the list represents the markdown
-code to be processed by `knitr::knit()`. For nested lists, each element will contain a "header" element
+group of plots (if \code{plt_list} is nested). Each character vector within the list represents the markdown
+code to be processed by \code{knitr::knit()}. For nested lists, each element will contain a "header" element
 and an "items" element. The "header" element is the markdown for the tabset header, and the "items" element
 is a list of markdown chunks for each tab.
 }
 \description{
-Generates markdown code for displaying plots in a document using `knitr::knit()`.
+Generates markdown code for displaying plots in a document using \code{knitr::knit()}.
 The function handles both simple lists of plots and nested lists, allowing for the creation of tabbed
 sections for grouped plots.
 }

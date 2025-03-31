@@ -4,16 +4,24 @@
 \alias{prep_nested_plot_chunk}
 \title{Prepare markdown chunk based on the nested plots list}
 \usage{
-prep_nested_plot_chunk(plt_list, chunk_name, header_level = 2)
+prep_nested_plot_chunk(
+  plt_list,
+  chunk_name,
+  link_list = NULL,
+  header_level = 2
+)
 }
 \arguments{
 \item{plt_list}{named list with generated plots to be shown in tabs; list of plots in nested
 hierarchy, where last 4th level is plot and 3rd level is \code{normalization_type} described by
 one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'}
 
-\item{chunk_name}{string name of markdown chunk; preferable without spaces}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{header_level}{numeric level of markdown header - only for the first level}
+\item{link_list}{A named list of links to the location (relative paths) where plots are saved, 
+which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.}
+
+\item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 }
 \value{
 list of character vectors - input for \code{knitr::knit}
