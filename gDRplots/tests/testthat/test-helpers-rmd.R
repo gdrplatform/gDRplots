@@ -353,15 +353,11 @@ test_that("prep_double_table_chunk works as expected", {
     CellLine2 = list(MetricC = iris[1:5, ], 
                      MetricD = iris[6:10, ])
   )
-  
-  download_link <- list()
-  for (nm in names(nested_tables)) {
-    ls_ <- lapply(seq_along(nested_tables[[nm]]), function(i) {
-      file.path("tables", paste0(names(nested_tables[[nm]])[i], ".xlsx"))
-    })
-    names(ls_) <- names(nested_tables[[nm]])
-    download_link[[nm]] <- ls_
-  }
+
+  download_link <- lapply(names(nested_tables), function(nm) {
+    file.path("tables", paste0("cgs_tables_RV__", nm, ".xlsx"))
+  })
+  names(download_link) <- names(nested_tables)
   
   res_1 <- prep_double_table_chunk(tbl_list = nested_tables, 
                                    chunk_name = "nested_tables")
@@ -379,6 +375,7 @@ test_that("prep_double_table_chunk works as expected", {
   
   res_2 <- prep_double_table_chunk(tbl_list = nested_tables, 
                                    chunk_name = "nested_tables", 
+                                   dwn_list = download_link,
                                    header_level = 4, 
                                    tabset_options = "tabset")
   expect_is(res_2, "list")
@@ -386,10 +383,15 @@ test_that("prep_double_table_chunk works as expected", {
   expect_equal(
     vapply(seq_along(res_2), 
            function(i) sum(grepl("\\{\\.tabset\\}", res_2[[i]])), numeric(1)), c(1, 1)) # headers
+  expect_equal(
+    vapply(seq_along(res_2), 
+           function(i) sum(grepl("download>", res_2[[i]])), numeric(1)), c(1, 1)) # dwn_list
   
+  download_link_noname <- download_link
+  names(download_link_noname) <- NULL
   res_3 <- prep_double_table_chunk(nested_tables, 
                                    chunk_name = "dt_tables", 
-                                   dwn_list = download_link,
+                                   dwn_list = download_link_noname,
                                    header_level = 2, 
                                    tabset_options = NULL)
   expect_is(res_3, "list")
@@ -398,8 +400,8 @@ test_that("prep_double_table_chunk works as expected", {
            function(i) sum(grepl(sprintf("## %s \n\n", names(nested_tables)[i]), res_3[[i]])), numeric(1)),
     c(1, 1)) # headers
   expect_equal(
-    vapply(seq_along(res_3), function(i) sum(grepl("download>", res_3[[i]])), numeric(1)),
-    vapply(seq_along(nested_tables), function(i) NROW(nested_tables[[i]]), numeric(1))) # dwn_list
+    vapply(seq_along(res_3), 
+           function(i) sum(grepl("download>", res_3[[i]])), numeric(1)), c(0, 0)) # lack of dwn_list
   
   expect_error(prep_double_table_chunk(tbl_list = data.table::data.table(iris), chunk_name = "iris"), 
                "Assertion on 'tbl_list' failed: Must be of type 'list'")
