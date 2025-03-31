@@ -33,6 +33,16 @@ test_that("plot_plate_stack_info works correctly", {
   empty_plot <- plot_plate_stack_info(nobarcode_data)
   expect_length(ggplot2::ggplot_build(empty_plot)$data[[1]], 0)
   
+  # Test for combo data
+  combo_data <- data.table::copy(test_data)
+  combo_data[, Concentration_2 := rep(withr::with_seed(123, runif(48, min = 0, max = 10)), 2)]
+  combo_plot <- plot_plate_stack_info(combo_data)
+  expect_length(combo_plot, NROW(unique(combo_data$Barcode)))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(combo_plot[[1]])$data[[1]]$fill)),
+               NROW(unique(combo_data[Barcode == "A", ][["Concentration"]])))
+  expect_equal(NROW(unique(ggplot2::ggplot_build(combo_plot[[1]])$data[[3]]$fill)),
+               NROW(unique(combo_data[Barcode == "A", ][["Concentration_2"]])))
+  
   # Test if it handles empty data
   empty_data <- test_data[0]
   empty_plots <- plot_plate_stack_info(empty_data)
