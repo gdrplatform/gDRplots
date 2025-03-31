@@ -451,6 +451,10 @@ prep_double_table_chunk <- function(tbl_list,
   lvl <- paste0(rep("#", header_level), collapse = "")
   inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
   
+  # checking if the structure of plt_list and dwn_list is identical
+  dwn_structure_condition <- all(names(tbl_list) %in% names(dwn_list))
+  if (!dwn_structure_condition) dwn_list <- NULL
+  
   lapply(names(tbl_list), function(cell_line) {
     tabset_string <- if (is.null(tabset_options)) {
       ""
@@ -458,12 +462,14 @@ prep_double_table_chunk <- function(tbl_list,
       paste0("{.", paste(tabset_options, collapse = " ."), "}")
     }
     
-    header <- sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string)
+    header <- c(
+      sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string),
+      if (!is.null(dwn_list)) c(create_download_link(dwn_list[[cell_line]]), "\n")
+    )
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
       chunk <- c(
         sprintf("%s# %s\n", inner_lvl, metric),
-        if (!is.null(dwn_list)) c(create_download_link(dwn_list[[cell_line]][[metric]]), "\n"),
         sprintf("```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
                 chunk_name, 
                 cell_line, 
