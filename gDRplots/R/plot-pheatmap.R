@@ -1304,6 +1304,7 @@ prep_pheatmap_matrix <- function(dt_response,
 #'
 #' @return character (for NA -> given string)
 #' @keywords internal
+#' @export 
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
   
