@@ -215,21 +215,25 @@ prep_nested_plot_chunk <- function(plt_list,
                   sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
-
-                      chunk_name <- sprintf("%s__%s_%s_%s",
-                                            chunk_name, nm_1, nm_2, nm_norm)
                       
-                      plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
-                                               plt_list_name, nm_1, nm_2, nm_norm)
+                      chunk_name <- sprintf("%s__%s_%s_%s_%s",
+                                            chunk_name, nm_1, nm_2, nm_norm, nm_vis)
+                      
+                      plt_list_name_i <- sprintf('%s[["%s"]][["%s"]][["%s"]][["%s"]]',
+                                                 plt_list_name, nm_1, nm_2, nm_norm, nm_vis)
+                      
+                      link_vis <- if (!is.null(link_list)) {
+                        c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
+                      } else {
+                        NULL
+                      }
+                      
                       
                       chunk <- c(
-                        sprintf("%s {{nm_vis}} \n\n", lvl_4),
-                        if (!is.null(link_list)) 
-                          c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n"),
-                        sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
-                        sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
-                        "```\n",
-                        "\n"
+                        sprintf("%s %s \n\n", lvl_4, nm_vis),
+                        link_vis,
+                        sprintf("```{r %s, echo = FALSE}\n%s\n```\n\n",
+                                chunk_name, plt_list_name)
                       )
                       purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
                     })
