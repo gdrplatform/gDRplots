@@ -346,7 +346,7 @@ test_that("save_plot throws error for non-existent directory", {
 
 test_that("save_plot throws error for non-write access. directory", {
   p <- ggplot2::ggplot(datasets::mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
-  fixed_dir_path <- paste(tempdir(), "plots", sep = "/")
+  fixed_dir_path <- file.path(tempdir(), "plots")
   dir.create(fixed_dir_path, mode = "0000")
   file_path <- file.path(fixed_dir_path, "test_plot")
   
