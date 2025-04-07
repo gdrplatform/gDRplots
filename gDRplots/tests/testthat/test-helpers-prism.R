@@ -337,7 +337,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
 test_that("prep_dt_depmap_meta works as expected", {
   id_col <- c("ModelID", "CCLEName") 
   test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  tab_model <- read.csv(test_meta_data_path)
+  tab_model <- data.table::fread(test_meta_data_path)
   
   obj_meta_1 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path) # default
   expect_is(obj_meta_1, "list")
@@ -350,7 +350,7 @@ test_that("prep_dt_depmap_meta works as expected", {
 
   meta_2 <- "OncotreeLineage"
   obj_meta_2 <- prep_dt_depmap_meta(test_meta_data_path,
-                                    meta_col = meta_2)
+                                    metadata_col = meta_2)
   expect_is(obj_meta_2, "list")
   expect_equal(obj_meta_2$selected_feat_meta_col, meta_2)
   expect_true(all(unique(tab_model[[meta_2]]) %in% names(obj_meta_2$dt_depmap)))
@@ -359,17 +359,16 @@ test_that("prep_dt_depmap_meta works as expected", {
   # scenario: origin column is numeric type
   meta_3 <- "Age"
   obj_meta_3 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
-                                    meta_col = meta_3)
+                                    metadata_col = meta_3)
   expect_is(obj_meta_3, "list")
   expect_equal(obj_meta_3$selected_feat_meta_col, meta_3)
   ls_col_3 <- vapply(unique(tab_model[[meta_3]]), change_NA_into_char, FUN.VALUE = character(1))
   expect_true(all(c(id_col, ls_col_3) %in% names(obj_meta_3$dt_depmap)))
   expect_true(all(vapply(obj_meta_3$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
 
-  # scenario: origin column is logical type
   meta_4 <- "SourceDetail"
   obj_meta_4 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
-                                    meta_col = meta_4)
+                                    metadata_col = meta_4)
   expect_is(obj_meta_4, "list")
   expect_equal(obj_meta_4$selected_feat_meta_col, meta_4)
   ls_col_4 <- vapply(unique(tab_model[[meta_4]]), change_NA_into_char, FUN.VALUE = character(1))
@@ -379,7 +378,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   # scenario: origin column is factor type
   meta_5 <- "Sex"
   obj_meta_5 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
-                                    meta_col = meta_5)
+                                    metadata_col = meta_5)
   expect_is(obj_meta_5, "list")
   expect_equal(obj_meta_5$selected_feat_meta_col, meta_5)
   ls_col_5 <- vapply(unique(tab_model[[meta_5]]), change_NA_into_char, FUN.VALUE = character(1))
@@ -389,17 +388,17 @@ test_that("prep_dt_depmap_meta works as expected", {
   # scenario: empty string in values
   meta_6 <- "TreatmentStatus"
   obj_meta_6 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
-                                    meta_col = meta_6)
+                                    metadata_col = meta_6)
   expect_is(obj_meta_6, "list")
   expect_equal(obj_meta_6$selected_feat_meta_col, meta_6)
   ls_col_6 <- vapply(unique(tab_model[[meta_6]]), change_NA_into_char, FUN.VALUE = character(1))
-  expect_true(all(c(id_col, ls_col_6[ls_col_6 != ""]) %in% names(obj_meta_6$dt_depmap))) # "" -> NA
+  expect_true(all(c(id_col, ls_col_6[ls_col_6 != ""]) %in% names(obj_meta_6$dt_depmap)))
   expect_true(all(vapply(obj_meta_6$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
   
   # scenario: id columns selected
   meta_7 <- id_col[1]
   obj_meta_7 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
-                                    meta_col = meta_7)
+                                    metadata_col = meta_7)
   expect_is(obj_meta_7, "list")
   expect_equal(obj_meta_7$selected_feat_meta_col, meta_7)
   expect_true(all(id_col %in% names(obj_meta_7$dt_depmap)))
@@ -409,10 +408,10 @@ test_that("prep_dt_depmap_meta works as expected", {
                "Assertion on 'meta_data_path' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.csv"), 
                "Assertion on 'meta_data_path' failed: Must comply to pattern")
-  expect_error(prep_dt_depmap_meta(test_meta_data_path, meta_col = 123),
-               "Assertion on 'meta_col' failed: Must be of type 'string'")
-  expect_error(prep_dt_depmap_meta(test_meta_data_path, meta_col = "some_meta"),
-               "Assertion on 'meta_col' failed: Must be element of set")
+  expect_error(prep_dt_depmap_meta(test_meta_data_path, metadata_col = 123),
+               "Assertion on 'metadata_col' failed: Must be of type 'string'")
+  expect_error(prep_dt_depmap_meta(test_meta_data_path, metadata_col = "some_meta"),
+               "Assertion on 'metadata_col' failed: Must be element of set")
 })
 
 #nolint start
