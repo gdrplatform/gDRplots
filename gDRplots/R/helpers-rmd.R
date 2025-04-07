@@ -228,13 +228,11 @@ prep_nested_plot_chunk <- function(plt_list,
                         NULL
                       }
                       
+                      chunk <- c(sprintf("%s %s \n\n", lvl_4, nm_vis),
+                                 link_vis,
+                                 sprintf("```{r %s, echo = FALSE}\n%s\n```\n\n",
+                                         chunk_name, plt_list_name))
                       
-                      chunk <- c(
-                        sprintf("%s %s \n\n", lvl_4, nm_vis),
-                        link_vis,
-                        sprintf("```{r %s, echo = FALSE}\n%s\n```\n\n",
-                                chunk_name, plt_list_name)
-                      )
                       purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
                     })
                   )
