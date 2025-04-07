@@ -13,6 +13,9 @@
 #'   chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
+#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal. 
+#'  It is usually a file named \code{Model.csv}.
 #' @param feature_sets character vector names of the molecular feature set to load from DepMap.
 #' @param prefixes character vector prefixes to use for the each feature set in \code{feature_sets};
 #'    has to be the same length as \code{feature_sets}
@@ -28,6 +31,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       normalization_type_vec = "RV",
                                       metric = c("xc50", "x_mean", "x_max"),
                                       fit_source = "gDR",
+                                      meta_data_path,
                                       feature_sets,
                                       prefixes,
                                       metadata_columns = NULL) {
@@ -45,6 +49,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
   if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
   checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
+  checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   checkmate::assert_character(prefixes, null.ok = TRUE)
   stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
@@ -113,7 +119,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   if (!is.null(metadata_columns)) {
     # 1st level
     for (meta in metadata_columns) {
-      obj_depmap <- prep_dt_depmap_meta(metadata_col = meta)
+      obj_depmap <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
+                                        metadata_col = meta)
       # 2nd level
       for (d_name in drug_name_vec) {
         # 3rd level
@@ -179,6 +186,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'   chosen from: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
+#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal. 
+#'  It is usually a file named \code{Model.csv}.
 #' @param feature_sets character vector names of the molecular feature set to load from DepMap.
 #' @param prefixes character vector prefixes to use for the each feature set in \code{feature_sets};
 #'    has to be the same length as \code{feature_sets}
@@ -196,6 +206,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          metric =  c("xc50", "x_mean", "x_max"),
                                          metric_scores = c("hsa_score", "bliss_score"),
                                          fit_source = "gDR",
+                                         meta_data_path,
                                          feature_sets,
                                          prefixes,
                                          metadata_columns = NULL) {
@@ -218,6 +229,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   stopifnot("Provide `metric_scores` for `dt_scores`." = !is.null(dt_scores) && !is.null(metric_scores))
   if (!is.null(metric_scores)) checkmate::assert_subset(metric_scores, choices = c("hsa_score", "bliss_score"))
   if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, choices = names(dt_scores))
+  checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
+  checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   checkmate::assert_character(prefixes, null.ok = TRUE)
   stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
@@ -295,7 +308,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   if (!is.null(metadata_columns)) {
     # 1st level
     for (meta in metadata_columns) {
-      obj_depmap <- prep_dt_depmap_meta(metadata_col = meta)
+      obj_depmap <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
+                                        metadata_col = meta)
       # 2nd level
       for (d_combo in drug_name_grid$DrugCombination) {
         d_name <- drug_name_grid[DrugCombination == d_combo, ][[drug_name]]
