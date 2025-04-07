@@ -397,12 +397,12 @@ prep_dt_depmap_feat <- function(
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param meta_col string with the metadata columns to load for DepMap cell lines
+#' @param metadata_col string with the metadata columns to load for DepMap cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-#'   \item \code{selected_feat_meta_col} string name of metadata column..
+#'   \item \code{selected_feat_meta_col} string name of metadata column.
 #' }
 #' 
 #' @keywords internal
@@ -414,31 +414,31 @@ prep_dt_depmap_feat <- function(
 #' }
 #' @export
 prep_dt_depmap_meta <- function(meta_data_path,
-                                meta_col = "PatientRace") {
+                                metadata_col = "PatientRace") {
   
   checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
   checkmate::assert_file_exists(meta_data_path)
-  checkmate::assert_string(meta_col)
+  checkmate::assert_string(metadata_col)
   dt_depmap_model <- data.table::fread(meta_data_path)
   
-  checkmate::assert_choice(meta_col, choices = names(dt_depmap_model))
+  checkmate::assert_choice(metadata_col, choices = names(dt_depmap_model))
   id_col <- c("ModelID", "CCLEName") 
-  dt_depmap_model <- dt_depmap_model[, .SD, .SDcols = unique(c(id_col, meta_col))]
+  dt_depmap_model <- dt_depmap_model[, .SD, .SDcols = unique(c(id_col, metadata_col))]
   
-  if (meta_col %in% id_col) {
+  if (metadata_col %in% id_col) {
     dt_depmap <- dt_depmap_model
   } else {
     # prep meta column
-    if (is.numeric(dt_depmap_model[[meta_col]]) || 
-        is.logical(dt_depmap_model[[meta_col]]) || 
-        is.factor(dt_depmap_model[[meta_col]])) {
-      dt_depmap_model[[meta_col]] <- as.character(dt_depmap_model[[meta_col]])
+    if (is.numeric(dt_depmap_model[[metadata_col]]) || 
+        is.logical(dt_depmap_model[[metadata_col]]) || 
+        is.factor(dt_depmap_model[[metadata_col]])) {
+      dt_depmap_model[[metadata_col]] <- as.character(dt_depmap_model[[metadata_col]])
     }
     # character
-    dt_depmap_model[, (meta_col) := lapply(.SD, gDRplots:::change_NA_into_char), .SDcols = meta_col]
-    dt_depmap_model[, (meta_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = meta_col]
+    dt_depmap_model[, (metadata_col) := lapply(.SD, gDRplots:::change_NA_into_char), .SDcols = metadata_col]
+    dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
     # final
-    fm_string <- paste(paste(id_col, collapse =  " + "), "~", meta_col)
+    fm_string <- paste(paste(id_col, collapse =  " + "), "~", metadata_col)
     dt_depmap <- data.table::dcast(
       dt_depmap_model,
       formula = stats::as.formula(fm_string),
@@ -447,7 +447,7 @@ prep_dt_depmap_meta <- function(meta_data_path,
   }
   data.table::setkey(dt_depmap, NULL)
   
-  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = meta_col))
+  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
 }
 
 
