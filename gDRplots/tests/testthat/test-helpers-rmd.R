@@ -351,6 +351,10 @@ test_that("save_plot throws error for non-write access. directory", {
   file_path <- file.path(fixed_dir_path, "test_plot")
   
   expect_error(save_plot(p, file_path, "svg"), "The specified directory does not have write access.")
+  
+  on.exit({
+    unlink(fixed_dir_path, recursive = TRUE)
+  })
 })
 
 test_that("get_r_file_path works as expected", {
