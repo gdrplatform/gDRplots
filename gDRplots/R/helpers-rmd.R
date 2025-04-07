@@ -199,6 +199,24 @@ prep_nested_plot_chunk <- function(plt_list,
   lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
   
+  # checking if the structure of plt_list and link_list is identical
+  link_structure_condition <-
+    all(
+      names(plt_list) %in% names(link_list),
+      vapply(names(plt_list), function(nm) {
+        all(names(plt_list[[nm]]) == names(link_list[[nm]]),
+            vapply(names(plt_list[[nm]]), function(nm_2) {
+              all(names(plt_list[[nm]][[nm_2]]) == names(link_list[[nm]][[nm_2]]), 
+                  vapply(names(plt_list[[nm]][[nm_2]]), function(nm_3) {
+                    all(names(plt_list[[nm]][[nm_2]][[nm_3]]) == names(link_list[[nm]][[nm_2]][[nm_3]]))
+                  }, logical(1))
+              )
+            }, logical(1))
+        )
+      }, logical(1))
+    )
+  if (!link_structure_condition) link_list <- NULL
+  
   lapply(names(plt_list), function(nm_1) {
     c(
       sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
