@@ -109,10 +109,11 @@ prep_plot_chunk <- function(plt_list,
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
-        knitr::knit_expand(text = chunk)
+        purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
       })
       
-      c(knitr::knit_expand(text = header), unlist(item_chunks))
+      c(purrr::quietly(knitr::knit_expand)(text = header)$result, # TODO GDR-2951, 
+        unlist(item_chunks))
       
     } else {
       # not nested - no tabset, access element by index
@@ -123,7 +124,7 @@ prep_plot_chunk <- function(plt_list,
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
-      knitr::knit_expand(text = chunk)
+      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
     }
   })
 }
@@ -214,7 +215,7 @@ prep_nested_plot_chunk <- function(plt_list,
                   sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
-                      
+
                       chunk_name <- sprintf("%s__%s_%s_%s",
                                             chunk_name, nm_1, nm_2, nm_norm)
                       
@@ -230,7 +231,7 @@ prep_nested_plot_chunk <- function(plt_list,
                         "```\n",
                         "\n"
                       )
-                      knitr::knit_expand(text = chunk)
+                      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
                     })
                   )
                 )
@@ -485,10 +486,11 @@ prep_double_table_chunk <- function(tbl_list,
                   "digits = 5)")
         )
       )
-      knitr::knit_expand(text = chunk)
+      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
     })
     
-    c(knitr::knit_expand(text = header), unlist(item_chunks))
+    c(purrr::quietly(knitr::knit_expand)(text = header)$result, # TODO GDR-2951 
+      unlist(item_chunks))
   })
 }
 
