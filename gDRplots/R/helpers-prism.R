@@ -433,11 +433,10 @@ prep_dt_depmap_meta <- function(meta_data_path,
         is.logical(dt_depmap_model[[meta_col]]) || 
         is.factor(dt_depmap_model[[meta_col]])) {
       dt_depmap_model[[meta_col]] <- as.character(dt_depmap_model[[meta_col]])
-      dt_depmap_model[, (meta_col) := lapply(.SD, gDRplots:::change_NA_into_char), .SDcols = meta_col]
-    } else {
-      # character
-      dt_depmap_model[, (meta_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = meta_col]
     }
+    # character
+    dt_depmap_model[, (meta_col) := lapply(.SD, gDRplots:::change_NA_into_char), .SDcols = meta_col]
+    dt_depmap_model[, (meta_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = meta_col]
     # final
     fm_string <- paste(paste(id_col, collapse =  " + "), "~", meta_col)
     dt_depmap <- data.table::dcast(
