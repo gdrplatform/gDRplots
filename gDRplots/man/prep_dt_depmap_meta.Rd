@@ -4,20 +4,20 @@
 \alias{prep_dt_depmap_meta}
 \title{Load DepMap merged data for one selected metadata}
 \usage{
-prep_dt_depmap_meta(meta_data_path, meta_col = "PatientRace")
+prep_dt_depmap_meta(meta_data_path, metadata_col = "PatientRace")
 }
 \arguments{
 \item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
 which are referenced by a dataset contained within the DepMap portal. 
 It is usually a file named \code{Model.csv}.}
 
-\item{meta_col}{string with the metadata columns to load for DepMap cell lines}
+\item{metadata_col}{string with the metadata columns to load for DepMap cell lines}
 }
 \value{
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-  \item \code{selected_feat_meta_col} string name of metadata column..
+  \item \code{selected_feat_meta_col} string name of metadata column.
 }
 }
 \description{
