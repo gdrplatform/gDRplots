@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{dt_assoc}{\code{data.table} with the calculated linear association between DepMap and metrics
-outputted by \code{kaleidoscope::calc_assoc}}
+outputted by \code{calc_assoc}}
 
 \item{n_top}{number of requested top linear associations}
 }

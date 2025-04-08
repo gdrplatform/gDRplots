@@ -16,7 +16,7 @@ plot_volcano_assoc(
 }
 \arguments{
 \item{dt_assoc}{\code{data.table} with the calculated linear association between DepMap and metrics
-outputted by \code{kaleidoscope::calc_assoc}}
+outputted by \code{calc_assoc}}
 
 \item{selected_feat_meta_col}{string describing the name of the associated feature/metadata from DepMap}
 
