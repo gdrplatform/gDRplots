@@ -1,7 +1,7 @@
 #' Volcano plot with association
 #'
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
-#'     outputted by \code{kaleidoscope::calc_assoc}
+#'     outputted by \code{calc_assoc}
 #' @param selected_feat_meta_col string describing the name of the associated feature/metadata from DepMap
 #' @param selected_metric string describing the name of the selected metric used the association calculation
 #' @param condition_info string describing experiment condition 
@@ -898,7 +898,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' (column sorted increasing) and values of \code{rho} (column sorted decreasing)
 #' 
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
-#'     outputted by \code{kaleidoscope::calc_assoc}
+#'     outputted by \code{calc_assoc}
 #' @param n_top number of requested top linear associations
 #' 
 #' @return a vector with name of the n-top linear associations; 
