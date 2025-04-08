@@ -1,13 +1,15 @@
 #' Calculate linear associations
 #' 
-#' Calculate the linear model associations between dependent variables and reponse variable(s) of interest.
+#' Calculate the linear model associations between dependent variables and response variable(s) of interest.
 #' 
 #' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
 #' Must have the same length as \code{Y}.
-#' @param Y \code{vector} or \code{matrix} Experimental reponse data (rows are samples).
+#' @param Y \code{vector} or \code{matrix} Experimental response data (rows are samples).
 #' Must have the same length as \code{X}.
 #' 
 #' @author James Hawley
+#' @seealso \code{\link[cdsrmodels]{lin_associations}}
+#' 
 #' @keywords internal
 #' 
 #' @export 
@@ -23,15 +25,17 @@ calc_assoc <- function(X, Y) {
   }
 }
 
-#' Calculate the linear model associations between dependent variables and some reponse variable of interest.
+#' Calculate the linear model associations between dependent variables and some response variable of interest.
 #' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
 #' Must have the same length as \code{Y}.
-#' @param Y \code{vector} Experimental reponse data (rows are samples).
+#' @param Y \code{vector} Experimental response data (rows are samples).
 #' Must have the same length as \code{X}.
 #' 
 #' @return \code{data.table}
 #' 
 #' @author James Hawley
+#' @seealso \code{\link[cdsrmodels]{lin_associations}}
+#' 
 #' @keywords internal 
 .calc_assoc_vector <- function(X, Y) {
   if (sd(Y, na.rm = TRUE) == 0) {
@@ -84,16 +88,18 @@ calc_assoc <- function(X, Y) {
   ]
 }
 
-#' Calculate the linear model associations between dependent variables and reponse variables of interest.
+#' Calculate the linear model associations between dependent variables and response variables of interest.
 #' 
 #' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
 #' Must have the same length as \code{Y}.
-#' @param Y \code{matrix} Experimental reponse data (rows are samples).
+#' @param Y \code{matrix} Experimental response data (rows are samples).
 #' Must have the same length as \code{X}.
 #' 
 #' @return \code{data.table}
 #' 
 #' @author James Hawley
+#' @seealso \code{\link[cdsrmodels]{lin_associations}}
+#' 
 #' @keywords internal
 .calc_assoc_matrix <- function(X, Y) {
   # calculate if any columns have zero variance
@@ -103,7 +109,8 @@ calc_assoc <- function(X, Y) {
   if (zero_var_cols_len > 0) {
     warning(
       paste0(
-        "The following columns in Y have no variance, rendering associations void. Please double check this is correct: "
+        "The following columns in Y have no variance, rendering associations void. 
+        Please double check this is correct: "
         , paste(zero_var_cols, collapse = ", ")
       )
     )
@@ -157,7 +164,7 @@ calc_assoc <- function(X, Y) {
   
   # combine each column of the correlation matrix into a single giant vector and
   # store it as the appropriate column in `res_dt`
-  res_dt[, rho := sapply(res$rho[available_genes, ], as.vector)]
+  res_dt[, rho := sapply(res$rho[available_genes, ], as.vector)] # nolint
   
   # re-order columns for a more human-friendly output
   res_dt <- res_dt[
