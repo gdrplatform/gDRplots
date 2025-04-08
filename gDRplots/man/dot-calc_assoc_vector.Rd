@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-associations.R
 \name{.calc_assoc_vector}
 \alias{.calc_assoc_vector}
-\title{Calculate the linear model associations between dependent variables and some reponse variable of interest.}
+\title{Calculate the linear model associations between dependent variables and some response variable of interest.}
 \usage{
 .calc_assoc_vector(X, Y)
 }
@@ -10,14 +10,17 @@
 \item{X}{\code{matrix} Dependent variables data matrix (rows are samples, columns are features).
 Must have the same length as \code{Y}.}
 
-\item{Y}{\code{vector} Experimental reponse data (rows are samples).
+\item{Y}{\code{vector} Experimental response data (rows are samples).
 Must have the same length as \code{X}.}
 }
 \value{
 \code{data.table}
 }
 \description{
-Calculate the linear model associations between dependent variables and some reponse variable of interest.
+Calculate the linear model associations between dependent variables and some response variable of interest.
+}
+\seealso{
+\code{\link[cdsrmodels]{lin_associations}}
 }
 \author{
 James Hawley

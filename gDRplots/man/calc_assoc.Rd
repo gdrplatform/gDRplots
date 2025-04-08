@@ -10,11 +10,14 @@ calc_assoc(X, Y)
 \item{X}{\code{matrix} Dependent variables data matrix (rows are samples, columns are features).
 Must have the same length as \code{Y}.}
 
-\item{Y}{\code{vector} or \code{matrix} Experimental reponse data (rows are samples).
+\item{Y}{\code{vector} or \code{matrix} Experimental response data (rows are samples).
 Must have the same length as \code{X}.}
 }
 \description{
-Calculate the linear model associations between dependent variables and reponse variable(s) of interest.
+Calculate the linear model associations between dependent variables and response variable(s) of interest.
+}
+\seealso{
+\code{\link[cdsrmodels]{lin_associations}}
 }
 \author{
 James Hawley
