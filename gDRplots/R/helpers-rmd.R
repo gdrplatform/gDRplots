@@ -109,11 +109,10 @@ prep_plot_chunk <- function(plt_list,
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
                   chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
         )
-        purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
+        knitr::knit_expand(text = chunk)
       })
       
-      c(purrr::quietly(knitr::knit_expand)(text = header)$result, # TODO GDR-2951, 
-        unlist(item_chunks))
+      c(knitr::knit_expand(text = header), unlist(item_chunks))
       
     } else {
       # not nested - no tabset, access element by index
@@ -124,7 +123,7 @@ prep_plot_chunk <- function(plt_list,
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
       )
-      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
+      knitr::knit_expand(text = chunk)
     }
   })
 }
@@ -251,7 +250,7 @@ prep_nested_plot_chunk <- function(plt_list,
                                  sprintf("```{r %s, echo = FALSE}\n%s\n```\n\n",
                                          chunk_name, plt_list_name))
                       
-                      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
+                      knitr::knit_expand(text = chunk)
                     })
                   )
                 )
@@ -506,11 +505,10 @@ prep_double_table_chunk <- function(tbl_list,
                   "digits = 5)")
         )
       )
-      purrr::quietly(knitr::knit_expand)(text = chunk)$result # TODO GDR-2951
+      knitr::knit_expand(text = chunk)
     })
     
-    c(purrr::quietly(knitr::knit_expand)(text = header)$result, # TODO GDR-2951 
-      unlist(item_chunks))
+    c(knitr::knit_expand(text = header), unlist(item_chunks))
   })
 }
 
