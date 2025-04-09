@@ -829,8 +829,8 @@ plot_volcano_assoc_panel <- function(dt_response,
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_side), widths = c(1, 1)),
     top = panel_title)
-  
-  return(panel)
+  # final
+  panel
 }
 
 #' Check data type

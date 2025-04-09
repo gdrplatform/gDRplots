@@ -140,6 +140,7 @@ create_log_seq <- function(start, end, length) {
   limits_log <- log10(limits)
   sequence_log <- seq(from = limits_log[1], limits_log[2], length.out = length)
   sequence <- 10 ^ sequence_log
-  return(sequence)
+  # final
+  sequence
 }                     
 
