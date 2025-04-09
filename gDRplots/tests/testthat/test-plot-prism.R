@@ -97,7 +97,6 @@ dt_depmap_meta <- data.table::dcast(data = dt_depmap_meta_lng,
                                     formula = CCLEName ~ meta_xx, 
                                     fun.aggregate = length)
 data.table::setkey(dt_depmap_meta, NULL)
-dt_depmap_meta[, "NA" := NULL] # as in kaleidoscope
 dt_depmap_meta <- merge(dt_model, dt_depmap_meta, by = "CCLEName")
 
 obj_depmap_meta <- list(
@@ -746,6 +745,8 @@ test_that("plot_boxplot_meta works as expected", {
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
+  grp_stat$meta_xx <- 
+    vapply(grp_stat$meta_xx, function(i) ifelse(is.na(i), "NA", i), character(1), USE.NAMES = FALSE)
   common_cellline <- merge(dt_response, 
                            dt_depmap_meta_lng[!is.na(meta_xx)], 
                            by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
@@ -758,25 +759,24 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_0[["labels"]][["title"]], selected_meta)
   expect_length(plt_0[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_0)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
+                NROW(grp_stat[["meta_xx"]]))
   expect_equal(sort(ggplot2::layer_scales(plt_0)$x$range$range),
-               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+               sort(grp_stat[["meta_xx"]]))
   expect_equal(
-    sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y), 
-    sort(dt_response[CellLineName %in% common_cellline & !is.infinite(get(selected_metric))][[selected_metric]]))
-  
+    sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y),
+    sort(dt_response[!is.infinite(get(selected_metric))][[selected_metric]]))
+
   plt_1_inf <- plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
                                  selected_feat_meta_col = selected_meta, 
                                  with_inf = TRUE)
   expect_is(plt_1_inf, "gg")
-  
   expect_length(ggplot2::ggplot_build(plt_1_inf)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
+                NROW(grp_stat[["meta_xx"]]))
   expect_equal(sort(ggplot2::layer_scales(plt_1_inf)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
-  expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y), 
-               sort(dt_response[CellLineName %in% common_cellline, ][[selected_metric]]))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y),
+               sort(dt_response[[selected_metric]]))
   
   plt_1_cap <- plot_boxplot_meta(dt_response = dt_response_capped,
                                  dt_depmap = dt_depmap_meta, 
@@ -788,9 +788,9 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(ggplot2::ggplot_build(plt_1_cap)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1_cap)$x$range$range),
-               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
-  expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y), 
-               sort(dt_response_capped[CellLineName %in% common_cellline][[selected_metric]]))
+               sort(grp_stat[["meta_xx"]]))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y),
+               sort(dt_response_capped[[selected_metric]]))
   
   # scenario: plot without one-item-group
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
@@ -836,11 +836,12 @@ test_that("plot_boxplot_meta works as expected", {
   meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
   names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
   dt_ <- dt_depmap_meta_numeric[CCLEName %in% dt_response[["CellLineName"]], ]
-  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]), 
+  data.table::setkey(dt_, NULL)
+  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]),
                  function(nm) !all(dt_[[nm]] == 0), logical(1))
-  
+
   plt_5 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap = dt_depmap_meta_numeric, 
+                             dt_depmap = dt_depmap_meta_numeric,
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_5, "gg")
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
