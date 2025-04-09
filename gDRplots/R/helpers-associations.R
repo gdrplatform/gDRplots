@@ -14,14 +14,17 @@
 #' 
 #' @export 
 calc_assoc <- function(X, Y) {
-  # check if there is 0 variance in \code{Y} (if so, this causes calculation
-  # problems inside the \code{lin_associations()} function call).
+
+  checkmate::assert_matrix(X, mode = "numeric")
+  checkmate::assert_names(rownames(X))
+  checkmate::assert_multi_class(Y, c("matrix", "vector"))
+  checkmate::assert_numeric(Y)
+  checkmate::assert_names(rownames(Y))
+
   if (is.vector(Y)) {
     .calc_assoc_vector(X = X, Y = Y)
   } else if (is.matrix(Y)) {
     .calc_assoc_matrix(X = X, Y = Y)
-  } else {
-    stop("Y must be a vector or a matrix.")
   }
 }
 
@@ -38,7 +41,8 @@ calc_assoc <- function(X, Y) {
 #' 
 #' @keywords internal 
 .calc_assoc_vector <- function(X, Y) {
-  if (sd(Y, na.rm = TRUE) == 0) {
+  
+  if (stats::sd(Y, na.rm = TRUE) == 0) {
     warning("Y has no variance, rendering all associations void. Please double check this is correct.")
     na_dt <- data.table::data.table(
       feature = names(Y)
