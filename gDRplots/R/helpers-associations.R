@@ -17,9 +17,10 @@ calc_assoc <- function(X, Y) {
 
   checkmate::assert_matrix(X, mode = "numeric")
   checkmate::assert_names(rownames(X))
-  checkmate::assert_multi_class(Y, c("matrix", "vector"))
+  checkmate::assert_multi_class(Y, c("matrix", "numeric"))
   checkmate::assert_numeric(Y)
-  checkmate::assert_names(rownames(Y))
+  if (is.matrix(Y)) checkmate::assert_names(rownames(Y))
+  if (is.vector(Y)) checkmate::assert_names(colnames(Y))
 
   if (is.vector(Y)) {
     .calc_assoc_vector(X = X, Y = Y)
