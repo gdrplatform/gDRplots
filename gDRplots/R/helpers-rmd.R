@@ -236,19 +236,21 @@ prep_nested_plot_chunk <- function(plt_list,
                       chunk_name <- sprintf("%s__%s_%s_%s_%s",
                                             chunk_name, nm_1, nm_2, nm_norm, nm_vis)
                       
-                      plt_list_name_i <- sprintf('%s[["%s"]][["%s"]][["%s"]][["%s"]]',
-                                                 plt_list_name, nm_1, nm_2, nm_norm, nm_vis)
-                      
                       link_vis <- if (!is.null(link_list)) {
                         c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
                       } else {
-                        NULL
+                        ""
                       }
+            
+                      plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
+                                               plt_list_name, nm_1, nm_2, nm_norm)
                       
-                      chunk <- c(sprintf("%s %s \n\n", lvl_4, nm_vis),
-                                 link_vis,
-                                 sprintf("```{r %s, echo = FALSE}\n%s\n```\n\n",
-                                         chunk_name, plt_list_name))
+                      chunk <- c(
+                        sprintf("%s %s \n\n", lvl_4, nm_vis),
+                        link_vis,
+                        sprintf("```{r %s, echo = FALSE}\n", chunk_name),
+                        sprintf('%s[["{{nm_vis}}"]] \n```\n\n', plt_list_name)
+                      )
                       
                       knitr::knit_expand(text = chunk)
                     })
