@@ -61,15 +61,18 @@ test_that("calc_assoc works as expected", {
   res_1 <- calc_assoc(X, Y) # default matrix
   expect_is(res_1, "data.table")
   expect_true(all(c(res_col_names, "response") %in% names(res_1)))
+  expect_equal(NROW(res_1), NROW(colnames(X)[colSums(X[rownames(Y), ]) > 0]))
   
   res_2 <- calc_assoc(X, Y_vec) # default vector
   expect_is(res_2, "data.table")
   expect_true(all(res_2$feature %in% colnames(X)[colSums(X[names(Y_vec), ]) > 0]))
+  expect_equal(NROW(res_2), NROW(colnames(X)[colSums(X[names(Y_vec), ]) > 0]))
   
   # scenario: matrix Y has more than one column
   res_3 <- calc_assoc(X, Y_all)
   expect_is(res_3, "data.table")
-  
+  expect_true(all(c(res_col_names, "response") %in% names(res_3)))
+  expect_equal(NROW(res_3), NROW(colnames(X)[colSums(X[rownames(Y_all), ]) > 0]) * NCOL(Y_all))
 
   expect_error(calc_assoc(X = matrix(LETTERS[1:9], nrow = 3), Y),
                "Assertion on 'X' failed: Must store numerics")
