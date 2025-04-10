@@ -31,7 +31,7 @@ Suggests:
     ggpubr,
     heatmaply,
     jsonlite,
-    knitr (>= 1.50),
+    knitr,
     matrixStats,
     mockery,
     purrr,
