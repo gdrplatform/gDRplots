@@ -126,7 +126,7 @@ calc_assoc <- function(X, Y) {
       paste0(
         "The following columns in Y have no variance, rendering associations void. 
         Please double check this is correct: "
-        , paste(zero_var_cols, collapse = ", ")
+        , paste(names(zero_var_cols), collapse = ", ")
       )
     )
     na_dt <- data.table::data.table(
