@@ -366,6 +366,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   expect_true(all(c(id_col, ls_col_3) %in% names(obj_meta_3$dt_depmap)))
   expect_true(all(vapply(obj_meta_3$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
 
+  # scenario: origin column is logial type
   meta_4 <- "SourceDetail"
   obj_meta_4 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
                                     metadata_col = meta_4)
@@ -406,12 +407,14 @@ test_that("prep_dt_depmap_meta works as expected", {
 
   expect_error(prep_dt_depmap_meta(123), 
                "Assertion on 'meta_data_path' failed: Must be of type 'string'")
+  expect_error(prep_dt_depmap_meta("testdata/meta_data.qs"), 
+               "Assertion on 'File ext must be csv' failed: Must be TRUE")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.csv"), 
-               "Assertion on 'meta_data_path' failed: Must comply to pattern")
+               "Assertion on 'meta_data_path' failed: File does not exist")
   expect_error(prep_dt_depmap_meta(test_meta_data_path, metadata_col = 123),
                "Assertion on 'metadata_col' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_meta(test_meta_data_path, metadata_col = "some_meta"),
-               "Assertion on 'metadata_col' failed: Must be element of set")
+               "failed: Must be a subset of")
 })
 
 #nolint start

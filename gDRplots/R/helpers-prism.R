@@ -416,13 +416,16 @@ prep_dt_depmap_feat <- function(
 prep_dt_depmap_meta <- function(meta_data_path,
                                 metadata_col = "PatientRace") {
   
-  checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_string(metadata_col)
   dt_depmap_model <- data.table::fread(meta_data_path)
   
-  checkmate::assert_choice(metadata_col, choices = names(dt_depmap_model))
-  id_col <- c("ModelID", "CCLEName") 
+  id_col <- c("ModelID", "CCLEName")
+  checkmate::assert_subset(c(id_col, metadata_col), choices = names(dt_depmap_model))
+  
+  # subset
   dt_depmap_model <- dt_depmap_model[, .SD, .SDcols = unique(c(id_col, metadata_col))]
   
   if (metadata_col %in% id_col) {
@@ -434,7 +437,7 @@ prep_dt_depmap_meta <- function(meta_data_path,
         is.factor(dt_depmap_model[[metadata_col]])) {
       dt_depmap_model[[metadata_col]] <- as.character(dt_depmap_model[[metadata_col]])
     }
-    # character
+    # character: consistent data (NA -> "NA" & "" -> "NA")
     dt_depmap_model[, (metadata_col) := lapply(.SD, change_NA_into_char), .SDcols = metadata_col]
     dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
     # final

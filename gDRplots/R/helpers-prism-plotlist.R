@@ -49,12 +49,18 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
   if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
   checkmate::assert_string(fit_source, null.ok = TRUE)
-  checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
+  checkmate::assert_character(metadata_columns, null.ok = TRUE)
+  if (!is.null(metadata_columns)) {
+    meta_data <- data.table::fread(meta_data_path, nrow = 1)
+    checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
+    rm(meta_data)
+  }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   checkmate::assert_character(prefixes, null.ok = TRUE)
   stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
-  checkmate::assert_character(metadata_columns, null.ok = TRUE)
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -229,12 +235,18 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   stopifnot("Provide `metric_scores` for `dt_scores`." = !is.null(dt_scores) && !is.null(metric_scores))
   if (!is.null(metric_scores)) checkmate::assert_subset(metric_scores, choices = c("hsa_score", "bliss_score"))
   if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, choices = names(dt_scores))
-  checkmate::assert_string(meta_data_path, pattern = ".*Model.csv$")
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
+  checkmate::assert_character(metadata_columns, null.ok = TRUE)
+  if (!is.null(metadata_columns)) {
+    meta_data <- data.table::fread(meta_data_path, nrow = 1)
+    checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
+    rm(meta_data)
+  }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   checkmate::assert_character(prefixes, null.ok = TRUE)
   stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
-  checkmate::assert_character(metadata_columns, null.ok = TRUE)
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
