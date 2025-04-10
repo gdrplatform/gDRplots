@@ -108,7 +108,7 @@ calc_assoc <- function(X, Y) {
 #' @keywords internal
 .calc_assoc_matrix <- function(X, Y) {
   # calculate if any columns have zero variance
-  zero_var_cols <- which(apply(Y, 2, sd, na.rm = TRUE) == 0)
+  zero_var_cols <- which(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)
   zero_var_cols_len <- length(zero_var_cols)
   
   if (zero_var_cols_len > 0) {
