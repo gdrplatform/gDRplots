@@ -558,7 +558,7 @@ test_that("plot_boxplot_num works as expected", {
   res_count_6 <- obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response$CellLineName]
   res_count_6 <- 
     res_count_6[!is.na(get(selected_feat)), .N, by = selected_feat][, lbl := sprintf("%s (%s)", get(selected_feat), N)]
-
+  
   plt_6_raw <- plot_boxplot_num(dt_response = dt_response,
                                 dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
                                 selected_feat = selected_feat)
@@ -765,7 +765,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(
     sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y),
     sort(dt_response[!is.infinite(get(selected_metric))][[selected_metric]]))
-
+  
   plt_1_inf <- plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
                                  selected_feat_meta_col = selected_meta, 
@@ -839,7 +839,7 @@ test_that("plot_boxplot_meta works as expected", {
   data.table::setkey(dt_, NULL)
   lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]),
                  function(nm) !all(dt_[[nm]] == 0), logical(1))
-
+  
   plt_5 <- plot_boxplot_meta(dt_response = dt_response,
                              dt_depmap = dt_depmap_meta_numeric,
                              selected_feat_meta_col = selected_meta)
@@ -915,11 +915,61 @@ test_that("plot_boxplot_meta works as expected", {
                "Assertion on 'with_inf' failed: Must be of type 'logical flag'")
 }) 
 
-#nolint start
-# test_that("plot_volcano_assoc_panel works as expected", {
-#   # TODO in GDR-2710
-# })
-#nolint end
+
+test_that("plot_volcano_assoc_panel works as expected", {
+  plt_1 <- plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                    dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_x_max",  
+                                    selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_1, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_1)[["data"]][[1]]))))
+  
+  plt_2 <- plot_volcano_assoc_panel(dt_response = dt_response_score,
+                                    dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_bliss_score",  
+                                    selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_2, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_2)[["data"]][[1]]))))
+  
+  plt_3 <- plot_volcano_assoc_panel(dt_response = dt_response_diff,
+                                    dt_depmap = obj_depmap_meta[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_x_max_cotrt_diff_0.1_col_fittings",  
+                                    selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
+  expect_is(plt_3, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_3)[["data"]][[1]]))))
+  
+  expect_error(plot_volcano_assoc_panel(dt_response = unlist(dt_response_met),
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat,
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = 1,  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'selected_metric' failed: Must be of type 'string'")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = NA),
+               "Assertion on 'selected_feat_meta_col' failed: May not be NA.")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "not_known_met",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'names\\(dt_response\\)' failed: Names must include the elements")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]][, 4:6],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+})
+
 
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(
