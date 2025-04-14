@@ -1,4 +1,4 @@
-context("Test sa_plots")
+context("Test dose-response combo")
 
 test_that("plot_dose_response_combo works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")

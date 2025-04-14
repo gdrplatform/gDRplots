@@ -106,7 +106,7 @@ test_that("prep_plot_chunk works as expected", {
   linklist_nest <- list(someCategory = c(linklist), anotherCategory = c(linklist))
   
   res_1n <- prep_plot_chunk(plt_list = plotlist_nest, 
-                           chunk_name = "iris") # default
+                            chunk_name = "iris") # default
   expect_is(res_1n, "list")
   expect_length(res_1n, NROW(plotlist_nest))
   expect_true(all(vapply(res_1n, function(i) is.character(i), logical(1))))
@@ -118,9 +118,9 @@ test_that("prep_plot_chunk works as expected", {
                NROW(plotlist_nest))
   
   res_2n <- prep_plot_chunk(plt_list = plotlist_nest, 
-                           link_list = linklist_nest,
-                           chunk_name = "iris",
-                           tabset_options = NULL)
+                            link_list = linklist_nest,
+                            chunk_name = "iris",
+                            tabset_options = NULL)
   expect_equal(unlist(lapply(seq_along(res_2n), function(i) sum(grepl("####", res_2n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
   expect_equal(unlist(lapply(seq_along(res_2n), function(i) sum(grepl("a href", res_2n[[i]])))), 
@@ -133,8 +133,8 @@ test_that("prep_plot_chunk works as expected", {
   # scenario: incomplete list of links
   linklist_nest_incom <- list(someCategory = c(linklist[2:3]), anotherCategory = c(linklist))
   res_3n <- prep_plot_chunk(plt_list = plotlist_nest, 
-                           link_list = linklist_nest_incom,
-                           chunk_name = "iris")
+                            link_list = linklist_nest_incom,
+                            chunk_name = "iris")
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("####", res_3n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("a href", res_3n[[i]])))), 
@@ -144,9 +144,9 @@ test_that("prep_plot_chunk works as expected", {
   plotlist_nest_noname <- plotlist_nest
   names(plotlist_nest_noname) <- NULL
   res_4n <- prep_plot_chunk(plt_list = plotlist_nest, 
-                           link_list = linklist_nest,
-                           chunk_name = "iris",
-                           tabset_options = "unnumbered")
+                            link_list = linklist_nest,
+                            chunk_name = "iris",
+                            tabset_options = "unnumbered")
   expect_equal(unlist(lapply(seq_along(res_4n), function(i) sum(grepl("####", res_4n[[i]])))), 
                c(NROW(plotlist_nest_noname[[1]]), NROW(plotlist_nest_noname[[2]])))
   expect_equal(unlist(lapply(seq_along(res_4n), function(i) sum(grepl("a href", res_4n[[i]])))), 
@@ -173,37 +173,75 @@ test_that("prep_nested_plot_chunk works as expected", {
   
   # creating nested list with plots
   plotlist <- list()
+  linklist <- list()
   ls_color <- c("darkred", "orange", "darkcyan")
   for (drug in unique(dt_metrics$DrugName)) {
     for (cl in unique(dt_metrics$CellLineName)) {
       tab_plot <- dt_metrics[DrugName == drug & CellLineName == cl]
       
-      plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
+      plt_GR <- lapply(ls_color, function(col) plot_col(tab_plot, "GRV", col))
       names(plt_GR) <- sprintf("%s_%s", "GR", ls_color)
       plt_RV <- lapply(ls_color, function(col) plot_col(tab_plot, "RV", col))
       names(plt_RV) <- sprintf("%s_%s", "RV", ls_color)
       
-      plotlist[[drug]][[cl]][["RV"]] <- plt_RV
       plotlist[[drug]][[cl]][["GR"]] <- plt_GR
+      plotlist[[drug]][[cl]][["RV"]] <- plt_RV
     }
   }
   
+  for (drug in unique(dt_metrics$DrugName)) {
+    for (cl in unique(dt_metrics$CellLineName)) {
+      link_GR <- lapply(ls_color, function(col) {
+        name_GR <- sprintf("%s_%s", "GR", col)
+        file.path("plot", paste0(name_GR, ".png"))
+      })
+      names(link_GR) <- sprintf("%s_%s", "GR", ls_color)
+      link_RV <- lapply(ls_color, function(col) {
+        name_RV <- sprintf("%s_%s", "RV", col)
+        file.path("plot", paste0(name_RV, ".png"))
+      })
+      names(link_RV) <- sprintf("%s_%s", "RV", ls_color)
+      
+      linklist[[drug]][[cl]][["GR"]] <- link_GR
+      linklist[[drug]][[cl]][["RV"]] <- link_RV
+    }
+  }  
+  no_plots_in_section <-  NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color)
+  
   res_1 <- prep_nested_plot_chunk(plt_list = plotlist, 
-                                  chunk_name = "metric_col")
+                                  chunk_name = "metric_col") # default
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_length(res_1, NROW(unique(dt_metrics$DrugName)))
-  expect_equal(sum(grepl("#####", res_1[[1]])), # the lowest lvl with plots - default
-               NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color))
+  expect_equal(sum(grepl("#####", res_1[[1]])), no_plots_in_section) # the lowest lvl with plots - default
   
+  chunk_name_2 <- "CHUNK"
   res_2 <- prep_nested_plot_chunk(plt_list = plotlist, 
-                                  chunk_name = "metric_col", 
+                                  chunk_name = chunk_name_2, 
+                                  link_list = linklist,
                                   header_level = 1)
   expect_is(res_2, "list")
-  expect_equal(sum(grepl("####", res_2[[1]])),
-               NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color))
+  expect_equal(sum(vapply(seq_along(res_2), function(i) grepl("# drug_", res_2[[i]][1]), logical(1))),
+               NROW(res_2))
+  expect_equal(sum(grepl(chunk_name_2, res_2[[1]])), no_plots_in_section)
+  expect_equal(sum(grepl("####", res_2[[1]])), no_plots_in_section)
+  expect_true(all(vapply(seq_along(res_2), 
+                         function(i) sum(grepl("_blank", res_2[[i]])) == no_plots_in_section, logical(1)))) # link_list
   
-  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
+  linklist_noname <- linklist[1:5]
+  names(linklist_noname) <- NULL
+  res_3 <- prep_nested_plot_chunk(plt_list = plotlist[1:5], 
+                                  chunk_name = "metric_col", 
+                                  link_list = linklist_noname,
+                                  header_level = 2)
+  expect_is(res_3, "list")
+  expect_equal(sum(vapply(seq_along(res_3), function(i) grepl("## drug_", res_3[[i]][1]), logical(1))),
+               NROW(res_3))
+  expect_equal(sum(grepl("#####", res_3[[1]])), no_plots_in_section)
+  expect_false(all(vapply(seq_along(res_3), 
+                         function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
+  
+    expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
@@ -353,7 +391,7 @@ test_that("prep_double_table_chunk works as expected", {
     CellLine2 = list(MetricC = iris[1:5, ], 
                      MetricD = iris[6:10, ])
   )
-
+  
   download_link <- lapply(names(nested_tables), function(nm) {
     file.path("tables", paste0("cgs_tables_RV__", nm, ".xlsx"))
   })

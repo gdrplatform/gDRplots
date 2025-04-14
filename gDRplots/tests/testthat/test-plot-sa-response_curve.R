@@ -1,4 +1,4 @@
-context("Test sa_plots")
+context("Test dose-response sa")
 
 test_that("plot_dose_response_sa works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")

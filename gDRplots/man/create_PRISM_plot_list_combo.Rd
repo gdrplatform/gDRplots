@@ -13,6 +13,7 @@ create_PRISM_plot_list_combo(
   metric = c("xc50", "x_mean", "x_max"),
   metric_scores = c("hsa_score", "bliss_score"),
   fit_source = "gDR",
+  meta_data_path,
   feature_sets,
   prefixes,
   metadata_columns = NULL
@@ -43,6 +44,10 @@ chosen from: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
+
+\item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
+which are referenced by a dataset contained within the DepMap portal. 
+It is usually a file named \code{Model.csv}.}
 
 \item{feature_sets}{character vector names of the molecular feature set to load from DepMap.}
 
