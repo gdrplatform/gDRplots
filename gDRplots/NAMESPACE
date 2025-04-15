@@ -2,6 +2,7 @@
 
 export(analyze_cgs)
 export(calc_assoc)
+export(change_NA_into_char)
 export(compute_distances)
 export(create_PRISM_plot_list_combo)
 export(create_PRISM_plot_list_sa)

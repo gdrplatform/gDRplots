@@ -1,6 +1,6 @@
-context("Test sa_plots")
+context("Test var_distribution")
 
-test_that("plot_dose_response_sa works as expected", {
+test_that("plot_var_distribution_qc works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
   se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]

@@ -198,6 +198,24 @@ prep_nested_plot_chunk <- function(plt_list,
   lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
   plt_list_name <- deparse(substitute(plt_list))
   
+  # checking if the structure of plt_list and link_list is identical
+  link_structure_condition <-
+    all(
+      names(plt_list) %in% names(link_list),
+      vapply(names(plt_list), function(nm) {
+        all(names(plt_list[[nm]]) == names(link_list[[nm]]),
+            vapply(names(plt_list[[nm]]), function(nm_2) {
+              all(names(plt_list[[nm]][[nm_2]]) == names(link_list[[nm]][[nm_2]]), 
+                  vapply(names(plt_list[[nm]][[nm_2]]), function(nm_3) {
+                    all(names(plt_list[[nm]][[nm_2]][[nm_3]]) == names(link_list[[nm]][[nm_2]][[nm_3]]))
+                  }, logical(1))
+              )
+            }, logical(1))
+        )
+      }, logical(1))
+    )
+  if (!link_structure_condition) link_list <- NULL
+  
   lapply(names(plt_list), function(nm_1) {
     c(
       sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
@@ -215,21 +233,25 @@ prep_nested_plot_chunk <- function(plt_list,
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
                       
-                      chunk_name <- sprintf("%s__%s_%s_%s",
-                                            chunk_name, nm_1, nm_2, nm_norm)
+                      chunk_name <- sprintf("%s__%s_%s_%s_%s",
+                                            chunk_name, nm_1, nm_2, nm_norm, nm_vis)
                       
+                      link_vis <- if (!is.null(link_list)) {
+                        c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
+                      } else {
+                        ""
+                      }
+            
                       plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
                                                plt_list_name, nm_1, nm_2, nm_norm)
                       
                       chunk <- c(
-                        sprintf("%s {{nm_vis}} \n\n", lvl_4),
-                        if (!is.null(link_list)) 
-                          c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n"),
-                        sprintf("```{r %s {{nm_vis}}, echo = FALSE}\n", chunk_name),
-                        sprintf('%s[["{{nm_vis}}"]] \n', plt_list_name),
-                        "```\n",
-                        "\n"
+                        sprintf("%s %s \n\n", lvl_4, nm_vis),
+                        link_vis,
+                        sprintf("```{r %s, echo = FALSE}\n", chunk_name),
+                        sprintf('%s[["{{nm_vis}}"]] \n```\n\n', plt_list_name)
                       )
+                      
                       knitr::knit_expand(text = chunk)
                     })
                   )

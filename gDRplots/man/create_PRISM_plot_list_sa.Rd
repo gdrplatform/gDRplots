@@ -11,6 +11,7 @@ create_PRISM_plot_list_sa(
   normalization_type_vec = "RV",
   metric = c("xc50", "x_mean", "x_max"),
   fit_source = "gDR",
+  meta_data_path,
   feature_sets,
   prefixes,
   metadata_columns = NULL
@@ -35,6 +36,10 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
+
+\item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
+which are referenced by a dataset contained within the DepMap portal. 
+It is usually a file named \code{Model.csv}.}
 
 \item{feature_sets}{character vector names of the molecular feature set to load from DepMap.}
 

@@ -101,7 +101,7 @@ analyze_cgs <- function(dt_metrics,
       
       fgsea_result$median <- median_values[fgsea_result$pathway]
       data.table::setorder(fgsea_result, -NES)
-      return(fgsea_result)
+      fgsea_result
     })
     names(list_results) <- metrics
     list(fgsea = list_results,
@@ -110,7 +110,8 @@ analyze_cgs <- function(dt_metrics,
   })
   
   names(results) <- cell_lines
-  return(results)
+  # final
+  results
 }
 
 
