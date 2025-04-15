@@ -14,13 +14,13 @@
 #' 
 #' @export 
 calc_assoc <- function(X, Y) {
-
+  
   checkmate::assert_matrix(X, mode = "numeric")
   checkmate::assert_names(rownames(X))
   checkmate::assert_multi_class(Y, c("matrix", "numeric"))
   if (is.matrix(Y)) checkmate::assert_names(rownames(Y))
   if (is.vector(Y)) checkmate::assert_names(names(Y))
-
+  
   if (is.vector(Y)) {
     .calc_assoc_vector(X = X, Y = Y)
   } else if (is.matrix(Y)) {
@@ -75,26 +75,11 @@ calc_assoc <- function(X, Y) {
   
   # store the correlation coefficient in the table
   available_genes <- rownames(res$res.table)
-  res_dt[, rho := res$rho[available_genes, 1]]
+  res_dt$rho <- res$rho[available_genes, 1]
   
   # return with a re-order columns for a more human-friendly output
-  res_dt[
-    , .(
-      feature = ind.var
-      , est_beta = betahat
-      , est_beta_se = sebetahat
-      , posterior_mean = PosteriorMean
-      , posterior_sd = PosteriorSD
-      , prob_negative = NegativeProb
-      , prob_positive = PositiveProb
-      , rho
-      , p_value = p.val
-      , q_value = qvalue
-      , s_value = svalue
-      , lfsr
-      , lfdr
-    )
-  ]
+  res_dt <- .order_assoc_result(res_dt)
+  res_dt
 }
 
 #' Calculate the linear model associations between dependent variables and response variables of interest.
@@ -174,32 +159,15 @@ calc_assoc <- function(X, Y) {
   # ensure that the `dep.var` column is listed, otherwise the renaming and 
   # re-ordering step below will fail
   if (!"dep.var" %in% names(res_dt)) {
-    res_dt[, dep.var := rep(colnames(Y), each = NROW(available_genes))]
+    res_dt$dep.var <- rep(colnames(Y), each = NROW(available_genes))
   }
   
   # combine each column of the correlation matrix into a single giant vector and
   # store it as the appropriate column in `res_dt`
-  res_dt[, rho := vapply(res$rho[available_genes, ], as.vector, numeric(1))]
+  res_dt$rho <- vapply(res$rho[available_genes, ], as.vector, numeric(1))
   
   # re-order columns for a more human-friendly output
-  res_dt <- res_dt[
-    , .(
-      feature = ind.var
-      , response = dep.var
-      , est_beta = betahat
-      , est_beta_se = sebetahat
-      , posterior_mean = PosteriorMean
-      , posterior_sd = PosteriorSD
-      , prob_negative = NegativeProb
-      , prob_positive = PositiveProb
-      , rho
-      , p_value = p.val
-      , q_value = qvalue
-      , s_value = svalue
-      , lfsr
-      , lfdr
-    )
-  ]
+  res_dt <- .order_assoc_result(res_dt)
   
   # add in NA values from any columns that had 0 variance, if necessary
   if (zero_var_cols_len > 0) {
@@ -207,5 +175,32 @@ calc_assoc <- function(X, Y) {
   }
   
   # return the combined table
+  res_dt
+}
+
+#' Order and rename columns in associations results
+#' 
+#' @param res_dt \code{data.table} of associations results
+#' 
+#' @return \code{data.table} of associations results with reorder and rename columns
+#'
+#' @keywords internal
+.order_assoc_result <- function(res_dt) {
+  checkmate::assert_data_table(res_dt)
+  
+  ls_col <- c("ind.var", "dep.var", "betahat", "sebetahat", "PosteriorMean",
+              "PosteriorSD",  "NegativeProb", "PositiveProb", "rho", 
+              "p.val", "qvalue", "svalue", "lfsr", "lfdr")
+  ls_col <- intersect(ls_col, names(res_dt)) # removre"dep.var" for vector
+  res_dt <- res_dt[, (ls_col), with = FALSE]
+  # rename
+  data.table::setnames(res_dt, 
+                       old = c("ind.var", "dep.var", "betahat", "sebetahat",
+                               "PosteriorMean", "PosteriorSD",  "NegativeProb", "PositiveProb",
+                               "p.val", "qvalue", "svalue"),
+                       new = c("feature", "response", "est_beta", "est_beta_se",
+                               "posterior_mean", "posterior_sd", "prob_negative", "prob_positive",
+                               "p_value", "q_value", "s_value"),
+                       skip_absent = TRUE)
   res_dt
 }
