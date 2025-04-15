@@ -239,7 +239,7 @@ test_that(".order_assoc_result works as expected", {
     PosteriorSD = withr::with_seed(271, sample(seq(0.95, 1.35, 0.05), 4)),
     dep.var = rep("met_1", 1),
     ind.var = sprintf("feat_%s", 1:4),   
-    p.val= withr::with_seed(314, sample(seq(0.01, .55, 0.13), 4)),
+    p.val = withr::with_seed(314, sample(seq(0.01, .55, 0.13), 4)),
     rho = withr::with_seed(42, sample(seq(-1, 1, 0.35), 4))
   )
   
