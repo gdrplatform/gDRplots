@@ -233,7 +233,7 @@ test_that(".order_assoc_result works as expected", {
     PositiveProb = withr::with_seed(314, sample(seq(0.05, .95, 0.08), 4)),
     lfsr = withr::with_seed(271, sample(seq(0.1, 0.95, 0.03), 4)),
     svalue = withr::with_seed(42, sample(seq(0.01, 0.33, 0.08), 4)),
-    lfdr =withr::with_seed(271, sample(seq(0, 1, 0.035), 4)),
+    lfdr = withr::with_seed(271, sample(seq(0, 1, 0.035), 4)),
     qvalue = withr::with_seed(981, sample(seq(0.01, 0.98, 0.07), 4)),
     PosteriorMean = withr::with_seed(42, sample(seq(-4.2, 2.1, 0.35), 4)) / 2,
     PosteriorSD = withr::with_seed(271, sample(seq(0.95, 1.35, 0.05), 4)),
