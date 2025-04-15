@@ -1,5 +1,3 @@
-context("Setup PRISM data")
-
 cellline_name <- gDRutils::get_env_identifiers("cellline_name")
 
 # gDR data ----
