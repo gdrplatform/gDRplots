@@ -17,7 +17,7 @@ calc_assoc <- function(X, Y) {
   
   checkmate::assert_matrix(X, mode = "numeric")
   checkmate::assert_names(rownames(X))
-  checkmate::assert_multi_class(Y, c("matrix", "numeric"))
+  checkmate::assert_multi_class(Y, c("matrix", "numeric", "integer"))
   if (is.matrix(Y)) checkmate::assert_names(rownames(Y))
   if (is.vector(Y)) checkmate::assert_names(names(Y))
   
@@ -44,7 +44,9 @@ calc_assoc <- function(X, Y) {
   
   checkmate::assert_matrix(X, mode = "numeric")
   checkmate::assert_names(rownames(X))
-  checkmate::assert_class(Y, "numeric")
+  # checkmate::assert(checkmate::check_class(Y, classes = "integer"), 
+  #                   checkmate::check_class(Y, classes = "numeric"))
+  checkmate::assert_numeric(Y)
   checkmate::assert_names(names(Y))
   
   if (stats::sd(Y, na.rm = TRUE) == 0) {
@@ -150,7 +152,7 @@ calc_assoc <- function(X, Y) {
   res <- cdsrmodels::lin_associations(X = X, Y = Y)
   
   # subset the data so that the correlations match the output of the table
-  available_genes <- rownames(stats::na.omit(res$rho))
+  available_genes <- rownames(stats::na.omit(res$p.val)) # since final result is filter based on p.val
   
   # convert results from a `matrix` to a `data.table`
   res_dt <- data.table::as.data.table(res$res.table)
