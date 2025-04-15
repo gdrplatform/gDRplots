@@ -131,4 +131,58 @@ test_that(".calc_assoc_matrix works as expected", {
                         lapply(.SD, is.na), .SDcols = -c("feature", "response")]))
   expect_false(all(res_2[response != colnames(Y_all_no_var)[3], 
                          lapply(.SD, is.na), .SDcols = -c("feature", "response")]))
+  
+  # scenario: matrix Y has no matching size
+  expect_error({
+    .calc_assoc_matrix(X, Y = Y[1:6, , drop = FALSE])
+  }, "non-conformable arguments")
+  expect_error({
+    .calc_assoc_matrix(X, Y = Y_all[1:6, , drop = FALSE])
+  }, "non-conformable arguments")
+  
+  # scenario: matrix Y has not matching name (the same order)
+  Y_wrongname <- Y
+  rownames(Y_wrongname) <- sprintf("%s_fix", toupper(rownames(Y_wrongname)))
+  res_3 <- .calc_assoc_matrix(X = X, Y = Y_wrongname)
+  expect_equal(res_3, .calc_assoc_matrix(X, Y = Y))
+  
+  # scenario: matrix Y has wrong order
+  Y_wrongorder <- Y[rev(seq_along(Y)), , drop = FALSE]
+  res_4 <- .calc_assoc_matrix(X = X, Y = Y_wrongorder)
+  expect_error(expect_equal(res_4, .calc_assoc_matrix(X, Y = Y)))
+  
+  # scenario: matrix Y has no name
+  Y_noname <- Y
+  rownames(Y_noname) <- NULL
+  expect_error(.calc_assoc_matrix(X = X, Y = Y_noname), 
+               "Must have names")
+  
+  # scenario: matrix Y has too many NA
+  Y_NA_row <- Y
+  Y_NA_row[1:6] <- NA
+  expect_warning({
+    expect_error({
+      .calc_assoc_matrix(X, Y = Y_NA_row)
+    }, "Error: all input values are missing")
+  },"Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
+  
+  # scenario: one column in matrix Y has one column with NA
+  Y_all_NA <- Y_all
+  Y_all_NA[, 3] <- NA
+  expect_error({
+    expect_warning({
+      .calc_assoc_matrix(X, Y = Y_all_NA)
+    }, "NaNs produced")
+  }, "all input values are missing")
+  
+  # scenario: matrix Y has some NA
+  Y_all_NA_col <- Y_all
+  Y_all_NA_col[1:2, 3] <- NA
+  Y_all_NA_col[5:6, 1] <- NA
+  expect_error({
+    expect_warning({
+      .calc_assoc_matrix(X, Y = Y_all_NA_col)
+    }, "Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
+  }, "all input values are missing")
+  
 })
