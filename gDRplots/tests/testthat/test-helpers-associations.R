@@ -46,7 +46,7 @@ test_that(".calc_assoc_vector works as expected", {
     expect_error({
       .calc_assoc_vector(X = X, Y = Y_vec_NA) 
     }, "Error: all input values are missing")
-  },"Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
+  }, "Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
   
   # scenario: vector Y has not matching size
   expect_error({
@@ -164,7 +164,7 @@ test_that(".calc_assoc_matrix works as expected", {
     expect_error({
       .calc_assoc_matrix(X, Y = Y_NA_row)
     }, "Error: all input values are missing")
-  },"Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
+  }, "Missing values generated in calculation of cor. Likely cause: too many missing entries or zero variance.")
   
   # scenario: one column in matrix Y has one column with NA
   Y_all_NA <- Y_all
