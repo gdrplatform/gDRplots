@@ -134,25 +134,3 @@ obj_assoc_combo <- list(dt_assoc = dt_assoc_combo,
                         condition_info = unique(dt_response_score[["rId"]]),
                         selected_metric = "hsa_score",
                         selected_feat_meta_col = "meta_xx")
-
-# association inputs ----
-selected_metric <- "RV_gDR_log10_xc50"
-Y <- as.matrix(
-  dt_response_met[, .SD, .SDcols = c(cellline_name, selected_metric)],
-  rownames = "CellLineName"
-)
-Y_all <- as.matrix(
-  dt_response_met[, .SD, .SDcols = -c("rId", "cId")],
-  rownames = "CellLineName"
-)
-Y_vec <- dt_response_met$RV_gDR_x_mean
-names(Y_vec) <- dt_response_met[[cellline_name]]
-X <- as.matrix(
-  dt_depmap_meta[CCLEName %in% dt_response_met[[cellline_name]], .SD, .SDcols = -c("ModelID")], 
-  rownames = "CCLEName"
-)
-
-# association columns ----
-res_col_names <- c("feature", "est_beta", "est_beta_se", 
-                   "posterior_mean", "posterior_sd", "prob_negative", "prob_positive", 
-                   "rho", "p_value", "q_value", "s_value", "lfsr", "lfdr")
