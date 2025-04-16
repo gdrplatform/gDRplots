@@ -2,6 +2,8 @@
 #' 
 #' Calculate the linear model associations between dependent variables and response variable(s) of interest.
 #' 
+#' @note inspired by the \code{calc_assoc} function written by James Hawley
+#' 
 #' @param X \code{matrix} dependent variables data matrix (rows are samples, columns are features).
 #' Must have the same number of rows as matrix \code{Y} or equal to length of vector \code{Y}
 #' @param Y \code{vector} or \code{matrix} experimental response data (rows are samples).
@@ -10,7 +12,13 @@
 #' 
 #' @return \code{data.table} with calculated linear associations
 #' 
-#' @note inspired by the \code{calc_assoc} function written by James Hawley
+#' @examples
+#' X <- matrix(rep(1:13, length.out = 42), nrow = 6, 
+#'             dimnames = list(sprintf("row_%s", 1:6), sprintf("feat_%s", 1:7)))
+#' Y <- matrix(c(10:15, 110:115, 210:215), ncol = 3,
+#'             dimnames = list(sprintf("row_%s", 1:6), sprintf("met_%s", 1:3)))
+#' tab_assoc <- calc_assoc(X, Y)
+#' 
 #' @seealso \code{\link[cdsrmodels]{lin_associations}}
 #' 
 #' @keywords internal
@@ -73,11 +81,8 @@ calc_assoc <- function(X, Y) {
   
   # convert results from a `matrix` to a `data.table`
   dt_res <- data.table::as.data.table(res$res.table)
-  
-  if (!"dep.var" %in% names(dt_res) && !is.vector(Y)) {
-    print("KLOPS")
-  }
-  
+
+  # fill lacking name in dt_res$ind.va
   if (!all(dt_res$ind.var %in% rownames(res$p.val))) {
     # finite values of res$p.val are used as the basis for the final result
     dt_pval <- data.table::as.data.table(stats::na.omit(res$p.val), keep.rownames = "ind.var")
