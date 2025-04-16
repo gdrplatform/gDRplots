@@ -12,7 +12,8 @@ Y_vec <- 1:8
 names(Y_vec) <- sprintf("row_%s", 1:8)
 
 # small matrix
-X_feat <- matrix(c(rep(NA, 2), rep(1, 10), rep(NA, 2), rep(1, 2), rep(NA, 3), rep(2, 5), rep(1, 2), rep(3, 2)), nrow = 7,
+X_feat <- matrix(c(rep(NA, 2), rep(1, 10), rep(NA, 2), rep(1, 2), rep(NA, 3), rep(2, 5), rep(1, 2), rep(3, 2)), 
+                 nrow = 7,
                  dimnames = list(sprintf("row_%s", 1:7), sprintf("feat_%s", 1:4)))
 Y_feat <- matrix(c(10:16), ncol = 1,
                  dimnames = list(sprintf("row_%s", 1:7), "met"))
