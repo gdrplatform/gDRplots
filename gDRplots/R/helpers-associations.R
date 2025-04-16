@@ -31,8 +31,11 @@ calc_assoc <- function(X, Y) {
   if (is.matrix(Y)) checkmate::assert_names(rownames(Y))
   if (is.vector(Y)) checkmate::assert_names(names(Y))
   
-  stopifnot("Sizes of X and Y have to match." = NROW(X) == NROW(Y))
+  stopifnot("The X and Y dimensions must match." = NROW(X) == NROW(Y))
   
+  # prevent error with lack of "dep.var"
+  if (is.matrix(Y) && is.null(colnames(Y))) colnames(Y) <- sprintf("var_%s", seq_len(NCOL(Y)))
+    
   # when Y has no variance
   if (is.vector(Y) && stats::sd(Y, na.rm = TRUE) == 0) {
     warning("Y has no variance, rendering all associations void. Please double check this is correct.")
