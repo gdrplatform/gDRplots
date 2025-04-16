@@ -35,10 +35,12 @@ calc_assoc <- function(X, Y) {
   
   # prevent error with lack of "dep.var"
   if (is.matrix(Y) && is.null(colnames(Y))) colnames(Y) <- sprintf("var_%s", seq_len(NCOL(Y)))
-    
+  
   # when Y has no variance
+  dt_na <- NULL
   if (is.vector(Y) && stats::sd(Y, na.rm = TRUE) == 0) {
-    warning("Y has no variance, rendering all associations void. Please double check this is correct.")
+    warning("Y has no variance.
+            Rendering all associations void. Please double check this is correct.")
     dt_na <- data.table::data.table(feature = colnames(X),
                                     est_beta = NA_real_,
                                     est_beta_se = NA_real_,
@@ -53,8 +55,14 @@ calc_assoc <- function(X, Y) {
                                     lfsr = NA_real_,
                                     lfdr = NA_real_)
     return(dt_na)
-  } else if (is.matrix(Y) && any(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)) {
+  } else if (is.matrix(Y) && any(apply(Y, 2, stats::sd, na.rm = TRUE) == 0, na.rm = TRUE)) {
     col_no_var <- which(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)
+    
+    warning(sprintf(
+        "The following columns in Y have no variance: %s.
+        Rendering associations void. Please double check this is correct.",
+        paste(names(col_no_var), collapse = ", ")
+      ))
     
     dt_na <- data.table::data.table(expand.grid(feature = colnames(X), 
                                                 response = names(col_no_var),
@@ -72,7 +80,7 @@ calc_assoc <- function(X, Y) {
                                     lfsr = NA_real_,
                                     lfdr = NA_real_)
     
-    if (NROW(col_no_var) == NROW(Y)) {
+    if (NROW(col_no_var) == NCOL(Y)) {
       return(dt_na)
     } else {
       Y <- Y[, -col_no_var, drop = FALSE]
@@ -84,7 +92,7 @@ calc_assoc <- function(X, Y) {
   
   # convert results from a `matrix` to a `data.table`
   dt_res <- data.table::as.data.table(res$res.table)
-
+  
   # fill lacking name in dt_res$ind.va
   if (!all(dt_res$ind.var %in% rownames(res$p.val))) {
     # finite values of res$p.val are used as the basis for the final result
@@ -106,6 +114,12 @@ calc_assoc <- function(X, Y) {
   # re-order columns for a more human-friendly output
   dt_res <- .order_assoc_result(dt_res) 
   data.table::setkey(dt_res, NULL)
+  
+  # add in NA values from any columns that had 0 variance, if necessary
+  if (NROW(dt_na)) {
+    dt_res <- rbind(dt_res, dt_na)
+    data.table::setorder(dt_res, "feature", na.last = TRUE)
+  }
   dt_res
 }
 
