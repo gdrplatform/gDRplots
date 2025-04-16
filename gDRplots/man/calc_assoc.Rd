@@ -7,19 +7,23 @@
 calc_assoc(X, Y)
 }
 \arguments{
-\item{X}{\code{matrix} Dependent variables data matrix (rows are samples, columns are features).
-Must have the same length as \code{Y}.}
+\item{X}{\code{matrix} dependent variables data matrix (rows are samples, columns are features).
+Must have the same number of rows as matrix \code{Y} or equal to length of vector \code{Y}}
 
-\item{Y}{\code{vector} or \code{matrix} Experimental response data (rows are samples).
-Must have the same length as \code{X}.}
+\item{Y}{\code{vector} or \code{matrix} experimental response data (rows are samples).
+When \code{Y} is a matrix must have the same number of rows as matrix \code{X}; 
+when \code{y} is a vector - its length has to be equal to number of rows in matrix \code{X}.}
+}
+\value{
+\code{data.table} with calculated linear associations
 }
 \description{
 Calculate the linear model associations between dependent variables and response variable(s) of interest.
 }
+\note{
+inspired by the \code{calc_assoc} function written by James Hawley
+}
 \seealso{
 \code{\link[cdsrmodels]{lin_associations}}
-}
-\author{
-James Hawley
 }
 \keyword{internal}
