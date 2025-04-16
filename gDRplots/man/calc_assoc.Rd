@@ -23,6 +23,14 @@ Calculate the linear model associations between dependent variables and response
 \note{
 inspired by the \code{calc_assoc} function written by James Hawley
 }
+\examples{
+X <- matrix(rep(1:13, length.out = 42), nrow = 6, 
+            dimnames = list(sprintf("row_\%s", 1:6), sprintf("feat_\%s", 1:7)))
+Y <- matrix(c(10:15, 110:115, 210:215), ncol = 3,
+            dimnames = list(sprintf("row_\%s", 1:6), sprintf("met_\%s", 1:3)))
+tab_assoc <- calc_assoc(X, Y)
+
+}
 \seealso{
 \code{\link[cdsrmodels]{lin_associations}}
 }
