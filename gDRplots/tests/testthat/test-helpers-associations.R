@@ -23,13 +23,12 @@ n_big <- 50
 X_big <- matrix(
   withr::with_seed(42, sample(c(0, 1, NA), size =  20 * n_big, replace = TRUE, prob = c(0.9, 0.09, 0.01))), 
   nrow = n_big, dimnames = list(sprintf("row_%s", 1:n_big), sprintf("feat_%s", 1:20)))
-
 Y_big <- as.matrix(data.table::data.table(
   met_11 = withr::with_seed(42, rnorm(n = n_big, mean = -0.05, sd = 0.11)),
   met_12 = withr::with_seed(42, rnorm(n = n_big, mean = -0.03, sd = 0.13)),
   met_13 = withr::with_seed(42, sample(c(1:10, NA), n_big, replace = TRUE)),
   met_14 = rep(c(0.15, NA, NA), length.out = n_big)
-),)
+))
 rownames(Y_big) <- sprintf("row_%02d", 1:n_big)
 
 # association columns ----
