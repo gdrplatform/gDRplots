@@ -37,7 +37,6 @@ calc_assoc <- function(X, Y) {
   if (is.matrix(Y) && is.null(colnames(Y))) colnames(Y) <- sprintf("var_%s", seq_len(NCOL(Y)))
   
   # when Y has no variance
-  dt_na <- NULL
   if (is.vector(Y) && stats::sd(Y, na.rm = TRUE) == 0) {
     warning("Y has no variance.
             Rendering all associations void. Please double check this is correct.")
@@ -85,6 +84,8 @@ calc_assoc <- function(X, Y) {
     } else {
       Y <- Y[, -col_no_var, drop = FALSE]
     }
+  } else {
+    dt_na <- NULL
   }
   
   # use `cdsr_models` to calculate the linear model coefficients efficiently on large matrices
