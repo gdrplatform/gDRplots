@@ -2,182 +2,103 @@
 #' 
 #' Calculate the linear model associations between dependent variables and response variable(s) of interest.
 #' 
-#' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
-#' Must have the same length as \code{Y}.
-#' @param Y \code{vector} or \code{matrix} Experimental response data (rows are samples).
-#' Must have the same length as \code{X}.
+#' @param X \code{matrix} dependent variables data matrix (rows are samples, columns are features).
+#' Must have the same number of rows as matrix \code{Y} or equal to length of vector \code{Y}
+#' @param Y \code{vector} or \code{matrix} experimental response data (rows are samples).
+#' When \code{Y} is a matrix must have the same number of rows as matrix \code{X}; 
+#' when \code{y} is a vector - its length has to be equal to number of rows in matrix \code{X}.
 #' 
-#' @author James Hawley
+#' @return \code{data.table} with calculated linear associations
+#' 
+#' @note inspired by the \code{calc_assoc} function written by James Hawley
 #' @seealso \code{\link[cdsrmodels]{lin_associations}}
 #' 
 #' @keywords internal
 #' 
 #' @export 
 calc_assoc <- function(X, Y) {
-  
   checkmate::assert_matrix(X, mode = "numeric")
   checkmate::assert_names(rownames(X))
   checkmate::assert_multi_class(Y, c("matrix", "numeric", "integer"))
   if (is.matrix(Y)) checkmate::assert_names(rownames(Y))
   if (is.vector(Y)) checkmate::assert_names(names(Y))
   
-  if (is.vector(Y)) {
-    .calc_assoc_vector(X = X, Y = Y)
-  } else if (is.matrix(Y)) {
-    .calc_assoc_matrix(X = X, Y = Y)
-  }
-}
-
-#' Calculate the linear model associations between dependent variables and some response variable of interest.
-#' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
-#' Must have the same length as \code{Y}.
-#' @param Y \code{vector} Experimental response data (rows are samples).
-#' Must have the same length as \code{X}.
-#' 
-#' @return \code{data.table}
-#' 
-#' @author James Hawley
-#' @seealso \code{\link[cdsrmodels]{lin_associations}}
-#' 
-#' @keywords internal 
-.calc_assoc_vector <- function(X, Y) {
+  stopifnot("Sizes of X and Y have to match." = NROW(X) == NROW(Y))
   
-  checkmate::assert_matrix(X, mode = "numeric")
-  checkmate::assert_names(rownames(X))
-  # checkmate::assert(checkmate::check_class(Y, classes = "integer"), 
-  #                   checkmate::check_class(Y, classes = "numeric"))
-  checkmate::assert_numeric(Y)
-  checkmate::assert_names(names(Y))
-  
-  if (stats::sd(Y, na.rm = TRUE) == 0) {
+  # when Y has no variance
+  if (is.vector(Y) && stats::sd(Y, na.rm = TRUE) == 0) {
     warning("Y has no variance, rendering all associations void. Please double check this is correct.")
-    na_dt <- data.table::data.table(
-      feature = names(Y)
-      , est_beta = NA_real_
-      , est_beta_se = NA_real_
-      , posterior_mean = NA_real_
-      , posterior_sd = NA_real_
-      , prob_negative = NA_real_
-      , prob_positive = NA_real_
-      , rho = NA_real_
-      , p_value = NA_real_
-      , q_value = NA_real_
-      , s_value = NA_real_
-      , lfsr = NA_real_
-      , lfdr = NA_real_
-    )
-    return(na_dt)
-  }
-  
-  # use `cdsr_models` to calculate the linear model coefficients efficiently on large matrices
-  res <- cdsrmodels::lin_associations(X = X, Y = Y)
-  
-  # convert results from a `matrix` to a `data.table`
-  res_dt <- data.table::as.data.table(res$res.table)
-  
-  # store the correlation coefficient in the table
-  available_genes <- rownames(res$res.table)
-  res_dt$rho <- res$rho[available_genes, 1]
-  
-  # return with a re-order columns for a more human-friendly output
-  res_dt <- .order_assoc_result(res_dt)
-  res_dt
-}
-
-#' Calculate the linear model associations between dependent variables and response variables of interest.
-#' 
-#' @param X \code{matrix} Dependent variables data matrix (rows are samples, columns are features).
-#' Must have the same length as \code{Y}.
-#' @param Y \code{matrix} Experimental response data (rows are samples).
-#' Must have the same length as \code{X}.
-#' 
-#' @return \code{data.table}
-#' 
-#' @author James Hawley
-#' @seealso \code{\link[cdsrmodels]{lin_associations}}
-#' 
-#' @keywords internal
-.calc_assoc_matrix <- function(X, Y) {
-  
-  checkmate::assert_matrix(X, mode = "numeric")
-  checkmate::assert_names(rownames(X))
-  checkmate::assert_matrix(Y, mode = "numeric")
-  checkmate::assert_names(rownames(Y))
-  
-  # calculate if any columns have zero variance
-  zero_var_cols <- which(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)
-  zero_var_cols_len <- length(zero_var_cols)
-  
-  if (zero_var_cols_len > 0) {
-    warning(
-      paste0(
-        "The following columns in Y have no variance, rendering associations void. 
-        Please double check this is correct: "
-        , paste(names(zero_var_cols), collapse = ", ")
-      )
-    )
-    na_dt <- data.table::data.table(
-      feature = rep(x = colnames(X), times = zero_var_cols_len)
-      , response = rep(x = colnames(Y)[zero_var_cols], each = dim(X)[2])
-      , est_beta = NA_real_
-      , est_beta_se = NA_real_
-      , posterior_mean = NA_real_
-      , posterior_sd = NA_real_
-      , prob_negative = NA_real_
-      , prob_positive = NA_real_
-      , rho = NA_real_
-      , p_value = NA_real_
-      , q_value = NA_real_
-      , s_value = NA_real_
-      , lfsr = NA_real_
-      , lfdr = NA_real_
-    )
+    dt_na <- data.table::data.table(feature = colnames(X),
+                                    est_beta = NA_real_,
+                                    est_beta_se = NA_real_,
+                                    posterior_mean = NA_real_,
+                                    posterior_sd = NA_real_,
+                                    prob_negative = NA_real_,
+                                    prob_positive = NA_real_,
+                                    rho = NA_real_,
+                                    p_value = NA_real_,
+                                    q_value = NA_real_,
+                                    s_value = NA_real_,
+                                    lfsr = NA_real_,
+                                    lfdr = NA_real_)
+    return(dt_na)
+  } else if (is.matrix(Y) && any(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)) {
+    col_no_var <- which(apply(Y, 2, stats::sd, na.rm = TRUE) == 0)
     
-    # remove the zero-variance columns from Y
-    # The `as.matrix()` ensures that even if Y only has 1 column remaining,
-    # it is still a matrix object, and doesn't get reduced to a vector.
-    # If it was, it would cause later problems trying to name the `res_dt`
-    # columns, correctly.
-    y_colnames <- colnames(Y)
-    Y <- as.matrix(Y[, -zero_var_cols])
-    colnames(Y) <- y_colnames[-zero_var_cols]
-  }
-  
-  # early return of the `na_dt` table if there are no columns of Y with non-zero variance
-  if (dim(Y)[2] == 0) {
-    return(na_dt)
+    dt_na <- data.table::data.table(expand.grid(feature = colnames(X), 
+                                                response = names(col_no_var),
+                                                stringsAsFactors = FALSE),
+                                    est_beta = NA_real_,
+                                    est_beta_se = NA_real_,
+                                    posterior_mean = NA_real_,
+                                    posterior_sd = NA_real_,
+                                    prob_negative = NA_real_,
+                                    prob_positive = NA_real_,
+                                    rho = NA_real_,
+                                    p_value = NA_real_,
+                                    q_value = NA_real_,
+                                    s_value = NA_real_,
+                                    lfsr = NA_real_,
+                                    lfdr = NA_real_)
+    
+    if (NROW(col_no_var) == NROW(Y)) {
+      return(dt_na)
+    } else {
+      Y <- Y[, -col_no_var, drop = FALSE]
+    }
   }
   
   # use `cdsr_models` to calculate the linear model coefficients efficiently on large matrices
   res <- cdsrmodels::lin_associations(X = X, Y = Y)
   
-  # subset the data so that the correlations match the output of the table
-  available_genes <- rownames(stats::na.omit(res$p.val)) # since final result is filter based on p.val
-  
   # convert results from a `matrix` to a `data.table`
-  res_dt <- data.table::as.data.table(res$res.table)
+  dt_res <- data.table::as.data.table(res$res.table)
   
-  # if Y only has 1 column (either originally, or because others were filtered out)
-  # ensure that the `dep.var` column is listed, otherwise the renaming and 
-  # re-ordering step below will fail
-  if (!"dep.var" %in% names(res_dt)) {
-    res_dt$dep.var <- rep(colnames(Y), each = NROW(available_genes))
+  if (!"dep.var" %in% names(dt_res) && !is.vector(Y)) {
+    print("KLOPS")
   }
   
-  # combine each column of the correlation matrix into a single giant vector and
-  # store it as the appropriate column in `res_dt`
-  res_dt$rho <- vapply(res$rho[available_genes, ], as.vector, numeric(1))
+  if (!all(dt_res$ind.var %in% rownames(res$p.val))) {
+    # finite values of res$p.val are used as the basis for the final result
+    dt_pval <- data.table::as.data.table(stats::na.omit(res$p.val), keep.rownames = "ind.var")
+    dt_res <-
+      merge(dt_res[, -c("ind.var"), with = FALSE], dt_pval,
+            by.x = "p.val", by.y = names(dt_pval)[names(dt_pval) != "ind.var"])
+  }
+  
+  # add information about `rho`
+  dt_rho <- data.table::melt(data.table::as.data.table(res$rho, keep.rownames = "ind.var"),
+                             id.vars = "ind.var", variable.name = "dep.var", value.name = "rho")
+  dt_res <- if (is.vector(Y)) {
+    merge(dt_res, dt_rho[, -c("dep.var"), with = FALSE], by = "ind.var")
+  } else {
+    merge(dt_res, dt_rho, by = c("ind.var", "dep.var"))
+  }
   
   # re-order columns for a more human-friendly output
-  res_dt <- .order_assoc_result(res_dt)
-  
-  # add in NA values from any columns that had 0 variance, if necessary
-  if (zero_var_cols_len > 0) {
-    res_dt <- data.table::rbindlist(list(res_dt, na_dt))
-  }
-  
-  # return the combined table
-  res_dt
+  dt_res <- .order_assoc_result(dt_res) 
+  data.table::setkey(dt_res, NULL)
+  dt_res
 }
 
 #' Order and rename columns in associations results
