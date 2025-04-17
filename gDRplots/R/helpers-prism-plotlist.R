@@ -18,7 +18,7 @@
 #'  It is usually a file named \code{Model.csv}.
 #' @param feature_sets character vector names of the molecular feature set to load from DepMap.
 #' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
-#' @param feature_set string file name of the molecular feature set to load from DepMap.
+#' @param feature_sets character vector file name of the molecular feature set to load from DepMap.
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -196,7 +196,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
 #' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
-#' @param feature_set string file name of the molecular feature set to load from DepMap.
+#' @param feature_sets character vector file name of the molecular feature set to load from DepMap.
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
