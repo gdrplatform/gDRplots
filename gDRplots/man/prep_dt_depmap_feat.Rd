@@ -4,13 +4,20 @@
 \alias{prep_dt_depmap_feat}
 \title{Load DepMap merged data for one selected feature}
 \usage{
-prep_dt_depmap_feat(feature_set = "CRISPRGeneEffect", prefix = "KO_")
+prep_dt_depmap_feat(
+  feat_data_path,
+  meta_data_path,
+  feature_file = "CRISPRGeneEffect.csv"
+)
 }
 \arguments{
-\item{feature_set}{string name of the molecular feature set to load from DepMap.}
+\item{feat_data_path}{string path to the dfolder with file the molecular feature set to load from DepMap.}
 
-\item{prefix}{string prefixes to use for the each feature set in \code{feature_set};
-has to be the same length as \code{feature_sets}}
+\item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
+which are referenced by a dataset contained within the DepMap portal. 
+It is usually a file named \code{Model.csv}.}
+
+\item{feature_file}{string file name of the molecular feature set to load from DepMap.}
 }
 \value{
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
@@ -24,9 +31,11 @@ Load DepMap merged data for one selected feature
 }
 \examples{
 \dontrun{
-dt_depmap_feat <- prep_dt_depmap_feat() 
+feat_data_path <- file.path(".", "depmapdata")
+meta_data_path <- file.path(".", "Model.csv")
+dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
+                                      meta_data_path = meta_data_path)
 }
-
 }
 \seealso{
 \code{kaleidoscope::load_depmap_merged}
