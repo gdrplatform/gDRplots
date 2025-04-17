@@ -786,7 +786,7 @@ plot_boxplot_meta <- function(dt_response,
 #' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
 #'  the name of the selected metadata from \code{dt_depmap} - respectively
 #'
-#' @return \code{ggplot} object containing a panel with volcano plot and  depending on data type:
+#' @return \code{ggplot} object containing a panel with volcano plot and depending on data type:
 #'  a scatter plots with correlation for top 4 variables or boxplots for variable levels
 #' 
 #' @keywords prism_plots
@@ -924,6 +924,15 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' 
 #' @return a vector with name of the n-top linear associations; 
 #'     when \code{n_top} will be higher than number of available features - only available will be returned.
+#' 
+#' @examples
+#' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
+#'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
+#' X <- matrix(
+#'   withr::with_seed(42, sample(c(NA, seq(0.35, 23.5, 1.25)), 50*20, replace = TRUE)), nrow = 50,
+#'   dimnames = list(sprintf("row_%s", 1:50), sprintf("feat_%s", 1:20)))
+#' tab_assoc <- calc_assoc(X, Y)
+#' .get_n_top_asssoc(tab_assoc)
 #' 
 #' @keywords prism_plots
 .get_n_top_asssoc <- function(dt_assoc,
