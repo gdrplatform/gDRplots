@@ -211,7 +211,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
 #'
-#' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features#' 
+#' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features 
 #' @keywords prism_plots
 #' 
 #' @export
