@@ -355,7 +355,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feature_file string file name of the molecular feature set to load from DepMap.
+#' @param feature_set string file name of the molecular feature set to load from DepMap.
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
@@ -377,11 +377,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @export
 prep_dt_depmap_feat <-  function(feat_data_path,
                                  meta_data_path,
-                                 feature_file = "CRISPRGeneEffect.csv") {
+                                 feature_set = "CRISPRGeneEffect.csv") {
   
   checkmate::assert_string(feat_data_path)
-  checkmate::assert_string(feature_file, pattern = ".*.csv$")
-  feat_path <- file.path(feat_data_path, feature_file)
+  checkmate::assert_string(feature_set, pattern = ".*.csv$")
+  feat_path <- file.path(feat_data_path, feature_set)
   checkmate::assert_file_exists(feat_path)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
@@ -393,7 +393,7 @@ prep_dt_depmap_feat <-  function(feat_data_path,
   supported_feature_condition <- grepl("ACH-[0-9]{6}", dt_feat_2row[1, 1])
   dt_feat_2row <- NULL
   
-  feat_name <- sub(".csv", "", feature_file)
+  feat_name <- sub(".csv", "", feature_set)
   # prep dt_depmap
   if (supported_feature_condition) { 
     dt_feat_raw <- data.table::fread(feat_path)
