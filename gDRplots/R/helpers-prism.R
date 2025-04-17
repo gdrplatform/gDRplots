@@ -370,7 +370,6 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @examples
 #' \dontrun{
 #' feat_data_path <- file.path(".", "depmapdata")
-#' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
 #'                                       meta_data_path = meta_data_path)
 #' }
@@ -403,8 +402,8 @@ prep_dt_depmap_feat <-  function(feat_data_path,
                            old = names(dt_feat_raw)[1], new = "ModelID")
     }
     # dict
-    dict_id <- prep_dt_depmap_meta_new(meta_data_path = meta_data_path,
-                                       meta_col = "ModelID") 
+    dict_id <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
+                                   meta_col = "ModelID") 
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
   } else {
     message(sprintf("The `%s` feature is not supported.", feat_name))
