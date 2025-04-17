@@ -351,9 +351,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 
 #' Load DepMap merged data for one selected feature
 #'
-#' @param feature_set string name of the molecular feature set to load from DepMap.
-#' @param prefix string prefixes to use for the each feature set in \code{feature_set};
-#'    has to be the same length as \code{feature_sets}
+#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
+#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal. 
+#'  It is usually a file named \code{Model.csv}.
+#' @param feature_file string file name of the molecular feature set to load from DepMap.
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
@@ -367,30 +369,52 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #'
 #' @examples
 #' \dontrun{
-#' dt_depmap_feat <- prep_dt_depmap_feat() 
+#' feat_data_path <- file.path(".", "depmapdata")
+#' meta_data_path <- file.path(".", "Model.csv")
+#' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
+#'                                       meta_data_path = meta_data_path)
 #' }
-#' 
 #' @export
-prep_dt_depmap_feat <- function(
-    feature_set = "CRISPRGeneEffect",
-    prefix = "KO_") {
+prep_dt_depmap_feat <-  function(feat_data_path,
+                                 meta_data_path,
+                                 feature_file = "CRISPRGeneEffect.csv") {
   
-  checkmate::assert_string(feature_set)
-  checkmate::assert_string(prefix)
+  checkmate::assert_string(feat_data_path)
+  checkmate::assert_string(feature_file, pattern = ".*.csv$")
+  feat_path <- file.path(feat_data_path, feature_file)
+  checkmate::assert_file_exists(feat_path)
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
+  checkmate::assert_file_exists(meta_data_path)
   
-  stopifnot("`prefix` has to be the same length as `feature_sets`" = NROW(feature_set) == NROW(prefix))
+  # check whether feature is supported
+  dt_feat_2row <- data.table::fread(feat_path, nrows = 2, select = 1)
+  # assumption: first column is a key; supported is ModelId with pattern "ACH-[0-9]{6}"
+  supported_feature_condition <- grepl("ACH-[0-9]{6}", dt_feat_2row[1, 1])
+  dt_feat_2row <- NULL
   
-  # TODO in GDR-2710 # nolint start
-  # dt_depmap <- kaleidoscope::load_depmap_merged(
-  #   feature_sets = feature_set,
-  #   prefix = prefix,
-  #   metadata_columns = "CCLEName")
-  # 
-  # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap <- dt_depmap[CCLEName != ""]
-  # 
-  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = feature_set)) # nolint end
+  feat_name <- sub(".csv", "", feature_file)
+  # prep dt_depmap
+  if (supported_feature_condition) { 
+    dt_feat_raw <- data.table::fread(feat_path)
+    # make proper naming
+    if (names(dt_feat_raw)[1] != "ModelID") {
+      data.table::setnames(dt_feat_raw, 
+                           old = names(dt_feat_raw)[1], new = "ModelID")
+    }
+    # dict
+    dict_id <- prep_dt_depmap_meta_new(meta_data_path = meta_data_path,
+                                       meta_col = "ModelID") 
+    dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
+  } else {
+    message(sprintf("The `%s` feature is not supported.", feat_name))
+    dt_depmap <- NULL
+  }
+  
+  return(list(dt_depmap = dt_depmap, 
+              selected_feat_meta_col = feat_name))
 }
+
 
 #' Load DepMap merged data for one selected metadata
 #'
@@ -450,9 +474,9 @@ prep_dt_depmap_meta <- function(meta_data_path,
   }
   data.table::setkey(dt_depmap, NULL)
   
-  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
+  return(list(dt_depmap = dt_depmap, 
+              selected_feat_meta_col = metadata_col))
 }
-
 
 
 #' Prep table with calculated linear associations

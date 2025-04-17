@@ -1,3 +1,6 @@
+## gDRplots 0.0.77 - 2025-04-17
+* update `prep_dt_depmap_feat`
+
 ## gDRplots 0.0.76 - 2025-04-07
 * update `prep_dt_depmap_meta`
 
