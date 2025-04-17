@@ -17,8 +17,8 @@
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
 #' @param feature_sets character vector names of the molecular feature set to load from DepMap.
-#' @param prefixes character vector prefixes to use for the each feature set in \code{feature_sets};
-#'    has to be the same length as \code{feature_sets}
+#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
+#' @param feature_set string file name of the molecular feature set to load from DepMap.
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -32,8 +32,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       metric = c("xc50", "x_mean", "x_max"),
                                       fit_source = "gDR",
                                       meta_data_path,
+                                      feat_data_path,
                                       feature_sets,
-                                      prefixes,
                                       metadata_columns = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -59,8 +59,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     rm(meta_data)
   }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  checkmate::assert_character(prefixes, null.ok = TRUE)
-  stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
+  # TODO add alidation
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -77,8 +76,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   if (!is.null(feature_sets)) {
     # 1st level
     for (feat in feature_sets) {
-      obj_depmap <- prep_dt_depmap_feat(feature_set = feat,
-                                        prefix = prefixes[which(feat == feature_sets)])
+      obj_depmap <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
+                                        meta_data_path = meta_data_path,
+                                        feature_set = feat)
       # 2nd level
       for (d_name in drug_name_vec) {
         # 3rd level
@@ -195,9 +195,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feature_sets character vector names of the molecular feature set to load from DepMap.
-#' @param prefixes character vector prefixes to use for the each feature set in \code{feature_sets};
-#'    has to be the same length as \code{feature_sets}
+#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
+#' @param feature_set string file name of the molecular feature set to load from DepMap.
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -213,8 +212,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          metric_scores = c("hsa_score", "bliss_score"),
                                          fit_source = "gDR",
                                          meta_data_path,
+                                         feat_data_path,
                                          feature_sets,
-                                         prefixes,
                                          metadata_columns = NULL) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -245,8 +244,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
     rm(meta_data)
   }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  checkmate::assert_character(prefixes, null.ok = TRUE)
-  stopifnot("`prefixes` has to be the same length as `feature_sets`" = NROW(feature_sets) == NROW(prefixes))
+  # TODO add validationa
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -266,8 +264,9 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   if (!is.null(feature_sets)) {
     # 1st level
     for (feat in feature_sets) {
-      obj_depmap <- prep_dt_depmap_feat(feature_set = feat,
-                                        prefix = prefixes[which(feat == feature_sets)])
+      obj_depmap <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
+                                        meta_data_path = meta_data_path,
+                                        feature_set = feat)
       # 2nd level
       for (d_combo in drug_name_grid$DrugCombination) {
         d_name <- drug_name_grid[DrugCombination == d_combo, ][[drug_name]]
