@@ -51,9 +51,9 @@ It is usually a file named \code{Model.csv}.}
 
 \item{feat_data_path}{string path to the dfolder with file the molecular feature set to load from DepMap.}
 
-\item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
+\item{feature_sets}{character vector file name of the molecular feature set to load from DepMap.}
 
-\item{feature_set}{string file name of the molecular feature set to load from DepMap.}
+\item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 }
 \value{
 nested list of plots
