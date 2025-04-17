@@ -1,5 +1,3 @@
-cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-
 # gDR data ----
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
