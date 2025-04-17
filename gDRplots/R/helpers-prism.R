@@ -370,6 +370,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @examples
 #' \dontrun{
 #' feat_data_path <- file.path(".", "depmapdata")
+#' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
 #'                                       meta_data_path = meta_data_path)
 #' }
