@@ -3,7 +3,7 @@ context("Test plot-prism")
 test_that("plot_volcano_assoc works as expected", {
   plt_1 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
                               selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
-                              selected_metric = obj_assoc_sa[["selected_metric"]])
+                              selected_metric = obj_assoc_sa[["selected_metric"]]) # default
   
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 2)
@@ -11,6 +11,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_equal(plt_1[["labels"]][["title"]], "RV_gDR_xc50__XZ_fatures") # <metric>__<feat>
   
+  # scenario: check number of label to be shown
   no_lbl <- 3
   q_alpha <- 0.25
   plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
@@ -36,6 +37,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_3[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_equal(plt_3[["labels"]][["title"]], "hsa_score__meta_xx") # <metric>__<meta>
   
+  # scenario: check high alpha
   q_alpha_2 <- 0.71
   plt_4 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
                               selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
@@ -48,7 +50,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(sort(plt_4_data$label[which(unlist(plt_4_data$colour) == "black")]),
                sort(obj_assoc_combo[["dt_assoc"]][q_value <= q_alpha_2, ]$feature))
   
-  # NAs in depmap
+  # scenario: NAs in depmap
   dt_assoc_na <- data.table::copy(obj_assoc_sa[["dt_assoc"]])
   plt_5 <- plot_volcano_assoc(dt_assoc = dt_assoc_na[0, ],
                               selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
@@ -69,7 +71,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_6[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_true(grepl(": all NAs", plt_6[["labels"]][["title"]]))
   
-  # check max_N
+  # scenario: check max_N
   dt_assoc_big <- data.table::data.table(
     feature = sprintf("XZ_A%02dTT", 1:50),
     response = rep("RV_gDR_xc50", 50),
@@ -78,15 +80,54 @@ test_that("plot_volcano_assoc works as expected", {
   )
   max_non_stat_sig <- 20
   plt_7 <- plot_volcano_assoc(dt_assoc = dt_assoc_big,
-                              selected_metric = obj_assoc_sa[["selected_metric"]],
-                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
-                              condition_info = obj_assoc_sa[["condition_info"]],
+                              selected_metric = "RV_gDR_xc50",
+                              selected_feat_meta_col = "XZ_fatures",
+                              condition_info = NULL,
                               max_N = max_non_stat_sig)
   expect_is(plt_7, "gg")
   expect_length(plt_7[["layers"]], 2)
   expect_equal(sum(ggplot2::ggplot_build(plt_7)$data[[1]][["label"]] != ""), 10) # default named_p_top
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)$data[[1]]),
                NROW(dt_assoc_big[q_value < 0.05]) + max_non_stat_sig) # default alpha
+  
+  # scenario: dt_assoc has more than 1 values in `response` and `selected_metric` is not one of them
+  dt_assoc_mix <- data.table::data.table(
+    feature = sprintf("XZ_A%02dTT", 1:50),
+    response = rep(c("RV_gDR_hsa_score", "RV_gDR_bliss_score"), length.out = 50),
+    rho = withr::with_seed(42, rnorm(n = 50, mean = 0, sd = 0.035)),
+    q_value = withr::with_seed(42, rnorm(n = 50, mean = 0.15, sd = 0.05))
+  )
+  expect_warning({
+    plt_8 <- plot_volcano_assoc(dt_assoc = dt_assoc_mix,
+                                selected_metric = "RV_gDR_xc50",
+                                selected_feat_meta_col = "XZ_fatures",
+                                condition_info = NULL)
+  }, "Association data is not consistent - there is more than one value in the `response` column.")
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 2)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_8)$data[[1]]), NROW(dt_assoc_mix))
+  
+  # scenario: dt_assoc has more than 1 values in `response` and `selected_metric` is one of them
+  sel_met <- "RV_gDR_hsa_score"
+  expect_warning({
+    plt_9 <- plot_volcano_assoc(dt_assoc = dt_assoc_mix,
+                                selected_metric = sel_met,
+                                selected_feat_meta_col = "XZ_fatures",
+                                condition_info = NULL)
+  }, "Association data was filtered based on `selected_metric`")
+  expect_is(plt_9, "gg")
+  expect_length(plt_9[["layers"]], 2)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_9)$data[[1]]), NROW(dt_assoc_mix[response == sel_met, ]))
+  
+  # scenario: dt_assoc does not have column `response`
+  plt_10 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]][, -c("response")],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]]) # default
+  expect_is(plt_10, "gg")
+  expect_equal(NROW(plt_10[["layers"]]), NROW(plt_1[["layers"]]))
+  expect_equal(plt_10[["labels"]][["x"]], plt_1[["labels"]][["x"]]) # predef for x axis
+  expect_equal(plt_10[["labels"]][["y"]], plt_1[["labels"]][["y"]]) # predef for y axis
+  expect_equal(plt_10[["labels"]][["title"]], plt_1[["labels"]][["title"]]) # <metric>__<feat>
   
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
