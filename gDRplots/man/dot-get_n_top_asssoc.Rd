@@ -20,4 +20,14 @@ a vector with name of the n-top linear associations;
 Currently, n-top linear associations are selected based on values of \code{q_value} 
 (column sorted increasing) and values of \code{rho} (column sorted decreasing)
 }
+\examples{
+Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
+            dimnames = list(sprintf("row_\%s", 1:50), "met_1"))
+X <- matrix(
+  withr::with_seed(42, sample(c(NA, seq(0.35, 23.5, 1.25)), 50*20, replace = TRUE)), nrow = 50,
+  dimnames = list(sprintf("row_\%s", 1:50), sprintf("feat_\%s", 1:20)))
+tab_assoc <- calc_assoc(X, Y)
+.get_n_top_asssoc(tab_assoc)
+
+}
 \keyword{prism_plots}
