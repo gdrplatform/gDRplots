@@ -36,6 +36,15 @@ plot_volcano_assoc <- function(dt_assoc,
   y_lbl <- "neglog_q_value"
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
+  # checking consistency of data
+  if ("response" %in% names(dt_assoc) && NROW(unique(dt_assoc$response)) > 1) {
+    warning("Association data is not consistent - there is more than one value in the `response` column.")
+    if (selected_metric %in% dt_assoc$response) {
+     warning("Association data was filtered based on `selected_metric`.")
+      response <- NULL
+      dt_assoc <- dt_assoc[response == selected_metric, ]
+    }
+  }
   
   plt_title <- sprintf("%s__%s", selected_metric, selected_feat_meta_col)
   
