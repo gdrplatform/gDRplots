@@ -14,8 +14,8 @@ create_PRISM_plot_list_combo(
   metric_scores = c("hsa_score", "bliss_score"),
   fit_source = "gDR",
   meta_data_path,
+  feat_data_path,
   feature_sets,
-  prefixes,
   metadata_columns = NULL
 )
 }
@@ -49,12 +49,11 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 which are referenced by a dataset contained within the DepMap portal. 
 It is usually a file named \code{Model.csv}.}
 
-\item{feature_sets}{character vector names of the molecular feature set to load from DepMap.}
-
-\item{prefixes}{character vector prefixes to use for the each feature set in \code{feature_sets};
-has to be the same length as \code{feature_sets}}
+\item{feat_data_path}{string path to the dfolder with file the molecular feature set to load from DepMap.}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
+
+\item{feature_set}{string file name of the molecular feature set to load from DepMap.}
 }
 \value{
 nested list of plots
