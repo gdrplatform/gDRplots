@@ -1,8 +1,6 @@
 context("Test common utils")
 
 test_that("compute_distances works as expected", {
-  set.seed(1234)
-  
   # matrix without row names
   y <- matrix(LETTERS[1:9], nrow = 3, ncol = 3, dimnames = list(letters[1:3]))
   expect_error(compute_distances(y),
@@ -35,12 +33,12 @@ test_that("compute_distances works as expected", {
   expect_equal(as.numeric(compute_distances(xx, method = "manhattan")), c(3, 6, 3)) 
   
   # single row with no variance
-  a <- t(matrix(c(rep(1, 3), sample(seq_len(100), 15)), nrow = 3, ncol = 6))
+  a <- t(matrix(c(rep(1, 3), withr::with_seed(1234, sample(seq_len(100), 15))), nrow = 3, ncol = 6))
   rownames(a) <- letters[seq_len(nrow(a))]
   expect_equal(sort(unique(as.numeric(compute_distances(a)))), seq(0, 2, 0.5))
   
   # single row with variance
-  b <- t(matrix(c(rep(1, 15), sample(seq_len(100), 3)), nrow = 3, ncol = 6))
+  b <- t(matrix(c(rep(1, 15), withr::with_seed(1234, sample(seq_len(100), 3))), nrow = 3, ncol = 6))
   rownames(b) <- letters[seq_len(nrow(b))]
   expect_equal(as.numeric(compute_distances(b)), rep(1, 15))
   
@@ -50,15 +48,14 @@ test_that("compute_distances works as expected", {
   expect_equal(as.numeric(compute_distances(y)), 1)
   
   # all rows with variance
-  z <- matrix(sample(seq_len(100), 9), nrow = 3, ncol = 3)
+  z <- matrix(withr::with_seed(1234, sample(seq_len(100), 9)), nrow = 3, ncol = 3)
   rownames(z) <- letters[seq_len(nrow(z))]
-  expect_equal(as.numeric(compute_distances(z)), c(1.5, 1.5, 0))
+  expect_equal(as.numeric(compute_distances(z)), c(0.5, 1.5, 2.0))
   
   # all rows with no variance
   y <- matrix(1, nrow = 3, ncol = 3)
   rownames(y) <- letters[seq_len(nrow(y))]
   expect_equal(as.numeric(compute_distances(y)), rep(1, 3))
-  
 })
 
 test_that("create_log_seq works as expected", {

@@ -1,7 +1,7 @@
 #' Volcano plot with association
 #'
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
-#'     outputted by \code{kaleidoscope::calc_assoc}
+#'     outputted by \code{calc_assoc}
 #' @param selected_feat_meta_col string describing the name of the associated feature/metadata from DepMap
 #' @param selected_metric string describing the name of the selected metric used the association calculation
 #' @param condition_info string describing experiment condition 
@@ -13,6 +13,20 @@
 #'     significant points to plot; for default \code{NULL} all points will be plotted.
 #'
 #' @return \code{ggplot} object containing a volcano plot with association
+#' 
+#' @examples
+#' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
+#'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
+#' X <- matrix(
+#'   withr::with_seed(42, sample(c(NA, seq(0.35, 23.5, 1.25)), 
+#'                               size = 50*20, replace = TRUE)), 
+#'   nrow = 50,
+#'   dimnames = list(sprintf("row_%s", 1:50), sprintf("feat_%s", 1:20)))
+#' tab_assoc <- calc_assoc(X, Y)
+#' plot_volcano_assoc(tab_assoc,
+#'                    selected_feat_meta_col = "feat_XY",
+#'                    selected_metric = "met_RV")
+#'                    
 #' @keywords prism_plots
 #' 
 #' @export
@@ -36,6 +50,15 @@ plot_volcano_assoc <- function(dt_assoc,
   y_lbl <- "neglog_q_value"
   
   checkmate::assert_names(names(dt_assoc), must.include = c(x_lbl, "q_value", "feature"))
+  # checking consistency of data
+  if ("response" %in% names(dt_assoc) && NROW(unique(dt_assoc$response)) > 1) {
+    warning("Association data is not consistent - there is more than one value in the `response` column.")
+    if (selected_metric %in% dt_assoc$response) {
+     warning("Association data was filtered based on `selected_metric`.")
+      response <- NULL
+      dt_assoc <- dt_assoc[response == selected_metric, ]
+    }
+  }
   
   plt_title <- sprintf("%s__%s", selected_metric, selected_feat_meta_col)
   
@@ -188,7 +211,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
 #'
-#' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features
+#' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features 
 #' @keywords prism_plots
 #' 
 #' @export
@@ -765,7 +788,7 @@ plot_boxplot_meta <- function(dt_response,
 #' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
 #'  the name of the selected metadata from \code{dt_depmap} - respectively
 #'
-#' @return \code{ggplot} object containing a panel with volcano plot and  depending on data type:
+#' @return \code{ggplot} object containing a panel with volcano plot and depending on data type:
 #'  a scatter plots with correlation for top 4 variables or boxplots for variable levels
 #' 
 #' @keywords prism_plots
@@ -898,11 +921,24 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' (column sorted increasing) and values of \code{rho} (column sorted decreasing)
 #' 
 #' @param dt_assoc \code{data.table} with the calculated linear association between DepMap and metrics
-#'     outputted by \code{kaleidoscope::calc_assoc}
+#'     outputted by \code{calc_assoc}
 #' @param n_top number of requested top linear associations
 #' 
 #' @return a vector with name of the n-top linear associations; 
 #'     when \code{n_top} will be higher than number of available features - only available will be returned.
+#' 
+#' @examples
+#' \dontrun{
+#' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
+#'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
+#' X <- matrix(
+#'   withr::with_seed(42, sample(c(NA, seq(0.35, 23.5, 1.25)), 
+#'                               size = 50*20, replace = TRUE)), 
+#'   nrow = 50,
+#'   dimnames = list(sprintf("row_%s", 1:50), sprintf("feat_%s", 1:20)))
+#' tab_assoc <- calc_assoc(X, Y)
+#' .get_n_top_asssoc(tab_assoc)
+#' }
 #' 
 #' @keywords prism_plots
 .get_n_top_asssoc <- function(dt_assoc,
