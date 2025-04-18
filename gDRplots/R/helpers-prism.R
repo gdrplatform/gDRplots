@@ -404,7 +404,7 @@ prep_dt_depmap_feat <-  function(feat_data_path,
     }
     # dict
     dict_id <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
-                                   metadata_col = "ModelID") 
+                                   metadata_col = "ModelID")[["dt_depmap"]]
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
   } else {
     message(sprintf("The `%s` feature is not supported.", feat_name))
