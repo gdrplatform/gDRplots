@@ -108,14 +108,15 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
           # 4th level - prep vis
+          feat_name <- sub(".csv", "", feat)
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_sa,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
-                                selected_feat_meta_col = feat)
+                                selected_feat_meta_col = feat_name)
           names(ls_vol) <- ls_selected_met$selected_metric
           
-          ls_plot[[feat]][[d_name]][[norm]] <- ls_vol
+          ls_plot[[feat_name]][[d_name]][[norm]] <- ls_vol
         }
         
       }
@@ -302,14 +303,15 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                                             c(id_col, drug_name, drug_name_2)))
           
           # 4th level - prep vis
+          feat_name <- sub(".csv", "", feat)
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_combo,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
-                                selected_feat_meta_col = feat)
+                                selected_feat_meta_col = feat_name)
           names(ls_vol) <- ls_selected_met$selected_metric
           
-          ls_plot[[feat]][[d_combo]][[norm]] <- ls_vol
+          ls_plot[[feat_name]][[d_combo]][[norm]] <- ls_vol
         }
         
       }
