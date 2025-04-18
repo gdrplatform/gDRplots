@@ -1,146 +1,9 @@
 context("Test plot-prism")
 
-# data ----
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                               assay_name = "Metrics")
-dt_average <- gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                               assay_name = "Averaged")
-dt_metrics_capped <-
-  gDRutils::cap_assay_infinities(conc_assay_dt = dt_average,
-                                 assay_dt = dt_metrics,
-                                 experiment_name = gDRutils::get_supported_experiments("sa"),
-                                 capping_fold = 5)
-
-se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
-dt_metrics_combo <- gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                                     assay_name = "Metrics")
-dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                              assay_name = "scores")
-
-d_name <- "drug_002"
-d_name2 <- "drug_026"
-dt_response_met <- 
-  prep_dt_response_metric_sa(dt_metrics, d_name,
-                             metric = c("xc50", "x_mean", "x_max"))
-dt_response_met_capped <- 
-  prep_dt_response_metric_sa(dt_metrics_capped, d_name,
-                             metric = c("xc50", "x_mean", "x_max"))
-dt_response_dose <- 
-  prep_dt_response_dose_sa(dt_average, d_name)
-
-dt_response_score <- 
-  prep_dt_response_scores(dt_scores, d_name, d_name2, 
-                          metric = c("hsa_score", "bliss_score"))
-dt_response_diff <-
-  prep_dt_response_metric_diff(dt_metrics_combo, d_name, d_name2,
-                               metric = c("xc50", "x_mean", "x_max"))
-
-
-# fake depmap data
-cell_lines <- gDRtestData::create_synthetic_cell_lines()[["CellLineName"]]
-dt_model <- data.table::data.table(
-  ModelID = sprintf("ACH-%06d", seq_along(cell_lines)),
-  CCLEName = cell_lines
-)
-drugs <- gDRtestData::create_synthetic_drugs()[["DrugName"]]
-
-#_feature_sets
-dt_depmap_feat <- data.table::data.table(
-  CCLEName = cell_lines,
-  "XZ_A1QW" = withr::with_seed(42, rnorm(n = NROW(cell_lines), mean = -0.05, sd = 0.11)),
-  "XZ_A2GH" = withr::with_seed(42, rnorm(n = NROW(cell_lines), mean = -0.03, sd = 0.13)),
-  "XZ_A3OP" = withr::with_seed(42, rnorm(n = NROW(cell_lines), mean = 0.045, sd = 0.10)),
-  "XZ_A4RT" = withr::with_seed(42, rnorm(n = NROW(cell_lines), mean = 0.05, sd = 0.10)),
-  "XZ_A5BN" = withr::with_seed(42, rnorm(n = NROW(cell_lines), mean = 0.11, sd = 0.13))
-)
-dt_depmap_feat[CCLEName %in% c("cellline_FD", "cellline_NE"), 
-               setdiff(names(dt_depmap_feat), "CCLEName") := NA]
-dt_depmap_feat <- merge(dt_model, dt_depmap_feat, by = "CCLEName")
-data.table::setkey(dt_depmap_feat, NULL)
-
-obj_depmap_feat <- list(
-  dt_depmap = dt_depmap_feat,
-  selected_feat_meta_col = "XZ_fatures"
-)
-
-dt_depmap_feat_2 <- data.table::data.table(
-  CCLEName = cell_lines,
-  "NU_X1QW" = withr::with_seed(42, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
-  "NU_X2GH" = withr::with_seed(314, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
-  "NU_X3OP" = withr::with_seed(271, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
-  "NU_X4RT" = withr::with_seed(981, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
-  "NU_X5BN" = rep(1, size = NROW(cell_lines))
-)
-dt_depmap_feat_2[CCLEName %in% c("cellline_FD", "cellline_NE"), 
-                 setdiff(names(dt_depmap_feat_2), "CCLEName") := NA]
-dt_depmap_feat_2 <- merge(dt_model, dt_depmap_feat_2, by = "CCLEName")
-data.table::setkey(dt_depmap_feat_2, NULL)
-
-obj_depmap_feat_2 <- list(
-  dt_depmap = dt_depmap_feat_2,
-  selected_feat_meta_col = "NU_fatures"
-)
-
-#_meta
-dt_depmap_meta_lng <- data.table::data.table(
-  CCLEName = cell_lines,
-  meta_xx = withr::with_seed(42, sample(x = sprintf("meta_%s", c("AA", "BB", "CC")), 
-                                        size = NROW(cell_lines), replace = TRUE))
-)
-dt_depmap_meta_lng[CCLEName %in% c("cellline_OO", "cellline_AA"), ][["meta_xx"]] <- NA
-dt_depmap_meta_lng[CCLEName == "cellline_FD", ][["meta_xx"]] <- "meta_DD"
-dt_depmap_meta_lng[CCLEName == "cellline_NE", ][["meta_xx"]] <- "longer_than_other_meta_EE"
-
-dt_depmap_meta <- data.table::dcast(data = dt_depmap_meta_lng, 
-                                    formula = CCLEName ~ meta_xx, 
-                                    fun.aggregate = length)
-data.table::setkey(dt_depmap_meta, NULL)
-dt_depmap_meta[, "NA" := NULL] # as in kaleidoscope
-dt_depmap_meta <- merge(dt_model, dt_depmap_meta, by = "CCLEName")
-
-obj_depmap_meta <- list(
-  dt_depmap = dt_depmap_meta,
-  selected_feat_meta_col = "meta_xx"
-)
-
-#_assoc
-ls_feat <- setdiff(names(obj_depmap_feat[["dt_depmap"]]), c("ModelID", "CCLEName"))
-dist_q <- withr::with_seed(42, rnorm(400, mean = 0.3, sd = 0.05))
-
-dt_assoc_sa <- data.table::data.table(
-  feature = ls_feat,
-  response = rep("RV_gDR_xc50", NROW(ls_feat)),
-  rho = withr::with_seed(42, rnorm(NROW(ls_feat), mean = 0, sd = 0.05)),
-  q_value = withr::with_seed(42, sample(dist_q[dist_q < 0.3], NROW(ls_feat), replace = TRUE))
-)
-
-obj_assoc_sa <- list(dt_assoc = dt_assoc_sa,
-                     condition_info = unique(dt_response_met[["rId"]]),
-                     selected_metric = "RV_gDR_xc50",
-                     selected_feat_meta_col = "XZ_fatures")
-
-ls_meta <- setdiff(names(obj_depmap_meta[["dt_depmap"]]), c("ModelID", "CCLEName"))
-dist_q <- withr::with_seed(42, rnorm(400, mean = 1, sd = 0.1))
-
-dt_assoc_combo <- data.table::data.table(
-  feature = ls_meta,
-  response = rep("hsa_score", NROW(ls_meta)),
-  rho = withr::with_seed(42, rnorm(NROW(ls_meta), mean = 0, sd = 0.05)),
-  q_value = withr::with_seed(42, sample(dist_q[dist_q < 0.75], NROW(ls_meta), replace = TRUE))
-)
-
-obj_assoc_combo <- list(dt_assoc = dt_assoc_combo,
-                        condition_info = unique(dt_response_score[["rId"]]),
-                        selected_metric = "hsa_score",
-                        selected_feat_meta_col = "meta_xx")
-
-# tests ----
 test_that("plot_volcano_assoc works as expected", {
   plt_1 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
                               selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
-                              selected_metric = obj_assoc_sa[["selected_metric"]])
+                              selected_metric = obj_assoc_sa[["selected_metric"]]) # default
   
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 2)
@@ -148,6 +11,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_1[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_equal(plt_1[["labels"]][["title"]], "RV_gDR_xc50__XZ_fatures") # <metric>__<feat>
   
+  # scenario: check number of label to be shown
   no_lbl <- 3
   q_alpha <- 0.25
   plt_2 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]],
@@ -173,6 +37,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_3[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_equal(plt_3[["labels"]][["title"]], "hsa_score__meta_xx") # <metric>__<meta>
   
+  # scenario: check high alpha
   q_alpha_2 <- 0.71
   plt_4 <- plot_volcano_assoc(dt_assoc = obj_assoc_combo[["dt_assoc"]],
                               selected_feat_meta_col = obj_assoc_combo[["selected_feat_meta_col"]],
@@ -185,7 +50,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(sort(plt_4_data$label[which(unlist(plt_4_data$colour) == "black")]),
                sort(obj_assoc_combo[["dt_assoc"]][q_value <= q_alpha_2, ]$feature))
   
-  # NAs in depmap
+  # scenario: NAs in depmap
   dt_assoc_na <- data.table::copy(obj_assoc_sa[["dt_assoc"]])
   plt_5 <- plot_volcano_assoc(dt_assoc = dt_assoc_na[0, ],
                               selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
@@ -206,7 +71,7 @@ test_that("plot_volcano_assoc works as expected", {
   expect_equal(plt_6[["labels"]][["y"]], "neglog_q_value") # predef for y axis
   expect_true(grepl(": all NAs", plt_6[["labels"]][["title"]]))
   
-  # check max_N
+  # scenario: check max_N
   dt_assoc_big <- data.table::data.table(
     feature = sprintf("XZ_A%02dTT", 1:50),
     response = rep("RV_gDR_xc50", 50),
@@ -215,15 +80,54 @@ test_that("plot_volcano_assoc works as expected", {
   )
   max_non_stat_sig <- 20
   plt_7 <- plot_volcano_assoc(dt_assoc = dt_assoc_big,
-                              selected_metric = obj_assoc_sa[["selected_metric"]],
-                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
-                              condition_info = obj_assoc_sa[["condition_info"]],
+                              selected_metric = "RV_gDR_xc50",
+                              selected_feat_meta_col = "XZ_fatures",
+                              condition_info = NULL,
                               max_N = max_non_stat_sig)
   expect_is(plt_7, "gg")
   expect_length(plt_7[["layers"]], 2)
   expect_equal(sum(ggplot2::ggplot_build(plt_7)$data[[1]][["label"]] != ""), 10) # default named_p_top
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)$data[[1]]),
                NROW(dt_assoc_big[q_value < 0.05]) + max_non_stat_sig) # default alpha
+  
+  # scenario: dt_assoc has more than 1 values in `response` and `selected_metric` is not one of them
+  dt_assoc_mix <- data.table::data.table(
+    feature = sprintf("XZ_A%02dTT", 1:50),
+    response = rep(c("RV_gDR_hsa_score", "RV_gDR_bliss_score"), length.out = 50),
+    rho = withr::with_seed(42, rnorm(n = 50, mean = 0, sd = 0.035)),
+    q_value = withr::with_seed(42, rnorm(n = 50, mean = 0.15, sd = 0.05))
+  )
+  expect_warning({
+    plt_8 <- plot_volcano_assoc(dt_assoc = dt_assoc_mix,
+                                selected_metric = "RV_gDR_xc50",
+                                selected_feat_meta_col = "XZ_fatures",
+                                condition_info = NULL)
+  }, "Association data is not consistent - there is more than one value in the `response` column.")
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 2)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_8)$data[[1]]), NROW(dt_assoc_mix))
+  
+  # scenario: dt_assoc has more than 1 values in `response` and `selected_metric` is one of them
+  sel_met <- "RV_gDR_hsa_score"
+  expect_warning({
+    plt_9 <- plot_volcano_assoc(dt_assoc = dt_assoc_mix,
+                                selected_metric = sel_met,
+                                selected_feat_meta_col = "XZ_fatures",
+                                condition_info = NULL)
+  }, "Association data was filtered based on `selected_metric`")
+  expect_is(plt_9, "gg")
+  expect_length(plt_9[["layers"]], 2)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_9)$data[[1]]), NROW(dt_assoc_mix[response == sel_met, ]))
+  
+  # scenario: dt_assoc does not have column `response`
+  plt_10 <- plot_volcano_assoc(dt_assoc = obj_assoc_sa[["dt_assoc"]][, -c("response")],
+                              selected_feat_meta_col = obj_assoc_sa[["selected_feat_meta_col"]],
+                              selected_metric = obj_assoc_sa[["selected_metric"]]) # default
+  expect_is(plt_10, "gg")
+  expect_equal(NROW(plt_10[["layers"]]), NROW(plt_1[["layers"]]))
+  expect_equal(plt_10[["labels"]][["x"]], plt_1[["labels"]][["x"]]) # predef for x axis
+  expect_equal(plt_10[["labels"]][["y"]], plt_1[["labels"]][["y"]]) # predef for y axis
+  expect_equal(plt_10[["labels"]][["title"]], plt_1[["labels"]][["title"]]) # <metric>__<feat>
   
   # testing assertions
   expect_error(plot_volcano_assoc(dt_assoc = obj_assoc_sa,
@@ -559,7 +463,7 @@ test_that("plot_boxplot_num works as expected", {
   res_count_6 <- obj_depmap_feat_2[["dt_depmap"]][CCLEName %in% dt_response$CellLineName]
   res_count_6 <- 
     res_count_6[!is.na(get(selected_feat)), .N, by = selected_feat][, lbl := sprintf("%s (%s)", get(selected_feat), N)]
-
+  
   plt_6_raw <- plot_boxplot_num(dt_response = dt_response,
                                 dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
                                 selected_feat = selected_feat)
@@ -746,6 +650,8 @@ test_that("plot_boxplot_meta works as expected", {
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
+  grp_stat$meta_xx <- 
+    vapply(grp_stat$meta_xx, function(i) ifelse(is.na(i), "NA", i), character(1), USE.NAMES = FALSE)
   common_cellline <- merge(dt_response, 
                            dt_depmap_meta_lng[!is.na(meta_xx)], 
                            by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
@@ -758,25 +664,24 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_0[["labels"]][["title"]], selected_meta)
   expect_length(plt_0[["layers"]], 4)
   expect_length(ggplot2::ggplot_build(plt_0)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
+                NROW(grp_stat[["meta_xx"]]))
   expect_equal(sort(ggplot2::layer_scales(plt_0)$x$range$range),
-               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+               sort(grp_stat[["meta_xx"]]))
   expect_equal(
-    sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y), 
-    sort(dt_response[CellLineName %in% common_cellline & !is.infinite(get(selected_metric))][[selected_metric]]))
+    sort(ggplot2::ggplot_build(plt_0)$data[[3]]$y),
+    sort(dt_response[!is.infinite(get(selected_metric))][[selected_metric]]))
   
   plt_1_inf <- plot_boxplot_meta(dt_response = dt_response,
                                  dt_depmap = dt_depmap_meta, 
                                  selected_feat_meta_col = selected_meta, 
                                  with_inf = TRUE)
   expect_is(plt_1_inf, "gg")
-  
   expect_length(ggplot2::ggplot_build(plt_1_inf)$data[[2]]$xid,
-                NROW(grp_stat[!is.na(meta_xx)]))
+                NROW(grp_stat[["meta_xx"]]))
   expect_equal(sort(ggplot2::layer_scales(plt_1_inf)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
-  expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y), 
-               sort(dt_response[CellLineName %in% common_cellline, ][[selected_metric]]))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y),
+               sort(dt_response[[selected_metric]]))
   
   plt_1_cap <- plot_boxplot_meta(dt_response = dt_response_capped,
                                  dt_depmap = dt_depmap_meta, 
@@ -788,9 +693,9 @@ test_that("plot_boxplot_meta works as expected", {
   expect_length(ggplot2::ggplot_build(plt_1_cap)$data[[2]]$xid,
                 NROW(grp_stat[!is.na(meta_xx)]))
   expect_equal(sort(ggplot2::layer_scales(plt_1_cap)$x$range$range),
-               sort(grp_stat[!is.na(meta_xx)]$meta_xx))
-  expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y), 
-               sort(dt_response_capped[CellLineName %in% common_cellline][[selected_metric]]))
+               sort(grp_stat[["meta_xx"]]))
+  expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y),
+               sort(dt_response_capped[[selected_metric]]))
   
   # scenario: plot without one-item-group
   plt_2 <- plot_boxplot_meta(dt_response = dt_response,
@@ -836,11 +741,12 @@ test_that("plot_boxplot_meta works as expected", {
   meta_name <- setdiff(names(dt_depmap_meta_numeric), c("CCLEName", "ModelID"))
   names(dt_depmap_meta_numeric) <- c("CCLEName", "ModelID", seq_along(meta_name))
   dt_ <- dt_depmap_meta_numeric[CCLEName %in% dt_response[["CellLineName"]], ]
-  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]), 
+  data.table::setkey(dt_, NULL)
+  lbl_ <- vapply(names(dt_[, as.character(seq_along(meta_name)), with = FALSE]),
                  function(nm) !all(dt_[[nm]] == 0), logical(1))
   
   plt_5 <- plot_boxplot_meta(dt_response = dt_response,
-                             dt_depmap = dt_depmap_meta_numeric, 
+                             dt_depmap = dt_depmap_meta_numeric,
                              selected_feat_meta_col = selected_meta)
   expect_is(plt_5, "gg")
   expect_equal(plt_5[["labels"]][["y"]], selected_metric)
@@ -914,11 +820,61 @@ test_that("plot_boxplot_meta works as expected", {
                "Assertion on 'with_inf' failed: Must be of type 'logical flag'")
 }) 
 
-#nolint start
-# test_that("plot_volcano_assoc_panel works as expected", {
-#   # TODO in GDR-2710
-# })
-#nolint end
+
+test_that("plot_volcano_assoc_panel works as expected", {
+  plt_1 <- plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                    dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_x_max",  
+                                    selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_is(plt_1, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_1)[["data"]][[1]]))))
+  
+  plt_2 <- plot_volcano_assoc_panel(dt_response = dt_response_score,
+                                    dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_bliss_score",  
+                                    selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(plt_2, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_2)[["data"]][[1]]))))
+  
+  plt_3 <- plot_volcano_assoc_panel(dt_response = dt_response_diff,
+                                    dt_depmap = obj_depmap_meta[["dt_depmap"]],
+                                    selected_metric = "RV_gDR_x_max_cotrt_diff_0.1_col_fittings",  
+                                    selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
+  expect_is(plt_3, "gg")
+  expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_3)[["data"]][[1]]))))
+  
+  expect_error(plot_volcano_assoc_panel(dt_response = unlist(dt_response_met),
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'dt_response' failed: Must be a data.table")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat,
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = 1,  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'selected_metric' failed: Must be of type 'string'")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = NA),
+               "Assertion on 'selected_feat_meta_col' failed: May not be NA.")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                                        selected_metric = "not_known_met",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'names\\(dt_response\\)' failed: Names must include the elements")
+  expect_error(plot_volcano_assoc_panel(dt_response = dt_response_met,
+                                        dt_depmap = obj_depmap_feat[["dt_depmap"]][, 4:6],
+                                        selected_metric = "RV_gDR_x_max",  
+                                        selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]]),
+               "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
+})
+
 
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(
