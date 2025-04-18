@@ -7,17 +7,18 @@
 prep_dt_depmap_feat(
   feat_data_path,
   meta_data_path,
-  feature_set = "CRISPRGeneEffect.csv"
+  feature_set = "CRISPRGeneEffect"
 )
 }
 \arguments{
-\item{feat_data_path}{string path to the dfolder with file the molecular feature set to load from DepMap.}
+\item{feat_data_path}{string path to the folder with files of the molecular feature set to load from DepMap.}
 
 \item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
 which are referenced by a dataset contained within the DepMap portal. 
 It is usually a file named \code{Model.csv}.}
 
-\item{feature_set}{string file name of the molecular feature set to load from DepMap.}
+\item{feature_set}{string name of the molecular feature set to load from DepMap; at the same time it should be 
+the name of the file with feature data (without the extension, which is assumed as \code{csv})}
 }
 \value{
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
