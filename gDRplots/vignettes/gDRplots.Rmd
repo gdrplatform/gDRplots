@@ -205,6 +205,18 @@ plot_boxplot_metric_sa_by_drugs(dt_metrics_sa_capped,
                                 grouped_flag = TRUE)
 ```
 
+Or user can colored points by opposite primary variable - by `DrugName` or `CellLineName` respectively. 
+
+```{r plot_boxplot_metric_sa_by_CLs_pts, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_CLs(dt_metrics_sa_capped,
+                              colored_pts_flag = TRUE)
+```
+
+```{r plot_boxplot_metric_sa_by_drugs_pts, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_drugs(dt_metrics_sa_capped,
+                                colored_pts_flag = TRUE)
+```
+
 ### Co-dilution Data
 
 The **pheatmap_with_anno_cd** function is dedicated to co-dilution experiments to generate a heatmap.
