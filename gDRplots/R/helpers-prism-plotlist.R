@@ -16,9 +16,9 @@
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feature_sets character vector names of the molecular feature set to load from DepMap.
-#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
-#' @param feature_sets character vector file name of the molecular feature set to load from DepMap.
+#' @param feat_data_path string path to the folder with file the molecular feature set to load from DepMap.
+#' @param feature_sets character vector names of the molecular feature set to load from DepMap; at the same time 
+#'  it should be the names of the files with feature data (without the extension, which is assumed as \code{csv})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -59,7 +59,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     rm(meta_data)
   }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  # TODO add alidation
+  # TODO add validation
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -108,15 +108,14 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
           # 4th level - prep vis
-          feat_name <- sub(".csv", "", feat)
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_sa,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
-                                selected_feat_meta_col = feat_name)
+                                selected_feat_meta_col = feat)
           names(ls_vol) <- ls_selected_met$selected_metric
           
-          ls_plot[[feat_name]][[d_name]][[norm]] <- ls_vol
+          ls_plot[[feat]][[d_name]][[norm]] <- ls_vol
         }
         
       }
@@ -196,8 +195,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
-#' @param feature_sets character vector file name of the molecular feature set to load from DepMap.
+#' @param feat_data_path string path to the folder with file the molecular feature set to load from DepMap.
+#' @param feature_sets character vector names of the molecular feature set to load from DepMap; at the same time 
+#'  it should be the names of the files with feature data (without the extension, which is assumed as \code{csv})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -245,7 +245,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
     rm(meta_data)
   }
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  # TODO add validationa
+  # TODO add validations
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -303,15 +303,14 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                                             c(id_col, drug_name, drug_name_2)))
           
           # 4th level - prep vis
-          feat_name <- sub(".csv", "", feat)
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_combo,
                                 dt_depmap = obj_depmap[["dt_depmap"]],
-                                selected_feat_meta_col = feat_name)
+                                selected_feat_meta_col = feat)
           names(ls_vol) <- ls_selected_met$selected_metric
           
-          ls_plot[[feat_name]][[d_combo]][[norm]] <- ls_vol
+          ls_plot[[feat]][[d_combo]][[norm]] <- ls_vol
         }
         
       }
