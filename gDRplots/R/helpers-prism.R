@@ -5,7 +5,7 @@
 #'  and single-agent \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
@@ -87,10 +87,10 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
-#'    one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
-#'    or "x_std" (standard deviation)
+#'  one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
+#'  or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
@@ -158,10 +158,10 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'  one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+#'  depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
 #' 
 #' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
@@ -227,7 +227,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param d_name2 string representing the drug name to be plotted (identifier \code{DrugName_2}).
 #'  If set to NULL, the function will return a table for all available DrugName_2
 #' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 #'  "x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
@@ -351,11 +351,12 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 
 #' Load DepMap merged data for one selected feature
 #'
-#' @param feat_data_path string path to the dfolder with file the molecular feature set to load from DepMap.
+#' @param feat_data_path string path to the folder with files of the molecular feature set to load from DepMap.
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feature_set string file name of the molecular feature set to load from DepMap.
+#' @param feature_set string name of the molecular feature set to load from DepMap; at the same time it should be 
+#'  the name of the file with feature data (without the extension, which is assumed as \code{csv})
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
@@ -377,11 +378,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @export
 prep_dt_depmap_feat <-  function(feat_data_path,
                                  meta_data_path,
-                                 feature_set = "CRISPRGeneEffect.csv") {
+                                 feature_set = "CRISPRGeneEffect") {
   
   checkmate::assert_string(feat_data_path)
-  checkmate::assert_string(feature_set, pattern = ".*.csv$")
-  feat_path <- file.path(feat_data_path, feature_set)
+  checkmate::assert_string(feature_set)
+  feat_path <- file.path(feat_data_path, paste0(feature_set, ".csv"))
   checkmate::assert_file_exists(feat_path)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
@@ -392,8 +393,7 @@ prep_dt_depmap_feat <-  function(feat_data_path,
   # assumption: first column is a key; supported is ModelId with pattern "ACH-[0-9]{6}"
   supported_feature_condition <- grepl("ACH-[0-9]{6}", dt_feat_2row[1, 1])
   dt_feat_2row <- NULL
-  
-  feat_name <- sub(".csv", "", feature_set)
+
   # prep dt_depmap
   if (supported_feature_condition) { 
     dt_feat_raw <- data.table::fread(feat_path)
@@ -407,12 +407,12 @@ prep_dt_depmap_feat <-  function(feat_data_path,
                                    metadata_col = "ModelID")[["dt_depmap"]]
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
   } else {
-    message(sprintf("The `%s` feature is not supported.", feat_name))
+    message(sprintf("The `%s` feature is not supported.", feature_set))
     dt_depmap <- NULL
   }
   
   return(list(dt_depmap = dt_depmap, 
-              selected_feat_meta_col = feat_name))
+              selected_feat_meta_col = feature_set))
 }
 
 
