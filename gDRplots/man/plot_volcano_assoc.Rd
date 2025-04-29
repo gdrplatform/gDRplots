@@ -16,7 +16,7 @@ plot_volcano_assoc(
 }
 \arguments{
 \item{dt_assoc}{\code{data.table} with the calculated linear association between DepMap and metrics
-outputted by \code{kaleidoscope::calc_assoc}}
+outputted by \code{calc_assoc}}
 
 \item{selected_feat_meta_col}{string describing the name of the associated feature/metadata from DepMap}
 
@@ -38,5 +38,19 @@ significant points to plot; for default \code{NULL} all points will be plotted.}
 }
 \description{
 Volcano plot with association
+}
+\examples{
+Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
+            dimnames = list(sprintf("row_\%s", 1:50), "met_1"))
+X <- matrix(
+  withr::with_seed(42, sample(c(NA, seq(0.35, 23.5, 1.25)), 
+                              size = 50*20, replace = TRUE)), 
+  nrow = 50,
+  dimnames = list(sprintf("row_\%s", 1:50), sprintf("feat_\%s", 1:20)))
+tab_assoc <- calc_assoc(X, Y)
+plot_volcano_assoc(tab_assoc,
+                   selected_feat_meta_col = "feat_XY",
+                   selected_metric = "met_RV")
+                   
 }
 \keyword{prism_plots}

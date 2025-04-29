@@ -1,3 +1,9 @@
+## gDRplots 0.0.77 - 2025-04-15
+* add function to calculate linear associations
+
+## gDRplots 0.0.76 - 2025-04-07
+* update `prep_dt_depmap_meta`
+
 ## gDRplots 0.0.75 - 2025-03-27
 * add link param in `prep_plot_chunk`
 * add download feature in `prep_plot_chunk` and `prep_double_table_chunk`

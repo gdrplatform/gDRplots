@@ -1005,7 +1005,7 @@ pheatmap_with_anno_combo <- function(
                                   metric = metric,
                                   fit_source = fit_source,
                                   experiment_type = gDRutils::get_supported_experiments("combo"))
-
+  
   # edge-case (no valid data in the matrix, usually matrix with NAs only)  
   if (NROW(mat_cvd) == 0) {
     return(ls_output)
@@ -1058,7 +1058,7 @@ pheatmap_with_anno_combo <- function(
   if (!is.null(annotation_row) && !is.null(annotation_colors)) {
     annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
   }
- 
+  
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
@@ -1304,6 +1304,7 @@ prep_pheatmap_matrix <- function(dt_response,
 #'
 #' @return character (for NA -> given string)
 #' @keywords internal
+#' @export 
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
   
@@ -1406,7 +1407,8 @@ fill_ann_color_map <- function(dt_ann,
       map_ann[[ann]] <- map_ann[[ann]][required_lvl]
     }
   }
-  return(map_ann)
+  # final
+  map_ann
 }
 
 
@@ -1458,7 +1460,9 @@ fill_ann_color_map <- function(dt_ann,
   
   if (additional_condition && NROW(mat_to_cluster) >= 2) {
     tryCatch(stats::hclust(distfun(mat_to_cluster)),
-             error = function(e) return(FALSE)) # if any problem with distfun -> no clustering
+             error = function(e) { 
+               FALSE 
+             }) # if any problem with distfun -> no clustering
   } else {
     FALSE
   }

@@ -440,49 +440,66 @@ prep_dt_depmap_feat <- function(
 
 #' Load DepMap merged data for one selected metadata
 #'
+#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal. 
+#'  It is usually a file named \code{Model.csv}.
 #' @param metadata_col string with the metadata columns to load for DepMap cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
-#'   \item \code{selected_feat_meta_col} string name of metadata column..
+#'   \item \code{selected_feat_meta_col} string name of metadata column.
 #' }
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{kaleidoscope::load_depmap_merged}
-#'
 #' @examples
 #' \dontrun{
-#' dt_depmap_meta <- prep_dt_depmap_meta() 
+#' meta_data_path <- file.path(".", "Model.csv")
+#' dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path) 
 #' }
 #' @export
-prep_dt_depmap_meta <- function(metadata_col = "OncotreeLineage") {
+prep_dt_depmap_meta <- function(meta_data_path,
+                                metadata_col = "PatientRace") {
   
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
+  checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_string(metadata_col)
+  dt_depmap_model <- data.table::fread(meta_data_path)
   
-  # TODO in GDR-2710 # nolint start
-  # ls_depmap <- kaleidoscope::load_depmap_list(
-  #   feature_sets = "OmicsCNGene",
-  #   prefix = "CN_",
-  #   metadata_columns = unique(c(metadata_col, "CCLEName")))
-  # ls_depmap <- ls_depmap[unique(c(metadata_col, "CCLEName"))]
-  # 
-  # # temporary fix
-  # if (any(grepl("V1", colnames(ls_depmap[[metadata_col]])))) {
-  #   colnames(ls_depmap[[metadata_col]]) <- metadata_col
-  # }
-  # 
-  # dt_depmap <- data.table::data.table(
-  #   merge(ls_depmap[["CCLEName"]], ls_depmap[[metadata_col]], by = "row.names", all = "TRUE")
-  # )
-  # data.table::setnames(dt_depmap, c("V1", "Row.names"), c("CCLEName", "ModelID"))
-  # 
-  # data.table::setkey(dt_depmap, NULL)
-  # dt_depmap <- stats::na.omit(dt_depmap)
-  # 
-  # return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col)) # nolint end
+  id_col <- c("ModelID", "CCLEName")
+  checkmate::assert_subset(c(id_col, metadata_col), choices = names(dt_depmap_model))
+  
+  # subset
+  dt_depmap_model <- dt_depmap_model[, .SD, .SDcols = unique(c(id_col, metadata_col))]
+  
+  if (metadata_col %in% id_col) {
+    dt_depmap <- dt_depmap_model
+  } else {
+    # prep meta column
+    if (is.numeric(dt_depmap_model[[metadata_col]]) || 
+        is.logical(dt_depmap_model[[metadata_col]]) || 
+        is.factor(dt_depmap_model[[metadata_col]])) {
+      dt_depmap_model[[metadata_col]] <- as.character(dt_depmap_model[[metadata_col]])
+    }
+    # character: consistent data (NA -> "NA" & "" -> "NA")
+    dt_depmap_model[, (metadata_col) := lapply(.SD, change_NA_into_char), .SDcols = metadata_col]
+    dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
+    # final
+    fm_string <- paste(paste(id_col, collapse =  " + "), "~", metadata_col)
+    dt_depmap <- data.table::dcast(
+      dt_depmap_model,
+      formula = stats::as.formula(fm_string),
+      fun.aggregate = length
+    )
+  }
+  data.table::setkey(dt_depmap, NULL)
+  
+  return(list(dt_depmap = dt_depmap, selected_feat_meta_col = metadata_col))
 }
+
+
 
 #' Prep table with calculated linear associations
 #'
@@ -576,10 +593,9 @@ prep_dt_assoc <- function(dt_response,
     
     if (Y_condition && X_condition && XY_condition) {
       # create dt_assoc
-      # TODO in GDR-2710
-      # dt_assoc <- kaleidoscope::calc_assoc(X, Y)  # nolint start
-      # # final
-      # obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE] # nolint end
+      dt_assoc <- calc_assoc(X, Y)
+      # final
+      obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
     }
   }
   # return

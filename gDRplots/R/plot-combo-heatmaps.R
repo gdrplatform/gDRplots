@@ -685,7 +685,8 @@ heatmap_combo_metrics_panel <- function(
       top = main_title) +
       ggpubr::bgcolor("white") + ggpubr::border("white")
   }
-  return(final_plot)
+  # final
+  final_plot
 }
 
 #' Plot line plot of combination index
@@ -1525,8 +1526,8 @@ transform_log_conc <- function(conc_vec) {
   zero_replacement <- doses[1] + (doses[1] - doses[2]) 
   if (is.na(zero_replacement)) zero_replacement <- doses[1] - 0.5 # only two unique conc and one is 0
   log_values[idx_inf] <- zero_replacement
-  
-  return(log_values)
+  # final
+  log_values
 }
 
 #' Calculate the size of tiles based on pos_x/pos_y values
