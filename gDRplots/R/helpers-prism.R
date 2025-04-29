@@ -226,6 +226,10 @@ prep_dt_response_scores <- function(dt_scores,
 #'  If set to NULL, the function will return a table for all available DrugName
 #' @param d_name2 string representing the drug name to be plotted (identifier \code{DrugName_2}).
 #'  If set to NULL, the function will return a table for all available DrugName_2
+#' @param resistant_cl string representing the resistant cell line name.
+#'  If set to NULL, the function will return a table for all available cell lines.
+#' @param sensitive_cl string representing the sensitive cell line name.
+#'  If set to NULL, the function will return a table for all available cell lines.
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
@@ -245,15 +249,19 @@ prep_dt_response_scores <- function(dt_scores,
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' d_name2 <- "drug_026"
-#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2)
+#' resistant_cl <- "resistant_cell_line"
+#' sensitive_cl <- "sensitive_cell_line"
+#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl)
 #' dt_response <- 
-#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl,
 #'                                metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
-                                         d_name,
-                                         d_name2,
+                                         d_name = NULL,
+                                         d_name2 = NULL,
+                                         resistant_cl = NULL,
+                                         sensitive_cl = NULL,
                                          normalization_type = "RV",
                                          metric = "xc50",
                                          fit_source = "gDR",
@@ -270,7 +278,6 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_choice(additional_cols, choices = names(dt_metrics), null.ok = TRUE)
   
-  
   if (!is.null(d_name)) {
     checkmate::assert_string(d_name)
     checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
@@ -279,6 +286,16 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   if (!is.null(d_name2)) {
     checkmate::assert_string(d_name2)
     checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+  }
+  
+  if (!is.null(resistant_cl)) {
+    checkmate::assert_string(resistant_cl)
+    checkmate::assert_choice(resistant_cl, choices = dt_metrics[[cellline_name]])
+  }
+  
+  if (!is.null(sensitive_cl)) {
+    checkmate::assert_string(sensitive_cl)
+    checkmate::assert_choice(sensitive_cl, choices = dt_metrics[[cellline_name]])
   }
   
   # select data for normalization type
@@ -295,12 +312,40 @@ prep_dt_response_metric_diff <- function(dt_metrics,
     dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
   }
   
+  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
+  
+  # select required cell lines if specified
+  if (!is.null(resistant_cl) && !is.null(sensitive_cl)) {
+    dt_cellline_1 <- dt_response_metric[get(cellline_name) == resistant_cl]
+    dt_cellline_2 <- dt_response_metric[get(cellline_name) == sensitive_cl]
+    
+    # Calculate difference between cell lines
+    dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2, by = intersect(names(dt_response_metric), 
+                                                                           c("source", "cotrt_value", "ratio",
+                                                                             "DrugName", "drug_moa", "Gnumber",
+                                                                             "DrugName_2", "drug_moa_2", "Gnumber_2")),
+                              suffixes = c("_c1", "_c2"))
+    for (m in metric) {
+      dt_cellline_diff[, paste0(m, "_cellline_diff") := {
+        c1_value <- get(paste0(m, "_c1"))
+        c2_value <- get(paste0(m, "_c2"))
+        
+        if (is.numeric(c1_value) && is.numeric(c2_value)) {
+          c1_value - c2_value
+        } else {
+          NA
+        }
+      }]
+    }
+    return(dt_cellline_diff[dt_cellline_diff$cotrt_value != 0, ])
+  }
+  
   # for xc50 - metric should be in log10 scale
   if (any(metric == "xc50")) {
     dt_response_metric[["xc50"]] <- purrr::quietly(log10)(dt_response_metric[["xc50"]])$result
   }
+  
   # create entries of non-zero co-trt
-  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
@@ -346,6 +391,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
                          old = names(dt_combo_diff)[xc50_col],
                          new = new_xc50_names)
   }
+  
   dt_combo_diff
 }
 

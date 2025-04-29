@@ -4,26 +4,36 @@
 \alias{analyze_cgs}
 \title{Analyze Chemical Genomics (CGS) Data and Perform GSEA}
 \usage{
-analyze_cgs(dt_metrics, metrics, cl_name = NULL, normalization_type = "RV")
+analyze_cgs(
+  dt_metrics,
+  metrics,
+  cl_name = NULL,
+  resistant_cl = NULL,
+  sensitive_cl = NULL,
+  normalization_type = "RV"
+)
 }
 \arguments{
 \item{dt_metrics}{A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`,
-and columns specified in the `metric` argument.}
+and columns specified in the `metrics` argument.}
 
 \item{metrics}{A character vector specifying the response metrics to analyze:
 "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".}
 
 \item{cl_name}{An optional string specifying a single cell line to analyze. If NULL (default),
-all cell lines in the data are analyzed.}
+all cell lines in the data are analyzed. Should be NULL if `resistant_cl` and `sensitive_cl` are provided.}
 
-\item{normalization_type}{string with normalization_types to be selected
-                          one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+\item{resistant_cl}{An optional string representing the resistant cell line name. Should be specified alongside `sensitive_cl`.}
+
+\item{sensitive_cl}{An optional string representing the sensitive cell line name. Should be specified alongside `resistant_cl`.}
+
+\item{normalization_type}{A string with normalization types to be selected, one of: "GR" ("GRvalue") or "RV" ("RelativeViability").
 Passed to `gDRplots::prep_dt_response_metric_diff`.}
 }
 \value{
-A list of results, where each element corresponds to a cell line. Each cell line's results contain:
-#' \itemize{
-  \item \code{fgsea}: A list of GSEA results for each metric,
+A list of results, where each element corresponds to a cell line or cell line difference. Each result contains:
+\itemize{
+  \item \code{fgsea}: GSEA results for the specified metrics,
   \item \code{metrics_diff}: The prepped data.table used for the GSEA analysis,
   \item \code{moa_list}: A list of DrugNames grouped by drug_moa.
 }
@@ -34,6 +44,6 @@ prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for
 }
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
+analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 }
 \keyword{cgs_plots}

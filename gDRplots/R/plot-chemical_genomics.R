@@ -4,18 +4,19 @@
 #' prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for specified cell lines and metrics.
 #'
 #' @param dt_metrics A data.table containing screening data. Requires columns: `drug_moa`, `DrugName`, `CellLineName`,
-#' and columns specified in the `metric` argument.
+#' and columns specified in the `metrics` argument.
 #' @param metrics A character vector specifying the response metrics to analyze:
 #' "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".
 #' @param cl_name An optional string specifying a single cell line to analyze. If NULL (default),
-#' all cell lines in the data are analyzed.
-#' @param normalization_type string with normalization_types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' all cell lines in the data are analyzed. Should be NULL if `resistant_cl` and `sensitive_cl` are provided.
+#' @param resistant_cl An optional string representing the resistant cell line name. Should be specified alongside `sensitive_cl`.
+#' @param sensitive_cl An optional string representing the sensitive cell line name. Should be specified alongside `resistant_cl`.
+#' @param normalization_type A string with normalization types to be selected, one of: "GR" ("GRvalue") or "RV" ("RelativeViability").
 #' Passed to `gDRplots::prep_dt_response_metric_diff`.
 #'
-#' @return A list of results, where each element corresponds to a cell line. Each cell line's results contain:
-#' #' \itemize{
-#'   \item \code{fgsea}: A list of GSEA results for each metric,
+#' @return A list of results, where each element corresponds to a cell line or cell line difference. Each result contains:
+#' \itemize{
+#'   \item \code{fgsea}: GSEA results for the specified metrics,
 #'   \item \code{metrics_diff}: The prepped data.table used for the GSEA analysis,
 #'   \item \code{moa_list}: A list of DrugNames grouped by drug_moa.
 #' }
@@ -23,12 +24,14 @@
 #' 
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
-#' analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
+#' analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 #' @export
 #'
 analyze_cgs <- function(dt_metrics,
                         metrics,
                         cl_name = NULL,
+                        resistant_cl = NULL,
+                        sensitive_cl = NULL,
                         normalization_type = "RV") {
   
   # identifiers
@@ -41,9 +44,17 @@ analyze_cgs <- function(dt_metrics,
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_true(all(metrics %in% names(dt_metrics)))
-  checkmate::assert_string(cl_name, null.ok = TRUE)
-  checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  
+  if (!is.null(resistant_cl) || !is.null(sensitive_cl)) {
+    checkmate::assert_string(resistant_cl, null.ok = FALSE)
+    checkmate::assert_string(sensitive_cl, null.ok = FALSE)
+    checkmate::assert_subset(resistant_cl, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
+    checkmate::assert_subset(sensitive_cl, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
+  } else {
+    checkmate::assert_string(cl_name, null.ok = TRUE)
+    checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
+  }
   
   # filter out unwanted drug moa
   dt_metrics <- dt_metrics[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
@@ -59,14 +70,17 @@ analyze_cgs <- function(dt_metrics,
                                                metric = metrics,
                                                d_name = NULL,
                                                d_name2 = NULL,
+                                               resistant_cl = resistant_cl,
+                                               sensitive_cl = sensitive_cl,
                                                normalization_type = normalization_type,
                                                additional_cols = drug_moa)
+  
   to_remove <- names(metrics_diff)[grepl("_fittings$", names(metrics_diff))]
   to_remove <- to_remove[!grepl("cotrt_diff", to_remove)]
   metrics_diff <- metrics_diff[, -c(to_remove), with = FALSE]
- 
-  original <- grep("cotrt_diff", names(metrics_diff), value = TRUE)
-  new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*", "\\2", original)
+  
+  original <- grep("cotrt_diff|cellline_diff", names(metrics_diff), value = TRUE)
+  new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*|_cellline_diff.*", "\\2", original)
   
   data.table::setnames(metrics_diff, original, new)
   
@@ -76,40 +90,66 @@ analyze_cgs <- function(dt_metrics,
   
   metrics_diff <- metrics_diff[eval(drug_moa) %chin% names(moa_list)]
   
-  # determine which cell lines to analyze
-  cell_lines <- if (!is.null(cl_name)) {
-    cl_name
-  } else {
-    unique(metrics_diff[[cellline]])
-  }
-  
-  # Run fgsea analysis for each specified cell line
-  results <- lapply(cell_lines, function(cl) {
-    data_subset <- metrics_diff[get(cellline) == cl]
-    data_subset$normalization_type <- normalization_type
+  # Determine FGSEA analysis path
+  if (!is.null(resistant_cl) && !is.null(sensitive_cl)) {
+    # Perform FGSEA on the difference between the specified cell lines
     list_results <- lapply(metrics, function(metric) {
-      metric_values <- data_subset[[metric]]
-      names(metric_values) <- data_subset[[drug_name]]
+      metric_values <- metrics_diff[[metric]]
+      names(metric_values) <- metrics_diff[[drug_name]]
       fgsea_result <- purrr::quietly(fgsea::fgsea)(pathways = moa_list,
                                                    stats = metric_values,
                                                    maxSize = 500,
                                                    minSize = 4,
                                                    nPermSimple = 1e5)$result
       
-      median_values <- data_subset[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
-      names(median_values) <- data_subset[, unique(drug_moa)]
+      median_values <- metrics_diff[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
+      names(median_values) <- metrics_diff[, unique(drug_moa)]
       
       fgsea_result$median <- median_values[fgsea_result$pathway]
       data.table::setorder(fgsea_result, -NES)
       return(fgsea_result)
     })
     names(list_results) <- metrics
-    list(fgsea = list_results,
-         metrics_diff = data_subset,
-         moa_list = moa_list)
-  })
+    results <- list(fgsea = list_results,
+                    metrics_diff = metrics_diff,
+                    moa_list = moa_list)
+    results <- list(results)
+    names(results) <- unique(paste0(metrics_diff$CellLineName_c1, "_", metrics_diff$CellLineName_c2))
+  } else {
+    # Analyze all or a single specified cell line
+    cell_lines <- if (!is.null(cl_name)) {
+      cl_name
+    } else {
+      unique(metrics_diff[[cellline]])
+    }
+    
+    results <- lapply(cell_lines, function(cl) {
+      data_subset <- metrics_diff[get(cellline) == cl]
+      data_subset$normalization_type <- normalization_type
+      list_results <- lapply(metrics, function(metric) {
+        metric_values <- data_subset[[metric]]
+        names(metric_values) <- data_subset[[drug_name]]
+        fgsea_result <- purrr::quietly(fgsea::fgsea)(pathways = moa_list,
+                                                     stats = metric_values,
+                                                     maxSize = 500,
+                                                     minSize = 4,
+                                                     nPermSimple = 1e5)$result
+        
+        median_values <- data_subset[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
+        names(median_values) <- data_subset[, unique(drug_moa)]
+        
+        fgsea_result$median <- median_values[fgsea_result$pathway]
+        data.table::setorder(fgsea_result, -NES)
+        return(fgsea_result)
+      })
+      names(list_results) <- metrics
+      list(fgsea = list_results,
+           metrics_diff = data_subset,
+           moa_list = moa_list)
+    })
+    names(results) <- cell_lines
+  }
   
-  names(results) <- cell_lines
   return(results)
 }
 

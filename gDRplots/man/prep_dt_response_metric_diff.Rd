@@ -6,8 +6,10 @@
 \usage{
 prep_dt_response_metric_diff(
   dt_metrics,
-  d_name,
-  d_name2,
+  d_name = NULL,
+  d_name2 = NULL,
+  resistant_cl = NULL,
+  sensitive_cl = NULL,
   normalization_type = "RV",
   metric = "xc50",
   fit_source = "gDR",
@@ -24,6 +26,12 @@ If set to NULL, the function will return a table for all available DrugName}
 
 \item{d_name2}{string representing the drug name to be plotted (identifier \code{DrugName_2}).
 If set to NULL, the function will return a table for all available DrugName_2}
+
+\item{resistant_cl}{string representing the resistant cell line name.
+If set to NULL, the function will return a table for all available cell lines.}
+
+\item{sensitive_cl}{string representing the sensitive cell line name.
+If set to NULL, the function will return a table for all available cell lines.}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -50,9 +58,11 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
 d_name <- "drug_004"
 d_name2 <- "drug_026"
-dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2)
+resistant_cl <- "resistant_cell_line"
+sensitive_cl <- "sensitive_cell_line"
+dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl)
 dt_response <- 
-  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl,
                                metric = c("xc50", "x_mean", "x_max"))
 
 }

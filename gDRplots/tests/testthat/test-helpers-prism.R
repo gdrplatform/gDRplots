@@ -219,6 +219,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
     prep_dt_response_metric_diff(dt_metrics = dt_metrics,
                                  d_name = d_name,
                                  d_name2 = d_name2) # default
+  
   expect_is(dt_response, "data.table")
   expect_true(all(
     names(dt_response) %in% 
