@@ -941,7 +941,7 @@ test_that(".get_data_type works as expected", {
   )
   
   expect_equal(.get_data_type(dt_ = tab_cat), "categorical")
-  expect_equal(.get_data_type(dt_ = tab_cat_2), "num_as_cat") # TODO
+  expect_equal(.get_data_type(dt_ = tab_cat_2), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_3), "num_as_cat") # TODO
   expect_equal(.get_data_type(dt_ = tab_cat_id, desc_col = "id"), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_na), "categorical")
