@@ -905,7 +905,10 @@ plot_volcano_assoc_panel <- function(dt_response,
     # unique values
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
-    data_type <- if (is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
+    data_type <- if (is.numeric(unique_val) && 
+                     (all(unique_val %in% c(0, 1, NA)) || 
+                      all(unique_val %in% c(-1, 0, 1, NA)) ||
+                      all(unique_val %in% c(0, 1, 2, NA)))) {
       # assumption: the presence of a feature is described by 0-1; NA means lack of information
       #     categorical - when one id has only one cat
       #     num_as_cat - when one id has many cat
