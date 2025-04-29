@@ -8,7 +8,8 @@ plot_scatter_with_corr_panel(
   dt_response,
   dt_depmap,
   selected_feats,
-  selected_feat_meta_col = NULL
+  selected_feat_meta_col = NULL,
+  ncol = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 
 \item{selected_feat_meta_col}{string with the name of a feature column in DepMap 
 (will be used as a plot title)}
+
+\item{ncol}{number of plot column in panel}
 }
 \value{
 \code{ggplot} object containing panel of scatter plot with correlation for selected features
