@@ -23,15 +23,19 @@ and columns specified in the `metrics` argument.}
 \item{cl_name}{An optional string specifying a single cell line to analyze. If NULL (default),
 all cell lines in the data are analyzed. Should be NULL if `resistant_cl` and `sensitive_cl` are provided.}
 
-\item{resistant_cl}{An optional string representing the resistant cell line name. Should be specified alongside `sensitive_cl`.}
+\item{resistant_cl}{An optional string representing the resistant cell line name. 
+Should be specified alongside `sensitive_cl`.}
 
-\item{sensitive_cl}{An optional string representing the sensitive cell line name. Should be specified alongside `resistant_cl`.}
+\item{sensitive_cl}{An optional string representing the sensitive cell line name. 
+Should be specified alongside `resistant_cl`.}
 
-\item{normalization_type}{A string with normalization types to be selected, one of: "GR" ("GRvalue") or "RV" ("RelativeViability").
+\item{normalization_type}{A string with normalization types to be selected, one of:
+"GR" ("GRvalue") or "RV" ("RelativeViability").
 Passed to `gDRplots::prep_dt_response_metric_diff`.}
 }
 \value{
-A list of results, where each element corresponds to a cell line or cell line difference. Each result contains:
+A list of results, where each element corresponds to a cell line or cell line difference.
+Each result contains:
 \itemize{
   \item \code{fgsea}: GSEA results for the specified metrics,
   \item \code{metrics_diff}: The prepped data.table used for the GSEA analysis,
