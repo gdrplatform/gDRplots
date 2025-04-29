@@ -577,26 +577,22 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep value ranges for y-axis
     range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-    
-    # order vis as in selected_feats
-    tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
-    tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
-    
+
     # prep the number of items in each category
     tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
-    
+    tab_count_all_possible <- expand.grid(feat_val = unique(tab_count_all$feat_val),
+                                          feat_lbl = unique(tab_count_all$feat_lbl),
+                                          stringsAsFactors = FALSE)
     # fill lacking labels
-    lack_feat_lbl <- feat_lbl_levels[!feat_lbl_levels %in% tab_count_all$feat_lbl]
-    if (NROW(lack_feat_lbl) > 0) {
-      tab_count_all <- rbind(tab_count_all,
-                             expand.grid(feat_val = unique(tab_count_all$feat_val),
-                                         feat_lbl = lack_feat_lbl,
-                                         N = 0))
+    
+    if (NROW(tab_count_all) < NROW(tab_count_all_possible)) {
+      tab_count_all <- merge(tab_count_all, tab_count_all_possible, all = TRUE)
+      tab_count_all$N <- data.table::nafill(tab_count_all$N, "const", fill = 0)
     }
     xlbl <- NULL # fix check
     tab_count_all[, xlbl := sprintf("%s (%s)", feat_val, N)]
     
-    tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all.x = TRUE)
+    tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all = TRUE)
     
     plt <- 
       ggplot2::ggplot(data = tab_plot_all,
