@@ -897,7 +897,7 @@ plot_volcano_assoc_panel <- function(dt_response,
   
   if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
     # checking whether relation in one-to-one or one-to-many
-    one_to_one <- !any(rowSums(dt_[, .SD, .SDcols = ls_col], na.rm = TRUE) > 1)
+    one_to_one <- !any(abs(rowSums(dt_[, .SD, .SDcols = ls_col], na.rm = TRUE)) > 1)
     # unique values
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
