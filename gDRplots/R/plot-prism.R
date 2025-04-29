@@ -210,6 +210,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' 
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
+#' @param ncol number of plot column in panel
 #'
 #' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features 
 #' @keywords prism_plots
@@ -218,7 +219,8 @@ plot_scatter_with_corr <- function(dt_response,
 plot_scatter_with_corr_panel <- function(dt_response,
                                          dt_depmap, 
                                          selected_feats,
-                                         selected_feat_meta_col = NULL) {
+                                         selected_feat_meta_col = NULL,
+                                         ncol = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
@@ -227,6 +229,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
   checkmate::assert_character(selected_feats)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -335,7 +338,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::guides(color = "none") +
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free") +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
       ggplot2::geom_smooth(ggplot2::aes(x = feat_val, 
                                         y = get(selected_metric)), 
                            color = "red",
@@ -831,7 +834,8 @@ plot_volcano_assoc_panel <- function(dt_response,
     plt_side <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
-                                             selected_feat_meta_col = selected_feat_meta_col) + 
+                                             selected_feat_meta_col = selected_feat_meta_col,
+                                             ncol = 2) + 
       ggplot2::labs(title = "", caption = "")
   } else {
     # boxplot for categorical &  boxplot for numeric as categorical
