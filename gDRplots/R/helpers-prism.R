@@ -269,6 +269,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
+  drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
   checkmate::assert_data_table(dt_metrics)
@@ -312,18 +317,17 @@ prep_dt_response_metric_diff <- function(dt_metrics,
     dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
   }
   
-  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
-  
   # select required cell lines if specified
   if (!is.null(resistant_cl) && !is.null(sensitive_cl)) {
     dt_cellline_1 <- dt_response_metric[get(cellline_name) == resistant_cl]
     dt_cellline_2 <- dt_response_metric[get(cellline_name) == sensitive_cl]
     
     # Calculate difference between cell lines
-    dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2, by = intersect(names(dt_response_metric), 
-                                                                           c("source", "cotrt_value", "ratio",
-                                                                             "DrugName", "drug_moa", "Gnumber",
-                                                                             "DrugName_2", "drug_moa_2", "Gnumber_2")),
+    dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2,
+                              by = intersect(names(dt_response_metric),
+                                             c("source", "cotrt_value", "ratio",
+                                               drug_name, drug_moa, gnumber,
+                                               drug_name_2, drug_moa_2, gnumber_2)),
                               suffixes = c("_c1", "_c2"))
     for (m in metric) {
       dt_cellline_diff[, paste0(m, "_cellline_diff") := {
@@ -346,6 +350,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   }
   
   # create entries of non-zero co-trt
+  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
   ls_cols <- c(meta_col, "cotrt_value", "source", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
