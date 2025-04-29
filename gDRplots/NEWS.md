@@ -1,3 +1,6 @@
+## gDRplots 0.0.78 - 2025-04-29
+* add support for cgs analysis for difference between two cell lines
+
 ## gDRplots 0.0.77 - 2025-04-15
 * add function to calculate linear associations
 
@@ -13,7 +16,6 @@
 
 ## gDRplots 0.0.73 - 2025-03-25
 * fix readability of number for PRISM boxplots
->>>>>>> main
 
 ## gDRplots 0.0.72 - 2025-03-24
 * change xc50 to log10 for PRISM analysis
