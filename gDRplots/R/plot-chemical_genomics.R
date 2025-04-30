@@ -84,7 +84,8 @@ analyze_cgs <- function(dt_metrics,
   metrics_diff <- metrics_diff[, -c(to_remove), with = FALSE]
   
   original <- grep("cotrt_diff|cellline_diff", names(metrics_diff), value = TRUE)
-  new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*|_cellline_diff.*", "\\2", original)
+  new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*", "\\2", original)
+  new <- gsub("_cellline_diff", "", new)
   
   data.table::setnames(metrics_diff, original, new)
   
