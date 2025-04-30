@@ -875,7 +875,6 @@ test_that("plot_volcano_assoc_panel works as expected", {
                "Assertion on 'names\\(dt_depmap\\)' failed: Names must include the elements")
 })
 
-
 test_that(".get_data_type works as expected", {
   tab_cat <- data.table::data.table(
     "A" = c(0, 0, 0, 1),
@@ -890,8 +889,8 @@ test_that(".get_data_type works as expected", {
   )
   
   tab_cat_3 <- data.table::data.table(
-    "A" = c(2, 0, 0, 1),
-    "B" = c(0, 1, 1, 0),
+    "A" = c(0, 0, 0, 1),
+    "B" = c(0, 1, 2, 0),
     "C" = c(2, 0, 0, 0)
   )
   
@@ -926,7 +925,7 @@ test_that(".get_data_type works as expected", {
   tab_num_as_cat$C <- 1
   
   tab_num_as_cat_2 <- data.table::copy(tab_cat_2)
-  tab_num_as_cat_2$B <- -1
+  tab_num_as_cat_2[1, ][["B"]] <- -1
   
   tab_mix <- data.table::data.table(
     "A" = LETTERS[1:5],
@@ -942,7 +941,7 @@ test_that(".get_data_type works as expected", {
   
   expect_equal(.get_data_type(dt_ = tab_cat), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_2), "categorical")
-  expect_equal(.get_data_type(dt_ = tab_cat_3), "num_as_cat") # TODO
+  expect_equal(.get_data_type(dt_ = tab_cat_3), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_id, desc_col = "id"), "categorical")
   expect_equal(.get_data_type(dt_ = tab_cat_na), "categorical")
   expect_equal(.get_data_type(dt_ = tab_not_cat), "numeric")
