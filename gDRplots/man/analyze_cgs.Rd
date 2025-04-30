@@ -49,5 +49,14 @@ prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
+
+mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                               assay_name = "Metrics")
+resistant_cl <- "cellline_GB"
+sensitive_cl <- "cellline_HB"
+analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
+
 }
 \keyword{cgs_plots}

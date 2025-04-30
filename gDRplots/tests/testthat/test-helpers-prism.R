@@ -295,6 +295,19 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_equal(setdiff(names(dt_response_addcol), names(dt_response)), drug_moa_2)
   expect_equal(dt_response_addcol[, -drug_moa_2, with = FALSE], dt_response_cap)
   
+  # scenario: cell lines diff
+  dt_response_cl_diff <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped,
+                                                      d_name = d_name,
+                                                      d_name2 = d_name2,
+                                                      resistant_cl = "cellline_GB",
+                                                      sensitive_cl = "cellline_HB",
+                                                      additional_cols = drug_moa_2)
+  expect_is(dt_response_cl_diff, "data.table")
+  expect_true("xc50_cellline_diff" %in% names(dt_response_cl_diff))
+  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c1")), 25)
+  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c2")), 25)
+  
+  
   # testing assertions
   expect_error(prep_dt_response_metric_diff(dt_metrics = unlist(dt_metrics),
                                             d_name = d_name,

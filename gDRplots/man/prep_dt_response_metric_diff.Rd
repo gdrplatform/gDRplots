@@ -58,12 +58,17 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
 d_name <- "drug_004"
 d_name2 <- "drug_026"
-resistant_cl <- "resistant_cell_line"
-sensitive_cl <- "sensitive_cell_line"
-dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl)
 dt_response <- 
-  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl,
-                               metric = c("xc50", "x_mean", "x_max"))
+  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+  metric = c("xc50", "x_mean", "x_max"))
+
+resistant_cl <- "cellline_GB"
+sensitive_cl <- "cellline_HB"
+
+dt_response <- 
+  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+  resistant_cl, sensitive_cl,
+  metric = c("xc50", "x_mean", "x_max"))
 
 }
 \keyword{prism_plots}

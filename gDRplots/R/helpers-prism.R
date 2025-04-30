@@ -249,12 +249,17 @@ prep_dt_response_scores <- function(dt_scores,
 #'                                                assay_name = "Metrics")
 #' d_name <- "drug_004"
 #' d_name2 <- "drug_026"
-#' resistant_cl <- "resistant_cell_line"
-#' sensitive_cl <- "sensitive_cell_line"
-#' dt_response <- prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl)
 #' dt_response <- 
-#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2, resistant_cl, sensitive_cl,
-#'                                metric = c("xc50", "x_mean", "x_max"))
+#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+#'   metric = c("xc50", "x_mean", "x_max"))
+#' 
+#' resistant_cl <- "cellline_GB"
+#' sensitive_cl <- "cellline_HB"
+#' 
+#' dt_response <- 
+#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+#'   resistant_cl, sensitive_cl,
+#'   metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
