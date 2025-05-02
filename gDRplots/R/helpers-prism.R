@@ -257,14 +257,14 @@ prep_dt_response_scores <- function(dt_scores,
 #' sensitive_cl <- "cellline_HB"
 #' 
 #' dt_response <- 
-#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+#'   prep_dt_response_metric_diff(dt_metrics, d_name = NULL, d_name2 = NULL,
 #'   resistant_cl, sensitive_cl,
 #'   metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
-                                         d_name = NULL,
-                                         d_name2 = NULL,
+                                         d_name,
+                                         d_name2,
                                          resistant_cl = NULL,
                                          sensitive_cl = NULL,
                                          normalization_type = "RV",
@@ -346,7 +346,11 @@ prep_dt_response_metric_diff <- function(dt_metrics,
         }
       }]
     }
-    return(dt_cellline_diff[dt_cellline_diff$cotrt_value != 0, ])
+    return(dt_cellline_diff[dt_cellline_diff$cotrt_value != 0,
+                            c(drug_name, drug_moa,
+                              drug_name_2, drug_moa_2,
+                              paste0(cellline_name, "_", c("c1", "c2")),
+                              paste0(metric, "_cellline_diff")), with = FALSE])
   }
   
   # for xc50 - metric should be in log10 scale

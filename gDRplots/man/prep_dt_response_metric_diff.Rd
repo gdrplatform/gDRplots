@@ -6,8 +6,8 @@
 \usage{
 prep_dt_response_metric_diff(
   dt_metrics,
-  d_name = NULL,
-  d_name2 = NULL,
+  d_name,
+  d_name2,
   resistant_cl = NULL,
   sensitive_cl = NULL,
   normalization_type = "RV",
@@ -66,7 +66,7 @@ resistant_cl <- "cellline_GB"
 sensitive_cl <- "cellline_HB"
 
 dt_response <- 
-  prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+  prep_dt_response_metric_diff(dt_metrics, d_name = NULL, d_name2 = NULL,
   resistant_cl, sensitive_cl,
   metric = c("xc50", "x_mean", "x_max"))
 

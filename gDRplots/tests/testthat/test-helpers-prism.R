@@ -295,10 +295,10 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_equal(setdiff(names(dt_response_addcol), names(dt_response)), drug_moa_2)
   expect_equal(dt_response_addcol[, -drug_moa_2, with = FALSE], dt_response_cap)
   
-  # scenario: cell lines diff
+  # scenario: cell lines diff (cgs case)
   dt_response_cl_diff <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped,
-                                                      d_name = d_name,
-                                                      d_name2 = d_name2,
+                                                      d_name = NULL,
+                                                      d_name2 = NULL,
                                                       resistant_cl = "cellline_GB",
                                                       sensitive_cl = "cellline_HB",
                                                       additional_cols = drug_moa_2)

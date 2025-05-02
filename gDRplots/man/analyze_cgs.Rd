@@ -31,7 +31,7 @@ Should be specified alongside `resistant_cl`.}
 
 \item{normalization_type}{A string with normalization types to be selected, one of:
 "GR" ("GRvalue") or "RV" ("RelativeViability").
-Passed to `gDRplots::prep_dt_response_metric_diff`.}
+Passed to \code{\link[gDRplots]{prep_dt_response_metric_diff}}.}
 }
 \value{
 A list of results, where each element corresponds to a cell line or cell line difference.
@@ -49,13 +49,8 @@ prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
-
-mae <- gDRutils::get_synthetic_data("combo_matrix_small")
-se <- mae[[gDRutils::get_supported_experiments("combo")]]
-dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                               assay_name = "Metrics")
-resistant_cl <- "cellline_GB"
-sensitive_cl <- "cellline_HB"
+resistant_cl <- "CellLineName_1"
+sensitive_cl <- "CellLineName_2"
 analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
 
 }
