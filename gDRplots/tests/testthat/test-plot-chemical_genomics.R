@@ -29,10 +29,20 @@ test_that("analyze_cgs works correctly", {
   
   expect_false(identical(results1$CellLineName_1$metrics_diff$xc50, results2$CellLineName_1$metrics_diff$xc50)) 
   
-  # no cell lien selection
+  # no cell line selection
   results3 <- analyze_cgs(metrics_data, metrics = "xc50", cl_name = NULL)
   expect_is(results3, "list")
-  expect_equal(names(results3), unique(metrics_data$CellLineName))
+  expect_true(setequal(names(results3), unique(metrics_data$CellLineName)))
+  
+  # cell lines diff
+  results4 <- analyze_cgs(metrics_data,
+                          metrics = "xc50",
+                          cl_name = NULL,
+                          resistant_cl = "CellLineName_1",
+                          sensitive_cl = "CellLineName_2",
+                          normalization_type = "RV")
+  expect_is(results4, "list")
+  expect_equal(names(results4), "CellLineName_1_CellLineName_2")
 })
 
 test_that("plot_cgs_ranking works correctly", {
