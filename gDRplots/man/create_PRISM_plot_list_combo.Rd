@@ -49,10 +49,11 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 which are referenced by a dataset contained within the DepMap portal. 
 It is usually a file named \code{Model.csv}.}
 
-\item{feat_data_path}{string path to the folder with file the molecular feature set to load from DepMap.}
+\item{feat_data_path}{string path to the directory containing the molecular feature set file to load from DepMap.}
 
-\item{feature_sets}{character vector names of the molecular feature set to load from DepMap; at the same time 
-it should be the names of the files with feature data (without the extension, which is assumed as \code{csv})}
+\item{feature_sets}{character vector containing the names of the molecular feature sets to load from DepMap.
+These names should also correspond to the file names containing the feature data 
+(without the extension, which is assumed to be \code{csv})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 }

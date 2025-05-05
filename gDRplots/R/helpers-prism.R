@@ -351,12 +351,14 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 
 #' Load DepMap merged data for one selected feature
 #'
-#' @param feat_data_path string path to the folder with files of the molecular feature set to load from DepMap.
-#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#' @param feat_data_path string with path to the directory containing the molecular 
+#'  feature set file to load from DepMap.
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feature_set string name of the molecular feature set to load from DepMap; at the same time it should be 
-#'  the name of the file with feature data (without the extension, which is assumed as \code{csv})
+#' @param feature_set string containing the name of the molecular feature set to load from DepMap.
+#'  This name should also correspond to the file containing the feature data 
+#'  (without the extension, which is assumed to be \code{csv})
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{
@@ -376,9 +378,9 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #'                                       meta_data_path = meta_data_path)
 #' }
 #' @export
-prep_dt_depmap_feat <-  function(feat_data_path,
-                                 meta_data_path,
-                                 feature_set = "CRISPRGeneEffect") {
+prep_dt_depmap_feat <- function(feat_data_path,
+                                meta_data_path,
+                                feature_set = "CRISPRGeneEffect") {
   
   checkmate::assert_string(feat_data_path)
   checkmate::assert_string(feature_set)
@@ -393,7 +395,7 @@ prep_dt_depmap_feat <-  function(feat_data_path,
   # assumption: first column is a key; supported is ModelId with pattern "ACH-[0-9]{6}"
   supported_feature_condition <- grepl("ACH-[0-9]{6}", dt_feat_2row[1, 1])
   dt_feat_2row <- NULL
-
+  
   # prep dt_depmap
   if (supported_feature_condition) { 
     dt_feat_raw <- data.table::fread(feat_path)
@@ -418,10 +420,10 @@ prep_dt_depmap_feat <-  function(feat_data_path,
 
 #' Load DepMap merged data for one selected metadata
 #'
-#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param metadata_col string with the metadata columns to load for DepMap cell lines
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
 #' \itemize{

@@ -16,9 +16,10 @@
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feat_data_path string path to the folder with file the molecular feature set to load from DepMap.
-#' @param feature_sets character vector names of the molecular feature set to load from DepMap; at the same time 
-#'  it should be the names of the files with feature data (without the extension, which is assumed as \code{csv})
+#' @param feat_data_path string path to the directory containing the molecular feature set file to load from DepMap.
+#' @param feature_sets character vector containing the names of the molecular feature sets to load from DepMap.
+#'  These names should also correspond to the file names containing the feature data 
+#'  (without the extension, which is assumed to be \code{csv})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
@@ -204,9 +205,10 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal. 
 #'  It is usually a file named \code{Model.csv}.
-#' @param feat_data_path string path to the folder with file the molecular feature set to load from DepMap.
-#' @param feature_sets character vector names of the molecular feature set to load from DepMap; at the same time 
-#'  it should be the names of the files with feature data (without the extension, which is assumed as \code{csv})
+#' @param feat_data_path string path to the directory containing the molecular feature set file to load from DepMap.
+#' @param feature_sets character vector containing the names of the molecular feature sets to load from DepMap.
+#'  These names should also correspond to the file names containing the feature data 
+#'  (without the extension, which is assumed to be \code{csv})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
