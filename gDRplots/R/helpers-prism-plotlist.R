@@ -61,7 +61,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
-              !xor(is.null(feature_sets), is.null(metadata_columns)))
+              !xor(is.null(feature_sets), is.null(feat_data_path)))
   if (!is.null(feat_data_path) && !is.null(feature_sets)) {
     checkmate::assert_directory_exists(feat_data_path)
     # use only available files
@@ -257,7 +257,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
   stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
-              !xor(is.null(feature_sets), is.null(metadata_columns)))
+              !xor(is.null(feature_sets), is.null(feat_data_path)))
   if (!is.null(feat_data_path) && !is.null(feature_sets)) {
     checkmate::assert_directory_exists(feat_data_path)
     # use only available files
