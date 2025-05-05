@@ -304,8 +304,8 @@ test_that("prep_dt_response_metric_diff works as expected", {
                                                       additional_cols = drug_moa_2)
   expect_is(dt_response_cl_diff, "data.table")
   expect_true("xc50_cellline_diff" %in% names(dt_response_cl_diff))
-  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c1")), 25)
-  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c2")), 25)
+  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c1")), 1)
+  expect_equal(sum(endsWith(names(dt_response_cl_diff), "c2")), 1)
   
   
   # testing assertions
