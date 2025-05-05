@@ -58,8 +58,17 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
     rm(meta_data)
   }
+  checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  # TODO add validation
+  stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
+              !xor(is.null(feature_sets), is.null(metadata_columns)))
+  if (!is.null(feat_data_path) && !is.null(feature_sets)) {
+    checkmate::assert_directory_exists(feat_data_path)
+    # use only available files
+    feature_sets <- feature_sets[vapply(feature_sets, function(f) {
+      file.exists(file.path(feat_data_path, paste0(f, ".csv")))
+    }, logical(1))]
+  }
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
@@ -235,6 +244,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   stopifnot("Provide `metric_scores` for `dt_scores`." = !is.null(dt_scores) && !is.null(metric_scores))
   if (!is.null(metric_scores)) checkmate::assert_subset(metric_scores, choices = c("hsa_score", "bliss_score"))
   if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, choices = names(dt_scores))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
@@ -244,8 +254,17 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
     checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
     rm(meta_data)
   }
+  checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  # TODO add validations
+  stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
+              !xor(is.null(feature_sets), is.null(metadata_columns)))
+  if (!is.null(feat_data_path) && !is.null(feature_sets)) {
+    checkmate::assert_directory_exists(feat_data_path)
+    # use only available files
+    feature_sets <- feature_sets[vapply(feature_sets, function(f) {
+      file.exists(file.path(feat_data_path, paste0(f, ".csv")))
+    }, logical(1))]
+  }
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
               !is.null(feature_sets) || !is.null(metadata_columns))
   
