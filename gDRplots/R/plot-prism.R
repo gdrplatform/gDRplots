@@ -210,6 +210,7 @@ plot_scatter_with_corr <- function(dt_response,
 #' 
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
+#' @param ncol number of plot column in panel
 #'
 #' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features 
 #' @keywords prism_plots
@@ -218,7 +219,8 @@ plot_scatter_with_corr <- function(dt_response,
 plot_scatter_with_corr_panel <- function(dt_response,
                                          dt_depmap, 
                                          selected_feats,
-                                         selected_feat_meta_col = NULL) {
+                                         selected_feat_meta_col = NULL,
+                                         ncol = NULL) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   
@@ -227,6 +229,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
   checkmate::assert_character(selected_feats)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+  checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
   
   selected_metric <- setdiff(names(dt_response), 
                              c(cellline_name, "rId", "cId"))
@@ -335,7 +338,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::guides(color = "none") +
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free") +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
       ggplot2::geom_smooth(ggplot2::aes(x = feat_val, 
                                         y = get(selected_metric)), 
                            color = "red",
@@ -574,26 +577,22 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep value ranges for y-axis
     range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-    
-    # order vis as in selected_feats
-    tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
-    tab_plot_all$feat_val <- factor(tab_plot_all$feat_val)
-    
+
     # prep the number of items in each category
     tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
-    
+    tab_count_all_possible <- expand.grid(feat_val = unique(tab_count_all$feat_val),
+                                          feat_lbl = unique(tab_count_all$feat_lbl),
+                                          stringsAsFactors = FALSE)
     # fill lacking labels
-    lack_feat_lbl <- feat_lbl_levels[!feat_lbl_levels %in% tab_count_all$feat_lbl]
-    if (NROW(lack_feat_lbl) > 0) {
-      tab_count_all <- rbind(tab_count_all,
-                             expand.grid(feat_val = unique(tab_count_all$feat_val),
-                                         feat_lbl = lack_feat_lbl,
-                                         N = 0))
+    
+    if (NROW(tab_count_all) < NROW(tab_count_all_possible)) {
+      tab_count_all <- merge(tab_count_all, tab_count_all_possible, all = TRUE)
+      tab_count_all$N <- data.table::nafill(tab_count_all$N, "const", fill = 0)
     }
     xlbl <- NULL # fix check
     tab_count_all[, xlbl := sprintf("%s (%s)", feat_val, N)]
     
-    tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all.x = TRUE)
+    tab_plot_all <- merge(tab_plot_all, tab_count_all, by = c("feat_val", "feat_lbl"), all = TRUE)
     
     plt <- 
       ggplot2::ggplot(data = tab_plot_all,
@@ -831,7 +830,8 @@ plot_volcano_assoc_panel <- function(dt_response,
     plt_side <- plot_scatter_with_corr_panel(dt_response = dt_response_,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
-                                             selected_feat_meta_col = selected_feat_meta_col) + 
+                                             selected_feat_meta_col = selected_feat_meta_col,
+                                             ncol = 2) + 
       ggplot2::labs(title = "", caption = "")
   } else {
     # boxplot for categorical &  boxplot for numeric as categorical
@@ -897,11 +897,16 @@ plot_volcano_assoc_panel <- function(dt_response,
   
   if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
     # checking whether relation in one-to-one or one-to-many
-    one_to_one <- !any(rowSums(dt_[, .SD, .SDcols = ls_col], na.rm = TRUE) > 1)
+    dt_cond <- data.table::copy(dt_)
+    dt_cond[, (ls_col) := lapply(.SD, function(col) (col != 0 & !is.na(col))), .SDcol = ls_col]
+    one_to_one <- !any(rowSums(dt_cond[, .SD, .SDcols = ls_col]) > 1)
     # unique values
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
-    data_type <- if (is.numeric(unique_val) && all(unique_val %in% c(0, 1, NA))) {
+    data_type <- if (is.numeric(unique_val) && 
+                     (all(unique_val %in% c(0, 1, NA)) || 
+                      all(unique_val %in% c(-1, 0, 1, NA)) ||
+                      all(unique_val %in% c(0, 1, 2, NA)))) {
       # assumption: the presence of a feature is described by 0-1; NA means lack of information
       #     categorical - when one id has only one cat
       #     num_as_cat - when one id has many cat

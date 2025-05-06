@@ -12,8 +12,8 @@ create_PRISM_plot_list_sa(
   metric = c("xc50", "x_mean", "x_max"),
   fit_source = "gDR",
   meta_data_path,
+  feat_data_path,
   feature_sets,
-  prefixes,
   metadata_columns = NULL
 )
 }
@@ -41,10 +41,11 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
 which are referenced by a dataset contained within the DepMap portal. 
 It is usually a file named \code{Model.csv}.}
 
-\item{feature_sets}{character vector names of the molecular feature set to load from DepMap.}
+\item{feat_data_path}{string path to the directory containing the molecular feature set file to load from DepMap.}
 
-\item{prefixes}{character vector prefixes to use for the each feature set in \code{feature_sets};
-has to be the same length as \code{feature_sets}}
+\item{feature_sets}{character vector containing the names of the molecular feature sets to load from DepMap.
+These names should also correspond to the file names containing the feature data 
+(without the extension, which is assumed to be \code{csv})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 }

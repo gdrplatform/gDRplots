@@ -7,11 +7,7 @@
 prep_dt_depmap_meta(meta_data_path, metadata_col = "PatientRace")
 }
 \arguments{
-\item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
-which are referenced by a dataset contained within the DepMap portal. 
-It is usually a file named \code{Model.csv}.}
-
-\item{metadata_col}{string with the metadata columns to load for DepMap cell lines}
+\item{meta_data_path}{string with path to metadata file describing all cancer models/cell lines}
 }
 \value{
 A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}

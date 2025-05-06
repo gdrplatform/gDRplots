@@ -1,3 +1,6 @@
+## gDRplots 0.0.79 - 2025-05-05
+* update `prep_dt_depmap_feat`
+
 ## gDRplots 0.0.78 - 2025-04-29
 * add support for cgs analysis for difference between two cell lines
 
