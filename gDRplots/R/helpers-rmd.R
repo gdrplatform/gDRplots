@@ -107,7 +107,12 @@ prep_plot_chunk <- function(plt_list,
           if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]][[i_nm]]), "\n"),
           if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]][[i_nm]]), "\n"),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
-                  chunk_name, group_name, item_name, plt_list_name, nm, i_nm)
+                  chunk_name, 
+                  gsub(" ", "", group_name, fixed = TRUE),
+                  formatC(i_nm, width = nchar(NROW(plt_list[[nm]])) + 1, flag = "0"),
+                  plt_list_name, 
+                  nm, 
+                  i_nm)
         )
         knitr::knit_expand(text = chunk)
       })
@@ -121,7 +126,10 @@ prep_plot_chunk <- function(plt_list,
         if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]]), "\n"),
         if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]]), "\n"),
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
-                chunk_name, group_name, plt_list_name, nm)  # Use %d and nm directly
+                chunk_name,
+                formatC(nm, width = nchar(NROW(plt_list)) + 1, flag = "0"),
+                plt_list_name, 
+                nm)
       )
       knitr::knit_expand(text = chunk)
     }

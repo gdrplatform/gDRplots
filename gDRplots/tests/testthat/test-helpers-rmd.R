@@ -20,8 +20,8 @@ test_that("prep_plot_chunk works as expected", {
   expect_is(res_1, "list")
   expect_length(res_1, NROW(plotlist))
   expect_true(all(vapply(seq_along(res_1), function(i) grepl("###", res_1[[i]]), logical(1))))
-  expect_true(all(vapply(seq_along(res_1), 
-                         function(i) grepl(unique(iris$Species)[i], res_1[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_1), function(i) {
+    grepl(unique(iris$Species)[i], res_1[[i]]) }, logical(1))))
   
   res_2 <- prep_plot_chunk(plt_list = plotlist, 
                            chunk_name = "iris", 
@@ -46,11 +46,13 @@ test_that("prep_plot_chunk works as expected", {
   names(plotlist_noname) <- NULL
   
   res_4 <- prep_plot_chunk(plt_list = plotlist_noname, 
-                           chunk_name = "iris")
+                           chunk_name = "CHUNK")
   expect_is(res_4, "list")
   expect_length(res_4, NROW(plotlist))
-  expect_true(all(vapply(seq_along(res_4), 
-                         function(i) grepl(sprintf("### %s", i), res_4[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_4), function(i) {
+    grepl(sprintf("### %s", i), res_4[[i]]) }, logical(1))))
+  expect_true(all(vapply(seq_along(res_4), function(i) {
+    grepl(sprintf("CHUNK_%s", sprintf("%02d", i)), res_4[[i]], fixed = TRUE) }, logical(1))))
   
   # scenario: all - plotlist, linklist and dwn_list - without names
   linklist_noname <- linklist
@@ -79,10 +81,33 @@ test_that("prep_plot_chunk works as expected", {
                            header_level = 2)
   expect_is(res_6, "list")
   expect_length(res_6, NROW(plotlist))
-  expect_true(all(vapply(seq_along(res_6), 
-                         function(i) grepl(sprintf("## %s", names(plotlist)[i]), res_6[[i]]), logical(1))))
+  expect_true(all(vapply(seq_along(res_6), function(i) {
+    grepl(sprintf("## %s", names(plotlist)[i]), res_6[[i]]) }, logical(1))))
+  expect_true(all(vapply(seq_along(res_6), function(i) {
+    grepl(sprintf("iris_%s", sprintf("%02d", i)), res_6[[i]], fixed = TRUE) }, logical(1))))
   expect_true(all(vapply(seq_along(res_6), function(i) grepl("_blank", res_6[[i]]), logical(1))))
-  expect_equal(sum(vapply(seq_along(res_6), function(i) grepl("download>", res_6[[i]]), logical(1))), 2)
+  expect_equal(sum(vapply(seq_along(res_6), function(i) {
+    grepl("download>", res_6[[i]]) }, logical(1))), 2)
+  
+  # scenario: plot names has spaces
+  plotlist_lng <- lapply(sort(unique(iris$Sepal.Length)), function(sl) {
+    ggplot2::ggplot(iris[iris$Sepal.Length == sl, c("Petal.Length", "Petal.Width", "Species")]) +
+      ggplot2::geom_point(ggplot2::aes(x = Petal.Length, y = Petal.Width, color = Species))
+  })
+  names(plotlist_lng) <- sprintf("Sepal.Length %s (%s of %s)", 
+                                 sort(unique(iris$Sepal.Length)), 
+                                 seq_along(names(plotlist_lng)), 
+                                 rep(NROW(plotlist_lng), NROW(plotlist_lng)))
+  
+  res_7 <- prep_plot_chunk(plt_list = plotlist_lng, 
+                           chunk_name = "iris",
+                           header_level = 2)
+  expect_is(res_7, "list")
+  expect_length(res_7, NROW(plotlist_lng))
+  expect_true(all(vapply(seq_along(res_7), function(i) { 
+    grepl(sprintf("## %s", names(plotlist_lng)[i]), res_7[[i]], fixed = TRUE) }, logical(1))))
+  expect_true(all(vapply(seq_along(res_7), function(i) {
+    grepl(sprintf("iris_%s", sprintf("%03d", i)), res_7[[i]], fixed = TRUE) }, logical(1))))
   
   expect_error(prep_plot_chunk(plt_list = iris, chunk_name = "iris"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
@@ -126,8 +151,8 @@ test_that("prep_plot_chunk works as expected", {
   expect_equal(unlist(lapply(seq_along(res_2n), function(i) sum(grepl("a href", res_2n[[i]])))), 
                c(NROW(linklist_nest[[1]]), NROW(linklist_nest[[2]])))
   expect_equal(
-    vapply(seq_along(res_2n), 
-           function(i) sum(grepl(sprintf("### %s\n\n", names(plotlist_nest)[i]), res_2n[[i]])), numeric(1)),
+    vapply(seq_along(res_2n), function(i) {
+      sum(grepl(sprintf("### %s\n\n", names(plotlist_nest)[i]), res_2n[[i]])) }, numeric(1)),
     c(1, 1)) # headers
   
   # scenario: incomplete list of links
@@ -239,9 +264,9 @@ test_that("prep_nested_plot_chunk works as expected", {
                NROW(res_3))
   expect_equal(sum(grepl("#####", res_3[[1]])), no_plots_in_section)
   expect_false(all(vapply(seq_along(res_3), 
-                         function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
+                          function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
   
-    expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
+  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
   expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
