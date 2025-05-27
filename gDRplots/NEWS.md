@@ -1,3 +1,6 @@
+## gDRplots 0.0.80 - 2025-05-27
+* update chunk naming to fulfill `knitr` requirements
+
 ## gDRplots 0.0.79 - 2025-05-05
 * update `prep_dt_depmap_feat`
 
