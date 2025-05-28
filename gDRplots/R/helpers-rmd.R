@@ -494,7 +494,7 @@ prep_double_table_chunk <- function(tbl_list,
   
   tbl_list_name <- deparse(substitute(tbl_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-  inner_lvl <- paste0(rep("#", header_level + 1), collapse = "") # Inner level is one greater
+  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
   
   # checking if the structure of plt_list and dwn_list is identical
   dwn_structure_condition <- all(names(tbl_list) %in% names(dwn_list))
