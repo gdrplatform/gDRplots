@@ -8,8 +8,8 @@ analyze_cgs(
   dt_metrics,
   metrics,
   cl_name = NULL,
-  resistant_cl = NULL,
-  sensitive_cl = NULL,
+  cellline1 = NULL,
+  cellline2 = NULL,
   normalization_type = "RV"
 )
 }
@@ -21,13 +21,13 @@ and columns specified in the `metrics` argument.}
 "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".}
 
 \item{cl_name}{An optional string specifying a single cell line to analyze. If NULL (default),
-all cell lines in the data are analyzed. Should be NULL if `resistant_cl` and `sensitive_cl` are provided.}
+all cell lines in the data are analyzed. Should be NULL if `cellline1` and `cellline2` are provided.}
 
-\item{resistant_cl}{An optional string representing the resistant cell line name. 
-Should be specified alongside `sensitive_cl`.}
+\item{cellline1}{An optional string representing the first cell line name. 
+Should be specified alongside `cellline2`.}
 
-\item{sensitive_cl}{An optional string representing the sensitive cell line name. 
-Should be specified alongside `resistant_cl`.}
+\item{cellline2}{An optional string representing the second cell line name. 
+Should be specified alongside `cellline1`.}
 
 \item{normalization_type}{A string with normalization types to be selected, one of:
 "GR" ("GRvalue") or "RV" ("RelativeViability").
@@ -49,9 +49,9 @@ prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for
 \examples{
 dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
-resistant_cl <- "CellLineName_1"
-sensitive_cl <- "CellLineName_2"
-analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
+cellline1 <- "CellLineName_1"
+cellline2 <- "CellLineName_2"
+analyze_cgs(dt_metrics, "xc50", cl_name = NULL, cellline1, cellline2)
 
 }
 \keyword{cgs_plots}
