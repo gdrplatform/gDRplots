@@ -513,19 +513,16 @@ prep_double_table_chunk <- function(tbl_list,
     )
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
-      # Determine sorting options for the current metric
       columns_to_sort <- if (!is.null(sorting_opts) && !is.null(sorting_opts[[cell_line]])) {
         sorting_opts[[cell_line]][[metric]]
       } else {
-        character(0)  # Default to no sorting
+        character(0)
       }
       
       if (length(columns_to_sort) > 0) {
-        # Parse columns and determine sort order
         sort_orders <- ifelse(grepl("^-", columns_to_sort), 'desc', 'asc')
         sorted_columns <- gsub("^-", "", columns_to_sort)
         
-        # Find indices and sort order list
         column_indices <- match(sorted_columns, names(tbl_list[[cell_line]][[metric]]))
         order_list <- lapply(seq_along(column_indices), function(i) {
           list(column_indices[i], sort_orders[i])
