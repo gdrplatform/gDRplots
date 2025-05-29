@@ -9,23 +9,26 @@ prep_double_table_chunk(
   chunk_name,
   dwn_list = NULL,
   header_level = 3,
-  tabset_options = c("tabset", "tabset-dropdown")
+  tabset_options = c("tabset", "tabset-dropdown"),
+  sorting_opts = NULL
 )
 }
 \arguments{
 \item{tbl_list}{A doubly nested named list of tables. The outer list represents cell lines,
-and the inner lists represent metrics.  Names are used as headings.}
+and the inner lists represent metrics. Names are used as headings.}
 
-\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
+\item{chunk_name}{A string representing the name of the chunk.}
 
-\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
-which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
+\item{dwn_list}{A list for download links, corresponding to the structure of tbl_list. 
+If NULL, no download links are included.}
 
-\item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
+\item{header_level}{An integer specifying the header level for the markdown.}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used 
-when \code{plt_list} is a nested list.
-Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
+\item{tabset_options}{A character vector specifying tabset options, such as "tabset" or 
+"tabset-dropdown". If NULL, no tabset options are applied.}
+
+\item{sorting_opts}{A vector specifying global sorting options for all tables. 
+Column names can be preceded by "-" to indicate descending order.}
 }
 \value{
 A list of character vectors. Each element corresponds to a cell line. Each character vector
@@ -42,7 +45,8 @@ nested_tables <- list(
   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 )
-prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
+sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
+prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset", sorting_opts = sorting_options)
 }
 
 }

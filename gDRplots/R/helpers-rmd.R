@@ -445,7 +445,6 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
 #' The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 #'
-#' @inheritParams prep_plot_chunk
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
 #'   and the inner lists represent metrics. Names are used as headings.
 #' @param chunk_name A string representing the name of the chunk.
@@ -454,9 +453,8 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' @param header_level An integer specifying the header level for the markdown.
 #' @param tabset_options A character vector specifying tabset options, such as "tabset" or 
 #'   "tabset-dropdown". If NULL, no tabset options are applied.
-#' @param sorting_opts A doubly nested list specifying sorting options for each table. 
-#'   Each element corresponds to a cell line, containing another list for metrics with 
-#'   sorting preferences. Column names can be preceded by "-" to indicate descending order.
+#' @param sorting_opts A vector specifying global sorting options for all tables. 
+#'   Column names can be preceded by "-" to indicate descending order.
 #'
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
 #'   represents markdown code for the cell line's tabset.
@@ -467,10 +465,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 #' )
-#' sorting_options <- list(
-#'   CellLine1 = list(MetricA = c("cyl", "-hp"), MetricB = c("disp")),
-#'   CellLine2 = list(MetricC = c("-Sepal.Length"), MetricD = c("Species"))
-#' )
+#' sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
 #' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset", sorting_opts = sorting_options)
 #' }
 #' 
@@ -490,11 +485,11 @@ prep_double_table_chunk <- function(tbl_list,
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
                               pattern = "unnumbered|tabset|tabset-dropdown")
-  checkmate::assert_list(sorting_opts, null.ok = TRUE)
+  checkmate::assert_character(sorting_opts, null.ok = TRUE)
   
   tbl_list_name <- deparse(substitute(tbl_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
+  inner_lvl <- paste0(rep("#", header_level + 1), collapse = "") # Inner level is one greater
   
   # checking if the structure of plt_list and dwn_list is identical
   dwn_structure_condition <- all(names(tbl_list) %in% names(dwn_list))
@@ -513,15 +508,9 @@ prep_double_table_chunk <- function(tbl_list,
     )
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
-      columns_to_sort <- if (!is.null(sorting_opts) && !is.null(sorting_opts[[cell_line]])) {
-        sorting_opts[[cell_line]][[metric]]
-      } else {
-        character(0)
-      }
-      
-      if (length(columns_to_sort) > 0) {
-        sort_orders <- ifelse(grepl("^-", columns_to_sort), 'desc', 'asc')
-        sorted_columns <- gsub("^-", "", columns_to_sort)
+      if (!is.null(sorting_opts) && length(sorting_opts) > 0) {
+        sort_orders <- ifelse(grepl("^-", sorting_opts), 'desc', 'asc')
+        sorted_columns <- gsub("^-", "", sorting_opts)
         
         column_indices <- match(sorted_columns, names(tbl_list[[cell_line]][[metric]]))
         order_list <- lapply(seq_along(column_indices), function(i) {
