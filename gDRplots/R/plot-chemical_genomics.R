@@ -124,7 +124,7 @@ analyze_cgs <- function(dt_metrics,
                     metrics_diff = metrics_diff,
                     moa_list = moa_list)
     results <- list(results)
-    names(results) <- unique(paste0(metrics_diff$CellLineName_c1, "_", metrics_diff$CellLineName_c2))
+    names(results) <- unique(paste0(metrics_diff$CellLineName_c1, " vs. ", metrics_diff$CellLineName_c2))
   } else {
     # Analyze all or a single specified cell line
     cell_lines <- if (!is.null(cl_name)) {

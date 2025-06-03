@@ -17,15 +17,16 @@ prep_double_table_chunk(
 \item{tbl_list}{A doubly nested named list of tables. The outer list represents cell lines,
 and the inner lists represent metrics. Names are used as headings.}
 
-\item{chunk_name}{A string representing the name of the chunk.}
+\item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{dwn_list}{A list for download links, corresponding to the structure of tbl_list. 
-If NULL, no download links are included.}
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
-\item{header_level}{An integer specifying the header level for the markdown.}
+\item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector specifying tabset options, such as "tabset" or 
-"tabset-dropdown". If NULL, no tabset options are applied.}
+\item{tabset_options}{A character vector of options for the tabset. This is only used 
+when \code{plt_list} is a nested list.
+Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 
 \item{sorting_opts}{A vector specifying global sorting options for all tables. 
 Column names can be preceded by "-" to indicate descending order.}

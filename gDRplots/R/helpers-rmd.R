@@ -445,14 +445,9 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' Handles doubly nested lists, allowing for tabbed sections for cell lines and then metrics.
 #' The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 #'
+#' @inheritParams prep_plot_chunk
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
 #'   and the inner lists represent metrics. Names are used as headings.
-#' @param chunk_name A string representing the name of the chunk.
-#' @param dwn_list A list for download links, corresponding to the structure of tbl_list. 
-#'   If NULL, no download links are included.
-#' @param header_level An integer specifying the header level for the markdown.
-#' @param tabset_options A character vector specifying tabset options, such as "tabset" or 
-#'   "tabset-dropdown". If NULL, no tabset options are applied.
 #' @param sorting_opts A vector specifying global sorting options for all tables. 
 #'   Column names can be preceded by "-" to indicate descending order.
 #'
@@ -489,7 +484,7 @@ prep_double_table_chunk <- function(tbl_list,
   
   tbl_list_name <- deparse(substitute(tbl_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
-  inner_lvl <- paste0(rep("#", header_level + 1), collapse = "") # Inner level is one greater
+  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
   
   # checking if the structure of plt_list and dwn_list is identical
   dwn_structure_condition <- all(names(tbl_list) %in% names(dwn_list))
@@ -508,14 +503,24 @@ prep_double_table_chunk <- function(tbl_list,
     )
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
+      
       if (!is.null(sorting_opts) && length(sorting_opts) > 0) {
         sort_orders <- ifelse(grepl("^-", sorting_opts), 'desc', 'asc')
         sorted_columns <- gsub("^-", "", sorting_opts)
         
-        column_indices <- match(sorted_columns, names(tbl_list[[cell_line]][[metric]]))
-        order_list <- lapply(seq_along(column_indices), function(i) {
-          list(column_indices[i], sort_orders[i])
-        })
+        # Check for column existence and filter out non-existing columns
+        available_columns <- names(tbl_list[[cell_line]][[metric]])
+        valid_indices <- match(sorted_columns, available_columns, nomatch = 0)
+        valid_indices <- valid_indices[valid_indices > 0]
+        sort_orders <- sort_orders[match(sorted_columns, available_columns, nomatch = 0) > 0]
+        
+        if (length(valid_indices) > 0) {
+          order_list <- lapply(seq_along(valid_indices), function(i) {
+            list(valid_indices[i], sort_orders[i])
+          })
+        } else {
+          order_list <- NULL
+        }
       } else {
         order_list <- NULL
       }
