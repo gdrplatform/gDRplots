@@ -508,7 +508,7 @@ prep_double_table_chunk <- function(tbl_list,
         sort_orders <- ifelse(grepl("^-", sorting_opts), 'desc', 'asc')
         sorted_columns <- gsub("^-", "", sorting_opts)
         
-        # Check for column existence and filter out non-existing columns
+        # check for column existence and filter out non-existing columns
         available_columns <- names(tbl_list[[cell_line]][[metric]])
         valid_indices <- match(sorted_columns, available_columns, nomatch = 0)
         valid_indices <- valid_indices[valid_indices > 0]
