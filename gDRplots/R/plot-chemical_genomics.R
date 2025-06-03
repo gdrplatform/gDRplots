@@ -8,11 +8,11 @@
 #' @param metrics A character vector specifying the response metrics to analyze:
 #' "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".
 #' @param cl_name An optional string specifying a single cell line to analyze. If NULL (default),
-#' all cell lines in the data are analyzed. Should be NULL if `cellline1` and `cellline2` are provided.
+#' all cell lines in the data are analyzed. Should be NULL if \code{cellline1} and \code{cellline2} are provided.
 #' @param cellline1 An optional string representing the first cell line name. 
-#' Should be specified alongside `cellline2`.
+#' Should be specified alongside \code{cellline2}.
 #' @param cellline2 An optional string representing the second cell line name. 
-#' Should be specified alongside `cellline1`.
+#' Should be specified alongside \code{cellline1}.
 #' @param normalization_type A string with normalization types to be selected, one of:
 #' "GR" ("GRvalue") or "RV" ("RelativeViability").
 #' Passed to \code{\link[gDRplots]{prep_dt_response_metric_diff}}.
