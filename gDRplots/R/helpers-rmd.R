@@ -461,7 +461,8 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 #' )
 #' sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
-#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset", sorting_opts = sorting_options)
+#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2,
+#'   tabset_options = "tabset", sorting_opts = sorting_options)
 #' }
 #' 
 #' @keywords internal
