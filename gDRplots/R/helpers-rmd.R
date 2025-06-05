@@ -506,7 +506,7 @@ prep_double_table_chunk <- function(tbl_list,
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
       
       if (!is.null(sorting_opts) && length(sorting_opts) > 0) {
-        sort_orders <- ifelse(grepl("^-", sorting_opts), 'desc', 'asc')
+        sort_orders <- ifelse(grepl("^-", sorting_opts), "desc", "asc")
         sorted_columns <- gsub("^-", "", sorting_opts)
         
         # check for column existence and filter out non-existing columns
