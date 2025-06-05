@@ -428,8 +428,6 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{kaleidoscope::load_depmap_merged}
-#'
 #' @examples
 #' \dontrun{
 #' feat_data_path <- file.path(".", "depmapdata")
