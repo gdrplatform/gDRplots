@@ -1,3 +1,6 @@
+## gDRplots 0.0.81 - 2025-05-28
+* update arg names in cgs functions
+
 ## gDRplots 0.0.80 - 2025-05-27
 * update chunk naming to fulfill `knitr` requirements
 

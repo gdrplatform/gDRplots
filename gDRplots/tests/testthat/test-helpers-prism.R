@@ -299,8 +299,8 @@ test_that("prep_dt_response_metric_diff works as expected", {
   dt_response_cl_diff <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped,
                                                       d_name = NULL,
                                                       d_name2 = NULL,
-                                                      resistant_cl = "cellline_GB",
-                                                      sensitive_cl = "cellline_HB",
+                                                      cellline1 = "cellline_GB",
+                                                      cellline2 = "cellline_HB",
                                                       additional_cols = drug_moa_2)
   expect_is(dt_response_cl_diff, "data.table")
   expect_true("xc50_cellline_diff" %in% names(dt_response_cl_diff))
