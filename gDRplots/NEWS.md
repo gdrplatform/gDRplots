@@ -1,4 +1,4 @@
-## gDRplots 0.0.81 - 2025-05-28
+## gDRplots 0.0.81 - 2025-06-06
 * update `pheatmap_qc` with standardized concentrations
 
 ## gDRplots 0.0.80 - 2025-05-27
