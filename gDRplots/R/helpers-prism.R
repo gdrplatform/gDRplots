@@ -226,9 +226,9 @@ prep_dt_response_scores <- function(dt_scores,
 #'  If set to NULL, the function will return a table for all available DrugName
 #' @param d_name2 string representing the drug name to be plotted (identifier \code{DrugName_2}).
 #'  If set to NULL, the function will return a table for all available DrugName_2
-#' @param resistant_cl string representing the resistant cell line name.
+#' @param cellline1 string representing the first cell line name.
 #'  If set to NULL, the function will return a table for all available cell lines.
-#' @param sensitive_cl string representing the sensitive cell line name.
+#' @param cellline2 string representing the second cell line name.
 #'  If set to NULL, the function will return a table for all available cell lines.
 #' @param normalization_type string with normalization types to be selected
 #'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -253,20 +253,20 @@ prep_dt_response_scores <- function(dt_scores,
 #'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
 #'   metric = c("xc50", "x_mean", "x_max"))
 #' 
-#' resistant_cl <- "cellline_GB"
-#' sensitive_cl <- "cellline_HB"
+#' cellline1 <- "cellline_GB"
+#' cellline2 <- "cellline_HB"
 #' 
 #' dt_response <- 
 #'   prep_dt_response_metric_diff(dt_metrics, d_name = NULL, d_name2 = NULL,
-#'   resistant_cl, sensitive_cl,
+#'   cellline1, cellline2,
 #'   metric = c("xc50", "x_mean", "x_max"))
 #' 
 #' @export
 prep_dt_response_metric_diff <- function(dt_metrics,
                                          d_name,
                                          d_name2,
-                                         resistant_cl = NULL,
-                                         sensitive_cl = NULL,
+                                         cellline1 = NULL,
+                                         cellline2 = NULL,
                                          normalization_type = "RV",
                                          metric = "xc50",
                                          fit_source = "gDR",
@@ -298,14 +298,14 @@ prep_dt_response_metric_diff <- function(dt_metrics,
     checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
   }
   
-  if (!is.null(resistant_cl)) {
-    checkmate::assert_string(resistant_cl)
-    checkmate::assert_choice(resistant_cl, choices = dt_metrics[[cellline_name]])
+  if (!is.null(cellline1)) {
+    checkmate::assert_string(cellline1)
+    checkmate::assert_choice(cellline1, choices = dt_metrics[[cellline_name]])
   }
   
-  if (!is.null(sensitive_cl)) {
-    checkmate::assert_string(sensitive_cl)
-    checkmate::assert_choice(sensitive_cl, choices = dt_metrics[[cellline_name]])
+  if (!is.null(cellline2)) {
+    checkmate::assert_string(cellline2)
+    checkmate::assert_choice(cellline2, choices = dt_metrics[[cellline_name]])
   }
   
   # select data for normalization type
@@ -323,9 +323,9 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   }
   
   # select required cell lines if specified
-  if (!is.null(resistant_cl) && !is.null(sensitive_cl)) {
-    dt_cellline_1 <- dt_response_metric[get(cellline_name) == resistant_cl]
-    dt_cellline_2 <- dt_response_metric[get(cellline_name) == sensitive_cl]
+  if (!is.null(cellline1) && !is.null(cellline2)) {
+    dt_cellline_1 <- dt_response_metric[get(cellline_name) == cellline1]
+    dt_cellline_2 <- dt_response_metric[get(cellline_name) == cellline2]
     
     # Calculate difference between cell lines
     dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2,

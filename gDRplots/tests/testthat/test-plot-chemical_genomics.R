@@ -38,11 +38,11 @@ test_that("analyze_cgs works correctly", {
   results4 <- analyze_cgs(metrics_data,
                           metrics = "xc50",
                           cl_name = NULL,
-                          resistant_cl = "CellLineName_1",
-                          sensitive_cl = "CellLineName_2",
+                          cellline1 = "CellLineName_1",
+                          cellline2 = "CellLineName_2",
                           normalization_type = "RV")
   expect_is(results4, "list")
-  expect_equal(names(results4), "CellLineName_1_CellLineName_2")
+  expect_equal(names(results4), "CellLineName_1 vs. CellLineName_2")
 })
 
 test_that("plot_cgs_ranking works correctly", {

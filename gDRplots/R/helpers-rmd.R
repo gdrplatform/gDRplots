@@ -455,18 +455,22 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'
 #' @inheritParams prep_plot_chunk
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
-#'   and the inner lists represent metrics.  Names are used as headings.
-#'   
+#'   and the inner lists represent metrics. Names are used as headings.
+#' @param sorting_opts A vector specifying global sorting options for all tables. 
+#'   Column names can be preceded by "-" to indicate descending order.
+#'
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
 #'   represents markdown code for the cell line's tabset.
-#'   
+#'
 #' @examples
 #' \dontrun{
 #' nested_tables <- list(
 #'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 #' )
-#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset_options = "tabset")
+#' sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
+#' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2,
+#'   tabset_options = "tabset", sorting_opts = sorting_options)
 #' }
 #' 
 #' @keywords internal
@@ -478,7 +482,8 @@ prep_double_table_chunk <- function(tbl_list,
                                     chunk_name,
                                     dwn_list = NULL,
                                     header_level = 3,
-                                    tabset_options = c("tabset", "tabset-dropdown")) {
+                                    tabset_options = c("tabset", "tabset-dropdown"),
+                                    sorting_opts = NULL) {
   
   checkmate::assert_list(tbl_list, min.len = 1)
   checkmate::assert_string(chunk_name)
@@ -486,6 +491,7 @@ prep_double_table_chunk <- function(tbl_list,
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
                               pattern = "unnumbered|tabset|tabset-dropdown")
+  checkmate::assert_character(sorting_opts, null.ok = TRUE)
   
   tbl_list_name <- deparse(substitute(tbl_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
@@ -508,6 +514,28 @@ prep_double_table_chunk <- function(tbl_list,
     )
     
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
+      
+      if (!is.null(sorting_opts) && length(sorting_opts) > 0) {
+        sort_orders <- ifelse(grepl("^-", sorting_opts), "desc", "asc")
+        sorted_columns <- gsub("^-", "", sorting_opts)
+        
+        # check for column existence and filter out non-existing columns
+        available_columns <- names(tbl_list[[cell_line]][[metric]])
+        valid_indices <- match(sorted_columns, available_columns, nomatch = 0)
+        valid_indices <- valid_indices[valid_indices > 0]
+        sort_orders <- sort_orders[match(sorted_columns, available_columns, nomatch = 0) > 0]
+        
+        if (length(valid_indices) > 0) {
+          order_list <- lapply(seq_along(valid_indices), function(i) {
+            list(valid_indices[i], sort_orders[i])
+          })
+        } else {
+          order_list <- NULL
+        }
+      } else {
+        order_list <- NULL
+      }
+      
       chunk <- c(
         sprintf("%s# %s\n", inner_lvl, metric),
         sprintf("```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
@@ -518,7 +546,9 @@ prep_double_table_chunk <- function(tbl_list,
                   "DT::formatRound(",
                   "DT::datatable(", 
                   tbl_list_name, 
-                  "[[\"", cell_line, "\"]][[\"", metric, "\"]]), ",
+                  "[[\"", cell_line, "\"]][[\"", metric, "\"]], ",
+                  if (!is.null(order_list)) paste0("options = list(order = ", deparse(order_list), ")"), 
+                  "), ",
                   "columns = names(Filter(is.numeric, ", 
                   tbl_list_name, 
                   "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 

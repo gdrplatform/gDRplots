@@ -8,11 +8,11 @@
 #' @param metrics A character vector specifying the response metrics to analyze:
 #' "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".
 #' @param cl_name An optional string specifying a single cell line to analyze. If NULL (default),
-#' all cell lines in the data are analyzed. Should be NULL if `resistant_cl` and `sensitive_cl` are provided.
-#' @param resistant_cl An optional string representing the resistant cell line name. 
-#' Should be specified alongside `sensitive_cl`.
-#' @param sensitive_cl An optional string representing the sensitive cell line name. 
-#' Should be specified alongside `resistant_cl`.
+#' all cell lines in the data are analyzed. Should be NULL if \code{cellline1} and \code{cellline2} are provided.
+#' @param cellline1 An optional string representing the first cell line name. 
+#' Should be specified alongside \code{cellline2}.
+#' @param cellline2 An optional string representing the second cell line name. 
+#' Should be specified alongside \code{cellline1}.
 #' @param normalization_type A string with normalization types to be selected, one of:
 #' "GR" ("GRvalue") or "RV" ("RelativeViability").
 #' Passed to \code{\link[gDRplots]{prep_dt_response_metric_diff}}.
@@ -32,16 +32,16 @@
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 #' analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 
-#' resistant_cl <- "CellLineName_1"
-#' sensitive_cl <- "CellLineName_2"
-#' analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
+#' cellline1 <- "CellLineName_1"
+#' cellline2 <- "CellLineName_2"
+#' analyze_cgs(dt_metrics, "xc50", cl_name = NULL, cellline1, cellline2)
 #' 
 #' @export
 analyze_cgs <- function(dt_metrics,
                         metrics,
                         cl_name = NULL,
-                        resistant_cl = NULL,
-                        sensitive_cl = NULL,
+                        cellline1 = NULL,
+                        cellline2 = NULL,
                         normalization_type = "RV") {
   
   # identifiers
@@ -56,11 +56,11 @@ analyze_cgs <- function(dt_metrics,
   checkmate::assert_true(all(metrics %in% names(dt_metrics)))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   
-  if (!is.null(resistant_cl) || !is.null(sensitive_cl)) {
-    checkmate::assert_string(resistant_cl, null.ok = FALSE)
-    checkmate::assert_string(sensitive_cl, null.ok = FALSE)
-    checkmate::assert_subset(resistant_cl, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
-    checkmate::assert_subset(sensitive_cl, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
+  if (!is.null(cellline1) || !is.null(cellline2)) {
+    checkmate::assert_string(cellline1, null.ok = FALSE)
+    checkmate::assert_string(cellline2, null.ok = FALSE)
+    checkmate::assert_subset(cellline1, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
+    checkmate::assert_subset(cellline2, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
   } else {
     checkmate::assert_string(cl_name, null.ok = TRUE)
     checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
@@ -80,8 +80,8 @@ analyze_cgs <- function(dt_metrics,
                                                metric = metrics,
                                                d_name = NULL,
                                                d_name2 = NULL,
-                                               resistant_cl = resistant_cl,
-                                               sensitive_cl = sensitive_cl,
+                                               cellline1 = cellline1,
+                                               cellline2 = cellline2,
                                                normalization_type = normalization_type,
                                                additional_cols = drug_moa)
   
@@ -102,7 +102,7 @@ analyze_cgs <- function(dt_metrics,
   metrics_diff <- metrics_diff[eval(drug_moa) %chin% names(moa_list)]
   
   # Determine FGSEA analysis path
-  if (!is.null(resistant_cl) && !is.null(sensitive_cl)) {
+  if (!is.null(cellline1) && !is.null(cellline2)) {
     # Perform FGSEA on the difference between the specified cell lines
     list_results <- lapply(metrics, function(metric) {
       metric_values <- metrics_diff[[metric]]
@@ -125,7 +125,7 @@ analyze_cgs <- function(dt_metrics,
                     metrics_diff = metrics_diff,
                     moa_list = moa_list)
     results <- list(results)
-    names(results) <- unique(paste0(metrics_diff$CellLineName_c1, "_", metrics_diff$CellLineName_c2))
+    names(results) <- unique(paste0(metrics_diff$CellLineName_c1, " vs. ", metrics_diff$CellLineName_c2))
   } else {
     # Analyze all or a single specified cell line
     cell_lines <- if (!is.null(cl_name)) {
