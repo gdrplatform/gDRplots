@@ -1,4 +1,6 @@
 #' Plot drug response curves for single-agent data
+#' 
+#' @note inspired by the \code{grob_SA} function written by Marc Hafner
 #'
 #' @param dt_metrics data.table representing data from the \code{Metrics} assay,
 #'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}

@@ -80,4 +80,7 @@ plot_boxplot_metric_sa_by_CLs(
   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
 
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{single-agent_plots}

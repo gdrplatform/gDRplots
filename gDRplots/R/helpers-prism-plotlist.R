@@ -23,6 +23,9 @@
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @keywords prism_plots
 #'   
 #' @export
@@ -212,6 +215,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @keywords prism_plots
 #'   
 #' @export

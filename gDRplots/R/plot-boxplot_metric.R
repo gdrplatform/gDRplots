@@ -25,6 +25,9 @@
 #'    grouped by \code{group_var}
 #' 
 #' @keywords single-agent_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -211,6 +214,9 @@ plot_boxplot_metric_sa <- function(
 #'    grouped by cellline names
 #' 
 #' @keywords single-agent_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -292,6 +298,9 @@ plot_boxplot_metric_sa_by_CLs <- function(
 #'    grouped by drug names
 #' 
 #' @keywords single-agent_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -381,6 +390,9 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'   grouped by \code{group_var}
 #' 
 #' @keywords combo_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -560,6 +572,9 @@ plot_boxplot_metric_combo <- function(
 #'   grouped by cell line names
 #' 
 #' @keywords combo_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -650,6 +665,9 @@ plot_boxplot_metric_combo_by_CLs <- function(
 #'    grouped by drug names
 #' 
 #' @keywords combo_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]

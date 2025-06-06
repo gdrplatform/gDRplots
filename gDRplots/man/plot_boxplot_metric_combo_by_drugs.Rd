@@ -60,4 +60,7 @@ plot_boxplot_metric_combo_by_drugs(dt_scores,
                                    colored_pts_flag = TRUE)
 
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{combo_plots}

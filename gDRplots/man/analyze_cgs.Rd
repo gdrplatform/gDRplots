@@ -54,4 +54,7 @@ sensitive_cl <- "CellLineName_2"
 analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
 
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{cgs_plots}

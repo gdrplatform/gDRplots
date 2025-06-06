@@ -51,6 +51,9 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 \description{
 Plot drug response curves for single-agent data
 }
+\note{
+inspired by the \code{grob_SA} function written by Marc Hafner
+}
 \examples{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]

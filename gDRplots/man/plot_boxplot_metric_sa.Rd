@@ -79,4 +79,7 @@ plot_boxplot_metric_sa(dt_metrics,
                        grouped_flag = TRUE)
 
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{single-agent_plots}

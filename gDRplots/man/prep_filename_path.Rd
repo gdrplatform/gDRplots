@@ -65,4 +65,7 @@ prep_filename_path(plt_list = nested_plotlist,
 \seealso{
 \code{\link[gDRplots]{prep_plot_chunk}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}

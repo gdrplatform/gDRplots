@@ -33,4 +33,7 @@ plot_fitting_acc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  normalization_type = "RV")
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{QC_plot}

@@ -45,4 +45,7 @@ plot_cgs_ranking(results,
   top_results_no_sig = 5,
   max_results_with_sig = 15)
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{cgs_plots}

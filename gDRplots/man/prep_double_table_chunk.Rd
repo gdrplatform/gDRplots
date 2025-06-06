@@ -46,4 +46,7 @@ prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2, tabset
 }
 
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{internal}

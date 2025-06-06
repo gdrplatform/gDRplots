@@ -149,7 +149,11 @@ plot_plate_stack_info <- function(dt_plate) {
 #' @param column_name The name of the column to plot
 #'
 #' @return A named list of ggplot objects for each barcode and column
+#' 
 #' @keywords QC_plot
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' test_data <- data.table::data.table(
 #'   WellColumn = rep(1:12, each = 8),
@@ -277,6 +281,9 @@ plot_plate <- function(dt_plate, column_name) {
 #' @param untrt_tag Untreated tag identifier
 #' 
 #' @keywords internal
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @return A list containing color mappings for Gnumber and Gnumber_2
 generate_color_mappings <- function(dt_plate_subset,
                                     untrt_tag = gDRutils::get_env_identifiers("untreated_tag")) {

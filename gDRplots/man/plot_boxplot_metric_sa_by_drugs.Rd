@@ -79,4 +79,7 @@ plot_boxplot_metric_sa_by_drugs(
   colors_vec = c("deeppink", "darkcyan", "orange", "darkblue", "limegreen"))
 
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{single-agent_plots}

@@ -26,6 +26,8 @@
 #' }
 #' @keywords cgs_plots
 #' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 #' analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
@@ -35,7 +37,6 @@
 #' analyze_cgs(dt_metrics, "xc50", cl_name = NULL, resistant_cl, sensitive_cl)
 #' 
 #' @export
-#'
 analyze_cgs <- function(dt_metrics,
                         metrics,
                         cl_name = NULL,
@@ -178,7 +179,11 @@ analyze_cgs <- function(dt_metrics,
 #' to plot when there are more than this number of significant values.
 #'
 #' @return A ggplot2 object with cgs results
+#' 
 #' @keywords cgs_plots
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
 #' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")

@@ -558,6 +558,8 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #' 
 #' @keywords prism_plots
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export
 prep_dt_assoc <- function(dt_response,
                           dt_depmap,

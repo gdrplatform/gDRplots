@@ -89,6 +89,9 @@ assert_RGB_format <- function(x) {
 #' get_qual_colors(35)
 #' 
 #' @keywords utils_color
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)

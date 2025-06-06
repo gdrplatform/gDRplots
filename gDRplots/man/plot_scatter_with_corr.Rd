@@ -32,4 +32,7 @@ outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
 \description{
 Plot scatter with correlation
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}

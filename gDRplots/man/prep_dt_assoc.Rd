@@ -28,4 +28,7 @@ A named list with elements, that may be input to \code{\link[gDRplots]{plot_volc
 \description{
 Prep table with calculated linear associations
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}

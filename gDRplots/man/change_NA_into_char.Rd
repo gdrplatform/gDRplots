@@ -17,4 +17,7 @@ character (for NA -> given string)
 \description{
 Change NA into given string
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}

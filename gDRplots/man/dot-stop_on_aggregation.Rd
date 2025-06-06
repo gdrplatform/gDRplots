@@ -17,4 +17,7 @@
 \description{
 idea from: https://github.com/Rdatatable/data.table/issues/5386
 }
+\author{
+Arkadiusz Gladki \email{arkadiusz.gladki@contractors.roche.com}
+}
 \keyword{internal}

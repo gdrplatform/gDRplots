@@ -129,7 +129,10 @@ plot_volcano_assoc <- function(dt_assoc,
 #'  (will be used as a plot title)
 #'
 #' @return \code{ggplot} object containing a scatter plot with correlation
+#' 
 #' @keywords prism_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @export
 plot_scatter_with_corr <- function(dt_response,
@@ -213,7 +216,10 @@ plot_scatter_with_corr <- function(dt_response,
 #' @param ncol number of plot column in panel
 #'
 #' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features 
+#' 
 #' @keywords prism_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @export
 plot_scatter_with_corr_panel <- function(dt_response,
@@ -371,7 +377,10 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #'  that has 0-1 values only (categorical character but without relation one-to-one for ids and feature)
 #'
 #' @return \code{ggplot} object containing boxplots for variable levels
+#' 
 #' @keywords prism_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @export
 plot_boxplot_num <- function(dt_response,
@@ -463,7 +472,10 @@ plot_boxplot_num <- function(dt_response,
 #' @param ncol number of plot column in panel
 #'
 #' @return \code{ggplot} object containing boxplots for variable levels (0-1)
+#' 
 #' @keywords prism_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @export
 plot_boxplot_num_panel <- function(dt_response,
@@ -642,6 +654,8 @@ plot_boxplot_num_panel <- function(dt_response,
 #' 
 #' @keywords prism_plots
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export
 plot_boxplot_meta <- function(dt_response,
                               dt_depmap, 
@@ -792,6 +806,8 @@ plot_boxplot_meta <- function(dt_response,
 #' 
 #' @keywords prism_plots
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export
 plot_volcano_assoc_panel <- function(dt_response,
                                      dt_depmap,
@@ -885,6 +901,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' .get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
 #' }
 #' @keywords prism_plots
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .get_data_type <- function(dt_,
                            desc_col = NULL) {
   

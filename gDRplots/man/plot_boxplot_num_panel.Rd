@@ -35,4 +35,7 @@ that has 0-1 values only (categorical character but without relation one-to-one 
 \description{
 Plot panel with boxplots
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}

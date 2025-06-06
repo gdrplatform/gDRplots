@@ -26,4 +26,7 @@ p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
 estimate_plot_size(p)
 
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{internal}

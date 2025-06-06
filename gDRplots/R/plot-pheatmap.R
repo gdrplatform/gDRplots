@@ -372,6 +372,8 @@ pheatmap_qc <- function(
 #' 
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return A named list with elements:
 #' \itemize{
 #'   \item \code{data} a list containing the information visualized in the heatmap:
@@ -676,6 +678,8 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return A named list with elements:
 #' \itemize{
 #'   \item \code{data} a list containing the information visualized in the heatmap:
@@ -947,6 +951,8 @@ pheatmap_with_anno_cd <- function(
 #'             
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return A named list with elements:
 #' \itemize{
 #'   \item \code{data} a list containing the information visualized in the heatmap:
@@ -1198,6 +1204,8 @@ get_hm_title <- function(metric = "xc50",
 #' 
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return matrix with values for selected metric with \code{CellLinName} in the rows
 #'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
 #' 
@@ -1309,6 +1317,9 @@ prep_pheatmap_matrix <- function(dt_response,
 #'
 #' @return character (for NA -> given string)
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
@@ -1336,6 +1347,9 @@ change_NA_into_char <- function(x,
 #' get_ann_color_map(dt_ann)
 #' 
 #' @keywords utils_color
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 get_ann_color_map <- function(dt_ann) {
   checkmate::assert_data_table(dt_ann)
@@ -1383,6 +1397,9 @@ get_ann_color_map <- function(dt_ann) {
 #' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
 #' 
 #' @keywords utils_color
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 fill_ann_color_map <- function(dt_ann,
                                map_ann) {
@@ -1455,6 +1472,7 @@ fill_ann_color_map <- function(dt_ann,
 #' }
 #' 
 #' @keywords internal
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .get_pheatmap_cluster_param <- function(mat_to_cluster,
                                         distfun = stats::dist,
                                         additional_condition = TRUE) {
@@ -1485,6 +1503,8 @@ fill_ann_color_map <- function(dt_ann,
 #'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
 #'
 #' @return \code{data.table} with annotation updated to \code{mat_with_metric}
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @keywords internal
 .fill_pheatmap_annotation <- function(
@@ -1530,6 +1550,8 @@ fill_ann_color_map <- function(dt_ann,
 #' @param formula string with the formula used in \code{data.table::dcast}
 #' 
 #' @keywords internal
+#' 
+#' @author Arkadiusz Gladki \email{arkadiusz.gladki@@contractors.roche.com}
 #'
 #' @return \code{NULL}
 .stop_on_aggregation <- function(fname, formula) {
@@ -1577,6 +1599,8 @@ fill_ann_color_map <- function(dt_ann,
 #' }
 #' 
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .get_pheatmap_number_color <- function(mat_with_metric,
                                        colors_vec,
                                        breaks,

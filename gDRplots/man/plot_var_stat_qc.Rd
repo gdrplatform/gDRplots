@@ -54,4 +54,7 @@ plot_var_stat_qc(dt_assay = dt_metrics,
                  with_table = TRUE)
                          
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{QC_plot}

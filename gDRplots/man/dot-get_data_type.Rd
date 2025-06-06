@@ -39,4 +39,7 @@ tab_feat <- data.table::data.table(
 .get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
 }
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}
