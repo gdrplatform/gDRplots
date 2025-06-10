@@ -30,4 +30,7 @@ test_data <- data.table::data.table(
   )
 plot_plate(test_data, "Gnumber")[["A"]]
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{QC_plot}

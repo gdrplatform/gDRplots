@@ -27,4 +27,7 @@ one of: \code{CellLineName} for rows or \code{DrugName} for column.}
 \description{
 Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}

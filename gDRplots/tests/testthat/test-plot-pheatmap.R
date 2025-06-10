@@ -49,17 +49,15 @@ test_that("pheatmap_qc works as expected", {
   expect_is(hm_4[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_4[["tree_col"]], NA) # no dendrogram for cols
   
-  ls_col <- c("#000000", "#F0F0F0")
+  ls_col <- c("#000000", "#00FFFF")
   hm_5 <- pheatmap_qc(dt_average = dt_average,
                       metric = "x_std",
-                      colors_vec = ls_col) 
+                      colors_vec = ls_col,
+                      cluster_rows = FALSE) 
   expect_is(hm_5, "pheatmap")
-  hm_5_data <- hm_5[["gtable"]][["grobs"]][[2]][["children"]][[1]][["gp"]][["fill"]]
-  min_val <- data.table::setorderv(data.table::copy(dt_average)[normalization_type == "GR", ], "x_std")[1, ]
-  expect_equal(hm_5_data[min_val$clid, 
-                         grepl(sprintf("%s_%s_%s_", min_val$Gnumber, min_val$Gnumber_2, min_val$Concentration), 
-                               colnames(hm_5_data))],
-               ls_col[2]) # check rev
+  hm_5_bar <- hm_5[["gtable"]][["grobs"]][[5]][["children"]][[1]][["gp"]][["fill"]]
+  expect_equal(hm_5_bar[1], ls_col[2]) # check rev
+  expect_equal(hm_5_bar[NROW(hm_5_bar)], ls_col[1]) # check rev
   
   # scenario: error is thrown on duplicates
   dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))

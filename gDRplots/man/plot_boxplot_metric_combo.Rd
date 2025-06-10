@@ -80,4 +80,7 @@ plot_boxplot_metric_combo(
   colors_vec = c("deeppink", "darkblue"))
 
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{combo_plots}

@@ -12,6 +12,9 @@
 #' @return \code{ggplot} object containing lollipop plot with stat value for each drug
 #'
 #' @keywords QC_plot
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -105,6 +108,9 @@ plot_var_stat_qc <- function(dt_assay,
 #' @return \code{ggplot} object containing panel with lollipop plots with r2 and rss values for each drug
 #'
 #' @keywords QC_plot
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
@@ -190,6 +196,9 @@ plot_fitting_acc <- function(dt_assay,
 #' @return \code{pheatmap} object containing hetamap of mapping controls to treated
 #'
 #' @keywords QC_plot
+#' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]

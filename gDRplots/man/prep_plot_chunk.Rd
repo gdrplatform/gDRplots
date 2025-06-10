@@ -71,4 +71,7 @@ prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "un
 \seealso{
 \code{\link[knitr]{knit}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}

@@ -133,4 +133,7 @@ ggpubr::as_ggplot(hm_2[["gtable"]])
 \seealso{
 \code{\link[pheatmap]{pheatmap}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{pheat_ann}

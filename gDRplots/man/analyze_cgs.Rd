@@ -54,4 +54,7 @@ cellline2 <- "CellLineName_2"
 analyze_cgs(dt_metrics, "xc50", cl_name = NULL, cellline1, cellline2)
 
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{cgs_plots}

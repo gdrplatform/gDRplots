@@ -428,8 +428,6 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' 
 #' @keywords internal
 #'
-#' @seealso \code{kaleidoscope::load_depmap_merged}
-#'
 #' @examples
 #' \dontrun{
 #' feat_data_path <- file.path(".", "depmapdata")
@@ -559,6 +557,8 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #' }
 #' 
 #' @keywords prism_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @export
 prep_dt_assoc <- function(dt_response,

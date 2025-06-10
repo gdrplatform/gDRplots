@@ -55,4 +55,7 @@ nested list of plots
 \description{
 Create a nested list of plots for PRISM data with single-agent metrics
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}

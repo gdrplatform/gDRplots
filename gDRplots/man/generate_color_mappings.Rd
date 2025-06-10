@@ -20,4 +20,7 @@ A list containing color mappings for Gnumber and Gnumber_2
 \description{
 Helper function to generate color mappings for Gnumber and Gnumber_2
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{internal}

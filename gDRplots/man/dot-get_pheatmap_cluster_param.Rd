@@ -53,4 +53,7 @@ add_cond <- NCOL(mat) > 10
 \seealso{
 \code{\link{compute_distances}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}

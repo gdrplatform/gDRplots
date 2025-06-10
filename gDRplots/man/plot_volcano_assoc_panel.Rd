@@ -35,4 +35,7 @@ the name of the selected metadata from \code{dt_depmap} - respectively}
 \description{
 Plot panel with volcano plot and according to the data type - scatter plots or box plots
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{prism_plots}

@@ -121,14 +121,19 @@ pheatmap_qc <- function(
       if (nm == conc_2) tab_response[[conc_2]] <- as.numeric(tab_response[[conc_2]])
     }
   }
+  # standardization of concentration
+  conc_map <- gDRutils::map_conc_to_standardized_conc(tab_response[[conc]], 
+                                                      tab_response[[conc_2]])
+  tab_response <- merge(tab_response, conc_map, by.x = conc, by.y = "concs")
+  tab_response <- merge(tab_response, conc_map, by.x = conc_2, by.y = "concs", suffixes = c("", "_2"))
   
   # prep pivot data
-  tab_response <- data.table::setorderv(tab_response, c(gnumber, gnumber_2, conc, conc_2))
+  tab_response <- data.table::setorderv(tab_response, c(gnumber, gnumber_2, "rconcs", "rconcs_2"))
   tab_response$col_pivot_name <- sprintf("%s_%s_%s_%s",
                                          tab_response[[gnumber]],
                                          tab_response[[gnumber_2]],
-                                         tab_response[[conc]],
-                                         tab_response[[conc_2]])
+                                         format(tab_response[["rconcs"]], scientific = FALSE),
+                                         format(tab_response[["rconcs_2"]], scientific = FALSE))
   col_pivot_name <- "col_pivot_name"
   tryCatch({
     fm_string <- "clid ~ col_pivot_name"
@@ -156,16 +161,16 @@ pheatmap_qc <- function(
   if (metric == "x_std") mat_cvd <- mat_cvd ^ 2
   
   # annotation
-  info_drug <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber, conc)])
-  info_drug_2 <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber_2, conc_2)])
-  data.table::setnames(info_drug_2, old = c(gnumber_2, conc_2), new = c(gnumber, conc))
+  info_drug <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber, "rconcs")])
+  info_drug_2 <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber_2, "rconcs_2")])
+  data.table::setnames(info_drug_2, old = c(gnumber_2, "rconcs_2"), new = c(gnumber, "rconcs"))
   info_drug <- rbind(info_drug, info_drug_2)[get(gnumber) != "untreated"]
   tryCatch({
     fm_string <- "col_pivot_name ~ get(gnumber)"
     drug_annotation <- data.table::dcast(
       data = info_drug,
       formula = stats::as.formula(fm_string),
-      value.var = conc
+      value.var = "rconcs"
     )
   }, warning = function(w) {
     .stop_on_aggregation("pheatmap_qc", fm_string)
@@ -366,6 +371,8 @@ pheatmap_qc <- function(
 #' ggpubr::as_ggplot(hm_3[["gtable"]])
 #' 
 #' @keywords pheat_ann
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @return A named list with elements:
 #' \itemize{
@@ -671,6 +678,8 @@ pheatmap_with_anno_sa <- function(
 #' 
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return A named list with elements:
 #' \itemize{
 #'   \item \code{data} a list containing the information visualized in the heatmap:
@@ -942,6 +951,8 @@ pheatmap_with_anno_cd <- function(
 #'             
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return A named list with elements:
 #' \itemize{
 #'   \item \code{data} a list containing the information visualized in the heatmap:
@@ -1193,6 +1204,8 @@ get_hm_title <- function(metric = "xc50",
 #' 
 #' @keywords pheat_ann
 #' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @return matrix with values for selected metric with \code{CellLinName} in the rows
 #'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
 #' 
@@ -1304,6 +1317,9 @@ prep_pheatmap_matrix <- function(dt_response,
 #'
 #' @return character (for NA -> given string)
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
@@ -1331,6 +1347,9 @@ change_NA_into_char <- function(x,
 #' get_ann_color_map(dt_ann)
 #' 
 #' @keywords utils_color
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 get_ann_color_map <- function(dt_ann) {
   checkmate::assert_data_table(dt_ann)
@@ -1378,6 +1397,9 @@ get_ann_color_map <- function(dt_ann) {
 #' fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
 #' 
 #' @keywords utils_color
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @export 
 fill_ann_color_map <- function(dt_ann,
                                map_ann) {
@@ -1450,6 +1472,7 @@ fill_ann_color_map <- function(dt_ann,
 #' }
 #' 
 #' @keywords internal
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .get_pheatmap_cluster_param <- function(mat_to_cluster,
                                         distfun = stats::dist,
                                         additional_condition = TRUE) {
@@ -1480,6 +1503,8 @@ fill_ann_color_map <- function(dt_ann,
 #'   one of: \code{CellLineName} for rows or \code{DrugName} for column.
 #'
 #' @return \code{data.table} with annotation updated to \code{mat_with_metric}
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @keywords internal
 .fill_pheatmap_annotation <- function(
@@ -1525,6 +1550,8 @@ fill_ann_color_map <- function(dt_ann,
 #' @param formula string with the formula used in \code{data.table::dcast}
 #' 
 #' @keywords internal
+#' 
+#' @author Arkadiusz Gladki \email{arkadiusz.gladki@@contractors.roche.com}
 #'
 #' @return \code{NULL}
 .stop_on_aggregation <- function(fname, formula) {
@@ -1572,6 +1599,8 @@ fill_ann_color_map <- function(dt_ann,
 #' }
 #' 
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .get_pheatmap_number_color <- function(mat_with_metric,
                                        colors_vec,
                                        breaks,

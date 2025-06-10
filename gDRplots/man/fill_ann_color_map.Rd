@@ -37,4 +37,7 @@ fill_ann_color_map(dt_ann = annotation_manual, map_ann = annotation_map)
 \seealso{
 \code{\link{pheatmap_with_anno_sa}} \code{\link{pheatmap_with_anno_combo}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{utils_color}

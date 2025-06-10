@@ -60,4 +60,7 @@ mat <- prep_pheatmap_matrix(dt_response = dt_scores,
                             experiment_type = gDRutils::get_supported_experiments("combo"))
                             
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{pheat_ann}

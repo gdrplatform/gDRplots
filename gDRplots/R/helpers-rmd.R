@@ -47,6 +47,9 @@
 #' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
 #' }
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
@@ -187,6 +190,9 @@ prep_plot_chunk <- function(plt_list,
 #' @return list of character vectors - input for \code{knitr::knit}
 #' 
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
@@ -333,6 +339,8 @@ neutralize_spaces <- function(x,
 #'
 #' @keywords internal
 #' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @export
 estimate_plot_size <- function(plt,
                                base_width = 10,
@@ -467,6 +475,8 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' 
 #' @keywords internal
 #' 
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
 #' @export
 prep_double_table_chunk <- function(tbl_list,
                                     chunk_name,
@@ -563,6 +573,9 @@ prep_double_table_chunk <- function(tbl_list,
 #' @return string with html link code
 #'
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
@@ -590,6 +603,9 @@ create_zoom_link <- function(img_path,
 #' @return string with html download code
 #'
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @seealso \code{\link[knitr]{knit}}
 #' 
 #' @export
@@ -652,6 +668,9 @@ create_download_link <- function(dwn_path,
 #' }
 #'
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
 #' @seealso \code{\link[gDRplots]{prep_plot_chunk}}
 #' 
 #' @export

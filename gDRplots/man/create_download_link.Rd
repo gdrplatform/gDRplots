@@ -21,4 +21,7 @@ The function output should be wrapped in \code{knitr::knit()}.
 \seealso{
 \code{\link[knitr]{knit}}
 }
+\author{
+Janina Smoła \email{janina.smola@contractors.roche.com}
+}
 \keyword{internal}
