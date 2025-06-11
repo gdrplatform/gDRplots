@@ -525,7 +525,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   new_selected_feats <- c(selected_feats, "NU_non_avial")
   plt_2 <- 
     plot_boxplot_num_panel(dt_response = dt_response,
-                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
                            selected_feats = new_selected_feats,
                            selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
   expect_is(plt_2, "gg")
@@ -546,7 +546,7 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_length(plt_3[["layers"]], 0) # empty plot
   expect_equal(plt_3[["labels"]][["x"]], "")
   expect_equal(plt_3[["labels"]][["y"]], selected_metric)
-  expect_equal(plt_3[["labels"]][["title"]], "NU_fatures : all NAs")
+  expect_equal(plt_3[["labels"]][["title"]], "NU_fatures: all NAs")
   
   # some NAs in selected_feats 
   selected_feats_with_NAs <- c(NA, selected_feats, NA) 
@@ -611,6 +611,30 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_true(any(is.infinite(ggplot2::ggplot_build(plt_7_raw)$data[[3]]$y)))
   expect_false(any(is.infinite(ggplot2::ggplot_build(plt_7_cap)$data[[3]]$y)))
   
+  # all selected_feats are not avialave in data
+  plt_8 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = dt_depmap_na, 
+                           selected_feats = LETTERS[1:5])
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 0) # empty plot
+  expect_true(grepl("all NAs", plt_8[["labels"]][["title"]]))
+  
+  # there are more category - one feat is not avialable
+  dt_depmap_multi <- data.table::copy(obj_depmap_feat_2[["dt_depmap"]])
+  dt_depmap_multi[[selected_feats[2]]][1:10] <- 2
+  
+  plt_9 <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = dt_depmap_multi, 
+                           selected_feats = new_selected_feats)
+  expect_is(plt_9, "gg")
+  expect_length(plt_9[["layers"]], 3)
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_9)[["data"]][[2]]$x)),
+               sum(!is.na(unique(as.vector(as.matrix(
+                 dt_depmap_multi[, .SD, .SDcols = intersect(new_selected_feats, names(dt_depmap_multi))])))))
+  )
+  
   # testing assertions
   expect_error(plot_boxplot_num_panel(dt_response = unlist(dt_response),
                                       dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
@@ -648,6 +672,8 @@ test_that("plot_boxplot_meta works as expected", {
   dt_response <- dt_response_met[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
   dt_response_capped <- 
     dt_response_met_capped[, c("rId", "cId", "CellLineName", selected_metric), with = FALSE]
+  selected_metric_2 <- "RV_gDR_x_10"
+  dt_response_2 <- dt_response_dose[, c("rId", "cId", "CellLineName", selected_metric_2), with = FALSE]
   
   grp_stat <- dt_depmap_meta_lng[CCLEName %in% dt_response$CellLineName, .N, by = meta_xx]
   grp_stat$meta_xx <- 
@@ -710,18 +736,19 @@ test_that("plot_boxplot_meta works as expected", {
                sort(grp_stat[!is.na(meta_xx) & N > 1]$meta_xx))
   
   # scenario: x-label with max 8 character
-  plt_3 <- plot_boxplot_meta(dt_response = dt_response,
+  plt_3 <- plot_boxplot_meta(dt_response = dt_response_2,
                              dt_depmap = dt_depmap_meta, 
                              selected_feat_meta_col = selected_meta,
                              max_x_lbl_length = 8)
   expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 4)
+  expect_length(plt_3[["layers"]], 5)
   ls_x_lbl <- ggplot2::layer_scales(plt_3)$x$labels
   short_lbl <- paste0(substr(grp_stat[!is.na(meta_xx) & nchar(meta_xx) > 8]$meta_xx, 1, 8 - 3), "...")
   expect_true(all(grp_stat[!is.na(meta_xx) & nchar(meta_xx) < 8]$meta_xx %in% ls_x_lbl))
   expect_true(short_lbl %in% ls_x_lbl)
   expect_equal(sort(ggplot2::layer_scales(plt_3)$x$range$range),
                sort(grp_stat[!is.na(meta_xx)]$meta_xx))
+  expect_equal(ggplot2::ggplot_build(plt_3)[["data"]][[5]]$yintercept, 1)
   
   # scenario: plot with combo metric
   selected_metric_2 <- "RV_gDR_bliss_score"
