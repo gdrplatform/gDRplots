@@ -533,7 +533,6 @@ test_that("pheatmap_with_anno_cd works as expected", {
                                  metric = "x_max",
                                  normalization_type = "RV",
                                  colors_vec = col_pal,
-                                 cluster_cols = FALSE,
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col,
                                  annotation_colors = annotation_map)
@@ -551,9 +550,9 @@ test_that("pheatmap_with_anno_cd works as expected", {
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
-  expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
-  expect_true(all(col_pal %in% plt_2$gtable$grobs[[10]]$children[[1]]$gp$fill))
-  expect_equal(unique(c(plt_2$gtable$grobs[[2]]$children[[2]]$gp$col)), "white") # dark background
+  expect_is(plt_2[["tree_col"]], "hclust") # cols are clustered
+  expect_true(all(col_pal %in% plt_2$gtable$grobs[[11]]$children[[1]]$gp$fill))
+  expect_equal(unique(c(plt_2$gtable$grobs[[3]]$children[[2]]$gp$col)), "white") # dark background
   
   col_pal <- c("#FF8C00", "#D3D3D3")
   out_2a <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2, 
