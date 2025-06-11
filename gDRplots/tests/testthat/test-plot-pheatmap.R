@@ -34,16 +34,17 @@ test_that("pheatmap_qc works as expected", {
   hm_3 <- pheatmap_qc(dt_average = dt_average_NA_r,
                       lbl_by_CellLineName = TRUE) 
   expect_is(hm_3, "pheatmap")
-  expect_false("cellline_AA" %in% hm_3[["gtable"]][["grobs"]][[3]][["label"]])
+  expect_false("cellline_AA" %in% hm_3$gtable$grobs[[3]]$label)
   
   # scenario: coll with all NA
   dt_average_NA_c <- data.table::copy(dt_average)
-  dt_average_NA_c[DrugName == "drug_002"]$x <- NA
+  dt_average_NA_c[DrugName == "drug_002"]$x_std <- NA
   
   hm_4 <- pheatmap_qc(dt_average = dt_average_NA_c,
+                      metric = "x_std",
                       lbl_by_DrugName = TRUE) 
   expect_is(hm_4, "pheatmap")
-  expect_false("drug_002" %in% hm_4[["gtable"]][["grobs"]][[5]][["label"]])
+  expect_false("drug_002" %in% hm_4$gtable$grobs[[5]]$label)
   
   # combo experiments
   se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -64,16 +65,17 @@ test_that("pheatmap_qc works as expected", {
   hm_6 <- pheatmap_qc(dt_average = dt_average_combo_NA_r,
                       lbl_by_CellLineName = TRUE) 
   expect_is(hm_6, "pheatmap")
-  expect_false("cellline_AA" %in% hm_6[["gtable"]][["grobs"]][[3]][["label"]])
+  expect_false("cellline_AA" %in% hm_6$gtable$grobs[[3]]$label)
   
   # scenario: coll with all NA
   dt_average_combo_NA_c <- data.table::copy(dt_average_combo)
-  dt_average_combo_NA_c[DrugName == "drug_002"]$x <- NA
+  dt_average_combo_NA_c[DrugName == "drug_002"]$x_std <- NA
   
   hm_7 <- pheatmap_qc(dt_average = dt_average_combo_NA_c,
+                      metric = "x_std",
                       lbl_by_DrugName = TRUE) 
   expect_is(hm_7, "pheatmap")
-  expect_false("drug_002" %in% hm_7[["gtable"]][["grobs"]][[5]][["label"]])
+  expect_false("drug_002" %in% hm_7$gtable$grobs[[5]]$label)
   
   dt_average_combo_NA_c2 <- data.table::copy(dt_average_combo)
   dt_average_combo_NA_c2[DrugName_2 == "drug_026"]$x <- NA
@@ -81,7 +83,7 @@ test_that("pheatmap_qc works as expected", {
   hm_8 <- pheatmap_qc(dt_average = dt_average_combo_NA_c2,
                       lbl_by_DrugName = TRUE) 
   expect_is(hm_8, "pheatmap")
-  expect_false("drug_026" %in% hm_8[["gtable"]][["grobs"]][[5]][["label"]])
+  expect_false("drug_026" %in% hm_8$gtable$grobs[[5]]$label)
   
   # co-dilution experiment
   mae <- gDRutils::get_synthetic_data("combo_codilution")
@@ -104,16 +106,17 @@ test_that("pheatmap_qc works as expected", {
   hm_10 <- pheatmap_qc(dt_average = dt_average_cd_NA_r,
                        lbl_by_CellLineName = TRUE) 
   expect_is(hm_10, "pheatmap")
-  expect_false("cellline_AA" %in% hm_10[["gtable"]][["grobs"]][[3]][["label"]])
+  expect_false("cellline_AA" %in% hm_10$gtable$grobs[[3]]$label)
   
   # scenario: coll with all NA
   dt_average_cd_NA_c <- data.table::copy(dt_average_cd)
-  dt_average_cd_NA_c[DrugName == "drug_002"]$x <- NA
+  dt_average_cd_NA_c[DrugName == "drug_002"]$x_std <- NA
   
   hm_11 <- pheatmap_qc(dt_average = dt_average_cd_NA_c,
+                       metric = "x_std",
                        lbl_by_DrugName = TRUE) 
   expect_is(hm_11, "pheatmap")
-  expect_false("drug_002" %in% hm_11[["gtable"]][["grobs"]][[5]][["label"]])
+  expect_false("drug_002" %in% hm_11$gtable$grobs[[5]]$label)
   
   # sceario all valuse in matrix is NA -> return NA heatmap
   dt_average_cd_NA_c2 <- data.table::copy(dt_average_cd)
@@ -123,7 +126,8 @@ test_that("pheatmap_qc works as expected", {
                        lbl_by_DrugName = TRUE)
   expect_is(hm_12, "pheatmap")
   expect_equal( # all NA has color red
-    unique(as.vector(hm_12[["gtable"]][["grobs"]][[2]][["children"]][[1]][["gp"]][["fill"]])), "red")
+    unique(as.vector(hm_12$gtable$grobs[[2]]$children[[1]]$gp$fill)), "red")
+  expect_equal(range(as.numeric(hm_12$gtable$grobs[[6]]$children[[2]]$label)), c(0, 1))
   
   # scenario: sa with definde colors and x_std
   ls_col <- c("#000000", "#00FFFF")
@@ -132,7 +136,7 @@ test_that("pheatmap_qc works as expected", {
                        colors_vec = ls_col,
                        cluster_rows = FALSE) 
   expect_is(hm_13, "pheatmap")
-  hm_13_bar <- hm_13[["gtable"]][["grobs"]][[5]][["children"]][[1]][["gp"]][["fill"]]
+  hm_13_bar <- hm_13$gtable$grobs[[5]]$children[[1]]$gp$fill
   expect_equal(hm_13_bar[1], ls_col[2]) # check rev
   expect_equal(hm_13_bar[NROW(hm_13_bar)], ls_col[1]) # check rev
   
@@ -245,8 +249,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_2[["tree_row"]], "hclust") # dendrogram
   expect_is(plt_2[["tree_col"]], "hclust") # dendrogram
   expect_true(all(col_pal %in%
-                    plt_2[["gtable"]][["grobs"]][[7]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(unique(c(plt_2[["gtable"]][["grobs"]][[4]][["children"]][[2]][["gp"]][["col"]])),
+                    plt_2$gtable$grobs[[7]]$children[[1]]$gp$fill))
+  expect_equal(unique(c(plt_2$gtable$grobs[[4]]$children[[2]]$gp$col)),
                "white")
   
   # scenario 3: annotations for row and col 
@@ -272,6 +276,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   data.table::setkey(res_3, NULL)
   
   out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_one_val,
+                                 dt_metrics_capped = dt_metrics_capped,
                                  colors_vec = c("darkblue", "darkred"),
                                  annotation_row = annotation_manual_row,
                                  annotation_col = annotation_manual_col)
@@ -296,7 +301,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(plt_3$gtable$grobs[[9]]$label, c("group"))
   expect_is(plt_3[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_3[["tree_col"]], "hclust") # clustering despite Inf
-  expect_equal(unique(c(plt_3[["gtable"]][["grobs"]][[3]][["children"]][[2]][["gp"]][["col"]])),
+  expect_equal(unique(c(plt_3$gtable$grobs[[3]]$children[[2]]$gp$col)),
                "white") # darkbackbround
   
   # scenario 4: incomplete annotations for col and color maps; and capped metrics
@@ -329,7 +334,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_4[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_4[["tree_col"]], "hclust") # clustering despite Inf
   expect_false(any(is.infinite(
-    as.numeric(plt_4[["gtable"]][["grobs"]][[3]][["children"]][[2]][["label"]])))) # capped
+    as.numeric(plt_4$gtable$grobs[[3]]$children[[2]]$label)))) # capped
   
   # scenario 5: incomplete annotations for row
   annotation_manual_row <-
@@ -406,10 +411,24 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(plt_7$gtable$grobs[[1]]$label, "X MAX")
   expect_is(plt_7[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_7[["tree_col"]], "hclust") # clustering despite Inf
-  expect_true(all(col_pal %in%
-                    plt_7[["gtable"]][["grobs"]][[7]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(plt_7[["gtable"]][["grobs"]][[4]][["children"]][[2]][["gp"]][["col"]],
-               "black")
+  expect_true(all(col_pal %in% plt_7$gtable$grobs[[7]]$children[[1]]$gp$fill))
+  expect_equal(plt_7$gtable$grobs[[4]]$children[[2]]$gp$col, "black")
+  
+  # scenario 8: all values are the same
+  dt_metrics_eq <- data.table::copy(dt_metrics)
+  val_eq <- 5
+  dt_metrics_eq[normalization_type == "RV"]$ec50 <- val_eq
+  out_8 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_eq, 
+                                 normalization_type = "RV",
+                                 metric = "ec50")
+  expect_length(out_8, 2)
+  expect_equal(names(out_8), c("data", "heatmap"))
+  data_8 <- out_8[["data"]]
+  expect_is(data_8, "list")
+  plt_8 <- out_8[["heatmap"]]
+  expect_is(plt_8, "pheatmap")
+  expect_equal(range(as.numeric(plt_8$gtable$grobs[[6]]$children[[2]]$label)),
+               c(val_eq - 1, val_eq))
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
@@ -533,10 +552,8 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_2, "pheatmap")
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
-  expect_true(all(col_pal %in%
-                    plt_2[["gtable"]][["grobs"]][[10]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(unique(c(plt_2[["gtable"]][["grobs"]][[2]][["children"]][[2]][["gp"]][["col"]])),
-               "white") # dark background
+  expect_true(all(col_pal %in% plt_2$gtable$grobs[[10]]$children[[1]]$gp$fill))
+  expect_equal(unique(c(plt_2$gtable$grobs[[2]]$children[[2]]$gp$col)), "white") # dark background
   
   col_pal <- c("#FF8C00", "#D3D3D3")
   out_2a <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2, 
@@ -548,10 +565,8 @@ test_that("pheatmap_with_anno_cd works as expected", {
                                   annotation_col = annotation_manual_col,
                                   annotation_colors = annotation_map)
   plt_2a <- out_2a[["heatmap"]]
-  expect_true(all(col_pal %in%
-                    plt_2a[["gtable"]][["grobs"]][[10]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(unique(c(plt_2a[["gtable"]][["grobs"]][[2]][["children"]][[2]][["gp"]][["col"]])),
-               "black") # light background
+  expect_true(all(col_pal %in% plt_2a$gtable$grobs[[10]]$children[[1]]$gp$fill))
+  expect_equal(unique(c(plt_2a$gtable$grobs[[2]]$children[[2]]$gp$col)), "black") # light background
   
   # scenario 3: missing annotations row
   annotation_manual_row_res <- data.table::copy(annotation_manual_row)
@@ -579,12 +594,11 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_3, "pheatmap")
   expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered due cluster_cols = FALSE
   expect_true(is.na(plt_3[["tree_col"]])) # cols aren't clustered due cluster_rows = FALSE
-  expect_true(all(.get_smooth_palette(50) %in%  
-                    plt_3[["gtable"]][["grobs"]][[7]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_length(plt_3[["gtable"]][["grobs"]][[1]][["children"]], 1) # no number
-  expect_equal(c(plt_3[["gtable"]][["grobs"]][[6]][["children"]][[1]][["label"]],
-                 plt_3[["gtable"]][["grobs"]][[6]][["children"]][[4]][["label"]]),
-               c("drug_moa_2", "drug_moa"))
+  expect_true(all(.get_smooth_palette(50) %in% plt_3$gtable$grobs[[7]]$children[[1]]$gp$fill))
+  expect_length(plt_3$gtable$grobs[[1]]$children, 1) # no number
+  expect_equal(
+    c(plt_3$gtable$grobs[[6]]$children[[1]]$label, plt_3$gtable$grobs[[6]]$children[[4]]$label),
+    c("drug_moa_2", "drug_moa"))
   
   # scenario 4: incomplete annotations for col and color maps
   annotation_map <- list(
@@ -622,9 +636,24 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_4[["tree_col"]], "hclust") # clustering despite Inf
   expect_true(all(
     vapply(c(1, 4, 7, 10), 
-           function(i) plt_4[["gtable"]][["grobs"]][[8]][["children"]][[i]][["label"]], 
+           function(i) plt_4$gtable$grobs[[8]]$children[[i]]$label, 
            character(1)) %in% ls_anno_cat)) # annotation_legend
   expect_true("NA" %in% plt_4$gtable$grobs[[8]]$children[[6]]$label) # filled mut_B
+  
+  # scenario 5: all values are the same
+  dt_metrics_eq <- data.table::copy(dt_metrics)
+  val_eq <- 100
+  dt_metrics_eq$x_AOC <- val_eq
+  out_5 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_eq, 
+                                 metric = "x_AOC")
+  expect_length(out_5, 2)
+  expect_equal(names(out_5), c("data", "heatmap"))
+  data_5 <- out_5[["data"]]
+  expect_is(data_5, "list")
+  plt_5 <- out_5[["heatmap"]]
+  expect_is(plt_5, "pheatmap")
+  expect_equal(range(as.numeric(plt_5$gtable$grobs[[6]]$children[[2]]$label)),
+               c(val_eq - 1, val_eq))
   
   # testing assertions
   expect_error(pheatmap_with_anno_cd(dt_metrics = unlist(dt_metrics)),
@@ -759,10 +788,8 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_3$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
   expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered due cluster_rows = FALSE
   expect_is(plt_3[["tree_col"]], "hclust") # cols are clustered
-  expect_true(all(col_pal %in%
-                    plt_3[["gtable"]][["grobs"]][[8]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(plt_3[["gtable"]][["grobs"]][[2]][["children"]][[2]][["gp"]][["col"]],
-               "black")
+  expect_true(all(col_pal %in% plt_3$gtable$grobs[[8]]$children[[1]]$gp$fill))
+  expect_equal(plt_3$gtable$grobs[[2]]$children[[2]]$gp$col, "black")
   
   # scenario 4: incomplete annotations for row and incomplete color maps
   annotation_map_4 <- list(
@@ -798,10 +825,8 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_4$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2", "grp_B", "grp_C"))
   expect_is(plt_4[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
-  expect_true(all(col_pal %in%
-                    plt_4[["gtable"]][["grobs"]][[9]][["children"]][[1]][["gp"]][["fill"]]))
-  expect_equal(plt_4[["gtable"]][["grobs"]][[3]][["children"]][[2]][["gp"]][["col"]],
-               "black") #light background
+  expect_true(all(col_pal %in% plt_4$gtable$grobs[[9]]$children[[1]]$gp$fill))
+  expect_equal(plt_4$gtable$grobs[[3]]$children[[2]]$gp$col, "black") #light background
   
   # scenario 5: incomplete annotations for row and incomplete color maps
   annotation_map_5 <- list(
