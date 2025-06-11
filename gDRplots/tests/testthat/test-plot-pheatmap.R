@@ -1,6 +1,7 @@
 context("Test pheatmap with anno")
 
 test_that("pheatmap_qc works as expected", {
+  # single-agent exepriment
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -26,38 +27,114 @@ test_that("pheatmap_qc works as expected", {
   expect_is(hm_2[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_2[["tree_col"]], NA) # no dendrogram for cols
   
-  se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                 assay_name = "Averaged")
-  hm_3 <- pheatmap_qc(dt_average = dt_average,
+  # scenario: row with all NA
+  dt_average_NA_r <- data.table::copy(dt_average)
+  dt_average_NA_r[CellLineName == "cellline_AA"]$x <- NA
+  
+  hm_3 <- pheatmap_qc(dt_average = dt_average_NA_r,
+                      lbl_by_CellLineName = TRUE) 
+  expect_is(hm_3, "pheatmap")
+  expect_false("cellline_AA" %in% hm_3[["gtable"]][["grobs"]][[3]][["label"]])
+  
+  # scenario: coll with all NA
+  dt_average_NA_c <- data.table::copy(dt_average)
+  dt_average_NA_c[DrugName == "drug_002"]$x <- NA
+  
+  hm_4 <- pheatmap_qc(dt_average = dt_average_NA_c,
+                      lbl_by_DrugName = TRUE) 
+  expect_is(hm_4, "pheatmap")
+  expect_false("drug_002" %in% hm_4[["gtable"]][["grobs"]][[5]][["label"]])
+  
+  # combo experiments
+  se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_average_combo <- gDRutils::convert_se_assay_to_dt(se = se_combo,
+                                                       assay_name = "Averaged")
+  hm_5 <- pheatmap_qc(dt_average = dt_average_combo,
                       hm_title = "Combo Data",
                       cluster_rows = FALSE)
-  expect_is(hm_3, "pheatmap")
-  expect_equal(hm_3$gtable$grobs[[1]]$label, "Combo Data")
-  expect_equal(hm_3[["tree_row"]], NA) # no dendrogram due cluster_rows = FALSE
-  expect_equal(hm_3[["tree_col"]], NA) # no dendrogram for cols
-  
-  mae <- gDRutils::get_synthetic_data("combo_codilution")
-  se <- mae[[gDRutils::get_supported_experiments("cd")]]
-  dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-  
-  hm_4 <- pheatmap_qc(dt_average = dt_average) # default
-  expect_is(hm_4, "pheatmap")
-  expect_equal(sort(hm_4$gtable$grobs[[3]]$label), sort(unique(dt_average$clid))) # row names
-  expect_equal(sort(hm_4$gtable$grobs[[5]]$label), 
-               sort(unique(c(dt_average$Gnumber, dt_average$Gnumber_2)))) # annotation
-  expect_is(hm_4[["tree_row"]], "hclust") # dendrogram
-  expect_equal(hm_4[["tree_col"]], NA) # no dendrogram for cols
-  
-  ls_col <- c("#000000", "#00FFFF")
-  hm_5 <- pheatmap_qc(dt_average = dt_average,
-                      metric = "x_std",
-                      colors_vec = ls_col,
-                      cluster_rows = FALSE) 
   expect_is(hm_5, "pheatmap")
-  hm_5_bar <- hm_5[["gtable"]][["grobs"]][[5]][["children"]][[1]][["gp"]][["fill"]]
-  expect_equal(hm_5_bar[1], ls_col[2]) # check rev
-  expect_equal(hm_5_bar[NROW(hm_5_bar)], ls_col[1]) # check rev
+  expect_equal(hm_5$gtable$grobs[[1]]$label, "Combo Data")
+  expect_equal(hm_5[["tree_row"]], NA) # no dendrogram due cluster_rows = FALSE
+  expect_equal(hm_5[["tree_col"]], NA) # no dendrogram for cols
+  
+  # scenario: row with all NA
+  dt_average_combo_NA_r <- data.table::copy(dt_average_combo)
+  dt_average_combo_NA_r[CellLineName == "cellline_AA"]$x <- NA
+  
+  hm_6 <- pheatmap_qc(dt_average = dt_average_combo_NA_r,
+                      lbl_by_CellLineName = TRUE) 
+  expect_is(hm_6, "pheatmap")
+  expect_false("cellline_AA" %in% hm_6[["gtable"]][["grobs"]][[3]][["label"]])
+  
+  # scenario: coll with all NA
+  dt_average_combo_NA_c <- data.table::copy(dt_average_combo)
+  dt_average_combo_NA_c[DrugName == "drug_002"]$x <- NA
+  
+  hm_7 <- pheatmap_qc(dt_average = dt_average_combo_NA_c,
+                      lbl_by_DrugName = TRUE) 
+  expect_is(hm_7, "pheatmap")
+  expect_false("drug_002" %in% hm_7[["gtable"]][["grobs"]][[5]][["label"]])
+  
+  dt_average_combo_NA_c2 <- data.table::copy(dt_average_combo)
+  dt_average_combo_NA_c2[DrugName_2 == "drug_026"]$x <- NA
+  
+  hm_8 <- pheatmap_qc(dt_average = dt_average_combo_NA_c2,
+                      lbl_by_DrugName = TRUE) 
+  expect_is(hm_8, "pheatmap")
+  expect_false("drug_026" %in% hm_8[["gtable"]][["grobs"]][[5]][["label"]])
+  
+  # co-dilution experiment
+  mae <- gDRutils::get_synthetic_data("combo_codilution")
+  se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
+  dt_average_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd, 
+                                                    assay_name = "Averaged")
+  
+  hm_9 <- pheatmap_qc(dt_average = dt_average_cd) # default
+  expect_is(hm_9, "pheatmap")
+  expect_equal(sort(hm_9$gtable$grobs[[3]]$label), sort(unique(dt_average_cd$clid))) # row names
+  expect_equal(sort(hm_9$gtable$grobs[[5]]$label), 
+               sort(unique(c(dt_average_cd$Gnumber, dt_average_cd$Gnumber_2)))) # annotation
+  expect_is(hm_9[["tree_row"]], "hclust") # dendrogram
+  expect_equal(hm_9[["tree_col"]], NA) # no dendrogram for cols
+  
+  # scenario: row with all NA
+  dt_average_cd_NA_r <- data.table::copy(dt_average_cd)
+  dt_average_cd_NA_r[CellLineName == "cellline_AA"]$x <- NA
+  
+  hm_10 <- pheatmap_qc(dt_average = dt_average_cd_NA_r,
+                       lbl_by_CellLineName = TRUE) 
+  expect_is(hm_10, "pheatmap")
+  expect_false("cellline_AA" %in% hm_10[["gtable"]][["grobs"]][[3]][["label"]])
+  
+  # scenario: coll with all NA
+  dt_average_cd_NA_c <- data.table::copy(dt_average_cd)
+  dt_average_cd_NA_c[DrugName == "drug_002"]$x <- NA
+  
+  hm_11 <- pheatmap_qc(dt_average = dt_average_cd_NA_c,
+                       lbl_by_DrugName = TRUE) 
+  expect_is(hm_11, "pheatmap")
+  expect_false("drug_002" %in% hm_11[["gtable"]][["grobs"]][[5]][["label"]])
+  
+  # sceario all valuse in matrix is NA -> return NA heatmap
+  dt_average_cd_NA_c2 <- data.table::copy(dt_average_cd)
+  dt_average_cd_NA_c2[DrugName_2 == "drug_001"]$x <- NA
+  
+  hm_12 <- pheatmap_qc(dt_average = dt_average_cd_NA_c2,
+                       lbl_by_DrugName = TRUE)
+  expect_is(hm_12, "pheatmap")
+  expect_equal( # all NA has color red
+    unique(as.vector(hm_12[["gtable"]][["grobs"]][[2]][["children"]][[1]][["gp"]][["fill"]])), "red")
+  
+  # scenario: sa with definde colors and x_std
+  ls_col <- c("#000000", "#00FFFF")
+  hm_13 <- pheatmap_qc(dt_average = dt_average,
+                       metric = "x_std",
+                       colors_vec = ls_col,
+                       cluster_rows = FALSE) 
+  expect_is(hm_13, "pheatmap")
+  hm_13_bar <- hm_13[["gtable"]][["grobs"]][[5]][["children"]][[1]][["gp"]][["fill"]]
+  expect_equal(hm_13_bar[1], ls_col[2]) # check rev
+  expect_equal(hm_13_bar[NROW(hm_13_bar)], ls_col[1]) # check rev
   
   # scenario: error is thrown on duplicates
   dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
@@ -221,7 +298,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_3[["tree_col"]], "hclust") # clustering despite Inf
   expect_equal(unique(c(plt_3[["gtable"]][["grobs"]][[3]][["children"]][[2]][["gp"]][["col"]])),
                "white") # darkbackbround
-
+  
   # scenario 4: incomplete annotations for col and color maps; and capped metrics
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue"),
@@ -463,13 +540,13 @@ test_that("pheatmap_with_anno_cd works as expected", {
   
   col_pal <- c("#FF8C00", "#D3D3D3")
   out_2a <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2, 
-                                 metric = "x_max",
-                                 normalization_type = "RV",
-                                 colors_vec = col_pal,
-                                 cluster_cols = FALSE,
-                                 annotation_row = annotation_manual_row,
-                                 annotation_col = annotation_manual_col,
-                                 annotation_colors = annotation_map)
+                                  metric = "x_max",
+                                  normalization_type = "RV",
+                                  colors_vec = col_pal,
+                                  cluster_cols = FALSE,
+                                  annotation_row = annotation_manual_row,
+                                  annotation_col = annotation_manual_col,
+                                  annotation_colors = annotation_map)
   plt_2a <- out_2a[["heatmap"]]
   expect_true(all(col_pal %in%
                     plt_2a[["gtable"]][["grobs"]][[10]][["children"]][[1]][["gp"]][["fill"]]))
@@ -548,7 +625,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
            function(i) plt_4[["gtable"]][["grobs"]][[8]][["children"]][[i]][["label"]], 
            character(1)) %in% ls_anno_cat)) # annotation_legend
   expect_true("NA" %in% plt_4$gtable$grobs[[8]]$children[[6]]$label) # filled mut_B
-
+  
   # testing assertions
   expect_error(pheatmap_with_anno_cd(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
