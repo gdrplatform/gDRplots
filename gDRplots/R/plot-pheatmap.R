@@ -132,8 +132,8 @@ pheatmap_qc <- function(
   tab_response$col_pivot_name <- sprintf("%s_%s_%s_%s",
                                          tab_response[[gnumber]],
                                          tab_response[[gnumber_2]],
-                                         format(tab_response[["rconcs"]], scientific = FALSE),
-                                         format(tab_response[["rconcs_2"]], scientific = FALSE))
+                                         trimws(format(tab_response[["rconcs"]], scientific = FALSE)),
+                                         trimws(format(tab_response[["rconcs_2"]], scientific = FALSE)))
   col_pivot_name <- "col_pivot_name"
   tryCatch({
     fm_string <- "clid ~ col_pivot_name"
@@ -156,13 +156,17 @@ pheatmap_qc <- function(
   rownames(mat_cvd) <- tab_plot[[clid]]
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  if (!all(sum(rm_col) == 0, sum(rm_col) == 0)) {
+    if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+    if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  }
   if (metric == "x_std") mat_cvd <- mat_cvd ^ 2
   
   # annotation
-  info_drug <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber, "rconcs")])
-  info_drug_2 <- unique(tab_response[, .SD, .SDcols = c("col_pivot_name", gnumber_2, "rconcs_2")])
+  info_drug <- unique(tab_response[col_pivot_name %in% colnames(mat_cvd),
+                                   .SD, .SDcols = c("col_pivot_name", gnumber, "rconcs")])
+  info_drug_2 <- unique(tab_response[col_pivot_name %in% colnames(mat_cvd),
+                                     .SD, .SDcols = c("col_pivot_name", gnumber_2, "rconcs_2")])
   data.table::setnames(info_drug_2, old = c(gnumber_2, "rconcs_2"), new = c(gnumber, "rconcs"))
   info_drug <- rbind(info_drug, info_drug_2)[get(gnumber) != "untreated"]
   tryCatch({
@@ -233,7 +237,7 @@ pheatmap_qc <- function(
   
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
-  minval <- min(c(0, round(min(mat_cvd, na.rm = TRUE), digits = 2)))
+  minval <- min(c(0, ifelse(all(is.na(mat_cvd)), 0, round(min(mat_cvd, na.rm = TRUE), digits = 2))))
   
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks + 1)
   hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
