@@ -466,6 +466,21 @@ test_that("prep_double_table_chunk works as expected", {
     vapply(seq_along(res_3), 
            function(i) sum(grepl("download>", res_3[[i]])), numeric(1)), c(0, 0)) # lack of dwn_list
   
+  # sorting opts
+  res_4 <- prep_double_table_chunk(tbl_list = nested_tables, 
+                                   chunk_name = "nested_tables",
+                                   sorting_opts = c("Sepal.Length", "-gear"))
+  expect_is(res_4, "list")
+  expect_true(all(grepl("order", res_4)))
+  expect_true(all(grepl(sprintf('(%sL, "desc")', which(colnames(mtcars) == "gear")), res_4[[1]][2:3])))
+  expect_true(all(grepl(sprintf('(%sL, "asc")', which(colnames(iris) == "Sepal.Length")), res_4[[2]][2:3])))
+  
+  res_5 <- prep_double_table_chunk(tbl_list = nested_tables, 
+                                   chunk_name = "nested_tables",
+                                   sorting_opts = c("-non_existen_col"))
+  expect_is(res_5, "list")
+  expect_false(all(grepl("order", res_5)))
+  
   expect_error(prep_double_table_chunk(tbl_list = data.table::data.table(iris), chunk_name = "iris"), 
                "Assertion on 'tbl_list' failed: Must be of type 'list'")
   expect_error(prep_double_table_chunk(tbl_list = nested_tables, chunk_name = 123), 
@@ -482,6 +497,10 @@ test_that("prep_double_table_chunk works as expected", {
                                        chunk_name = "nested_tables",
                                        tabset_options = 2), 
                "Assertion on 'tabset_options' failed: Must be of type 'character'")
+  expect_error(prep_double_table_chunk(tbl_list = nested_tables, 
+                                       chunk_name = "nested_tables",
+                                       sorting_opts = 2), 
+               "Assertion on 'sorting_opts' failed: Must be of type 'character'")
 })
 
 test_that("create_zoom_link works as expected", {
