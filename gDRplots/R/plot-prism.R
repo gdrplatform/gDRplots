@@ -54,7 +54,7 @@ plot_volcano_assoc <- function(dt_assoc,
   if ("response" %in% names(dt_assoc) && NROW(unique(dt_assoc$response)) > 1) {
     warning("Association data is not consistent - there is more than one value in the `response` column.")
     if (selected_metric %in% dt_assoc$response) {
-     warning("Association data was filtered based on `selected_metric`.")
+      warning("Association data was filtered based on `selected_metric`.")
       response <- NULL
       dt_assoc <- dt_assoc[response == selected_metric, ]
     }
@@ -519,9 +519,14 @@ plot_boxplot_num_panel <- function(dt_response,
       all(is.na(tab_plot[[selected_metric]])) ||
       all(vapply(selected_feats[selected_feats %in% available_feats], 
                  function(nm) all(is.na(tab_plot[[nm]])), FUN.VALUE = logical(1)))) {
+    plt_title <- if (is.null(selected_feat_meta_col)) {
+      paste0(paste(selected_feats, collapse = ", "), ": all NAs")
+    } else {
+      paste0(selected_feat_meta_col, ": all NAs")
+    }
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+      ggplot2::labs(title = plt_title,
                     x = "", 
                     y = selected_metric) +
       ggplot2::theme_bw()
@@ -529,8 +534,7 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep dummy values for x-axis
     ls_lbl <- unique(as.vector(as.matrix(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])))
     dummy_feat_val <- ls_lbl[!is.na(ls_lbl)]
-    if (all(is.na(dummy_feat_val))) dummy_feat_val <- 0
-    
+ 
     tab_plot_all <- data.table::data.table()
     
     if (sum(is.na(selected_feats)) > 1) {
@@ -570,7 +574,7 @@ plot_boxplot_num_panel <- function(dt_response,
         }
       } else {
         # dummy data required for faceting
-        feat_lbl <- paste(selected_feat, ": all NAs")
+        feat_lbl <- paste0(selected_feat, ": all NAs")
         feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
         
         tab_plot_tmp <- data.table::data.table(
@@ -589,11 +593,11 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep value ranges for y-axis
     range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)), ][[selected_metric]])
     min_val <- min(c(range_y[1], 0), na.rm = TRUE) - 0.05 * (range_y[2] - range_y[1]) 
-
+    
     # prep the number of items in each category
     tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
-    tab_count_all_possible <- expand.grid(feat_val = unique(tab_count_all$feat_val),
-                                          feat_lbl = unique(tab_count_all$feat_lbl),
+    tab_count_all_possible <- expand.grid(feat_val = unique(tab_plot_all$feat_val),
+                                          feat_lbl = unique(tab_plot_all$feat_lbl),
                                           stringsAsFactors = FALSE)
     # fill lacking labels
     
