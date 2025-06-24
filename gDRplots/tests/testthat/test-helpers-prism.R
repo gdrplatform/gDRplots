@@ -484,7 +484,7 @@ test_that("prep_dt_assoc works as expected", {
   expect_is(res_2[["dt_assoc"]], "data.table")
   ls_cl_res <- 
     dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][is.finite(get(sel_met_2))][["CellLineName"]]
-  ls_cl_dm <- stats::na.omit(obj_depmap_feat[["dt_depmap"]][CCLEName %in% ls_cl[["CellLineName"]]])
+  ls_cl_dm <- stats::na.omit(obj_depmap_feat[["dt_depmap"]][CCLEName %in% ls_cl_res])
   expect_equal(NROW(res_2[["dt_assoc"]]), 0) # becaues ls_cl_dm < 6
   expect_null(res_2[["condition_info"]])
   expect_equal(res_2[["selected_feat_meta_col"]], "XZ_fatures")
@@ -513,9 +513,16 @@ test_that("prep_dt_assoc works as expected", {
   expect_error(
     prep_dt_assoc(dt_response = dt_res_not_num,
                   dt_depmap = obj_depmap_feat[["dt_depmap"]]),
-    "Column with metric should be numeric.")
+    "Column in `dt_response` with metric should be numeric.")
   expect_error(
     prep_dt_assoc(dt_response = dt_response_met,
                   dt_depmap = obj_depmap_feat[["dt_depmap"]]),
     "Provide `dt_response` with for one metric.")
+  dt_depmap_not_num <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  cols <- names(dt_depmap_not_num)
+  dt_depmap_not_num[, (cols) := lapply(.SD, function(i) as.character(i)), .SDcols = cols]
+  expect_error(
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)],
+                  dt_depmap = dt_depmap_not_num),
+    "Provide `dt_depmap` with numeric values.")
 })
