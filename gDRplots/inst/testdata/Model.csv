@@ -1,26 +1,26 @@
-"ModelID","CCLEName","OncotreeLineage","Age","GrowthPattern","PatientRace","Sex","SourceDetail","TreatmentStatus"
-"ACH-000101","NRH_UPS1","Soft Tissue",NA,"Adherent","asian","Female",TRUE,""
-"ACH-000102","NRH_UPS2","Soft Tissue",66,"Adherent","african","Unknown",TRUE,"Active treatment"
-"ACH-000103","NRH_UPS3","Soft Tissue",82,NA,"caucasian","Female",TRUE,""
-"ACH-000104","NRH_UPS4","Soft Tissue",42,"Suspension","caucasian","Female",TRUE,""
-"ACH-000105","NRH_UPS5","Soft Tissue",91,"Mixed","unknown","Male",FALSE,"Unknown"
-"ACH-000106","M140325_SKIN","Skin",35,"Unknown","hispanic_or_latino","Male",FALSE,"Pre-treatment"
-"ACH-000107","M150325_SKIN","Skin",98,"Neurosphere","asian","Male",FALSE,"Unknown"
-"ACH-000108","M160325_SKIN","Skin",64,"Organoid","african","Male",TRUE,"Unknown"
-"ACH-000109","M170325_SKIN","Skin",41,"","caucasian","Female",NA,""
-"ACH-000110","M180325_SKIN","Skin",88,"Adherent","caucasian",NA,NA,"Pre-treatment"
-"ACH-000111","HCA527GR5_LUNG","Lung",54,"Adherent","unknown",NA,TRUE,""
-"ACH-000112","HCB427GR5_LUNG","Lung",37,NA,"hispanic_or_latino","Unknown",TRUE,"Active treatment"
-"ACH-000113","HCC327GR5_LUNG","Lung",43,"Suspension","asian","Male",FALSE,NA
-"ACH-000114","HCD227GR5_LUNG","Lung",20,"Mixed","african","Male",FALSE,"Pre-treatment"
-"ACH-000115","HCE127GR5_LUNG","Lung",58,"Unknown","caucasian","Male",FALSE,"Unknown"
-"ACH-000116","SNU423_LIVER","Liver",44,"Neurosphere","caucasian","Female",NA,"Unknown"
-"ACH-000117","SNU424_LIVER","Liver",53,"Organoid","unknown","Female",NA,"Post-treatment"
-"ACH-000118","SNU425_LIVER","Liver",22,"","hispanic_or_latino","Female",TRUE,""
-"ACH-000119","SNU426_LIVER","Liver",90,"Adherent","asian","Female",TRUE,""
-"ACH-000120","SNU427_LIVER","Liver",51,"Adherent","african","Male",NA,"Post-treatment"
-"ACH-000121","DS23T","Breast",45,NA,"caucasian","Unknown",TRUE,"Pre-treatment"
-"ACH-000122","DS117T","Breast",57,"Suspension","caucasian","Unknown",NA,"Active treatment"
-"ACH-000123","DS98T","Breast",86,"Mixed","unknown","Unknown",TRUE,"Active treatment"
-"ACH-000124","DS56T","Breast",75,"Unknown","hispanic_or_latino","Male",TRUE,"Active treatment"
-"ACH-000125","DS4T","Breast",NA,"Neurosphere","asian","Male",FALSE,"Pre-treatment"
+ModelID,CCLEName,OncotreeLineage,Age,GrowthPattern,PatientRace,Sex,SourceDetail,TreatmentStatus
+ACH-000101,NRH_UPS1,Soft Tissue,,Adherent,asian,Female,TRUE,""
+ACH-000102,NRH_UPS2,Soft Tissue,66,Adherent,african,Unknown,TRUE,Active treatment
+ACH-000103,NRH_UPS3,Soft Tissue,82,,caucasian,Female,TRUE,""
+ACH-000104,NRH_UPS4,Soft Tissue,42,Suspension,caucasian,Female,TRUE,""
+ACH-000105,NRH_UPS5,Soft Tissue,91,Mixed,unknown,Male,FALSE,Unknown
+ACH-000106,M140325_SKIN,Skin,35,Unknown,hispanic_or_latino,Male,FALSE,Pre-treatment
+ACH-000107,M150325_SKIN,Skin,98,Neurosphere,asian,Male,FALSE,Unknown
+ACH-000108,M160325_SKIN,Skin,64,Organoid,african,Male,TRUE,Unknown
+ACH-000109,M170325_SKIN,Skin,41,"",caucasian,Female,,""
+ACH-000110,M180325_SKIN,Skin,88,Adherent,caucasian,Male,,Pre-treatment
+ACH-000111,HCA527GR5_LUNG,Lung,54,Adherent,unknown,Female,TRUE,""
+ACH-000112,HCB427GR5_LUNG,Lung,37,,hispanic_or_latino,Unknown,TRUE,Active treatment
+ACH-000113,HCC327GR5_LUNG,Lung,43,Suspension,asian,Male,FALSE,
+ACH-000114,HCD227GR5_LUNG,Lung,20,Mixed,african,Male,FALSE,Pre-treatment
+ACH-000115,HCE127GR5_LUNG,Lung,58,Unknown,caucasian,Male,FALSE,Unknown
+ACH-000116,SNU423_LIVER,Liver,44,Neurosphere,caucasian,Female,,Unknown
+ACH-000117,SNU424_LIVER,Liver,53,Organoid,unknown,Female,,Post-treatment
+ACH-000118,SNU425_LIVER,Liver,22,"",hispanic_or_latino,Female,TRUE,""
+ACH-000119,SNU426_LIVER,Liver,90,Adherent,asian,Female,TRUE,""
+ACH-000120,SNU427_LIVER,Liver,51,Adherent,african,Male,,Post-treatment
+ACH-000121,DS23T,Breast,45,,caucasian,Unknown,TRUE,Pre-treatment
+ACH-000122,DS117T,Breast,57,Suspension,caucasian,Unknown,,Active treatment
+ACH-000123,DS98T,Breast,86,Mixed,unknown,Unknown,TRUE,Active treatment
+ACH-000124,DS56T,Breast,75,Unknown,hispanic_or_latino,Male,TRUE,Active treatment
+ACH-000125,DS4T,Breast,,Neurosphere,asian,Male,FALSE,Pre-treatment
