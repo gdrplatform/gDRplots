@@ -16,7 +16,8 @@ create_PRISM_plot_list_combo(
   meta_data_path,
   feat_data_path,
   feature_sets,
-  metadata_columns = NULL
+  metadata_columns = NULL,
+  clear_taxonomy_info = TRUE
 )
 }
 \arguments{
@@ -35,7 +36,7 @@ and combo \code{SummarizedExperiment}}
 \item{normalization_type_vec}{character vector with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
 
-\item{metric}{character vector with names of metric for difference:
+\item{metric}{character vector with names of metric;
  chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
@@ -56,6 +57,9 @@ These names should also correspond to the file names containing the feature data
 (without the extension, which is assumed to be \code{csv})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
+
+\item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table 
+with the molecular feature sets from DepMap.}
 }
 \value{
 nested list of plots
