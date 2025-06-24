@@ -438,18 +438,35 @@ test_that("prep_dt_depmap_feat works as expected", {
   tab_model <- data.table::fread(test_meta_data_path)
   
   test_feat_data_path <- system.file("testdata", package = "gDRplots")
+
+  obj_feat_1 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                    meta_data_path = test_meta_data_path) # default
+  expect_is(obj_feat_1, "list")
+  expect_is(obj_feat_1[[1]], "data.table")
+  expect_equal(names(obj_feat_1), c("dt_depmap", "selected_feat_meta_col"))
+  expect_equal(obj_feat_1$selected_feat_meta_col, "CRISPRGeneEffect")
+  expect_true(all(id_col %in% names(obj_feat_1$dt_depmap)))
+  expect_true(all(vapply(obj_feat_1$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
+  
+  obj_feat_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                    meta_data_path = test_meta_data_path,
+                                    feature_set = "OmicsSomaticMutationsMatrixHotspot")
+  expect_is(obj_feat_2, "list")
+  expect_is(obj_feat_2[[1]], "data.table")
+  expect_equal(names(obj_feat_2), c("dt_depmap", "selected_feat_meta_col"))
+  expect_equal(obj_feat_2$selected_feat_meta_col, "OmicsSomaticMutationsMatrixHotspot")
+  expect_true(all(id_col %in% names(obj_feat_2$dt_depmap)))
+  expect_true(all(vapply(obj_feat_2$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
   
   expect_error(prep_dt_depmap_feat(feat_data_path = 123, 
                                    meta_data_path = test_meta_data_path), 
                "Assertion on 'feat_data_path' failed: Must be of type 'string'")
-  # TODO nolint start
-  # expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path, 
-  #                                  meta_data_path = "testdata/meta_data.qs"), 
-  #              "Assertion on 'File ext must be csv' failed: Must be TRUE")
-  # expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path, 
-  #                                  meta_data_path = "testdata/meta_data.csv"), 
-  #              "Assertion on 'meta_data_path' failed: File does not exist")
-  # nolint end
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = "testdata/meta_data.qs"),
+               "Assertion on 'File ext must be csv' failed: Must be TRUE")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = "testdata/meta_data.csv"),
+               "Assertion on 'meta_data_path' failed: File does not exist")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = test_meta_data_path, 
                                    feature_set = 123),
