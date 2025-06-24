@@ -68,7 +68,7 @@ dt_depmap_feat_2 <- data.table::data.table(
   "NU_X1QW" = withr::with_seed(42, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
   "NU_X2GH" = withr::with_seed(314, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
   "NU_X3OP" = withr::with_seed(271, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
-  "NU_X4RT" = withr::with_seed(981, sample(c(0, 1), size = NROW(cell_lines), replace = TRUE)),
+  "NU_X4RT" = withr::with_seed(981, sample(c(0, 1, 2), size = NROW(cell_lines), replace = TRUE)),
   "NU_X5BN" = rep(1, size = NROW(cell_lines))
 )
 dt_depmap_feat_2[CCLEName %in% c("cellline_FD", "cellline_NE"), 
