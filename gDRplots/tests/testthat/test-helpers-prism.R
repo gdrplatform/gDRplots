@@ -437,7 +437,7 @@ test_that("prep_dt_depmap_feat works as expected", {
   tab_model <- data.table::fread(test_meta_data_path)
   
   test_feat_data_path <- system.file("testdata", package = "gDRplots")
-
+  
   obj_feat_1 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                     meta_data_path = test_meta_data_path) # default
   expect_is(obj_feat_1, "list")
@@ -456,6 +456,13 @@ test_that("prep_dt_depmap_feat works as expected", {
   expect_equal(obj_feat_2$selected_feat_meta_col, "OmicsSomaticMutationsMatrixHotspot")
   expect_true(all(id_col %in% names(obj_feat_2$dt_depmap)))
   expect_true(all(vapply(obj_feat_2$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
+  
+  # sceanraio: not supported feature
+  expect_message(
+    prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                        meta_data_path = test_meta_data_path,
+                        feature_set = "OmicsSignaturesProfile"),
+    "The `OmicsSignaturesProfile` feature is not supported.")
   
   expect_error(prep_dt_depmap_feat(feat_data_path = 123, 
                                    meta_data_path = test_meta_data_path), 
