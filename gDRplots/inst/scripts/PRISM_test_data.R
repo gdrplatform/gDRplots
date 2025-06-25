@@ -1,20 +1,27 @@
 # Model.csv ----
+cell_lines <- gDRtestData::create_synthetic_cell_lines()[["CellLineName"]]
+no_cell_lines <- NROW(cell_lines)
+
 tab_model <- data.table::data.table(
-  ModelID = sprintf("ACH-%06d", 101:125),
-  CCLEName = c(sprintf("NRH_UPS%s", 1:5), 
-               sprintf("M%s0325_SKIN", 14:18),
-               sprintf("HC%s%s27GR5_LUNG", LETTERS[1:5], 5:1),
-               sprintf("SNU4%s_LIVER", 23:27),
-               sprintf("DS%sT", c(23, 117, 98, 56, 4))),
-  OncotreeLineage = rep(c("Soft Tissue", "Skin", "Lung", "Liver", "Breast"), each = 5),
-  
-  Age = c(NA, withr::with_seed(42, sample(18:98, 23)), NA),
-  GrowthPattern = rep(c("Adherent", "Adherent",  NA, "Suspension", "Mixed", "Unknown", "Neurosphere", "Organoid", ""),
-                      length.out = 25),
-  PatientRace = rep(c("asian", "african", "caucasian", "caucasian", "unknown", "hispanic_or_latino"), length.out = 25),
-  Sex = as.factor(withr::with_seed(42, sample(c("Female",  "Male", "Female",  "Male", "Unknown"), 25, replace = TRUE))),
-  SourceDetail = withr::with_seed(42, sample(c(TRUE, FALSE, NA), 25, replace = TRUE)),
-  TreatmentStatus = withr::with_seed(42, sample(c( "", "Unknown", "Post-treatment", "Pre-treatment", "Active treatment", NA), 25, replace = TRUE))
+  ModelID = sprintf("ACH-%06d", seq_along(cell_lines)),
+  CCLEName = cell_lines,
+  OncotreeLineage = 
+    withr::with_seed(42, 
+                     sample(c("Soft Tissue", "Skin", "Lung", "Liver", "Breast", "Kidney", "Other"),
+                            no_cell_lines, replace = TRUE)),
+  Age = withr::with_seed(42, sample(c(18:98, NA), no_cell_lines, replace = TRUE)),
+  GrowthPattern = 
+    rep(c("Adherent", "Adherent",  NA, "Suspension", "Mixed", "Unknown", "Neurosphere", "Organoid", ""),
+        length.out = no_cell_lines, replace = TRUE),
+  PatientRace = rep(c("asian", "african", "caucasian", "caucasian", "unknown", "hispanic_or_latino"), 
+                    length.out = no_cell_lines, replace = TRUE),
+  Sex = as.factor(withr::with_seed(42, sample(c("Female",  "Male", "Female", "Male", "Unknown"), 
+                                              no_cell_lines, replace = TRUE))),
+  SourceDetail = withr::with_seed(42, sample(c(TRUE, FALSE, NA), no_cell_lines, replace = TRUE)),
+  TreatmentStatus = 
+    withr::with_seed(42, 
+                     sample(c( "", "Unknown", "Post-treatment", "Pre-treatment", "Active treatment", NA), 
+                            no_cell_lines, replace = TRUE))
 )
 
 data.table::fwrite(tab_model, "./gDRplots/inst/testdata/Model.csv", row.names = FALSE)
