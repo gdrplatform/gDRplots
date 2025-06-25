@@ -66,7 +66,7 @@ plot_volcano_assoc <- function(dt_assoc,
     # empty plot
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(plt_title, ": all NAs"),
+      ggplot2::labs(title = paste0(plt_title, ": all NAs"),
                     subtitle = condition_info,
                     x = x_lbl,
                     y = y_lbl) +
@@ -162,7 +162,7 @@ plot_scatter_with_corr <- function(dt_response,
   if (NROW(tab_plot) == 0) {
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+      ggplot2::labs(title = paste0(selected_feat_meta_col, ": all NAs"),
                     x = selected_feat, 
                     y = selected_metric,
                     caption = unique(dt_response$rId)) +
@@ -244,7 +244,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
   if (all(is.na(selected_feats))) {
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+      ggplot2::labs(title = paste0(selected_feat_meta_col, ": all NAs"),
                     x = "", 
                     y = selected_metric) +
       ggplot2::theme_bw()
@@ -290,7 +290,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
           data.table::setnames(tab_plot_sel, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
-          feat_lbl <- paste(selected_feat, ": all NAs")
+          feat_lbl <- paste0(selected_feat, ": all NAs")
           feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
           
           tab_plot_sel <- data.table::data.table(
@@ -307,7 +307,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
         }
       } else {
         # dummy data required for faceting
-        feat_lbl <- paste(selected_feat, ": all NAs")
+        feat_lbl <- paste0(selected_feat, ": all NAs")
         feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
         
         tab_plot_sel <- data.table::data.table(
@@ -426,7 +426,7 @@ plot_boxplot_num <- function(dt_response,
   if (NROW(tab_plot) == 0) {
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+      ggplot2::labs(title = paste0(selected_feat_meta_col, ": all NAs"),
                     x = selected_feat, 
                     y = selected_metric,
                     caption = unique(dt_response$rId)) +
@@ -559,7 +559,7 @@ plot_boxplot_num_panel <- function(dt_response,
           data.table::setnames(tab_plot_tmp, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
-          feat_lbl <- paste(selected_feat, ": all NAs")
+          feat_lbl <- paste0(selected_feat, ": all NAs")
           feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
           
           tab_plot_tmp <- data.table::data.table(
@@ -722,7 +722,7 @@ plot_boxplot_meta <- function(dt_response,
   if (NROW(tab_plot) == 0 || all(is.na(tab_plot[[selected_feat_meta_col]]))) {
     plt <- 
       ggplot2::ggplot() + 
-      ggplot2::labs(title = paste(selected_feat_meta_col, ": all NAs"),
+      ggplot2::labs(title = paste0(selected_feat_meta_col, ": all NAs"),
                     x = "", 
                     y = selected_metric) +
       ggplot2::theme_bw()
