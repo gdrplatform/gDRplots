@@ -1,91 +1,91 @@
 ModelID,CCLEName,OncotreeLineage,Age,GrowthPattern,PatientRace,Sex,SourceDetail,TreatmentStatus
-ACH-000001,cellline_AA,Soft Tissue,66,Adherent,asian,Female,TRUE,""
-ACH-000002,cellline_BA,Breast,82,Adherent,african,Unknown,TRUE,Active treatment
-ACH-000003,cellline_CA,Soft Tissue,42,,caucasian,Female,TRUE,""
-ACH-000004,cellline_DA,Soft Tissue,91,Suspension,caucasian,Female,TRUE,""
-ACH-000005,cellline_EA,Skin,35,Mixed,unknown,Male,FALSE,Unknown
-ACH-000006,cellline_FA,Liver,66,Unknown,hispanic_or_latino,Male,FALSE,Pre-treatment
-ACH-000007,cellline_GB,Skin,64,Neurosphere,asian,Male,FALSE,Unknown
-ACH-000008,cellline_HB,Skin,41,Organoid,african,Male,TRUE,Unknown
-ACH-000009,cellline_IB,Soft Tissue,88,"",caucasian,Female,,""
-ACH-000010,cellline_JB,Other,54,Adherent,caucasian,Male,,Pre-treatment
-ACH-000011,cellline_KB,Other,37,Adherent,unknown,Female,TRUE,""
-ACH-000012,cellline_LB,Liver,43,,hispanic_or_latino,Unknown,TRUE,Active treatment
-ACH-000013,cellline_MC,Soft Tissue,20,Suspension,asian,Male,FALSE,
-ACH-000014,cellline_NC,Breast,58,Mixed,african,Male,FALSE,Pre-treatment
-ACH-000015,cellline_OC,Kidney,44,Unknown,caucasian,Male,FALSE,Unknown
-ACH-000016,cellline_AC,Liver,53,Neurosphere,caucasian,Female,,Unknown
-ACH-000017,cellline_BC,Skin,22,Organoid,unknown,Female,,Post-treatment
-ACH-000018,cellline_CC,Skin,51,"",hispanic_or_latino,Female,TRUE,""
-ACH-000019,cellline_DD,Other,20,Adherent,asian,Female,TRUE,""
-ACH-000020,cellline_ED,Lung,75,Adherent,african,Male,,Post-treatment
-ACH-000021,cellline_FD,Soft Tissue,59,,caucasian,Unknown,TRUE,Pre-treatment
-ACH-000022,cellline_GD,Soft Tissue,41,Suspension,caucasian,Unknown,,Active treatment
-ACH-000023,cellline_HD,Lung,47,Mixed,unknown,Unknown,TRUE,Active treatment
-ACH-000024,cellline_ID,Liver,60,Unknown,hispanic_or_latino,Male,TRUE,Active treatment
-ACH-000025,cellline_JE,Breast,32,Neurosphere,asian,Male,FALSE,Pre-treatment
-ACH-000026,cellline_KE,Other,39,Organoid,african,Male,,Unknown
-ACH-000027,cellline_LE,Breast,75,"",caucasian,Female,FALSE,Pre-treatment
-ACH-000028,cellline_ME,Breast,25,Adherent,caucasian,Male,TRUE,Post-treatment
-ACH-000029,cellline_NE,Liver,53,Adherent,unknown,Female,FALSE,Unknown
-ACH-000030,cellline_OE,Skin,85,,hispanic_or_latino,Male,FALSE,""
-ACH-000031,cellline_AF,Liver,35,Suspension,asian,Female,,Unknown
-ACH-000032,cellline_BF,Lung,86,Mixed,african,Male,,
-ACH-000033,cellline_CF,Skin,21,Unknown,caucasian,Male,FALSE,Post-treatment
-ACH-000034,cellline_DF,Soft Tissue,67,Neurosphere,caucasian,Male,FALSE,
-ACH-000035,cellline_EF,Skin,66,Organoid,unknown,Male,FALSE,Unknown
-ACH-000036,cellline_FF,Kidney,43,"",hispanic_or_latino,Unknown,FALSE,Pre-treatment
-ACH-000037,cellline_GG,Lung,23,Adherent,asian,Male,TRUE,Pre-treatment
-ACH-000038,cellline_HG,Other,23,Adherent,african,Unknown,TRUE,
-ACH-000039,cellline_IG,Kidney,19,,caucasian,Male,FALSE,Unknown
-ACH-000040,cellline_JG,Skin,20,Suspension,caucasian,Male,FALSE,Active treatment
-ACH-000041,cellline_KG,Liver,38,Mixed,unknown,Male,,Pre-treatment
-ACH-000042,cellline_LG,Liver,19,Unknown,hispanic_or_latino,Female,,Active treatment
-ACH-000043,cellline_MH,Kidney,75,Neurosphere,asian,Female,TRUE,Pre-treatment
-ACH-000044,cellline_NH,Skin,27,Organoid,african,Unknown,TRUE,Unknown
-ACH-000045,cellline_OH,Breast,57,"",caucasian,Male,FALSE,Unknown
-ACH-000046,cellline_AH,Liver,22,Adherent,caucasian,Male,FALSE,Post-treatment
-ACH-000047,cellline_BH,Breast,50,Adherent,unknown,Male,FALSE,""
+ACH-000001,cellline_AA,Soft Tissue,18,Adherent,asian,Female,TRUE,""
+ACH-000002,cellline_BA,Breast,66,Adherent,african,Unknown,TRUE,Active treatment
+ACH-000003,cellline_CA,Soft Tissue,18,,caucasian,Female,TRUE,""
+ACH-000004,cellline_DA,Soft Tissue,90,Suspension,caucasian,Female,TRUE,""
+ACH-000005,cellline_EA,Skin,,Mixed,unknown,Male,FALSE,Unknown
+ACH-000006,cellline_FA,Liver,65,Unknown,hispanic_or_latino,Male,FALSE,Pre-treatment
+ACH-000007,cellline_GB,Skin,25,Neurosphere,asian,Male,FALSE,Unknown
+ACH-000008,cellline_HB,Skin,,Organoid,african,Male,TRUE,Unknown
+ACH-000009,cellline_IB,Soft Tissue,18,"",caucasian,Female,,""
+ACH-000010,cellline_JB,Other,89,Adherent,caucasian,Male,,Pre-treatment
+ACH-000011,cellline_KB,Other,68,Adherent,unknown,Female,TRUE,""
+ACH-000012,cellline_LB,Liver,65,,hispanic_or_latino,Unknown,TRUE,Active treatment
+ACH-000013,cellline_MC,Soft Tissue,90,Suspension,asian,Male,FALSE,
+ACH-000014,cellline_NC,Breast,66,Mixed,african,Male,FALSE,Pre-treatment
+ACH-000015,cellline_OC,Kidney,65,Unknown,caucasian,Male,FALSE,Unknown
+ACH-000016,cellline_AC,Liver,,Neurosphere,caucasian,Female,,Unknown
+ACH-000017,cellline_BC,Skin,25,Organoid,unknown,Female,,Post-treatment
+ACH-000018,cellline_CC,Skin,45,"",hispanic_or_latino,Female,TRUE,""
+ACH-000019,cellline_DD,Other,90,Adherent,asian,Female,TRUE,""
+ACH-000020,cellline_ED,Lung,90,Adherent,african,Male,,Post-treatment
+ACH-000021,cellline_FD,Soft Tissue,65,,caucasian,Unknown,TRUE,Pre-treatment
+ACH-000022,cellline_GD,Soft Tissue,66,Suspension,caucasian,Unknown,,Active treatment
+ACH-000023,cellline_HD,Lung,66,Mixed,unknown,Unknown,TRUE,Active treatment
+ACH-000024,cellline_ID,Liver,65,Unknown,hispanic_or_latino,Male,TRUE,Active treatment
+ACH-000025,cellline_JE,Breast,25,Neurosphere,asian,Male,FALSE,Pre-treatment
+ACH-000026,cellline_KE,Other,89,Organoid,african,Male,,Unknown
+ACH-000027,cellline_LE,Breast,45,"",caucasian,Female,FALSE,Pre-treatment
+ACH-000028,cellline_ME,Breast,,Adherent,caucasian,Male,TRUE,Post-treatment
+ACH-000029,cellline_NE,Liver,18,Adherent,unknown,Female,FALSE,Unknown
+ACH-000030,cellline_OE,Skin,,,hispanic_or_latino,Male,FALSE,""
+ACH-000031,cellline_AF,Liver,89,Suspension,asian,Female,,Unknown
+ACH-000032,cellline_BF,Lung,67,Mixed,african,Male,,
+ACH-000033,cellline_CF,Skin,,Unknown,caucasian,Male,FALSE,Post-treatment
+ACH-000034,cellline_DF,Soft Tissue,89,Neurosphere,caucasian,Male,FALSE,
+ACH-000035,cellline_EF,Skin,65,Organoid,unknown,Male,FALSE,Unknown
+ACH-000036,cellline_FF,Kidney,65,"",hispanic_or_latino,Unknown,FALSE,Pre-treatment
+ACH-000037,cellline_GG,Lung,67,Adherent,asian,Male,TRUE,Pre-treatment
+ACH-000038,cellline_HG,Other,25,Adherent,african,Unknown,TRUE,
+ACH-000039,cellline_IG,Kidney,66,,caucasian,Male,FALSE,Unknown
+ACH-000040,cellline_JG,Skin,65,Suspension,caucasian,Male,FALSE,Active treatment
+ACH-000041,cellline_KG,Liver,25,Mixed,unknown,Male,,Pre-treatment
+ACH-000042,cellline_LG,Liver,89,Unknown,hispanic_or_latino,Female,,Active treatment
+ACH-000043,cellline_MH,Kidney,25,Neurosphere,asian,Female,TRUE,Pre-treatment
+ACH-000044,cellline_NH,Skin,45,Organoid,african,Unknown,TRUE,Unknown
+ACH-000045,cellline_OH,Breast,89,"",caucasian,Male,FALSE,Unknown
+ACH-000046,cellline_AH,Liver,68,Adherent,caucasian,Male,FALSE,Post-treatment
+ACH-000047,cellline_BH,Breast,18,Adherent,unknown,Male,FALSE,""
 ACH-000048,cellline_CH,Liver,66,,hispanic_or_latino,Male,FALSE,Active treatment
-ACH-000049,cellline_DI,Skin,90,Suspension,asian,Female,FALSE,Unknown
-ACH-000050,cellline_EI,Skin,46,Mixed,african,Unknown,,Unknown
-ACH-000051,cellline_FI,Lung,93,Unknown,caucasian,Male,FALSE,
-ACH-000052,cellline_GI,Other,26,Neurosphere,caucasian,Male,TRUE,
-ACH-000053,cellline_HI,Soft Tissue,52,Organoid,unknown,Male,FALSE,Unknown
-ACH-000054,cellline_II,Breast,33,"",hispanic_or_latino,Unknown,,Pre-treatment
-ACH-000055,cellline_JJ,Skin,86,Adherent,asian,Female,FALSE,Post-treatment
-ACH-000056,cellline_KJ,Skin,19,Adherent,african,Female,FALSE,
-ACH-000057,cellline_LJ,Kidney,,,caucasian,Male,FALSE,Active treatment
-ACH-000058,cellline_MJ,Kidney,41,Suspension,caucasian,Unknown,TRUE,Unknown
-ACH-000059,cellline_NJ,Skin,35,Mixed,unknown,Male,TRUE,
-ACH-000060,cellline_OJ,Liver,86,Unknown,hispanic_or_latino,Female,TRUE,Unknown
-ACH-000061,cellline_AK,Lung,72,Neurosphere,asian,Unknown,,Unknown
-ACH-000062,cellline_BK,Kidney,57,Organoid,african,Male,TRUE,Active treatment
-ACH-000063,cellline_CK,Breast,38,"",caucasian,Male,FALSE,""
-ACH-000064,cellline_DK,Skin,74,Adherent,caucasian,Female,TRUE,""
-ACH-000065,cellline_EK,Other,59,Adherent,unknown,Female,TRUE,Pre-treatment
-ACH-000066,cellline_FK,Kidney,35,,hispanic_or_latino,Female,TRUE,Active treatment
-ACH-000067,cellline_GL,Skin,30,Suspension,asian,Unknown,,Unknown
-ACH-000068,cellline_HL,Skin,70,Mixed,african,Unknown,,""
-ACH-000069,cellline_IL,Breast,71,Unknown,caucasian,Male,TRUE,Active treatment
-ACH-000070,cellline_JL,Soft Tissue,49,Neurosphere,caucasian,Unknown,TRUE,Pre-treatment
-ACH-000071,cellline_KL,Soft Tissue,97,Organoid,unknown,Male,FALSE,Pre-treatment
-ACH-000072,cellline_LL,Other,77,"",hispanic_or_latino,Male,TRUE,""
-ACH-000073,cellline_MM,Liver,46,Adherent,asian,Male,FALSE,Post-treatment
-ACH-000074,cellline_NM,Breast,98,Adherent,african,Female,FALSE,Post-treatment
-ACH-000075,cellline_OM,Skin,90,,caucasian,Male,FALSE,Active treatment
-ACH-000076,cellline_AM,Soft Tissue,60,Suspension,caucasian,Unknown,TRUE,Active treatment
-ACH-000077,cellline_BM,Breast,75,Mixed,unknown,Unknown,FALSE,Pre-treatment
-ACH-000078,cellline_CM,Liver,89,Unknown,hispanic_or_latino,Male,TRUE,
-ACH-000079,cellline_DN,Liver,46,Neurosphere,asian,Female,FALSE,Active treatment
-ACH-000080,cellline_EN,Soft Tissue,72,Organoid,african,Male,,Pre-treatment
-ACH-000081,cellline_FN,Lung,55,"",caucasian,Male,TRUE,
-ACH-000082,cellline_GN,Lung,18,Adherent,caucasian,Male,TRUE,Unknown
-ACH-000083,cellline_HN,Breast,30,Adherent,unknown,Female,,Unknown
-ACH-000084,cellline_IN,Breast,95,,hispanic_or_latino,Unknown,FALSE,""
-ACH-000085,cellline_JO,Liver,22,Suspension,asian,Unknown,FALSE,Unknown
-ACH-000086,cellline_KO,Kidney,90,Mixed,african,Female,,Active treatment
-ACH-000087,cellline_LO,Breast,72,Unknown,caucasian,Male,TRUE,
-ACH-000088,cellline_MO,Liver,33,Neurosphere,caucasian,Unknown,TRUE,Active treatment
-ACH-000089,cellline_NO,Kidney,60,Organoid,unknown,Female,FALSE,Pre-treatment
-ACH-000090,cellline_OO,Skin,59,"",hispanic_or_latino,Male,,""
+ACH-000049,cellline_DI,Skin,,Suspension,asian,Female,FALSE,Unknown
+ACH-000050,cellline_EI,Skin,25,Mixed,african,Unknown,,Unknown
+ACH-000051,cellline_FI,Lung,67,Unknown,caucasian,Male,FALSE,
+ACH-000052,cellline_GI,Other,67,Neurosphere,caucasian,Male,TRUE,
+ACH-000053,cellline_HI,Soft Tissue,25,Organoid,unknown,Male,FALSE,Unknown
+ACH-000054,cellline_II,Breast,65,"",hispanic_or_latino,Unknown,,Pre-treatment
+ACH-000055,cellline_JJ,Skin,45,Adherent,asian,Female,FALSE,Post-treatment
+ACH-000056,cellline_KJ,Skin,67,Adherent,african,Female,FALSE,
+ACH-000057,cellline_LJ,Kidney,66,,caucasian,Male,FALSE,Active treatment
+ACH-000058,cellline_MJ,Kidney,25,Suspension,caucasian,Unknown,TRUE,Unknown
+ACH-000059,cellline_NJ,Skin,68,Mixed,unknown,Male,TRUE,
+ACH-000060,cellline_OJ,Liver,67,Unknown,hispanic_or_latino,Female,TRUE,Unknown
+ACH-000061,cellline_AK,Lung,,Neurosphere,asian,Unknown,,Unknown
+ACH-000062,cellline_BK,Kidney,,Organoid,african,Male,TRUE,Active treatment
+ACH-000063,cellline_CK,Breast,89,"",caucasian,Male,FALSE,""
+ACH-000064,cellline_DK,Skin,66,Adherent,caucasian,Female,TRUE,""
+ACH-000065,cellline_EK,Other,18,Adherent,unknown,Female,TRUE,Pre-treatment
+ACH-000066,cellline_FK,Kidney,18,,hispanic_or_latino,Female,TRUE,Active treatment
+ACH-000067,cellline_GL,Skin,68,Suspension,asian,Unknown,,Unknown
+ACH-000068,cellline_HL,Skin,65,Mixed,african,Unknown,,""
+ACH-000069,cellline_IL,Breast,,Unknown,caucasian,Male,TRUE,Active treatment
+ACH-000070,cellline_JL,Soft Tissue,90,Neurosphere,caucasian,Unknown,TRUE,Pre-treatment
+ACH-000071,cellline_KL,Soft Tissue,65,Organoid,unknown,Male,FALSE,Pre-treatment
+ACH-000072,cellline_LL,Other,90,"",hispanic_or_latino,Male,TRUE,""
+ACH-000073,cellline_MM,Liver,45,Adherent,asian,Male,FALSE,Post-treatment
+ACH-000074,cellline_NM,Breast,66,Adherent,african,Female,FALSE,Post-treatment
+ACH-000075,cellline_OM,Skin,89,,caucasian,Male,FALSE,Active treatment
+ACH-000076,cellline_AM,Soft Tissue,66,Suspension,caucasian,Unknown,TRUE,Active treatment
+ACH-000077,cellline_BM,Breast,67,Mixed,unknown,Unknown,FALSE,Pre-treatment
+ACH-000078,cellline_CM,Liver,25,Unknown,hispanic_or_latino,Male,TRUE,
+ACH-000079,cellline_DN,Liver,25,Neurosphere,asian,Female,FALSE,Active treatment
+ACH-000080,cellline_EN,Soft Tissue,89,Organoid,african,Male,,Pre-treatment
+ACH-000081,cellline_FN,Lung,18,"",caucasian,Male,TRUE,
+ACH-000082,cellline_GN,Lung,25,Adherent,caucasian,Male,TRUE,Unknown
+ACH-000083,cellline_HN,Breast,66,Adherent,unknown,Female,,Unknown
+ACH-000084,cellline_IN,Breast,89,,hispanic_or_latino,Unknown,FALSE,""
+ACH-000085,cellline_JO,Liver,68,Suspension,asian,Unknown,FALSE,Unknown
+ACH-000086,cellline_KO,Kidney,89,Mixed,african,Female,,Active treatment
+ACH-000087,cellline_LO,Breast,66,Unknown,caucasian,Male,TRUE,
+ACH-000088,cellline_MO,Liver,65,Neurosphere,caucasian,Unknown,TRUE,Active treatment
+ACH-000089,cellline_NO,Kidney,90,Organoid,unknown,Female,FALSE,Pre-treatment
+ACH-000090,cellline_OO,Skin,65,"",hispanic_or_latino,Male,,""
