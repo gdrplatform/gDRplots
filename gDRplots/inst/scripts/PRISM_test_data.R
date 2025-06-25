@@ -52,3 +52,18 @@ tab_hot <- data.table::data.table(
 tab_hot[[3]][11:12] <- NA
 
 data.table::fwrite(tab_hot, "./gDRplots/inst/testdata/OmicsSomaticMutationsMatrixHotspot.csv", row.names = FALSE)
+
+# OmicsSignaturesProfile ----
+chars <- c(letters, LETTERS, 0:9)
+no_profils <- 100
+tab_profil <- data.table::data.table(
+  V1 = sprintf("PR-%s", 
+               vapply(seq_len(no_profils), function(i) {
+                 withr::with_seed(i, paste(sample(chars, 8), collapse = "")) 
+                 }, character(1))),
+  MSIScore = round(withr::with_seed(42, rnorm(n = no_profils, mean = 2.56, sd = 1.25)), 2), 
+  Ploidy = withr::with_seed(42, rnorm(n = no_profils, mean = 6.5, sd = 2.11)),
+  CIN = withr::with_seed(42, rnorm(n = no_profils, mean = 0.5, sd = 0.02))
+)
+
+data.table::fwrite(tab_profil, "./gDRplots/inst/testdata/OmicsSignaturesProfile.csv", row.names = FALSE)
