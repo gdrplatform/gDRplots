@@ -431,7 +431,6 @@ test_that("prep_dt_depmap_meta works as expected", {
                "failed: Must be a subset of")
 })
 
-
 test_that("prep_dt_depmap_feat works as expected", {
   id_col <- c("ModelID", "CCLEName") 
   test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
@@ -479,6 +478,25 @@ test_that("prep_dt_depmap_feat works as expected", {
 
 
 test_that("prep_dt_assoc works as expected", {
+  # prep response data
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                                 assay_name = "Metrics")
+  d_name <- "drug_002"
+  d_name2 <- "drug_026"
+  dt_response_met <- 
+    prep_dt_response_metric_sa(dt_metrics, d_name,
+                               metric = c("xc50", "x_mean", "x_max"))
+  
+  # prep depmap data
+  obj_depmap_feat <- 
+    prep_dt_depmap_feat(feat_data_path = system.file("testdata", package = "gDRplots"),
+                        meta_data_path = system.file("testdata/Model.csv", package = "gDRplots"),
+                        feature_set = "CRISPRGeneEffect")
+  obj_depmap_meta <- 
+    prep_dt_depmap_meta(meta_data_path = system.file("testdata/Model.csv", package = "gDRplots"))
+  
   sel_met_1 <- "RV_gDR_x_mean"
   res_1 <- 
     prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_1)],
@@ -493,7 +511,7 @@ test_that("prep_dt_assoc works as expected", {
   
   sel_met_2 <- "RV_gDR_log10_xc50"
   res_2 <- 
-    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)],
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][1:5,],
                   dt_depmap = obj_depmap_feat[["dt_depmap"]],
                   selected_feat_meta_col = "XZ_fatures")
   expect_is(res_2, "list")
