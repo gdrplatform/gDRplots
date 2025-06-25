@@ -10,19 +10,9 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   d_names <- c("drug_004", "drug_021")
   
   meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  metadata_columns <- "OncotreeLineage"
-  feat_data_path <- file.path(tempdir(), "depmap_data")
-  dir.create(feat_data_path, showWarnings = FALSE)
-  feat_file <- file.path(feat_data_path, "CRISPRGeneEffect.csv")
-  writeLines(text = "CRISPRGeneEffect data", con = feat_file)
-  file.exists(feat_file)
-  dir.exists(feat_data_path)
-  
-  on.exit({
-    unlink(feat_data_path, recursive = TRUE)
-    unlink(feat_file)
-  })
-  feature_sets <- c("CRISPRGeneEffect", "OmicsCNGene")
+  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
+  feat_data_path <- system.file("testdata", package = "gDRplots")
+  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
   
   # testing assertions
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = 1:3,
@@ -123,24 +113,11 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                                 assay_name = "scores")
   d_names <- c("drug_001", "drug_011")
   d_names_2 <- c("drug_026", "drug_031")
-  
+
   meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  metadata_columns <- "OncotreeLineage"
-  
-  meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  metadata_columns <- "OncotreeLineage"
-  feat_data_path <- file.path(tempdir(), "depmap_data")
-  dir.create(feat_data_path, showWarnings = FALSE)
-  feat_file <- file.path(feat_data_path, "CRISPRGeneEffect.csv")
-  writeLines(text = "CRISPRGeneEffect data", con = feat_file)
-  file.exists(feat_file)
-  dir.exists(feat_data_path)
-  
-  on.exit({
-    unlink(feat_data_path, recursive = TRUE)
-    unlink(feat_file)
-  })
-  feature_sets <- c("CRISPRGeneEffect", "OmicsCNGene")
+  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
+  feat_data_path <- system.file("testdata", package = "gDRplots")
+  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
   
   # testing assertions
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = 1:3,
