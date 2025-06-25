@@ -9,7 +9,7 @@ tab_model <- data.table::data.table(
     withr::with_seed(42, 
                      sample(c("Soft Tissue", "Skin", "Lung", "Liver", "Breast", "Kidney", "Other"),
                             no_cell_lines, replace = TRUE)),
-  Age = withr::with_seed(42, sample(c(18:98, NA), no_cell_lines, replace = TRUE)),
+  Age = withr::with_seed(42, sample(c(18, 25, 45, 65:68, 89, 90, NA), no_cell_lines, replace = TRUE)),
   GrowthPattern = 
     rep(c("Adherent", "Adherent",  NA, "Suspension", "Mixed", "Unknown", "Neurosphere", "Organoid", ""),
         length.out = no_cell_lines, replace = TRUE),
