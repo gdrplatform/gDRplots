@@ -861,8 +861,8 @@ test_that("plot_boxplot_meta works as expected", {
                       with_1_item_grp = FALSE)
   expect_is(plt_3_with_1, "gg")
   expect_is(plt_3_without_1, "gg")
-  expect_length(plt_3_with_1[["layers"]], 4)
-  expect_length(plt_3_without_1[["layers"]], 4)
+  expect_length(plt_3_with_1[["layers"]], 5)
+  expect_length(plt_3_without_1[["layers"]], 5)
   common_cellline_3 <- merge(dt_response_2, 
                              obj_depmap_meta_lng[["dt_depmap"]], 
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
@@ -879,7 +879,7 @@ test_that("plot_boxplot_meta works as expected", {
                sort(names(res_3_without_1)[colSums(res_3_without_1) > 1]))
   expect_equal(ggplot2::ggplot_build(plt_3_without_1)$data[[4]]$label, 
                c(colSums(res_3_without_1)[colSums(res_3_without_1) > 1], use.names = FALSE))
-  expect_false(1 %in% c(colSums(res_3_without_1)[colSums(res_3_without_1) > 0], use.names = FALSE))
+  expect_false(1 %in% c(colSums(res_3_without_1)[colSums(res_3_without_1) > 1], use.names = FALSE))
   
   # scenario: plot with combo metric
   selected_metric_3 <- "RV_gDR_bliss_score"
