@@ -511,7 +511,7 @@ test_that("prep_dt_assoc works as expected", {
   
   sel_met_2 <- "RV_gDR_log10_xc50"
   res_2 <- 
-    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][1:5,],
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][1:5, ],
                   dt_depmap = obj_depmap_feat[["dt_depmap"]],
                   selected_feat_meta_col = "XZ_fatures")
   expect_is(res_2, "list")
