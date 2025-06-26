@@ -957,23 +957,17 @@ test_that("plot_boxplot_meta works as expected", {
       plot_boxplot_meta(dt_response = dt_response_1,
                         dt_depmap = dt_depmap_meta_multi, 
                         selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
-    expect_is(plt_8, "gg")
-    expect_equal(plt_8[["labels"]][["y"]], selected_metric_1)
-    common_cellline_8 <- merge(dt_response_1[!is.infinite(get(selected_metric_1)), ], 
-                               dt_depmap_meta_multi, 
-                               by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
-    res_8 <- dt_depmap_meta_multi[CCLEName %in% common_cellline_8, .SD, .SDcols = -id_col]
-    expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) == sum(colSums(res_8)))
-    expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) > sum(colSums(res_1)))
-    expect_equal(ggplot2::layer_scales(plt_8)$x$range$range,
-                 sort(names(res_8)[colSums(res_8) > 0]))
-  })
-  expect_warning(
-    plot_boxplot_meta(dt_response = dt_response_1,
-                      dt_depmap = dt_depmap_meta_multi, 
-                      selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]]),
-    "The data does not appear to be categorical"
-  )
+  }, "The data does not appear to be categorical")
+  expect_is(plt_8, "gg")
+  expect_equal(plt_8[["labels"]][["y"]], selected_metric_1)
+  common_cellline_8 <- merge(dt_response_1[!is.infinite(get(selected_metric_1)), ], 
+                             dt_depmap_meta_multi, 
+                             by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
+  res_8 <- dt_depmap_meta_multi[CCLEName %in% common_cellline_8, .SD, .SDcols = -id_col]
+  expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) == sum(colSums(res_8)))
+  expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) > sum(colSums(res_1)))
+  expect_equal(ggplot2::layer_scales(plt_8)$x$range$range,
+               sort(names(res_8)[colSums(res_8) > 0]))
   
   # testing assertions
   expect_error(plot_boxplot_meta(dt_response = unlist(dt_response_1),

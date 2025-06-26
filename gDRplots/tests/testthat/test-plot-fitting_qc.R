@@ -73,11 +73,10 @@ test_that("plot_fitting_acc works as expected", {
   dt_metric_NA <- data.table::copy(dt_metrics)
   dt_metric_NA[CellLineName == cl_name]$r2 <- NA
   
-  expect_warning(
+  expect_warning({
     plt_3 <- plot_fitting_acc(dt_assay = dt_metric_NA,
-                              cl_name = cl_name),
-    sprintf("Missing data for %s in GR normalization type.", cl_name)
-  )
+                              cl_name = cl_name)
+    } , sprintf("Missing data for %s in GR normalization type.", cl_name))
   expect_length(ggplot2::ggplot_build(plt_3)[["data"]][[1]], 0)
   
   expect_error(plot_fitting_acc(dt_assay = unlist(dt_metrics),
