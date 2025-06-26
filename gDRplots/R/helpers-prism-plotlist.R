@@ -86,7 +86,13 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   }
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
               !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
-  
+
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type %in% norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type_vec, fit_src = fit_source))
+  if (!is.null(dt_metrics)) dt_metrics <- dt_metrics[eval(filter_expr)]
+  if (!is.null(dt_average)) dt_average <- dt_average[eval(filter_expr)]
+
   # adjust drug list
   available_drugs <- if (!is.null(dt_metrics)) {
     unique(dt_metrics[[drug_name]]) 
@@ -99,6 +105,13 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
   }
   
+  # fast end when there are no available drugs
+  if (NROW(available_drugs) == 0) {
+    message("There was na data for selected drugs.")
+    return(list())
+  }
+  
+  # final object
   ls_plot <- list()
   
   if (!is.null(feature_sets)) {
@@ -258,15 +271,15 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   checkmate::assert_character(drug2_name_vec, all.missing = FALSE)
   checkmate::assert_data_table(dt_metrics, min.rows = 1, null.ok = TRUE)
   checkmate::assert_data_table(dt_scores, min.rows = 1, null.ok = TRUE)
+  stopifnot("Provide response data - at least one of `dt_metrics` or `dt_scores`." =
+              (!is.null(dt_metrics) || !is.null(dt_scores)))
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE, null.ok = TRUE)
-  stopifnot("Provide `metric` for `dt_metrics`." = !is.null(dt_metrics) && !is.null(metric))
   if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
-  if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
+  if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics), empty.ok = FALSE)
   checkmate::assert_character(metric_scores, any.missing = FALSE, null.ok = TRUE)
-  stopifnot("Provide `metric_scores` for `dt_scores`." = !is.null(dt_scores) && !is.null(metric_scores))
   if (!is.null(metric_scores)) checkmate::assert_subset(metric_scores, choices = c("hsa_score", "bliss_score"))
-  if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, choices = names(dt_scores))
+  if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, choices = names(dt_scores), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
@@ -274,22 +287,32 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   checkmate::assert_character(metadata_columns, null.ok = TRUE)
   if (!is.null(metadata_columns)) {
     meta_data <- data.table::fread(meta_data_path, nrow = 1)
-    checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
+    checkmate::assert_subset(c("ModelID", "CCLEName"), names(meta_data))
+    # use only available meta
+    metadata_columns <- intersect(metadata_columns, names(meta_data))
+    if (NROW(metadata_columns) == 0) metadata_columns <- NULL
     rm(meta_data)
   }
   checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
-              !xor(is.null(feature_sets), is.null(feat_data_path)))
   if (!is.null(feat_data_path) && !is.null(feature_sets)) {
     checkmate::assert_directory_exists(feat_data_path)
     # use only available files
     feature_sets <- feature_sets[vapply(feature_sets, function(f) {
       file.exists(file.path(feat_data_path, paste0(f, ".csv")))
     }, logical(1))]
+    if (NROW(feature_sets) == 0) feature_sets <- NULL
   }
-  stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
-              !is.null(feature_sets) || !is.null(metadata_columns))
+  if (xor(is.null(feature_sets), is.null(feat_data_path))) {
+    stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset." =
+                !is.null(metadata_columns))
+    if (!is.null(metadata_columns)) {
+      feature_sets <- NULL
+      feat_data_path <- NULL
+    }
+  }
+  stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
+              !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
   
   # prep drugs combinations
   drug_name_grid <- if (!is.null(dt_metrics)) {
