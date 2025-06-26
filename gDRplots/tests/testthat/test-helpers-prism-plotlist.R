@@ -89,9 +89,9 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_length(res_5, NROW(metadata_columns))
   expect_equal(names(res_5), metadata_columns)
   expect_length(res_5[[1]], NROW(d_names))
-  expect_length(res_4[[1]][[1]], 1) # only default RV
-  expect_length(res_4[[1]][[1]][[1]],
-                 NROW(unique(dt_average$Concentration))) # metrics
+  expect_length(res_5[[1]][[1]], 1) # only default RV
+  expect_length(res_5[[1]][[1]][[1]],
+                NROW(unique(dt_average$Concentration))) # metrics
   
   # testing assertions
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = 1:3,
@@ -115,6 +115,29 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets[1]),
                "Assertion on 'dt_average' failed: Must be a data.table")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = NULL,
+                                         dt_average = NULL,
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = feature_sets[1]),
+               "Provide response data - at least one of `dt_metrics` or `dt_average`.")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         metric = NULL,
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = feature_sets[1]),
+               "Assertion on 'metric' failed: Must be a subset of")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         metric = "not_known_metric",
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = feature_sets[1]),
+               "Assertion on 'metric' failed: Must be a subset of")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          dt_average = dt_average,
@@ -156,7 +179,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          meta_data_path = meta_data_path,
                                          feat_data_path = feat_data_path,
                                          feature_sets = NULL),
-               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset.")
+               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          dt_average = dt_average,
@@ -164,7 +187,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feat_data_path = NULL,
                                          feature_sets = NULL,
                                          metadata_columns = NULL),
-               "Provide `feature_sets` or `metadata_columns` for DepMam subset.")
+               "Provide `feature_sets` or `metadata_columns` for DepMap subset.")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          dt_average = dt_average,
@@ -180,7 +203,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feat_data_path = NULL,
                                          feature_sets = feature_sets,
                                          metadata_columns = NULL),
-               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset.")
+               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
@@ -205,7 +228,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         meta_data_path = meta_data_path,
                                         feat_data_path = feat_data_path,
                                         feature_sets = feature_sets) # default
-
+  
   # testing assertions
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = 1:3,
                                             drug2_name_vec = d_names_2,
@@ -285,7 +308,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             meta_data_path = meta_data_path,
                                             feat_data_path = feat_data_path,
                                             feature_sets = NULL),
-               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset.")
+               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
@@ -294,7 +317,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             feat_data_path = NULL,
                                             feature_sets = NULL,
                                             metadata_columns = NULL),
-               "Provide `feature_sets` or `metadata_columns` for DepMam subset.")
+               "Provide `feature_sets` or `metadata_columns` for DepMap subset.")
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
@@ -312,5 +335,5 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             feat_data_path = NULL,
                                             feature_sets = feature_sets,
                                             metadata_columns = NULL),
-               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset.")
+               "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
 })
