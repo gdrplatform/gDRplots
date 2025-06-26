@@ -124,7 +124,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           }
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
-          # prep data for deepmap 
+          # prep data for depmap 
           dt_depmap <- obj_depmap[["dt_depmap"]]
           if (clear_taxonomy_info) {
             names(dt_depmap) <- gsub(" \\((.*))", "", names(dt_depmap))
@@ -328,7 +328,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo),
                                                             c(id_col, drug_name, drug_name_2)))
           
-          # prep data for deepmap 
+          # prep data for depmap 
           dt_depmap <- obj_depmap[["dt_depmap"]]
           if (clear_taxonomy_info) {
             names(dt_depmap) <- gsub(" \\((.*))", "", names(dt_depmap))
