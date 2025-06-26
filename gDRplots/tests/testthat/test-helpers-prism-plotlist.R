@@ -286,7 +286,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
   expect_length(res_4, NROW(metadata_columns[1]))
   expect_equal(names(res_4), metadata_columns[1])
   expect_equal(names(res_4[[1]]), sprintf("%s x %s", d_names[1], d_names_2))
-  expect_length(res_4[[1]][[1]], NROW(c("RV", "GR")))
+  expect_length(res_4[[1]][[1]], NROW(c("GR")))
   expect_true(all(grepl("GR_gDR_hsa_score", names(res_4[[1]][[1]][[1]])))) # metrics
   
   # scenario: no data for given drugs
