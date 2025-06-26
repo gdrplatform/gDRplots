@@ -14,7 +14,8 @@ create_PRISM_plot_list_sa(
   meta_data_path,
   feat_data_path,
   feature_sets,
-  metadata_columns = NULL
+  metadata_columns = NULL,
+  clear_taxonomy_info = TRUE
 )
 }
 \arguments{
@@ -26,7 +27,7 @@ and single-agent \code{SummarizedExperiment}}
 
 \item{dt_average}{\code{data.table} representing data from the \code{Averaged} assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
-and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
+and single-agent \code{SummarizedExperiment}}
 
 \item{normalization_type_vec}{character vector with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
@@ -48,6 +49,9 @@ These names should also correspond to the file names containing the feature data
 (without the extension, which is assumed to be \code{csv})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
+
+\item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table 
+with the molecular feature sets from DepMap.}
 }
 \value{
 nested list of plots
