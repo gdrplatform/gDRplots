@@ -47,11 +47,12 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   checkmate::assert_character(drug_name_vec)
   checkmate::assert_data_table(dt_metrics, min.rows = 1, null.ok = TRUE)
   checkmate::assert_data_table(dt_average, min.rows = 1, null.ok = TRUE)
+  stopifnot("Provide response data - at least one of `dt_metrics` or `dt_average`." =
+              (!is.null(dt_metrics) || !is.null(dt_average)))
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE, null.ok = TRUE)
-  stopifnot("Provide `metric` for `dt_metrics`." = !is.null(dt_metrics) && !is.null(metric))
   if (!is.null(metric)) checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"))
-  if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics))
+  if (!is.null(dt_metrics)) checkmate::assert_subset(metric, choices = names(dt_metrics), empty.ok = FALSE)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
@@ -59,25 +60,39 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   checkmate::assert_character(metadata_columns, null.ok = TRUE)
   if (!is.null(metadata_columns)) {
     meta_data <- data.table::fread(meta_data_path, nrow = 1)
-    checkmate::assert_subset(unique(c("ModelID", "CCLEName", metadata_columns)), names(meta_data))
+    checkmate::assert_subset(c("ModelID", "CCLEName"), names(meta_data))
+    # use only available meta
+    metadata_columns <- intersect(metadata_columns, names(meta_data))
+    if (NROW(metadata_columns) == 0) metadata_columns <- NULL
     rm(meta_data)
   }
   checkmate::assert_string(feat_data_path, null.ok = TRUE)
   checkmate::assert_character(feature_sets, null.ok = TRUE)
-  stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMam subset." =
-              !xor(is.null(feature_sets), is.null(feat_data_path)))
   if (!is.null(feat_data_path) && !is.null(feature_sets)) {
     checkmate::assert_directory_exists(feat_data_path)
     # use only available files
     feature_sets <- feature_sets[vapply(feature_sets, function(f) {
       file.exists(file.path(feat_data_path, paste0(f, ".csv")))
     }, logical(1))]
+    if (NROW(feature_sets) == 0) feature_sets <- NULL
   }
-  stopifnot("Provide `feature_sets` or `metadata_columns` for DepMam subset." =
-              !is.null(feature_sets) || !is.null(metadata_columns))
+  if (xor(is.null(feature_sets), is.null(feat_data_path))) {
+    stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset." =
+                !is.null(metadata_columns))
+    if (!is.null(metadata_columns)) {
+      feature_sets <- NULL
+      feat_data_path <- NULL
+    }
+  }
+  stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
+              !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
   
   # adjust drug list
-  available_drugs <- unique(dt_metrics[[drug_name]])
+  available_drugs <- if (!is.null(dt_metrics)) {
+    unique(dt_metrics[[drug_name]]) 
+  } else {
+    unique(dt_average[[drug_name]]) 
+  }
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
     drug_name_vec <- available_drugs
   } else if (!all(drug_name_vec %in% available_drugs)) {
