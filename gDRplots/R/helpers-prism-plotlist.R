@@ -130,13 +130,15 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
               prep_dt_response_metric_sa(dt_metrics = dt_metrics,
                                          d_name = d_name,
                                          normalization_type = norm,
+                                         fit_source = fit_source,
                                          metric = metric)
           }
           if (!is.null(dt_average)) {
             dt_response_dose <- 
               prep_dt_response_dose_sa(dt_average = dt_average, 
                                        d_name = d_name,
-                                       normalization_type = norm)
+                                       normalization_type = norm,
+                                       fit_source = fit_source)
           }
           
           dt_response_sa <- if (!is.null(dt_metrics) && !is.null(dt_average)) {
@@ -178,13 +180,15 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
               prep_dt_response_metric_sa(dt_metrics = dt_metrics,
                                          d_name = d_name,
                                          normalization_type = norm,
+                                         fit_source = fit_source,
                                          metric = metric)
           }
           if (!is.null(dt_average)) {
             dt_response_dose <- 
               prep_dt_response_dose_sa(dt_average = dt_average, 
                                        d_name = d_name,
-                                       normalization_type = norm)
+                                       normalization_type = norm,
+                                       fit_source = fit_source)
           }
           
           dt_response_sa <- if (!is.null(dt_metrics) && !is.null(dt_average)) {
@@ -314,6 +318,12 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
               !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
   
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type %in% norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type_vec, fit_src = fit_source))
+  if (!is.null(dt_metrics)) dt_metrics <- dt_metrics[eval(filter_expr)]
+  if (!is.null(dt_scores)) dt_scores <- dt_scores[eval(filter_expr)]
+  
   # prep drugs combinations
   drug_name_grid <- if (!is.null(dt_metrics)) {
     unique(dt_metrics[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec, 
@@ -325,6 +335,13 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   data.table::setorder(drug_name_grid)
   drug_name_grid[, DrugCombination := paste(get(drug_name), get(drug_name_2), sep = " x ")]
   
+  # fast end when there are no available drugs
+  if (NROW(drug_name_grid) == 0) {
+    message("There was na data for selected drugs combinations.")
+    return(list())
+  }
+  
+  # final
   ls_plot <- list()
   
   if (!is.null(feature_sets)) {
@@ -346,6 +363,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                            d_name = d_name,
                                            d_name2 = d_name2,
                                            normalization_type = norm,
+                                           fit_source = fit_source,
                                            metric = metric)
           }
           if (!is.null(dt_scores)) {
@@ -354,6 +372,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                       d_name = d_name,
                                       d_name2 = d_name2,
                                       normalization_type = norm,
+                                      fit_source = fit_source,
                                       metric = metric_scores)
           }
           
@@ -400,6 +419,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                            d_name = d_name,
                                            d_name2 = d_name2,
                                            normalization_type = norm,
+                                           fit_source = fit_source,
                                            metric = metric)
           }
           if (!is.null(dt_scores)) {
@@ -408,6 +428,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                       d_name = d_name,
                                       d_name2 = d_name2,
                                       normalization_type = norm,
+                                      fit_source = fit_source,
                                       metric = metric_scores)
           }
           
