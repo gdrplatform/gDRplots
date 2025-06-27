@@ -575,7 +575,7 @@ prep_dt_assoc <- function(dt_response,
   
   # checking input format
   selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
-  stopifnot("Provide `dt_response` with for one metric." = NROW(selected_metric) == 1)
+  stopifnot("Provide `dt_response` for one metric only." = NROW(selected_metric) == 1)
   stopifnot("Column in `dt_response` with metric should be numeric." = is.numeric(dt_response[[selected_metric]]))
   selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
   stopifnot("Provide `dt_depmap` with numeric values." = 

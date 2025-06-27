@@ -559,7 +559,7 @@ test_that("prep_dt_assoc works as expected", {
   expect_error(
     prep_dt_assoc(dt_response = dt_response_met,
                   dt_depmap = obj_depmap_feat[["dt_depmap"]]),
-    "Provide `dt_response` with for one metric.")
+    "Provide `dt_response` for one metric.")
   dt_depmap_not_num <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
   cols <- names(dt_depmap_not_num)
   dt_depmap_not_num[, (cols) := lapply(.SD, function(i) as.character(i)), .SDcols = cols]
