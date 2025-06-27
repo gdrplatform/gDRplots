@@ -3,10 +3,10 @@
 #' @param drug_name_vec character vector with drug names to be plotted (identifiers \code{DrugName})
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
-#'  and single-agent \code{SummarizedExperiment}
+#'  and single-agent \code{SummarizedExperiment} 
 #' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
-#'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo 
+#'  and single-agent \code{SummarizedExperiment} 
 #' @param normalization_type_vec character vector with normalization types to be selected
 #'                               one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both
 #' @param metric character vector with names of metric;
@@ -21,6 +21,8 @@
 #'  These names should also correspond to the file names containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
+#' @param clear_taxonomy_info logical flag whether to remove taxonomy information for gene names in table 
+#'  with the molecular feature sets from DepMap.
 #' 
 #' @return nested list of plots
 #' 
@@ -38,7 +40,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       meta_data_path,
                                       feat_data_path,
                                       feature_sets,
-                                      metadata_columns = NULL) {
+                                      metadata_columns = NULL,
+                                      clear_taxonomy_info = TRUE) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -76,6 +79,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     }, logical(1))]
     if (NROW(feature_sets) == 0) feature_sets <- NULL
   }
+
   if (xor(is.null(feature_sets), is.null(feat_data_path))) {
     stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset." =
                 !is.null(metadata_columns))
@@ -86,6 +90,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   }
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
               !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
+  checkmate::assert_flag(clear_taxonomy_info)
 
   # select data for normalization type
   filter_expr <- substitute(normalization_type %in% norm_type & fit_source == fit_src,
@@ -150,11 +155,17 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
           }
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_sa), id_col))
           
+          # prep data for depmap 
+          dt_depmap <- obj_depmap[["dt_depmap"]]
+          if (clear_taxonomy_info) {
+            names(dt_depmap) <- gsub(" \\((.*))", "", names(dt_depmap))
+          }
+          
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_sa,
-                                dt_depmap = obj_depmap[["dt_depmap"]],
+                                dt_depmap = dt_depmap,
                                 selected_feat_meta_col = feat)
           names(ls_vol) <- ls_selected_met$selected_metric
           
@@ -220,6 +231,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 
 #' Create a nested list of plots for PRISM data with combo metrics
 #' 
+#' @inheritParams create_PRISM_plot_list_sa
 #' @param drug1_name_vec character vector with drug names to be plotted (identifiers \code{DrugName})
 #' @param drug2_name_vec character vector with co-drug names to be plotted (identifiers \code{DrugName_2})
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
@@ -228,23 +240,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'  and combo \code{SummarizedExperiment}
-#' @param normalization_type_vec character vector with normalization types to be selected
-#'                               one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both
-#' @param metric character vector with names of metric for difference:
-#'   chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param metric_scores character vector with names of combo metric;
 #'   chosen from: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
-#' @param fit_source string source name for metrics
-#' @param meta_data_path string path to metadata file describing all cancer models/cell lines
-#'  which are referenced by a dataset contained within the DepMap portal. 
-#'  It is usually a file named \code{Model.csv}.
-#' @param feat_data_path string path to the directory containing the molecular feature set file to load from DepMap.
-#' @param feature_sets character vector containing the names of the molecular feature sets to load from DepMap.
-#'  These names should also correspond to the file names containing the feature data 
-#'  (without the extension, which is assumed to be \code{csv})
-#' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' 
 #' @return nested list of plots
 #' 
@@ -264,7 +262,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          meta_data_path,
                                          feat_data_path,
                                          feature_sets,
-                                         metadata_columns = NULL) {
+                                         metadata_columns = NULL,
+                                         clear_taxonomy_info = TRUE) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
@@ -317,13 +316,14 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   }
   stopifnot("Provide `feature_sets` or `metadata_columns` for DepMap subset." =
               !all(is.null(feat_data_path), is.null(feature_sets), is.null(metadata_columns)))
+  checkmate::assert_flag(clear_taxonomy_info)
   
   # select data for normalization type
   filter_expr <- substitute(normalization_type %in% norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type_vec, fit_src = fit_source))
   if (!is.null(dt_metrics)) dt_metrics <- dt_metrics[eval(filter_expr)]
   if (!is.null(dt_scores)) dt_scores <- dt_scores[eval(filter_expr)]
-  
+
   # prep drugs combinations
   drug_name_grid <- if (!is.null(dt_metrics)) {
     unique(dt_metrics[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec, 
@@ -386,11 +386,17 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
           ls_selected_met <- list(selected_metric = setdiff(names(dt_response_combo),
                                                             c(id_col, drug_name, drug_name_2)))
           
+          # prep data for depmap 
+          dt_depmap <- obj_depmap[["dt_depmap"]]
+          if (clear_taxonomy_info) {
+            names(dt_depmap) <- gsub(" \\((.*))", "", names(dt_depmap))
+          }
+          
           # 4th level - prep vis
           ls_vol <- purrr::pmap(ls_selected_met,
                                 plot_volcano_assoc_panel,
                                 dt_response = dt_response_combo,
-                                dt_depmap = obj_depmap[["dt_depmap"]],
+                                dt_depmap = dt_depmap,
                                 selected_feat_meta_col = feat)
           names(ls_vol) <- ls_selected_met$selected_metric
           

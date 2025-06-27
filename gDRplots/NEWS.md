@@ -1,3 +1,10 @@
+## gDRplots 0.0.84 - 2025-06-25
+* test data for PRISM
+* update and ad dmissing tests
+
+## gDRplots 0.0.83 - 2025-06-24
+* clean gene names in PRISM reports
+
 ## gDRplots 0.0.82 - 2025-06-06
 * update `pheatmap_qc` with standardized concentrations
 

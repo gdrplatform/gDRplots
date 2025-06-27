@@ -202,6 +202,15 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feature_sets = feature_sets,
                                          metadata_columns = NULL),
                "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = feature_sets,
+                                         clear_taxonomy_info = "str"),
+               "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
+
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
@@ -430,4 +439,13 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             feature_sets = feature_sets,
                                             metadata_columns = NULL),
                "Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset.")
+  expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                            drug2_name_vec = d_names_2,
+                                            dt_metrics = dt_metrics,
+                                            dt_scores = dt_scores,
+                                            meta_data_path = meta_data_path,
+                                            feat_data_path = feat_data_path,
+                                            feature_sets = feature_sets,
+                                            clear_taxonomy_info = NULL),
+               "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
 })
