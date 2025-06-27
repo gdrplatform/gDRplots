@@ -88,7 +88,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                        meta_data_path = meta_data_path,
                                        feat_data_path = feat_data_path,
                                        feature_sets = feature_sets)
-  }, "There was na data for selected drugs.")
+  }, "There was no data for selected drugs.")
   expect_length(res_5, 0)
   
   # testing assertions
@@ -303,7 +303,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                           feat_data_path = feat_data_path,
                                           feature_sets = feature_sets,
                                           metadata_columns = "non_available_meta")
-  }, "There was na data for selected drugs combination.")
+  }, "There was no data for selected drugs combination.")
   expect_length(res_5, 0)
   
   # testing assertions

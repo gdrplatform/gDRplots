@@ -107,7 +107,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
   
   # fast end when there are no available drugs
   if (NROW(available_drugs) == 0) {
-    message("There was na data for selected drugs.")
+    message("There was no data for selected drugs.")
     return(list())
   }
   
@@ -337,7 +337,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
   
   # fast end when there are no available drugs
   if (NROW(drug_name_grid) == 0) {
-    message("There was na data for selected drugs combinations.")
+    message("There was no data for selected drugs combinations.")
     return(list())
   }
   
