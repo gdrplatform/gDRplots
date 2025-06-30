@@ -339,7 +339,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             meta_data_path = meta_data_path,
                                             feat_data_path = feat_data_path,
                                             feature_sets = feature_sets),
-               "Assertion on 'dt_metrics' failed: Must have at least 1 rows")
+               "Assertion on 'dt_metrics_combo' failed: Must have at least 1 rows")
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
