@@ -27,7 +27,7 @@
 #' @param metric character vector with names of single-agent metric;
 #'   chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
-#' @param drug_name_vec character vector with drug names to be plotted (identifiers \code{DrugName}) 
+#' @param drug1_name_vec character vector with drug names to be plotted (identifiers \code{DrugName}) 
 #' @param drug2_name_vec character vector with co-drug names to be plotted (identifiers \code{DrugName_2})
 #' @param normalization_type_vec character vector with normalization types to be selected
 #'                               one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both
@@ -61,7 +61,7 @@
                                     dt_metrics_combo,
                                     dt_average = NULL,
                                     dt_scores = NULL,
-                                    drug_name_vec = NULL,
+                                    drug1_name_vec = NULL,
                                     drug2_name_vec = NULL,
                                     normalization_type_vec = "RV",
                                     metric = c("xc50", "x_mean", "x_max"),
@@ -90,7 +90,7 @@
   checkmate::assert_flag(clear_taxonomy_info)
   
   if (experiment_type == "sa") {
-    checkmate::assert_character(drug_name_vec, null.ok = TRUE)
+    checkmate::assert_character(.drug1_name_vec, null.ok = TRUE)
     checkmate::assert_data_table(dt_metrics_sa, min.rows = 1, null.ok = TRUE)
     checkmate::assert_data_table(dt_average, min.rows = 1, null.ok = TRUE)
     stopifnot("Provide response data - at least one of `dt_metrics` or `dt_average`." =
@@ -101,7 +101,7 @@
                                                           choices = names(dt_metrics), 
                                                           empty.ok = FALSE)
   } else { # combo
-    checkmate::assert_character(drug_name_vec, all.missing = FALSE)
+    checkmate::assert_character(drug1_name_vec, all.missing = FALSE)
     checkmate::assert_character(drug2_name_vec, all.missing = FALSE)
     checkmate::assert_data_table(dt_metrics_combo, min.rows = 1, null.ok = TRUE)
     checkmate::assert_data_table(dt_scores, min.rows = 1, null.ok = TRUE)
@@ -155,18 +155,18 @@
     drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
     available_drugs <- unique(drug_source[[drug_name]])
     
-    if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
-      drug_name_vec <- available_drugs
+    if (is.null(drug1_name_vec) || all(!drug1_name_vec %in% available_drugs)) {
+      drug1_name_vec <- available_drugs
     } else {
-      drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
+      drug1_name_vec <- drug1_name_vec[drug1_name_vec %in% available_drugs]
     }
-    drug_name_grid <- data.table::data.table(iter_id = drug_name_vec, 
-                                             drug_name = drug_name_vec)
+    drug_name_grid <- data.table::data.table(iter_id = drug1_name_vec, 
+                                             drug_name = drug1_name_vec)
     data.table::setnames(drug_name_grid, "drug_name", drug_name)
   } else { # combo
     drug_source <- if (!is.null(dt_metrics_combo)) dt_metrics_combo else dt_scores
     drug_name_grid <- 
-      unique(drug_source[get(drug_name) %in% drug_name_vec & get(drug_name_2) %in% drug2_name_vec,
+      unique(drug_source[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec,
                          c(drug_name, drug_name_2), with = FALSE])
     data.table::setorder(drug_name_grid)
     drug_name_grid[, iter_id := paste(get(drug_name), get(drug_name_2), sep = " x ")]
@@ -294,6 +294,7 @@
 #' Create a nested list of plots for PRISM data with single-agent metrics
 #'
 #' @inheritParams .create_PRISM_plot_list
+#' @param drug_name_vec character vector with drug names to be plotted (identifiers \code{DrugName}) 
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
@@ -318,7 +319,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       clear_taxonomy_info = TRUE) {
   .create_PRISM_plot_list(
     experiment_type = "sa",
-    drug_name_vec = drug_name_vec,
+    drug1_name_vec = drug_name_vec,
     dt_metrics_sa = dt_metrics,
     dt_metrics_combo = NULL,
     dt_average = dt_average,
@@ -363,7 +364,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          clear_taxonomy_info = TRUE) {
   .create_PRISM_plot_list(
     experiment_type = "combo",
-    drug_name_vec = drug1_name_vec,
+    drug1_name_vec = drug1_name_vec,
     drug2_name_vec = drug2_name_vec,
     dt_metrics_sa = NULL,
     dt_metrics_combo = dt_metrics,
