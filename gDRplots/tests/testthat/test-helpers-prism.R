@@ -361,7 +361,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   expect_true(all(id_col %in% names(obj_meta_1$dt_depmap)))
   expect_true(all(unique(tab_model[["PatientRace"]]) %in% names(obj_meta_1$dt_depmap)))
   expect_true(all(vapply(obj_meta_1$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
-
+  
   meta_2 <- "OncotreeLineage"
   obj_meta_2 <- prep_dt_depmap_meta(test_meta_data_path,
                                     metadata_col = meta_2)
@@ -369,7 +369,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   expect_equal(obj_meta_2$selected_feat_meta_col, meta_2)
   expect_true(all(unique(tab_model[[meta_2]]) %in% names(obj_meta_2$dt_depmap)))
   expect_true(all(vapply(obj_meta_2$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
-
+  
   # scenario: origin column is numeric type
   meta_3 <- "Age"
   obj_meta_3 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
@@ -379,7 +379,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   ls_col_3 <- vapply(unique(tab_model[[meta_3]]), change_NA_into_char, FUN.VALUE = character(1))
   expect_true(all(c(id_col, ls_col_3) %in% names(obj_meta_3$dt_depmap)))
   expect_true(all(vapply(obj_meta_3$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
-
+  
   # scenario: origin column is logial type
   meta_4 <- "SourceDetail"
   obj_meta_4 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
@@ -389,7 +389,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   ls_col_4 <- vapply(unique(tab_model[[meta_4]]), change_NA_into_char, FUN.VALUE = character(1))
   expect_true(all(c(id_col, ls_col_4) %in% names(obj_meta_4$dt_depmap)))
   expect_true(all(vapply(obj_meta_4$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
-
+  
   # scenario: origin column is factor type
   meta_5 <- "Sex"
   obj_meta_5 <- prep_dt_depmap_meta(meta_data_path = test_meta_data_path,
@@ -418,7 +418,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   expect_equal(obj_meta_7$selected_feat_meta_col, meta_7)
   expect_true(all(id_col %in% names(obj_meta_7$dt_depmap)))
   expect_equal(NCOL(obj_meta_7$dt_depmap), NROW(id_col))
-
+  
   expect_error(prep_dt_depmap_meta(123), 
                "Assertion on 'meta_data_path' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.qs"), 
@@ -431,13 +431,140 @@ test_that("prep_dt_depmap_meta works as expected", {
                "failed: Must be a subset of")
 })
 
-#nolint start
-# test_that("prep_dt_depmap_feat works as expected", {
-#   # TODO in GDR-2710
-# })
-# 
-# 
-# test_that("prep_dt_assoc works as expected", {
-#   # TODO in GDR-2710
-# })
-#nolint end
+test_that("prep_dt_depmap_feat works as expected", {
+  id_col <- c("ModelID", "CCLEName") 
+  test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  tab_model <- data.table::fread(test_meta_data_path)
+  
+  test_feat_data_path <- system.file("testdata", package = "gDRplots")
+  
+  obj_feat_1 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                    meta_data_path = test_meta_data_path) # default
+  expect_is(obj_feat_1, "list")
+  expect_is(obj_feat_1[[1]], "data.table")
+  expect_equal(names(obj_feat_1), c("dt_depmap", "selected_feat_meta_col"))
+  expect_equal(obj_feat_1$selected_feat_meta_col, "CRISPRGeneEffect")
+  expect_true(all(id_col %in% names(obj_feat_1$dt_depmap)))
+  expect_true(all(vapply(obj_feat_1$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
+  
+  obj_feat_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                    meta_data_path = test_meta_data_path,
+                                    feature_set = "OmicsSomaticMutationsMatrixHotspot")
+  expect_is(obj_feat_2, "list")
+  expect_is(obj_feat_2[[1]], "data.table")
+  expect_equal(names(obj_feat_2), c("dt_depmap", "selected_feat_meta_col"))
+  expect_equal(obj_feat_2$selected_feat_meta_col, "OmicsSomaticMutationsMatrixHotspot")
+  expect_true(all(id_col %in% names(obj_feat_2$dt_depmap)))
+  expect_true(all(vapply(obj_feat_2$dt_depmap[, .SD, .SDcols = -id_col], is.numeric, logical(1))))
+  
+  # sceanraio: not supported feature
+  expect_message(
+    prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                        meta_data_path = test_meta_data_path,
+                        feature_set = "OmicsSignaturesProfile"),
+    "The `OmicsSignaturesProfile` feature is not supported.")
+  
+  expect_error(prep_dt_depmap_feat(feat_data_path = 123, 
+                                   meta_data_path = test_meta_data_path), 
+               "Assertion on 'feat_data_path' failed: Must be of type 'string'")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = "testdata/meta_data.qs"),
+               "Assertion on 'File ext must be csv' failed: Must be TRUE")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = "testdata/meta_data.csv"),
+               "Assertion on 'meta_data_path' failed: File does not exist")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = test_meta_data_path, 
+                                   feature_set = 123),
+               "Assertion on 'feature_set' failed: Must be of type 'string'")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = test_meta_data_path,
+                                   feature_set = "some_feat"),
+               "Assertion on 'feat_path' failed: File does not exist")
+})
+
+
+test_that("prep_dt_assoc works as expected", {
+  # prep response data
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa,
+                                                 assay_name = "Metrics")
+  d_name <- "drug_002"
+  d_name2 <- "drug_026"
+  dt_response_met <- 
+    prep_dt_response_metric_sa(dt_metrics, d_name,
+                               metric = c("xc50", "x_mean", "x_max"))
+  
+  # prep depmap data
+  obj_depmap_feat <- 
+    prep_dt_depmap_feat(feat_data_path = system.file("testdata", package = "gDRplots"),
+                        meta_data_path = system.file("testdata/Model.csv", package = "gDRplots"),
+                        feature_set = "CRISPRGeneEffect")
+  obj_depmap_meta <- 
+    prep_dt_depmap_meta(meta_data_path = system.file("testdata/Model.csv", package = "gDRplots"))
+  
+  sel_met_1 <- "RV_gDR_x_mean"
+  res_1 <- 
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_1)],
+                  dt_depmap = obj_depmap_feat[["dt_depmap"]])
+  expect_is(res_1, "list")
+  expect_length(res_1, 4)
+  expect_equal(res_1[["selected_metric"]], sel_met_1)
+  expect_null(res_1[["selected_feat_meta_col"]])
+  expect_equal(names(res_1[["dt_assoc"]]), c("feature", "response", "rho", "q_value"))
+  expect_equal(NROW(res_1[["dt_assoc"]]),
+               NCOL(obj_depmap_feat[["dt_depmap"]][, .SD, .SDcols = -c("CCLEName", "ModelID")]))
+  
+  sel_met_2 <- "RV_gDR_log10_xc50"
+  res_2 <- 
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][1:5, ],
+                  dt_depmap = obj_depmap_feat[["dt_depmap"]],
+                  selected_feat_meta_col = "XZ_fatures")
+  expect_is(res_2, "list")
+  expect_length(res_2, 4)
+  expect_is(res_2[["dt_assoc"]], "data.table")
+  ls_cl_res <- 
+    dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)][is.finite(get(sel_met_2))][["CellLineName"]]
+  ls_cl_dm <- stats::na.omit(obj_depmap_feat[["dt_depmap"]][CCLEName %in% ls_cl_res])
+  expect_equal(NROW(res_2[["dt_assoc"]]), 0) # becaues ls_cl_dm < 6
+  expect_null(res_2[["condition_info"]])
+  expect_equal(res_2[["selected_feat_meta_col"]], "XZ_fatures")
+  expect_equal(res_2[["selected_metric"]], sel_met_2)
+  
+  sel_met_3 <- "RV_gDR_x_max"
+  res_3 <- 
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_3)],
+                  dt_depmap = obj_depmap_meta[["dt_depmap"]],
+                  selected_feat_meta_col = "meta_xx")
+  expect_is(res_3, "list")
+  expect_length(res_3, 4)
+  expect_equal(res_3[["selected_metric"]], sel_met_3)
+  expect_equal(res_3[["selected_feat_meta_col"]], "meta_xx")
+  expect_equal(names(res_3[["dt_assoc"]]), c("feature", "response", "rho", "q_value"))
+  expect_equal(
+    NROW(res_3[["dt_assoc"]]),
+    sum(unlist(lapply(
+      obj_depmap_meta[["dt_depmap"]][CCLEName %in% dt_response_met[["CellLineName"]], .SD, 
+                                     .SDcols = -c("CCLEName", "ModelID")], 
+      function(x) sum(x) > 0))))
+  
+  
+  dt_res_not_num <- data.table::copy(dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_1)])
+  dt_res_not_num[[sel_met_1]] <- as.character(dt_res_not_num[[sel_met_1]])
+  expect_error(
+    prep_dt_assoc(dt_response = dt_res_not_num,
+                  dt_depmap = obj_depmap_feat[["dt_depmap"]]),
+    "Column in `dt_response` with metric should be numeric.")
+  expect_error(
+    prep_dt_assoc(dt_response = dt_response_met,
+                  dt_depmap = obj_depmap_feat[["dt_depmap"]]),
+    "Provide `dt_response` for one metric.")
+  dt_depmap_not_num <- data.table::copy(obj_depmap_feat[["dt_depmap"]])
+  cols <- names(dt_depmap_not_num)
+  dt_depmap_not_num[, (cols) := lapply(.SD, function(i) as.character(i)), .SDcols = cols]
+  expect_error(
+    prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)],
+                  dt_depmap = dt_depmap_not_num),
+    "Provide `dt_depmap` with numeric values.")
+})

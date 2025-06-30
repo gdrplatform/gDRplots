@@ -91,7 +91,7 @@ plot_dose_response_sa <- function(dt_metrics,
   } else if (group_var == drug_name) {
     main_var <- cellline_name
   }
-  stopifnot("empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
+  stopifnot("Empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
   
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
