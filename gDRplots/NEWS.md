@@ -1,3 +1,6 @@
+## gDRplots 0.0.85 - 2025-06-30
+* refactor `create_PRISM_plot_list_sa` and `create_PRISM_plot_list_combo`
+
 ## gDRplots 0.0.84 - 2025-06-25
 * test data for PRISM
 * update and ad dmissing tests
