@@ -72,12 +72,12 @@
                                     feature_sets,
                                     metadata_columns = NULL,
                                     clear_taxonomy_info = TRUE) {
-
+  
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   id_col <- c("rId", "cId", cellline_name)
-
+  
   checkmate::assert_string(experiment_type, pattern = "sa|combo")
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -90,7 +90,7 @@
   checkmate::assert_flag(clear_taxonomy_info)
   
   if (experiment_type == "sa") {
-    checkmate::assert_character(.drug1_name_vec, null.ok = TRUE)
+    checkmate::assert_character(drug1_name_vec, null.ok = TRUE)
     checkmate::assert_data_table(dt_metrics_sa, min.rows = 1, null.ok = TRUE)
     checkmate::assert_data_table(dt_average, min.rows = 1, null.ok = TRUE)
     stopifnot("Provide response data - at least one of `dt_metrics` or `dt_average`." =
@@ -130,6 +130,8 @@
     if (NROW(feature_sets) == 0) feature_sets <- NULL
   }
   if (xor(is.null(feature_sets), is.null(feat_data_path))) {
+    stopifnot("Provide consistent values for `feature_sets` and `feat_data_path` for DepMap subset." =
+                !is.null(metadata_columns))
     if (!is.null(metadata_columns)) {
       feature_sets <- feat_data_path <- NULL
     }
@@ -175,7 +177,11 @@
   
   # fast end when there are no available drugs
   if (NROW(drug_name_grid) == 0) {
-    message("There was no data for selected drugs or drug combinations.")
+    if (experiment_type == "sa") {
+      message("There was no data for selected drugs.")
+    } else {
+      message("There was no data for selected drugs combination.")
+    }
     return(list())
   }
   
@@ -279,7 +285,7 @@
                               selected_feat_meta_col = obj_depmap[["selected_feat_meta_col"]])
         
         names(ls_vol) <- selected_metrics$selected_metric
-
+        
         id_feat_meta <- depmap_items$feat_meta_name[[i_feat_meta]]
         id_drug <- drug_name_grid[["iter_id"]][i_drug]
         
