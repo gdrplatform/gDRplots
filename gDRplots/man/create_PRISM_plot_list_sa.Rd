@@ -33,24 +33,24 @@ and single-agent \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability") or both}
 
 \item{metric}{character vector with names of metric;
- chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+ chosen from: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
 
 \item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
-which are referenced by a dataset contained within the DepMap portal. 
+which are referenced by a dataset contained within the DepMap portal.
 It is usually a file named \code{Model.csv}.}
 
 \item{feat_data_path}{string path to the directory containing the molecular feature set file to load from DepMap.}
 
 \item{feature_sets}{character vector containing the names of the molecular feature sets to load from DepMap.
-These names should also correspond to the file names containing the feature data 
+These names should also correspond to the file names containing the feature data
 (without the extension, which is assumed to be \code{csv})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 
-\item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table 
+\item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table
 with the molecular feature sets from DepMap.}
 }
 \value{
