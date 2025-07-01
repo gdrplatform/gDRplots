@@ -7,7 +7,7 @@
 create_PRISM_plot_list_sa(
   drug_name_vec,
   dt_metrics,
-  dt_average,
+  dt_average = NULL,
   normalization_type_vec = "RV",
   metric = c("xc50", "x_mean", "x_max"),
   fit_source = "gDR",

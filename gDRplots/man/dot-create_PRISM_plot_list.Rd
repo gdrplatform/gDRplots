@@ -74,8 +74,6 @@ These names should also correspond to the file names containing the feature data
 
 \item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table
 with the molecular feature sets from DepMap.}
-
-\item{drug_name_vec}{character vector with drug names to be plotted (identifiers \code{DrugName})}
 }
 \value{
 nested list of plots for selected type of experiment

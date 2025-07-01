@@ -8,7 +8,7 @@ create_PRISM_plot_list_combo(
   drug1_name_vec,
   drug2_name_vec,
   dt_metrics,
-  dt_scores,
+  dt_scores = NULL,
   normalization_type_vec = "RV",
   metric = c("xc50", "x_mean", "x_max"),
   metric_scores = c("hsa_score", "bliss_score"),
