@@ -7,7 +7,7 @@
 .create_PRISM_plot_list(
   experiment_type,
   dt_metrics_sa,
-  dt_metrics_combo,
+  dt_metrics_combo = NULL,
   dt_average = NULL,
   dt_scores = NULL,
   drug1_name_vec = NULL,
