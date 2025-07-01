@@ -5,7 +5,6 @@
 #' 
 #' @param experiment_type string with type of experiment
 #'   one of: "sa" for thr single-agent experiment "combo" for the combination experiment
-#' @param drug_name_vec character vector with drug names to be plotted (identifiers \code{DrugName})
 #' @param dt_metrics_sa \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
@@ -362,7 +361,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          drug2_name_vec,
                                          dt_metrics,
-                                         dt_scores,
+                                         dt_scores = NULL,
                                          normalization_type_vec = "RV",
                                          metric = c("xc50", "x_mean", "x_max"),
                                          metric_scores = c("hsa_score", "bliss_score"),
