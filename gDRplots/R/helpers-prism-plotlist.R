@@ -98,7 +98,7 @@
     if (!is.null(metric)) checkmate::assert_subset(metric, 
                                                    choices = c("xc50", "x_mean", "x_max"))
     if (!is.null(dt_metrics_sa)) checkmate::assert_subset(metric, 
-                                                          choices = names(dt_metrics), 
+                                                          choices = names(dt_metrics_sa), 
                                                           empty.ok = FALSE)
   } else { # combo
     checkmate::assert_character(drug1_name_vec, all.missing = FALSE)
@@ -107,6 +107,11 @@
     checkmate::assert_data_table(dt_scores, min.rows = 1, null.ok = TRUE)
     stopifnot("Provide response data - at least one of `dt_metrics` or `dt_scores`." =
                 !is.null(dt_metrics_combo) || !is.null(dt_scores))
+    if (!is.null(metric)) checkmate::assert_subset(metric, 
+                                                   choices = c("xc50", "x_mean", "x_max"))
+    if (!is.null(dt_metrics_combo)) checkmate::assert_subset(metric, 
+                                                             choices = names(dt_metrics_combo), 
+                                                             empty.ok = FALSE)
     if (!is.null(metric_scores)) checkmate::assert_subset(metric_scores, 
                                                           choices = c("hsa_score", "bliss_score"))
     if (!is.null(dt_scores)) checkmate::assert_subset(metric_scores, 
@@ -154,8 +159,8 @@
   
   # adjust drug list
   if (experiment_type == "sa") {
-    drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
-    available_drugs <- unique(drug_source[[drug_name]])
+    dt_drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
+    available_drugs <- unique(dt_drug_source[[drug_name]])
     
     if (is.null(drug1_name_vec) || all(!drug1_name_vec %in% available_drugs)) {
       drug1_name_vec <- available_drugs
@@ -166,10 +171,10 @@
                                              drug_name = drug1_name_vec)
     data.table::setnames(drug_name_grid, "drug_name", drug_name)
   } else { # combo
-    drug_source <- if (!is.null(dt_metrics_combo)) dt_metrics_combo else dt_scores
+    dt_drug_source <- if (!is.null(dt_metrics_combo)) dt_metrics_combo else dt_scores
     drug_name_grid <- 
-      unique(drug_source[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec,
-                         c(drug_name, drug_name_2), with = FALSE])
+      unique(dt_drug_source[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec,
+                            c(drug_name, drug_name_2), with = FALSE])
     data.table::setorder(drug_name_grid)
     drug_name_grid[, iter_id := paste(get(drug_name), get(drug_name_2), sep = " x ")]
     drug_name_grid
@@ -238,7 +243,7 @@
           
           dt_response <- if (!is.null(dt_met) && !is.null(dt_dose)) {
             merge(dt_met, dt_dose, by = id_col)
-          } else if (!is.null(dt_met)) {
+          } else if (!is.null(dt_dose)) {
             dt_met 
           } else {
             dt_dose
@@ -314,7 +319,7 @@
 #' @export
 create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       dt_metrics,
-                                      dt_average,
+                                      dt_average = NULL,
                                       normalization_type_vec = "RV",
                                       metric = c("xc50", "x_mean", "x_max"),
                                       fit_source = "gDR",
