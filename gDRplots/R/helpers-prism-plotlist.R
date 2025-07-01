@@ -1,7 +1,7 @@
 #' Create a list of PRISM plots for selected type o experiment
 #' 
 #' This internal function was created to avoid code duplication and maintain consistency.
-#' For user, It is contained in a single-purpose function, depending on the experiment type.
+#' For user, it is contained in a single-purpose function, depending on the experiment type.
 #' 
 #' @param experiment_type string with type of experiment
 #'   one of: "sa" for thr single-agent experiment "combo" for the combination experiment
