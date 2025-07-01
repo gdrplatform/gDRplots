@@ -148,7 +148,6 @@
   filter_expr <- substitute(normalization_type %in% norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type_vec, fit_src = fit_source))
   
-  
   if (experiment_type == "sa") {
     if (!is.null(dt_metrics_sa)) dt_metrics_sa <- dt_metrics_sa[eval(filter_expr)]
     if (!is.null(dt_average)) dt_average <- dt_average[eval(filter_expr)]
@@ -243,7 +242,7 @@
           
           dt_response <- if (!is.null(dt_met) && !is.null(dt_dose)) {
             merge(dt_met, dt_dose, by = id_col)
-          } else if (!is.null(dt_dose)) {
+          } else if (!is.null(dt_met)) {
             dt_met 
           } else {
             dt_dose
