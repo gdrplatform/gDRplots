@@ -44,6 +44,15 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_length(res_2[[1]][[1]][["RV"]], NROW(c("x_mean")))
   expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
   
+  res_2_bis <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         metric = "x_mean",
+                                         normalization_type_vec = c("RV", "GR"),
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = c(feature_sets, "non_available_feature"))
+  expect_equivalent(names(unlist(res_2)), names(unlist(res_2_bis)))
+  
   # scenario: all meta columns and features
   res_3 <- create_PRISM_plot_list_sa(drug_name_vec = c(d_names, "non_available_drug"),
                                      dt_metrics = dt_metrics,
@@ -210,7 +219,6 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feature_sets = feature_sets,
                                          clear_taxonomy_info = "str"),
                "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
-
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
@@ -261,6 +269,15 @@ test_that("create_PRISM_plot_list_combo works as expected", {
     any(grepl(met, names(res_2[[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1)))) # dt_scores = NULL nolint
   expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
+  
+  res_2_bis <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                        drug2_name_vec = d_names_2,
+                                        dt_metrics = dt_metrics,
+                                        normalization_type_vec = c("RV", "GR"),
+                                        meta_data_path = meta_data_path,
+                                        feat_data_path = feat_data_path,
+                                        feature_sets = c(feature_sets[2], "non_available_feature"))
+  expect_equivalent(names(unlist(res_2)), names(unlist(res_2_bis)))
   
   # scenario: all meta columns and features
   res_3 <- create_PRISM_plot_list_combo(drug1_name_vec = c(d_names, "non_available_drug"),
