@@ -80,7 +80,7 @@ nested list of plots for selected type of experiment
 }
 \description{
 This internal function was created to avoid code duplication and maintain consistency.
-For user, It is contained in a single-purpose function, depending on the experiment type.
+For user, it is contained in a single-purpose function, depending on the experiment type.
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
