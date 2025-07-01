@@ -156,10 +156,11 @@
   }
   
   # adjust drug list
+  iter_id <- NULL
   if (experiment_type == "sa") {
     dt_drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
     available_drugs <- unique(dt_drug_source[[drug_name]])
-    
+
     if (is.null(drug1_name_vec) || all(!drug1_name_vec %in% available_drugs)) {
       drug1_name_vec <- available_drugs
     } else {
