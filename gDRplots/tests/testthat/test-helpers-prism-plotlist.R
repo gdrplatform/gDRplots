@@ -383,8 +383,8 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         metric_scores = "hsa_score",
                                         normalization_type_vec = "GR",
                                         meta_data_path = meta_data_path,
-                                        feat_data_path = NULL,
-                                        feature_sets = feature_sets,
+                                        feat_data_path = feat_data_path,
+                                        feature_sets = "non_available_feat",
                                         metadata_columns = c(metadata_columns[1], "non_available_meta"))
   expect_is(res_4, "list")
   expect_length(res_4, NROW(metadata_columns[1]))
