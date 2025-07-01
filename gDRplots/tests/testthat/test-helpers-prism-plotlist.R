@@ -39,8 +39,8 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_is(res_2, "list")
   expect_length(res_2, NROW(feature_sets))
   expect_equal(names(res_2), feature_sets)
-  expect_length(res_2[[1]], NROW(c("RV", "GR"))) 
-  expect_length(res_2[[1]], NROW(d_names))
+  expect_equal(names(res_2[[1]]), d_names)
+  expect_equal(names(res_2[[1]][[1]]), c("RV", "GR"))
   expect_length(res_2[[1]][[1]][["RV"]], NROW(c("x_mean")))
   expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
   
@@ -98,14 +98,14 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          meta_data_path = meta_data_path,
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets[1]),
-               "Assertion on 'drug_name_vec' failed: Must be of type 'character'")
+               "Assertion on 'drug1_name_vec' failed: Must be of type 'character'")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = unlist(dt_metrics),
                                          dt_average = dt_average,
                                          meta_data_path = meta_data_path,
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets),
-               "Assertion on 'dt_metrics' failed: Must be a data.table")
+               "Assertion on 'dt_metrics_sa' failed: Must be a data.table")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          dt_average = unlist(dt_average),
