@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-prism-plotlist.R
 \name{.create_PRISM_plot_list}
 \alias{.create_PRISM_plot_list}
-\title{Create a list of PRISM plots for selected type o experiment}
+\title{Create a list of PRISM plots for a selected type of experiment}
 \usage{
 .create_PRISM_plot_list(
   experiment_type,
@@ -24,8 +24,8 @@
 )
 }
 \arguments{
-\item{experiment_type}{string with type of experiment
-one of: "sa" for thr single-agent experiment "combo" for the combination experiment}
+\item{experiment_type}{string with the type of experiment
+one of: "sa" for the single-agent experiment "combo" for the combination experiment}
 
 \item{dt_metrics_sa}{\code{data.table} representing data from the \code{Metrics} assay,
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}

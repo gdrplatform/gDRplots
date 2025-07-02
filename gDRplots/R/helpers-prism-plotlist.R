@@ -1,10 +1,10 @@
-#' Create a list of PRISM plots for selected type o experiment
+#' Create a list of PRISM plots for a selected type of experiment
 #' 
 #' This internal function was created to avoid code duplication and maintain consistency.
 #' For user, it is contained in a single-purpose function, depending on the experiment type.
 #' 
-#' @param experiment_type string with type of experiment
-#'   one of: "sa" for thr single-agent experiment "combo" for the combination experiment
+#' @param experiment_type string with the type of experiment
+#'  one of: "sa" for the single-agent experiment "combo" for the combination experiment
 #' @param dt_metrics_sa \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
@@ -75,7 +75,7 @@
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   id_col <- c("rId", "cId", cellline_name)
   
-  checkmate::assert_string(experiment_type, pattern = "sa|combo")
+  checkmate::assert_choice(experiment_type, choices = c("sa", "combo"))
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(meta_data_path)
