@@ -18,7 +18,7 @@ generate_datatable(
 \item{options}{A list of options to customize the DataTable. Defaults to 
 `list(scrollX = TRUE, dom = "t")`.}
 
-\item{width}{A character string specifying the width of the table. Defaults to `"100%"`.}
+\item{width}{A character string specifying the width of the table. Defaults to "100%".}
 
 \item{...}{Additional arguments passed to `DT::datatable`.}
 }

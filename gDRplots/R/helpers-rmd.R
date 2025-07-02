@@ -743,7 +743,7 @@ prep_filename_path <- function(plt_list,
 #'   `data.table`, `data.frame`, or `DFrame`.
 #' @param options A list of options to customize the DataTable. Defaults to 
 #'   `list(scrollX = TRUE, dom = "t")`.
-#' @param width A character string specifying the width of the table. Defaults to `"100%"`.
+#' @param width A character string specifying the width of the table. Defaults to "100%".
 #' @param ... Additional arguments passed to `DT::datatable`.
 #' 
 #' @return A `DT::datatable` object.
