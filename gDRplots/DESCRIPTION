@@ -15,6 +15,7 @@ License: Artistic-2.0
 Imports:
     checkmate,
     data.table,
+    DT,
     fgsea,
     ggplot2,
     ggrepel,
