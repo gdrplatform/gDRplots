@@ -732,7 +732,7 @@ prep_filename_path <- function(plt_list,
   ls_file_name
 }
 
-#' Generate a Customized DataTable
+#' Generate a customized datatable
 #'
 #' This function creates a `DT::datatable` object with default settings for 
 #' horizontal scrolling (`scrollX = TRUE`) and no table controls (`dom = "t"`). 
@@ -751,7 +751,6 @@ prep_filename_path <- function(plt_list,
 #' generate_datatable(iris)
 #' 
 #' @keywords internal
-#' 
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' 
 #' @export

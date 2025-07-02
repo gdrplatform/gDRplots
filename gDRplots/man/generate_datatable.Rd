@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-rmd.R
 \name{generate_datatable}
 \alias{generate_datatable}
-\title{Generate a Customized DataTable}
+\title{Generate a customized datatable}
 \usage{
 generate_datatable(
   data,
