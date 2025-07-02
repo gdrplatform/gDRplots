@@ -53,8 +53,6 @@
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
-#'
-#' @export
 .create_PRISM_plot_list <- function(experiment_type,
                                     dt_metrics_sa,
                                     dt_metrics_combo = NULL,
