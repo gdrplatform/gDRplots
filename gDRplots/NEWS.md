@@ -1,3 +1,6 @@
+## gDRplots 0.0.85 - 2025-07-02
+* add wrapper for `DT::datatable`
+
 ## gDRplots 0.0.84 - 2025-06-25
 * test data for PRISM
 * update and ad dmissing tests

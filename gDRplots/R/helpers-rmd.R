@@ -544,15 +544,19 @@ prep_double_table_chunk <- function(tbl_list,
                 metric, 
                 paste0(
                   "DT::formatRound(",
-                  "DT::datatable(", 
+                  "generate_datatable(", 
                   tbl_list_name, 
                   "[[\"", cell_line, "\"]][[\"", metric, "\"]], ",
-                  if (!is.null(order_list)) paste0("options = list(order = ", deparse(order_list), ")"), 
+                  "options = ", 
+                  paste0("list(scrollX = TRUE, dom = \"t\"", 
+                         if (!is.null(order_list)) paste0(", order = ", deparse(order_list)), 
+                         ")"), 
                   "), ",
                   "columns = names(Filter(is.numeric, ", 
                   tbl_list_name, 
                   "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
-                  "digits = 5)")
+                  "digits = 5)"
+                )
         )
       )
       knitr::knit_expand(text = chunk)
@@ -726,4 +730,42 @@ prep_filename_path <- function(plt_list,
   }
   # final
   ls_file_name
-} 
+}
+
+#' Generate a customized datatable
+#'
+#' This function creates a `DT::datatable` object with default settings for 
+#' horizontal scrolling (`scrollX = TRUE`) and no table controls (`dom = "t"`). 
+#' It supports input data of types `data.table`, `data.frame`, or `DFrame`. 
+#' Additional options and arguments can be passed to customize the table further.
+#'
+#' @param data A dataset to be displayed in the datatable. Must be of class 
+#'   `data.table`, `data.frame`, or `DFrame`.
+#' @param options A list of options to customize the DataTable. Defaults to 
+#'   `list(scrollX = TRUE, dom = "t")`.
+#' @param width A character string specifying the width of the table. Defaults to "100\%".
+#' @param ... Additional arguments passed to `DT::datatable`.
+#' 
+#' @return A `DT::datatable` object.
+#' @examples
+#' generate_datatable(iris)
+#' 
+#' @keywords internal
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' 
+#' @export
+generate_datatable <- function(data, 
+                               options = list(scrollX = TRUE, dom = "t"), 
+                               width = "100%", 
+                               ...) {
+  checkmate::assert(
+    checkmate::check_class(data, "data.frame"),
+    checkmate::check_class(data, "data.table"),
+    checkmate::check_class(data, "DFrame"),
+    combine = "or"
+  )
+  checkmate::assert_list(options, null.ok = TRUE)
+  checkmate::assert_string(width, null.ok = FALSE)
+  
+  DT::datatable(data, options = options, width = width, ...)
+}

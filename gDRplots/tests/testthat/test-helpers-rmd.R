@@ -655,3 +655,26 @@ test_that("prep_filename_path works as expected", {
                                   file_format = TRUE),
                "Assertion on 'file_format' failed: Must be of type 'string'")
 })
+
+
+test_that("generate_datatable works as expected", {
+  result_df <- generate_datatable(iris)
+  expect_s3_class(result_df, "datatables")
+  
+  expect_error(
+    generate_datatable(matrix(1:10, ncol = 2)), 
+    "Assertion failed"
+  )
+  expect_error(
+    generate_datatable(iris, options = "invalid_options"),
+    "Must be of type 'list'"
+  )
+  expect_error(
+    generate_datatable(iris, width = 100), 
+    "Must be of type 'string'"
+  )
+  result_custom_options <- generate_datatable(iris, options = list(scrollX = TRUE, pageLength = 5))
+  expect_s3_class(result_custom_options, "datatables")
+  result_with_caption <- generate_datatable(iris, caption = "Iris Dataset")
+  expect_s3_class(result_with_caption, "datatables")
+})
