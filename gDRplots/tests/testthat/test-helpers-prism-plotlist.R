@@ -7,6 +7,84 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                                  assay_name = "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Averaged")
+  d_names_sa <- c("drug_021", "drug_026")
+  
+  meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
+  feat_data_path <- system.file("testdata", package = "gDRplots")
+  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
+  
+  res_1  <- .create_PRISM_plot_list(experiment_type = "sa",
+                                    dt_metrics_sa = dt_metrics,
+                                    drug1_name_vec = d_names_sa,
+                                    meta_data_path = meta_data_path,
+                                    feat_data_path = feat_data_path,
+                                    feature_sets = feature_sets) # default
+  
+  res_1_w  <- create_PRISM_plot_list_sa(drug_name_vec = d_names_sa,
+                                        dt_metrics = dt_metrics,
+                                        meta_data_path = meta_data_path,
+                                        feat_data_path = feat_data_path,
+                                        feature_sets = feature_sets) # default
+  
+  expect_equivalent(names(unlist(res_1)), names(unlist(res_1_w)))
+  expect_is(res_1, "list")
+  expect_is(res_1_w, "list")
+  expect_length(res_1, NROW(feature_sets))
+  expect_length(res_1_w, NROW(feature_sets))
+  expect_length(res_1[[1]], NROW(d_names_sa))
+  expect_length(res_1_w[[1]], NROW(d_names_sa))
+  expect_length(res_1[[1]][[1]], 1) # only RV
+  expect_length(res_1_w[[1]][[1]], 1) # only RV
+  expect_length(res_1[[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
+  expect_length(res_1_w[[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
+  
+  
+  mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                 assay_name = "Metrics")
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                assay_name = "scores")
+  d_names <- c("drug_004", "drug_005")
+  d_names_2 <- "drug_021"
+  
+  res_2 <- .create_PRISM_plot_list(experiment_type = "combo",
+                                   dt_metrics_sa = NULL,
+                                   dt_metrics_combo = dt_metrics,
+                                   drug1_name_vec = d_names,
+                                   drug2_name_vec = d_names_2,
+                                   meta_data_path = meta_data_path,
+                                   feat_data_path = feat_data_path,
+                                   feature_sets = feature_sets)
+  
+  res_2_w <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                          drug2_name_vec = d_names_2,
+                                          dt_metrics = dt_metrics,
+                                          meta_data_path = meta_data_path,
+                                          feat_data_path = feat_data_path,
+                                          feature_sets = feature_sets) # default
+  expect_is(res_2, "list")
+  expect_is(res_2_w, "list")
+  expect_length(res_2, NROW(feature_sets))
+  expect_length(res_2_w, NROW(feature_sets))
+  expect_length(res_2[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_2_w[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_2[[1]][[1]], 1) # only RV
+  expect_length(res_2_w[[1]][[1]], 1) # only RV
+  expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
+    any(grepl(met, names(res_2[[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
+  expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
+    any(grepl(met, names(res_2_w[[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
+})
+
+test_that("create_PRISM_plot_list_sa works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                 assay_name = "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                 assay_name = "Averaged")
   d_names <- c("drug_021", "drug_026")
   
   meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
@@ -19,7 +97,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                      dt_average = dt_average,
                                      meta_data_path = meta_data_path,
                                      feat_data_path = feat_data_path,
-                                     feature_sets = feature_sets) # default
+                                     feature_sets = feature_sets)
   expect_is(res_1, "list")
   expect_length(res_1, NROW(feature_sets))
   expect_length(res_1[[1]], NROW(d_names))
@@ -39,10 +117,19 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_is(res_2, "list")
   expect_length(res_2, NROW(feature_sets))
   expect_equal(names(res_2), feature_sets)
-  expect_length(res_2[[1]], NROW(c("RV", "GR"))) 
-  expect_length(res_2[[1]], NROW(d_names))
+  expect_equal(names(res_2[[1]]), d_names)
+  expect_equal(names(res_2[[1]][[1]]), c("RV", "GR"))
   expect_length(res_2[[1]][[1]][["RV"]], NROW(c("x_mean")))
   expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
+  
+  res_2_bis <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         metric = "x_mean",
+                                         normalization_type_vec = c("RV", "GR"),
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = c(feature_sets, "non_available_feature"))
+  expect_equivalent(names(unlist(res_2)), names(unlist(res_2_bis)))
   
   # scenario: all meta columns and features
   res_3 <- create_PRISM_plot_list_sa(drug_name_vec = c(d_names, "non_available_drug"),
@@ -98,14 +185,14 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          meta_data_path = meta_data_path,
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets[1]),
-               "Assertion on 'drug_name_vec' failed: Must be of type 'character'")
+               "Assertion on 'drug1_name_vec' failed: Must be of type 'character'")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = unlist(dt_metrics),
                                          dt_average = dt_average,
                                          meta_data_path = meta_data_path,
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets),
-               "Assertion on 'dt_metrics' failed: Must be a data.table")
+               "Assertion on 'dt_metrics_sa' failed: Must be a data.table")
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          dt_average = unlist(dt_average),
@@ -210,7 +297,6 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feature_sets = feature_sets,
                                          clear_taxonomy_info = "str"),
                "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
-
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
@@ -262,6 +348,15 @@ test_that("create_PRISM_plot_list_combo works as expected", {
   }, FUN.VALUE = logical(1)))) # dt_scores = NULL nolint
   expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
   
+  res_2_bis <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                            drug2_name_vec = d_names_2,
+                                            dt_metrics = dt_metrics,
+                                            normalization_type_vec = c("RV", "GR"),
+                                            meta_data_path = meta_data_path,
+                                            feat_data_path = feat_data_path,
+                                            feature_sets = c(feature_sets[2], "non_available_feature"))
+  expect_equivalent(names(unlist(res_2)), names(unlist(res_2_bis)))
+  
   # scenario: all meta columns and features
   res_3 <- create_PRISM_plot_list_combo(drug1_name_vec = c(d_names, "non_available_drug"),
                                         drug2_name_vec = d_names_2,
@@ -288,8 +383,8 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         metric_scores = "hsa_score",
                                         normalization_type_vec = "GR",
                                         meta_data_path = meta_data_path,
-                                        feat_data_path = NULL,
-                                        feature_sets = feature_sets,
+                                        feat_data_path = feat_data_path,
+                                        feature_sets = "non_available_feat",
                                         metadata_columns = c(metadata_columns[1], "non_available_meta"))
   expect_is(res_4, "list")
   expect_length(res_4, NROW(metadata_columns[1]))
@@ -339,7 +434,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             meta_data_path = meta_data_path,
                                             feat_data_path = feat_data_path,
                                             feature_sets = feature_sets),
-               "Assertion on 'dt_metrics' failed: Must have at least 1 rows")
+               "Assertion on 'dt_metrics_combo' failed: Must have at least 1 rows")
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
