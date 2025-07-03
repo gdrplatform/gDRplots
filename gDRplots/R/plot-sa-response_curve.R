@@ -37,7 +37,13 @@
 #'                       selection_name = selected_drug,
 #'                       group_var = group_var,
 #'                       group_names = celline_names)
-#'             
+#'
+#' plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                       dt_average = NULL,
+#'                       selection_name = selected_drug,
+#'                       group_var = group_var,
+#'                       group_names = celline_names)
+#'                     
 #' selected_cellline <- "cellline_HB"
 #' group_var <- "DrugName"
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -75,7 +81,7 @@ plot_dose_response_sa <- function(dt_metrics,
                                      system.file(package = "gDRplots", "settings.json"))
   
   checkmate::assert_data_table(dt_metrics)
-  checkmate::assert_data_table(dt_average)
+  checkmate::assert_data_table(dt_average, null.ok = TRUE)
   checkmate::assert_string(selection_name)
   checkmate::assert_choice(group_var, choices = c(cellline_name, drug_name))
   checkmate::assert_character(group_names, null.ok = TRUE)
@@ -101,7 +107,11 @@ plot_dose_response_sa <- function(dt_metrics,
   
   # filter data for selected main variable
   dt_met <- dt_met_norm[get(main_var) == selection_name, ]
-  dt_avg <- dt_avg_norm[get(main_var) == selection_name, ]
+  dt_avg <- if (is.null(dt_avg_norm)) {
+    NULL
+  } else {
+    dt_avg_norm[get(main_var) == selection_name, ]
+  }
   
   # update group (it depends on user choice for `group_names` and `selection_name`)
   group_names <- if (is.null(group_names)) {
@@ -111,9 +121,13 @@ plot_dose_response_sa <- function(dt_metrics,
               group_names)
   }
   
-  # filter data
-  dt_met <- dt_met[get(group_var) %in% group_names, ]
-  dt_avg <- dt_avg[get(group_var) %in% group_names, ][!is.na(x), ]
+  # filter data 
+  dt_met <- dt_met[get(group_var) %in% group_names, ][!is.na(x_inf) & !is.na(x_0) & !is.na(ec50) & !is.na(h)]
+  if (!is.null(dt_avg)) dt_avg <- dt_avg[get(group_var) %in% group_names, ][!is.na(x), ]
+  
+  # if conc is NA
+  if (all(is.na(unique(dt_avg[[conc]])))) dt_avg <- NULL
+  if (!NROW(dt_met)) dt_met <- NULL
   
   # plot title 
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
@@ -129,40 +143,54 @@ plot_dose_response_sa <- function(dt_metrics,
     )
   }
   
-  if (NROW(dt_met) == 0 || NROW(dt_avg) == 0 || all(is.na(unique(dt_avg[[conc]])))) {
+  if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
     plt <-
       ggplot2::ggplot() +
       ggplot2::theme(aspect.ratio = 1)
   } else {
     # prep value ranges for x-axis
-    min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
-    max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
+    if (is.null(dt_avg)) {
+      min_conc <- 1e-3
+      max_conc <- max(10^dt_met[["maxlog10Concentration"]])
+      if (is.na(max_conc)) max_conc <- 30
+    } else {
+      min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
+      max_conc <- max(dt_avg[[conc]], na.rm = TRUE)
+      # handle conc = 0
+      dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
+    }
     conc_range <- 0.5 * c(floor(2 * log10(min_conc) - 0.5), ceiling(2 * log10(max(max_conc)) + 0.3))
-    # handle conc = 0
-    dt_avg[[conc]][dt_avg[[conc]] == 0] <- min_conc / zero_conc_scaling_factor
     
     # prep fitted data
     sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
-    dt_fit <- data.table::data.table()
     
-    for (grp_nm in group_names) {
-      sel_metrics <- dt_met[get(group_var) == grp_nm, ]
-      if (NROW(sel_metrics) == 0) next
-      dt_fit <- rbind(dt_fit,
-                      cbind(sel_metrics[, group_var, with = FALSE],
-                            data.table::data.table(
-                              conc_col = sel_conc,
-                              x = gDRutils::predict_efficacy_from_conc(sel_conc,
-                                                                       sel_metrics$x_inf,
-                                                                       sel_metrics$x_0,
-                                                                       sel_metrics$ec50,
-                                                                       sel_metrics$h)
-                            )
-                      )
-      )
+    if (!NROW(dt_met)) {
+      dt_fit <- NULL
+    } else {
+      dt_fit <- data.table::data.table()
+      for (grp_nm in group_names) {
+        sel_metrics <- dt_met[get(group_var) == grp_nm, ]
+        if (NROW(sel_metrics) == 0) next
+        dt_fit <- rbind(dt_fit,
+                        cbind(sel_metrics[, group_var, with = FALSE],
+                              data.table::data.table(
+                                conc_col = sel_conc,
+                                x = gDRutils::predict_efficacy_from_conc(sel_conc,
+                                                                         sel_metrics$x_inf,
+                                                                         sel_metrics$x_0,
+                                                                         sel_metrics$ec50,
+                                                                         sel_metrics$h)
+                              )
+                        )
+        )
+      }
+      if (!NROW(dt_fit)) {
+        dt_fit <- NULL
+      } else {
+        dt_fit <- dt_fit[!is.na(x)]
+        data.table::setnames(dt_fit, "conc_col", conc)
+      }
     }
-    dt_fit <- dt_fit[!is.na(x)]
-    data.table::setnames(dt_fit, "conc_col", conc)
     
     # prep value ranges for y-axis
     min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
@@ -180,8 +208,8 @@ plot_dose_response_sa <- function(dt_metrics,
     names(color_values) <- group_names
     
     # levels
-    dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
-    dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
+    if (!is.null(dt_avg)) dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
+    if (!is.null(dt_fit)) dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
     
     # final plot
     plt <-
@@ -192,11 +220,12 @@ plot_dose_response_sa <- function(dt_metrics,
       ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
       ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2)))
     
-    if (plot_averaged_flag) {
+    
+    if (plot_averaged_flag && !is.null(dt_avg)) {
       plt <- plt + ggplot2::geom_point(data = dt_avg, na.rm = TRUE)
     }
     
-    if (plot_fit_flag) {
+    if (plot_fit_flag && !is.null(dt_fit)) {
       plt <- plt + ggplot2::geom_line(data = dt_fit, na.rm = TRUE)
     }
     
