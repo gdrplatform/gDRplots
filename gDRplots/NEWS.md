@@ -1,5 +1,8 @@
-## gDRplots 0.0.85 - 2025-06-30
+## gDRplots 0.0.86 - 2025-07-03
 * refactor `create_PRISM_plot_list_sa` and `create_PRISM_plot_list_combo`
+
+## gDRplots 0.0.85 - 2025-07-02
+* add wrapper for `DT::datatable`
 
 ## gDRplots 0.0.84 - 2025-06-25
 * test data for PRISM
