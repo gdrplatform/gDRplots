@@ -68,7 +68,13 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_drug,
                       group_var = group_var,
                       group_names = celline_names)
-            
+
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = NULL,
+                      selection_name = selected_drug,
+                      group_var = group_var,
+                      group_names = celline_names)
+                    
 selected_cellline <- "cellline_HB"
 group_var <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
