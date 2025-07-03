@@ -209,6 +209,22 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_13[["labels"]][["title"]], selected_celline)
   expect_length(ggplot2::ggplot_build(plt_13)$data[[1]], 0) # no data at all
   
+  # scenario: there is no data in average for selected cell line and maxlog10Concentration is NA
+  dt_metrics_no_maxconc <- data.table::copy(dt_metrics)
+  dt_metrics_no_maxconc[["maxlog10Concentration"]] <- NA
+  plt_14 <- plot_dose_response_sa(dt_metrics = dt_metrics_no_maxconc,
+                                  dt_average = dt_average_miss,
+                                  selection_name = selected_celline,
+                                  group_var = group_var,
+                                  group_names = drug_name_vec)
+  expect_is(plt_14, "gg")
+  expect_true(grepl(selected_celline, plt_14[["labels"]][["title"]]))
+  expect_length(ggplot2::ggplot_build(plt_14)$data[[1]], 7) # no data at all
+  expect_equal(ggplot2::get_guide_data(plt_12, "colour")[[".label"]],
+               drug_name_vec)
+  expect_equal(ggplot2::layer_scales(plt_14)$x$range$range,
+               c(-3.5, 2.0))
+  
   # scenario: fitted curve has bigger y-range than avg points
   drug_nm <- "drug_0A"
   cl_nm <- "cl_14"
@@ -244,15 +260,15 @@ test_that("plot_dose_response_sa works as expected", {
                                                              sel_metrics$ec50,
                                                              sel_metrics$h))
   
-  plt_14 <- plot_dose_response_sa(dt_metrics = tab_met, 
+  plt_15 <- plot_dose_response_sa(dt_metrics = tab_met, 
                                   dt_average = tab_avg,
                                   selection_name = "drug_0A",
                                   group_var = cellline_name,
                                   group_names = "cl_14",
                                   normalization_type = "GR")
-  expect_is(plt_14, "gg")
-  expect_true(grepl(drug_nm, plt_14[["labels"]][["title"]]))
-  plot_range <- range(as.numeric(ggplot2::layer_scales(plt_14)$y$get_labels()))
+  expect_is(plt_15, "gg")
+  expect_true(grepl(drug_nm, plt_15[["labels"]][["title"]]))
+  plot_range <- range(as.numeric(ggplot2::layer_scales(plt_15)$y$get_labels()))
   expect_true(all(data.table::between(fitted_range, plot_range[1], plot_range[2])))
   
   # testing assertion
