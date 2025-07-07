@@ -1,3 +1,6 @@
+## gDRplots 0.0.87 - 2025-07-04
+* update `plot_dose_response_sa` - option to plot only fitted curve
+
 ## gDRplots 0.0.86 - 2025-07-03
 * refactor `create_PRISM_plot_list_sa` and `create_PRISM_plot_list_combo`
 
