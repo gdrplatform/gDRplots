@@ -151,7 +151,7 @@ plot_dose_response_sa <- function(dt_metrics,
     # prep value ranges for x-axis
     if (is.null(dt_avg)) {
       min_conc <- 1e-3
-      max_conc <- max(10^dt_met[["maxlog10Concentration"]])
+      max_conc <- max(10 ^ dt_met[["maxlog10Concentration"]])
       if (is.na(max_conc)) max_conc <- 30
     } else {
       min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]], na.rm = TRUE)
