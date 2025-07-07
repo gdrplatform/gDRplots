@@ -280,12 +280,12 @@
         # 4th level - prep vis for each metric
         selected_metrics <- list(selected_metric = setdiff(names(dt_response), id_cols_to_remove))
         
-        ls_vol <- purrr::pmap(selected_metrics,
+        obj_vol <- purrr::pmap(selected_metrics,
                               plot_volcano_assoc_panel,
                               dt_response = dt_response,
                               dt_depmap = dt_depmap,
                               selected_feat_meta_col = obj_depmap[["selected_feat_meta_col"]])
-        
+        ls_vol <- purrr::map(obj_vol, "panel")
         names(ls_vol) <- selected_metrics$selected_metric
         
         id_feat_meta <- depmap_items$feat_meta_name[[i_feat_meta]]

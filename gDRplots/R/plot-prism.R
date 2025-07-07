@@ -881,7 +881,7 @@ plot_volcano_assoc_panel <- function(dt_response,
     top = panel_title)
   
   # final
-  return(list(assoc_data = ,
+  return(list(assoc_data = assoc_data,
               panel = panel))
 }
 
