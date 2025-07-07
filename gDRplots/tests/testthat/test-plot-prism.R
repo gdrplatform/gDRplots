@@ -1006,24 +1006,32 @@ test_that("plot_boxplot_meta works as expected", {
 
 
 test_that("plot_volcano_assoc_panel works as expected", {
-  plt_1 <- plot_volcano_assoc_panel(dt_response = dt_response_met,
+  obj_1 <- plot_volcano_assoc_panel(dt_response = dt_response_met,
                                     dt_depmap = obj_depmap_feat[["dt_depmap"]],
                                     selected_metric = "RV_gDR_x_max",  
                                     selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
+  expect_length(obj_1, 2)
+  expect_is(obj_1, "list")
+  expect_equal(names(obj_1), c("assoc_data", "panel"))
+  plt_1 <- obj_1[["panel"]]
   expect_is(plt_1, "gg")
   expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_1)[["data"]][[1]]))))
   
-  plt_2 <- plot_volcano_assoc_panel(dt_response = dt_response_score,
+  obj_2 <- plot_volcano_assoc_panel(dt_response = dt_response_score,
                                     dt_depmap = obj_depmap_feat_2[["dt_depmap"]],
                                     selected_metric = "RV_gDR_bliss_score",  
                                     selected_feat_meta_col = obj_depmap_feat_2[["selected_feat_meta_col"]])
+  expect_is(obj_2, "list")
+  plt_2 <- obj_2[["panel"]]
   expect_is(plt_2, "gg")
   expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_2)[["data"]][[1]]))))
   
-  plt_3 <- plot_volcano_assoc_panel(dt_response = dt_response_diff,
+  obj_3 <- plot_volcano_assoc_panel(dt_response = dt_response_diff,
                                     dt_depmap = obj_depmap_meta[["dt_depmap"]],
                                     selected_metric = "RV_gDR_x_max_cotrt_diff_0.1_col_fittings",  
                                     selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
+  expect_is(obj_3, "list")
+  plt_3 <- obj_3[["panel"]]
   expect_is(plt_3, "gg")
   expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_3)[["data"]][[1]]))))
   
