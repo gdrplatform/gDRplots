@@ -534,7 +534,7 @@ plot_boxplot_num_panel <- function(dt_response,
     # prep dummy values for x-axis
     ls_lbl <- unique(as.vector(as.matrix(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])))
     dummy_feat_val <- ls_lbl[!is.na(ls_lbl)]
- 
+    
     tab_plot_all <- data.table::data.table()
     
     if (sum(is.na(selected_feats)) > 1) {
@@ -805,8 +805,12 @@ plot_boxplot_meta <- function(dt_response,
 #' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
 #'  the name of the selected metadata from \code{dt_depmap} - respectively
 #'
-#' @return \code{ggplot} object containing a panel with volcano plot and depending on data type:
-#'  a scatter plots with correlation for top 4 variables or boxplots for variable levels
+#' @return A named list with elements:
+#' \itemize{
+#'   \item \code{assoc_data} table with association data
+#'   \item \code{panel} \code{ggplot} object containing a panel with volcano plot and depending 
+#'      on data type: a scatter plots with correlation for top 4 variables or boxplots for variable levels
+#' }
 #' 
 #' @keywords prism_plots
 #' 
@@ -834,6 +838,9 @@ plot_volcano_assoc_panel <- function(dt_response,
   obj_assoc <- prep_dt_assoc(dt_response = dt_response_,
                              dt_depmap = dt_depmap,
                              selected_feat_meta_col = selected_feat_meta_col)
+  assoc_data <- data.table::setorderv(data.table::copy(obj_assoc[["dt_assoc"]]), cols = "q_value")
+  assoc_data[["neglog_q_value"]] <- -log10(assoc_data$q_value)
+  
   top_4 <- .get_n_top_asssoc(obj_assoc[["dt_assoc"]])
   
   # volcano plot
@@ -872,8 +879,10 @@ plot_volcano_assoc_panel <- function(dt_response,
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = list(plt_vol, plt_side), widths = c(1, 1)),
     top = panel_title)
+  
   # final
-  panel
+  return(list(assoc_data = ,
+              panel = panel))
 }
 
 #' Check data type
