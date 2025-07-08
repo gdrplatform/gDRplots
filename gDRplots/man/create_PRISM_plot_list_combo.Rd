@@ -62,7 +62,11 @@ These names should also correspond to the file names containing the feature data
 with the molecular feature sets from DepMap.}
 }
 \value{
-nested list of plots
+A named list with elements:
+\itemize{
+  \item \code{ls_plot} nested list of plots for selected type of experiment
+  \item \code{ls_assoc_data} nested list of table with association data
+}
 }
 \description{
 Create a nested list of plots for PRISM data with combo metrics
