@@ -840,6 +840,7 @@ plot_volcano_assoc_panel <- function(dt_response,
                              selected_feat_meta_col = selected_feat_meta_col)
   assoc_data <- data.table::setorderv(data.table::copy(obj_assoc[["dt_assoc"]]), cols = "q_value")
   assoc_data[["neglog_q_value"]] <- -log10(assoc_data$q_value)
+  if (NROW(assoc_data) == 0) assoc_data <- NULL
   
   top_4 <- .get_n_top_asssoc(obj_assoc[["dt_assoc"]])
   
