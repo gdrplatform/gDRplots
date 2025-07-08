@@ -266,14 +266,28 @@ test_that("prep_nested_plot_chunk works as expected", {
   expect_false(all(vapply(seq_along(res_3), 
                           function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
   
-  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
+  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, 
+                                      chunk_name = "metric_col"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = 123), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = "1"), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = 0), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      header_level = 0), 
                "Assertion on 'header_level' failed: Element 1 is not >= 1")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      link_list = 0), 
+               "Assertion on 'link_list' failed: Must be of type 'list'")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      dwn_list = "str"), 
+               "Assertion on 'dwn_list' failed: Must be of type 'list'")
 })
 
 test_that("escape_special_characters works as expected", {
