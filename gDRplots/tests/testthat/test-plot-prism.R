@@ -1053,8 +1053,7 @@ test_that("plot_volcano_assoc_panel works as expected", {
   expect_is(plt_4, "gg")
   expect_true(any(grepl("PANEL", names(ggplot2::ggplot_build(plt_4)[["data"]][[1]]))))
   tab_4 <- obj_4[["assoc_data"]]
-  expect_is(tab_4, "data.table")
-  expect_equal(NROW(tab_4), 0) # empty data
+  expect_null(tab_4, "data.table") # empty data
   
   expect_error(plot_volcano_assoc_panel(dt_response = unlist(dt_response_met),
                                         dt_depmap = obj_depmap_feat[["dt_depmap"]],
