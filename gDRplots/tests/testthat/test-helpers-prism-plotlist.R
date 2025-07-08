@@ -391,7 +391,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
     any(grepl(met, names(res_2[["ls_assoc_data"]][[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1)))) 
   expect_is(res_2[["ls_plot"]][[1]][[1]][["RV"]][[2]], "ggplot")
-  expect_is(res_2[["ls_plot"]][[1]][[1]][["RV"]][[2]], NULL) # empty plot
+  expect_null(res_2[["ls_assoc_data"]][[1]][[1]][["RV"]][[2]]) # empty plot
   
   res_2_bis <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
