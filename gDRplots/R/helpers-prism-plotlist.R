@@ -290,9 +290,9 @@
                                dt_response = dt_response,
                                dt_depmap = dt_depmap,
                                selected_feat_meta_col = obj_depmap[["selected_feat_meta_col"]])
-        names(obj_vol) <- selected_metrics$selected_metric
         ls_vol <- purrr::map(obj_vol, "panel")
         ls_tab <- purrr::map(obj_vol, "assoc_data")
+        names(ls_vol) <- names(ls_tab) <- selected_metrics$selected_metric
 
         id_feat_meta <- depmap_items$feat_meta_name[[i_feat_meta]]
         id_drug <- drug_name_grid[["iter_id"]][i_drug]
