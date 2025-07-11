@@ -7,7 +7,7 @@ test_that("plot_dose_response_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   
-  group_var_1 <- cellline_name
+  group_var <- cellline_name
   selected_drug <- "drug_002"
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
@@ -15,7 +15,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_1 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var_1) # default
+                                 group_var = group_var) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug,  plt_1[["labels"]][["title"]]))
@@ -28,7 +28,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var_1,
+                                 group_var = group_var,
                                  normalization_type = normalization_type,
                                  colors_vec = rainbow(NROW(unique(dt_metrics[[group_var]]))))
   expect_is(plt_2, "gg")
@@ -48,7 +48,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
                                  group_names = sel_grp_names,
-                                 group_var = group_var_1)
+                                 group_var = group_var)
   expect_is(plt_3, "gg")
   expect_equal(plt_3[["labels"]][["y"]], "GR")
   expect_length(plt_3[["layers"]], 3)
@@ -60,7 +60,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var_1)
+                                 group_var = group_var)
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(any(grepl("Concentration", plt_4[["labels"]][["x"]])))
