@@ -7,7 +7,7 @@ test_that("plot_dose_response_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("small")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   
-  group_var <- cellline_name
+  group_var_1 <- cellline_name
   selected_drug <- "drug_002"
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
@@ -15,7 +15,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_1 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var) # default
+                                 group_var = group_var_1) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug,  plt_1[["labels"]][["title"]]))
@@ -28,7 +28,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var,
+                                 group_var = group_var_1,
                                  normalization_type = normalization_type,
                                  colors_vec = rainbow(NROW(unique(dt_metrics[[group_var]]))))
   expect_is(plt_2, "gg")
@@ -48,7 +48,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
                                  group_names = sel_grp_names,
-                                 group_var = group_var)
+                                 group_var = group_var_1)
   expect_is(plt_3, "gg")
   expect_equal(plt_3[["labels"]][["y"]], "GR")
   expect_length(plt_3[["layers"]], 3)
@@ -60,7 +60,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var)
+                                 group_var = group_var_1)
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(any(grepl("Concentration", plt_4[["labels"]][["x"]])))
@@ -105,7 +105,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])), 
                NROW(intersect(drug_name_subset, drug_name_vec))) # metric 
   
-  # scenario: lack of averager data for selected `group_names`
+  # scenario: lack of averaged data for selected `group_names`
   drug_name_subset <- c("drug_002", "drug_003", "drug_004", "drug_005", "drug_006")
   dt_average_lack <- data.table::copy(dt_average)[get(drug_name) %in% drug_name_subset]
   drug_name_vec <- c("drug_005", "drug_006", "drug_007", "drug_008", "drug_009", "drug_010")
@@ -270,6 +270,32 @@ test_that("plot_dose_response_sa works as expected", {
   expect_true(grepl(drug_nm, plt_15[["labels"]][["title"]]))
   plot_range <- range(as.numeric(ggplot2::layer_scales(plt_15)$y$get_labels()))
   expect_true(all(data.table::between(fitted_range, plot_range[1], plot_range[2])))
+  
+  # scenario: only metric data are available
+  plt_16 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = NULL,
+                                  selection_name = selected_drug,
+                                  group_var = cellline_name) # default
+  expect_is(plt_16, "gg")
+  expect_equal(plt_16[["labels"]][["y"]], "GR")
+  expect_true(grepl(selected_drug,  plt_16[["labels"]][["title"]]))
+  expect_length(plt_16[["layers"]], 2)
+  expect_equal(ggplot2::get_guide_data(plt_16, "colour")[[".label"]],
+               unique(dt_metrics[[cellline_name]]))
+  expect_equal(plt_16[["labels"]][["colour"]], "group_var")
+  
+  # scenario: only metric data are available
+  plt_17 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
+                                  dt_average = dt_average,
+                                  selection_name = selected_drug,
+                                  group_var = cellline_name) # default
+  expect_is(plt_17, "gg")
+  expect_equal(plt_17[["labels"]][["y"]], "GR")
+  expect_true(grepl(selected_drug,  plt_17[["labels"]][["title"]]))
+  expect_length(plt_17[["layers"]], 2)
+  expect_equal(ggplot2::get_guide_data(plt_17, "colour")[[".label"]],
+               unique(dt_average[[cellline_name]]))
+  expect_equal(plt_17[["labels"]][["colour"]], "group_var")
   
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
