@@ -30,15 +30,18 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_equivalent(names(unlist(res_1)), names(unlist(res_1_w)))
   expect_is(res_1, "list")
   expect_is(res_1_w, "list")
-  expect_length(res_1, NROW(feature_sets))
-  expect_length(res_1_w, NROW(feature_sets))
-  expect_length(res_1[[1]], NROW(d_names_sa))
-  expect_length(res_1_w[[1]], NROW(d_names_sa))
-  expect_length(res_1[[1]][[1]], 1) # only RV
-  expect_length(res_1_w[[1]][[1]], 1) # only RV
-  expect_length(res_1[[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
-  expect_length(res_1_w[[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
-  
+  expect_length(res_1, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_1_w, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(unique(vapply(seq_len(NROW(res_1)), function(nm) NROW(res_1[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_equal(unique(vapply(seq_len(NROW(res_1_w)), function(nm) NROW(res_1_w[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_length(res_1[[1]][[1]], NROW(d_names_sa))
+  expect_length(res_1_w[[1]][[1]], NROW(d_names_sa))
+  expect_length(res_1[[1]][[1]][[1]], 1) # only RV
+  expect_length(res_1_w[[1]][[1]][[1]], 1) # only RV
+  expect_length(res_1[[1]][[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
+  expect_length(res_1_w[[1]][[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
   
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -64,18 +67,25 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                           meta_data_path = meta_data_path,
                                           feat_data_path = feat_data_path,
                                           feature_sets = feature_sets) # default
+  
+  expect_equivalent(names(unlist(res_2)), names(unlist(res_2_w)))
   expect_is(res_2, "list")
   expect_is(res_2_w, "list")
-  expect_length(res_2, NROW(feature_sets))
-  expect_length(res_2_w, NROW(feature_sets))
-  expect_length(res_2[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
-  expect_length(res_2_w[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
-  expect_length(res_2[[1]][[1]], 1) # only RV
-  expect_length(res_2_w[[1]][[1]], 1) # only RV
+  expect_length(res_2, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_2_w, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(unique(vapply(seq_len(NROW(res_2)), function(nm) NROW(res_2[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_equal(unique(vapply(seq_len(NROW(res_2_w)), function(nm) NROW(res_2_w[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  
+  expect_length(res_2[[1]][[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_2_w[[1]][[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_2[[1]][[1]][[1]], 1) # only RV
+  expect_length(res_2_w[[1]][[1]][[1]], 1) # only RV
   expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
-    any(grepl(met, names(res_2[[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
+    any(grepl(met, names(res_2[[1]][[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
   expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
-    any(grepl(met, names(res_2_w[[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
+    any(grepl(met, names(res_2_w[[1]][[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
 })
 
 test_that("create_PRISM_plot_list_sa works as expected", {
@@ -99,11 +109,16 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                      feat_data_path = feat_data_path,
                                      feature_sets = feature_sets)
   expect_is(res_1, "list")
-  expect_length(res_1, NROW(feature_sets))
-  expect_length(res_1[[1]], NROW(d_names))
-  expect_length(res_1[[1]][[1]], 1) # only RV
-  expect_length(res_1[[1]][[1]][[1]],
+  expect_length(res_1, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(unique(vapply(seq_len(NROW(res_1)), function(nm) NROW(res_1[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_length(res_1[[1]][[1]], NROW(d_names))
+  expect_length(res_1[[1]][[1]][[1]], 1) # only RV
+  expect_length(res_1[[1]][[1]][[1]][[1]],
                 NROW(c("xc50", "x_mean", "x_max")) + NROW(unique(dt_average$Concentration))) # metrics
+  expect_equal(unique(vapply(seq_len(NROW(c("ls_plot", "ls_assoc_data"))), 
+                             function(nm) NROW(res_1[[nm]][[1]][[1]][["RV"]]), numeric(1))),
+               NROW(c("xc50", "x_mean", "x_max")) + NROW(unique(dt_average$Concentration)))
   
   # scenario: only dt_metrics and not available feature
   res_2 <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
@@ -115,12 +130,17 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                      feat_data_path = feat_data_path,
                                      feature_sets = c(feature_sets, "non_available_feature"))
   expect_is(res_2, "list")
-  expect_length(res_2, NROW(feature_sets))
-  expect_equal(names(res_2), feature_sets)
-  expect_equal(names(res_2[[1]]), d_names)
-  expect_equal(names(res_2[[1]][[1]]), c("RV", "GR"))
-  expect_length(res_2[[1]][[1]][["RV"]], NROW(c("x_mean")))
-  expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
+  expect_length(res_2, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(names(res_2), c("ls_plot", "ls_assoc_data"))
+  expect_equal(unique(vapply(seq_len(NROW(res_2)), function(nm) NROW(res_2[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_equal(names(res_2[[1]]), feature_sets)
+  expect_equal(names(res_2[[1]][[1]]), d_names)
+  expect_equal(names(res_2[[1]][[1]][[1]]), c("RV", "GR"))
+  expect_length(res_2[[1]][[1]][[1]][["RV"]], NROW(c("x_mean")))
+  expect_length(res_2[[2]][[1]][[1]][["RV"]], NROW(c("x_mean")))
+  expect_is(res_2[["ls_plot"]][[1]][[1]][["RV"]][[1]], "ggplot")
+  expect_is(res_2[["ls_assoc_data"]][[1]][[1]][["RV"]][[1]], "data.table")
   
   res_2_bis <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
@@ -141,12 +161,16 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                      feature_sets = feature_sets[1],
                                      metadata_columns = metadata_columns)
   expect_is(res_3, "list")
-  expect_length(res_3, NROW(feature_sets[1]) + NROW(metadata_columns))
-  expect_equal(names(res_3), c(feature_sets[1], metadata_columns))
-  expect_length(res_3[[1]], NROW(d_names))
-  expect_equal(names(res_3[[1]]), d_names)
-  expect_length(res_3[[1]][[1]], 1) # only GR
-  expect_length(res_3[[1]][[1]][[1]],
+  expect_length(res_3, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_3[[1]], NROW(feature_sets[1]) + NROW(metadata_columns))
+  expect_equal(names(res_3[[1]]), c(feature_sets[1], metadata_columns))
+  expect_length(res_3[["ls_plot"]][[1]], NROW(d_names))
+  expect_length(res_3[["ls_assoc_data"]][[1]], NROW(d_names))
+  expect_equal(names(res_3[[1]][[1]]), d_names)
+  expect_equal(names(res_3[[1]][[1]][[1]]), "GR") # only GR
+  expect_length(res_3[["ls_plot"]][[1]][[1]][[1]],
+                NROW(c("xc50", "x_mean", "x_max")) + NROW(unique(dt_average$Concentration))) # metrics
+  expect_length(res_3[["ls_assoc_data"]][[1]][[1]][[1]],
                 NROW(c("xc50", "x_mean", "x_max")) + NROW(unique(dt_average$Concentration))) # metrics
   
   # scenario: only dt_average and not available meta
@@ -159,11 +183,16 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                      feature_sets = feature_sets,
                                      metadata_columns = c(metadata_columns[1], "non_available_meta"))
   expect_is(res_4, "list")
-  expect_length(res_4, NROW(metadata_columns[1]))
-  expect_equal(names(res_4), metadata_columns[1])
-  expect_length(res_4[[1]], NROW(d_names))
-  expect_length(res_4[[1]][[1]], NROW(c("RV", "GR")))
-  expect_length(res_4[[1]][[1]][[1]],
+  expect_length(res_4, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_4[["ls_plot"]], NROW(metadata_columns[1]))
+  expect_length(res_4[["ls_assoc_data"]], NROW(metadata_columns[1]))
+  expect_equal(names(res_4[[1]]), metadata_columns[1])
+  expect_equal(names(res_4[[2]]), metadata_columns[1])
+  expect_length(res_4[[1]][[1]], NROW(d_names))
+  expect_equal(names(res_4[[1]][[1]][[1]]), c("RV", "GR"))
+  expect_length(res_4[["ls_plot"]][[1]][[1]][[1]],
+                NROW(unique(dt_average$Concentration))) # metrics
+  expect_length(res_4[["ls_assoc_data"]][[1]][[1]][[1]],
                 NROW(unique(dt_average$Concentration))) # metrics
   
   # scenario: no data for given drugs
@@ -322,12 +351,20 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         feat_data_path = feat_data_path,
                                         feature_sets = feature_sets) # default
   expect_is(res_1, "list")
-  expect_length(res_1, NROW(feature_sets))
-  expect_length(res_1[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
-  expect_length(res_1[[1]][[1]], 1) # only RV
+  expect_length(res_1, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(unique(vapply(seq_len(NROW(res_1)), function(nm) NROW(res_1[[nm]]), numeric(1))), 
+               NROW(feature_sets))
+  expect_length(res_1[["ls_plot"]][[1]], 
+                NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_1[["ls_assoc_data"]][[1]], 
+                NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_1[[1]][[1]][[1]], 1) # only RV
   expect_true(all(vapply(c("xc50", "x_mean", "x_max", "hsa_score", "bliss_score"), function(met) {
-    any(grepl(met, names(res_1[[1]][[1]][[1]])))
+    any(grepl(met, names(res_1[["ls_plot"]][[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1)))) # metrics
+  expect_true(all(vapply(c("xc50", "x_mean", "x_max", "hsa_score", "bliss_score"), function(met) {
+    any(grepl(met, names(res_1[["ls_assoc_data"]][[1]][[1]][[1]])))
+  }, FUN.VALUE = logical(1))))
   
   # scenario: only dt_metrics and not available feature
   res_2 <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
@@ -339,14 +376,22 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         feat_data_path = feat_data_path,
                                         feature_sets = c(feature_sets[2], "non_available_feature"))
   expect_is(res_2, "list")
-  expect_length(res_2, NROW(feature_sets[2]))
-  expect_equal(names(res_2), feature_sets[2])
-  expect_length(res_2[[1]], NROW(c("RV", "GR"))) 
-  expect_length(res_2[[1]], NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_length(res_2, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_equal(names(res_2), c("ls_plot", "ls_assoc_data"))
+  expect_equal(unique(vapply(seq_len(NROW(res_2)), function(nm) NROW(res_2[[nm]]), numeric(1))), 
+               NROW(feature_sets[2]))
+  expect_equal(names(res_2[[1]]), feature_sets[2])
+  expect_length(names(res_2[[1]][[1]]), 
+                NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_equal(names(res_2[[1]][[1]][[1]]), c("RV", "GR"))
   expect_false(all(vapply(c("hsa_score", "bliss_score"), function(met) {
-    any(grepl(met, names(res_2[[1]][[1]][[1]])))
+    any(grepl(met, names(res_2[["ls_plot"]][[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1)))) # dt_scores = NULL nolint
-  expect_is(res_2[[1]][[1]][["RV"]][[1]], "ggplot")
+  expect_false(all(vapply(c("hsa_score", "bliss_score"), function(met) {
+    any(grepl(met, names(res_2[["ls_assoc_data"]][[1]][[1]][[1]])))
+  }, FUN.VALUE = logical(1)))) 
+  expect_is(res_2[["ls_plot"]][[1]][[1]][["RV"]][[2]], "ggplot")
+  expect_null(res_2[["ls_assoc_data"]][[1]][[1]][["RV"]][[2]]) # empty plot
   
   res_2_bis <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                             drug2_name_vec = d_names_2,
@@ -369,11 +414,18 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         feature_sets = feature_sets[1],
                                         metadata_columns = metadata_columns)
   expect_is(res_3, "list")
-  expect_length(res_3, NROW(feature_sets[1]) + NROW(metadata_columns))
-  expect_equal(names(res_3), c(feature_sets[1], metadata_columns))
-  expect_length(res_3[[1]],  NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
-  expect_length(res_3[[1]][[1]], 1) # only GR
-  expect_true(all(grepl("GR_gDR_x_max", names(res_3[[1]][[1]][[1]])))) # metrics
+  expect_length(res_3, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_3[[1]], NROW(feature_sets[1]) + NROW(metadata_columns))
+  expect_equal(names(res_3[[1]]), c(feature_sets[1], metadata_columns))
+  expect_length(res_3[["ls_plot"]][[1]], NROW(d_names))
+  expect_length(res_3[["ls_assoc_data"]][[1]], NROW(d_names))
+  expect_length(names(res_3[[1]][[1]]), 
+                NROW(expand.grid(d_names, d_names_2, stringsAsFactors = FALSE)))
+  expect_equal(names(res_3[[1]][[1]][[1]]), "GR") # only GR
+  expect_true(all(grepl("GR_gDR_x_max", 
+                        names(res_3[["ls_plot"]][[1]][[1]][[1]])))) # metrics
+  expect_true(all(grepl("GR_gDR_x_max", 
+                        names(res_3[["ls_assoc_data"]][[1]][[1]][[1]])))) # metrics
   
   # scenario: only dt_average and not available meta
   res_4 <- create_PRISM_plot_list_combo(drug1_name_vec = d_names[1],
@@ -387,11 +439,18 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                         feature_sets = "non_available_feat",
                                         metadata_columns = c(metadata_columns[1], "non_available_meta"))
   expect_is(res_4, "list")
-  expect_length(res_4, NROW(metadata_columns[1]))
-  expect_equal(names(res_4), metadata_columns[1])
-  expect_equal(names(res_4[[1]]), sprintf("%s x %s", d_names[1], d_names_2))
-  expect_length(res_4[[1]][[1]], NROW(c("GR")))
-  expect_true(all(grepl("GR_gDR_hsa_score", names(res_4[[1]][[1]][[1]])))) # metrics
+  expect_length(res_4, NROW(c("ls_plot", "ls_assoc_data")))
+  expect_length(res_4[["ls_plot"]], NROW(metadata_columns[1]))
+  expect_length(res_4[["ls_assoc_data"]], NROW(metadata_columns[1]))
+  expect_equal(names(res_4[[1]]), metadata_columns[1])
+  expect_equal(names(res_4[[2]]), metadata_columns[1])
+  expect_equal(names(res_4[[1]][[1]]), sprintf("%s x %s", d_names[1], d_names_2))
+  expect_equal(names(res_4[["ls_plot"]][[1]][[1]]), "GR")
+  expect_equal(names(res_4[["ls_assoc_data"]][[1]][[1]]), "GR")
+  expect_true(all(grepl("GR_gDR_hsa_score", 
+                        names(res_4[["ls_plot"]][[1]][[1]][[1]])))) # metrics
+  expect_true(all(grepl("GR_gDR_hsa_score", 
+                        names(res_4[["ls_assoc_data"]][[1]][[1]][[1]])))) # metrics
   
   # scenario: no data for given drugs
   dt_metrics_GR <- data.table::copy(dt_metrics)[normalization_type == "GR", ]

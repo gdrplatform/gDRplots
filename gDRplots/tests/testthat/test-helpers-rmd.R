@@ -199,6 +199,7 @@ test_that("prep_nested_plot_chunk works as expected", {
   # creating nested list with plots
   plotlist <- list()
   linklist <- list()
+  dwnlist <- list()
   ls_color <- c("darkred", "orange", "darkcyan")
   for (drug in unique(dt_metrics$DrugName)) {
     for (cl in unique(dt_metrics$CellLineName)) {
@@ -229,6 +230,20 @@ test_that("prep_nested_plot_chunk works as expected", {
       
       linklist[[drug]][[cl]][["GR"]] <- link_GR
       linklist[[drug]][[cl]][["RV"]] <- link_RV
+      
+      dwn_GR <- lapply(ls_color, function(col) {
+        name_GR <- sprintf("%s_%s", "GR", col)
+        file.path("table", paste0(name_GR, ".xlsx"))
+      })
+      names(dwn_GR) <- sprintf("%s_%s", "GR", ls_color)
+      dwn_RV <- lapply(ls_color, function(col) {
+        name_RV <- sprintf("%s_%s", "RV", col)
+        file.path("table", paste0(name_RV, ".xlsx"))
+      })
+      names(dwn_RV) <- sprintf("%s_%s", "RV", ls_color)
+      
+      dwnlist[[drug]][[cl]][["GR"]] <- dwn_GR
+      dwnlist[[drug]][[cl]][["RV"]] <- dwn_RV
     }
   }  
   no_plots_in_section <-  NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color)
@@ -244,36 +259,61 @@ test_that("prep_nested_plot_chunk works as expected", {
   res_2 <- prep_nested_plot_chunk(plt_list = plotlist, 
                                   chunk_name = chunk_name_2, 
                                   link_list = linklist,
+                                  dwn_list = dwnlist,
                                   header_level = 1)
   expect_is(res_2, "list")
   expect_equal(sum(vapply(seq_along(res_2), function(i) grepl("# drug_", res_2[[i]][1]), logical(1))),
                NROW(res_2))
   expect_equal(sum(grepl(chunk_name_2, res_2[[1]])), no_plots_in_section)
   expect_equal(sum(grepl("####", res_2[[1]])), no_plots_in_section)
-  expect_true(all(vapply(seq_along(res_2), 
-                         function(i) sum(grepl("_blank", res_2[[i]])) == no_plots_in_section, logical(1)))) # link_list
+  expect_true(
+    all(vapply(seq_along(res_2), 
+               function(i) sum(grepl("_blank", res_2[[i]])) == no_plots_in_section, logical(1)))) # link_list
+  expect_true(
+    all(vapply(seq_along(res_2), 
+               function(i) sum(grepl("download", res_2[[i]])) == no_plots_in_section, logical(1)))) # dwn_list
   
   linklist_noname <- linklist[1:5]
   names(linklist_noname) <- NULL
   res_3 <- prep_nested_plot_chunk(plt_list = plotlist[1:5], 
                                   chunk_name = "metric_col", 
                                   link_list = linklist_noname,
+                                  dwn_list = dwnlist[1:3],
                                   header_level = 2)
   expect_is(res_3, "list")
   expect_equal(sum(vapply(seq_along(res_3), function(i) grepl("## drug_", res_3[[i]][1]), logical(1))),
                NROW(res_3))
   expect_equal(sum(grepl("#####", res_3[[1]])), no_plots_in_section)
-  expect_false(all(vapply(seq_along(res_3), 
-                          function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
+  expect_false(
+    all(vapply(seq_along(res_3), 
+               function(i) sum(grepl("_blank", res_3[[i]])) == no_plots_in_section, logical(1)))) # link_list
+  expect_equal(
+    sum(vapply(seq_along(res_3), 
+               function(i) sum(grepl("download", res_3[[i]])) == no_plots_in_section, logical(1))), 
+    3) # dwn_list only for three items
   
-  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, chunk_name = "metric_col"), 
+  expect_error(prep_nested_plot_chunk(plt_list = dt_metrics, 
+                                      chunk_name = "metric_col"), 
                "Assertion on 'plt_list' failed: Must be of type 'list'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = 123), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = 123), 
                "Assertion on 'chunk_name' failed: Must be of type 'string'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = "1"), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      header_level = "1"), 
                "Assertion on 'header_level' failed: Must be of type 'single integerish value'")
-  expect_error(prep_nested_plot_chunk(plt_list = plotlist, chunk_name = "metric_col", header_level = 0), 
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      header_level = 0), 
                "Assertion on 'header_level' failed: Element 1 is not >= 1")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      link_list = 0), 
+               "Assertion on 'link_list' failed: Must be of type 'list'")
+  expect_error(prep_nested_plot_chunk(plt_list = plotlist, 
+                                      chunk_name = "metric_col", 
+                                      dwn_list = "str"), 
+               "Assertion on 'dwn_list' failed: Must be of type 'list'")
 })
 
 test_that("escape_special_characters works as expected", {

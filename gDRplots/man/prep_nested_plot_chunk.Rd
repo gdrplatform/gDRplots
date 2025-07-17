@@ -8,6 +8,7 @@ prep_nested_plot_chunk(
   plt_list,
   chunk_name,
   link_list = NULL,
+  dwn_list = NULL,
   header_level = 2
 )
 }
@@ -20,6 +21,9 @@ one of: "GR" ("GR Value") or "RV" ("Relative Viability")#'}
 
 \item{link_list}{A named list of links to the location (relative paths) where plots are saved, 
 which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.}
+
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 }

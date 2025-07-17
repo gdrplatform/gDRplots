@@ -199,11 +199,13 @@ prep_plot_chunk <- function(plt_list,
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
                                    link_list = NULL,
+                                   dwn_list = NULL,
                                    header_level = 2) {
   checkmate::assert_list(plt_list)
   checkmate::assert_named(plt_list)
   checkmate::assert_string(chunk_name)
   checkmate::assert_list(link_list, null.ok = TRUE)
+  checkmate::assert_list(dwn_list, null.ok = TRUE)
   checkmate::assert_int(header_level, lower = 1)
   
   lvl_1 <- paste0(rep("#", header_level), collapse =  "")
@@ -255,13 +257,20 @@ prep_nested_plot_chunk <- function(plt_list,
                       } else {
                         ""
                       }
-            
+                      
+                      link_dwn <- if (!is.null(dwn_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]])) {
+                        c(create_download_link(dwn_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
+                      } else {
+                        ""
+                      }
+                      
                       plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
                                                plt_list_name, nm_1, nm_2, nm_norm)
                       
                       chunk <- c(
                         sprintf("%s %s \n\n", lvl_4, nm_vis),
                         link_vis,
+                        link_dwn,
                         sprintf("```{r %s, echo = FALSE}\n", chunk_name),
                         sprintf('%s[["{{nm_vis}}"]] \n```\n\n', plt_list_name)
                       )

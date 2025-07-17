@@ -1,3 +1,6 @@
+## gDRplots 0.0.88 - 2025-07-07
+* add table as an output from `plot_volcano_assoc_panel`
+
 ## gDRplots 0.0.87 - 2025-07-04
 * update `plot_dose_response_sa` - option to plot only fitted curve
 

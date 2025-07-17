@@ -47,8 +47,12 @@
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' @param clear_taxonomy_info logical flag whether to remove taxonomy information for gene names in table
 #'  with the molecular feature sets from DepMap.
-#'
-#' @return nested list of plots for selected type of experiment
+#' 
+#' @return A named list with elements:
+#' \itemize{
+#'   \item \code{ls_plot} nested list of plots for selected type of experiment
+#'   \item \code{ls_assoc_data} nested list of table with association data
+#' }
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
@@ -158,7 +162,7 @@
   if (experiment_type == "sa") {
     dt_drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
     available_drugs <- unique(dt_drug_source[[drug_name]])
-
+    
     if (is.null(drug1_name_vec) || all(!drug1_name_vec %in% available_drugs)) {
       drug1_name_vec <- available_drugs
     } else {
@@ -202,6 +206,7 @@
   
   # final object
   ls_plot <- list()
+  ls_assoc_data <- list()
   
   # 1st level
   for (i_feat_meta in seq_len(NROW(depmap_items))) {
@@ -280,23 +285,26 @@
         # 4th level - prep vis for each metric
         selected_metrics <- list(selected_metric = setdiff(names(dt_response), id_cols_to_remove))
         
-        ls_vol <- purrr::pmap(selected_metrics,
-                              plot_volcano_assoc_panel,
-                              dt_response = dt_response,
-                              dt_depmap = dt_depmap,
-                              selected_feat_meta_col = obj_depmap[["selected_feat_meta_col"]])
-        
-        names(ls_vol) <- selected_metrics$selected_metric
-        
+        obj_vol <- purrr::pmap(selected_metrics,
+                               plot_volcano_assoc_panel,
+                               dt_response = dt_response,
+                               dt_depmap = dt_depmap,
+                               selected_feat_meta_col = obj_depmap[["selected_feat_meta_col"]])
+        ls_vol <- purrr::map(obj_vol, "panel")
+        ls_tab <- purrr::map(obj_vol, "assoc_data")
+        names(ls_vol) <- names(ls_tab) <- selected_metrics$selected_metric
+
         id_feat_meta <- depmap_items$feat_meta_name[[i_feat_meta]]
         id_drug <- drug_name_grid[["iter_id"]][i_drug]
         
         ls_plot[[id_feat_meta]][[id_drug]][[norm]] <- ls_vol
+        ls_assoc_data[[id_feat_meta]][[id_drug]][[norm]] <- ls_tab
       }
     }
     rm(obj_depmap)
   }
-  return(ls_plot)
+  return(list(ls_plot = ls_plot,
+              ls_assoc_data = ls_assoc_data))
 }
 
 #' Create a nested list of plots for PRISM data with single-agent metrics
@@ -306,8 +314,8 @@
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and single-agent \code{SummarizedExperiment}
-#' 
-#' @return nested list of plots
+#'
+#' @inherit .create_PRISM_plot_list return
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
@@ -350,7 +358,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 #'  and combo \code{SummarizedExperiment}
 #'
-#' @return nested list of plots
+#' @inherit .create_PRISM_plot_list return
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
