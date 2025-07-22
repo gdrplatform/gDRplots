@@ -1,3 +1,6 @@
+## gDRplots 0.0.89 - 2025-07-22
+* add rounding options to `generate_datatable`
+
 ## gDRplots 0.0.88 - 2025-07-07
 * add table as an output from `plot_volcano_assoc_panel`
 

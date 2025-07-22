@@ -743,19 +743,21 @@ prep_filename_path <- function(plt_list,
 
 #' Generate a customized datatable
 #'
-#' This function creates a `DT::datatable` object with default settings for 
-#' horizontal scrolling (`scrollX = TRUE`) and no table controls (`dom = "t"`). 
-#' It supports input data of types `data.table`, `data.frame`, or `DFrame`. 
+#' This function creates a \code{DT::datatable} object with default settings for 
+#' horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
+#' It supports input data of types \code{data.table}, \code{data.frame}, or \code{DFrame}. 
 #' Additional options and arguments can be passed to customize the table further.
 #'
-#' @param data A dataset to be displayed in the datatable. Must be of class 
-#'   `data.table`, `data.frame`, or `DFrame`.
+#' @param tab A dataset to be displayed in the datatable. Must be of class 
+#'   \code{data.table}, \code{data.frame}, or \code{DFrame}.
 #' @param options A list of options to customize the DataTable. Defaults to 
-#'   `list(scrollX = TRUE, dom = "t")`.
+#'   \code{list(scrollX = TRUE, dom = "t")}.
 #' @param width A character string specifying the width of the table. Defaults to "100\%".
-#' @param ... Additional arguments passed to `DT::datatable`.
+#' @param col_to_round A character vector with the names of the columns whose values should be rounded.
+#' @param digits A numeric value indicating the number of decimal places to be used for rounding
+#' @param ... Additional arguments passed to \code{DT::datatable}.
 #' 
-#' @return A `DT::datatable` object.
+#' @return A \code{DT::datatable} object.
 #' @examples
 #' generate_datatable(iris)
 #' 
@@ -763,18 +765,29 @@ prep_filename_path <- function(plt_list,
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' 
 #' @export
-generate_datatable <- function(data, 
+generate_datatable <- function(tab, 
                                options = list(scrollX = TRUE, dom = "t"), 
-                               width = "100%", 
+                               width = "100%",
+                               col_to_round = NULL,
+                               digits = 3,
                                ...) {
   checkmate::assert(
-    checkmate::check_class(data, "data.frame"),
-    checkmate::check_class(data, "data.table"),
-    checkmate::check_class(data, "DFrame"),
+    checkmate::check_class(tab, "data.frame"),
+    checkmate::check_class(tab, "data.table"),
+    checkmate::check_class(tab, "DFrame"),
     combine = "or"
   )
   checkmate::assert_list(options, null.ok = TRUE)
-  checkmate::assert_string(width, null.ok = FALSE)
+  checkmate::assert_string(width, null.ok = FALSE, pattern = "^[0-9]*%$|^[0-9]*px$")
+  num_col <- names(tab)[vapply(names(tab), function(nm) is.numeric(tab[[nm]]), logical(1))]
+  checkmate::assert_subset(col_to_round, choices = num_col)
+  checkmate::assert_number(digits, lower = 0)
   
-  DT::datatable(data, options = options, width = width, ...)
+  tab_fin <- data.table::copy(data.table::as.data.table(tab))
+  
+  if (!is.null(col_to_round)) {
+    tab_fin[, (col_to_round) := lapply(.SD, round, digits), .SDcols = col_to_round]
+  }
+  
+  DT::datatable(tab_fin, options = options, width = width, ...)
 }
