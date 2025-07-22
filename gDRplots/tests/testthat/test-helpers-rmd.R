@@ -772,5 +772,5 @@ test_that("prep_assoc_summary works as expected", {
   
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
-               " Assertion on 'dir_path' failed:")
+               "Assertion on 'dir_path' failed:")
 })
