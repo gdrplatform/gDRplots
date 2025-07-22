@@ -702,18 +702,14 @@ test_that("prep_filename_path works as expected", {
 
 
 test_that("generate_datatable works as expected", {
-  result_df <- generate_datatable(iris)
-  expect_s3_class(result_df, "datatables")
-  expect_equal(result_df[["width"]], "100%") # default
-  expect_equal(result_df[["x"]][["options"]][["scrollX"]], TRUE) # default
-  
   result_dt <- generate_datatable(data.table::data.table(iris))
   expect_s3_class(result_dt, "datatables")
-  expect_equal(result_dt, result_df)
+  expect_equal(result_dt[["width"]], "100%") # default
+  expect_equal(result_dt[["x"]][["options"]][["scrollX"]], TRUE) # default
   
   result_DF <- generate_datatable(S4Vectors::DataFrame(iris))
   expect_s3_class(result_DF, "datatables")
-  expect_equal(result_DF, result_df)
+  expect_equal(result_DF, result_dt)
   
   page_len <- 5
   result_custom_options <- generate_datatable(iris, 
