@@ -66,7 +66,7 @@ prep_plot_chunk <- function(plt_list,
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
-                              pattern = "unnumbered|tabset|tabset-dropdown")
+                              pattern = "unnumbered|tabset|tabset-dropdown|tabset-fade|tabset-pills")
   
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
