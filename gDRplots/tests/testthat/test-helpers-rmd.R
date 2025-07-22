@@ -765,3 +765,12 @@ test_that("generate_datatable works as expected", {
     "Assertion on 'digits' failed: Must be of type 'number'"
   )
 })
+
+test_that("prep_assoc_summary works as expected", {
+  d_path <- "path_to_dir"
+  ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
+  
+  expect_error(prep_assoc_summary(dir_path = "wrong_path",
+                                  ls_file = ls_tab), 
+               " Assertion on 'dir_path' failed:")
+})
