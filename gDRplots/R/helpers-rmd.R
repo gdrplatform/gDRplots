@@ -790,3 +790,58 @@ generate_datatable <- function(tab,
   
   DT::datatable(tab_fin, options = options, width = width, ...)
 }
+
+#' Prepare summary table with statistically significant associations
+#'
+#' @param dir_path A string path to the directory containing files with associations data.
+#' @param ls_file A character vector with names of files containing associations data.
+#' @param alpha A numeric cutoff to identify statistically significant correlations
+#' @param n_stat_sig_row A numeric value for limit the maximum number of statistically significant 
+#'    associations to subset form table
+#' @param read_file_fun A function to read the data from file; default is \code{readxl::read_excel}
+#' @param as_table A logical flage weather result should be return as a lis or as a table.
+#'
+#' @return A \code{DT::datatable} object.
+#' 
+#' @keywords internal
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @export
+prep_assoc_summary <- function(dir_path, 
+                               ls_file,
+                               alpha = 0.05,
+                               n_stat_sig_row = 10,
+                               read_file_fun = readxl::read_excel,
+                               as_list = TRUE) {
+  
+  checkmate::assert_directory_exists(dir_path)
+  checkmate::assert_character(ls_file)
+  checkmate::assert_number(n_stat_sig_row, lower = 1)
+  checkmate::assert_function(read_file_fun)
+  checkmate::assert_flag(as_table)
+  
+  if (!NROW(ls_file)) return(NULL)
+  
+  ls_stat_sig <- list() 
+  for (f in ls_file) {
+    file_path <- file.path(dir_path, f)
+    if (!checkmate::test_file_exists(file_path)) next
+    
+    tab_ <- data.table::as.data.table(read_file_fun(file_path))
+    # order table
+    tab_$abs_rho <- abs(tab_$rho)
+    tab_ <- data.table::setorderv(tab_, 
+                                  cols = c("q_value", "abs_rho"), order = c(1L, -1L))[, abs_rho := NULL]
+    # subset of stat sig
+    tab_subset <- tab_[q_value < alpha, ]
+    tab_subset <- tab_subset[seq_len(min(NROW(tab_subset), n_stat_sig_row)), ]
+    
+    ls_stat_sig[[f]] <- tab_subset
+  }
+  
+  if (as_list) {
+    ls_stat_sig
+  } else {
+    data.table::rbindlist(ls_stat_sig)
+  }
+}
