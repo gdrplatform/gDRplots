@@ -5,30 +5,36 @@
 \title{Generate a customized datatable}
 \usage{
 generate_datatable(
-  data,
+  tab,
   options = list(scrollX = TRUE, dom = "t"),
   width = "100\%",
+  col_to_round = NULL,
+  digits = 3,
   ...
 )
 }
 \arguments{
-\item{data}{A dataset to be displayed in the datatable. Must be of class 
-`data.table`, `data.frame`, or `DFrame`.}
+\item{tab}{A dataset to be displayed in the datatable. Must be of class 
+\code{data.table}, \code{data.frame}, or \code{DFrame}.}
 
 \item{options}{A list of options to customize the DataTable. Defaults to 
-`list(scrollX = TRUE, dom = "t")`.}
+\code{list(scrollX = TRUE, dom = "t")}.}
 
 \item{width}{A character string specifying the width of the table. Defaults to "100\%".}
 
-\item{...}{Additional arguments passed to `DT::datatable`.}
+\item{col_to_round}{A character vector with the names of the columns whose values should be rounded.}
+
+\item{digits}{A numeric value indicating the number of decimal places to be used for rounding}
+
+\item{...}{Additional arguments passed to \code{DT::datatable}.}
 }
 \value{
-A `DT::datatable` object.
+A \code{DT::datatable} object.
 }
 \description{
-This function creates a `DT::datatable` object with default settings for 
-horizontal scrolling (`scrollX = TRUE`) and no table controls (`dom = "t"`). 
-It supports input data of types `data.table`, `data.frame`, or `DFrame`. 
+This function creates a \code{DT::datatable} object with default settings for 
+horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
+It supports input data of types \code{data.table}, \code{data.frame}, or \code{DFrame}. 
 Additional options and arguments can be passed to customize the table further.
 }
 \examples{
