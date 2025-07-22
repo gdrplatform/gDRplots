@@ -157,9 +157,13 @@ test_that("prep_plot_chunk works as expected", {
   
   # scenario: incomplete list of links
   linklist_nest_incom <- list(someCategory = c(linklist[2:3]), anotherCategory = c(linklist))
+  tab_opt <- c("tabset", "tabset-fade", "tabset-pills")
   res_3n <- prep_plot_chunk(plt_list = plotlist_nest, 
                             link_list = linklist_nest_incom,
-                            chunk_name = "iris")
+                            chunk_name = "iris",
+                            tabset_options = tab_opt)
+  expect_equal(sum(grepl(paste(tab_opt, collapse = " ."), unlist(res_3n))), 
+               NROW(plotlist_nest))
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("####", res_3n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("a href", res_3n[[i]])))), 
