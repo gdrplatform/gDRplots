@@ -700,6 +700,44 @@ test_that("prep_filename_path works as expected", {
 test_that("generate_datatable works as expected", {
   result_df <- generate_datatable(iris)
   expect_s3_class(result_df, "datatables")
+  expect_equal(result_df[["width"]], "100%") # default
+  expect_equal(result_df[["x"]][["options"]][["scrollX"]], TRUE) # default
+  
+  result_dt <- generate_datatable(data.table::data.table(iris))
+  expect_s3_class(result_dt, "datatables")
+  expect_equal(result_dt, result_df)
+  
+  result_DF <- generate_datatable(S4Vectors::DataFrame(iris))
+  expect_s3_class(result_DF, "datatables")
+  expect_equal(result_DF, result_df)
+  
+  page_len <- 5
+  result_custom_options <- generate_datatable(iris, 
+                                              options = list(scrollX = TRUE, pageLength = page_len))
+  expect_s3_class(result_custom_options, "datatables")
+  expect_equal(result_custom_options[["x"]][["options"]][["pageLength"]], page_len)
+  
+  cap_str <- "Iris Dataset"
+  result_with_caption <- generate_datatable(iris, 
+                                            caption = cap_str)
+  expect_s3_class(result_with_caption, "datatables")
+  expect_true(grepl(cap_str, result_with_caption[["x"]][["caption"]]))
+  
+  dom_str <- "ftp"
+  result_with_search <- generate_datatable(iris, 
+                                           options = list(scrollX = TRUE, dom = dom_str))
+  expect_s3_class(result_with_search, "datatables")
+  expect_equal(result_with_search[["x"]][["options"]][["dom"]], dom_str)
+  
+  ls_col <- c("Sepal.Length", "Sepal.Width")
+  result_with_rounding <- generate_datatable(iris,
+                                             col_to_round = ls_col,
+                                             digits = 0)
+  expect_s3_class(result_with_rounding, "datatables")
+  expect_equal(result_with_rounding[["x"]][["data"]][[ls_col[1]]],
+               as.integer(result_with_rounding[["x"]][["data"]][[ls_col[1]]]))
+  expect_equal(result_with_rounding[["x"]][["data"]][[ls_col[2]]],
+               as.integer(result_with_rounding[["x"]][["data"]][[ls_col[2]]]))
   
   expect_error(
     generate_datatable(matrix(1:10, ncol = 2)), 
@@ -707,14 +745,22 @@ test_that("generate_datatable works as expected", {
   )
   expect_error(
     generate_datatable(iris, options = "invalid_options"),
-    "Must be of type 'list'"
+    "Assertion on 'options' failed: Must be of type 'list'"
   )
   expect_error(
     generate_datatable(iris, width = 100), 
-    "Must be of type 'string'"
+    "Assertion on 'width' failed: Must be of type 'string'"
   )
-  result_custom_options <- generate_datatable(iris, options = list(scrollX = TRUE, pageLength = 5))
-  expect_s3_class(result_custom_options, "datatables")
-  result_with_caption <- generate_datatable(iris, caption = "Iris Dataset")
-  expect_s3_class(result_with_caption, "datatables")
+  expect_error(
+    generate_datatable(iris, width = "100pt"), 
+    "Assertion on 'width' failed: Must comply to pattern"
+  )
+  expect_error(
+    generate_datatable(iris, col_to_round = "Species"), 
+    "Assertion on 'col_to_round' failed: Must be a subset of "
+  )
+  expect_error(
+    generate_datatable(iris, digits = "2"), 
+    "Assertion on 'digits' failed: Must be of type 'number'"
+  )
 })
