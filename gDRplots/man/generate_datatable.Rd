@@ -15,7 +15,7 @@ generate_datatable(
 }
 \arguments{
 \item{tab}{A dataset to be displayed in the datatable. Must be of class 
-\code{data.table}, \code{data.frame}, or \code{DFrame}.}
+\code{data.table} or \code{DFrame}.}
 
 \item{options}{A list of options to customize the DataTable. Defaults to 
 \code{list(scrollX = TRUE, dom = "t")}.}
@@ -34,11 +34,11 @@ A \code{DT::datatable} object.
 \description{
 This function creates a \code{DT::datatable} object with default settings for 
 horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
-It supports input data of types \code{data.table}, \code{data.frame}, or \code{DFrame}. 
+It supports input data of types \code{data.table} or \code{DFrame}. 
 Additional options and arguments can be passed to customize the table further.
 }
 \examples{
-generate_datatable(iris)
+generate_datatable(data.table::data.table(iris))
 
 }
 \author{
