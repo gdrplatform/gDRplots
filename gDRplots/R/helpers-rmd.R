@@ -745,11 +745,11 @@ prep_filename_path <- function(plt_list,
 #'
 #' This function creates a \code{DT::datatable} object with default settings for 
 #' horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
-#' It supports input data of types \code{data.table}, \code{data.frame}, or \code{DFrame}. 
+#' It supports input data of types \code{data.table} or \code{DFrame}. 
 #' Additional options and arguments can be passed to customize the table further.
 #'
 #' @param tab A dataset to be displayed in the datatable. Must be of class 
-#'   \code{data.table}, \code{data.frame}, or \code{DFrame}.
+#'   \code{data.table} or \code{DFrame}.
 #' @param options A list of options to customize the DataTable. Defaults to 
 #'   \code{list(scrollX = TRUE, dom = "t")}.
 #' @param width A character string specifying the width of the table. Defaults to "100\%".
@@ -759,7 +759,7 @@ prep_filename_path <- function(plt_list,
 #' 
 #' @return A \code{DT::datatable} object.
 #' @examples
-#' generate_datatable(iris)
+#' generate_datatable(data.table::data.table(iris))
 #' 
 #' @keywords internal
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
@@ -772,7 +772,6 @@ generate_datatable <- function(tab,
                                digits = 3,
                                ...) {
   checkmate::assert(
-    checkmate::check_class(tab, "data.frame"),
     checkmate::check_class(tab, "data.table"),
     checkmate::check_class(tab, "DFrame"),
     combine = "or"
