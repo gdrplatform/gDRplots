@@ -774,3 +774,27 @@ test_that("prep_assoc_summary works as expected", {
                                   ls_file = ls_tab), 
                "Assertion on 'dir_path' failed:")
 })
+
+test_that(".get_info_from_name works as expected", {
+  f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
+  res_1 <- .get_info_from_name(f_n)
+  expect_is(res_1, "list")
+  expect_length(res_1, 2)
+  expect_equal(res_1, list(drug_grid = "DRUG_ABC", feat_meta = "FEAT"))
+  
+  f_n_2 <- "NAME_SECTION__MetaForData_drugVIP_001_GR_AUC"
+  res_2 <- .get_info_from_name(f_n_2,
+                               normalization_type = "GR")
+  expect_is(res_2, "list")
+  expect_length(res_2, 2)
+  expect_equal(res_2, list(drug_grid = "drugVIP_001", feat_meta = "MetaForData"))
+  
+  expect_error(.get_info_from_name(file_name = "name_META_drug_001_RV_AUC",
+                                   normalization_type = "GR"), 
+               "Assertion on 'file_name' failed: Must comply to pattern")
+  expect_error(.get_info_from_name("name_META_drug_001_RV_AUC"), 
+               "Assertion on 'file_name' failed: Must comply to pattern")
+  expect_error(.get_info_from_name(f_n,
+                                   normalization_type = "XX"), 
+               "Assertion on 'normalization_type' failed: Must be element of set")
+})
