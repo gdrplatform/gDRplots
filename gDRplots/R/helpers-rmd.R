@@ -845,3 +845,43 @@ prep_assoc_summary <- function(dir_path,
     data.table::rbindlist(ls_stat_sig)
   }
 }
+
+
+#' Help function 
+#' 
+#' This function retrieves information about the feature name and drug name from a file name,
+#' which has the schema <chunk_name>__<feature_name>_<drug_name>_<gDR_metric_name>
+#'
+#' @param file_name A string with file name
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' 
+#' @return A named list with elements:
+#' \itemize{
+#'   \item \code{drug_grid} a string with drug name
+#'   \item \code{feat_meta} a string with omic name (feature or meta)
+#' }
+#' 
+#' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @examples
+#' \dontrun{
+#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
+#' get_info_from_name(f_n)
+#' }
+#' 
+.get_info_from_name <- function(file_name, 
+                                normalization_type = "RV") {
+  
+  checkmate::assert_string(file_name, pattern = ".*__.*RV|GR.*")
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  
+  tab_desc <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
+  tab_desc <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
+  drug_grid <- sub(".*?_", "", tab_desc)
+  feat_meta <- sub("_.*", "", tab_desc)
+  list(drug_grid = drug_grid,
+       feat_meta = feat_meta)
+}
