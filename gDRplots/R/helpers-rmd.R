@@ -875,8 +875,8 @@ prep_assoc_summary <- function(dir_path,
 .get_info_from_name <- function(file_name, 
                                 normalization_type = "RV") {
   
-  checkmate::assert_string(file_name, pattern = ".*__.*RV|GR.*")
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_string(file_name, pattern = sprintf(".*__.*_%s.*", normalization_type))
   
   tab_desc <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
   tab_desc <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
