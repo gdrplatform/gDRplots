@@ -837,7 +837,7 @@ prep_assoc_summary <- function(dir_path,
     tab_subset <- tab_[q_value < alpha, ]
     tab_subset <- tab_subset[seq_len(min(NROW(tab_subset), n_stat_sig_row)), ]
     
-    ls_stat_sig[[f]] <- tab_subset
+    ls_stat_sig[[f_name]] <- tab_subset
   }
   
   if (as_list) {
