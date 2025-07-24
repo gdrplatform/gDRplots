@@ -799,7 +799,7 @@ generate_datatable <- function(tab,
 #' @param n_stat_sig_row A numeric value for limit the maximum number of statistically significant 
 #'    associations to subset form table
 #' @param read_file_fun A function to read the data from file; default is \code{readxl::read_excel}
-#' @param as_table A logical flage weather result should be return as a lis or as a table.
+#' @param as_list A logical flag weather result should be return as a list or as a table.
 #'
 #' @return A \code{DT::datatable} object.
 #' 
@@ -818,7 +818,7 @@ prep_assoc_summary <- function(dir_path,
   checkmate::assert_character(ls_file)
   checkmate::assert_number(n_stat_sig_row, lower = 1)
   checkmate::assert_function(read_file_fun)
-  checkmate::assert_flag(as_table)
+  checkmate::assert_flag(as_list)
   
   if (!NROW(ls_file)) return(NULL)
   
