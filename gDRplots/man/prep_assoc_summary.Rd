@@ -10,7 +10,7 @@ prep_assoc_summary(
   alpha = 0.05,
   n_stat_sig_row = 10,
   read_file_fun = readxl::read_excel,
-  as_list = TRUE
+  as_list = FALSE
 )
 }
 \arguments{
