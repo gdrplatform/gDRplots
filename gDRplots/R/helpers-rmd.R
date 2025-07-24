@@ -823,8 +823,8 @@ prep_assoc_summary <- function(dir_path,
   if (!NROW(ls_file)) return(NULL)
   
   ls_stat_sig <- list() 
-  for (f in ls_file) {
-    file_path <- file.path(dir_path, f)
+  for (f_name in ls_file) {
+    file_path <- file.path(dir_path, f_name)
     if (!checkmate::test_file_exists(file_path)) next
     
     tab_ <- data.table::as.data.table(read_file_fun(file_path))
@@ -832,6 +832,7 @@ prep_assoc_summary <- function(dir_path,
     tab_$abs_rho <- abs(tab_$rho)
     tab_ <- data.table::setorderv(tab_, 
                                   cols = c("q_value", "abs_rho"), order = c(1L, -1L))[, abs_rho := NULL]
+    if (!as_list) tab_[["src"]] <- f_name
     # subset of stat sig
     tab_subset <- tab_[q_value < alpha, ]
     tab_subset <- tab_subset[seq_len(min(NROW(tab_subset), n_stat_sig_row)), ]
