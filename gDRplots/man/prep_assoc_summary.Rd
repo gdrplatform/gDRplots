@@ -25,7 +25,7 @@ associations to subset form table}
 
 \item{read_file_fun}{A function to read the data from file; default is \code{readxl::read_excel}}
 
-\item{as_table}{A logical flage weather result should be return as a lis or as a table.}
+\item{as_list}{A logical flag weather result should be return as a list or as a table.}
 }
 \value{
 A \code{DT::datatable} object.
