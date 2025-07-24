@@ -37,6 +37,7 @@ Suggests:
     matrixStats,
     mockery,
     purrr,
+    readxl,
     rlang,
     scales,
     S4Vectors,
