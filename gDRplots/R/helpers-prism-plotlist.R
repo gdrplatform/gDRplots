@@ -396,3 +396,94 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
     clear_taxonomy_info = clear_taxonomy_info
   )
 }
+
+#' Create a list of PRISM association table
+#'
+#' @param assoc_summary_RV A \code{data.table} with associations for normalization 
+#'   type of "Relative Viability", outputted by \code{gDRplots::::prep_assoc_summary()}
+#' @param assoc_summary_GR A \code{data.table} with associations for normalization 
+#'   type of "GR Value", outputted by \code{gDRplots::::prep_assoc_summary()}
+#'
+#' @return A list of table split by drug name and normalization type
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @keywords prism_plots
+#'
+#' @export
+create_PRISM_summary_list <- function(assoc_summary_RV,
+                                      assoc_summary_GR = NULL) {
+  
+  checkmate::assert_data_table(assoc_summary_RV)
+  checkmate::assert_data_table(assoc_summary_GR, null.ok = TRUE)
+  
+  # create info column
+  tab_RV <- data.table::copy(assoc_summary_RV)
+  tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
+    lapply(seq_len(NROW(tab_RV$src)), function(i) .get_info_from_name(tab_RV$src[i])))]
+  tab_RV[, src := NULL]
+  data.table::setcolorder(tab_RV, "feat_meta")
+  ls_RV <- split(tab_RV, by = "drug_grid")
+  
+  if (!is.null(assoc_summary_GR)) {
+    tab_GR <- data.table::copy(assoc_summary_GR)
+    tab_GR[, c("drug_grid", "feat_meta") := data.table::rbindlist(
+      lapply(seq_len(NROW(tab_GR$src)), function(i) .get_info_from_name(tab_GR$src[i])))]
+    tab_GR[, src := NULL]
+    data.table::setcolorder(tab_GR, "feat_meta")
+    ls_GR <- split(tab_GR, by = "drug_grid")
+  } else {
+    ls_GR <- NULL
+  }
+  
+  # final
+  ls_all <- lapply(seq_len(NROW(ls_RV)), function(i) {
+    list("Relative Viability" = ls_RV[[i]],
+         "GR Value" = ls_GR[[i]])
+  })
+  
+  # remove NULL items
+  ls_all <- lapply(seq_along(ls_all), function(x) Filter(Negate(is.null), ls_all[[x]]))
+  names(ls_all) <- names(ls_RV)
+  
+  return(ls_all)
+}
+
+#' Help function 
+#' 
+#' This function retrieves information about the feature name and drug name from a file name,
+#' which has the schema <chunk_name>__<feature_name>_<drug_name>_<gDR_metric_name>
+#'
+#' @param file_name A string with file name
+#' @param normalization_type string with normalization types to be selected
+#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' 
+#' @return A named list with elements:
+#' \itemize{
+#'   \item \code{drug_grid} a string with drug name
+#'   \item \code{feat_meta} a string with omic name (feature or meta)
+#' }
+#' 
+#' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @examples
+#' \dontrun{
+#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
+#' get_info_from_name(f_n)
+#' }
+#' 
+.get_info_from_name <- function(file_name, 
+                                normalization_type = "RV") {
+  
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_string(file_name, pattern = sprintf(".*__.*_%s.*", normalization_type))
+  
+  tab_desc <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
+  tab_desc <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
+  drug_grid <- sub(".*?_", "", tab_desc)
+  feat_meta <- sub("_.*", "", tab_desc)
+  list(drug_grid = drug_grid,
+       feat_meta = feat_meta)
+}
