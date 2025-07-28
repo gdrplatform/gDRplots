@@ -438,8 +438,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   
   # final
   ls_all <- lapply(seq_len(NROW(ls_RV)), function(i) {
-    list("Relative Viability" = ls_RV[[i]],
-         "GR Value" = ls_GR[[i]])
+    list("RV" = ls_RV[[i]],
+         "GR" = ls_GR[[i]])
   })
   
   # remove NULL items
