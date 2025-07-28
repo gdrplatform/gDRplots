@@ -767,8 +767,21 @@ test_that("generate_datatable works as expected", {
 })
 
 test_that("prep_assoc_summary works as expected", {
-  d_path <- "path_to_dir"
+  d_path <- system.file("testdata", package = "gDRplots")
+  ls_RV <- list.files(d_path, pattern = "tab_assoc_RV")
+  
+  tab_1 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV)
+  expect_is(tab_1, "data.table")
+  expect_true(all(unique(tab_1$src) %in% ls_RV))
+  expect_true(all(tab_1$q_value < 0.05))
+  expect_true(NROW(unique(tab_1[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_1))
+  
   ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
+  tab_2 <- prep_assoc_summary(dir_path = d_path,
+                              ls_file = ls_tab)
+  expect_is(tab_2, "data.table")
+  expect_length(tab_2, 0)
   
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
