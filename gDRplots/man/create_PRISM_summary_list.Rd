@@ -4,7 +4,7 @@
 \alias{create_PRISM_summary_list}
 \title{Create a list of PRISM association table}
 \usage{
-create_PRISM_summary_list(assoc_summary_RV, assoc_summary_GR)
+create_PRISM_summary_list(assoc_summary_RV, assoc_summary_GR = NULL)
 }
 \arguments{
 \item{assoc_summary_RV}{A \code{data.table} with associations for normalization 
