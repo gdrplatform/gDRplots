@@ -413,7 +413,6 @@ test_that("save_plot throws error for non-existent directory", {
 })
 
 test_that("get_r_file_path works as expected", {
-  
   r_path <- "test-helpers-rmd.R" 
   ca1 <- c("a",
            "b=3",
@@ -777,13 +776,46 @@ test_that("prep_assoc_summary works as expected", {
   expect_true(all(tab_1$q_value < 0.05))
   expect_true(NROW(unique(tab_1[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_1))
   
-  ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
-  tab_2 <- prep_assoc_summary(dir_path = d_path,
-                              ls_file = ls_tab)
+  tab_1_ls <- prep_assoc_summary(dir_path = d_path, 
+                                 ls_file = ls_RV,
+                                 as_list = TRUE)
+  expect_is(tab_1_ls, "list")
+  expect_true(NROW(data.table::rbindlist(tab_1_ls)) == NROW(tab_1))
+  
+  tab_2 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV,
+                              alpha = 0.01)
   expect_is(tab_2, "data.table")
-  expect_length(tab_2, 0)
+  expect_true(all(tab_2$q_value < 0.01))
+  expect_equal(tab_2, tab_1[q_value < 0.01, ])
+  
+  tab_3 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV,
+                              n_stat_sig_row = 5)
+  expect_is(tab_3, "data.table")
+  expect_true(all(unique(tab_3$src) %in% ls_RV))
+  expect_true(all(tab_3$q_value < 0.05))
+  expect_equal(tab_3, stats::na.omit(tab_1[, .SD[1:5], src][, .SD, .SDcols = names(tab_3)]))
+  
+  ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
+  tab_5 <- prep_assoc_summary(dir_path = d_path,
+                              ls_file = ls_tab)
+  expect_is(tab_5, "data.table")
+  expect_length(tab_5, 0)
   
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
                "Assertion on 'dir_path' failed:")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  alpha = "0.05"), 
+               "Assertion on 'alpha' failed: Must be of type 'number'")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  n_stat_sig_row = "all"), 
+               "Assertion on 'n_stat_sig_row' failed: Must be of type 'number'")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  as_list = "TRUE"), 
+               "Assertion on 'as_list' failed: Must be of type 'logical flag'")
 })
