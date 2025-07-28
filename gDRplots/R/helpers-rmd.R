@@ -816,6 +816,7 @@ prep_assoc_summary <- function(dir_path,
   
   checkmate::assert_directory_exists(dir_path)
   checkmate::assert_character(ls_file)
+  checkmate::assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
   checkmate::assert_number(n_stat_sig_row, lower = 1)
   checkmate::assert_function(read_file_fun)
   checkmate::assert_flag(as_list)
