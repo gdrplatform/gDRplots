@@ -797,6 +797,10 @@ test_that("prep_assoc_summary works as expected", {
   expect_true(all(tab_3$q_value < 0.05))
   expect_equal(tab_3, stats::na.omit(tab_1[, .SD[1:5], src][, .SD, .SDcols = names(tab_3)]))
   
+  tab_4 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = "")
+  expect_null(tab_4)
+  
   ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
   tab_5 <- prep_assoc_summary(dir_path = d_path,
                               ls_file = ls_tab)
@@ -806,6 +810,9 @@ test_that("prep_assoc_summary works as expected", {
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
                "Assertion on 'dir_path' failed:")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = NULL),
+               "Assertion on 'ls_file' failed: Must be of type 'character'")
   expect_error(prep_assoc_summary(dir_path = d_path, 
                                   ls_file = ls_RV,
                                   alpha = "0.05"), 
