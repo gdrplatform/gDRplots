@@ -8,10 +8,10 @@ create_PRISM_summary_list(assoc_summary_RV, assoc_summary_GR = NULL)
 }
 \arguments{
 \item{assoc_summary_RV}{A \code{data.table} with associations for normalization 
-type of "Relative Viability", outputted by \code{gDRplots::::prep_assoc_summary()}}
+type of "Relative Viability", outputted by \code{gDRplots::prep_assoc_summary()}}
 
 \item{assoc_summary_GR}{A \code{data.table} with associations for normalization 
-type of "GR Value", outputted by \code{gDRplots::::prep_assoc_summary()}}
+type of "GR Value", outputted by \code{gDRplots::prep_assoc_summary()}}
 }
 \value{
 A list of table split by drug name and normalization type
