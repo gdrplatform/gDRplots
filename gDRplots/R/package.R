@@ -38,6 +38,7 @@ utils::globalVariables(
     "q_value",
     "ReadoutValue",
     "rId",
+    "src",
     "stat_sig",
     "value",
     "WellColumn",
