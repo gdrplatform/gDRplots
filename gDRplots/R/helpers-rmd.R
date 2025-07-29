@@ -821,7 +821,7 @@ prep_assoc_summary <- function(dir_path,
   checkmate::assert_function(read_file_fun)
   checkmate::assert_flag(as_list)
   
-  if (!nchar(ls_file)) return(NULL)
+  if (NROW(ls_file) == 1 && nchar(ls_file) < 5) return(NULL)
   
   ls_stat_sig <- list() 
   for (f_name in ls_file) {
