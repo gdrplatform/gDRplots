@@ -428,7 +428,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
     tab_RV <- data.table::copy(assoc_summary_RV)
     tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
       lapply(seq_len(NROW(tab_RV)), function(i) { 
-        .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV") }
+        .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV") 
+      } 
       ))]
     tab_RV[, src := NULL]
     data.table::setcolorder(tab_RV, "feat_meta")
@@ -441,7 +442,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
     tab_GR <- data.table::copy(assoc_summary_GR)
     tab_GR[, c("drug_grid", "feat_meta") := data.table::rbindlist(
       lapply(seq_len(NROW(tab_GR)), function(i) { 
-        .get_info_from_name(tab_GR[["src"]][i], normalization_type = "GR") }
+        .get_info_from_name(tab_GR[["src"]][i], normalization_type = "GR") 
+      } 
       ))]
     tab_GR[, src := NULL]
     data.table::setcolorder(tab_GR, "feat_meta")
