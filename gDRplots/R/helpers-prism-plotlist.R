@@ -416,18 +416,28 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   
   checkmate::assert_data_table(assoc_summary_RV)
   checkmate::assert_data_table(assoc_summary_GR, null.ok = TRUE)
+  if (NROW(assoc_summary_RV) > 0) {
+    checkmate::assert_names(names(assoc_summary_RV), must.includ = c("src"))
+  }
+  if (NROW(assoc_summary_GR) > 0) {
+    checkmate::assert_names(names(assoc_summary_GR), must.includ = c("src"))
+  }
   
   # create info column
-  tab_RV <- data.table::copy(assoc_summary_RV)
-  tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
-    lapply(seq_len(NROW(tab_RV)), function(i) { 
-      .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV") }
-    ))]
-  tab_RV[, src := NULL]
-  data.table::setcolorder(tab_RV, "feat_meta")
-  ls_RV <- split(tab_RV, by = "drug_grid")
+  if (NROW(assoc_summary_RV) > 0) {
+    tab_RV <- data.table::copy(assoc_summary_RV)
+    tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
+      lapply(seq_len(NROW(tab_RV)), function(i) { 
+        .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV") }
+      ))]
+    tab_RV[, src := NULL]
+    data.table::setcolorder(tab_RV, "feat_meta")
+    ls_RV <- split(tab_RV, by = "drug_grid")
+  } else {
+    ls_RV <- NULL
+  }
   
-  if (!is.null(assoc_summary_GR)) {
+  if (NROW(assoc_summary_GR) > 0) {
     tab_GR <- data.table::copy(assoc_summary_GR)
     tab_GR[, c("drug_grid", "feat_meta") := data.table::rbindlist(
       lapply(seq_len(NROW(tab_GR)), function(i) { 
