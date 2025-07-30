@@ -1033,7 +1033,7 @@ test_that("plot_volcano_assoc_panel works as expected", {
   
   obj_3 <- plot_volcano_assoc_panel(dt_response = dt_response_diff,
                                     dt_depmap = obj_depmap_meta[["dt_depmap"]],
-                                    selected_metric = "RV_gDR_x_max_cotrt_diff_0.1_col_fittings",  
+                                    selected_metric = "RV_gDR_x_max_cotrt_diff_0.1_drug_1",  
                                     selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
   expect_is(obj_3, "list")
   plt_3 <- obj_3[["panel"]]
@@ -1046,7 +1046,7 @@ test_that("plot_volcano_assoc_panel works as expected", {
   obj_4 <- 
     plot_volcano_assoc_panel(dt_response = dt_response_diff,
                              dt_depmap = obj_depmap_meta[["dt_depmap"]],
-                             selected_metric = "RV_gDR_log10_xc50_cotrt_zero_0.001_row_fittings",  
+                             selected_metric = "RV_gDR_log10_xc50_cotrt_zero_0.001_drug_2",  
                              selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
   expect_is(obj_4, "list")
   plt_4 <- obj_4[["panel"]]
