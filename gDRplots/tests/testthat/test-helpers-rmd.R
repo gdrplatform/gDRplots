@@ -768,6 +768,7 @@ test_that("generate_datatable works as expected", {
 test_that("prep_assoc_summary works as expected", {
   d_path <- system.file("testdata", package = "gDRplots")
   ls_RV <- list.files(d_path, pattern = "tab_assoc_RV")
+  ls_GR <- list.files(d_path, pattern = "tab_assoc_GR")
   
   tab_1 <- prep_assoc_summary(dir_path = d_path, 
                               ls_file = ls_RV)
@@ -775,6 +776,7 @@ test_that("prep_assoc_summary works as expected", {
   expect_true(all(unique(tab_1$src) %in% ls_RV))
   expect_true(all(tab_1$q_value < 0.05))
   expect_true(NROW(unique(tab_1[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_1))
+  expect_true(all(grepl("RV_gDR", tab_1$response)))
   
   tab_1_ls <- prep_assoc_summary(dir_path = d_path, 
                                  ls_file = ls_RV,
@@ -788,6 +790,7 @@ test_that("prep_assoc_summary works as expected", {
   expect_is(tab_2, "data.table")
   expect_true(all(tab_2$q_value < 0.01))
   expect_equal(tab_2, tab_1[q_value < 0.01, ])
+  expect_true(all(grepl("RV_gDR", tab_2$response)))
   
   tab_3 <- prep_assoc_summary(dir_path = d_path, 
                               ls_file = ls_RV,
@@ -806,6 +809,36 @@ test_that("prep_assoc_summary works as expected", {
                               ls_file = ls_tab)
   expect_is(tab_5, "data.table")
   expect_length(tab_5, 0)
+  
+  tab_6 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR)
+  expect_is(tab_6, "data.table")
+  expect_true(all(unique(tab_6$src) %in% ls_GR))
+  expect_true(all(tab_6$q_value < 0.05))
+  expect_true(NROW(unique(tab_6[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_6))
+  expect_true(all(grepl("GR_gDR", tab_6$response)))
+  
+  tab_6_ls <- prep_assoc_summary(dir_path = d_path, 
+                                 ls_file = ls_GR,
+                                 as_list = TRUE)
+  expect_is(tab_6_ls, "list")
+  expect_true(NROW(data.table::rbindlist(tab_6_ls)) == NROW(tab_6))
+  
+  tab_7 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR,
+                              alpha = 0.01)
+  expect_is(tab_7, "data.table")
+  expect_true(all(tab_7$q_value < 0.01))
+  expect_equal(tab_7, tab_6[q_value < 0.01, ])
+  expect_true(all(grepl("GR_gDR", tab_7$response)))
+  
+  tab_8 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR,
+                              n_stat_sig_row = 2)
+  expect_is(tab_8, "data.table")
+  expect_true(all(unique(tab_8$src) %in% ls_GR))
+  expect_true(all(tab_8$q_value < 0.05))
+  expect_equal(tab_8, stats::na.omit(tab_6[, .SD[1:2], src][, .SD, .SDcols = names(tab_8)]))
   
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
