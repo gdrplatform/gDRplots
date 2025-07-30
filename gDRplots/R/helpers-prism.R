@@ -525,7 +525,7 @@ prep_dt_depmap_meta <- function(meta_data_path,
     dt_depmap_model[, (metadata_col) := lapply(.SD, change_NA_into_char), .SDcols = metadata_col]
     dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
     # final
-    formula_object <- stats::reformulate(termlabels = id_col, response = metadata_col)
+    formula_object <- stats::reformulate(termlabels = metadata_col, response = paste(id_col, collapse = "+"))
     dt_depmap <- data.table::dcast(
       dt_depmap_model,
       formula = formula_object,
