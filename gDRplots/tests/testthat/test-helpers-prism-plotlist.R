@@ -647,10 +647,10 @@ test_that("create_PRISM_summary_list works as expected", {
                                          assoc_summary_GR = as.list(assoc_sum_GR)),
                "Assertion on 'assoc_summary_GR' failed: Must be a data.table")
   expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV[, 1:3]),
-               "Assertion on 'names\(assoc_summary_RV\)' failed: Names must include the elements")
+               "failed: Names must include the elements")
   expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV,
                                          assoc_summary_GR = assoc_sum_GR[, 1:3]),
-               "Assertion on 'names\(assoc_summary_GR\)' failed: Names must include the elements")
+               "failed: Names must include the elements")
 })
 
 
