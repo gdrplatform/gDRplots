@@ -501,7 +501,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   checkmate::assert_string(file_name, pattern = sprintf(".*__.*_%s.*", normalization_type))
   
   desc_ <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
-  desc_ <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
+  desc_ <- strsplit(desc_, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
   drug_grid <- sub(".*?_", "", desc_)
   feat_meta <- sub("_.*", "", desc_)
   list(drug_grid = drug_grid,
