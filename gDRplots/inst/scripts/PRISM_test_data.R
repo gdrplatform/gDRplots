@@ -70,63 +70,75 @@ data.table::fwrite(tab_profil, "./gDRplots/inst/testdata/OmicsSignaturesProfile.
 
 
 # assoc table ----
-tab_drug_001_met1 <- data.table::data.table(
+tab_drug_001_met1_RV <- data.table::data.table(
   feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),
   response = rep("RV_gDR_x_max", 25),
   rho = withr::with_seed(42, sample(seq(-1, 1, 0.35), 25, replace = TRUE)),
   q_value = withr::with_seed(314, sample(seq(0.001, 0.1, 0.0025), 25, replace = TRUE))
 )
-tab_drug_001_met1$neglog_q_value <- -log10(tab_drug_001_met1$q_value)
+tab_drug_001_met1_RV$neglog_q_value <- -log10(tab_drug_001_met1_RV$q_value)
 
 writexl::write_xlsx(
-  tab_drug_001_met1, 
-  "./gDRplots/inst/testdata/tab_assoc_RV__featNU_drug_001_RV_gDR_x_max.xlsx")
+  tab_drug_001_met1_RV, 
+  "./gDRplots/inst/testdata/tab_assoc_RV__featNUX_drug_001_RV_gDR_x_max.xlsx")
 
-tab_drug_001_met2 <- data.table::data.table(
+tab_drug_001_met2_RV <- data.table::data.table(
   feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),
   response = rep("RV_gDR_x_mean", 25),
   rho = withr::with_seed(42, sample(seq(-0.85, 1.55, 0.35), 25, replace = TRUE)),
   q_value = withr::with_seed(42, sample(seq(0.001, 0.55, 0.0015), 25, replace = TRUE))
 )
-tab_drug_001_met2$neglog_q_value <- -log10(tab_drug_001_met2$q_value)
+tab_drug_001_met2_RV$neglog_q_value <- -log10(tab_drug_001_met2_RV$q_value)
 
 writexl::write_xlsx(
-  tab_drug_001_met2, 
-  "./gDRplots/inst/testdata/tab_assoc_RV__featNU_drug_001_RV_gDR_x_mean.xlsx")
+  tab_drug_001_met2_RV, 
+  "./gDRplots/inst/testdata/tab_assoc_RV__featNUX_drug_001_RV_gDR_x_mean.xlsx")
 
 
-tab_drug_002 <- data.table::data.table(
+tab_drug_002_met2_RV <- data.table::data.table(
   feature = sprintf("GRP_%03d_XC", 1:25),
   response = rep("RV_gDR_x_mean", 25),
   rho = withr::with_seed(314, sample(seq(-0.85, 1.55, 0.35), 25, replace = TRUE)),
   q_value = withr::with_seed(42, sample(seq(0.001, 0.55, 0.0025), 25, replace = TRUE))
 )
-tab_drug_002$neglog_q_value <- -log10(tab_drug_002$q_value)
+tab_drug_002_met2_RV$neglog_q_value <- -log10(tab_drug_002_met2_RV$q_value)
 
 writexl::write_xlsx(
-  tab_drug_002, 
+  tab_drug_002_met2_RV, 
   "./gDRplots/inst/testdata/tab_assoc_RV__metaGRP_drug_002_RV_gDR_x_mean.xlsx")
 
-tab_drug_001_drug_021_met3 <- data.table::data.table(
+tab_drug_001_met1_GR <- data.table::data.table(
   feature = sprintf("GRP_%03d_XC", 1:25),
-  response = rep("GR_gDR_hsa_score", 25),
+  response = rep("GR_gDR_x_max", 25),
   rho = withr::with_seed(42, sample(seq(-1, 1, 0.35), 25, replace = TRUE)),
   q_value = withr::with_seed(314, sample(seq(0.001, 0.1, 0.0025), 25, replace = TRUE))
 )
-tab_drug_001_drug_021_met3$neglog_q_value <- -log10(tab_drug_001_drug_021_met3$q_value)
+tab_drug_001_met1_GR$neglog_q_value <- -log10(tab_drug_001_met1_GR$q_value)
 
 writexl::write_xlsx(
-  tab_drug_001_drug_021_met3, 
-  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_x_drug_021_GR_gDR_hsa_score.xlsx")
+  tab_drug_001_met1_GR, 
+  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_GR_gDR_x_max.xlsx")
 
-tab_drug_001_drug_021_met4 <- data.table::data.table(
+tab_drug_001_met4_GR <- data.table::data.table(
   feature = sprintf("GRP_%03d_XC", 1:25),
-  response = rep("GR_gDR_bliss_score", 25),
+  response = rep("GR_gDR_log10_xc50", 25),
   rho = withr::with_seed(314, sample(seq(-1, 1, 0.35), 25, replace = TRUE)),
   q_value = withr::with_seed(314, sample(seq(0.001, 0.55, 0.0015), 25, replace = TRUE))
 )
-tab_drug_001_drug_021_met4$neglog_q_value <- -log10(tab_drug_001_drug_021_met4$q_value)
+tab_drug_001_met4_GR$neglog_q_value <- -log10(tab_drug_001_met4_GR$q_value)
 
 writexl::write_xlsx(
-  tab_drug_001_drug_021_met4, 
-  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_x_drug_021_GR_gDR_bliss_score.xlsx")
+  tab_drug_001_met4_GR, 
+  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_GR_gDR_log10_xc50.xlsx")
+
+tab_drug_003_met4_GR <- data.table::data.table(
+  feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),
+  response = rep("GR_gDR_log10_xc50", 25),
+  rho = withr::with_seed(42, sample(seq(-0.85, 1.55, 0.35), 25, replace = TRUE)),
+  q_value = withr::with_seed(42, sample(seq(0.001, 0.55, 0.0015), 25, replace = TRUE))
+)
+tab_drug_003_met4_GR$neglog_q_value <- -log10(tab_drug_003_met4_GR$q_value)
+
+writexl::write_xlsx(
+  tab_drug_003_met4_GR, 
+  "./gDRplots/inst/testdata/tab_assoc_GR__featNUX_drug_003_GR_gDR_log10_xc50.xlsx")
