@@ -840,6 +840,14 @@ test_that("prep_assoc_summary works as expected", {
   expect_true(all(tab_8$q_value < 0.05))
   expect_equal(tab_8, stats::na.omit(tab_6[, .SD[1:2], src][, .SD, .SDcols = names(tab_8)]))
   
+  expect_message({
+    tab_9 <- prep_assoc_summary(dir_path = d_path, 
+                                ls_file = ls_RV,
+                                read_file_fun = qs::qread)
+  }, "An error occurred for file")
+  expect_is(tab_9, "data.table")
+  expect_length(tab_9, 0)
+  
   expect_error(prep_assoc_summary(dir_path = "wrong_path",
                                   ls_file = ls_tab), 
                "Assertion on 'dir_path' failed:")
