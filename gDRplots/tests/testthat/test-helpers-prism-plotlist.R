@@ -606,6 +606,51 @@ test_that("create_PRISM_plot_list_combo works as expected", {
 
 
 test_that("create_PRISM_summary_list works as expected", {
+  d_path <- system.file("testdata", package = "gDRplots")
+  ls_RV <- list.files(d_path, pattern = "tab_assoc_RV")
+  ls_GR <- list.files(d_path, pattern = "tab_assoc_GR")
+  assoc_sum_RV <- prep_assoc_summary(dir_path = d_path, ls_file = ls_RV)
+  assoc_sum_GR <- prep_assoc_summary(dir_path = d_path, ls_file = ls_GR)
+  
+  res_1 <- create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV) # default
+  expect_is(res_1, "list")
+  expect_length(res_1, 2)
+  expect_true(all(names(res_1) %in% c("drug_001", "drug_002")))
+  expect_true(all(vapply(seq_len(NROW(res_1)), function(i) names(res_1[[i]]) == "RV", logical(1))))
+  expect_true(all(vapply(seq_len(NROW(res_1)), function(i) {
+    all(res_1[[i]][["RV"]][, .N, by = c("feat_meta", "feature", "response")]$N == 1)
+  }, logical(1)))) # unique combinations
+  expect_true(all(vapply(seq_len(NROW(res_1)), function(i) {
+    all(res_1[[i]][["RV"]]$q_value < 0.05)
+  }, logical(1)))) # default alpha
+  
+  res_2 <- create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV,
+                                     assoc_summary_GR = assoc_sum_GR) 
+  expect_is(res_2, "list")
+  expect_length(res_2, 3)
+  expect_true(all(names(res_2) %in% c("drug_001", "drug_002", "drug_003")))
+  expect_true(all(vapply(seq_len(NROW(res_1)), function(i) {
+    all(data.table::rbindlist(res_1[[i]])[, .N, by = c("feat_meta", "feature", "response")]$N == 1)
+  }, logical(1)))) # unique combinations
+  expect_true(all(vapply(seq_len(NROW(res_2)), function(i) {
+    all(data.table::rbindlist(res_2[[i]])$q_value < 0.05)
+  }, logical(1)))) # default alpha
+  
+  assoc_sum_RV_small <- prep_assoc_summary(dir_path = d_path, ls_file = ls_RV, alpha = 0.001)
+  res_3 <- create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV_small) 
+  expect_is(res_3, "list")
+  expect_length(res_3, 0)
+
+  expect_error(create_PRISM_summary_list(assoc_summary_RV = as.list(assoc_sum_RV)),
+               "Assertion on 'assoc_summary_RV' failed: Must be a data.table")
+  expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV,
+                                         assoc_summary_GR = as.list(assoc_sum_GR)),
+               "Assertion on 'assoc_summary_GR' failed: Must be a data.table")
+  expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV[, 1:3]),
+               "Assertion on 'names(assoc_summary_RV)' failed: Names must include the elements")
+  expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV,
+                                         assoc_summary_GR = assoc_sum_GR[, 1:3]),
+               "Assertion on 'names(assoc_summary_GR)' failed: Names must include the elements")
 })
 
 
@@ -622,7 +667,7 @@ test_that(".get_info_from_name works as expected", {
   expect_is(res_2, "list")
   expect_length(res_2, 2)
   expect_equal(res_2, list(drug_grid = "drugVIP_001", feat_meta = "MetaForData"))
-  
+
   expect_error(.get_info_from_name(file_name = "name_META_drug_001_RV_AUC",
                                    normalization_type = "GR"), 
                "Assertion on 'file_name' failed: Must comply to pattern")
