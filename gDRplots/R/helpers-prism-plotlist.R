@@ -293,7 +293,7 @@
         ls_vol <- purrr::map(obj_vol, "panel")
         ls_tab <- purrr::map(obj_vol, "assoc_data")
         names(ls_vol) <- names(ls_tab) <- selected_metrics$selected_metric
-
+        
         id_feat_meta <- depmap_items$feat_meta_name[[i_feat_meta]]
         id_drug <- drug_name_grid[["iter_id"]][i_drug]
         
@@ -420,7 +420,9 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   # create info column
   tab_RV <- data.table::copy(assoc_summary_RV)
   tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
-    lapply(seq_len(NROW(tab_RV)), function(i) .get_info_from_name(tab_RV[["src"]][i])))]
+    lapply(seq_len(NROW(tab_RV)), function(i) { 
+      .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV") }
+    ))]
   tab_RV[, src := NULL]
   data.table::setcolorder(tab_RV, "feat_meta")
   ls_RV <- split(tab_RV, by = "drug_grid")
@@ -428,7 +430,9 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   if (!is.null(assoc_summary_GR)) {
     tab_GR <- data.table::copy(assoc_summary_GR)
     tab_GR[, c("drug_grid", "feat_meta") := data.table::rbindlist(
-      lapply(seq_len(NROW(tab_GR)), function(i) .get_info_from_name(tab_GR[["src"]][i])))]
+      lapply(seq_len(NROW(tab_GR)), function(i) { 
+        .get_info_from_name(tab_GR[["src"]][i], normalization_type = "GR") }
+      ))]
     tab_GR[, src := NULL]
     data.table::setcolorder(tab_GR, "feat_meta")
     ls_GR <- split(tab_GR, by = "drug_grid")
@@ -437,14 +441,15 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   }
   
   # final
-  ls_all <- lapply(seq_len(NROW(ls_RV)), function(i) {
-    list("RV" = ls_RV[[i]],
-         "GR" = ls_GR[[i]])
+  ls_names <- sort(unique(c(names(ls_RV), names(ls_GR))))
+  ls_all <- lapply(ls_names, function(nm) {
+    list("RV" = ls_RV[[nm]],
+         "GR" = ls_GR[[nm]])
   })
   
   # remove NULL items
   ls_all <- lapply(seq_along(ls_all), function(x) Filter(Negate(is.null), ls_all[[x]]))
-  names(ls_all) <- names(ls_RV)
+  names(ls_all) <- ls_names
   
   return(ls_all)
 }
@@ -453,6 +458,9 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' 
 #' This function retrieves information about the feature name and drug name from a file name,
 #' which has the schema <chunk_name>__<feature_name>_<drug_name>_<gDR_metric_name>
+#' Assumption:
+#' - <feature_name> is assumed not to contain any underscores (usually written in camel case)
+#' - <gDR_metric_name> starts with normalization type that is \code{RV} or \code{GR}
 #'
 #' @param file_name A string with file name
 #' @param normalization_type string with normalization types to be selected
@@ -471,7 +479,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' @examples
 #' \dontrun{
 #' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-#' get_info_from_name(f_n)
+#' .get_info_from_name(f_n)
 #' }
 #' 
 .get_info_from_name <- function(file_name, 
@@ -480,10 +488,10 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_string(file_name, pattern = sprintf(".*__.*_%s.*", normalization_type))
   
-  tab_desc <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
-  tab_desc <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
-  drug_grid <- sub(".*?_", "", tab_desc)
-  feat_meta <- sub("_.*", "", tab_desc)
+  desc_ <- strsplit(file_name, "__", perl = TRUE)[[1]][2]
+  desc_ <- strsplit(tab_desc, sprintf("_%s_", normalization_type), perl = TRUE)[[1]][1]
+  drug_grid <- sub(".*?_", "", desc_)
+  feat_meta <- sub("_.*", "", desc_)
   list(drug_grid = drug_grid,
        feat_meta = feat_meta)
 }
