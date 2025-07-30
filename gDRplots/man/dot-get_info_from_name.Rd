@@ -22,11 +22,14 @@ A named list with elements:
 \description{
 This function retrieves information about the feature name and drug name from a file name,
 which has the schema <chunk_name>__<feature_name>_<drug_name>_<gDR_metric_name>
+Assumption:
+- <feature_name> is assumed not to contain any underscores (usually written in camel case)
+- <gDR_metric_name> starts with normalization type that is \code{RV} or \code{GR}
 }
 \examples{
 \dontrun{
 f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-get_info_from_name(f_n)
+.get_info_from_name(f_n)
 }
 
 }
