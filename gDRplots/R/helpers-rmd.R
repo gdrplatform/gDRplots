@@ -828,7 +828,12 @@ prep_assoc_summary <- function(dir_path,
     file_path <- file.path(dir_path, f_name)
     if (!checkmate::test_file_exists(file_path)) next
     
-    tab_ <- data.table::as.data.table(read_file_fun(file_path))
+    tab_ <- tryCatch(data.table::as.data.table(read_file_fun(file_path)),
+                     error = function(e) { 
+                       message(sprintf("An error occurred for file `%s`:\n%s",
+                                       f_name, e))
+                     })
+    if (!NROW(tab_)) next
     # order table
     tab_$abs_rho <- abs(tab_$rho)
     tab_ <- data.table::setorderv(tab_, 
