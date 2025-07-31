@@ -330,7 +330,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
     # Calculate difference between cell lines
     dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2,
                               by = intersect(names(dt_response_metric),
-                                             c("source", "cotrt_value", "ratio",
+                                             c("dilution_drug", "cotrt_value", "ratio",
                                                drug_name, drug_moa, gnumber,
                                                drug_name_2, drug_moa_2, gnumber_2)),
                               suffixes = c("_c1", "_c2"))
@@ -360,7 +360,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   
   # create entries of non-zero co-trt
   meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
-  ls_cols <- c(meta_col, "cotrt_value", "source", metric)
+  ls_cols <- c(meta_col, "cotrt_value", "dilution_drug", metric)
   dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
   data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
   
@@ -371,7 +371,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
                        new = c("cotrt_value_zero", paste0(metric, "_cotrt_zero")))
   
   # merge zero and non zero
-  dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "source"), nomatch = NULL]
+  dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "dilution_drug"), nomatch = NULL]
   dt_combo_merged[, cotrt_value_zero := NULL]
   
   # calculate differences
@@ -380,7 +380,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
                                                              mget(paste0(metric, "_cotrt")), 
                                                              mget(paste0(metric, "_cotrt_zero")))]
   ls_col_met <- 
-    colnames(dt_combo_diff)[!colnames(dt_combo_diff) %in% c(meta_col, "cotrt_value", "source")]
+    colnames(dt_combo_diff)[!colnames(dt_combo_diff) %in% c(meta_col, "cotrt_value", "dilution_drug")]
   ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
   data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
   
@@ -388,7 +388,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
   meta_col_str <- paste(meta_col, collapse = " + ")
   
   # generate the formula using reformulate
-  dcast_formula <- stats::as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  dcast_formula <- stats::reformulate(c("cotrt_value", "dilution_drug"), response = meta_col_str)
   
   dt_combo_diff <- data.table::dcast(
     data = dt_combo_diff, 
@@ -525,10 +525,10 @@ prep_dt_depmap_meta <- function(meta_data_path,
     dt_depmap_model[, (metadata_col) := lapply(.SD, change_NA_into_char), .SDcols = metadata_col]
     dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
     # final
-    fm_string <- paste(paste(id_col, collapse =  " + "), "~", metadata_col)
+    formula_object <- stats::reformulate(termlabels = metadata_col, response = paste(id_col, collapse = "+"))
     dt_depmap <- data.table::dcast(
       dt_depmap_model,
-      formula = stats::as.formula(fm_string),
+      formula = formula_object,
       fun.aggregate = length
     )
   }
