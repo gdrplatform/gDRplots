@@ -205,7 +205,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
     dt_metrics[get(drug_name) == d_name & get(drug_name_2) == d_name2 & 
                  normalization_type == "RV", ][!is.na(cotrt_value)]
   meta_col_str <- paste(c("rId", "cId", gDRutils::get_env_identifiers("cellline_name")), collapse = " + ")
-  dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + source"))
+  dcast_formula <- as.formula(paste(meta_col_str, "~ cotrt_value + dilution_drug"))
   
   res <- data.table::dcast(subset, formula = dcast_formula, 
                            value.var = "xc50")
@@ -227,12 +227,12 @@ test_that("prep_dt_response_metric_diff works as expected", {
         do.call(paste0, expand.grid(sprintf("RV_gDR_log10_xc50_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response), NROW(res))
-  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_zero_0.001_col_fittings"]], 
-               log10(res[["0_col_fittings"]]))
-  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.001_col_fittings"]], 
-               log10(res[["0.001_col_fittings"]]))
-  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.00316_row_fittings"]], 
-               log10(res[["0.00316_row_fittings"]]))
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1"]], 
+               log10(res[["0_drug_1"]]))
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.001_drug_1"]], 
+               log10(res[["0.001_drug_1"]]))
+  expect_equal(dt_response[["RV_gDR_log10_xc50_cotrt_0.00316_drug_2"]], 
+               log10(res[["0.00316_drug_2"]]))
   
   # scenario: "GR" and list of metrics
   dt_response_GR <-
@@ -268,10 +268,10 @@ test_that("prep_dt_response_metric_diff works as expected", {
         do.call(paste0, expand.grid(sprintf("RV_gDR_log10_xc50_%s_", comb), ls_col_diff_fin)))
   ))
   expect_equal(NROW(dt_response_cap), NROW(res))
-  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_zero_0.001_col_fittings"]], 
-               log10(res[["0_col_fittings"]]))
-  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_0.001_col_fittings"]], 
-               log10(res[["0.001_col_fittings"]]))
+  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1"]], 
+               log10(res[["0_drug_1"]]))
+  expect_equal(dt_response_cap[["RV_gDR_log10_xc50_cotrt_0.001_drug_1"]], 
+               log10(res[["0.001_drug_1"]]))
   
   ls_col_inf <- names(dt_response)[
     vapply(names(dt_response), function(nm) all(is.infinite(dt_response[[nm]])), logical(1))]
@@ -282,7 +282,7 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_false(all(
     vapply(ls_col_inf, function(nm) all(is.na(dt_response_cap[[nm]])), logical(1))))
   ls_col_equal <- names(dt_response)[!names(dt_response) %in% c(ls_col_inf, ls_col_na)]
-  ls_col_equal <- ls_col_equal[!grepl("_row_fittings", ls_col_equal)]
+  ls_col_equal <- ls_col_equal[!grepl("_drug_2", ls_col_equal)]
   expect_equal(dt_response_cap[, ls_col_equal, with = FALSE], 
                dt_response[, ls_col_equal, with = FALSE])
   

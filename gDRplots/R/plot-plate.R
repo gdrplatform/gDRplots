@@ -51,7 +51,7 @@ plot_plate_stack_info <- function(dt_plate) {
   
   overall_color_mapping <- generate_color_mappings(dt_plate_copy) # Assuming this function exists
   
-  plate_list <- lapply(unique(dt_plate_copy[[barcode_idf]]), function(x) {
+  plate_list <- gDRutils::loop(unique(dt_plate_copy[[barcode_idf]]), function(x) {
     dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
     
     dt_plate_copy_subset[, WellRow := droplevels(WellRow)]
@@ -214,7 +214,7 @@ plot_plate <- function(dt_plate, column_name) {
     }
   }]
   
-  plate_list <- lapply(unique(dt_plate_copy[[barcode_idf]]), function(x) {
+  plate_list <- gDRutils::loop(unique(dt_plate_copy[[barcode_idf]]), function(x) {
     dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
     
     dt_plate_copy_subset[, WellRow := droplevels(WellRow)]
