@@ -417,10 +417,10 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   checkmate::assert_data_table(assoc_summary_RV)
   checkmate::assert_data_table(assoc_summary_GR, null.ok = TRUE)
   if (NROW(assoc_summary_RV) > 0) {
-    checkmate::assert_names(names(assoc_summary_RV), must.includ = c("src"))
+    checkmate::assert_names(names(assoc_summary_RV), must.include = c("src"))
   }
   if (NROW(assoc_summary_GR) > 0) {
-    checkmate::assert_names(names(assoc_summary_GR), must.includ = c("src"))
+    checkmate::assert_names(names(assoc_summary_GR), must.include = c("src"))
   }
   
   # create info column

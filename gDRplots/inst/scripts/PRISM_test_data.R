@@ -1,3 +1,5 @@
+testdata_dir <- feat_data_path <- system.file("testdata", package = "gDRplots")
+
 # Model.csv ----
 cell_lines <- gDRtestData::create_synthetic_cell_lines()[["CellLineName"]]
 no_cell_lines <- NROW(cell_lines)
@@ -24,7 +26,9 @@ tab_model <- data.table::data.table(
                             no_cell_lines, replace = TRUE))
 )
 
-data.table::fwrite(tab_model, "./gDRplots/inst/testdata/Model.csv", row.names = FALSE)
+data.table::fwrite(tab_model, 
+                   file = file.path(testdata_dir, "Model.csv"),
+                   row.names = FALSE)
 
 
 # CRISPRGeneEffect.csv ----
@@ -38,7 +42,9 @@ tab_cko <- data.table::data.table(
 )
 tab_cko[[2]][4:5] <- NA
 
-data.table::fwrite(tab_cko, "./gDRplots/inst/testdata/CRISPRGeneEffect.csv", row.names = FALSE)
+data.table::fwrite(tab_cko, 
+                   file = file.path(testdata_dir, "CRISPRGeneEffect.csv"), 
+                   row.names = FALSE)
 
 # OmicsSomaticMutationsMatrixHotspot.csv ----
 tab_hot <- data.table::data.table(
@@ -51,7 +57,9 @@ tab_hot <- data.table::data.table(
 )
 tab_hot[[3]][11:12] <- NA
 
-data.table::fwrite(tab_hot, "./gDRplots/inst/testdata/OmicsSomaticMutationsMatrixHotspot.csv", row.names = FALSE)
+data.table::fwrite(tab_hot, 
+                   file = file.path(testdata_dir, "OmicsSomaticMutationsMatrixHotspot.csv"), 
+                   row.names = FALSE)
 
 # OmicsSignaturesProfile ----
 chars <- c(letters, LETTERS, 0:9)
@@ -66,8 +74,9 @@ tab_profil <- data.table::data.table(
   CIN = withr::with_seed(42, rnorm(n = no_profils, mean = 0.5, sd = 0.02))
 )
 
-data.table::fwrite(tab_profil, "./gDRplots/inst/testdata/OmicsSignaturesProfile.csv", row.names = FALSE)
-
+data.table::fwrite(tab_profil, 
+                   file = file.path(testdata_dir, "OmicsSignaturesProfile.csv"), 
+                   row.names = FALSE)
 
 # assoc table ----
 tab_drug_001_met1_RV <- data.table::data.table(
@@ -80,7 +89,8 @@ tab_drug_001_met1_RV$neglog_q_value <- -log10(tab_drug_001_met1_RV$q_value)
 
 writexl::write_xlsx(
   tab_drug_001_met1_RV, 
-  "./gDRplots/inst/testdata/tab_assoc_RV__featNUX_drug_001_RV_gDR_x_max.xlsx")
+  path = file.path(testdata_dir, "tab_assoc_RV__featNUX_drug_001_RV_gDR_x_max.xlsx")
+)
 
 tab_drug_001_met2_RV <- data.table::data.table(
   feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),
@@ -92,7 +102,8 @@ tab_drug_001_met2_RV$neglog_q_value <- -log10(tab_drug_001_met2_RV$q_value)
 
 writexl::write_xlsx(
   tab_drug_001_met2_RV, 
-  "./gDRplots/inst/testdata/tab_assoc_RV__featNUX_drug_001_RV_gDR_x_mean.xlsx")
+  path = file.path(testdata_dir, "tab_assoc_RV__featNUX_drug_001_RV_gDR_x_mean.xlsx")
+)
 
 
 tab_drug_002_met2_RV <- data.table::data.table(
@@ -117,7 +128,8 @@ tab_drug_001_met1_GR$neglog_q_value <- -log10(tab_drug_001_met1_GR$q_value)
 
 writexl::write_xlsx(
   tab_drug_001_met1_GR, 
-  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_GR_gDR_x_max.xlsx")
+  path = file.path(testdata_dir, "tab_assoc_GR__metaGRP_drug_001_GR_gDR_x_max.xlsx")
+)
 
 tab_drug_001_met4_GR <- data.table::data.table(
   feature = sprintf("GRP_%03d_XC", 1:25),
@@ -129,7 +141,8 @@ tab_drug_001_met4_GR$neglog_q_value <- -log10(tab_drug_001_met4_GR$q_value)
 
 writexl::write_xlsx(
   tab_drug_001_met4_GR, 
-  "./gDRplots/inst/testdata/tab_assoc_GR__metaGRP_drug_001_GR_gDR_log10_xc50.xlsx")
+  path = file.path(testdata_dir, "tab_assoc_GR__metaGRP_drug_001_GR_gDR_log10_xc50.xlsx")
+)
 
 tab_drug_003_met4_GR <- data.table::data.table(
   feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),
@@ -141,4 +154,5 @@ tab_drug_003_met4_GR$neglog_q_value <- -log10(tab_drug_003_met4_GR$q_value)
 
 writexl::write_xlsx(
   tab_drug_003_met4_GR, 
-  "./gDRplots/inst/testdata/tab_assoc_GR__featNUX_drug_003_GR_gDR_log10_xc50.xlsx")
+  path = file.path(testdata_dir, "tab_assoc_GR__featNUX_drug_003_GR_gDR_log10_xc50.xlsx")
+)

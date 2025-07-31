@@ -796,10 +796,11 @@ generate_datatable <- function(tab,
 #' @param dir_path A string path to the directory containing files with associations data.
 #' @param ls_file A character vector with names of files containing associations data.
 #' @param alpha A numeric cutoff to identify statistically significant correlations
-#' @param n_stat_sig_row A numeric value for limit the maximum number of statistically significant 
-#'    associations to subset form table
+#' @param n_stat_sig_row A numeric value specifying the maximum number of statistically 
+#'    significant associations (rows) to include from each file.
 #' @param read_file_fun A function to read the data from file; default is \code{readxl::read_excel}
-#' @param as_list A logical flag weather result should be return as a list or as a table.
+#' @param as_list A logical flag indicating whether the result should be returned 
+#'    as a list or as a table.
 #'
 #' @return A \code{DT::datatable} object.
 #' 
@@ -834,6 +835,7 @@ prep_assoc_summary <- function(dir_path,
                                        f_name, e))
                      })
     if (!NROW(tab_)) next
+    if (!checkmate::test_names(names(tab_), must.include = c("rho", "q_value"))) next
     # order table
     tab_$abs_rho <- abs(tab_$rho)
     tab_ <- data.table::setorderv(tab_, 
