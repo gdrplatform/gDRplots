@@ -157,9 +157,13 @@ test_that("prep_plot_chunk works as expected", {
   
   # scenario: incomplete list of links
   linklist_nest_incom <- list(someCategory = c(linklist[2:3]), anotherCategory = c(linklist))
+  tab_opt <- c("tabset", "tabset-fade", "tabset-pills")
   res_3n <- prep_plot_chunk(plt_list = plotlist_nest, 
                             link_list = linklist_nest_incom,
-                            chunk_name = "iris")
+                            chunk_name = "iris",
+                            tabset_options = tab_opt)
+  expect_equal(sum(grepl(paste(tab_opt, collapse = " ."), unlist(res_3n))), 
+               NROW(plotlist_nest))
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("####", res_3n[[i]])))), 
                c(NROW(plotlist_nest[[1]]), NROW(plotlist_nest[[2]])))
   expect_equal(unlist(lapply(seq_along(res_3n), function(i) sum(grepl("a href", res_3n[[i]])))), 
@@ -409,7 +413,6 @@ test_that("save_plot throws error for non-existent directory", {
 })
 
 test_that("get_r_file_path works as expected", {
-  
   r_path <- "test-helpers-rmd.R" 
   ca1 <- c("a",
            "b=3",
@@ -698,23 +701,169 @@ test_that("prep_filename_path works as expected", {
 
 
 test_that("generate_datatable works as expected", {
-  result_df <- generate_datatable(iris)
-  expect_s3_class(result_df, "datatables")
+  dt_iris <- data.table::data.table(iris)
+  result_dt <- generate_datatable(dt_iris)
+  expect_s3_class(result_dt, "datatables")
+  expect_equal(result_dt[["width"]], "100%") # default
+  expect_equal(result_dt[["x"]][["options"]][["scrollX"]], TRUE) # default
+  
+  result_DF <- generate_datatable(S4Vectors::DataFrame(iris))
+  expect_s3_class(result_DF, "datatables")
+  expect_equal(result_DF, result_dt)
+  
+  page_len <- 5
+  result_custom_options <- generate_datatable(dt_iris, 
+                                              options = list(scrollX = TRUE, pageLength = page_len))
+  expect_s3_class(result_custom_options, "datatables")
+  expect_equal(result_custom_options[["x"]][["options"]][["pageLength"]], page_len)
+  
+  cap_str <- "Iris Dataset"
+  result_with_caption <- generate_datatable(dt_iris, 
+                                            caption = cap_str)
+  expect_s3_class(result_with_caption, "datatables")
+  expect_true(grepl(cap_str, result_with_caption[["x"]][["caption"]]))
+  
+  dom_str <- "ftp"
+  result_with_search <- generate_datatable(dt_iris, 
+                                           options = list(scrollX = TRUE, dom = dom_str))
+  expect_s3_class(result_with_search, "datatables")
+  expect_equal(result_with_search[["x"]][["options"]][["dom"]], dom_str)
+  
+  ls_col <- c("Sepal.Length", "Sepal.Width")
+  result_with_rounding <- generate_datatable(dt_iris,
+                                             col_to_round = ls_col,
+                                             digits = 0)
+  expect_s3_class(result_with_rounding, "datatables")
+  expect_equal(result_with_rounding[["x"]][["data"]][[ls_col[1]]],
+               as.integer(result_with_rounding[["x"]][["data"]][[ls_col[1]]]))
+  expect_equal(result_with_rounding[["x"]][["data"]][[ls_col[2]]],
+               as.integer(result_with_rounding[["x"]][["data"]][[ls_col[2]]]))
   
   expect_error(
     generate_datatable(matrix(1:10, ncol = 2)), 
     "Assertion failed"
   )
   expect_error(
-    generate_datatable(iris, options = "invalid_options"),
-    "Must be of type 'list'"
+    generate_datatable(dt_iris, options = "invalid_options"),
+    "Assertion on 'options' failed: Must be of type 'list'"
   )
   expect_error(
-    generate_datatable(iris, width = 100), 
-    "Must be of type 'string'"
+    generate_datatable(dt_iris, width = 100), 
+    "Assertion on 'width' failed: Must be of type 'string'"
   )
-  result_custom_options <- generate_datatable(iris, options = list(scrollX = TRUE, pageLength = 5))
-  expect_s3_class(result_custom_options, "datatables")
-  result_with_caption <- generate_datatable(iris, caption = "Iris Dataset")
-  expect_s3_class(result_with_caption, "datatables")
+  expect_error(
+    generate_datatable(dt_iris, width = "100pt"), 
+    "Assertion on 'width' failed: Must comply to pattern"
+  )
+  expect_error(
+    generate_datatable(dt_iris, col_to_round = "Species"), 
+    "Assertion on 'col_to_round' failed: Must be a subset of "
+  )
+  expect_error(
+    generate_datatable(dt_iris, digits = "2"), 
+    "Assertion on 'digits' failed: Must be of type 'number'"
+  )
+})
+
+test_that("prep_assoc_summary works as expected", {
+  d_path <- system.file("testdata", package = "gDRplots")
+  ls_RV <- list.files(d_path, pattern = "tab_assoc_RV")
+  ls_GR <- list.files(d_path, pattern = "tab_assoc_GR")
+  
+  tab_1 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV)
+  expect_is(tab_1, "data.table")
+  expect_true(all(unique(tab_1$src) %in% ls_RV))
+  expect_true(all(tab_1$q_value < 0.05))
+  expect_true(NROW(unique(tab_1[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_1))
+  expect_true(all(grepl("RV_gDR", tab_1$response)))
+  
+  tab_1_ls <- prep_assoc_summary(dir_path = d_path, 
+                                 ls_file = ls_RV,
+                                 as_list = TRUE)
+  expect_is(tab_1_ls, "list")
+  expect_true(NROW(data.table::rbindlist(tab_1_ls)) == NROW(tab_1))
+  
+  tab_2 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV,
+                              alpha = 0.01)
+  expect_is(tab_2, "data.table")
+  expect_true(all(tab_2$q_value < 0.01))
+  expect_equal(tab_2, tab_1[q_value < 0.01, ])
+  expect_true(all(grepl("RV_gDR", tab_2$response)))
+  
+  tab_3 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_RV,
+                              n_stat_sig_row = 5)
+  expect_is(tab_3, "data.table")
+  expect_true(all(unique(tab_3$src) %in% ls_RV))
+  expect_true(all(tab_3$q_value < 0.05))
+  expect_equal(tab_3, stats::na.omit(tab_1[, .SD[1:5], src][, .SD, .SDcols = names(tab_3)]))
+  
+  tab_4 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = "")
+  expect_null(tab_4)
+  
+  ls_tab <- c("tabA.xlsx", "tabB.xlsx", "tabC.xlsx")
+  tab_5 <- prep_assoc_summary(dir_path = d_path,
+                              ls_file = ls_tab)
+  expect_is(tab_5, "data.table")
+  expect_length(tab_5, 0)
+  
+  tab_6 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR)
+  expect_is(tab_6, "data.table")
+  expect_true(all(unique(tab_6$src) %in% ls_GR))
+  expect_true(all(tab_6$q_value < 0.05))
+  expect_true(NROW(unique(tab_6[, .SD, .SDcols = c("feature", "response")])) == NROW(tab_6))
+  expect_true(all(grepl("GR_gDR", tab_6$response)))
+  
+  tab_6_ls <- prep_assoc_summary(dir_path = d_path, 
+                                 ls_file = ls_GR,
+                                 as_list = TRUE)
+  expect_is(tab_6_ls, "list")
+  expect_true(NROW(data.table::rbindlist(tab_6_ls)) == NROW(tab_6))
+  
+  tab_7 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR,
+                              alpha = 0.01)
+  expect_is(tab_7, "data.table")
+  expect_true(all(tab_7$q_value < 0.01))
+  expect_equal(tab_7, tab_6[q_value < 0.01, ])
+  expect_true(all(grepl("GR_gDR", tab_7$response)))
+  
+  tab_8 <- prep_assoc_summary(dir_path = d_path, 
+                              ls_file = ls_GR,
+                              n_stat_sig_row = 2)
+  expect_is(tab_8, "data.table")
+  expect_true(all(unique(tab_8$src) %in% ls_GR))
+  expect_true(all(tab_8$q_value < 0.05))
+  expect_equal(tab_8, stats::na.omit(tab_6[, .SD[1:2], src][, .SD, .SDcols = names(tab_8)]))
+  
+  expect_message({
+    tab_9 <- prep_assoc_summary(dir_path = d_path, 
+                                ls_file = ls_RV,
+                                read_file_fun = qs::qread)
+  }, "An error occurred for file")
+  expect_is(tab_9, "data.table")
+  expect_length(tab_9, 0)
+  
+  expect_error(prep_assoc_summary(dir_path = "wrong_path",
+                                  ls_file = ls_tab), 
+               "Assertion on 'dir_path' failed:")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = NULL),
+               "Assertion on 'ls_file' failed: Must be of type 'character'")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  alpha = "0.05"), 
+               "Assertion on 'alpha' failed: Must be of type 'number'")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  n_stat_sig_row = "all"), 
+               "Assertion on 'n_stat_sig_row' failed: Must be of type 'number'")
+  expect_error(prep_assoc_summary(dir_path = d_path, 
+                                  ls_file = ls_RV,
+                                  as_list = "TRUE"), 
+               "Assertion on 'as_list' failed: Must be of type 'logical flag'")
 })

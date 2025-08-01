@@ -66,7 +66,7 @@ prep_plot_chunk <- function(plt_list,
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
-                              pattern = "unnumbered|tabset|tabset-dropdown")
+                              pattern = "unnumbered|tabset|tabset-dropdown|tabset-fade|tabset-pills")
   
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- paste0(rep("#", header_level), collapse = "")
@@ -743,38 +743,114 @@ prep_filename_path <- function(plt_list,
 
 #' Generate a customized datatable
 #'
-#' This function creates a `DT::datatable` object with default settings for 
-#' horizontal scrolling (`scrollX = TRUE`) and no table controls (`dom = "t"`). 
-#' It supports input data of types `data.table`, `data.frame`, or `DFrame`. 
+#' This function creates a \code{DT::datatable} object with default settings for 
+#' horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
+#' It supports input data of types \code{data.table} or \code{DFrame}. 
 #' Additional options and arguments can be passed to customize the table further.
 #'
-#' @param data A dataset to be displayed in the datatable. Must be of class 
-#'   `data.table`, `data.frame`, or `DFrame`.
+#' @param tab A dataset to be displayed in the datatable. Must be of class 
+#'   \code{data.table} or \code{DFrame}.
 #' @param options A list of options to customize the DataTable. Defaults to 
-#'   `list(scrollX = TRUE, dom = "t")`.
+#'   \code{list(scrollX = TRUE, dom = "t")}.
 #' @param width A character string specifying the width of the table. Defaults to "100\%".
-#' @param ... Additional arguments passed to `DT::datatable`.
+#' @param col_to_round A character vector with the names of the columns whose values should be rounded.
+#' @param digits A numeric value indicating the number of decimal places to be used for rounding
+#' @param ... Additional arguments passed to \code{DT::datatable}.
 #' 
-#' @return A `DT::datatable` object.
+#' @return A \code{DT::datatable} object.
 #' @examples
-#' generate_datatable(iris)
+#' generate_datatable(data.table::data.table(iris))
 #' 
 #' @keywords internal
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' 
 #' @export
-generate_datatable <- function(data, 
+generate_datatable <- function(tab, 
                                options = list(scrollX = TRUE, dom = "t"), 
-                               width = "100%", 
+                               width = "100%",
+                               col_to_round = NULL,
+                               digits = 3,
                                ...) {
   checkmate::assert(
-    checkmate::check_class(data, "data.frame"),
-    checkmate::check_class(data, "data.table"),
-    checkmate::check_class(data, "DFrame"),
+    checkmate::check_class(tab, "data.table"),
+    checkmate::check_class(tab, "DFrame"),
     combine = "or"
   )
   checkmate::assert_list(options, null.ok = TRUE)
-  checkmate::assert_string(width, null.ok = FALSE)
+  checkmate::assert_string(width, null.ok = FALSE, pattern = "^[0-9]*%$|^[0-9]*px$")
+  num_col <- names(tab)[vapply(names(tab), function(nm) is.numeric(tab[[nm]]), logical(1))]
+  checkmate::assert_subset(col_to_round, choices = num_col)
+  checkmate::assert_number(digits, lower = 0)
   
-  DT::datatable(data, options = options, width = width, ...)
+  tab_fin <- data.table::copy(data.table::as.data.table(tab))
+  
+  if (!is.null(col_to_round)) {
+    tab_fin[, (col_to_round) := lapply(.SD, round, digits), .SDcols = col_to_round]
+  }
+  
+  DT::datatable(tab_fin, options = options, width = width, ...)
+}
+
+#' Prepare summary table with statistically significant associations
+#'
+#' @param dir_path A string path to the directory containing files with associations data.
+#' @param ls_file A character vector with names of files containing associations data.
+#' @param alpha A numeric cutoff to identify statistically significant correlations
+#' @param n_stat_sig_row A numeric value specifying the maximum number of statistically 
+#'    significant associations (rows) to include from each file.
+#' @param read_file_fun A function to read the data from file; default is \code{readxl::read_excel}
+#' @param as_list A logical flag indicating whether the result should be returned 
+#'    as a list or as a table.
+#'
+#' @return A \code{DT::datatable} object.
+#' 
+#' @keywords internal
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @export
+prep_assoc_summary <- function(dir_path, 
+                               ls_file,
+                               alpha = 0.05,
+                               n_stat_sig_row = 10,
+                               read_file_fun = readxl::read_excel,
+                               as_list = FALSE) {
+  
+  checkmate::assert_directory_exists(dir_path)
+  checkmate::assert_character(ls_file)
+  checkmate::assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
+  checkmate::assert_number(n_stat_sig_row, lower = 1)
+  checkmate::assert_function(read_file_fun)
+  checkmate::assert_flag(as_list)
+  
+  if (NROW(ls_file) == 1 && nchar(ls_file) < 5) return(NULL)
+  
+  ls_stat_sig <- list() 
+  for (f_name in ls_file) {
+    file_path <- file.path(dir_path, f_name)
+    if (!checkmate::test_file_exists(file_path)) next
+    
+    tab_ <- tryCatch(data.table::as.data.table(read_file_fun(file_path)),
+                     error = function(e) { 
+                       message(sprintf("An error occurred for file `%s`:\n%s",
+                                       f_name, e))
+                     })
+    if (!NROW(tab_)) next
+    if (!checkmate::test_names(names(tab_), must.include = c("rho", "q_value"))) next
+    # order table
+    tab_$abs_rho <- abs(tab_$rho)
+    tab_ <- data.table::setorderv(tab_, 
+                                  cols = c("q_value", "abs_rho"), order = c(1L, -1L))[, abs_rho := NULL]
+    if (!as_list) tab_[["src"]] <- f_name
+    # subset of stat sig
+    tab_subset <- tab_[q_value < alpha, ]
+    tab_subset <- tab_subset[seq_len(min(NROW(tab_subset), n_stat_sig_row)), ]
+    
+    ls_stat_sig[[f_name]] <- tab_subset
+  }
+  
+  if (as_list) {
+    ls_stat_sig
+  } else {
+    data.table::rbindlist(ls_stat_sig)
+  }
 }
