@@ -1,3 +1,6 @@
+## gDRplots 0.0.90 - 2025-08-08
+* fix order of boxplots in `plot_boxplot_num_panel`
+
 ## gDRplots 0.0.90 - 2025-07-31
 * add rounding options to `generate_datatable`
 * add functions to create associations summary tables for PRISM
