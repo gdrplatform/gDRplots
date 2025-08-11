@@ -608,6 +608,16 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_equal(plt_1[["labels"]][["title"]], NULL)
   expect_equal(plt_1[["labels"]][["caption"]], unique(dt_response$rId))
   
+  plt_1_rev <- 
+    plot_boxplot_num_panel(dt_response = dt_response,
+                           dt_depmap = obj_depmap_feat_2[["dt_depmap"]], 
+                           selected_feats = rev(selected_feats))
+  expect_is(plt_1_rev, "gg")
+  expect_length(plt_1_rev[["layers"]], 3)
+  expect_error(
+    expect_equivalent(ggplot2::ggplot_build(plt_1_rev), 
+                      ggplot2::ggplot_build(plt_1)))
+
   # selected feat is not present in dt_depmap
   new_selected_feats <- c(selected_feats, "NU_non_avial")
   plt_2 <- 
