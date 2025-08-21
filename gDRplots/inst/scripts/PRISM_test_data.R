@@ -82,7 +82,14 @@ data.table::fwrite(tab_profil,
 # OmicsArmLevelCNA ----
 tab_arm <- data.table::data.table(
   V1 = tab_model$ModelID,
-  
+  `1p` = withr::with_seed(42, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.20, 0.75, 0.05), replace = TRUE)),
+  `1q` = withr::with_seed(42, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.08, 0.8, 0.12), replace = TRUE)),
+  `8p` = withr::with_seed(314, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.20, 0.75, 0.05), replace = TRUE)),
+  `8q` = withr::with_seed(314, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.08, 0.8, 0.12), replace = TRUE)),
+  `16p` = withr::with_seed(42, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.15, 0.70, 0.15), replace = TRUE)),
+  `16q` = withr::with_seed(42, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.09, 0.7, 0.21), replace = TRUE)),
+  `22p` = withr::with_seed(314, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.15, 0.70, 0.15), replace = TRUE)),
+  `22q` = withr::with_seed(314, sample(c(-1, 0, 1), size = NROW(tab_model), prob = c(0.09, 0.7, 0.21), replace = TRUE))
 )
 
 data.table::fwrite(tab_arm, 
