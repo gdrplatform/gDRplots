@@ -93,7 +93,7 @@ tab_arm <- data.table::data.table(
 )
 
 data.table::fwrite(tab_arm, 
-                   file = file.path(testdata_dir, "OmicsArmLevelCNA"), 
+                   file = file.path(testdata_dir, "OmicsArmLevelCNA.csv"), 
                    row.names = FALSE)
 
 # assoc table ----
