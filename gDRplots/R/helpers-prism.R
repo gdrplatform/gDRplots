@@ -670,18 +670,19 @@ prep_dt_assoc <- function(dt_response,
 #' 
 #' @keywords internal
 .prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
-  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+
+  ls_chro <- grep("^[0-9].*(p$|q$)", names(dt_depmap), value = TRUE)
   
-  id_col <- c("ModelID", "CCLEName")
-  ls_chro <- names(dt_depmap)[!names(dt_depmap) %in% id_col]
-  
-  dt_depmap_new <- data.table::copy(dt_depmap)
-  dt_depmap_new[, paste0(ls_chro, "_loss") := lapply(.SD, function(x) { 
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, paste0(ls_chro, "_loss") := lapply(.SD, function(x) { 
     data.table::fifelse(x == -1, 1, 0) }), .SDcols = ls_chro]
-  dt_depmap_new[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) { 
+  dt_depmap_recoded[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) { 
     data.table::fifelse(x == 1, 1, 0) }), .SDcols = ls_chro]
-  dt_depmap_new[, (ls_chro) := NULL]
+  dt_depmap_recoded[, (ls_chro) := NULL]
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
   
   # return
-  return(dt_depmap_new)
+  return(dt_depmap_recoded)
 }
