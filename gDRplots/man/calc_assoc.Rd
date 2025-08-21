@@ -32,6 +32,6 @@ tab_assoc <- calc_assoc(X, Y)
 
 }
 \seealso{
-\code{\link[cdsrmodels]{lin_associations}}
+\code{\link[cdsrmodels:lin_associations]{cdsrmodels::lin_associations}}
 }
 \keyword{internal}

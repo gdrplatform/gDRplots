@@ -78,6 +78,17 @@ data.table::fwrite(tab_profil,
                    file = file.path(testdata_dir, "OmicsSignaturesProfile.csv"), 
                    row.names = FALSE)
 
+
+# OmicsArmLevelCNA ----
+tab_arm <- data.table::data.table(
+  V1 = tab_model$ModelID,
+  
+)
+
+data.table::fwrite(tab_arm, 
+                   file = file.path(testdata_dir, "OmicsArmLevelCNA"), 
+                   row.names = FALSE)
+
 # assoc table ----
 tab_drug_001_met1_RV <- data.table::data.table(
   feature = sprintf("NU_%03d_X1%s", 1:25, LETTERS[1:25]),

@@ -13,13 +13,13 @@ plot_boxplot_num(
 }
 \arguments{
 \item{dt_response}{\code{data.table} with experimental response data (rows are samples) for one metric
-outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-\code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-or \code{\link[gDRplots]{prep_dt_response_metric_diff}},}
+outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
+\code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
+or \code{\link{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one feature;
 (rows are samples, columns are features). 
-outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}}
+outputted by \code{\link{prep_dt_depmap_feat}}}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}
 

@@ -23,7 +23,7 @@ This name should also correspond to the file containing the feature data
 (without the extension, which is assumed to be \code{csv})}
 }
 \value{
-A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
   \item \code{selected_feat_meta_col} string name of feature.

@@ -14,7 +14,7 @@ prep_dt_response_dose_sa(
 }
 \arguments{
 \item{dt_average}{\code{data.table} representing data from the \code{Averaged} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
 \item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
@@ -29,7 +29,7 @@ or "x_std" (standard deviation)}
 \item{fit_source}{string source name for metrics}
 }
 \value{
-\code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+\code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 }
 \description{
 Prep table with metric values by doses for single-agent experiment

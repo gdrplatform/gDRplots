@@ -15,7 +15,7 @@ prep_dt_response_scores(
 }
 \arguments{
 \item{dt_scores}{\code{data.table} representing data from the \code{scores} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and combo \code{SummarizedExperiment}}
 
 \item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
@@ -32,7 +32,7 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 \item{fit_source}{string source name for metrics}
 }
 \value{
-\code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+\code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 }
 \description{
 Prep table with metric values for combination experiment

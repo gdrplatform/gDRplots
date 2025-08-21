@@ -19,7 +19,7 @@ Generate markdown code with a html link item that, when clicked, downloads a fil
 The function output should be wrapped in \code{knitr::knit()}.
 }
 \seealso{
-\code{\link[knitr]{knit}}
+\code{\link[knitr:knit]{knitr::knit}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

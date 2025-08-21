@@ -20,7 +20,7 @@ pheatmap_qc(
 }
 \arguments{
 \item{dt_average}{\code{data.table} representing data from the \code{Averaged} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and \code{SummarizedExperiment} with chosen data type: single-agent or combo}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -45,7 +45,7 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 
 \item{distfun}{function used to compute the distance (dissimilarity) between rows;
 used for the dendrogram when \code{cluster_rows} is set to TRUE; 
-the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
+the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{lbl_by_CellLineName}{logical flag whether heatmap should be described by CellLineNames instead of clid}
 
@@ -88,6 +88,6 @@ ggpubr::as_ggplot(hm_4[["gtable"]])
 
 }
 \seealso{
-\code{\link[pheatmap]{pheatmap}}
+\code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 }
 \keyword{QC_plot}
