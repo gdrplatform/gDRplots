@@ -568,3 +568,43 @@ test_that("prep_dt_assoc works as expected", {
                   dt_depmap = dt_depmap_not_num),
     "Provide `dt_depmap` with numeric values.")
 })
+
+
+test_that(".prep_dt_OmicsArmLevelCNA works as expected", {
+  data_path <- system.file("testdata/OmicsArmLevelCNA.csv", package = "gDRplots")
+  tab_raw <- data.table::fread(data_path)
+  ls_chro <- grep("^[0-9].*(p$|q$)", names(tab_raw), value = TRUE)
+  id_col <- setdiff(names(tab_raw), ls_chro)
+  
+  res_1 <- .prep_dt_OmicsArmLevelCNA(tab_raw)
+  expect_is(res_1, "data.table")
+  expect_equal(names(res_1),
+               c(id_col, paste0(ls_chro, "_loss"), paste0(ls_chro, "_gain")))
+  expect_true(all(
+    vapply(ls_chro, function(i) { 
+      all(res_1[[id_col]][res_1[[paste0(ls_chro[i], "_loss")]] == 1] == 
+            tab_raw[[id_col]][tab_raw[[ls_chro[i]]] == -1])
+    }, logical(1))))
+  expect_true(all(
+    vapply(ls_chro, function(i) { 
+      all(res_1[[id_col]][res_1[[paste0(ls_chro[i], "_gain")]] == 1] == 
+            tab_raw[[id_col]][tab_raw[[ls_chro[i]]] == 1])
+    }, logical(1))))
+  
+  # scenario: check recording inside prep_dt_depmap_feat
+  test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  test_feat_data_path <- system.file("testdata", package = "gDRplots")
+  
+  res_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsArmLevelCNA")
+  expect_is(res_2, "list")
+  expect_is(res_2[[1]], "data.table")
+  expect_equal(res_2$selected_feat_meta_col, "OmicsArmLevelCNA")
+  expect_equal(res_2[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               res_1[, .SD, .SDcols = -id_col])
+  
+  expect_error(.prep_dt_OmicsArmLevelCNA(dt_depmap = as.list(tab_raw)),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+})
+
