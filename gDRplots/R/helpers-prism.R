@@ -1,7 +1,7 @@
 #' Prep table with metric values for single-agent experiment
 #' 
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and single-agent \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
@@ -11,7 +11,7 @@
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -83,7 +83,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #' Prep table with metric values by doses for single-agent experiment
 #' 
 #' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
@@ -93,7 +93,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #'  or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -153,7 +153,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' Prep table with metric values for combination experiment
 #' 
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
@@ -164,7 +164,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #'  depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -220,7 +220,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' Prep table with metric values for combination experiment
 #' 
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string representing the drug name to be plotted (identifier \code{DrugName}).
 #'  If set to NULL, the function will return a table for all available DrugName
@@ -239,7 +239,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param fit_source string source name for metrics
 #' @param additional_cols character vector with additional cols that should be included in the output
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -420,7 +420,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #'  This name should also correspond to the file containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
 #'
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
 #'   \item \code{selected_feat_meta_col} string name of feature.
@@ -466,6 +466,11 @@ prep_dt_depmap_feat <- function(feat_data_path,
     dict_id <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
                                    metadata_col = "ModelID")[["dt_depmap"]]
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
+    
+    # correction
+    if (feature_set == "OmicsArmLevelCNA") {
+      dt_depmap <- .prep_dt_OmicsArmLevelCNA(dt_depmap)
+    }
   } else {
     message(sprintf("The `%s` feature is not supported.", feature_set))
     dt_depmap <- NULL
@@ -483,7 +488,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #'  It is usually a file named \code{Model.csv}.
 #' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
 #'   \item \code{selected_feat_meta_col} string name of metadata column.
@@ -544,11 +549,11 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'   (rows are samples, columns are features or meta);  
-#'   outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
-#'   \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} or
+#'   \code{\link{prep_dt_depmap_meta}}
 #' @param selected_feat_meta_col string name of feature/meta column in DepMap
 #'   
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{plot_volcano_assoc}}
 #' \itemize{
 #'   \item \code{dt_assoc} \code{data.table} with calculated association values between 
 #'      feature/meta of DepMap and selected metric,
@@ -640,4 +645,43 @@ prep_dt_assoc <- function(dt_response,
   }
   # return
   return(obj_assoc)
+}
+
+
+#' Encode OmicsArmLevelCNA as not mutated and mutated
+#' 
+#' OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data 
+#' from PureCN, method from the Ben-David 2021 paper (https://www.nature.com/articles/s41586-020-03114-6).
+#' Chromosome arms: 1 indicates arm-level gain, -1 indicates arm-level loss, and 0 indicates copy-neutral.
+#' 
+#' This function transform each chromosome column (e.g., \code{3p}) into two new binary columns: 
+#' \code{3p_loss} and \code{3p_gain}. \code{3p_loss} is \emph{1} for values of \emph{-1*} in the original column 
+#' and \emph{0} otherwise. \code{3p_gain} is \emph{1} for values of \emph{1} in the original column 
+#' and \emph{0} otherwise. The original chromosome column is then removed.
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);  
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsArmLevelCNA
+#'
+#'   
+#' @return \code{data.table} with OmicsArmLevelCNA decoded as mutated - not mutated
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
+.prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_response)
+  
+  id_col <- c("ModelID", "CCLEName")
+  ls_chro <- names(dt_depmap)[!names(dt_depmap) %in% id_col]
+  
+  dt_depmap_new <- data.table::copy(dt_depmap)
+  dt_depmap_new[, paste0(ls_chro, "_loss") := lapply(.SD, function(x) { 
+    data.table::fifelse(x == -1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_new[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) { 
+    data.table::fifelse(x == 1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_new[, (ls_chro) := NULL]
+  
+  # return
+  return(dt_depmap_new)
 }
