@@ -481,6 +481,10 @@ test_that("prep_dt_depmap_feat works as expected", {
                                    meta_data_path = test_meta_data_path,
                                    feature_set = "some_feat"),
                "Assertion on 'feat_path' failed: File does not exist")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = test_meta_data_path,
+                                   with_decoding = "decode"),
+               "Assertion on 'with_decoding' failed: Must be of type 'logical flag'")
 })
 
 
@@ -597,12 +601,22 @@ test_that(".prep_dt_OmicsArmLevelCNA works as expected", {
   
   res_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                meta_data_path = test_meta_data_path,
-                               feature_set = "OmicsArmLevelCNA")
+                               feature_set = "OmicsArmLevelCNA",
+                               with_decoding = TRUE)
   expect_is(res_2, "list")
   expect_is(res_2[[1]], "data.table")
   expect_equal(res_2$selected_feat_meta_col, "OmicsArmLevelCNA")
   expect_equal(res_2[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
                res_1[, .SD, .SDcols = -id_col])
+  
+  res_3 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsArmLevelCNA",
+                               with_decoding = FALSE)
+  expect_is(res_3, "list")
+  expect_is(res_3[[1]], "data.table")
+  expect_equal(res_3[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               tab_raw[, .SD, .SDcols = -id_col])
   
   expect_error(.prep_dt_OmicsArmLevelCNA(dt_depmap = as.list(tab_raw)),
                "Assertion on 'dt_depmap' failed: Must be a data.table")
