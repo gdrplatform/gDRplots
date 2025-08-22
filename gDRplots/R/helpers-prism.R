@@ -419,6 +419,8 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param feature_set string containing the name of the molecular feature set to load from DepMap.
 #'  This name should also correspond to the file containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
+#' @param with_decoding logical whether the feature (OmicsArmLevelCNA) 
+#'  should be encoded into a 0-1 scheme
 #'
 #' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
@@ -438,15 +440,19 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @export
 prep_dt_depmap_feat <- function(feat_data_path,
                                 meta_data_path,
-                                feature_set = "CRISPRGeneEffect") {
+                                feature_set = "CRISPRGeneEffect",
+                                with_decoding = FALSE
+) {
   
   checkmate::assert_string(feat_data_path)
   checkmate::assert_string(feature_set)
+  checkmate::assert_flag(with_decoding)
   feat_path <- file.path(feat_data_path, paste0(feature_set, ".csv"))
   checkmate::assert_file_exists(feat_path)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
+ 
   
   # check whether feature is supported
   dt_feat_2row <- data.table::fread(feat_path, nrows = 2, select = 1)
@@ -467,8 +473,8 @@ prep_dt_depmap_feat <- function(feat_data_path,
                                    metadata_col = "ModelID")[["dt_depmap"]]
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
     
-    # correction
-    if (feature_set == "OmicsArmLevelCNA") {
+    # decoding
+    if (feature_set == "OmicsArmLevelCNA" && with_decoding) {
       dt_depmap <- .prep_dt_OmicsArmLevelCNA(dt_depmap)
     }
   } else {
@@ -671,7 +677,7 @@ prep_dt_assoc <- function(dt_response,
 #' @keywords internal
 .prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
   checkmate::assert_data_table(dt_depmap)
-
+  
   ls_chro <- grep("^[0-9].*(p$|q$)", names(dt_depmap), value = TRUE)
   
   dt_depmap_recoded <- data.table::copy(dt_depmap)
