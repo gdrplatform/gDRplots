@@ -452,7 +452,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
- 
+  
   
   # check whether feature is supported
   dt_feat_2row <- data.table::fread(feat_path, nrows = 2, select = 1)
@@ -476,6 +476,10 @@ prep_dt_depmap_feat <- function(feat_data_path,
     # decoding
     if (feature_set == "OmicsArmLevelCNA" && with_decoding) {
       dt_depmap <- .prep_dt_OmicsArmLevelCNA(dt_depmap)
+    }
+    if (feature_set %in% c("OmicsSomaticMutationsMatrixHotspot",
+                           "OmicsSomaticMutationsMatrixDamaging") && with_decoding) {
+      dt_depmap <- .prep_dt_OmicsSomaticMutationsMatrix(dt_depmap)
     }
   } else {
     message(sprintf("The `%s` feature is not supported.", feature_set))
@@ -658,10 +662,11 @@ prep_dt_assoc <- function(dt_response,
 #' 
 #' OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data 
 #' from PureCN, method from the Ben-David 2021 paper (https://www.nature.com/articles/s41586-020-03114-6).
-#' Chromosome arms: 1 indicates arm-level gain, -1 indicates arm-level loss, and 0 indicates copy-neutral.
+#' Chromosome arms: \emph{1} indicates arm-level gain, \emph{-1} indicates arm-level loss, 
+#' and \emph{0} indicates copy-neutral.
 #' 
 #' This function transform each chromosome column (e.g., \code{3p}) into two new binary columns: 
-#' \code{3p_loss} and \code{3p_gain}. \code{3p_loss} is \emph{1} for values of \emph{-1*} in the original column 
+#' \code{3p_loss} and \code{3p_gain}. \code{3p_loss} is \emph{1} for values of \emph{-1} in the original column 
 #' and \emph{0} otherwise. \code{3p_gain} is \emph{1} for values of \emph{1} in the original column 
 #' and \emph{0} otherwise. The original chromosome column is then removed.
 #'
@@ -669,7 +674,6 @@ prep_dt_assoc <- function(dt_response,
 #'   (rows are samples, columns are features or meta);  
 #'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsArmLevelCNA
 #'
-#'   
 #' @return \code{data.table} with OmicsArmLevelCNA decoded as mutated - not mutated
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
@@ -686,6 +690,53 @@ prep_dt_assoc <- function(dt_response,
   dt_depmap_recoded[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) { 
     data.table::fifelse(x == 1, 1, 0) }), .SDcols = ls_chro]
   dt_depmap_recoded[, (ls_chro) := NULL]
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
+  
+  # return
+  return(dt_depmap_recoded)
+}
+
+#' Encode OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging as not mutated and mutated
+#' 
+#' OmicsSomaticMutationsMatrixHotspot is genotyped matrix determining for each cell line whether 
+#' each gene has at least one hot spot mutation.
+#' A variant is considered a hot spot if it's present in one of the following: 
+#' Hess et al. 2019 paper, OncoKB hotspot, COSMIC mutation significance tier 1.
+#' 
+#' OmicsSomaticMutationsMatrixDamaging is genotyped matrix determining for each cell line whether 
+#' each gene has at least one damaging mutation. A variant is considered a damaging mutation 
+#' if LikelyLoF is True
+#' 
+#' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
+#' in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
+#' is greater than 0.95, a value of \emph{2} is assigned and if not, a value of \emph{1}is assigned.
+#' 
+#' This function transforms each gene column into binary columns:
+#' \emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of whether 
+#' the original value was \emph{1} or \emph{2}
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);  
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsSomaticMutationsMatrixHotspot
+#'   or OmicsSomaticMutationsMatrixDamaging
+#'
+#' @return \code{data.table} with OmicsSomaticMutationsMatrixHotspot or OmicsSomaticMutationsMatrixDamaging
+#'  decoded as not mutated and mutated
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
+.prep_dt_OmicsSomaticMutationsMatrix <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_depmap)
+  
+  ls_gene <- 
+    names(dt_depmap)[vapply(names(dt_depmap), function(nm) is.numeric(dt_depmap[[nm]]), logical(1))]
+  
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, (ls_gene) := lapply(.SD, function(x) { 
+    data.table::fifelse(x == 2, 1, x) }), .SDcols = ls_gene]
+  
   data.table::setkey(dt_depmap_recoded, NULL)
   dt_depmap_recoded
   
