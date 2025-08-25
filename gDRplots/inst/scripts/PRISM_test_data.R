@@ -46,6 +46,7 @@ data.table::fwrite(tab_cko,
                    file = file.path(testdata_dir, "CRISPRGeneEffect.csv"), 
                    row.names = FALSE)
 
+
 # OmicsSomaticMutationsMatrixHotspot.csv ----
 tab_hot <- data.table::data.table(
   V1 = tab_model$ModelID,
@@ -60,6 +61,7 @@ tab_hot[[3]][11:12] <- NA
 data.table::fwrite(tab_hot, 
                    file = file.path(testdata_dir, "OmicsSomaticMutationsMatrixHotspot.csv"), 
                    row.names = FALSE)
+
 
 # OmicsSignaturesProfile ----
 chars <- c(letters, LETTERS, 0:9)
@@ -95,6 +97,7 @@ tab_arm <- data.table::data.table(
 data.table::fwrite(tab_arm, 
                    file = file.path(testdata_dir, "OmicsArmLevelCNA.csv"), 
                    row.names = FALSE)
+
 
 # assoc table ----
 tab_drug_001_met1_RV <- data.table::data.table(
