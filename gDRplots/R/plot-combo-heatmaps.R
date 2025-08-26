@@ -465,11 +465,14 @@ heatmap_combo_metrics_panel <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  legend_lbl_iso <- paste0(if (normalization_type == "GR") {
+  prefix <- if (normalization_type == "GR") {
     "GR"
   } else {
     "IC"
-  }, 100 - 100 * as.numeric(available_iso_lvl))
+  }
+  
+  legend_lbl_iso <- sprintf("%s%s", prefix, 100 - 100 * as.numeric(available_iso_lvl))
+  
   
   # prep hm color palette
   hm_color_palette_smooth <-
@@ -831,11 +834,14 @@ plot_combination_index <- function(
   # check if isolines are available and adjust plotting logic accordingly
   if (NROW(available_iso_lvl) > 0) {
     legend_title_iso <- "Iso Levels"
-    legend_lbl_iso <- paste0(if (normalization_type == "GR") {
+    prefix <- if (normalization_type == "GR") {
       "GR"
     } else {
       "IC"
-    }, 100 - 100 * as.numeric(available_iso_lvl))
+    }
+    
+    legend_lbl_iso <- sprintf("%s%s", prefix, 100 - 100 * as.numeric(available_iso_lvl))
+    
     
     iso_colors <- 
       if (is.null(colors_vec_iso) || !all(vapply(colors_vec_iso, is_valid_color, logical(1)))) {

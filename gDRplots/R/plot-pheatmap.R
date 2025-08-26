@@ -248,12 +248,7 @@ pheatmap_qc <- function(
   hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
-  
-  fontsize_row <- if (NROW(mat_cvd) > 40) {
-    0.6 * 8
-  } else {
-    8
-  }
+  fontsize_row <- .get_pheatmap_fontsize(mat_cvd, "row")
   
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
@@ -576,11 +571,7 @@ pheatmap_with_anno_sa <- function(
       "black"
     }
   
-  fontsize_col <- if (NCOL(t_mat_cvd) > 40) {
-    0.6 * 8
-  } else {
-    8
-  }
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
@@ -881,12 +872,8 @@ pheatmap_with_anno_cd <- function(
       "black"
     }
   
-  fontsize_col <- if (NCOL(t_mat_cvd) > 40) {
-    0.6 * 8
-  } else {
-    8
-  }
-  
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
+
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
@@ -1146,11 +1133,7 @@ pheatmap_with_anno_combo <- function(
       "black"
     }
   
-  fontsize_col <- if (NCOL(t_mat_cvd) > 40) {
-    0.6 * 8
-  } else {
-    8
-  }
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
   
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
@@ -1709,4 +1692,35 @@ fill_ann_color_map <- function(dt_ann,
     }, character(1))
   
   return(mat_number_color)
+}
+
+
+#' Get fontsize for rownames or colnames in pheatmap::pheatmap 
+#'
+#' @param matrix numeric matrix with metric values.
+#' @param dimension character value, either "row" or "col", indicating whether to compute fontsize for rows or columns.
+#' @param threshold_count integer value of the number of rows/columns for which the font size remains standard.
+#' 
+#' @return numeric value of font size.
+#' 
+#' @keywords internal
+.get_pheatmap_fontsize <- function(matrix,
+                                   dimension = c("row", "col"),
+                                   threshold_count = 40L) {
+  dimension <- match.arg(dimension)
+  
+  checkmate::assert_matrix(matrix)
+  checkmate::assert_int(threshold_count, lower = 1)
+  
+  count <- if (dimension == "row") {
+    NROW(matrix)
+  } else {
+    NCOL(matrix)
+  }
+  
+  if (count > threshold_count) {
+    0.6 * 8
+  } else {
+    8
+  }
 }
