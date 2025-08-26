@@ -125,9 +125,12 @@ plot_boxplot_metric_sa <- function(
     dt_met[is.infinite(get(metric)), (metric) := NA] 
   }
   
-  plt_title <- sprintf("Number of unique %s: %s", 
-                       ifelse(point_var == cellline_name, "celllines", "drugs"),
-                       NROW(unique(dt_met[[point_var]])))
+  group_label <- if (point_var == cellline_name) {
+    "celllines"
+  } else {
+    "drugs"
+  }
+  plt_title <- sprintf("Number of unique %s: %s", group_label, NROW(unique(dt_met[[point_var]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_met, col_var)
@@ -486,9 +489,12 @@ plot_boxplot_metric_combo <- function(
   dt_sco$DrugCombination <-
     paste(dt_sco[[drug_name]], "x", dt_sco[[drug_name_2]])
   
-  plt_title <- sprintf("Number of unique %s: %s", 
-                       ifelse(point_var == cellline_name, "celllines", "drug combinations"),
-                       NROW(unique(dt_sco[[point_var]])))
+  group_label <- if (point_var == cellline_name) {
+    "celllines"
+  } else {
+    "drug combinations"
+  }
+  plt_title <- sprintf("Number of unique %s: %s", group_label, NROW(unique(dt_sco[[point_var]])))
   
   if (grouped_flag) {
     data.table::setorderv(dt_sco, col_var)

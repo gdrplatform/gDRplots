@@ -926,28 +926,29 @@ plot_volcano_assoc_panel <- function(dt_response,
   
   # column names with features
   ls_col <- names(dt_)[!names(dt_) %chin% desc_col]
-  
-  if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
-    # checking whether relation in one-to-one or one-to-many
+  data_type <- if (all(vapply(dt_[, c(ls_col), with = FALSE], is.numeric, logical(1)))) {
+    # Checking whether relation is one-to-one or one-to-many
     dt_cond <- data.table::copy(dt_)
     dt_cond[, (ls_col) := lapply(.SD, function(col) (col != 0 & !is.na(col))), .SDcol = ls_col]
     one_to_one <- !any(rowSums(dt_cond[, .SD, .SDcols = ls_col]) > 1)
-    # unique values
+    
+    # Unique values
     unique_val <- unique(unlist(lapply(ls_col, function(nm) unique(dt_[[nm]]))))
     
-    data_type <- if (is.numeric(unique_val) && 
-                     (all(unique_val %in% c(0, 1, NA)) || 
-                      all(unique_val %in% c(-1, 0, 1, NA)) ||
-                      all(unique_val %in% c(0, 1, 2, NA)))) {
-      # assumption: the presence of a feature is described by 0-1; NA means lack of information
-      #     categorical - when one id has only one cat
-      #     num_as_cat - when one id has many cat
-      ifelse(one_to_one, "categorical", "num_as_cat")
+    if (is.numeric(unique_val) && 
+        (all(unique_val %in% c(0, 1, NA)) || 
+         all(unique_val %in% c(-1, 0, 1, NA)) || 
+         all(unique_val %in% c(0, 1, 2, NA)))) {
+      if (one_to_one) {
+        "categorical"
+      } else {
+        "num_as_cat"
+      }
     } else {
       "numeric"
-    } 
+    }
   } else {
-    data_type <- "unknown"
+    "unknown"
   }
   return(data_type)  
 }

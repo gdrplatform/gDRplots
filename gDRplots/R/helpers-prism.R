@@ -76,7 +76,11 @@ prep_dt_response_metric_sa <- function(dt_metrics,
     dt_response_metric, 
     old = metric, 
     new = sprintf("%s_%s_%s", normalization_type, fit_source, 
-                  ifelse(metric == "xc50", "log10_xc50", metric)))
+                  if (metric == "xc50") {
+                    "log10_xc50"
+                  } else {
+                    metric
+                  }))
   dt_response_metric
 }
 

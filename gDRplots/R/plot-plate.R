@@ -68,11 +68,21 @@ plot_plate_stack_info <- function(dt_plate) {
       dt_plate_copy_subset[, (concentration2) := factor(get(concentration2), levels = doses)]
     }
     
+    xmax_offset <- if (has_combo) {
+      0
+    } else {
+      0.5
+    }
+    x_point_offset <- if (has_combo) {
+      -0.25
+    } else {
+      0
+    }
     
     p <- ggplot2::ggplot(dt_plate_copy_subset) +
       ggplot2::geom_rect(ggplot2::aes(
         xmin = WellColumn - 0.5,
-        xmax = WellColumn + ifelse(has_combo, 0, 0.5),
+        xmax = WellColumn + xmax_offset,
         ymin = as.numeric(WellRow) - 0.5,
         ymax = as.numeric(WellRow) + 0.5,
         fill = !!rlang::sym(concentration)
@@ -80,7 +90,7 @@ plot_plate_stack_info <- function(dt_plate) {
       color = "black", linewidth = 0.2
       ) +
       ggplot2::geom_point(ggplot2::aes(
-        x = WellColumn + ifelse(has_combo, -0.25, 0),
+        x = WellColumn + x_point_offset,
         y = WellRow,
         color = !!rlang::sym(drug),
         shape = !!rlang::sym(cellline)

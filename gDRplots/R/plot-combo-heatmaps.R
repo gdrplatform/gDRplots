@@ -157,8 +157,12 @@ heatmap_combo_metrics <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                           100 - 100 * as.numeric(available_iso_lvl))
+  label_prefix <- if (normalization_type == "GR") {
+    "GR"
+  } else {
+    "IC"
+  }
+  legend_lbl_iso <- paste0(label_prefix, 100 - 100 * as.numeric(available_iso_lvl))
   
   # prep hm color palette
   hm_color_palette_smooth <-
@@ -183,8 +187,21 @@ heatmap_combo_metrics <- function(
   # plot data
   dt_ <- dt_excess[, c(conc, conc_2, metric), with = FALSE]
   
-  x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
-  y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+  
+  x_axis_drug <- if (swap_axes) {
+    drug1_name
+  } else {
+    drug2_name
+  }
+  
+  y_axis_drug <- if (swap_axes) {
+    drug2_name
+  } else {
+    drug1_name
+  }
+  
+  x_axis_lab <- sprintf("%s [\U00B5M]", x_axis_drug)
+  y_axis_lab <- sprintf("%s [\U00B5M]", y_axis_drug)
   
   if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, metric = 1)
     plt <- 
@@ -448,8 +465,11 @@ heatmap_combo_metrics_panel <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                           100 - 100 * as.numeric(available_iso_lvl))
+  legend_lbl_iso <- paste0(if (normalization_type == "GR") {
+    "GR"
+  } else {
+    "IC"
+  }, 100 - 100 * as.numeric(available_iso_lvl))
   
   # prep hm color palette
   hm_color_palette_smooth <-
@@ -477,8 +497,17 @@ heatmap_combo_metrics_panel <- function(
     
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
     
-    x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
-    y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+    x_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+      drug1_name
+    } else {
+      drug2_name
+    })
+    
+    y_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+      drug2_name
+    } else {
+      drug1_name
+    })
     
     if (!NROW(dt_) > 1 || # co-dilution input data is like: (conc = 0, conc_2 = 0, mx_name = 1)
         all(is.na(dt_[get(conc) != 0 & get(conc_2) != 0][[mx_name]]))) { # lack of smooth & excess data
@@ -802,8 +831,11 @@ plot_combination_index <- function(
   # check if isolines are available and adjust plotting logic accordingly
   if (NROW(available_iso_lvl) > 0) {
     legend_title_iso <- "Iso Levels"
-    legend_lbl_iso <- paste0(ifelse(normalization_type == "GR", "GR", "IC"),
-                             100 - 100 * as.numeric(available_iso_lvl))
+    legend_lbl_iso <- paste0(if (normalization_type == "GR") {
+      "GR"
+    } else {
+      "IC"
+    }, 100 - 100 * as.numeric(available_iso_lvl))
     
     iso_colors <- 
       if (is.null(colors_vec_iso) || !all(vapply(colors_vec_iso, is_valid_color, logical(1)))) {
@@ -1014,9 +1046,17 @@ heatmap_combo_with_isoref <- function(
   # prep plot data
   dt_ <- dt_excess[, c(conc, conc_2, metric), with = FALSE]
   
-  x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
-  y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
-  
+  x_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+    drug1_name
+  } else {
+    drug2_name
+  })
+  y_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+    drug2_name
+  } else {
+    drug1_name
+  })
+
   if (!NROW(dt_) > 1) { # co-dilution input data is like: (conc = 0, conc_2 = 0, metric = 1)
     plt <- 
       ggplot2::ggplot() +
@@ -1105,9 +1145,13 @@ heatmap_combo_with_isoref <- function(
         iso_colors <- .get_iso_colors(available_iso_lvl)
         
         # plot
-        iso_label <- sprintf("%s%s",
-                             ifelse(normalization_type == "GR", "GR", "IC"),
-                             100 - 100 * as.numeric(available_iso_lvl))
+        prefix <- if (normalization_type == "GR") {
+          "GR"
+        } else {
+          "IC"
+        }
+        
+        iso_label <- sprintf("%s%s", prefix, 100 - 100 * as.numeric(available_iso_lvl))
         names(iso_label) <- available_iso_lvl
         
         tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
@@ -1311,8 +1355,17 @@ heatmap_combo_with_isoref_panel <- function(
   # prep panel elements
   dt_all <- dt_excess[, c(cellline_name, conc, conc_2, metric), with = FALSE]
   
-  conc_y <- ifelse(swap_axes, conc_2, conc)
-  conc_x <- ifelse(swap_axes, conc, conc_2)
+  conc_y <- if (swap_axes) {
+    conc_2
+  } else {
+    conc
+  }
+  
+  conc_x <- if (swap_axes) {
+    conc
+  } else {
+    conc_2
+  }
   
   dt_tile <- dt_all[get(cellline_name) %in% cl_names, ][, 
                                                         `:=`(
@@ -1352,8 +1405,17 @@ heatmap_combo_with_isoref_panel <- function(
                                gDRutils::prettify_flat_metrics(x = metric, human_readable = TRUE),
                                normalization_type)
   # base plot
-  x_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug1_name, drug2_name))
-  y_axis_lab <- sprintf("%s [\U00B5M]", ifelse(swap_axes, drug2_name, drug1_name))
+  x_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+    drug1_name
+  } else {
+    drug2_name
+  })
+  
+  y_axis_lab <- sprintf("%s [\U00B5M]", if (swap_axes) {
+    drug2_name
+  } else {
+    drug1_name
+  })
   
   plt <-
     ggplot2::ggplot(dt_tile,
@@ -1401,9 +1463,13 @@ heatmap_combo_with_isoref_panel <- function(
       iso_colors <- .get_iso_colors(available_iso_lvl)
       
       # plot
-      iso_label <- sprintf("%s%s",
-                           ifelse(normalization_type == "GR", "GR", "IC"),
-                           100 - 100 * as.numeric(iso_levels))
+      prefix <- if (normalization_type == "GR") {
+        "GR"
+      } else {
+        "IC"
+      }
+      
+      iso_label <- sprintf("%s%s", prefix, 100 - 100 * as.numeric(iso_levels))
       names(iso_label) <- iso_levels
       
       tab_measured <- dt_iso[, .SD, .SDcols = -c("pos_x_ref", "pos_y_ref")]
@@ -1482,15 +1548,31 @@ prep_hm_limits <- function(num_vec,
   max_data <- max(vec_range)
   
   max_val <- if (metric == "smooth") {
-    ifelse(max_data > 1, max_data, 1)
+    if (max_data > 1) {
+      max_data
+    } else {
+      1
+    }
   } else {
-    ifelse(max_data < 0.25, 0.25, max_data)
+    if (max_data < 0.25) {
+      0.25
+    } else {
+      max_data
+    }
   }
   
   min_val <- if (metric == "smooth") {
-    ifelse(normalization_type == "GR", min(0, min_data), 0)
+    if (normalization_type == "GR") {
+      min(0, min_data)
+    } else {
+      0
+    }
   } else {
-    ifelse(min_data > -0.25, -0.25, min_data)
+    if (min_data > -0.25) {
+      -0.25
+    } else {
+      min_data
+    }
   }
   
   if (symmetric) {
