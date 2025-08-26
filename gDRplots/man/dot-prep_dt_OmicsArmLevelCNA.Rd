@@ -16,7 +16,7 @@ outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsArmLevelCNA}
 }
 \description{
 OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data 
-from PureCN, method from the Ben-David 2021 paper (https://www.nature.com/articles/s41586-020-03114-6).
+from PureCN, method from the Ben-David et al. (2021) paper (https://www.nature.com/articles/s41586-020-03114-6).
 Chromosome arms: \emph{1} indicates arm-level gain, \emph{-1} indicates arm-level loss, 
 and \emph{0} indicates copy-neutral.
 }

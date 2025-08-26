@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers-prism.R
 \name{.prep_dt_OmicsSomaticMutationsMatrix}
 \alias{.prep_dt_OmicsSomaticMutationsMatrix}
-\title{Encode OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging as not mutated and mutated}
+\title{Binarize somatic mutations in OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging}
 \usage{
 .prep_dt_OmicsSomaticMutationsMatrix(dt_depmap)
 }
@@ -20,7 +20,7 @@ or OmicsSomaticMutationsMatrixDamaging}
 OmicsSomaticMutationsMatrixHotspot is genotyped matrix determining for each cell line whether 
 each gene has at least one hot spot mutation.
 A variant is considered a hot spot if it's present in one of the following: 
-Hess et al. 2019 paper, OncoKB hotspot, COSMIC mutation significance tier 1.
+Hess et al. (2019) paper, OncoKB hotspot, COSMIC mutation significance tier 1.
 }
 \details{
 OmicsSomaticMutationsMatrixDamaging is genotyped matrix determining for each cell line whether 
@@ -28,12 +28,14 @@ each gene has at least one damaging mutation. A variant is considered a damaging
 if LikelyLoF is True
 
 \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
+
 in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
-is greater than 0.95, a value of \emph{2} is assigned and if not, a value of \emph{1}is assigned.
+is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation), 
+otherwise a value of \emph{1} is assigned (likely heterozygous).
 
 This function transforms each gene column into binary columns:
-\emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of whether 
-the original value was \emph{1} or \emph{2}
+\emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of zygosity
+(the original value was \emph{1} or \emph{2}).
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

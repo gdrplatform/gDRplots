@@ -653,7 +653,7 @@ prep_dt_assoc <- function(dt_response,
       obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
     }
   }
-  # return
+
   return(obj_assoc)
 }
 
@@ -661,7 +661,7 @@ prep_dt_assoc <- function(dt_response,
 #' Encode OmicsArmLevelCNA as not mutated and mutated
 #' 
 #' OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data 
-#' from PureCN, method from the Ben-David 2021 paper (https://www.nature.com/articles/s41586-020-03114-6).
+#' from PureCN, method from the Ben-David et al. (2021) paper (https://www.nature.com/articles/s41586-020-03114-6).
 #' Chromosome arms: \emph{1} indicates arm-level gain, \emph{-1} indicates arm-level loss, 
 #' and \emph{0} indicates copy-neutral.
 #' 
@@ -692,29 +692,30 @@ prep_dt_assoc <- function(dt_response,
   dt_depmap_recoded[, (ls_chro) := NULL]
   data.table::setkey(dt_depmap_recoded, NULL)
   dt_depmap_recoded
-  
-  # return
+
   return(dt_depmap_recoded)
 }
 
-#' Encode OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging as not mutated and mutated
+#' Binarize somatic mutations in OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging
 #' 
 #' OmicsSomaticMutationsMatrixHotspot is genotyped matrix determining for each cell line whether 
 #' each gene has at least one hot spot mutation.
 #' A variant is considered a hot spot if it's present in one of the following: 
-#' Hess et al. 2019 paper, OncoKB hotspot, COSMIC mutation significance tier 1.
+#' Hess et al. (2019) paper, OncoKB hotspot, COSMIC mutation significance tier 1.
 #' 
 #' OmicsSomaticMutationsMatrixDamaging is genotyped matrix determining for each cell line whether 
 #' each gene has at least one damaging mutation. A variant is considered a damaging mutation 
 #' if LikelyLoF is True
 #' 
 #' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
+#' 
 #' in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
-#' is greater than 0.95, a value of \emph{2} is assigned and if not, a value of \emph{1}is assigned.
+#' is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation), 
+#' otherwise a value of \emph{1} is assigned (likely heterozygous).
 #' 
 #' This function transforms each gene column into binary columns:
-#' \emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of whether 
-#' the original value was \emph{1} or \emph{2}
+#' \emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of zygosity
+#' (the original value was \emph{1} or \emph{2}).
 #'
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'   (rows are samples, columns are features or meta);  
@@ -739,7 +740,6 @@ prep_dt_assoc <- function(dt_response,
   
   data.table::setkey(dt_depmap_recoded, NULL)
   dt_depmap_recoded
-  
-  # return
+
   return(dt_depmap_recoded)
 }
