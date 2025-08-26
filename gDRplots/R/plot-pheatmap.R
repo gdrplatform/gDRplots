@@ -1699,7 +1699,7 @@ fill_ann_color_map <- function(dt_ann,
   # prepare the final matrix with color names
   mat_number_color <- Reduce(pmax, ls_range_condition)
   mat_number_color[is.na(mat_number_color)] <- 0 # light_color_font for NA field (assumption: grey)
-  mat_number_color[] <- 
+  mat_number_color[] <-
     vapply(mat_number_color, function(x) {
       if (x) {
         dark_color_font
