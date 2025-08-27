@@ -136,11 +136,14 @@ plot_dose_response_sa <- function(dt_metrics,
     dt_src <- if (NROW(dt_met) == 0) dt_avg else dt_met
     dt_src <- unique(dt_src[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
     
-    plt_title <- sprintf(
-      "%s (%s)",
-      ifelse(group_var == cellline_name, unique(dt_src[[drug_name]]), unique(dt_src[[cellline_name]])),
-      ifelse(group_var == cellline_name, unique(dt_src[[gnumber]]), unique(dt_src[[clid]]))
-    )
+    if (group_var == cellline_name) {
+      title_name <- unique(dt_src[[drug_name]])
+      title_id <- unique(dt_src[[gnumber]])
+    } else {
+      title_name <- unique(dt_src[[cellline_name]])
+      title_id <- unique(dt_src[[clid]])
+    }
+    plt_title <- sprintf("%s (%s)", title_name, title_id)
   }
   
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {

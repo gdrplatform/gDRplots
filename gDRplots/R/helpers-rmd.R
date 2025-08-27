@@ -90,8 +90,11 @@ prep_plot_chunk <- function(plt_list,
   if (!dwn_structure_condition) dwn_list <- NULL
   
   lapply(seq_along(plt_list), function(nm) {
-    group_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
-    
+    group_name <- if (is.null(names(plt_list)[nm])) {
+      nm
+    } else {
+      names(plt_list)[nm]
+    }    
     if (inherits(plt_list[[nm]], "list")) {
       # nested list - use tabset options
       header <- if (is.null(tabset_options)) {
@@ -102,8 +105,11 @@ prep_plot_chunk <- function(plt_list,
       }
       
       item_chunks <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
-        item_name <- 
-          ifelse(is.null(names(plt_list[[nm]])[i_nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
+        item_name <- if (is.null(names(plt_list[[nm]])[i_nm])) {
+          i_nm
+        } else {
+          names(plt_list[[nm]])[i_nm]
+        }
         
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
@@ -699,20 +705,32 @@ prep_filename_path <- function(plt_list,
   checkmate::assert_string(file_format, null.ok = TRUE)
   
   ls_file_name <- lapply(seq_along(plt_list), function(nm) {
-    lvl1_name <- ifelse(is.null(names(plt_list)[nm]), nm, names(plt_list)[nm]) # number on name
-    
+    lvl1_name <- if (is.null(names(plt_list)[nm])) {
+      nm
+    } else {
+      names(plt_list)[nm]
+    }    
     if (inherits(plt_list[[nm]], "list")) {
       
       ls_nested <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
-        lvl2_name <-
-          ifelse(is.null(names(plt_list[[nm]])[i_nm]), i_nm, names(plt_list[[nm]])[i_nm]) # number on name
-        # file name
-        file_name <- paste0(prefix,
-                            neutralize_spaces(as.character(
-                              ifelse(is.null(file_format), lvl2_name,
-                                     paste(lvl2_name, file_format, sep = ".")))))
+        lvl2_name <- if (is.null(names(plt_list[[nm]])[i_nm])) {
+          i_nm
+        } else {
+          names(plt_list[[nm]])[i_nm]
+        }
+        # file name part
+        file_name_part <- if (is.null(file_format)) {
+          lvl2_name
+        } else {
+          paste(lvl2_name, file_format, sep = ".")
+        }
+        file_name <- paste0(prefix, neutralize_spaces(as.character(file_name_part)))
         # path
-        ifelse(is.null(path_file), file_name, file.path(path_file, file_name))
+        if (is.null(path_file)) {
+          file_name
+        } else {
+          file.path(path_file, file_name)
+        }
       })
       
       if (is.null(names(plt_list[[nm]]))) {
@@ -724,12 +742,18 @@ prep_filename_path <- function(plt_list,
       ls_nested
     } else {
       # file name
-      file_name <- paste0(prefix,
-                          neutralize_spaces(as.character(
-                            ifelse(is.null(file_format), lvl1_name,
-                                   paste(lvl1_name, file_format, sep = ".")))))
+      file_name_part <- if (is.null(file_format)) {
+        lvl1_name
+      } else {
+        paste(lvl1_name, file_format, sep = ".")
+      }
+      file_name <- paste0(prefix, neutralize_spaces(as.character(file_name_part)))
       # path
-      ifelse(is.null(path_file), file_name, file.path(path_file, file_name))
+      if (is.null(path_file)) {
+        file_name
+      } else {
+        file.path(path_file, file_name)
+      }
     }
   })
   

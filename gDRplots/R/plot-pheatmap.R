@@ -237,11 +237,18 @@ pheatmap_qc <- function(
   
   # prep hm color palette
   maxval <- switch(metric, "x" = 1.1, "x_std" = 0.5)
-  minval <- min(c(0, ifelse(all(is.na(mat_cvd)), 0, round(min(mat_cvd, na.rm = TRUE), digits = 2))))
-  
+  min_mat <- if (all(is.na(mat_cvd))) {
+    0
+  } else {
+    round(min(mat_cvd, na.rm = TRUE), digits = 2)
+  }
+  minval <- min(c(0, min_mat))
+
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks + 1)
   hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
+  
+  fontsize_row <- .get_pheatmap_fontsize(mat_cvd, "row")
   
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
@@ -253,7 +260,7 @@ pheatmap_qc <- function(
                        show_colnames = FALSE,
                        main = hm_title,
                        fontsize = 8,
-                       fontsize_row = ifelse(NROW(mat_cvd) > 40, 0.6 * 8, 8),
+                       fontsize_row = fontsize_row,
                        na_col = "red",
                        annotation_legend = annotation_legend_flag,
                        # dendrogram
@@ -530,13 +537,16 @@ pheatmap_with_anno_sa <- function(
   }
   
   # prep hm color palette
-  min_val <- ifelse(
-    all(is.infinite(t_mat_cvd) | is.na(t_mat_cvd)),
-    -1,
+  min_val <- if (all(is.infinite(t_mat_cvd) | is.na(t_mat_cvd))) {
+    -1
+  } else {
     min(t_mat_cvd[!is.infinite(t_mat_cvd)], na.rm = TRUE)
-  )
-  max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
-  
+  }
+  max_val <- if (metric %in% c("x", "xc50", "x_max", "x_mean")) {
+    1.0
+  } else {
+    max(t_mat_cvd, na.rm = TRUE)
+  }  
   if (min_val == max_val) {
     min_val <- min_val - 1
   }
@@ -562,6 +572,8 @@ pheatmap_with_anno_sa <- function(
       "black"
     }
   
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
+  
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
@@ -574,7 +586,7 @@ pheatmap_with_anno_sa <- function(
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
-                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       fontsize_col = fontsize_col,
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -829,8 +841,11 @@ pheatmap_with_anno_cd <- function(
   
   # prep hm color palette
   min_val <- min(t_mat_cvd, na.rm = TRUE)
-  max_val <- ifelse(metric %in% c("x", "xc50", "x_max", "x_mean"), 1.0, max(t_mat_cvd, na.rm = TRUE))
-  
+  max_val <- if (metric %in% c("x", "xc50", "x_max", "x_mean")) {
+    1.0
+  } else {
+    max(t_mat_cvd, na.rm = TRUE)
+  }  
   if (min_val == max_val) {
     min_val <- min_val - 1
   } else if (is.infinite(min_val)) {
@@ -858,6 +873,8 @@ pheatmap_with_anno_cd <- function(
       "black"
     }
   
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
+
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(mat = t_mat_cvd,
                        scale = "none",
@@ -870,7 +887,7 @@ pheatmap_with_anno_cd <- function(
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
-                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       fontsize_col = fontsize_col,
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -1117,6 +1134,8 @@ pheatmap_with_anno_combo <- function(
       "black"
     }
   
+  fontsize_col <- .get_pheatmap_fontsize(t_mat_cvd, "col")
+  
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(t_mat_cvd,
                        scale = "none",
@@ -1129,7 +1148,7 @@ pheatmap_with_anno_combo <- function(
                        angle_col = 90,
                        main = hm_title,
                        fontsize = 8,
-                       fontsize_col = ifelse(NCOL(t_mat_cvd) > 40, 0.6 * 8, 8),
+                       fontsize_col = fontsize_col,
                        na_col = "darkgray",
                        # dendrogram
                        cluster_rows = cluster_rows,
@@ -1426,7 +1445,11 @@ fill_ann_color_map <- function(dt_ann,
       }
       
       if (NROW(missing_lvl) == 1 && missing_lvl == "NA") {
-        col_na <- ifelse(any(map_ann[[ann]] %in% c("black", "#000000")), "darkred", "black")
+        col_na <- if (any(map_ann[[ann]] %in% c("black", "#000000"))) {
+          "darkred"
+        } else {
+          "black"
+        }
         map_ann[[ann]] <- c(map_ann[[ann]], "NA" = col_na)
       } else if (NROW(missing_lvl) > 0) {
         map_ann[[ann]] <- NULL # allow default coloring
@@ -1660,8 +1683,45 @@ fill_ann_color_map <- function(dt_ann,
   # prepare the final matrix with color names
   mat_number_color <- Reduce(pmax, ls_range_condition)
   mat_number_color[is.na(mat_number_color)] <- 0 # light_color_font for NA field (assumption: grey)
-  mat_number_color[] <- 
-    vapply(mat_number_color, function(x) ifelse(x, dark_color_font, light_color_font), character(1))
+  mat_number_color[] <-
+    vapply(mat_number_color, function(x) {
+      if (x) {
+        dark_color_font
+      } else {
+        light_color_font
+      }
+    }, character(1))
   
   return(mat_number_color)
+}
+
+
+#' Get fontsize for rownames or colnames in pheatmap::pheatmap 
+#'
+#' @param matrix numeric matrix with metric values.
+#' @param dimension character value, either "row" or "col", indicating whether to compute fontsize for rows or columns.
+#' @param threshold_count integer value of the number of rows/columns for which the font size remains standard.
+#' 
+#' @return numeric value of font size.
+#' 
+#' @keywords internal
+.get_pheatmap_fontsize <- function(matrix,
+                                   dimension = c("row", "col"),
+                                   threshold_count = 40L) {
+  dimension <- match.arg(dimension)
+  
+  checkmate::assert_matrix(matrix)
+  checkmate::assert_int(threshold_count, lower = 1)
+  
+  count <- if (dimension == "row") {
+    NROW(matrix)
+  } else {
+    NCOL(matrix)
+  }
+  
+  if (count > threshold_count) {
+    0.6 * 8
+  } else {
+    8
+  }
 }
