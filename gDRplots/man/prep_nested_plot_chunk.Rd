@@ -73,7 +73,7 @@ prep_nested_plot_chunk(plotlist, "metric_value")
 }
 }
 \seealso{
-\code{\link[knitr]{knit}}
+\code{\link[knitr:knit]{knitr::knit}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

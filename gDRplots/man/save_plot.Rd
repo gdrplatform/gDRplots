@@ -27,6 +27,6 @@ save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = 
 
 }
 \seealso{
-\code{\link[ggplot2]{ggsave}}
+\code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
 }
 \keyword{internal}

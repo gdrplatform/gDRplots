@@ -27,7 +27,7 @@ list of strings describing names or paths depending on the input; the list is st
 like the input \code{plt_list} and retains the same names as \code{plt_list}.
 }
 \description{
-This function can creates lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
+This function can creates lists that can be used as an input to \code{\link{prep_plot_chunk}} -
 param \code{link_list} and \code{dwn_list}. 
 Depending on the inputs, outputted string will have a format:
 \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
@@ -63,7 +63,7 @@ prep_filename_path(plt_list = nested_plotlist,
 
 }
 \seealso{
-\code{\link[gDRplots]{prep_plot_chunk}}
+\code{\link{prep_plot_chunk}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

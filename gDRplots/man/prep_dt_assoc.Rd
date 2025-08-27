@@ -11,13 +11,13 @@ prep_dt_assoc(dt_response, dt_depmap, selected_feat_meta_col = NULL)
 
 \item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap.
 (rows are samples, columns are features or meta);  
-outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
-\code{\link[gDRplots]{prep_dt_depmap_meta}}}
+outputted by one of \code{\link{prep_dt_depmap_feat}} or
+\code{\link{prep_dt_depmap_meta}}}
 
 \item{selected_feat_meta_col}{string name of feature/meta column in DepMap}
 }
 \value{
-A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
+A named list with elements, that may be input to \code{\link{plot_volcano_assoc}}
 \itemize{
   \item \code{dt_assoc} \code{data.table} with calculated association values between 
      feature/meta of DepMap and selected metric,

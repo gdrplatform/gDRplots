@@ -118,12 +118,12 @@ plot_volcano_assoc <- function(dt_assoc,
 #' Plot scatter with correlation
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
+#'  \code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
+#'  or \code{\link{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one feature;
 #'  (rows are samples, columns are features). 
-#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
+#'  outputted by \code{\link{prep_dt_depmap_feat}}
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #' @param selected_feat_meta_col string with the name of a feature column in DepMap 
 #'  (will be used as a plot title)
@@ -366,12 +366,12 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #' Plot boxplot for categorical features
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
+#'  \code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
+#'  or \code{\link{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap - for one feature;
 #'  (rows are samples, columns are features). 
-#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}}
+#'  outputted by \code{\link{prep_dt_depmap_feat}}
 #' @param selected_feat string with name of selected feature from \code{dt_depmap}
 #' @param selected_feat_meta_col string with the name of a feature column in DepMap (will be used as a plot title)
 #'  that has 0-1 values only (categorical character but without relation one-to-one for ids and feature)
@@ -643,12 +643,12 @@ plot_boxplot_num_panel <- function(dt_response,
 #' Plot boxplot for metric values grouped by metadata from DepMap
 #'
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
-#'  outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
+#'  \code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
+#'  or \code{\link{prep_dt_response_metric_diff}}, 
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap - for one metadata;
 #'  (rows are samples, columns are metadata levels);  
-#'  outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#'  outputted by \code{\link{prep_dt_depmap_meta}}
 #' @param selected_feat_meta_col string with the name of the selected metadata from \code{dt_depmap}
 #'  (will be used as a plot title)
 #' @param with_1_item_grp logical flag indicating whether to show group with only one item
@@ -794,14 +794,14 @@ plot_boxplot_meta <- function(dt_response,
 #' Plot panel with volcano plot and according to the data type - scatter plots or box plots
 #'
 #' @param dt_response \code{data.table} with the experimental response data (rows are samples) 
-#'  for one metric outputted by one of functions: \code{\link[gDRplots]{prep_dt_response_metric_sa}},
-#'  \code{\link[gDRplots]{prep_dt_response_dose_sa}}, \code{\link[gDRplots]{prep_dt_response_scores}}
-#'  or \code{\link[gDRplots]{prep_dt_response_metric_diff}}, 
+#'  for one metric outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
+#'  \code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
+#'  or \code{\link{prep_dt_response_metric_diff}}, 
 #'  must have at least a column with \code{CellLineName} and a numeric column with metric values.
 #' @param dt_depmap \code{data.table} with dependent variables data loaded from DepMap
 #'  where rows are samples, columns are features/metadata levels;
-#'  one of: data for one feature outputted by \code{\link[gDRplots]{prep_dt_depmap_feat}} or data 
-#'  or data for one metadata outputted by \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#'  one of: data for one feature outputted by \code{\link{prep_dt_depmap_feat}} or data 
+#'  or data for one metadata outputted by \code{\link{prep_dt_depmap_meta}}
 #' @param selected_metric string name of the metric in \code{dt_response}
 #' @param selected_feat_meta_col string with name of selected feature from \code{dt_depmap} or 
 #'  the name of the selected metadata from \code{dt_depmap} - respectively

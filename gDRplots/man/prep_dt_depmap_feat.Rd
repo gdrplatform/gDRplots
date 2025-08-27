@@ -7,7 +7,8 @@
 prep_dt_depmap_feat(
   feat_data_path,
   meta_data_path,
-  feature_set = "CRISPRGeneEffect"
+  feature_set = "CRISPRGeneEffect",
+  with_decoding = FALSE
 )
 }
 \arguments{
@@ -21,9 +22,12 @@ It is usually a file named \code{Model.csv}.}
 \item{feature_set}{string containing the name of the molecular feature set to load from DepMap.
 This name should also correspond to the file containing the feature data 
 (without the extension, which is assumed to be \code{csv})}
+
+\item{with_decoding}{logical whether the feature (OmicsArmLevelCNA) 
+should be encoded into a 0-1 scheme}
 }
 \value{
-A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
   \item \code{selected_feat_meta_col} string name of feature.

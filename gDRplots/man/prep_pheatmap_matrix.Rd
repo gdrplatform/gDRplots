@@ -14,10 +14,10 @@ prep_pheatmap_matrix(
 }
 \arguments{
 \item{dt_response}{\code{data.table} representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and single-agent \code{SummarizedExperiment} or 
 \code{data.table} representing data from the \code{scores} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and combo \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
