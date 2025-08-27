@@ -1,6 +1,7 @@
 #' Determine whether or not a color name is valid
 #' 
-#' A name of color is valid when either is a color name listed by \code{\link[grDevices]{colors}}
+#' A name of color is valid when either is a color name 
+#' listed by \code{\link[grDevices:colors]{grDevices::colors}}
 #' or a hexadecimal string of the form \code{#rrggbb} 
 #' 
 #' @param col_name string representing a valid color

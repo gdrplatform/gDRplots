@@ -19,7 +19,7 @@ Generate markdown code for html link item which when clicked opens plot in new b
 The function output should be wrapped in \code{knitr::knit()}.
 }
 \seealso{
-\code{\link[knitr]{knit}}
+\code{\link[knitr:knit]{knitr::knit}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

@@ -16,7 +16,8 @@ estimate_plot_size(plt, base_width = 10, base_height = 6, scale_factor = 0.5)
 \item{scale_factor}{an integer with default scale_factor}
 }
 \value{
-named vector with optimal width and height used in \code{\link[ggplot2]{ggsave}} function
+named vector with optimal width and height used 
+   in the \code{\link[ggplot2:ggsave]{ggplot2::ggsave}} function
 }
 \description{
 Estimate the optimal plot size (either ggplot or pheatmap) for saving plots

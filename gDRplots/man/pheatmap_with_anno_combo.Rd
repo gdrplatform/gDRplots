@@ -22,7 +22,7 @@ pheatmap_with_anno_combo(
 }
 \arguments{
 \item{dt_scores}{\code{data.table} representing data from the \code{scores} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and combo \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -49,7 +49,7 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 
 \item{distfun}{function used to compute the distance (dissimilarity) between both rows and columns;
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
-the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
+the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation

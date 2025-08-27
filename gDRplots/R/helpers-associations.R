@@ -19,7 +19,7 @@
 #'             dimnames = list(sprintf("row_%s", 1:6), sprintf("met_%s", 1:3)))
 #' tab_assoc <- calc_assoc(X, Y)
 #' 
-#' @seealso \code{\link[cdsrmodels]{lin_associations}}
+#' @seealso \code{\link[cdsrmodels:lin_associations]{cdsrmodels::lin_associations}}
 #' 
 #' @keywords internal
 #' 

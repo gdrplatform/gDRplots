@@ -15,7 +15,7 @@
 #' Should be specified alongside \code{cellline1}.
 #' @param normalization_type A string with normalization types to be selected, one of:
 #' "GR" ("GRvalue") or "RV" ("RelativeViability").
-#' Passed to \code{\link[gDRplots]{prep_dt_response_metric_diff}}.
+#' Passed to \code{\link{prep_dt_response_metric_diff}}.
 #'
 #' @return A list of results, where each element corresponds to a cell line or cell line difference.
 #' Each result contains:

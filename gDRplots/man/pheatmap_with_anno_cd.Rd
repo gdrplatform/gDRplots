@@ -22,7 +22,7 @@ pheatmap_with_anno_cd(
 }
 \arguments{
 \item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+outputted by  \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and co-dilution \code{SummarizedExperiment}}
 
 \item{normalization_type}{string with normalization types to be selected
@@ -49,7 +49,7 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 
 \item{distfun}{function used to compute the distance (dissimilarity) between both rows and columns;
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
-the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
+the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on the left side 
 of the heatmap.
@@ -137,7 +137,7 @@ ggpubr::as_ggplot(hm_3[["gtable"]])
 
 }
 \seealso{
-\code{\link[pheatmap]{pheatmap}}
+\code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

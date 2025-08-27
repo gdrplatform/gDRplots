@@ -10,7 +10,7 @@ prep_dt_depmap_meta(meta_data_path, metadata_col = "PatientRace")
 \item{meta_data_path}{string with path to metadata file describing all cancer models/cell lines}
 }
 \value{
-A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 \itemize{
   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
   \item \code{selected_feat_meta_col} string name of metadata column.

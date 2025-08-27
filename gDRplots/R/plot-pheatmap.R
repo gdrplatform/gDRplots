@@ -1,7 +1,7 @@
 #' Plot pretty heatmap for single-agent or combo data to control quality of the data
 #'    
 #' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
-#'    outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#'    outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'    and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -18,11 +18,11 @@
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
 #'   used for the dendrogram when \code{cluster_rows} is set to TRUE; 
-#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
+#'   the default is \code{\link{compute_distances}} using Spearman method.
 #' @param lbl_by_CellLineName logical flag whether heatmap should be described by CellLineNames instead of clid
 #' @param lbl_by_DrugName logical flag whether heatmap should be described by DrugName instead of Gnumber
 #' 
-#' @seealso \code{\link[pheatmap]{pheatmap}}
+#' @seealso \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 #'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -279,11 +279,12 @@ pheatmap_qc <- function(
 
 #' Plot pretty heatmap with annotations for single-agent data
 #'
-#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#' @param dt_metrics \code{data.table} representing data from the \code{"Metrics"} assay,
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and single-agent \code{SummarizedExperiment}
-#' @param dt_metrics_capped \code{data.table} representing data from the \code{Metrics} assay,
-#'  the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}
+#' @param dt_metrics_capped \code{data.table} representing data from the \code{"Metrics"} assay,
+#'  the same as \code{dt_metrics} but with capped values with 
+#'  \code{\link[gDRutils:cap_assay_infinities]{gDRutils::cap_assay_infinities}}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
@@ -305,7 +306,7 @@ pheatmap_qc <- function(
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
 #'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
-#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
+#'   the default is \code{\link{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -317,7 +318,7 @@ pheatmap_qc <- function(
 #'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 #'   Not described elements will be colored in default.
 #' 
-#' @seealso \code{\link[pheatmap]{pheatmap}}
+#' @seealso \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 #'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix")
@@ -604,7 +605,7 @@ pheatmap_with_anno_sa <- function(
 #' Plot pretty heatmap with annotations for co-dilution data
 #'
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by  \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and co-dilution \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -628,7 +629,7 @@ pheatmap_with_anno_sa <- function(
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
 #' @param distfun function used to compute the distance (dissimilarity) between both rows and columns;
 #'   used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
-#'   the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.
+#'   the default is \code{\link{compute_distances}} using Spearman method.
 #' @param annotation_col \code{data.table} that specifies the annotations shown above the heatmap.
 #'   Each row defines the features for a specific column. The columns in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{CellLineName} column.
@@ -640,7 +641,7 @@ pheatmap_with_anno_sa <- function(
 #'   each value described in \code{annotation_row} and in \code{annotation_col}, respectively.
 #'   Not described elements will be colored by default.
 #' 
-#' @seealso \code{\link[pheatmap]{pheatmap}}
+#' @seealso \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 #'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_codilution_small")
@@ -905,7 +906,7 @@ pheatmap_with_anno_cd <- function(
 #' Plot pretty heatmap with annotations for combo data
 #' 
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
-#'   outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'   outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'   and combo \code{SummarizedExperiment}
 #' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
@@ -1210,10 +1211,10 @@ get_hm_title <- function(metric = "xc50",
 #' Prep matrix with metric value based on the Metrics assay
 #'
 #' @param dt_response \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and single-agent \code{SummarizedExperiment} or 
 #'  \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and combo \code{SummarizedExperiment}
 #' @param normalization_type string with normalization types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
@@ -1473,7 +1474,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @param mat_to_cluster numeric matrix to be clustered; cluster dimension must be named
 #' @param distfun function used to compute the distance (dissimilarity) between rows;
-#'   defaults to \code{\link[stats]{dist}} using euclidean euclidean.
+#'   defaults to \code{\link[stats:dist]{stats::dist}} using euclidean euclidean.
 #' @param additional_condition additional logical flag whether rows/columns should be clustered 
 #'
 #' @return logical flag determining if rows should be clustered or \code{hclust} object.

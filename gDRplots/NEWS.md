@@ -1,5 +1,8 @@
-## gDRplots 0.0.92 - 2025-08-26
+## gDRplots 0.0.93 - 2025-08-27
 * fix usage of `ifelse`
+
+## gDRplots 0.0.92 - 2025-08-21
+* add prep function for omics data
 
 ## gDRplots 0.0.91 - 2025-08-08
 * fix order of boxplots in `plot_boxplot_num_panel`

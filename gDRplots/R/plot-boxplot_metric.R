@@ -186,13 +186,14 @@ plot_boxplot_metric_sa <- function(
     names(color_points) <- unique(dt_met[[point_var]])
     
     plt <- plt +
-      ggplot2::geom_jitter(mapping = ggplot2::aes(color = get(point_var)), size = 2,
+      ggplot2::geom_jitter(mapping = ggplot2::aes(color = get(point_var)), size = 2, alpha = 0.75,
                            width = 0.2, height = 0, na.rm = TRUE) +
       ggplot2::scale_color_manual(name = drug_name, values = color_points) +
       ggplot2::guides(color = ggplot2::guide_legend(title = point_var))
   } else {
     plt <- plt +
-      ggplot2::geom_jitter(color = jitter_poinst_color, width = 0.2, height = 0, na.rm = TRUE)
+      ggplot2::geom_jitter(color = jitter_poinst_color, alpha = 0.75,
+                           width = 0.2, height = 0, na.rm = TRUE)
   }
   
   # final
@@ -547,13 +548,14 @@ plot_boxplot_metric_combo <- function(
     names(color_points) <- unique(dt_sco[[point_var]])
     
     plt <- plt +
-      ggplot2::geom_jitter(mapping = ggplot2::aes(color = get(point_var)), size = 2,
+      ggplot2::geom_jitter(mapping = ggplot2::aes(color = get(point_var)), size = 2, alpha = 0.75,
                            width = 0.2, height = 0, na.rm = TRUE) +
       ggplot2::scale_color_manual(name = drug_name, values = color_points) +
       ggplot2::guides(color = ggplot2::guide_legend(title = point_var))
   } else {
     plt <- plt +
-      ggplot2::geom_jitter(color = jitter_poinst_color, width = 0.2, height = 0, na.rm = TRUE)
+      ggplot2::geom_jitter(color = jitter_poinst_color, alpha = 0.75,
+                           width = 0.2, height = 0, na.rm = TRUE)
   }
   
   # final

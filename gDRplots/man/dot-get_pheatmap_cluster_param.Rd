@@ -14,7 +14,7 @@
 \item{mat_to_cluster}{numeric matrix to be clustered; cluster dimension must be named}
 
 \item{distfun}{function used to compute the distance (dissimilarity) between rows;
-defaults to \code{\link[stats]{dist}} using euclidean euclidean.}
+defaults to \code{\link[stats:dist]{stats::dist}} using euclidean euclidean.}
 
 \item{additional_condition}{additional logical flag whether rows/columns should be clustered}
 }

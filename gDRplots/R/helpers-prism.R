@@ -1,7 +1,7 @@
 #' Prep table with metric values for single-agent experiment
 #' 
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and single-agent \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
@@ -11,7 +11,7 @@
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -83,7 +83,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #' Prep table with metric values by doses for single-agent experiment
 #' 
 #' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param normalization_type string with normalization types to be selected
@@ -93,7 +93,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #'  or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -153,7 +153,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #' Prep table with metric values for combination experiment
 #' 
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
@@ -164,7 +164,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 #'  depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -220,7 +220,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' Prep table with metric values for combination experiment
 #' 
 #' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
-#'  outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'  and combo \code{SummarizedExperiment}
 #' @param d_name string representing the drug name to be plotted (identifier \code{DrugName}).
 #'  If set to NULL, the function will return a table for all available DrugName
@@ -239,7 +239,7 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param fit_source string source name for metrics
 #' @param additional_cols character vector with additional cols that should be included in the output
 #' 
-#' @return \code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 #' @keywords prism_plots
 #' 
 #' @examples
@@ -419,8 +419,10 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param feature_set string containing the name of the molecular feature set to load from DepMap.
 #'  This name should also correspond to the file containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
+#' @param with_decoding logical whether the feature (OmicsArmLevelCNA) 
+#'  should be encoded into a 0-1 scheme
 #'
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
 #'   \item \code{selected_feat_meta_col} string name of feature.
@@ -438,15 +440,19 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @export
 prep_dt_depmap_feat <- function(feat_data_path,
                                 meta_data_path,
-                                feature_set = "CRISPRGeneEffect") {
+                                feature_set = "CRISPRGeneEffect",
+                                with_decoding = FALSE
+) {
   
   checkmate::assert_string(feat_data_path)
   checkmate::assert_string(feature_set)
+  checkmate::assert_flag(with_decoding)
   feat_path <- file.path(feat_data_path, paste0(feature_set, ".csv"))
   checkmate::assert_file_exists(feat_path)
   checkmate::assert_string(meta_data_path)
   checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
   checkmate::assert_file_exists(meta_data_path)
+  
   
   # check whether feature is supported
   dt_feat_2row <- data.table::fread(feat_path, nrows = 2, select = 1)
@@ -466,6 +472,15 @@ prep_dt_depmap_feat <- function(feat_data_path,
     dict_id <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
                                    metadata_col = "ModelID")[["dt_depmap"]]
     dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
+    
+    # decoding
+    if (feature_set == "OmicsArmLevelCNA" && with_decoding) {
+      dt_depmap <- .prep_dt_OmicsArmLevelCNA(dt_depmap)
+    }
+    if (feature_set %in% c("OmicsSomaticMutationsMatrixHotspot",
+                           "OmicsSomaticMutationsMatrixDamaging") && with_decoding) {
+      dt_depmap <- .prep_dt_OmicsSomaticMutationsMatrix(dt_depmap)
+    }
   } else {
     message(sprintf("The `%s` feature is not supported.", feature_set))
     dt_depmap <- NULL
@@ -483,7 +498,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #'  It is usually a file named \code{Model.csv}.
 #' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{prep_dt_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
 #'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
 #'   \item \code{selected_feat_meta_col} string name of metadata column.
@@ -544,11 +559,11 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
 #' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
 #'   (rows are samples, columns are features or meta);  
-#'   outputted by one of \code{\link[gDRplots]{prep_dt_depmap_feat}} or
-#'   \code{\link[gDRplots]{prep_dt_depmap_meta}}
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} or
+#'   \code{\link{prep_dt_depmap_meta}}
 #' @param selected_feat_meta_col string name of feature/meta column in DepMap
 #'   
-#' @return A named list with elements, that may be input to \code{\link[gDRplots]{plot_volcano_assoc}}
+#' @return A named list with elements, that may be input to \code{\link{plot_volcano_assoc}}
 #' \itemize{
 #'   \item \code{dt_assoc} \code{data.table} with calculated association values between 
 #'      feature/meta of DepMap and selected metric,
@@ -638,6 +653,93 @@ prep_dt_assoc <- function(dt_response,
       obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
     }
   }
-  # return
+
   return(obj_assoc)
+}
+
+
+#' Encode OmicsArmLevelCNA as not mutated and mutated
+#' 
+#' OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data 
+#' from PureCN, method from the Ben-David et al. (2021) paper (https://www.nature.com/articles/s41586-020-03114-6).
+#' Chromosome arms: \emph{1} indicates arm-level gain, \emph{-1} indicates arm-level loss, 
+#' and \emph{0} indicates copy-neutral.
+#' 
+#' This function transform each chromosome column (e.g., \code{3p}) into two new binary columns: 
+#' \code{3p_loss} and \code{3p_gain}. \code{3p_loss} is \emph{1} for values of \emph{-1} in the original column 
+#' and \emph{0} otherwise. \code{3p_gain} is \emph{1} for values of \emph{1} in the original column 
+#' and \emph{0} otherwise. The original chromosome column is then removed.
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);  
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsArmLevelCNA
+#'
+#' @return \code{data.table} with OmicsArmLevelCNA decoded as mutated - not mutated
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
+.prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_depmap)
+  
+  ls_chro <- grep("^[0-9].*(p$|q$)", names(dt_depmap), value = TRUE)
+  
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, paste0(ls_chro, "_loss") := lapply(.SD, function(x) { 
+    data.table::fifelse(x == -1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_recoded[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) { 
+    data.table::fifelse(x == 1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_recoded[, (ls_chro) := NULL]
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
+
+  return(dt_depmap_recoded)
+}
+
+#' Binarize somatic mutations in OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging
+#' 
+#' OmicsSomaticMutationsMatrixHotspot is genotyped matrix determining for each cell line whether 
+#' each gene has at least one hot spot mutation.
+#' A variant is considered a hot spot if it's present in one of the following: 
+#' Hess et al. (2019) paper, OncoKB hotspot, COSMIC mutation significance tier 1.
+#' 
+#' OmicsSomaticMutationsMatrixDamaging is genotyped matrix determining for each cell line whether 
+#' each gene has at least one damaging mutation. A variant is considered a damaging mutation 
+#' if LikelyLoF is True
+#' 
+#' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
+#' 
+#' in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
+#' is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation), 
+#' otherwise a value of \emph{1} is assigned (likely heterozygous).
+#' 
+#' This function transforms each gene column into binary columns:
+#' \emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of zygosity
+#' (the original value was \emph{1} or \emph{2}).
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);  
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsSomaticMutationsMatrixHotspot
+#'   or OmicsSomaticMutationsMatrixDamaging
+#'
+#' @return \code{data.table} with OmicsSomaticMutationsMatrixHotspot or OmicsSomaticMutationsMatrixDamaging
+#'  decoded as not mutated and mutated
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
+.prep_dt_OmicsSomaticMutationsMatrix <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_depmap)
+  
+  ls_gene <- 
+    names(dt_depmap)[vapply(names(dt_depmap), function(nm) is.numeric(dt_depmap[[nm]]), logical(1))]
+  
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, (ls_gene) := lapply(.SD, function(x) { 
+    data.table::fifelse(x == 2, 1, x) }), .SDcols = ls_gene]
+  
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
+
+  return(dt_depmap_recoded)
 }

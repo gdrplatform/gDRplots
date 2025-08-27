@@ -14,7 +14,7 @@ prep_dt_response_metric_sa(
 }
 \arguments{
 \item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and single-agent \code{SummarizedExperiment}}
 
 \item{d_name}{string with drug name to be plotted (identifiers \code{DrugName})}
@@ -29,7 +29,7 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 \item{fit_source}{string source name for metrics}
 }
 \value{
-\code{data.table} with selected metric, input to \code{\link[gDRplots]{prep_dt_assoc}}
+\code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
 }
 \description{
 Prep table with metric values for single-agent experiment

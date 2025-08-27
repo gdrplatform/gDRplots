@@ -50,7 +50,7 @@
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @seealso \code{\link[knitr]{knit}}
+#' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #' 
 #' @export
 prep_plot_chunk <- function(plt_list,
@@ -199,7 +199,7 @@ prep_plot_chunk <- function(plt_list,
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @seealso \code{\link[knitr]{knit}}
+#' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #' 
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
@@ -346,7 +346,8 @@ neutralize_spaces <- function(x,
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
 #'
-#' @return named vector with optimal width and height used in \code{\link[ggplot2]{ggsave}} function
+#' @return named vector with optimal width and height used 
+#'    in the \code{\link[ggplot2:ggsave]{ggplot2::ggsave}} function
 #'
 #' @examples
 #' p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()
@@ -400,7 +401,7 @@ estimate_plot_size <- function(plt,
 #' save_plot(plt = p, path = paste(tmp_dir, "mtcars_scatter", sep = "/"), format = "png")
 #'
 #' @keywords internal
-#' @seealso \code{\link[ggplot2]{ggsave}}
+#' @seealso \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
 #' 
 #' @export
 save_plot <- function(plt, path, format = "svg") {
@@ -595,7 +596,7 @@ prep_double_table_chunk <- function(tbl_list,
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @seealso \code{\link[knitr]{knit}}
+#' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #' 
 #' @export
 create_zoom_link <- function(img_path,
@@ -625,7 +626,7 @@ create_zoom_link <- function(img_path,
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @seealso \code{\link[knitr]{knit}}
+#' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #' 
 #' @export
 create_download_link <- function(dwn_path,
@@ -644,7 +645,7 @@ create_download_link <- function(dwn_path,
 
 #' Prepare list of names or paths
 #' 
-#' This function can creates lists that can be used as an input to \code{\link[gDRplots]{prep_plot_chunk}} -
+#' This function can creates lists that can be used as an input to \code{\link{prep_plot_chunk}} -
 #' param \code{link_list} and \code{dwn_list}. 
 #' Depending on the inputs, outputted string will have a format:
 #' \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
@@ -690,7 +691,7 @@ create_download_link <- function(dwn_path,
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @seealso \code{\link[gDRplots]{prep_plot_chunk}}
+#' @seealso \code{\link{prep_plot_chunk}}
 #' 
 #' @export
 prep_filename_path <- function(plt_list,

@@ -22,12 +22,13 @@ pheatmap_with_anno_sa(
 )
 }
 \arguments{
-\item{dt_metrics}{\code{data.table} representing data from the \code{Metrics} assay,
-outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
+\item{dt_metrics}{\code{data.table} representing data from the \code{"Metrics"} assay,
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and single-agent \code{SummarizedExperiment}}
 
-\item{dt_metrics_capped}{\code{data.table} representing data from the \code{Metrics} assay,
-the same as \code{dt_metrics} but with capped values with \code{\link[gDRutils]{cap_assay_infinities}}}
+\item{dt_metrics_capped}{\code{data.table} representing data from the \code{"Metrics"} assay,
+the same as \code{dt_metrics} but with capped values with 
+\code{\link[gDRutils:cap_assay_infinities]{gDRutils::cap_assay_infinities}}}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -54,7 +55,7 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 
 \item{distfun}{function used to compute the distance (dissimilarity) between both rows and columns;
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
-the default is \code{\link[gDRplots]{compute_distances}} using Spearman method.}
+the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
@@ -152,7 +153,7 @@ ggpubr::as_ggplot(hm_3[["gtable"]])
 
 }
 \seealso{
-\code{\link[pheatmap]{pheatmap}}
+\code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

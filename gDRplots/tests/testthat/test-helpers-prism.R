@@ -481,6 +481,10 @@ test_that("prep_dt_depmap_feat works as expected", {
                                    meta_data_path = test_meta_data_path,
                                    feature_set = "some_feat"),
                "Assertion on 'feat_path' failed: File does not exist")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = test_meta_data_path,
+                                   with_decoding = "decode"),
+               "Assertion on 'with_decoding' failed: Must be of type 'logical flag'")
 })
 
 
@@ -567,4 +571,94 @@ test_that("prep_dt_assoc works as expected", {
     prep_dt_assoc(dt_response = dt_response_met[, .SD, .SDcols = c("CellLineName", sel_met_2)],
                   dt_depmap = dt_depmap_not_num),
     "Provide `dt_depmap` with numeric values.")
+})
+
+
+test_that(".prep_dt_OmicsArmLevelCNA works as expected", {
+  data_path <- system.file("testdata/OmicsArmLevelCNA.csv", package = "gDRplots")
+  tab_raw <- data.table::fread(data_path)
+  ls_chro <- grep("^[0-9].*(p$|q$)", names(tab_raw), value = TRUE)
+  id_col <- setdiff(names(tab_raw), ls_chro)
+  
+  res_1 <- .prep_dt_OmicsArmLevelCNA(tab_raw)
+  expect_is(res_1, "data.table")
+  expect_equal(names(res_1),
+               c(id_col, paste0(ls_chro, "_loss"), paste0(ls_chro, "_gain")))
+  expect_true(all(
+    vapply(ls_chro, function(i) { 
+      all(res_1[[id_col]][res_1[[paste0(ls_chro[i], "_loss")]] == 1] == 
+            tab_raw[[id_col]][tab_raw[[ls_chro[i]]] == -1])
+    }, logical(1))))
+  expect_true(all(
+    vapply(ls_chro, function(i) { 
+      all(res_1[[id_col]][res_1[[paste0(ls_chro[i], "_gain")]] == 1] == 
+            tab_raw[[id_col]][tab_raw[[ls_chro[i]]] == 1])
+    }, logical(1))))
+  
+  # scenario: check recording inside prep_dt_depmap_feat
+  test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  test_feat_data_path <- system.file("testdata", package = "gDRplots")
+  
+  res_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsArmLevelCNA",
+                               with_decoding = TRUE)
+  expect_is(res_2, "list")
+  expect_is(res_2[[1]], "data.table")
+  expect_equal(res_2$selected_feat_meta_col, "OmicsArmLevelCNA")
+  expect_equal(res_2[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               res_1[, .SD, .SDcols = -id_col])
+  
+  res_3 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsArmLevelCNA",
+                               with_decoding = FALSE)
+  expect_is(res_3, "list")
+  expect_is(res_3[[1]], "data.table")
+  expect_equal(res_3[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               tab_raw[, .SD, .SDcols = -id_col])
+  
+  expect_error(.prep_dt_OmicsArmLevelCNA(dt_depmap = as.list(tab_raw)),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
+})
+
+
+test_that(".prep_dt_OmicsSomaticMutationsMatrix works as expected", {
+  data_path <- system.file("testdata/OmicsSomaticMutationsMatrixHotspot.csv", package = "gDRplots")
+  tab_raw <- data.table::fread(data_path)
+  ls_gene <- names(tab_raw)[vapply(names(tab_raw), function(nm) is.numeric(tab_raw[[nm]]), logical(1))]
+  id_col <- setdiff(names(tab_raw), ls_gene)
+  col_with_2 <- names(tab_raw)[vapply(names(tab_raw), function(nm) {
+    any(tab_raw[[nm]] == 2 & !is.na(tab_raw[[nm]])) 
+  }, logical(1))]
+  
+  res_1 <- .prep_dt_OmicsSomaticMutationsMatrix(tab_raw)
+  expect_is(res_1, "data.table")
+  expect_false(any(res_1[[col_with_2]] == 2))
+  
+  # scenario: check recording inside prep_dt_depmap_feat
+  test_meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  test_feat_data_path <- system.file("testdata", package = "gDRplots")
+  
+  res_2 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsSomaticMutationsMatrixHotspot",
+                               with_decoding = TRUE)
+  expect_is(res_2, "list")
+  expect_is(res_2[[1]], "data.table")
+  expect_equal(res_2$selected_feat_meta_col, "OmicsSomaticMutationsMatrixHotspot")
+  expect_equal(res_2[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               res_1[, .SD, .SDcols = -id_col])
+  
+  res_3 <- prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                               meta_data_path = test_meta_data_path,
+                               feature_set = "OmicsSomaticMutationsMatrixHotspot",
+                               with_decoding = FALSE)
+  expect_is(res_3, "list")
+  expect_is(res_3[[1]], "data.table")
+  expect_equal(res_3[[1]][, .SD, .SDcols = -c("ModelID", "CCLEName")],
+               tab_raw[, .SD, .SDcols = -id_col])
+  
+  expect_error(.prep_dt_OmicsArmLevelCNA(dt_depmap = as.list(tab_raw)),
+               "Assertion on 'dt_depmap' failed: Must be a data.table")
 })
