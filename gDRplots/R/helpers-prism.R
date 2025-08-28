@@ -419,8 +419,8 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param feature_set string containing the name of the molecular feature set to load from DepMap.
 #'  This name should also correspond to the file containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
-#' @param with_decoding logical whether the feature (OmicsArmLevelCNA) 
-#'  should be encoded into a 0-1 scheme
+#' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+#'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
 #'
 #' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{

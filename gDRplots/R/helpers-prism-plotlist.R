@@ -47,6 +47,8 @@
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' @param clear_taxonomy_info logical flag whether to remove taxonomy information for gene names in table
 #'  with the molecular feature sets from DepMap.
+#' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+#'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
 #' 
 #' @return A named list with elements:
 #' \itemize{
@@ -72,7 +74,9 @@
                                     feat_data_path,
                                     feature_sets,
                                     metadata_columns = NULL,
-                                    clear_taxonomy_info = TRUE) {
+                                    clear_taxonomy_info = TRUE,
+                                    with_decoding = FALSE
+) {
   
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
@@ -213,7 +217,8 @@
     obj_depmap <- if (depmap_items$feat_meta_type[[i_feat_meta]] == "feature") {
       prep_dt_depmap_feat(feat_data_path = feat_data_path, 
                           meta_data_path = meta_data_path, 
-                          feature_set = depmap_items$feat_meta_name[[i_feat_meta]])
+                          feature_set = depmap_items$feat_meta_name[[i_feat_meta]],
+                          with_decoding = with_decoding)
     } else {
       prep_dt_depmap_meta(meta_data_path = meta_data_path,
                           metadata_col = depmap_items$feat_meta_name[[i_feat_meta]])
@@ -332,7 +337,9 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       feat_data_path,
                                       feature_sets,
                                       metadata_columns = NULL,
-                                      clear_taxonomy_info = TRUE) {
+                                      clear_taxonomy_info = TRUE,
+                                      with_decoding = FALSE
+) {
   .create_PRISM_plot_list(
     experiment_type = "sa",
     drug1_name_vec = drug_name_vec,
@@ -346,7 +353,8 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
     feat_data_path = feat_data_path,
     feature_sets = feature_sets,
     metadata_columns = metadata_columns,
-    clear_taxonomy_info = clear_taxonomy_info
+    clear_taxonomy_info = clear_taxonomy_info,
+    with_decoding = with_decoding
   )
 }
 
@@ -377,7 +385,9 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
                                          feat_data_path,
                                          feature_sets,
                                          metadata_columns = NULL,
-                                         clear_taxonomy_info = TRUE) {
+                                         clear_taxonomy_info = TRUE,
+                                         with_decoding = FALSE
+) {
   .create_PRISM_plot_list(
     experiment_type = "combo",
     drug1_name_vec = drug1_name_vec,
@@ -393,7 +403,8 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
     feat_data_path = feat_data_path,
     feature_sets = feature_sets,
     metadata_columns = metadata_columns,
-    clear_taxonomy_info = clear_taxonomy_info
+    clear_taxonomy_info = clear_taxonomy_info,
+    with_decoding = with_decoding
   )
 }
 
