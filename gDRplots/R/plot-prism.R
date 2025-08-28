@@ -158,6 +158,8 @@ plot_scatter_with_corr <- function(dt_response,
   tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
   # remove NA
   tab_plot <- stats::na.omit(tab_plot)
+  # remove Inf
+  tab_plot <- tab_plot[!is.infinite(get(selected_metric)), ]
   
   if (NROW(tab_plot) == 0) {
     plt <- 
@@ -271,6 +273,8 @@ plot_scatter_with_corr_panel <- function(dt_response,
       if (selected_feat %chin% available_feats) {
         # remove NA
         tab_plot_sel <- stats::na.omit(tab_plot[, c(cellline_name, selected_metric, selected_feat), with = FALSE])
+        # remove Inf
+        tab_plot_sel <- tab_plot_sel[!is.infinite(get(selected_metric)), ]
         
         if (NROW(tab_plot_sel) > 0) { 
           # re-calculate correlation, slope and intercept
