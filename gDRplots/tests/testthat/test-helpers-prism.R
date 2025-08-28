@@ -23,26 +23,34 @@ test_that("prep_dt_response_metric_sa works as expected", {
   
   res <- dt_metrics[get(drug_name) == d_name & normalization_type == "RV", ]
   
-  dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name) # default
+  dt_response <- prep_dt_response_metric_sa(dt_metrics = dt_metrics, 
+                                            d_name = d_name) # default
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "RV_gDR_log10_xc50"))
   expect_equal(NROW(dt_response), NROW(res))
   
   d_name <- "drug_021"
-  dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name, metric = "xc50")
-  dt_response_capped <- prep_dt_response_metric_sa(dt_metrics_capped, d_name, metric = "xc50")
+  
+  dt_response <- prep_dt_response_metric_sa(dt_metrics = dt_metrics, 
+                                            d_name = d_name, 
+                                            metric = "xc50")
+  dt_response_capped <- prep_dt_response_metric_sa(dt_metrics = dt_metrics_capped, 
+                                                   d_name = d_name, 
+                                                   metric = "xc50")
   expect_identical(dt_response[, c(meta_col)], dt_response_capped[, c(meta_col)])
   expect_true(all(is.infinite(dt_response$RV_gDR_log10_xc50)))
   expect_false(all(is.infinite(dt_response_capped$RV_gDR_log10_xc50)))
   
-  dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name,
+  dt_response <- prep_dt_response_metric_sa(dt_metrics = dt_metrics, 
+                                            d_name = d_name,
                                             normalization_type = "GR",
                                             metric = c("xc50", "x_mean"))
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "GR_gDR_log10_xc50", "GR_gDR_x_mean"))
   
   sel_met <- c("xc50", "x_mean", "x_max")
-  dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name,
+  dt_response <- prep_dt_response_metric_sa(dt_metrics = dt_metrics, 
+                                            d_name = d_name,
                                             metric = sel_met)
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "RV_gDR_log10_xc50", sprintf("RV_gDR_%s", sel_met[2:3])))
@@ -87,12 +95,14 @@ test_that("prep_dt_response_dose_sa works as expected", {
     formula = get(cellline_name) ~ get(conc),
     metric = "x")
   
-  dt_response <- prep_dt_response_dose_sa(dt_average, d_name) # default
+  dt_response <- prep_dt_response_dose_sa(dt_average = dt_average,
+                                          d_name = d_name) # default
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("RV_gDR_x_%s", ls_conc)))
   expect_equal(NROW(dt_response), NROW(res))
   
-  dt_response <- prep_dt_response_dose_sa(dt_average, d_name,
+  dt_response <- prep_dt_response_dose_sa(dt_average = dt_average,
+                                          d_name = d_name,
                                           normalization_type = "GR",
                                           metric = "x_std")
   expect_is(dt_response, "data.table")
@@ -133,19 +143,25 @@ test_that("prep_dt_response_scores works as expected", {
   res <- 
     dt_scores[get(drug_name) == d_name & get(drug_name_2) == d_name2 & normalization_type == "RV", ]
   
-  dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2) # default
+  dt_response <- prep_dt_response_scores(dt_scores = dt_scores, 
+                                         d_name = d_name, 
+                                         d_name2 = d_name2) # default
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "RV_gDR_hsa_score"))
   expect_equal(NROW(dt_response), NROW(res))
   
-  dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2,
+  dt_response <- prep_dt_response_scores(dt_scores = dt_scores, 
+                                         d_name = d_name, 
+                                         d_name2 = d_name2,
                                          normalization_type = "GR",
                                          metric = "bliss_score") 
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "GR_gDR_bliss_score"))
   
   sel_met <- c("hsa_score", "bliss_score")
-  dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2,
+  dt_response <- prep_dt_response_scores(dt_scores = dt_scores, 
+                                         d_name = d_name, 
+                                         d_name2 = d_name2,
                                          metric = sel_met)
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("RV_gDR_%s", sel_met)))

@@ -1,6 +1,12 @@
 context("Test helpers-prism-plotlist")
 
 test_that(".create_PRISM_plot_list works as expected", {
+  meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
+  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
+  feat_data_path <- system.file("testdata", package = "gDRplots")
+  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
+  
+  # scenario: creat PRISM plot for single-agent data
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics_sa <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -8,11 +14,6 @@ test_that(".create_PRISM_plot_list works as expected", {
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Averaged")
   d_names_sa <- c("drug_021", "drug_026")
-  
-  meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
-  feat_data_path <- system.file("testdata", package = "gDRplots")
-  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
   
   res_1  <- .create_PRISM_plot_list(experiment_type = "sa",
                                     dt_metrics_sa = dt_metrics_sa,
@@ -43,6 +44,7 @@ test_that(".create_PRISM_plot_list works as expected", {
   expect_length(res_1[[1]][[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
   expect_length(res_1_w[[1]][[1]][[1]][[1]], NROW(c("xc50", "x_mean", "x_max"))) # metrics
   
+  # scenario: creat PRISM plot for combo data
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_metrics_combo <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -239,8 +241,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                        feature_sets = feature_sets)
   }, "There was no data for selected drugs.")
   expect_length(res_5, 0)
-  
-  # testing assertions
+
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = 1:3,
                                          dt_metrics = dt_metrics,
                                          dt_average = dt_average,
@@ -407,6 +408,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
     any(grepl(met, names(res_1[["ls_assoc_data"]][[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1))))
   
+  # scenario: check decoding of OmicsArmLevelCNA
   res_1_decode <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                                drug2_name_vec = d_names_2,
                                                dt_metrics = dt_metrics,
@@ -531,7 +533,6 @@ test_that("create_PRISM_plot_list_combo works as expected", {
   }, "There was no data for selected drugs combination.")
   expect_length(res_5, 0)
   
-  # testing assertions
   expect_error(create_PRISM_plot_list_combo(drug1_name_vec = 1:3,
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
@@ -707,7 +708,10 @@ test_that("create_PRISM_summary_list works as expected", {
     all(data.table::rbindlist(res_2[[i]])$q_value < 0.05)
   }, logical(1)))) # default alpha
   
-  assoc_sum_RV_small <- prep_assoc_summary(dir_path = d_path, ls_file = ls_RV, alpha = 0.001)
+  # scenario: creat summary for empty list
+  assoc_sum_RV_small <- prep_assoc_summary(dir_path = d_path, 
+                                           ls_file = ls_RV, 
+                                           alpha = 0.001)
   res_3 <- create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV_small) 
   expect_is(res_3, "list")
   expect_length(res_3, 0)
