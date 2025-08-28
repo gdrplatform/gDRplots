@@ -17,7 +17,8 @@ create_PRISM_plot_list_combo(
   feat_data_path,
   feature_sets,
   metadata_columns = NULL,
-  clear_taxonomy_info = TRUE
+  clear_taxonomy_info = TRUE,
+  with_decoding = FALSE
 )
 }
 \arguments{
@@ -60,6 +61,9 @@ These names should also correspond to the file names containing the feature data
 
 \item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table
 with the molecular feature sets from DepMap.}
+
+\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 }
 \value{
 A named list with elements:
