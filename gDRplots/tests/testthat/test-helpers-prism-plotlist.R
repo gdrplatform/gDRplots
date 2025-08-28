@@ -1,10 +1,10 @@
 context("Test helpers-prism-plotlist")
 
-test_that("create_PRISM_plot_list_sa works as expected", {
+test_that(".create_PRISM_plot_list works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                 assay_name = "Metrics")
+  dt_metrics_sa <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                    assay_name = "Metrics")
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Averaged")
   d_names_sa <- c("drug_021", "drug_026")
@@ -15,14 +15,14 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
   
   res_1  <- .create_PRISM_plot_list(experiment_type = "sa",
-                                    dt_metrics_sa = dt_metrics,
+                                    dt_metrics_sa = dt_metrics_sa,
                                     drug1_name_vec = d_names_sa,
                                     meta_data_path = meta_data_path,
                                     feat_data_path = feat_data_path,
                                     feature_sets = feature_sets) # default
   
   res_1_w  <- create_PRISM_plot_list_sa(drug_name_vec = d_names_sa,
-                                        dt_metrics = dt_metrics,
+                                        dt_metrics = dt_metrics_sa,
                                         meta_data_path = meta_data_path,
                                         feat_data_path = feat_data_path,
                                         feature_sets = feature_sets) # default
@@ -45,8 +45,8 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
-                                                 assay_name = "Metrics")
+  dt_metrics_combo <- gDRutils::convert_se_assay_to_dt(se = se,
+                                                       assay_name = "Metrics")
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   d_names <- c("drug_004", "drug_005")
@@ -54,7 +54,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   
   res_2 <- .create_PRISM_plot_list(experiment_type = "combo",
                                    dt_metrics_sa = NULL,
-                                   dt_metrics_combo = dt_metrics,
+                                   dt_metrics_combo = dt_metrics_combo,
                                    drug1_name_vec = d_names,
                                    drug2_name_vec = d_names_2,
                                    meta_data_path = meta_data_path,
@@ -63,7 +63,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   
   res_2_w <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                           drug2_name_vec = d_names_2,
-                                          dt_metrics = dt_metrics,
+                                          dt_metrics = dt_metrics_combo,
                                           meta_data_path = meta_data_path,
                                           feat_data_path = feat_data_path,
                                           feature_sets = feature_sets) # default
@@ -86,6 +86,15 @@ test_that("create_PRISM_plot_list_sa works as expected", {
     any(grepl(met, names(res_2[[1]][[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
   expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
     any(grepl(met, names(res_2_w[[1]][[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
+  
+  # testing assertions
+  expect_error(.create_PRISM_plot_list(experiment_type = "str",
+                                       dt_metrics_sa = dt_metrics_sa,
+                                       drug1_name_vec = d_names_sa,
+                                       meta_data_path = meta_data_path,
+                                       feat_data_path = feat_data_path,
+                                       feature_sets = feature_sets),
+               "Assertion on 'experiment_type' failed: Must be element of set")
 })
 
 test_that("create_PRISM_plot_list_sa works as expected", {
@@ -120,6 +129,29 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                              function(nm) NROW(res_1[[nm]][[1]][[1]][["RV"]]), numeric(1))),
                NROW(c("xc50", "x_mean", "x_max")) + NROW(unique(dt_average$Concentration)))
   
+  # scenario: check decoding of OmicsSomaticMutationsMatrixHotspot
+  res_1_decode <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                            dt_metrics = dt_metrics,
+                                            dt_average = dt_average,
+                                            meta_data_path = meta_data_path,
+                                            feat_data_path = feat_data_path,
+                                            feature_sets = feature_sets,
+                                            with_decoding = TRUE)
+  expect_is(res_1_decode, "list")
+  expect_length(res_1_decode, NROW(c("ls_plot", "ls_assoc_data")))
+  
+  .select <- function(ls_, drug_) {
+    ls_[["ls_assoc_data"]][["OmicsSomaticMutationsMatrixHotspot"]][[drug_]][["RV"]]
+  }
+  expect_false(all(
+    vapply(seq_along(.select(res_1_decode, d_names[1])), function(i) {
+      if (!is.null(.select(res_1_decode, d_names[1])[[i]])) {
+        identical(.select(res_1_decode, d_names[1])[[i]], .select(res_1, d_names[1])[[i]])
+      } else {
+        FALSE # for xc50 is NULL
+      }
+    }, logical(1))))
+  
   # scenario: only dt_metrics and not available feature
   res_2 <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                      dt_metrics = dt_metrics,
@@ -142,6 +174,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_is(res_2[["ls_plot"]][[1]][[1]][["RV"]][[1]], "ggplot")
   expect_is(res_2[["ls_assoc_data"]][[1]][[1]][["RV"]][[1]], "data.table")
   
+  # scenario: check default dt_average
   res_2_bis <- create_PRISM_plot_list_sa(drug_name_vec = d_names,
                                          dt_metrics = dt_metrics,
                                          metric = "x_mean",
@@ -326,22 +359,30 @@ test_that("create_PRISM_plot_list_sa works as expected", {
                                          feature_sets = feature_sets,
                                          clear_taxonomy_info = "str"),
                "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
+  expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,
+                                         dt_metrics = dt_metrics,
+                                         dt_average = dt_average,
+                                         meta_data_path = meta_data_path,
+                                         feat_data_path = feat_data_path,
+                                         feature_sets = feature_sets,
+                                         with_decoding = 1),
+               "Assertion on 'with_decoding' failed: Must be of type 'logical flag'")
 })
 
 test_that("create_PRISM_plot_list_combo works as expected", {
-  mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Metrics")
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
-  d_names <- c("drug_004", "drug_005")
+  d_names <- "drug_011"
   d_names_2 <- "drug_021"
   
   meta_data_path <- system.file("testdata/Model.csv", package = "gDRplots")
-  metadata_columns <- c("OncotreeLineage", "Sex", "PatientRace")
+  metadata_columns <- c("OncotreeLineage", "PatientRace")
   feat_data_path <- system.file("testdata", package = "gDRplots")
-  feature_sets <- c("CRISPRGeneEffect", "OmicsSomaticMutationsMatrixHotspot")
+  feature_sets <- c("CRISPRGeneEffect", "OmicsArmLevelCNA")
   
   res_1 <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                         drug2_name_vec = d_names_2,
@@ -366,6 +407,27 @@ test_that("create_PRISM_plot_list_combo works as expected", {
     any(grepl(met, names(res_1[["ls_assoc_data"]][[1]][[1]][[1]])))
   }, FUN.VALUE = logical(1))))
   
+  res_1_decode <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                               drug2_name_vec = d_names_2,
+                                               dt_metrics = dt_metrics,
+                                               dt_scores = dt_scores,
+                                               meta_data_path = meta_data_path,
+                                               feat_data_path = feat_data_path,
+                                               feature_sets = feature_sets,
+                                               with_decoding = TRUE)
+  expect_is(res_1_decode, "list")
+  expect_length(res_1_decode, NROW(c("ls_plot", "ls_assoc_data")))
+  
+  expect_false(any(
+    vapply(seq_along(res_1_decode[["ls_assoc_data"]][["OmicsArmLevelCNA"]][[1]][["RV"]]), function(i) {
+      if (!is.null(res_1_decode[["ls_assoc_data"]][["OmicsArmLevelCNA"]][[1]][["RV"]][[i]])) {
+        identical(res_1_decode[["ls_assoc_data"]][["OmicsArmLevelCNA"]][[1]][["RV"]][[i]], 
+                  res_1[["ls_assoc_data"]][["OmicsArmLevelCNA"]][[1]][["RV"]][[i]])
+      } else {
+        FALSE # for xc50 is NULL
+      }
+    }, logical(1))))
+
   # scenario: only dt_metrics and not available feature
   res_2 <- create_PRISM_plot_list_combo(drug1_name_vec = d_names,
                                         drug2_name_vec = d_names_2,
@@ -602,6 +664,15 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             feature_sets = feature_sets,
                                             clear_taxonomy_info = NULL),
                "Assertion on 'clear_taxonomy_info' failed: Must be of type 'logical flag'")
+  expect_error(create_PRISM_plot_list_combo(drug1_name_vec = d_names,
+                                            drug2_name_vec = d_names_2,
+                                            dt_metrics = dt_metrics,
+                                            dt_scores = dt_scores,
+                                            meta_data_path = meta_data_path,
+                                            feat_data_path = feat_data_path,
+                                            feature_sets = feature_sets,
+                                            with_decoding = list()),
+               "Assertion on 'with_decoding' failed: Must be of type 'logical flag'")
 })
 
 
@@ -640,7 +711,7 @@ test_that("create_PRISM_summary_list works as expected", {
   res_3 <- create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV_small) 
   expect_is(res_3, "list")
   expect_length(res_3, 0)
-
+  
   expect_error(create_PRISM_summary_list(assoc_summary_RV = as.list(assoc_sum_RV)),
                "Assertion on 'assoc_summary_RV' failed: Must be a data.table")
   expect_error(create_PRISM_summary_list(assoc_summary_RV = assoc_sum_RV,
@@ -667,7 +738,7 @@ test_that(".get_info_from_name works as expected", {
   expect_is(res_2, "list")
   expect_length(res_2, 2)
   expect_equal(res_2, list(drug_grid = "drugVIP_001", feat_meta = "MetaForData"))
-
+  
   expect_error(.get_info_from_name(file_name = "name_META_drug_001_RV_AUC",
                                    normalization_type = "GR"), 
                "Assertion on 'file_name' failed: Must comply to pattern")
