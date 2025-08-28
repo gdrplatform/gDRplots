@@ -1626,9 +1626,9 @@ fill_ann_color_map <- function(dt_ann,
 #'                    cluster_cols = FALSE)
 #' }
 #' 
-#' @keywords internal
-#' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
 .get_pheatmap_number_color <- function(mat_with_metric,
                                        colors_vec,
                                        breaks,
@@ -1703,6 +1703,8 @@ fill_ann_color_map <- function(dt_ann,
 #' @param threshold_count integer value of the number of rows/columns for which the font size remains standard.
 #' 
 #' @return numeric value of font size.
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @keywords internal
 .get_pheatmap_fontsize <- function(matrix,
