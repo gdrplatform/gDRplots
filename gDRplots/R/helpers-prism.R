@@ -708,7 +708,6 @@ prep_dt_assoc <- function(dt_response,
 #' if LikelyLoF is True
 #' 
 #' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
-#' 
 #' in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
 #' is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation), 
 #' otherwise a value of \emph{1} is assigned (likely heterozygous).
