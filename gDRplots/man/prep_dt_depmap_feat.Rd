@@ -23,8 +23,8 @@ It is usually a file named \code{Model.csv}.}
 This name should also correspond to the file containing the feature data 
 (without the extension, which is assumed to be \code{csv})}
 
-\item{with_decoding}{logical whether the feature (OmicsArmLevelCNA) 
-should be encoded into a 0-1 scheme}
+\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 }
 \value{
 A named list with elements, that may be input to \code{\link{prep_dt_assoc}}

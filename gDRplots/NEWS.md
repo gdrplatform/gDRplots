@@ -1,3 +1,6 @@
+## gDRplots 0.0.94 - 2025-08-28
+* add omics prep function in reports
+
 ## gDRplots 0.0.93 - 2025-08-27
 * fix usage of `ifelse`
 

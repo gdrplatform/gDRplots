@@ -419,8 +419,8 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @param feature_set string containing the name of the molecular feature set to load from DepMap.
 #'  This name should also correspond to the file containing the feature data 
 #'  (without the extension, which is assumed to be \code{csv})
-#' @param with_decoding logical whether the feature (OmicsArmLevelCNA) 
-#'  should be encoded into a 0-1 scheme
+#' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+#'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
 #'
 #' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 #' \itemize{
@@ -708,7 +708,6 @@ prep_dt_assoc <- function(dt_response,
 #' if LikelyLoF is True
 #' 
 #' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively, 
-#' 
 #' in the same gene for the same cell line, the allele frequencies are summed, and if the sum 
 #' is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation), 
 #' otherwise a value of \emph{1} is assigned (likely heterozygous).

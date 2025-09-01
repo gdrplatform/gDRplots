@@ -53,7 +53,7 @@ for smooth values; the default is the dark purple-light grey palette}
 for excess values; the default is the blue-light grey-red color scale}
 
 \item{limit}{numeric vector of length two providing limits of the scale. 
-Use NA to refer to the existing minimum or maximumdescription}
+Use NA to refer to the existing minimum or maximum}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
