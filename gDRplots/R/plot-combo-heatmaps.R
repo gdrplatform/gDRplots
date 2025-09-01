@@ -21,7 +21,7 @@
 #' @param colors_vec_excess character vector of colors (valid name or hex codes) used in the heatmap
 #'    for excess values; the default is the blue-light grey-red color scale
 #' @param limit numeric vector of length two providing limits of the scale. 
-#'    Use NA to refer to the existing minimum or maximumd
+#'    Use NA to refer to the existing minimum or maximum
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag indicating whether to swap the axes with drugs of the heatmap
 #' @param show_values logical flag indicating whether to show values of the metric on the heatmap
