@@ -42,7 +42,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
   )
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4) # grouped_flag
-  expect_length(plt_4[["guides"]]$guides, 2) # col_var + point_var
+  expect_length(plt_4[["guides"]]$guides, 2)
   expect_true(all(c("colour", "fill") %in% names(plt_4[["guides"]]$guides)))
 
   ls_moa_col <- c("deeppink", "darkcyan", "orange", "darkblue", "gold")
