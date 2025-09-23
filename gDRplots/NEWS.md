@@ -1,3 +1,6 @@
+## gDRplots 0.0.95 - 2025-09-23
+* adjust to ggplot2 v.4.0.
+
 ## gDRplots 0.0.94 - 2025-08-28
 * add omics prep function in reports
 
