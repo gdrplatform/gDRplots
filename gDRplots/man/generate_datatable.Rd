@@ -6,7 +6,7 @@
 \usage{
 generate_datatable(
   tab,
-  options = list(scrollX = TRUE, dom = "t"),
+  options = list(scrollX = TRUE, dom = "ftip"),
   width = "100\%",
   col_to_round = NULL,
   digits = 3,
@@ -18,7 +18,8 @@ generate_datatable(
 \code{data.table} or \code{DFrame}.}
 
 \item{options}{A list of options to customize the DataTable. Defaults to 
-\code{list(scrollX = TRUE, dom = "t")}.}
+\code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information 
+about the number of rows and pagination}
 
 \item{width}{A character string specifying the width of the table. Defaults to "100\%".}
 
