@@ -776,7 +776,8 @@ prep_filename_path <- function(plt_list,
 #' @param tab A dataset to be displayed in the datatable. Must be of class 
 #'   \code{data.table} or \code{DFrame}.
 #' @param options A list of options to customize the DataTable. Defaults to 
-#'   \code{list(scrollX = TRUE, dom = "t")}.
+#'   \code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information 
+#'   about the number of rows and pagination
 #' @param width A character string specifying the width of the table. Defaults to "100\%".
 #' @param col_to_round A character vector with the names of the columns whose values should be rounded.
 #' @param digits A numeric value indicating the number of decimal places to be used for rounding
@@ -791,7 +792,7 @@ prep_filename_path <- function(plt_list,
 #' 
 #' @export
 generate_datatable <- function(tab, 
-                               options = list(scrollX = TRUE, dom = "t"), 
+                               options = list(scrollX = TRUE, dom = "ftip"), 
                                width = "100%",
                                col_to_round = NULL,
                                digits = 3,
