@@ -706,6 +706,7 @@ test_that("generate_datatable works as expected", {
   expect_s3_class(result_dt, "datatables")
   expect_equal(result_dt[["width"]], "100%") # default
   expect_equal(result_dt[["x"]][["options"]][["scrollX"]], TRUE) # default
+  expect_equal(result_dt[["x"]][["options"]][["dom"]], "ftip") # default
   
   result_DF <- generate_datatable(S4Vectors::DataFrame(iris))
   expect_s3_class(result_DF, "datatables")
@@ -723,11 +724,11 @@ test_that("generate_datatable works as expected", {
   expect_s3_class(result_with_caption, "datatables")
   expect_true(grepl(cap_str, result_with_caption[["x"]][["caption"]]))
   
-  dom_str <- "ftp"
-  result_with_search <- generate_datatable(dt_iris, 
-                                           options = list(scrollX = TRUE, dom = dom_str))
-  expect_s3_class(result_with_search, "datatables")
-  expect_equal(result_with_search[["x"]][["options"]][["dom"]], dom_str)
+  dom_str <- "t"
+  result_only_table <- generate_datatable(dt_iris, 
+                                          options = list(scrollX = TRUE, dom = dom_str))
+  expect_s3_class(result_only_table, "datatables")
+  expect_equal(result_only_table[["x"]][["options"]][["dom"]], dom_str)
   
   ls_col <- c("Sepal.Length", "Sepal.Width")
   result_with_rounding <- generate_datatable(dt_iris,

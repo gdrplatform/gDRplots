@@ -295,13 +295,13 @@ heatmap_combo_metrics <- function(
                                           linetype = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                       breaks = available_iso_lvl,
-                                      labels = legend_lbl_iso,
-                                      name = legend_title_iso) +
+                                      labels = legend_lbl_iso) +
           ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                          breaks = available_iso_lvl,
-                                         labels = legend_lbl_iso,
-                                         name = legend_title_iso) +
-          ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+                                         labels = legend_lbl_iso) +
+          ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+          ggplot2::labs(color = legend_title_iso,
+                        linetype = legend_title_iso)
       } else {
         plt <- plt +
           ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
@@ -310,8 +310,8 @@ heatmap_combo_metrics <- function(
                                           color = iso_level)) +
           ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                       breaks = available_iso_lvl,
-                                      labels = legend_lbl_iso,
-                                      name = legend_title_iso)
+                                      labels = legend_lbl_iso) +
+          ggplot2::labs(color = legend_title_iso)
       }
     }
   }
@@ -602,13 +602,13 @@ heatmap_combo_metrics_panel <- function(
                                             linetype = iso_level)) +
             ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                         breaks = available_iso_lvl,
-                                        labels = legend_lbl_iso,
-                                        name = legend_title_iso) +
+                                        labels = legend_lbl_iso) +
             ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                            breaks = available_iso_lvl,
-                                           labels = legend_lbl_iso,
-                                           name = legend_title_iso) +
-            ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+                                           labels = legend_lbl_iso) +
+            ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+            ggplot2::labs(color = legend_title_iso,
+                          linetype = legend_title_iso)
         } else {
           plt <- plt +
             ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
@@ -617,8 +617,8 @@ heatmap_combo_metrics_panel <- function(
                                             color = iso_level)) +
             ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                         breaks = available_iso_lvl,
-                                        labels = legend_lbl_iso,
-                                        name = legend_title_iso)
+                                        labels = legend_lbl_iso) +
+            ggplot2::labs(color = legend_title_iso)
         }
       }
     }
@@ -648,27 +648,29 @@ heatmap_combo_metrics_panel <- function(
                            ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)) +
         ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                     breaks = available_iso_lvl,
-                                    labels = legend_lbl_iso,
-                                    name = legend_title_iso) +
+                                    labels = legend_lbl_iso) +
         ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
                                        breaks = available_iso_lvl,
-                                       labels = legend_lbl_iso,
-                                       name = legend_title_iso) +
-        ggplot2::theme(legend.key.width = ggplot2::unit(3, "line"))
+                                       labels = legend_lbl_iso) +
+        ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+        ggplot2::labs(color = legend_title_iso,
+                      linetype = legend_title_iso)
     } else {
       plt_iso_compare <- plt_iso_compare +
         ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
                            ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) +
         ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
                                     breaks = available_iso_lvl,
-                                    labels = legend_lbl_iso,
-                                    name = legend_title_iso)
+                                    labels = legend_lbl_iso) +
+        ggplot2::labs(color = legend_title_iso)
     }
     
     # add x and y scales
     plt_iso_compare <- plt_iso_compare +
-      ggplot2::scale_y_continuous(breaks = -5:4, labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
-      ggplot2::scale_x_continuous(breaks = -3:3, labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
+      ggplot2::scale_y_continuous(breaks = -5:4, 
+                                  labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+      ggplot2::scale_x_continuous(breaks = -3:3, 
+                                  labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
       ggplot2::coord_cartesian(ylim = c(-5, 4)) +
       ggplot2::labs(y = "CI",
                     x = paste(drug2_name, "/", drug1_name, "ratio"),
@@ -1182,8 +1184,8 @@ heatmap_combo_with_isoref <- function(
                                             y = if (swap_axes) pos_x else pos_y,
                                             linetype = iso_source),
                                linewidth = 1, color = iso_colors) +
-            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
-                                           name = iso_label)
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash")) +
+            ggplot2::labs(linetype = as.character(iso_label))
         } else {
           plt <- plt +
             ggplot2::geom_path(data = tab_isoline,
@@ -1192,12 +1194,12 @@ heatmap_combo_with_isoref <- function(
                                             linetype = iso_source,
                                             color = iso_level),
                                linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
-                                           name = normalization_type) +
+            ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash")) +
             ggplot2::scale_color_manual(values = iso_colors,
-                                        label = iso_label,
-                                        breaks = available_iso_lvl,
-                                        name = "Iso Levels")
+                                        labels = iso_label,
+                                        breaks = available_iso_lvl) +
+            ggplot2::labs(linetype = normalization_type,
+                          color = "Iso Levels")
         }
       }
     }
@@ -1500,11 +1502,11 @@ heatmap_combo_with_isoref_panel <- function(
                                         y = if (swap_axes) pos_x else pos_y,
                                         linetype = iso_source, color = iso_level),
                            linewidth = 1) +
-        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash"),
-                                       name = normalization_type) +
+        ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash")) +
         ggplot2::scale_color_manual(values = iso_colors,
-                                    label = iso_label,
-                                    name = "Iso Levels")
+                                    labels = iso_label) +
+        ggplot2::labs(color = "Iso Levels",
+                      linetype = normalization_type)
     }
   }
   

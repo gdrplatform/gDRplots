@@ -22,7 +22,6 @@ test_that("plot_dose_response_sa works as expected", {
   expect_length(plt_1[["layers"]], 3)
   expect_equal(ggplot2::get_guide_data(plt_1, "colour")[[".label"]],
                unique(dt_average[[group_var]]))
-  expect_equal(plt_1[["labels"]][["colour"]], "group_var")
   
   normalization_type <- "RV"
   plt_2 <- plot_dose_response_sa(dt_metrics = dt_metrics,
@@ -222,7 +221,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_length(ggplot2::ggplot_build(plt_14)$data[[1]], 7) # no data at all
   expect_equal(ggplot2::get_guide_data(plt_12, "colour")[[".label"]],
                drug_name_vec)
-  expect_equal(ggplot2::layer_scales(plt_14)$x$range$range,
+  expect_equal(ggplot2::get_panel_scales(plt_14)$x$range$range,
                c(-3.5, 2.0))
   
   # scenario: fitted curve has bigger y-range than avg points
@@ -268,7 +267,7 @@ test_that("plot_dose_response_sa works as expected", {
                                   normalization_type = "GR")
   expect_is(plt_15, "gg")
   expect_true(grepl(drug_nm, plt_15[["labels"]][["title"]]))
-  plot_range <- range(as.numeric(ggplot2::layer_scales(plt_15)$y$get_labels()))
+  plot_range <- range(as.numeric(ggplot2::get_panel_scales(plt_15)$y$get_labels()))
   expect_true(all(data.table::between(fitted_range, plot_range[1], plot_range[2])))
   
   # scenario: only metric data are available
@@ -282,7 +281,6 @@ test_that("plot_dose_response_sa works as expected", {
   expect_length(plt_16[["layers"]], 2)
   expect_equal(ggplot2::get_guide_data(plt_16, "colour")[[".label"]],
                unique(dt_metrics[[cellline_name]]))
-  expect_equal(plt_16[["labels"]][["colour"]], "group_var")
   
   # scenario: only metric data are available
   plt_17 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
@@ -295,7 +293,6 @@ test_that("plot_dose_response_sa works as expected", {
   expect_length(plt_17[["layers"]], 2)
   expect_equal(ggplot2::get_guide_data(plt_17, "colour")[[".label"]],
                unique(dt_average[[cellline_name]]))
-  expect_equal(plt_17[["labels"]][["colour"]], "group_var")
   
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),

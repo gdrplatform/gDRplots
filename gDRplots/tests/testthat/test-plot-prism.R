@@ -507,7 +507,7 @@ test_that("plot_boxplot_num works as expected", {
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(plt_3[["labels"]][["x"]], selected_feat)
-  expect_equal(sort(ggplot2::layer_scales(plt_3)$x$get_labels()), sort(res_count_3$lbl))
+  expect_equal(sort(ggplot2::get_panel_scales(plt_3)$x$get_labels()), sort(res_count_3$lbl))
   
   # NAs in response
   dt_response_na <- data.table::copy(dt_response)
@@ -563,8 +563,8 @@ test_that("plot_boxplot_num works as expected", {
   expect_equal(plt_6_raw[["labels"]][["y"]], plt_6_cap[["labels"]][["y"]])
   expect_true(any(is.infinite(ggplot2::ggplot_build(plt_6_raw)$data[[3]]$y)))
   expect_false(any(is.infinite(ggplot2::ggplot_build(plt_6_cap)$data[[3]]$y)))
-  expect_equal(sort(ggplot2::layer_scales(plt_6_raw)$x$get_labels()), sort(res_count_6$lbl))
-  expect_equal(sort(ggplot2::layer_scales(plt_6_cap)$x$get_labels()), sort(res_count_6$lbl))
+  expect_equal(sort(ggplot2::get_panel_scales(plt_6_raw)$x$get_labels()), sort(res_count_6$lbl))
+  expect_equal(sort(ggplot2::get_panel_scales(plt_6_cap)$x$get_labels()), sort(res_count_6$lbl))
   
   # testing assertions
   expect_error(plot_boxplot_num(dt_response = unlist(dt_response),
@@ -615,8 +615,8 @@ test_that("plot_boxplot_num_panel works as expected", {
   expect_is(plt_1_rev, "gg")
   expect_length(plt_1_rev[["layers"]], 3)
   expect_error(
-    expect_equivalent(ggplot2::ggplot_build(plt_1_rev), 
-                      ggplot2::ggplot_build(plt_1)))
+    expect_equivalent(ggplot2::ggplot_build(plt_1_rev)@data[[2]], 
+                      ggplot2::ggplot_build(plt_1)@data[[2]]))
 
   # selected feat is not present in dt_depmap
   new_selected_feats <- c(selected_feats, "NU_non_avial")
@@ -789,7 +789,7 @@ test_that("plot_boxplot_meta works as expected", {
                              obj_depmap_meta[["dt_depmap"]], 
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_1 <- obj_depmap_meta[["dt_depmap"]][CCLEName %in% common_cellline_1, .SD, .SDcols = -id_col]
-  expect_equal(sort(ggplot2::layer_scales(plt_1)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$range$range),
                sort(names(res_1)[colSums(res_1) > 0]))
   expect_equal(
     sort(ggplot2::ggplot_build(plt_1)$data[[3]]$y),
@@ -808,7 +808,7 @@ test_that("plot_boxplot_meta works as expected", {
                                  obj_depmap_meta[["dt_depmap"]], 
                                  by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_1_inf <- obj_depmap_meta[["dt_depmap"]][CCLEName %in% common_cellline_1_inf, .SD, .SDcols = -id_col]
-  expect_equal(sort(ggplot2::layer_scales(plt_1_inf)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_1_inf)$x$range$range),
                sort(names(res_1)[colSums(res_1) > 0]))
   expect_equal(sort(ggplot2::ggplot_build(plt_1_inf)$data[[3]]$y),
                sort(dt_response_1[[selected_metric_1]]))
@@ -824,7 +824,7 @@ test_that("plot_boxplot_meta works as expected", {
   expect_equal(plt_1_cap[["labels"]][["y"]], selected_metric_1)
   expect_equal(plt_1_cap[["labels"]][["title"]], obj_depmap_meta[["selected_feat_meta_col"]])
   expect_length(plt_1_cap[["layers"]], 4)
-  expect_equal(sort(ggplot2::layer_scales(plt_1_cap)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_1_cap)$x$range$range),
                sort(names(res_1)[colSums(res_1) > 0]))
   expect_equal(sort(ggplot2::ggplot_build(plt_1_cap)$data[[3]]$y),
                sort(dt_response_capped_1[[selected_metric_1]]))
@@ -846,10 +846,10 @@ test_that("plot_boxplot_meta works as expected", {
                              obj_depmap_meta_lng[["dt_depmap"]], 
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_2 <- obj_depmap_meta_lng[["dt_depmap"]][CCLEName %in% common_cellline_1_inf, .SD, .SDcols = -id_col]
-  expect_equal(sort(ggplot2::layer_scales(plt_2)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_2)$x$range$range),
                sort(names(res_2)[colSums(res_2) > 0]))
   
-  ls_x_lbl <- unique(ggplot2::layer_scales(plt_2)$x$labels)
+  ls_x_lbl <- unique(ggplot2::get_panel_scales(plt_2)$x$labels)
   short_lbl <- paste0(
     substr(names(res_2)[colSums(res_2) > 0][nchar(names(res_2)[colSums(res_2) > 0]) > 8], 1, 8 - 3),
     "...")
@@ -878,14 +878,14 @@ test_that("plot_boxplot_meta works as expected", {
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_3_with_1 <- 
     obj_depmap_meta_lng[["dt_depmap"]][CCLEName %in% common_cellline_3, .SD, .SDcols = -id_col]
-  expect_equal(sort(ggplot2::layer_scales(plt_3_with_1)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_3_with_1)$x$range$range),
                sort(names(res_3_with_1)[colSums(res_3_with_1) > 0]))
   expect_equal(ggplot2::ggplot_build(plt_3_with_1)$data[[4]]$label, 
                c(colSums(res_3_with_1)[colSums(res_3_with_1) > 0], use.names = FALSE))
   expect_true(1 %in% c(colSums(res_3_with_1)[colSums(res_3_with_1) > 0], use.names = FALSE))
   res_3_without_1 <- 
     obj_depmap_meta_lng[["dt_depmap"]][CCLEName %in% common_cellline_3, .SD, .SDcols = -id_col]
-  expect_equal(sort(ggplot2::layer_scales(plt_3_without_1)$x$range$range),
+  expect_equal(sort(ggplot2::get_panel_scales(plt_3_without_1)$x$range$range),
                sort(names(res_3_without_1)[colSums(res_3_without_1) > 1]))
   expect_equal(ggplot2::ggplot_build(plt_3_without_1)$data[[4]]$label, 
                c(colSums(res_3_without_1)[colSums(res_3_without_1) > 1], use.names = FALSE))
@@ -920,7 +920,7 @@ test_that("plot_boxplot_meta works as expected", {
                              obj_depmap_meta_num[["dt_depmap"]], 
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_5 <- obj_depmap_meta_num[["dt_depmap"]][CCLEName %in% common_cellline_5, .SD, .SDcols = -id_col]
-  expect_equal(ggplot2::layer_scales(plt_5)$x$range$range,
+  expect_equal(ggplot2::get_panel_scales(plt_5)$x$range$range,
                sort(names(res_5)[colSums(res_5) > 0]))
   
   # scenario: data with logical levels
@@ -938,7 +938,7 @@ test_that("plot_boxplot_meta works as expected", {
                              obj_depmap_meta_log[["dt_depmap"]], 
                              by.x = "CellLineName", by.y = "CCLEName")[["CellLineName"]]
   res_6 <- obj_depmap_meta_log[["dt_depmap"]][CCLEName %in% common_cellline_6, .SD, .SDcols = -id_col]
-  expect_equal(ggplot2::layer_scales(plt_6)$x$range$range,
+  expect_equal(ggplot2::get_panel_scales(plt_6)$x$range$range,
                sort(names(res_6)[colSums(res_6) > 0]))
   
   # scenario: lack of the intersection (empty plot)
@@ -976,7 +976,7 @@ test_that("plot_boxplot_meta works as expected", {
   res_8 <- dt_depmap_meta_multi[CCLEName %in% common_cellline_8, .SD, .SDcols = -id_col]
   expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) == sum(colSums(res_8)))
   expect_true(NROW(ggplot2::ggplot_build(plt_8)$data[[3]]) > sum(colSums(res_1)))
-  expect_equal(ggplot2::layer_scales(plt_8)$x$range$range,
+  expect_equal(ggplot2::get_panel_scales(plt_8)$x$range$range,
                sort(names(res_8)[colSums(res_8) > 0]))
   
   # testing assertions
