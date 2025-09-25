@@ -249,6 +249,11 @@ pheatmap_qc <- function(
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
   
   fontsize_row <- .get_pheatmap_fontsize(mat_cvd, "row")
+  cellheight <- if (NROW(mat_cvd) == 1) {
+    20
+  } else {
+    NA
+  }
   
   hm <- 
     pheatmap::pheatmap(mat = mat_cvd,
@@ -261,6 +266,7 @@ pheatmap_qc <- function(
                        main = hm_title,
                        fontsize = 8,
                        fontsize_row = fontsize_row,
+                       cellheight = cellheight,
                        na_col = "red",
                        annotation_legend = annotation_legend_flag,
                        # dendrogram
