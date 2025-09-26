@@ -448,6 +448,7 @@ pheatmap_with_anno_sa <- function(
     checkmate::assert_names(names(annotation_col), must.include = cellline_name)
   }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
+  if (!is.null(annotation_colors)) checkmate::assert_named(annotation_colors)
   max_hm_lbl_length <- 35
   # gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
   #                                  system.file(package = "gDRplots", "settings.json"))
@@ -471,7 +472,6 @@ pheatmap_with_anno_sa <- function(
   
   if (is.null(dt_metrics_capped)) {
     mat_cvd <- mat_cvd_raw
-    mat_cvd_raw <- NULL
   } else {
     mat_cvd <- prep_pheatmap_matrix(dt_response = dt_metrics_capped,
                                     normalization_type = normalization_type,
@@ -490,15 +490,12 @@ pheatmap_with_anno_sa <- function(
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
     # order matrix
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
-    if (!is.null(dt_metrics_capped)) { # order raw as capped
-      mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
-    }
+    mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
     
     # trim annotation
     ls_too_long_lbl <- 
       vapply(names(annotation_col), function(nm) any(nchar(annotation_col[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
-      print("too long annotation_col")
       ls_col <- names(annotation_col)[ls_too_long_lbl]
       annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
       
@@ -518,15 +515,12 @@ pheatmap_with_anno_sa <- function(
     rownames(annotation_row) <- annotation_row[[drug_name]] # required by pheatmap::pheatmap
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
-    if (!is.null(dt_metrics_capped)) {  # order raw as capped
-      mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
-    }
+    mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
     
     # trim annotation
     ls_too_long_lbl <- 
       vapply(names(annotation_row), function(nm) any(nchar(annotation_row[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
-      print("too long annotation_row")
       ls_col <- names(annotation_row)[ls_too_long_lbl]
       annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
       
@@ -539,14 +533,17 @@ pheatmap_with_anno_sa <- function(
   
   if (!is.null(annotation_colors)) {
     # trim annotation
-    annotation_colors <- lapply(names(annotation_colors), function(nm) {
-      if (any(nchar(names(annotation_colors[[nm]])) > max_hm_lbl_length)) {
+    ls_too_long_lbl <- 
+      vapply(names(annotation_colors), function(nm) {
+        any(nchar(names(annotation_colors[[nm]])) > max_hm_lbl_length) }, logical(1))
+    if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
+      for (nm in names(annotation_colors)[ls_too_long_lbl]) {
         names(annotation_colors[[nm]]) <- 
           .trim_labels(lbls_vec = names(annotation_colors[[nm]]), 
                        max_lbl_length = max_hm_lbl_length)
       }
-    })
-    
+    }
+
     # filling missing values
     if (!is.null(annotation_col)) {
       annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
@@ -556,11 +553,8 @@ pheatmap_with_anno_sa <- function(
     }
   }
   
-  ls_output[["data"]][["matrix"]] <- if (is.null(dt_metrics_capped)) {
-    data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
-  } else {
+  ls_output[["data"]][["matrix"]] <- 
     data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
-  }
   
   # flip
   t_mat_cvd <- t(mat_cvd)
