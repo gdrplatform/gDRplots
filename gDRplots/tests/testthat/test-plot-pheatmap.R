@@ -430,6 +430,43 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(range(as.numeric(plt_8$gtable$grobs[[6]]$children[[2]]$label)),
                c(val_eq - 1, val_eq))
   
+  # scenario 9: long drug and annotation name
+  dt_metrics_lng <- data.table::copy(dt_metrics)
+  dt_metrics_lng[DrugName == "drug_026"][["drug_moa"]] <- "moa_E__veryveryverylongnameofmoa|moa_E"
+  dt_metrics_lng[DrugName == "drug_026"][["DrugName"]] <- "drug_026__veryveryverylongnameofdrug|drug_026"
+  annotation_manual_row_9 <-
+    unique(dt_metrics_lng[, c("DrugName", "drug_moa"), with = FALSE])
+  anno_test <- data.table::data.table(
+    DrugName = c("drug_004", "drug_005", "drug_006"),
+    lng_anno = c("short", "short", "veryveryverylongnameofannotationfordrug")
+  )
+  annotation_manual_row_9 <- anno_test[annotation_manual_row_9, on = "DrugName"]
+  annotation_map_9 <- list(
+    drug_moa = c("moa_A" = "deeppink", "moa_D" = "cadetblue", moa_E = "gold"),
+    lng_anno = c("short" = "black", "veryveryverylongnameofannotationfordrug" = "red")
+  )
+  
+  out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+                                 annotation_row = annotation_manual_row_9,
+                                 annotation_colors = annotation_map_9)
+  expect_length(out_9, 2)
+  expect_equal(names(out_9), c("data", "heatmap"))
+  data_9 <- out_9[["data"]]
+  expect_is(data_9, "list")
+  expect_equal(names(data_9), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_9[["matrix"]], "data.table")
+  anno_9 <- out_9[["data"]][["annotation_row"]]
+  expect_is(anno_9, "data.table")
+  expect_equal(anno_9, annotation_manual_row_9) # not trimmed 
+  expect_true(all(unique(anno_9$DrugName) %in% colnames(data_9[["matrix"]])))
+  plt_9 <- out_9[["heatmap"]]
+  expect_is(plt_9, "pheatmap")
+  expect_equal(plt_9$gtable$grobs[[7]]$label, c("lng_anno", "drug_moa"))
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= 35)) # trimmed drug name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35)) # trimmed anno name
+  # because of missing colors, all anno was fill with new scheme
+  expect_true("NA" %in% names(plt_9$gtable$grobs[[8]]$children[[5]]$gp$fill)) # filled
+  
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
