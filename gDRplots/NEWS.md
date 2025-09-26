@@ -1,3 +1,6 @@
+## gDRplots 0.0.96 - 2025-09-25
+* add trim option in `pheatmap_with_anno_x` functions
+
 ## gDRplots 0.0.95 - 2025-09-23
 * adjust to ggplot2 v.4.0.
 
