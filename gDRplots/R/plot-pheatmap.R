@@ -502,7 +502,8 @@ pheatmap_with_anno_sa <- function(
       vapply(names(annotation_col), function(nm) any(nchar(annotation_col[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
       ls_col <- names(annotation_col)[ls_too_long_lbl]
-      annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), 
+                     .SDcols = ls_col]
       
       rownames(annotation_col) <- annotation_col[[cellline_name]] # update
       rownames(mat_cvd) <- annotation_col[[cellline_name]] # update
@@ -527,7 +528,8 @@ pheatmap_with_anno_sa <- function(
       vapply(names(annotation_row), function(nm) any(nchar(annotation_row[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
       ls_col <- names(annotation_row)[ls_too_long_lbl]
-      annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), 
+                     .SDcols = ls_col]
       
       rownames(annotation_row) <- annotation_row[[drug_name]] # update
       colnames(mat_cvd) <- annotation_row[[drug_name]] # update
@@ -1130,7 +1132,8 @@ pheatmap_with_anno_combo <- function(
       vapply(names(annotation_col), function(nm) any(nchar(annotation_col[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
       ls_col <- names(annotation_col)[ls_too_long_lbl]
-      annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), 
+                     .SDcols = ls_col]
       
       rownames(annotation_col) <- annotation_col[[cellline_name]] # update
       rownames(mat_cvd) <- annotation_col[[cellline_name]] # update
@@ -1170,7 +1173,8 @@ pheatmap_with_anno_combo <- function(
       vapply(names(annotation_row), function(nm) any(nchar(annotation_row[[nm]]) > max_hm_lbl_length), logical(1))
     if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
       ls_col <- names(annotation_row)[ls_too_long_lbl]
-      annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), 
+                     .SDcols = ls_col]
       
       if (any(ls_col %in% c(drug_name, drug_name_2))) {
         annotation_row$DrugCombination <-
@@ -1212,13 +1216,13 @@ pheatmap_with_anno_combo <- function(
     data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
   # trim colnames & rownames for matrix
   if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
-    colnames(mat_cvd) <- .trim_labels(lbls_vec = colnames(mat_cvd), 
-                                      max_lbl_length = max_hm_lbl_length)
+    # TODO prep combo names
+    # colnames(mat_cvd) <- .trim_labels(lbls_vec = colnames(mat_cvd), 
+    #                                   max_lbl_length = max_hm_lbl_length)
   }
   if (any(nchar(rownames(mat_cvd)) > max_hm_lbl_length)) {
-    # TODO prep combo names
-    # rownames(mat_cvd) <- .trim_labels(lbls_vec = rownames(mat_cvd), 
-    #                                   max_lbl_length = max_hm_lbl_length)
+    rownames(mat_cvd) <- .trim_labels(lbls_vec = rownames(mat_cvd),
+                                      max_lbl_length = max_hm_lbl_length)
   }
   
   # flip
@@ -1867,11 +1871,12 @@ fill_ann_color_map <- function(dt_ann,
 #' @examples
 #' \dontrun{
 #' ls_lbls <- c(
-#'   "short_lbl", "veryveryverylong", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
+#'   "short_lbl", "short_lbl", "veryveryverylong", 
+#'   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 #' )
 #' 
-#' .trim_labels(ls_lbls)
-#' .trim_labels(ls_lbls, max_lbl_length = 15)
+#' .trim_labels(lbls_vec = ls_lbls)
+#' .trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 #' }
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
@@ -1897,8 +1902,9 @@ fill_ann_color_map <- function(dt_ann,
       trim_dup <- unique(trimed_vec_lbl[duplicated(trimed_vec_lbl)])
       
       for (trim_d in trim_dup) {
-        i_dup <- which(trimed_vec_lbl == trim_d)
-        i_dup <- i_dup[sort(names(i_dup))]
+        i_dup_0 <- which(trimed_vec_lbl == trim_d)
+        i_dup <- i_dup_0[sort(unique(names(i_dup_0)))]
+        if (NROW(i_dup) == 1) next
         len_dup <- vapply(lbls_vec[i_dup], function(i) nchar(i), numeric(1))
         
         # find min number of character to distinguish strings
@@ -1915,8 +1921,8 @@ fill_ann_color_map <- function(dt_ann,
           }, numeric(1)))
         
         # update duplicates in trimmed list
-        trimed_vec_lbl[i_dup] <-
-          vapply(i_dup, function(i) {
+        trimed_vec_lbl[i_dup_0] <-
+          vapply(i_dup_0, function(i) {
             if (nchar(lbls_vec[i]) <= min_distinguishing) {
               lbls_vec[i]
             } else {
