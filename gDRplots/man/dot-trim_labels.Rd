@@ -18,6 +18,17 @@ character vectors with trimmed labels
 \description{
 Trim labels to the required number of characters
 }
+\examples{
+\dontrun{
+ls_lbls <- c(
+  "short_lbl", "veryveryverylong", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
+)
+
+.trim_labels(ls_lbls)
+.trim_labels(ls_lbls, max_lbl_length = 15)
+}
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }
