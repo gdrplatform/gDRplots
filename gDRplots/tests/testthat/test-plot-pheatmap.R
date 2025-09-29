@@ -463,9 +463,32 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_9, "pheatmap")
   expect_equal(plt_9$gtable$grobs[[7]]$label, c("lng_anno", "drug_moa"))
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= 35)) # trimmed drug name
-  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35)) # trimmed anno name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= 35)) # trimmed anno name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35))
+  expect_true(all(annotation_map_9[["lng_anno"]] %in% 
+                    unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "lng_anno"])))
+  expect_false(all(annotation_map_9[["drug_moa"]] %in% 
+                     unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "drug_moa"])))
   # because of missing colors, all anno was fill with new scheme
   expect_true("NA" %in% names(plt_9$gtable$grobs[[8]]$children[[5]]$gp$fill)) # filled
+  
+  out_10 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+                                  annotation_row = annotation_manual_row_9,
+                                  annotation_colors = annotation_map_9,
+                                  max_hm_lbl_length = Inf)
+  expect_length(out_10, 2)
+  expect_equal(names(out_10), c("data", "heatmap"))
+  data_10 <- out_10[["data"]]
+  expect_is(data_10, "list")
+  expect_equivalent(data_10[["matrix"]], 
+                    data_9[["matrix"]][, .SD, .SDcols = names(data_10[["matrix"]])])
+  expect_equivalent(data_10[["annotation_row"]], 
+                    data_9[["annotation_row"]][order(match(DrugName, data_10[["annotation_row"]]$DrugName)),
+                                               .SD, .SDcols = names(data_10[["annotation_row"]])])
+  plt_10 <- out_10[["heatmap"]]
+  expect_is(plt_10, "pheatmap")
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= 35)) # not trimmed anno name
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35)) 
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
@@ -509,6 +532,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_colors = unlist(annotation_map)),
                "Assertion on 'annotation_colors' failed: Must be of type 'list'")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     max_hm_lbl_length = "long"),
+               "Assertion on 'max_hm_lbl_length' failed: Must be of type 'number'")
 })
 
 test_that("pheatmap_with_anno_cd works as expected", {
@@ -1691,7 +1717,7 @@ test_that(".get_pheatmap_number_color works as expected", {
 
 test_that(".get_pheatmap_fontsize works as expected", {
   mat_s <- matrix(-14:30, ncol = 5,
-                dimnames = list(letters[1:9], LETTERS[1:5]))
+                  dimnames = list(letters[1:9], LETTERS[1:5]))
   mat_xl <- matrix(-10^3:99, ncol = 100)
   
   res_1 <- .get_pheatmap_fontsize(mat_s) # default
