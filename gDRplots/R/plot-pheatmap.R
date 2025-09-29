@@ -543,7 +543,7 @@ pheatmap_with_anno_sa <- function(
                        max_lbl_length = max_hm_lbl_length)
       }
     }
-
+    
     # filling missing values
     if (!is.null(annotation_col)) {
       annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
@@ -1778,10 +1778,19 @@ fill_ann_color_map <- function(dt_ann,
 #'  if set to Inf, no trimming will be performed
 #'
 #' @returns character vectors with trimmed labels
+#' @examples
+#' \dontrun{
+#' ls_lbls <- c(
+#'   "short_lbl", "veryveryverylong", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
+#' )
+#' 
+#' .trim_labels(ls_lbls)
+#' .trim_labels(ls_lbls, max_lbl_length = 15)
+#' }
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
 #' @keywords internal
-#'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 .trim_labels <- function(lbls_vec,
                          max_lbl_length = Inf) {
   
@@ -1797,8 +1806,40 @@ fill_ann_color_map <- function(dt_ann,
     names(trimed_vec_lbl) <- lbls_vec
     trimed_vec_lbl[too_long_lbl] <- 
       paste0(substr(trimed_vec_lbl[too_long_lbl], 1, max_lbl_length - 3), "...")
-    
-    # TODO add protection for duplicates
+    # duplicates in the trimmed list
+    if (any(duplicated(trimed_vec_lbl))) {
+      trim_dup <- unique(trimed_vec_lbl[duplicated(trimed_vec_lbl)])
+      
+      for (trim_d in trim_dup) {
+        i_dup <- which(trimed_vec_lbl == trim_d)
+        i_dup <- i_dup[sort(names(i_dup))]
+        len_dup <- vapply(lbls_vec[i_dup], function(i) nchar(i), numeric(1))
+        
+        # find min number of character to distinguish strings
+        min_distinguishing <-
+          max(vapply(seq_len(NROW(i_dup) - 1), function(i) {
+            str_1 <- head(c(strsplit(lbls_vec[i_dup[i]], split = "")[[1]], rep(NA, max(len_dup))), max(len_dup)) 
+            str_2 <- head(c(strsplit(lbls_vec[i_dup[i + 1]], split = "")[[1]], rep(NA, max(len_dup))), max(len_dup)) 
+            
+            if (any(str_1 != str_2) && !is.na(any(str_1 != str_2))) {
+              min(which(str_1 != str_2), na.rm = TRUE)
+            } else {
+              min(len_dup)
+            }
+          }, numeric(1)))
+        
+        # update duplicates in trimmed list
+        trimed_vec_lbl[i_dup] <-
+          vapply(i_dup, function(i) {
+            if (nchar(lbls_vec[i]) <= min_distinguishing) {
+              lbls_vec[i]
+            } else {
+              paste0(substr(lbls_vec[i], 1, min_distinguishing), "...")
+            }
+          }, character(1))
+      }
+    }
+    # final trimmed
     trimed_vec_lbl
   }
 }
