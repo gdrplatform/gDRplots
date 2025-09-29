@@ -467,7 +467,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                                system.file(package = "gDRplots", "settings.json"))
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
-  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len)) # trimmed anno name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len))
   expect_true(all(annotation_map_9[["lng_anno"]] %in% 
                     unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "lng_anno"])))
@@ -493,7 +493,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_10, "pheatmap")
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
-  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len)) # not trimmed anno name
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len)) 
   
   # testing assertions
@@ -1021,7 +1021,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   dt_scores_lng[DrugName_2 == "drug_021"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
   dt_scores_lng[DrugName == "drug_006"][["DrugName"]] <- "drug_006__veryveryverylongnameofdrug|drug_006"
   annotation_manual_row_10 <-
-    unique(dt_scores_lng[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+    unique(dt_scores_lng[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
   annotation_manual_col_10 <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
     lng_anno = c("short", "veryveryverylongnameofannotationforcellline")
