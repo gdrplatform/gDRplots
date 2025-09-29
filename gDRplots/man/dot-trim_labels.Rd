@@ -9,7 +9,7 @@
 \arguments{
 \item{lbls_vec}{character vector with labels to be trimmed}
 
-\item{max_lbl_length}{numeric value for the maximum number of characters in the x-axis label;
+\item{max_lbl_length}{numeric value for the maximum number of characters in the label;
 if set to Inf, no trimming will be performed}
 }
 \value{
