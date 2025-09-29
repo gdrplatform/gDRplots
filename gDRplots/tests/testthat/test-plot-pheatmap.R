@@ -1018,7 +1018,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   # scenario 10: long drug and annotation name
   dt_scores_lng <- data.table::copy(dt_scores)
-  dt_scores_lng[DrugName_2 == "drug_021"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
+  dt_scores_lng[drug_moa_2 == "moa_D"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
   dt_scores_lng[DrugName == "drug_006"][["DrugName"]] <- "drug_006__veryveryverylongnameofdrug|drug_006"
   annotation_manual_row_10 <-
     unique(dt_scores_lng[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
