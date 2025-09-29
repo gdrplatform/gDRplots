@@ -456,8 +456,7 @@ pheatmap_with_anno_sa <- function(
   }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
   if (!is.null(annotation_colors)) checkmate::assert_named(annotation_colors)
-  checkmate::assert_number(max_hm_lbl_length)
-  checkmate::assert_number(max_lbl_length, lower = 5)
+  checkmate::assert_number(max_hm_lbl_length, lower = 5)
   
   # output
   ls_output <- list(data = list(matrix = NULL,
