@@ -432,6 +432,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   
   # scenario 9: long drug and annotation name
   dt_metrics_lng <- data.table::copy(dt_metrics)
+  dt_metrics_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
   dt_metrics_lng[DrugName == "drug_026"][["drug_moa"]] <- "moa_E__veryveryverylongnameofmoa|moa_E"
   dt_metrics_lng[DrugName == "drug_026"][["DrugName"]] <- "drug_026__veryveryverylongnameofdrug|drug_026"
   annotation_manual_row_9 <-
@@ -445,7 +446,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
     drug_moa = c("moa_A" = "deeppink", "moa_D" = "cadetblue", moa_E = "gold"),
     lng_anno = c("short" = "black", "veryveryverylongnameofannotationfordrug" = "red")
   )
-  
+
   out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
                                  annotation_row = annotation_manual_row_9,
                                  annotation_colors = annotation_map_9)
@@ -462,9 +463,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_9 <- out_9[["heatmap"]]
   expect_is(plt_9, "pheatmap")
   expect_equal(plt_9$gtable$grobs[[7]]$label, c("lng_anno", "drug_moa"))
-  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= 35)) # trimmed drug name
-  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= 35)) # trimmed anno name
-  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35))
+  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                               system.file(package = "gDRplots", "settings.json"))
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len)) # trimmed anno name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len))
   expect_true(all(annotation_map_9[["lng_anno"]] %in% 
                     unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "lng_anno"])))
   expect_false(all(annotation_map_9[["drug_moa"]] %in% 
@@ -487,8 +491,10 @@ test_that("pheatmap_with_anno_sa works as expected", {
                                                .SD, .SDcols = names(data_10[["annotation_row"]])])
   plt_10 <- out_10[["heatmap"]]
   expect_is(plt_10, "pheatmap")
-  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= 35)) # not trimmed anno name
-  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= 35)) 
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len)) # not trimmed anno name
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len)) 
   
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
@@ -995,13 +1001,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
   dt_scores_NA <- data.table::copy(dt_scores)
   dt_scores_NA[["bliss_score"]] <- NA_integer_
   dt_scores_NA[["hsa_score"]] <- NA_integer_
-  out_9 <- pheatmap_with_anno_combo(
-    dt_scores = dt_scores_NA,
-    metric = "bliss_score",
-    normalization_type = "RV",
-    annotation_col = annotation_manual_col,
-    annotation_colors = annotation_map
-  )
+  out_9 <- pheatmap_with_anno_combo(dt_scores = dt_scores_NA,
+                                    metric = "bliss_score",
+                                    normalization_type = "RV",
+                                    annotation_col = annotation_manual_col,
+                                    annotation_colors = annotation_map)
   
   expect_length(out_9, 2)
   expect_equal(names(out_9), c("data", "heatmap"))
@@ -1011,6 +1015,37 @@ test_that("pheatmap_with_anno_combo works as expected", {
                c("matrix", "annotation_col", "annotation_row"))
   plt_9 <- out_9[["heatmap"]]
   expect_null(plt_9)
+  
+  # scenario 10: long drug and annotation name
+  dt_scores_lng <- data.table::copy(dt_scores)
+  dt_scores_lng[DrugName_2 == "drug_021"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
+  dt_scores_lng[DrugName == "drug_006"][["DrugName"]] <- "drug_006__veryveryverylongnameofdrug|drug_006"
+  annotation_manual_row_10 <-
+    unique(dt_scores_lng[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+  annotation_manual_col_10 <- data.table::data.table(
+    CellLineName = c("cellline_GB", "cellline_HB"),
+    lng_anno = c("short", "veryveryverylongnameofannotationforcellline")
+  )
+  annotation_map_10 <- list(
+    drug_moa_2 = c("moa_E" = "deeppink", "moa_D" = "cadetblue"),
+    lng_anno = c("short" = "black", "veryveryverylongnameofannotationforcellline" = "red")
+  )
+  
+  out_10 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV",
+                                     annotation_col = annotation_manual_col_10,
+                                     annotation_row = annotation_manual_row_10,
+                                     annotation_colors = annotation_map_10)
+  
+  expect_length(out_10, 2)
+  expect_equal(names(out_10), c("data", "heatmap"))
+  data_10 <- out_10[["data"]]
+  expect_is(data_10, "list")
+  expect_equal(names(data_10),
+               c("matrix", "annotation_col", "annotation_row"))
+  plt_10 <- out_10[["heatmap"]]
+  expect_is(plt_10, "pheatmap")
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
