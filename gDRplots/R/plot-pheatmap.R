@@ -323,7 +323,7 @@ pheatmap_qc <- function(
 #'   without \code{CellLineName}), each list item is named vector with valid color name for 
 #'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 #'   Not described elements will be colored in default.
-#' @param max_lbl_length numeric value for the maximum number of characters in the label;
+#' @param max_hm_lbl_length numeric value for the maximum number of characters in the label;
 #'   if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
 #'   the default number.
 #' 
