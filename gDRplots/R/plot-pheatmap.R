@@ -879,7 +879,9 @@ pheatmap_with_anno_cd <- function(
                                             map_ann = annotation_colors)
   }
   
-  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  ls_output[["data"]][["matrix"]] <- 
+    data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  
   # flip
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) purrr::quietly(qmfun)(x)$result, numeric(1))
@@ -1208,6 +1210,17 @@ pheatmap_with_anno_combo <- function(
   
   ls_output[["data"]][["matrix"]] <- 
     data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
+  # trim colnames & rownames for matrix
+  if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
+    colnames(mat_cvd) <- .trim_labels(lbls_vec = colnames(mat_cvd), 
+                                      max_lbl_length = max_hm_lbl_length)
+  }
+  if (any(nchar(rownames(mat_cvd)) > max_hm_lbl_length)) {
+    # TODO prep combo names
+    # rownames(mat_cvd) <- .trim_labels(lbls_vec = rownames(mat_cvd), 
+    #                                   max_lbl_length = max_hm_lbl_length)
+  }
+  
   # flip
   t_mat_cvd <- t(mat_cvd)
   
