@@ -1688,3 +1688,44 @@ test_that(".get_pheatmap_number_color works as expected", {
                                           light_color_font = 123),
                "Assertion on 'light_color_font' failed: Must be of type 'string'")
 })
+
+test_that(".get_pheatmap_fontsize works as expected", {
+  mat_s <- matrix(-14:30, ncol = 5,
+                dimnames = list(letters[1:9], LETTERS[1:5]))
+  mat_xl <- matrix(-10^3:99, ncol = 100)
+  
+  res_1 <- .get_pheatmap_fontsize(mat_s) # default
+  expect_is(res_1, "numeric")
+  expect_equal(res_1, 8)
+  
+  res_2 <- .get_pheatmap_fontsize(mat_xl) # default
+  expect_is(res_2, "numeric")
+  expect_equal(res_2, 8)
+  
+  res_3 <- .get_pheatmap_fontsize(mat_s, 
+                                  threshold_count = 5)
+  expect_equal(res_3, 4.8)
+  
+  res_4 <- .get_pheatmap_fontsize(mat_xl,
+                                  threshold_count = 20)
+  expect_equal(res_4, 8) # default is row
+  
+  res_5 <- .get_pheatmap_fontsize(mat_s, 
+                                  dimension = "col",
+                                  threshold_count = 5)
+  expect_equal(res_5, 8)
+  
+  res_6 <- .get_pheatmap_fontsize(mat_xl, 
+                                  dimension = "col",
+                                  threshold_count = 20)
+  expect_equal(res_6, 4.8)
+  
+  expect_error(.get_pheatmap_fontsize(matrix = as.list(mat_s)),
+               "Assertion on 'matrix' failed: Must be of type 'matrix'")
+  expect_error(.get_pheatmap_fontsize(matrix = mat_s,
+                                      dimension = 1),
+               "'arg' must be NULL or a character vector")
+  expect_error(.get_pheatmap_fontsize(matrix = mat_s,
+                                      threshold_count = -1),
+               "Assertion on 'threshold_count' failed: Element 1 is not >= 1")
+})
