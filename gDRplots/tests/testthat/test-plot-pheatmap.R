@@ -1729,3 +1729,43 @@ test_that(".get_pheatmap_fontsize works as expected", {
                                       threshold_count = -1),
                "Assertion on 'threshold_count' failed: Element 1 is not >= 1")
 })
+
+test_that(".trim_labels works as expected", {
+  ls_lbls <- c(
+    "short_lbl",
+    "long_duplicates|lbl_123",
+    "veryveryverylong", 
+    "long_duplicates|lbl_1AB", 
+    "veryveryverylong|dup_AB|123",
+    "long_duplicates|lbl_123AB",
+    "veryveryverylong|dup_AB|all123"
+  )
+  
+  res_1 <- .trim_labels(lbls_vec = ls_lbls) # default - no trimming
+  expect_is(res_1, "character")
+  expect_length(res_1, NROW(ls_lbls))
+  expect_true(all(res_1 == ls_lbls))
+  
+  res_2 <- .trim_labels(lbls_vec = ls_lbls, 
+                        max_lbl_length = 15) 
+  expect_is(res_2, "character")
+  expect_length(res_2, NROW(ls_lbls))
+  expect_length(unique(res_2), NROW(res_2)) # no duplicates
+  
+  res_3 <- .trim_labels(lbls_vec = ls_lbls, 
+                        max_lbl_length = max(nchar(ls_lbls))) 
+  expect_is(res_3, "character")
+  expect_length(res_3, NROW(ls_lbls))
+  expect_equal(res_3, res_1)
+  
+  expect_error(.trim_labels(lbls_vec = 1:3),
+               "Assertion on 'lbls_vec' failed: Must be of type 'character'")
+  expect_error(.trim_labels(lbls_vec = c(ls_lbls, NA)),
+               "Assertion on 'lbls_vec' failed: Contains missing values")
+  expect_error(.trim_labels(lbls_vec = ls_lbls,
+                            max_lbl_length = 3),
+               "Assertion on 'max_lbl_length' failed: Element 1 is not >= 5")
+  expect_error(.trim_labels(lbls_vec = ls_lbls,
+                            max_lbl_length = "100"),
+               "Assertion on 'max_lbl_length' failed: Must be of type 'number'")
+})
