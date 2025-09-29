@@ -323,6 +323,9 @@ pheatmap_qc <- function(
 #'   without \code{CellLineName}), each list item is named vector with valid color name for 
 #'   each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 #'   Not described elements will be colored in default.
+#' @param max_lbl_length numeric value for the maximum number of characters in the label;
+#'   if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
+#'   the default number.
 #' 
 #' @seealso \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 #'
@@ -418,7 +421,11 @@ pheatmap_with_anno_sa <- function(
     distfun = compute_distances,
     annotation_row = NULL,
     annotation_col = NULL,
-    annotation_colors = NULL) {
+    annotation_colors = NULL,
+    max_hm_lbl_length = 
+      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                       system.file(package = "gDRplots", "settings.json"))
+) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -449,9 +456,8 @@ pheatmap_with_anno_sa <- function(
   }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
   if (!is.null(annotation_colors)) checkmate::assert_named(annotation_colors)
-  max_hm_lbl_length <- 35
-  # gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-  #                                  system.file(package = "gDRplots", "settings.json"))
+  checkmate::assert_number(max_hm_lbl_length)
+  checkmate::assert_number(max_lbl_length, lower = 5)
   
   # output
   ls_output <- list(data = list(matrix = NULL,
@@ -546,10 +552,12 @@ pheatmap_with_anno_sa <- function(
     
     # filling missing values
     if (!is.null(annotation_col)) {
-      annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+      annotation_colors <- fill_ann_color_map(dt_ann = annotation_col,
+                                              map_ann = annotation_colors)
     }
     if (!is.null(annotation_row)) {
-      annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
+      annotation_colors <- fill_ann_color_map(dt_ann = annotation_row, 
+                                              map_ann = annotation_colors)
     }
   }
   
@@ -854,10 +862,12 @@ pheatmap_with_anno_cd <- function(
   
   # filling missing values
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+    annotation_colors <- fill_ann_color_map(dt_ann = annotation_col, 
+                                            map_ann = annotation_colors)
   }
   if (!is.null(annotation_row) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
+    annotation_colors <- fill_ann_color_map(dt_ann = annotation_row, 
+                                            map_ann = annotation_colors)
   }
   
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
@@ -1128,10 +1138,12 @@ pheatmap_with_anno_combo <- function(
   
   # filling missing values
   if (!is.null(annotation_col) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+    annotation_colors <- fill_ann_color_map(dt_ann = annotation_col, 
+                                            map_ann = annotation_colors)
   }
   if (!is.null(annotation_row) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(annotation_row, annotation_colors)
+    annotation_colors <- fill_ann_color_map(dt_ann = annotation_row, 
+                                            map_ann = annotation_colors)
   }
   
   ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
@@ -1774,7 +1786,7 @@ fill_ann_color_map <- function(dt_ann,
 #' Trim labels to the required number of characters
 #'
 #' @param lbls_vec character vector with labels to be trimmed
-#' @param max_lbl_length numeric value for the maximum number of characters in the x-axis label;
+#' @param max_lbl_length numeric value for the maximum number of characters in the label;
 #'  if set to Inf, no trimming will be performed
 #'
 #' @returns character vectors with trimmed labels
