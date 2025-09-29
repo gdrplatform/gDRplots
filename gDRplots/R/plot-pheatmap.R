@@ -563,6 +563,16 @@ pheatmap_with_anno_sa <- function(
   ls_output[["data"]][["matrix"]] <- 
     data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
   
+  # trim colnames & rownames for matrix
+  if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
+    colnames(mat_cvd) <- .trim_labels(lbls_vec = colnames(mat_cvd), 
+                                      max_lbl_length = max_hm_lbl_length)
+  }
+  if (any(nchar(rownames(mat_cvd)) > max_hm_lbl_length)) {
+    rownames(mat_cvd) <- .trim_labels(lbls_vec = rownames(mat_cvd), 
+                                      max_lbl_length = max_hm_lbl_length)
+  }
+  
   # flip
   t_mat_cvd <- t(mat_cvd)
   t_mat_cvd[] <- vapply(t_mat_cvd, function(x) qmfun(x), numeric(1))
@@ -1051,7 +1061,11 @@ pheatmap_with_anno_combo <- function(
     distfun = compute_distances,
     annotation_row = NULL,
     annotation_col = NULL,
-    annotation_colors = NULL) {
+    annotation_colors = NULL,
+    max_hm_lbl_length = 
+      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                       system.file(package = "gDRplots", "settings.json"))
+) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -1076,6 +1090,7 @@ pheatmap_with_anno_combo <- function(
     checkmate::assert_names(names(annotation_col), must.include = cellline_name)
   }
   checkmate::assert_list(annotation_colors, null.ok = TRUE)
+  checkmate::assert_number(max_hm_lbl_length, lower = 5)
   
   # output
   ls_output <- list(data = list(matrix = NULL,
@@ -1089,6 +1104,7 @@ pheatmap_with_anno_combo <- function(
                                   metric = metric,
                                   fit_source = fit_source,
                                   experiment_type = gDRutils::get_supported_experiments("combo"))
+  mat_cvd_raw <- mat_cvd
   
   # edge-case (no valid data in the matrix, usually matrix with NAs only)  
   if (NROW(mat_cvd) == 0) {
@@ -1103,9 +1119,22 @@ pheatmap_with_anno_combo <- function(
     ls_output[["data"]][["annotation_col"]] <- annotation_col
     
     rownames(annotation_col) <- annotation_col[[cellline_name]] # required by pheatmap::pheatmap
-    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
     # order matrix
     mat_cvd <- mat_cvd[rownames(annotation_col), , drop = FALSE]
+    mat_cvd_raw <- mat_cvd_raw[rownames(annotation_col), , drop = FALSE]
+    
+    # trim annotation
+    ls_too_long_lbl <- 
+      vapply(names(annotation_col), function(nm) any(nchar(annotation_col[[nm]]) > max_hm_lbl_length), logical(1))
+    if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
+      ls_col <- names(annotation_col)[ls_too_long_lbl]
+      annotation_col[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      
+      rownames(annotation_col) <- annotation_col[[cellline_name]] # update
+      rownames(mat_cvd) <- annotation_col[[cellline_name]] # update
+    }
+    
+    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name]
   }
   
   if (!is.null(annotation_row)) {
@@ -1130,22 +1159,55 @@ pheatmap_with_anno_combo <- function(
     ls_output[["data"]][["annotation_row"]] <- annotation_row[, !c("DrugCombination"), with = FALSE]
     
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
-    annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
+    mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_row), drop = FALSE]
+    
+    # trim annotation
+    ls_too_long_lbl <- 
+      vapply(names(annotation_row), function(nm) any(nchar(annotation_row[[nm]]) > max_hm_lbl_length), logical(1))
+    if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
+      ls_col <- names(annotation_row)[ls_too_long_lbl]
+      annotation_row[, (ls_col) := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), .SDcols = ls_col]
+      
+      if (any(ls_col %in% c(drug_name, drug_name_2))) {
+        annotation_row$DrugCombination <-
+          paste(annotation_row[[drug_name]], "x", annotation_row[[drug_name_2]])
+      }
+      
+      rownames(annotation_row) <- annotation_row[["DrugCombination"]] # update
+      colnames(mat_cvd) <- annotation_row[["DrugCombination"]] # update
+    }
+    
+    annotation_row <- annotation_row[, .SD, .SDcol = -c(drug_name, drug_name_2, "DrugCombination")]
   }
   
-  # filling missing values
-  if (!is.null(annotation_col) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(dt_ann = annotation_col, 
-                                            map_ann = annotation_colors)
-  }
-  if (!is.null(annotation_row) && !is.null(annotation_colors)) {
-    annotation_colors <- fill_ann_color_map(dt_ann = annotation_row, 
-                                            map_ann = annotation_colors)
+  if (!is.null(annotation_colors)) {
+    # trim annotation
+    ls_too_long_lbl <- 
+      vapply(names(annotation_colors), function(nm) {
+        any(nchar(names(annotation_colors[[nm]])) > max_hm_lbl_length) }, logical(1))
+    if (any(ls_too_long_lbl) && is.finite(max_hm_lbl_length)) {
+      for (nm in names(annotation_colors)[ls_too_long_lbl]) {
+        names(annotation_colors[[nm]]) <- 
+          .trim_labels(lbls_vec = names(annotation_colors[[nm]]), 
+                       max_lbl_length = max_hm_lbl_length)
+      }
+    }
+    
+    # filling missing values
+    if (!is.null(annotation_col)) {
+      annotation_colors <- fill_ann_color_map(dt_ann = annotation_col,
+                                              map_ann = annotation_colors)
+    }
+    if (!is.null(annotation_row)) {
+      annotation_colors <- fill_ann_color_map(dt_ann = annotation_row, 
+                                              map_ann = annotation_colors)
+    }
   }
   
-  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd, keep.rownames = cellline_name)
+  ls_output[["data"]][["matrix"]] <- 
+    data.table::as.data.table(mat_cvd_raw, keep.rownames = cellline_name)
   # flip
   t_mat_cvd <- t(mat_cvd)
   
