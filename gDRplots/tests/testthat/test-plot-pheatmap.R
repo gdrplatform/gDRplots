@@ -1057,6 +1057,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[3]][["label"]]) <= max_len))
   expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[6]][["label"]]) <= max_len))
   
+  dt_scores_lng[DrugName_2 == "drug_021"][["DrugName_2"]] <- "drug_021__VERYVERYVERYLONGNAMEOFDRUG|drug_021"
   out_11 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
                                      metric = "bliss_score",
                                      normalization_type = "RV")
@@ -1069,6 +1070,19 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_null(data_11[["annotation_row"]])
   plt_11 <- out_11[["heatmap"]]
   expect_is(plt_11, "pheatmap")
+  expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[4]][["label"]])), 1) # trimmed cell line
+  expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[5]][["label"]])), 4) # trimmed drug name
+  
+  out_12 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV",
+                                     max_hm_lbl_length = Inf)
+  expect_length(out_12, 2)
+  expect_equal(names(out_12), c("data", "heatmap"))
+  plt_12 <- out_12[["heatmap"]]
+  expect_is(plt_12, "pheatmap")
+  expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[4]][["label"]]))) # not trimmed cell line
+  expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[5]][["label"]]))) # not trimmed drug name
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
