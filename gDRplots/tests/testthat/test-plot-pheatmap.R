@@ -1018,12 +1018,13 @@ test_that("pheatmap_with_anno_combo works as expected", {
   
   # scenario 10: long drug and annotation name
   dt_scores_lng <- data.table::copy(dt_scores)
+  dt_scores_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
   dt_scores_lng[drug_moa_2 == "moa_D"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
   dt_scores_lng[DrugName == "drug_006"][["DrugName"]] <- "drug_006__veryveryverylongnameofdrug|drug_006"
   annotation_manual_row_10 <-
     unique(dt_scores_lng[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
   annotation_manual_col_10 <- data.table::data.table(
-    CellLineName = c("cellline_GB", "cellline_HB"),
+    CellLineName = unique(dt_scores_lng[["CellLineName"]]),
     lng_anno = c("short", "veryveryverylongnameofannotationforcellline")
   )
   annotation_map_10 <- list(
@@ -1042,10 +1043,32 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(names(out_10), c("data", "heatmap"))
   data_10 <- out_10[["data"]]
   expect_is(data_10, "list")
-  expect_equal(names(data_10),
-               c("matrix", "annotation_col", "annotation_row"))
+  expect_equal(names(data_10), c("matrix", "annotation_col", "annotation_row"))
+  expect_equivalent(data_10[["annotation_col"]], annotation_manual_col_10)
+  expect_equivalent(
+    data_10[["annotation_row"]], 
+    annotation_manual_row_10[order(match(DrugName, data_10[["annotation_row"]]$DrugName)), ][order(DrugName_2)])
   plt_10 <- out_10[["heatmap"]]
   expect_is(plt_10, "pheatmap")
+  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                               system.file(package = "gDRplots", "settings.json"))
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_equal(sum(grepl("\\.\\.\\.", plt_10[["gtable"]][["grobs"]][[5]][["label"]])), 2) # trimmed drug name
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[3]][["label"]]) <= max_len))
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[6]][["label"]]) <= max_len))
+  
+  out_11 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV")
+  expect_length(out_11, 2)
+  expect_equal(names(out_11), c("data", "heatmap"))
+  data_11 <- out_11[["data"]]
+  expect_is(data_11, "list")
+  expect_equal(names(data_11), c("matrix", "annotation_col", "annotation_row"))
+  expect_null(data_11[["annotation_col"]])
+  expect_null(data_11[["annotation_row"]])
+  plt_11 <- out_11[["heatmap"]]
+  expect_is(plt_11, "pheatmap")
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
