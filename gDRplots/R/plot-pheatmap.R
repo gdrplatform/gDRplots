@@ -1230,6 +1230,7 @@ pheatmap_with_anno_combo <- function(
   if (is.finite(max_hm_lbl_length)) {
     if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
       dt_lbls <- data.table::data.table(src = colnames(mat_cvd))
+      drug_1 <- drug_2 <- trimmed <- NULL
       dt_lbls[, c("drug_1", "drug_2") := data.table::tstrsplit(src, " x ", fixed = TRUE)]
       dt_lbls[, c("drug_1", "drug_2") := lapply(.SD, .trim_labels, max_lbl_length = max_hm_lbl_length), 
               .SDcols = c("drug_1", "drug_2")]
