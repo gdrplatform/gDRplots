@@ -446,7 +446,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
     drug_moa = c("moa_A" = "deeppink", "moa_D" = "cadetblue", moa_E = "gold"),
     lng_anno = c("short" = "black", "veryveryverylongnameofannotationfordrug" = "red")
   )
-
+  
   out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
                                  annotation_row = annotation_manual_row_9,
                                  annotation_colors = annotation_map_9)
@@ -1818,6 +1818,33 @@ test_that(".trim_labels works as expected", {
   expect_is(res_3, "character")
   expect_length(res_3, NROW(ls_lbls))
   expect_equal(res_3, res_1)
+  
+  # scenario: not unique string in vector
+  ls_lbls_2 <- c(
+    "short_lbl",
+    "long_duplicates|lbl_123",
+    "veryveryverylong", 
+    "long_duplicates|lbl_1AB", 
+    "veryveryverylong|dup_AB|123",
+    "long_duplicates|lbl_123AB",
+    "short_lbl",
+    "veryveryverylong|dup_AB|all123",
+    "long_duplicates|lbl_1AB"
+  )
+  
+  res_4 <- .trim_labels(lbls_vec = ls_lbls_2) # default - no trimming
+  expect_is(res_4, "character")
+  expect_length(res_4, NROW(ls_lbls_2))
+  expect_true(all(res_4 == ls_lbls_2))
+  
+  res_5 <- .trim_labels(lbls_vec = ls_lbls_2, 
+                        max_lbl_length = 10) 
+  expect_is(res_5, "character")
+  expect_length(res_5, NROW(ls_lbls_2))
+  expect_length(unique(res_5), NROW(unique(ls_lbls_2)))
+  expect_true(all(duplicated(ls_lbls_2) == duplicated(ls_lbls_2)))
+  expect_true(all(vapply(names(res_5)[duplicated(res_5)], 
+                         function(nm) NROW(unique(res_5[[nm]])) == 1, logical(1))))
   
   expect_error(.trim_labels(lbls_vec = 1:3),
                "Assertion on 'lbls_vec' failed: Must be of type 'character'")
