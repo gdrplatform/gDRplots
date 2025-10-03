@@ -17,7 +17,9 @@ pheatmap_with_anno_combo(
   distfun = compute_distances,
   annotation_row = NULL,
   annotation_col = NULL,
-  annotation_colors = NULL
+  annotation_colors = NULL,
+  max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+    system.file(package = "gDRplots", "settings.json"))
 )
 }
 \arguments{
@@ -68,6 +70,10 @@ without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotat
 without \code{CellLineName}), each list item is named vector with a valid color name for 
 each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 Not described elements will be colored in default.}
+
+\item{max_hm_lbl_length}{numeric value for the maximum number of characters in the label;
+if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
+the default number.}
 }
 \value{
 A named list with elements:

@@ -430,6 +430,72 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(range(as.numeric(plt_8$gtable$grobs[[6]]$children[[2]]$label)),
                c(val_eq - 1, val_eq))
   
+  # scenario 9: long drug and annotation name
+  dt_metrics_lng <- data.table::copy(dt_metrics)
+  dt_metrics_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
+  dt_metrics_lng[DrugName == "drug_026"][["drug_moa"]] <- "moa_E__veryveryverylongnameofmoa|moa_E"
+  dt_metrics_lng[DrugName == "drug_026"][["DrugName"]] <- "drug_026__veryveryverylongnameofdrug|drug_026"
+  annotation_manual_row_9 <-
+    unique(dt_metrics_lng[, c("DrugName", "drug_moa"), with = FALSE])
+  anno_test <- data.table::data.table(
+    DrugName = c("drug_004", "drug_005", "drug_006"),
+    lng_anno = c("short", "short", "veryveryverylongnameofannotationfordrug")
+  )
+  annotation_manual_row_9 <- anno_test[annotation_manual_row_9, on = "DrugName"]
+  annotation_map_9 <- list(
+    drug_moa = c("moa_A" = "deeppink", "moa_D" = "cadetblue", moa_E = "gold"),
+    lng_anno = c("short" = "black", "veryveryverylongnameofannotationfordrug" = "red")
+  )
+  
+  out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+                                 annotation_row = annotation_manual_row_9,
+                                 annotation_colors = annotation_map_9)
+  expect_length(out_9, 2)
+  expect_equal(names(out_9), c("data", "heatmap"))
+  data_9 <- out_9[["data"]]
+  expect_is(data_9, "list")
+  expect_equal(names(data_9), c("matrix", "annotation_col", "annotation_row"))
+  expect_is(data_9[["matrix"]], "data.table")
+  anno_9 <- out_9[["data"]][["annotation_row"]]
+  expect_is(anno_9, "data.table")
+  expect_equal(anno_9, annotation_manual_row_9) # not trimmed 
+  expect_true(all(unique(anno_9$DrugName) %in% colnames(data_9[["matrix"]])))
+  plt_9 <- out_9[["heatmap"]]
+  expect_is(plt_9, "pheatmap")
+  expect_equal(plt_9$gtable$grobs[[7]]$label, c("lng_anno", "drug_moa"))
+  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                               system.file(package = "gDRplots", "settings.json"))
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
+  expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len))
+  expect_true(all(annotation_map_9[["lng_anno"]] %in% 
+                    unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "lng_anno"])))
+  expect_false(all(annotation_map_9[["drug_moa"]] %in% 
+                     unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "drug_moa"])))
+  # because of missing colors, all anno was fill with new scheme
+  expect_true("NA" %in% names(plt_9$gtable$grobs[[8]]$children[[5]]$gp$fill)) # filled
+  
+  out_10 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+                                  annotation_row = annotation_manual_row_9,
+                                  annotation_colors = annotation_map_9,
+                                  max_hm_lbl_length = Inf)
+  expect_length(out_10, 2)
+  expect_equal(names(out_10), c("data", "heatmap"))
+  data_10 <- out_10[["data"]]
+  expect_is(data_10, "list")
+  expect_equivalent(data_10[["matrix"]], 
+                    data_9[["matrix"]][, .SD, .SDcols = names(data_10[["matrix"]])])
+  expect_equivalent(data_10[["annotation_row"]], 
+                    data_9[["annotation_row"]][order(match(DrugName, data_10[["annotation_row"]]$DrugName)),
+                                               .SD, .SDcols = names(data_10[["annotation_row"]])])
+  plt_10 <- out_10[["heatmap"]]
+  expect_is(plt_10, "pheatmap")
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len)) 
+  
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
@@ -472,6 +538,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                      annotation_colors = unlist(annotation_map)),
                "Assertion on 'annotation_colors' failed: Must be of type 'list'")
+  expect_error(pheatmap_with_anno_sa(dt_metrics = dt_metrics,
+                                     max_hm_lbl_length = "long"),
+               "Assertion on 'max_hm_lbl_length' failed: Must be of type 'number'")
 })
 
 test_that("pheatmap_with_anno_cd works as expected", {
@@ -932,13 +1001,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
   dt_scores_NA <- data.table::copy(dt_scores)
   dt_scores_NA[["bliss_score"]] <- NA_integer_
   dt_scores_NA[["hsa_score"]] <- NA_integer_
-  out_9 <- pheatmap_with_anno_combo(
-    dt_scores = dt_scores_NA,
-    metric = "bliss_score",
-    normalization_type = "RV",
-    annotation_col = annotation_manual_col,
-    annotation_colors = annotation_map
-  )
+  out_9 <- pheatmap_with_anno_combo(dt_scores = dt_scores_NA,
+                                    metric = "bliss_score",
+                                    normalization_type = "RV",
+                                    annotation_col = annotation_manual_col,
+                                    annotation_colors = annotation_map)
   
   expect_length(out_9, 2)
   expect_equal(names(out_9), c("data", "heatmap"))
@@ -948,6 +1015,74 @@ test_that("pheatmap_with_anno_combo works as expected", {
                c("matrix", "annotation_col", "annotation_row"))
   plt_9 <- out_9[["heatmap"]]
   expect_null(plt_9)
+  
+  # scenario 10: long drug and annotation name
+  dt_scores_lng <- data.table::copy(dt_scores)
+  dt_scores_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
+  dt_scores_lng[drug_moa_2 == "moa_D"][["drug_moa_2"]] <- "moa_D__veryveryveryverylongnameofmoadrug2|moa_D"
+  dt_scores_lng[DrugName == "drug_006"][["DrugName"]] <- "drug_006__veryveryverylongnameofdrug|drug_006"
+  annotation_manual_row_10 <-
+    unique(dt_scores_lng[, .SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+  annotation_manual_col_10 <- data.table::data.table(
+    CellLineName = unique(dt_scores_lng[["CellLineName"]]),
+    lng_anno = c("short", "veryveryverylongnameofannotationforcellline")
+  )
+  annotation_map_10 <- list(
+    drug_moa_2 = c("moa_E" = "deeppink", "moa_D" = "cadetblue"),
+    lng_anno = c("short" = "black", "veryveryverylongnameofannotationforcellline" = "red")
+  )
+  
+  out_10 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV",
+                                     annotation_col = annotation_manual_col_10,
+                                     annotation_row = annotation_manual_row_10,
+                                     annotation_colors = annotation_map_10)
+  
+  expect_length(out_10, 2)
+  expect_equal(names(out_10), c("data", "heatmap"))
+  data_10 <- out_10[["data"]]
+  expect_is(data_10, "list")
+  expect_equal(names(data_10), c("matrix", "annotation_col", "annotation_row"))
+  expect_equivalent(data_10[["annotation_col"]], annotation_manual_col_10)
+  expect_equivalent(
+    data_10[["annotation_row"]], 
+    annotation_manual_row_10[order(match(DrugName, data_10[["annotation_row"]]$DrugName)), ][order(DrugName_2)])
+  plt_10 <- out_10[["heatmap"]]
+  expect_is(plt_10, "pheatmap")
+  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                               system.file(package = "gDRplots", "settings.json"))
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
+  expect_equal(sum(grepl("\\.\\.\\.", plt_10[["gtable"]][["grobs"]][[5]][["label"]])), 2) # trimmed drug name
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[3]][["label"]]) <= max_len))
+  expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[6]][["label"]]) <= max_len))
+  
+  dt_scores_lng[DrugName_2 == "drug_021"][["DrugName_2"]] <- "drug_021__VERYVERYVERYLONGNAMEOFDRUG|drug_021"
+  out_11 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV")
+  expect_length(out_11, 2)
+  expect_equal(names(out_11), c("data", "heatmap"))
+  data_11 <- out_11[["data"]]
+  expect_is(data_11, "list")
+  expect_equal(names(data_11), c("matrix", "annotation_col", "annotation_row"))
+  expect_null(data_11[["annotation_col"]])
+  expect_null(data_11[["annotation_row"]])
+  plt_11 <- out_11[["heatmap"]]
+  expect_is(plt_11, "pheatmap")
+  expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[4]][["label"]])), 1) # trimmed cell line
+  expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[5]][["label"]])), 4) # trimmed drug name
+  
+  out_12 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
+                                     metric = "bliss_score",
+                                     normalization_type = "RV",
+                                     max_hm_lbl_length = Inf)
+  expect_length(out_12, 2)
+  expect_equal(names(out_12), c("data", "heatmap"))
+  plt_12 <- out_12[["heatmap"]]
+  expect_is(plt_12, "pheatmap")
+  expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[4]][["label"]]))) # not trimmed cell line
+  expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[5]][["label"]]))) # not trimmed drug name
   
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
@@ -1650,4 +1785,112 @@ test_that(".get_pheatmap_number_color works as expected", {
                                           breaks = breaks,
                                           light_color_font = 123),
                "Assertion on 'light_color_font' failed: Must be of type 'string'")
+})
+
+test_that(".get_pheatmap_fontsize works as expected", {
+  mat_s <- matrix(-14:30, ncol = 5,
+                  dimnames = list(letters[1:9], LETTERS[1:5]))
+  mat_xl <- matrix(-10^3:99, ncol = 100)
+  
+  res_1 <- .get_pheatmap_fontsize(mat_s) # default
+  expect_is(res_1, "numeric")
+  expect_equal(res_1, 8)
+  
+  res_2 <- .get_pheatmap_fontsize(mat_xl) # default
+  expect_is(res_2, "numeric")
+  expect_equal(res_2, 8)
+  
+  res_3 <- .get_pheatmap_fontsize(mat_s, 
+                                  threshold_count = 5)
+  expect_equal(res_3, 4.8)
+  
+  res_4 <- .get_pheatmap_fontsize(mat_xl,
+                                  threshold_count = 20)
+  expect_equal(res_4, 8) # default is row
+  
+  res_5 <- .get_pheatmap_fontsize(mat_s, 
+                                  dimension = "col",
+                                  threshold_count = 5)
+  expect_equal(res_5, 8)
+  
+  res_6 <- .get_pheatmap_fontsize(mat_xl, 
+                                  dimension = "col",
+                                  threshold_count = 20)
+  expect_equal(res_6, 4.8)
+  
+  expect_error(.get_pheatmap_fontsize(matrix = as.list(mat_s)),
+               "Assertion on 'matrix' failed: Must be of type 'matrix'")
+  expect_error(.get_pheatmap_fontsize(matrix = mat_s,
+                                      dimension = 1),
+               "'arg' must be NULL or a character vector")
+  expect_error(.get_pheatmap_fontsize(matrix = mat_s,
+                                      threshold_count = -1),
+               "Assertion on 'threshold_count' failed: Element 1 is not >= 1")
+})
+
+test_that(".trim_labels works as expected", {
+  ls_lbls <- c(
+    "short_lbl",
+    "long_duplicates|lbl_123",
+    "veryveryverylong", 
+    "long_duplicates|lbl_1AB", 
+    "veryveryverylong|dup_AB|123",
+    "long_duplicates|lbl_123AB",
+    "veryveryverylong|dup_AB|all123"
+  )
+  
+  res_1 <- .trim_labels(lbls_vec = ls_lbls) # default - no trimming
+  expect_is(res_1, "character")
+  expect_length(res_1, NROW(ls_lbls))
+  expect_true(all(res_1 == ls_lbls))
+  
+  res_2 <- .trim_labels(lbls_vec = ls_lbls, 
+                        max_lbl_length = 15) 
+  expect_is(res_2, "character")
+  expect_length(res_2, NROW(ls_lbls))
+  expect_length(unique(res_2), NROW(res_2)) # no duplicates
+  
+  res_3 <- .trim_labels(lbls_vec = ls_lbls, 
+                        max_lbl_length = max(nchar(ls_lbls))) 
+  expect_is(res_3, "character")
+  expect_length(res_3, NROW(ls_lbls))
+  expect_equal(res_3, res_1)
+  
+  # scenario: not unique string in vector
+  ls_lbls_2 <- c(
+    "short_lbl",
+    "long_duplicates|lbl_123",
+    "veryveryverylong", 
+    "long_duplicates|lbl_1AB", 
+    "veryveryverylong|dup_AB|123",
+    "long_duplicates|lbl_123AB",
+    "short_lbl",
+    "veryveryverylong|dup_AB|all123",
+    "long_duplicates|lbl_1AB"
+  )
+  
+  res_4 <- .trim_labels(lbls_vec = ls_lbls_2) # default - no trimming
+  expect_is(res_4, "character")
+  expect_length(res_4, NROW(ls_lbls_2))
+  expect_true(all(res_4 == ls_lbls_2))
+  
+  res_5 <- .trim_labels(lbls_vec = ls_lbls_2, 
+                        max_lbl_length = 10) 
+  expect_is(res_5, "character")
+  expect_length(res_5, NROW(ls_lbls_2))
+  expect_length(unique(res_5), NROW(unique(ls_lbls_2)))
+  expect_true(all(duplicated(ls_lbls_2) == duplicated(ls_lbls_2)))
+  expect_true(all(vapply(names(res_5)[duplicated(res_5)], 
+                         function(nm) NROW(unique(res_5[[nm]])) == 1, logical(1))))
+  
+  expect_error(.trim_labels(lbls_vec = 1:3),
+               "Assertion on 'lbls_vec' failed: Must be of type 'character'")
+  expect_error(.trim_labels(lbls_vec = c(ls_lbls, NA)),
+               "Assertion on 'lbls_vec' failed: Contains missing values")
+  expect_error(.trim_labels(lbls_vec = ls_lbls,
+                            max_lbl_length = 3),
+               "Assertion on 'max_lbl_length' failed: Element 1 is not >= 5")
+  expect_error(.trim_labels(lbls_vec = ls_lbls,
+                            max_lbl_length = "100"),
+               "Assertion on 'max_lbl_length' failed: Must be of type 'number'")
 })
