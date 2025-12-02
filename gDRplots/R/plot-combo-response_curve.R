@@ -100,7 +100,9 @@ plot_dose_response_combo <- function(dt_average,
   
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
-  dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
+  dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
+                             levels = sort(unique(dt_avg[[conc_2]])),
+                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
@@ -129,7 +131,7 @@ plot_dose_response_combo <- function(dt_average,
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_color_manual(values = colormap, 
-                                labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
+                                labels = levels(ls_conc_2)) +
     ggplot2::xlab(bquote(.(drug1_name) ~ "[" ~ mu * M ~ "]")) +
     ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(plt_title) +
@@ -240,7 +242,9 @@ plot_dose_response_combo_panel <- function(dt_average,
   # filter data for combination cell line (drug x drug2)
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
-  dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]])
+  dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
+                             levels = sort(unique(dt_avg[[conc_2]])),
+                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
@@ -269,7 +273,7 @@ plot_dose_response_combo_panel <- function(dt_average,
     ggplot2::scale_y_continuous(lim = c(ymin, ymax)) +
     ggplot2::scale_x_log10(oob = scales::squish_infinite) +
     ggplot2::scale_color_manual(values = colormap, 
-                                labels = sprintf("%.4f", as.numeric(levels(ls_conc_2)))) +
+                                labels = levels(ls_conc_2)) +
     ggplot2::xlab(bquote(~ "Concentration of Drug [" ~ mu * M ~ "]")) +
     ggplot2::ylab(normalization_type) +
     ggplot2::ggtitle(panel_title) +
