@@ -1400,6 +1400,27 @@ heatmap_combo_with_isoref_panel <- function(
   tile_height <- .get_tile_size(mrk_y)
   tile_width <- .get_tile_size(mrk_x)
   
+  # correction when the concentration levels are really close -> the fields will overlap (e.g. 0.001200 0.001320)
+  if (any(abs(diff(sort(unique(dt_tile$pos_y))) - tile_height) > tile_height / 4)) { 
+    dt_pos_y_adjusted <- data.table::data.table(
+      pos_y = mrk_y,
+      new_pos_y = seq(from = min(mrk_y), by = tile_height, length.out = NROW(mrk_y)))
+    
+    dt_tile <- dt_tile[dt_pos_y_adjusted, on = "pos_y"][, pos_y := NULL]
+    data.table::setnames(dt_tile, "new_pos_y", "pos_y")
+    mrk_y <- dt_pos_y_adjusted$new_pos_y
+  } 
+  if (any(abs(diff(sort(unique(dt_tile$pos_x))) - tile_width) > tile_width / 4)) { 
+    dt_pos_x_adjusted <- data.table::data.table(
+      pos_x = mrk_x,
+      new_pos_x = seq(from = min(mrk_x), by = tile_height, length.out = NROW(mrk_x)))
+    
+    dt_tile <- dt_tile[dt_pos_x_adjusted, on = "pos_x"][, pos_x := NULL]
+    data.table::setnames(dt_tile, "new_pos_x", "pos_x")
+    mrk_x <- dt_pos_x_adjusted$new_pos_x
+  } 
+  
+  # plot range
   range_x <- c(min(mrk_x) - 0.65 * tile_width, max(mrk_x) + 0.65 * tile_width)
   range_y <- c(min(mrk_y) - 0.65 * tile_height, max(mrk_y) + 0.65 * tile_height)
   

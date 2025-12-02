@@ -1,3 +1,6 @@
+## gDRplots 0.0.97 - 2025-12-02
+* update `heatmap_combo_with_isoref_panel` to work with not standard concentrations 
+
 ## gDRplots 0.0.96 - 2025-09-25
 * add trim option in `pheatmap_with_anno_x` functions
 
