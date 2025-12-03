@@ -2,7 +2,7 @@
 % Please edit documentation in R/common-utils.R
 \name{.round_to_unique_string}
 \alias{.round_to_unique_string}
-\title{Round to unique}
+\title{Round numbers to unique string}
 \usage{
 .round_to_unique_string(num_vec, initial_digits = 4)
 }
