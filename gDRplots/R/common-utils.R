@@ -144,7 +144,7 @@ create_log_seq <- function(start, end, length) {
   sequence
 }                     
 
-#' Round to unique
+#' Round numbers to unique string
 #' 
 #' Rounds a numeric vector to the minimum precision needed to ensure uniqueness
 #'
@@ -182,17 +182,17 @@ create_log_seq <- function(start, end, length) {
     for (d_val in unique_duplicates) {
       i_dup <- which(initial_rounded_vec == d_val)
       
-      x_subset <- num_vec[i_dup]
-      max_digits <- max(nchar(format(x_subset, scientific = FALSE)))
+      vec_subset <- num_vec[i_dup]
+      max_digits <- max(nchar(format(vec_subset, scientific = FALSE)))
       
       # start the precision search from the next digit
       d <- initial_digits + 1
       while (d <= max_digits) {
-        x_subset_rounded <- round(x_subset, digits = d)
+        vec_subset_rounded <- round(vec_subset, digits = d)
         
-        if (NROW(unique(x_subset_rounded)) == NROW(x_subset)) {
-          # update the elements in the final_rounded_vec
-          final_char_vec[i_dup] <- format(x_subset_rounded, 
+        if (NROW(unique(vec_subset_rounded)) == NROW(vec_subset)) {
+          # update the elements in the final_char_vec
+          final_char_vec[i_dup] <- format(vec_subset_rounded, 
                                           scientific = FALSE,
                                           trim = TRUE)
           break
