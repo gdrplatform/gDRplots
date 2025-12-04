@@ -60,7 +60,7 @@ and have almost no or no common values.
 }
 \examples{
 cl_names <-
-  c("cellline_AA", "cellline_EA", "cellline_IB", 
+  c("cellline_AA", "cellline_EA", "cellline_IB",
   "cellline_MC", "cellline_BC", "cellline_FD")
 
 drug1_name <- "drug_001"
@@ -71,25 +71,25 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names)
-
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                iso_levels = c("0.25", "0.5"))
-                                
 heatmap_combo_with_isoref_panel_independent(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                normalization_type = "RV",
-                                iso_levels = NULL,
-                                colors_vec = c("darkcyan", "snow", "darkorange"),
-                                swap_axes = TRUE)
+                                            dt_isobolograms,
+                                            drug1_name, drug2_name,
+                                            cl_names)
+
+heatmap_combo_with_isoref_panel_independent(dt_excess,
+                                            dt_isobolograms,
+                                            drug1_name, drug2_name,
+                                            cl_names,
+                                            iso_levels = c("0.25", "0.5"))
+
+heatmap_combo_with_isoref_panel_independent(dt_excess,
+                                            dt_isobolograms,
+                                            drug1_name, drug2_name,
+                                            cl_names,
+                                            normalization_type = "RV",
+                                            iso_levels = NULL,
+                                            colors_vec = c("darkcyan", "snow", "darkorange"),
+                                            swap_axes = TRUE)
 
 }
 \keyword{combo_plots}
