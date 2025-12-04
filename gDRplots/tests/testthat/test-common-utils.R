@@ -107,7 +107,7 @@ test_that(".round_to_unique_string works as expected", {
   expect_error(.round_to_unique_string(num_vec = as.character(vec)),
                "Assertion on 'num_vec' failed: Must be of type 'numeric'")
   expect_error(.round_to_unique_string(num_vec = c(vec, NA)),
-               "ssertion on 'num_vec' failed: Contains missing values")
+               "Assertion on 'num_vec' failed: Contains missing values")
   expect_error(.round_to_unique_string(num_vec = vec,
                                        initial_digits = "4"),
                "Assertion on 'initial_digits' failed: Must be of type 'integerish'")

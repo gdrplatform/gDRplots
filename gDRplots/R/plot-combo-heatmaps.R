@@ -1530,7 +1530,7 @@ heatmap_combo_with_isoref_panel <- function(
 #' This function is dedicated to cases in which given cell lines are exposed to drugs of different concentrations 
 #' and have almost no or no common values.
 #'
-#' @inheritParams heatmap_combo_with_isoref
+#' @inheritParams heatmap_combo_with_isoref_panel
 #'    
 #' @return \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
 #'    for isobolograms for selected drug and co-drug by list of cell lines

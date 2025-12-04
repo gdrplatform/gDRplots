@@ -31,6 +31,9 @@ and combo \code{SummarizedExperiment}}
 
 \item{drug2_name}{string with co-drug name to be plotted (identifiers \code{DrugName_2})}
 
+\item{cl_names}{character vector with cell line names to be plotted (Cell Line Name);
+if \code{NULL} - all available cell lines will be plotted}
+
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
