@@ -1538,7 +1538,7 @@ heatmap_combo_with_isoref_panel <- function(
 #' @keywords combo_plots
 #' @examples
 #' cl_names <-
-#'   c("cellline_AA", "cellline_EA", "cellline_IB", 
+#'   c("cellline_AA", "cellline_EA", "cellline_IB",
 #'   "cellline_MC", "cellline_BC", "cellline_FD")
 #' 
 #' drug1_name <- "drug_001"
@@ -1549,25 +1549,25 @@ heatmap_combo_with_isoref_panel <- function(
 #' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
 #' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 #' 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names)
-#' 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 iso_levels = c("0.25", "0.5"))
-#'                                 
 #' heatmap_combo_with_isoref_panel_independent(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 normalization_type = "RV",
-#'                                 iso_levels = NULL,
-#'                                 colors_vec = c("darkcyan", "snow", "darkorange"),
-#'                                 swap_axes = TRUE)
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names)
+#' 
+#' heatmap_combo_with_isoref_panel_independent(dt_excess,
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names,
+#'                                             iso_levels = c("0.25", "0.5"))
+#' 
+#' heatmap_combo_with_isoref_panel_independent(dt_excess,
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names,
+#'                                             normalization_type = "RV",
+#'                                             iso_levels = NULL,
+#'                                             colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                             swap_axes = TRUE)
 #' 
 #' @export
 heatmap_combo_with_isoref_panel_independent <- function(
@@ -1623,7 +1623,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
                          drug2_name,
                          unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
-  plt_list <- lapply(cellline_name_vec, function(cl_nm) {
+  plt_list <- lapply(cl_names, function(cl_nm) {
     plt <- gDRplots::heatmap_combo_with_isoref(
       dt_excess = dt_excess,
       dt_isobolograms = dt_isobolograms,
@@ -1637,7 +1637,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
       no_breaks = no_breaks,
       swap_axes = swap_axes)
   })
-  names(plt_list) <- cellline_name_vec
+  names(plt_list) <- cl_names
   
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
