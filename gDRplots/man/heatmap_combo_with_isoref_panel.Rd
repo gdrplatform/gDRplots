@@ -55,67 +55,9 @@ and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 }
 \value{
 \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
-   for isobolograms for selected drug and co-drug by list of cell lines
+   for isobolograms for selected drug and co-drug and all selected cell line
 }
 \description{
 Plot panel of heatmaps with fitted and reference data for isobolograms
-}
-\examples{
-cl_names <-
-  c("cellline_AA", "cellline_EA", "cellline_IB", 
-  "cellline_MC", "cellline_BC", "cellline_FD")
-
-drug1_name <- "drug_001"
-drug2_name <- "drug_026"
-
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-se <- mae[[gDRutils::get_supported_experiments("combo")]]
-dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
-dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
-
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names)
-
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                iso_levels = c("0.25", "0.5"))
-                                
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                metric = "hsa_excess",
-                                iso_levels = c("0.25", "0.5"))
-
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                normalization_type = "RV",
-                                iso_levels = NULL,
-                                colors_vec = c("darkcyan", "snow", "darkorange"),
-                                swap_axes = FALSE)
-                                
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                normalization_type = "RV",
-                                iso_levels = NULL,
-                                colors_vec = c("darkcyan", "snow", "darkorange"),
-                                swap_axes = TRUE)
-
-heatmap_combo_with_isoref_panel(dt_excess,
-                                dt_isobolograms,
-                                drug1_name, drug2_name,
-                                cl_names,
-                                metric = "hsa_excess",
-                                iso_levels = NULL,
-                                swap_axes = FALSE)
-
 }
 \keyword{combo_plots}
