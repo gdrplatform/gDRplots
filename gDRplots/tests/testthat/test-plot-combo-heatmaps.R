@@ -591,7 +591,7 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
   expect_is(plt_independent, "gg")
   expect_error(expect_identical(plt_common, plt_independent))
   expect_length(plt_common@layers, NROW(c("geom_tile", "geom_path")))
-  expect_length(plt_independent@layers, c("draw_grob"))
+  expect_length(plt_independent@layers, NROW(c("draw_grob")))
   expect_length(plt_common@labels, NROW(c("colour", "linetype", "x", "y", "fill", "title")))
   expect_length(plt_independent@labels, 0)
 })
