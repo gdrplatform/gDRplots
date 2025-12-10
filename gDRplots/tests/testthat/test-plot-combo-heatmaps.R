@@ -113,7 +113,6 @@ test_that("heatmap_combo_metrics works as expected", {
 })
 
 test_that("heatmap_combo_metrics_panel works as expected", {
-  
   cl_name <- "cellline_FD"
   drug1_name <- "drug_011"
   drug2_name <- "drug_026"
@@ -123,11 +122,13 @@ test_that("heatmap_combo_metrics_panel works as expected", {
   dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
   dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
   
-  plts_1 <- heatmap_combo_metrics_panel(dt_excess, 
-                                        dt_isobolograms,
-                                        drug1_name, 
-                                        drug2_name, 
-                                        cl_name) # default
+  expect_warning({ # remove when ggpubr will be updated to ggplot2 v.4.0.0. # nolint
+    plts_1 <- heatmap_combo_metrics_panel(dt_excess, 
+                                          dt_isobolograms,
+                                          drug1_name, 
+                                          drug2_name, 
+                                          cl_name) # default
+  })
   expect_is(plts_1, "gg")
   expect_length(ggplot2::ggplot_build(plts_1)$data, 1)
   
