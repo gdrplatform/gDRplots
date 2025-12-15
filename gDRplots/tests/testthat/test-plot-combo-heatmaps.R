@@ -972,3 +972,35 @@ test_that(".get_excess_palette works as expected", {
   expect_error(.get_excess_palette(1),
                "Assertion on 'no_breaks' failed: Element 1 is not >= 2.")
 })
+
+test_that(".get_combo_panel_type works as expected", {
+  ls_vec_conc_1 <- list(
+    c(0.000000000,  0.001524158,  0.004370000,  0.013200000,
+      0.039800000,  0.120000000,  0.363000000,  1.100000000,
+      3.310000000, 10.000000000),
+    c(0.000000000, 0.001524158, 0.004370000, 0.013200000,
+      0.039800000, 0.120000000, 0.363000000, 1.100000000,
+      3.310000000)
+  )
+  expect_equal(.get_combo_panel_type(ls_vec_conc_1), "common")
+  
+  ls_vec_conc_2 <- list(
+    c(0.000000, 0.000132, 0.000398, 0.001200, 0.003630, 
+      0.011000, 0.033100, 0.100000),
+    c(0.00000, 0.00132, 0.00398, 0.01200, 0.03630, 0.11000, 0.33100, 1.00000)
+  )
+  expect_equal(.get_combo_panel_type(ls_vec_conc_2), "independent")
+  
+  ls_vec_conc_3 <- list(
+    c(0.000000, 0.000100, 0.000316, 0.001000, 0.003160,
+      0.010000, 0.031600, 0.100000, 0.316000, 1.000000),
+    c(0.00000,  0.00100,  0.00316,  0.01000,  0.03160,
+      0.10000,  0.31600,  1.00000, 3.16000, 10.00000)
+  )
+  expect_equal(.get_combo_panel_type(ls_vec_conc_3), "independent")
+  
+  expect_error(.get_combo_panel_type(unlist(ls_vec_conc_1)),
+               "Assertion on 'ls_vec_conc' failed: Must be of type 'list'")
+  expect_error(.get_combo_panel_type(list(c(0, 0.01, 0.1, 1), c("0", "0.01", "0.1", "1"))),
+               "Must be a list with numeric vectors.")
+})
