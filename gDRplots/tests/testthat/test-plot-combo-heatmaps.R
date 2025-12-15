@@ -573,8 +573,6 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
-  dt_excess_2 <- data.table::copy(dt_excess)
-  dt_excess_2[CellLineName %in% cl_names[1:2], Concentration := Concentration / 10]
   dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
   
   plt_common <- heatmap_combo_with_isoref_panel(dt_excess,
@@ -582,6 +580,9 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
                                                 drug1_name, 
                                                 drug2_name,
                                                 cl_names)
+  
+  dt_excess_2 <- data.table::copy(dt_excess)
+  dt_excess_2[CellLineName %in% cl_names[1:2], Concentration := Concentration / 10]
   plt_independent <- heatmap_combo_with_isoref_panel(dt_excess_2,
                                                      dt_isobolograms,
                                                      drug1_name, 
@@ -622,14 +623,23 @@ test_that("heatmap_combo_with_isoref_panel_common works as expected", {
   expect_equal(plt_1[["labels"]][["colour"]], "Iso Levels")
   expect_equal(plt_1[["labels"]][["linetype"]], "GR")
   
-  plt_2 <- heatmap_combo_with_isoref_panel_common(dt_excess,
-                                                  dt_isobolograms,
-                                                  drug1_name, 
-                                                  drug2_name,
-                                                  cl_names = "cellline_XX")
   
-  expect_is(plt_2, "gg")
-  expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[1]]$PANEL),
+  plt_2_nonexisten <- heatmap_combo_with_isoref_panel_common(dt_excess,
+                                                             dt_isobolograms,
+                                                             drug1_name, 
+                                                             drug2_name,
+                                                             cl_names = "cellline_XX")
+  expect_is(plt_2_nonexisten, "gg")
+  expect_length(unique(ggplot2::ggplot_build(plt_2_nonexisten)$data[[1]]$PANEL),
+                NROW(unique(dt_excess[["CellLineName"]])))
+  
+  plt_2_NULL <- heatmap_combo_with_isoref_panel_common(dt_excess,
+                                                       dt_isobolograms,
+                                                       drug1_name, 
+                                                       drug2_name,
+                                                       cl_names = NULL)
+  expect_is(plt_2_nonexisten, "gg")
+  expect_length(unique(ggplot2::ggplot_build(plt_2_nonexisten)$data[[1]]$PANEL),
                 NROW(unique(dt_excess[["CellLineName"]])))
   
   cl_names_NA <- c("cellline_AA", "cellline_XX")
