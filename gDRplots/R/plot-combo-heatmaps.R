@@ -1949,10 +1949,31 @@ transform_log_conc <- function(conc_vec) {
 }
 
 
+#' Check type of concentrations set for combination of drug per cell line
+#' 
+#' @param ls_vec_conc a list with vectors with concentration per cell line
+#'
+#' @return a string decribing type of concentration list - one of:
+#' \itemize{
+#'   \item \code{common} vectors in the input list have common part; heatmaps in the panel
+#'   should be created jointly with function \code{\link{heatmap_combo_with_isoref_panel_common}}
+#'   \item \code{independent} vectors in the input list do not have common part; heatmaps in the panel
+#'   should be created independently with function \code{\link{heatmap_combo_with_isoref_panel_independent}}
+#' }
+#'
 #' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @examples
+#' \dontrun{
+#' ls_conc <- list(c(0, 0.003, 0.01, 0.03), c(0, 0.003, 0.01, 0.03, 0.1))
+#' .get_combo_panel_type(ls_conc)
+#' }
+#' 
 .get_combo_panel_type <- function(ls_vec_conc) {
   checkmate::assert_list(ls_vec_conc)
-  checkmate::assert_true(all(
+  stopifnot("Must be a list with numeric vectors." = all(
     vapply(ls_vec_conc, function(x) is.numeric(x), logical(1))
   ))
   
@@ -1960,6 +1981,7 @@ transform_log_conc <- function(conc_vec) {
   ls_vec_conc <- ls_vec_conc[!duplicated(lapply(ls_vec_conc, sort))]
   
   if (NROW(ls_vec_conc) == 1) {
+    # there is only one concentration set
     return("common")
   } else {
     # clean list 
@@ -1973,8 +1995,9 @@ transform_log_conc <- function(conc_vec) {
     })
     common_conc <- Reduce(intersect, ls_vec_conc_clean)
     
-    if (NROW(common_conc) == 0 ||
+    if (NROW(common_conc) == 0 || 
         all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1)))) {
+      # each vector is fully independent or the shift between is too big
       return("independent")
     } else {
       return("common")
