@@ -1264,6 +1264,13 @@ heatmap_combo_with_isoref_panel <- function(
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(swap_axes)
   
+  available_cls <- unique(dt_excess[[cellline_name]])
+  if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
+    cl_names  <- available_cls
+  } else if (!all(cl_names %in% available_cls)) {
+    cl_names <- cl_names[cl_names %in% available_cls]
+  }
+  
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_excess <- dt_excess[eval(filter_expr)]
@@ -1279,11 +1286,10 @@ heatmap_combo_with_isoref_panel <- function(
   ls_vec_conc_2 <- lapply(cl_names, function(cl_nm) {
     unique(dt_excess[get(cellline_name) == cl_nm, ][[conc_2]])
   })
-  common_conc_condition <- all(NROW(ls_vec_conc[!duplicated(lapply(ls_vec_conc, sort))]) == 1,
-                               NROW(ls_vec_conc_2[!duplicated(lapply(ls_vec_conc_2, sort))]) == 1)
   
-  panel <- if (common_conc_condition) {
-    heatmap_combo_with_isoref_panel_common(
+  panel <- if ("independent" %in% c(.get_combo_panel_type(ls_vec_conc), 
+                                    .get_combo_panel_type(ls_vec_conc_2))) {
+    heatmap_combo_with_isoref_panel_independent(
       dt_excess = dt_excess,
       dt_isobolograms = dt_isobolograms,
       drug1_name = drug1_name,
@@ -1296,7 +1302,7 @@ heatmap_combo_with_isoref_panel <- function(
       no_breaks = no_breaks,
       swap_axes = swap_axes)
   } else {
-    heatmap_combo_with_isoref_panel_independent(
+    heatmap_combo_with_isoref_panel_common(
       dt_excess = dt_excess,
       dt_isobolograms = dt_isobolograms,
       drug1_name = drug1_name,
@@ -1940,4 +1946,38 @@ transform_log_conc <- function(conc_vec) {
     gDRutils::get_settings_from_json("EXCESS_PALETTE",
                                      system.file(package = "gDRplots", "settings.json"))
   )(no_breaks)
+}
+
+
+#' @keywords internal
+.get_combo_panel_type <- function(ls_vec_conc) {
+  checkmate::assert_list(ls_vec_conc)
+  checkmate::assert_true(all(
+    vapply(ls_vec_conc, function(x) is.numeric(x), logical(1))
+  ))
+  
+  # find unique vectors
+  ls_vec_conc <- ls_vec_conc[!duplicated(lapply(ls_vec_conc, sort))]
+  
+  if (NROW(ls_vec_conc) == 1) {
+    return("common")
+  } else {
+    # clean list 
+    digits <- max(vapply(ls_vec_conc, function(x) { 
+      max(nchar(as.character(x))) }, numeric(1)))
+    # clean unique vectors
+    ls_vec_conc_clean <- lapply(ls_vec_conc, function(x) {
+      x <- x[!is.na(x) & x > 0] # remove NAs & 0
+      x <- round(as.numeric(x), digits) # handle floating point differences
+      x
+    })
+    common_conc <- Reduce(intersect, ls_vec_conc_clean)
+    
+    if (NROW(common_conc) == 0 ||
+        all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1)))) {
+      return("independent")
+    } else {
+      return("common")
+    }
+  }
 }
