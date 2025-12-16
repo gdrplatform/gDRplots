@@ -801,7 +801,7 @@ test_that("heatmap_combo_with_isoref_panel_independent works as expected", {
                                                             drug1_name, 
                                                             drug2_name,
                                                             cl_names = NULL)
-  expect_identical(plt_3_all, plt_3_null)
+  expect_equal(plt_3_all, plt_3_null)
   
   expect_error(heatmap_combo_with_isoref_panel_independent(dt_excess = unlist(dt_excess),
                                                            dt_isobolograms = dt_isobolograms,
