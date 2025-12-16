@@ -1011,6 +1011,17 @@ test_that(".get_combo_panel_type works as expected", {
   )
   expect_equal(.get_combo_panel_type(ls_vec_conc_3), "independent")
   
+  ls_vec_conc_4 <- list(
+    c(0.000000000, 0.000762079, 0.002180000, 0.006590000, 0.019900000,
+      0.060100000, 0.182000000, 0.548000000, 1.660000000, 5.000000000),
+    c(0.000000000, 0.000762079, 0.002180000, 0.006590000, 0.019900000,
+      0.060100000, 0.182000000, 1.660000000, 5.000000000),
+    c(0.000000000, 0.000762079, 0.006590000, 0.019900000, 0.060100000,
+      0.182000000, 0.548000000, 1.660000000, 5.000000000)
+  )
+  expect_equal(.get_combo_panel_type(ls_vec_conc_4), "common")
+  
+  
   expect_error(.get_combo_panel_type(unlist(ls_vec_conc_1)),
                "Assertion on 'ls_vec_conc' failed: Must be of type 'list'")
   expect_error(.get_combo_panel_type(list(c(0, 0.01, 0.1, 1), c("0", "0.01", "0.1", "1"))),
