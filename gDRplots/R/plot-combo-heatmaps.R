@@ -2023,7 +2023,7 @@ transform_log_conc <- function(conc_vec) {
     end_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) max(x), numeric(1)))) == 1
     
     if (NROW(common_conc) == 0 || 
-        (all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1))) &
+        (all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1))) &&
          !(start_is_same & end_is_same))) {
       # each vector is fully independent or the shift between is too big
       return("independent")
