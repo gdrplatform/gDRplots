@@ -791,6 +791,18 @@ test_that("heatmap_combo_with_isoref_panel_independent works as expected", {
                                                        swap_axes = TRUE)
   expect_is(plt_2, "gg")
   
+  plt_3_all <- heatmap_combo_with_isoref_panel_independent(dt_excess,
+                                                           dt_isobolograms,
+                                                           drug1_name, 
+                                                           drug2_name,
+                                                           cl_names = unique(dt_excess[["CellLineName"]]))
+  plt_3_null <- heatmap_combo_with_isoref_panel_independent(dt_excess,
+                                                            dt_isobolograms,
+                                                            drug1_name, 
+                                                            drug2_name,
+                                                            cl_names = NULL)
+  expect_identical(plt_3_all, plt_3_null)
+  
   expect_error(heatmap_combo_with_isoref_panel_independent(dt_excess = unlist(dt_excess),
                                                            dt_isobolograms = dt_isobolograms,
                                                            drug1_name = drug1_name,
