@@ -1722,6 +1722,24 @@ heatmap_combo_with_isoref_panel_independent <- function(
     cl_names <- cl_names[cl_names %in% available_cls]
   }
   
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_excess <- dt_excess[eval(filter_expr)]
+  dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
+  
+  # filter data for combination cell line (drug x drug2)
+  selected_combination <-
+    unique(dt_excess[get(cellline_name) %in% cl_names & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, 
+                     .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
+  
+  dt_excess <-
+    dt_excess[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  dt_isobolograms <-
+    dt_isobolograms[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  
+  # removing cell line with no data
+  cl_names_with_data <- cl_names[cl_names %in% unique(dt_excess[get(cellline_name) %in% cl_names][[cellline_name]])]
+  
   # panel title
   panel_title <- sprintf("%s (%s) x %s (%s)",
                          drug1_name,
@@ -1729,7 +1747,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
                          drug2_name,
                          unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
-  plt_list <- lapply(cl_names, function(cl_nm) {
+  plt_list <- lapply(cl_names_with_data, function(cl_nm) {
     plt <- gDRplots::heatmap_combo_with_isoref(
       dt_excess = dt_excess,
       dt_isobolograms = dt_isobolograms,
@@ -1743,7 +1761,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
       no_breaks = no_breaks,
       swap_axes = swap_axes)
   })
-  names(plt_list) <- cl_names
+  names(plt_list) <- cl_names_with_data
   
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
@@ -1979,6 +1997,7 @@ transform_log_conc <- function(conc_vec) {
   
   # find unique vectors
   ls_vec_conc <- ls_vec_conc[!duplicated(lapply(ls_vec_conc, sort))]
+  ls_vec_conc <- ls_vec_conc[vapply(ls_vec_conc, function(x) NROW(x) > 0, logical(1))]
   
   if (NROW(ls_vec_conc) == 1) {
     # there is only one concentration set
