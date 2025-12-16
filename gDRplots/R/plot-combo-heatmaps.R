@@ -1433,6 +1433,8 @@ heatmap_combo_with_isoref_panel_common <- function(
     cl_names <- cl_names[cl_names %in% available_cls]
   }
   
+  # TODO add check for overlap of conc
+  
   # panel title
   panel_title <- sprintf("%s (%s) x %s (%s)",
                          drug1_name,
@@ -2014,8 +2016,15 @@ transform_log_conc <- function(conc_vec) {
     })
     common_conc <- Reduce(intersect, ls_vec_conc_clean)
     
+    # TODO add comments
+    all_conc <- unique(unlist(ls_vec_conc_clean))
+    ls_range_conc <- lapply(ls_vec_conc_clean, function(x) which(all_conc %in% x))
+    start_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) min(x), numeric(1)))) == 1
+    end_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) max(x), numeric(1)))) == 1
+    
     if (NROW(common_conc) == 0 || 
-        all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1)))) {
+        (all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1))) &
+         !(start_is_same & end_is_same))) {
       # each vector is fully independent or the shift between is too big
       return("independent")
     } else {
