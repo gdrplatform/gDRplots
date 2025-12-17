@@ -704,6 +704,16 @@ test_that("heatmap_combo_with_isoref_panel_common works as expected", {
   expect_equal(plt_1_swap_axes[["data"]][["pos_x"]], plt_1[["data"]][["pos_y"]])
   expect_equal(plt_1_swap_axes[["data"]][["smooth"]], plt_1[["data"]][["smooth"]])
   
+  dt_excess_2 <- data.table::copy(dt_excess)
+  dt_excess_2[CellLineName %in% cl_names[1:2], Concentration := Concentration / 10]
+  expect_error({
+    plt_6 <- heatmap_combo_with_isoref_panel_common(dt_excess_2,
+                                                    dt_isobolograms,
+                                                    drug1_name, 
+                                                    drug2_name,
+                                                    cl_names)
+  }, "Concentration values for drug 1 are not common for all selected cell lines.")
+
   expect_error(heatmap_combo_with_isoref_panel_common(dt_excess = unlist(dt_excess),
                                                       dt_isobolograms = dt_isobolograms,
                                                       drug1_name = drug1_name,
