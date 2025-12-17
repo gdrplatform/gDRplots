@@ -60,4 +60,32 @@ and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 \description{
 Plot panel of heatmaps with fitted and reference data for isobolograms
 }
+\examples{
+cl_names <-
+  c("cellline_AA", "cellline_EA", "cellline_IB", 
+  "cellline_MC", "cellline_BC", "cellline_FD")
+
+drug1_name <- "drug_001"
+drug2_name <- "drug_026"
+
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+
+heatmap_combo_with_isoref_panel(dt_excess,
+                                dt_isobolograms,
+                                drug1_name, drug2_name,
+                                cl_names)
+
+dt_excess_2 <- data.table::copy(dt_excess)
+dt_excess_2[CellLineName \%in\% cl_names[1:2], Concentration := Concentration / 10]
+
+heatmap_combo_with_isoref_panel(dt_excess_2,
+                                dt_isobolograms,
+                                drug1_name, drug2_name,
+                                cl_names,
+                                colors_vec = c("darkcyan", "snow", "darkorange")) 
+
+}
 \keyword{combo_plots}
