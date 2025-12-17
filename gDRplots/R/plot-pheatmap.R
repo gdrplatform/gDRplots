@@ -1955,3 +1955,242 @@ fill_ann_color_map <- function(dt_ann,
     trimed_vec_lbl
   }
 }
+
+#' Plot Heatmap: Single Agents & Combinations (Merged Annotations)
+#'
+#' @description
+#' A specialized heatmap for Single Agents and Combinations metrics data.
+#'
+#' \strong{Structure:}
+#' \itemize{
+#'    \item \strong{Single Agent Rows}: Fixed_Drugs are labeled as the untreated tag (e.g., "vehicle").
+#'    \item \strong{Combo Rows}: Fixed_Drugs show "Name (Concentration)".
+#'    \item \strong{Row Label}: Always displays the primary \code{DrugName}, with technical info (Gnumber_3/Concentration_3) removed.
+#' }
+#'
+#' @inheritParams pheatmap_with_anno_sa
+#' @export
+#' @examples
+#' dt_metrics <- data.table::data.table(
+#'   DrugName = c(
+#'     "Ribociclib (Gnumber_3 = vehicle) (Concentration_3 = 0)", 
+#'     "Ribociclib", 
+#'     "Metformin (Concentration_3 = 0.5)", 
+#'     "Aspirin",
+#'     "Paracetamol"
+#'   ),
+#'   DrugName_2 = c("vehicle", "DrugB", "vehicle", "DrugC", "DrugC"),
+#'   cotrt_value = c(0, 0.5, 0, 1.2, 0.1),
+#'   CellLineName = rep(c("CL1", "CL2"), times = 3)[1:5],
+#'   normalization_type = "GR",
+#'   fit_source = "gDR",
+#'   xc50 = c(0.1, 0.05, 0.8, 0.2, 0.6),
+#'   DrugName_3 = c("vehicle", "vehicle", "DrugD", "vehicle", "vehicle"),
+#'   Concentration_3 = c(0, 0, 0.5, 0, 0)
+#' )
+#' 
+#' res <- pheatmap_with_anno_combo_metrics(
+#'   dt_metrics, 
+#'   metric = "xc50", 
+#'   hm_title = "Example Combination Heatmap"
+#' )
+#' res$heatmap
+pheatmap_with_anno_combo_metrics <- function(
+    dt_metrics,
+    dt_metrics_capped = NULL,
+    normalization_type = "GR",
+    metric = "xc50",
+    fit_source = "gDR",
+    hm_title = NA,
+    colors_vec = NULL,
+    no_breaks = 50,
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
+    distfun = compute_distances,
+    annotation_row = NULL,
+    annotation_col = NULL,
+    annotation_colors = NULL,
+    max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                                         system.file(package = "gDRplots", "settings.json"))
+) {
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  drug_name_id <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_id2 <- gDRutils::get_env_identifiers("drug_name2")
+  cellline_name_id <- gDRutils::get_env_identifiers("cellline_name")
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_metrics_capped, null.ok = TRUE)
+  
+  dt_to_use <- if (!is.null(dt_metrics_capped)) dt_metrics_capped else dt_metrics
+  
+  req_cols <- c(drug_name_id, drug_name_id2, "cotrt_value", cellline_name_id, 
+                "normalization_type", "fit_source")
+  missing_cols <- setdiff(req_cols, names(dt_to_use))
+  if (length(missing_cols) > 0) stop(paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+  
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_sub <- dt_to_use[eval(filter_expr)]
+  
+  if (nrow(dt_sub) == 0) stop("No data found for selected normalization/source.")
+  dt_sub <- data.table::copy(dt_sub)
+  
+  pattern <- "\\s*\\([^)]*(Gnumber_3|Concentration_3)[^)]*\\)"
+  dt_sub[[drug_name_id]] <- trimws(gsub(pattern, "", dt_sub[[drug_name_id]]))
+  
+  if ("dilution_drug" %in% names(dt_sub)) dt_sub <- dt_sub[dilution_drug != "codilution"]
+  
+  dt_sub[is.na(cotrt_value), cotrt_value := 0]
+  
+  dt_sub[, `:=`(
+    Row_Display_Name = get(drug_name_id),
+    Fixed_Name_1     = get(drug_name_id2),
+    Fixed_Conc_1     = as.numeric(cotrt_value),
+    Fixed_Name_2     = untreated_tag,
+    Fixed_Conc_2     = 0
+  )]
+  
+  dt_sub[Fixed_Conc_1 == 0, Fixed_Name_1 := untreated_tag]
+  
+  if ("DrugName_3" %in% names(dt_sub) && "Concentration_3" %in% names(dt_sub)) {
+    dt_sub[is.na(Concentration_3), Concentration_3 := 0]
+    
+    dt_sub[Concentration_3 > 0, `:=`(
+      Fixed_Name_2 = DrugName_3,
+      Fixed_Conc_2 = as.numeric(Concentration_3)
+    )]
+  }
+  
+  dt_sub[, Fixed_Conc_1 := round(Fixed_Conc_1, 4)]
+  dt_sub[, Fixed_Conc_2 := round(Fixed_Conc_2, 4)]
+  
+  dt_sub[, Fixed_Label_1 := ifelse(Fixed_Name_1 == untreated_tag, untreated_tag, 
+                                   paste0(Fixed_Name_1, " (", Fixed_Conc_1, ")"))]
+  
+  dt_sub[, Fixed_Label_2 := ifelse(Fixed_Name_2 == untreated_tag, untreated_tag, 
+                                   paste0(Fixed_Name_2, " (", Fixed_Conc_2, ")"))]
+  
+  dt_sub[, Treatment_Key := paste(Row_Display_Name, Fixed_Label_1, Fixed_Label_2, sep = "__")]
+  
+  fm_string <- paste("Treatment_Key ~", cellline_name_id)
+  
+  tryCatch({
+    tab_dcast <- data.table::dcast(dt_sub, 
+                                   formula = stats::as.formula(fm_string), 
+                                   value.var = metric, 
+                                   fun.aggregate = mean, 
+                                   na.rm = TRUE)
+  }, error = function(e) {
+    stop("Error pivoting data. Ensure identifiers are unique.")
+  })
+  
+  mat_cvd <- as.matrix(tab_dcast[, -1, with = FALSE])
+  rownames(mat_cvd) <- tab_dcast[[1]]
+  
+  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  
+  mat_cvd_raw <- mat_cvd
+  
+  qmfun <- switch(metric, "xc50" = log10, identity)
+  mat_cvd[] <- vapply(mat_cvd, function(x) qmfun(x), numeric(1))
+  
+  ls_output <- list(data = list(matrix = NULL, annotation_col = NULL, annotation_row = NULL), heatmap = NULL)
+  
+  if (!is.null(annotation_col)) {
+    annotation_col <- .fill_pheatmap_annotation(annotation_col, t(mat_cvd), cellline_name_id)
+    ls_output[["data"]][["annotation_col"]] <- annotation_col
+    rownames(annotation_col) <- annotation_col[[cellline_name_id]]
+    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name_id]
+    
+    mat_cvd <- mat_cvd[, rownames(annotation_col), drop = FALSE]
+    mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_col), drop = FALSE]
+  }
+  
+  row_meta <- unique(dt_sub[Treatment_Key %in% rownames(mat_cvd), 
+                            .(Treatment_Key, Row_Display_Name, Fixed_Label_1, Fixed_Label_2)])
+  row_meta <- row_meta[match(rownames(mat_cvd), row_meta$Treatment_Key), ]
+  
+  anno_df <- data.frame(
+    `Fixed_Drug` = row_meta$Fixed_Label_1,
+    stringsAsFactors = FALSE
+  )
+  
+  if (any(row_meta$Fixed_Label_2 != untreated_tag)) {
+    anno_df$`Fixed_Drug_2` <- row_meta$Fixed_Label_2
+  }
+  
+  rownames(anno_df) <- row_meta$Treatment_Key
+  ls_output[["data"]][["annotation_row"]] <- anno_df
+  
+  if (is.null(annotation_colors)) annotation_colors <- list()
+  if (!is.null(annotation_col)) annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+  
+  for (nm in names(anno_df)) {
+    levels_vec <- unique(anno_df[[nm]])
+    
+    if (length(levels_vec) > 0) {
+      new_colors <- get_qual_colors(length(levels_vec))
+      names(new_colors) <- levels_vec
+      
+      if (untreated_tag %in% names(new_colors)) {
+        new_colors[untreated_tag] <- "#E0E0E0"
+      }
+      annotation_colors[[nm]] <- new_colors
+    }
+  }
+  
+  row_labels_display <- row_meta$Row_Display_Name
+  
+  if (is.finite(max_hm_lbl_length)) {
+    if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) 
+      colnames(mat_cvd) <- .trim_labels(colnames(mat_cvd), max_hm_lbl_length)
+    if (any(nchar(row_labels_display) > max_hm_lbl_length)) 
+      row_labels_display <- .trim_labels(row_labels_display, max_hm_lbl_length)
+  }
+  
+  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER", system.file(package = "gDRplots", "settings.json"))
+  can_cluster <- any(dim(mat_cvd) < max_dim)
+  
+  cl_rows <- if(cluster_rows) .get_pheatmap_cluster_param(mat_cvd, distfun, can_cluster) else FALSE
+  cl_cols <- if(cluster_cols) .get_pheatmap_cluster_param(t(mat_cvd), distfun, can_cluster) else FALSE
+  
+  min_val <- min(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE); max_val <- max(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE)
+  if (is.infinite(min_val)) min_val <- 0; if (is.infinite(max_val)) max_val <- 0
+  if (min_val == max_val) { max_val <- max_val + 0.1; min_val <- min_val - 0.1 }
+  
+  breaks <- seq(min_val, max_val, length.out = no_breaks + 1)
+  hm_colors <- if (is.null(colors_vec)) .get_smooth_palette(no_breaks) else grDevices::colorRampPalette(colors_vec)(no_breaks)
+  
+  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd_raw, keep.rownames = "Treatment_Key")
+  
+  if (is.na(hm_title)) hm_title <- "Single Agents & Combinations"
+  
+  ls_output[["heatmap"]] <- 
+    pheatmap::pheatmap(
+      mat = mat_cvd,
+      scale = "none",
+      display_numbers = !any(dim(mat_cvd) > c(30, 30)),
+      color = hm_colors,
+      breaks = breaks,
+      border_color = "lightgrey",
+      angle_col = 90,
+      main = hm_title,
+      fontsize = 8,
+      fontsize_col = .get_pheatmap_fontsize(mat_cvd, "col"),
+      fontsize_row = .get_pheatmap_fontsize(mat_cvd, "row"),
+      na_col = "darkgray",
+      cluster_rows = cl_rows,
+      cluster_cols = cl_cols,
+      annotation_row = anno_df,
+      annotation_col = annotation_col,
+      annotation_colors = annotation_colors,
+      labels_row = row_labels_display,
+      silent = TRUE
+    )
+  
+  return(ls_output)
+}
