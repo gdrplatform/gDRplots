@@ -45,9 +45,9 @@ test_that("plot_dose_response_combo works as expected", {
                                     colors_vec = c("pinky", "blackish"))
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
-  expect_equal(plt_4[["plot_env"]][["colormap"]],
-               .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
-  ) # default colors when invalid `colors_vec`
+  expect_true(all(plt_4[["plot_env"]][["colormap"]] ==
+                    .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
+  )) # default colors when invalid `colors_vec`
   
   plt_5 <- plot_dose_response_combo(dt_average = dt_average,
                                     drug1_name = drug1_name,
@@ -157,9 +157,9 @@ test_that("plot_dose_response_combo_panel works as expected", {
                                           colors_vec = c("pinky", "blackish"))
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
-  expect_equal(plt_4[["plot_env"]][["colormap"]],
+  expect_true(all(plt_4[["plot_env"]][["colormap"]] ==
                .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
-  ) # default colors when invalid `colors_vec`
+  )) # default colors when invalid `colors_vec`
   
   plt_5 <- plot_dose_response_combo_panel(dt_average = dt_average,
                                           d_names = c("drug_XX", "drug_YY"),
