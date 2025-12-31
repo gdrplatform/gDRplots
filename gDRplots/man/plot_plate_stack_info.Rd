@@ -4,10 +4,21 @@
 \alias{plot_plate_stack_info}
 \title{Plot plate data}
 \usage{
-plot_plate_stack_info(dt_plate)
+plot_plate_stack_info(
+  dt_plate,
+  ctrl_fail_threshold = 0.6,
+  n_sd = 1,
+  use_sd_threshold = TRUE
+)
 }
 \arguments{
 \item{dt_plate}{The data table containing plate information}
+
+\item{ctrl_fail_threshold}{Numeric (0-1). Flags controls below `Mean(Ctrl) * this`. Default 0.6.}
+
+\item{n_sd}{Numeric. Number of SDs above mean to flag high signals. Default 1 (High Sensitivity).}
+
+\item{use_sd_threshold}{Logical. If TRUE, uses dynamic limit (`Mean + n_sd*SD`). If FALSE, uses fixed limit (`Mean * 1.1`).}
 }
 \value{
 A named list of ggplot objects for each barcode

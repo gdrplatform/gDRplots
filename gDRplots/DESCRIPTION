@@ -19,6 +19,7 @@ Imports:
     fgsea,
     ggplot2 (>= 4.0.0),
     ggrepel,
+    ggtext,
     gDRutils (>= 1.6.0),
     pheatmap,
     RColorBrewer,
