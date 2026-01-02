@@ -865,15 +865,19 @@ plot_volcano_assoc_panel <- function(dt_response,
                                              selected_feats = top_4,
                                              selected_feat_meta_col = selected_feat_meta_col,
                                              ncol = 2) + 
-      ggplot2::labs(title = "", caption = "")
+      ggplot2::labs(title = "", 
+                    caption = "", 
+                    x = selected_feat_meta_col)
   } else {
-    # boxplot for categorical &  boxplot for numeric as categorical
+    # boxplot for categorical & boxplot for numeric as categorical
     plt_side <- plot_boxplot_num_panel(dt_response = dt_response_,
                                        dt_depmap = dt_depmap,
                                        selected_feats = top_4,
                                        selected_feat_meta_col = selected_feat_meta_col,
                                        ncol = 2) + 
-      ggplot2::labs(title = "", caption = "")
+      ggplot2::labs(title = "", 
+                    caption = "", 
+                    x = selected_feat_meta_col)
   }
   
   # final panel
