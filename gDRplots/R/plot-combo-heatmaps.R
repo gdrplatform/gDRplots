@@ -929,7 +929,7 @@ plot_combination_index <- function(
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
-#' @return \code{ggplot} object containing with heatmap for fitted values and reference data 
+#' @return \code{ggplot} object containing heatmap for fitted values and reference data 
 #'    for isobolograms for selected drug and co-drug and selected cell line
 #'    
 #' @keywords combo_plots
@@ -1214,14 +1214,13 @@ heatmap_combo_with_isoref <- function(
 }
 
 #' Plot panel of heatmaps with fitted and reference data for isobolograms
-#' to control quality of the data
-#'
+#' 
 #' @inheritParams heatmap_combo_with_isoref
 #' @param cl_names character vector with cell line names to be plotted (Cell Line Name);
 #'    if \code{NULL} - all available cell lines will be plotted
-#'    
+#'
 #' @return \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
-#'    for isobolograms for selected drug and co-drug by list of cell lines
+#'    for isobolograms for selected drug and co-drug and all selected cell line
 #'    
 #' @keywords combo_plots
 #' @examples
@@ -1242,47 +1241,179 @@ heatmap_combo_with_isoref <- function(
 #'                                 drug1_name, drug2_name,
 #'                                 cl_names)
 #' 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 iso_levels = c("0.25", "0.5"))
-#'                                 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 metric = "hsa_excess",
-#'                                 iso_levels = c("0.25", "0.5"))
+#' dt_excess_2 <- data.table::copy(dt_excess)
+#' dt_excess_2[CellLineName %in% cl_names[1:2], Concentration := Concentration / 10]
 #' 
-#' heatmap_combo_with_isoref_panel(dt_excess,
+#' heatmap_combo_with_isoref_panel(dt_excess_2,
 #'                                 dt_isobolograms,
 #'                                 drug1_name, drug2_name,
 #'                                 cl_names,
-#'                                 normalization_type = "RV",
-#'                                 iso_levels = NULL,
-#'                                 colors_vec = c("darkcyan", "snow", "darkorange"),
-#'                                 swap_axes = FALSE)
-#'                                 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 normalization_type = "RV",
-#'                                 iso_levels = NULL,
-#'                                 colors_vec = c("darkcyan", "snow", "darkorange"),
-#'                                 swap_axes = TRUE)
-#' 
-#' heatmap_combo_with_isoref_panel(dt_excess,
-#'                                 dt_isobolograms,
-#'                                 drug1_name, drug2_name,
-#'                                 cl_names,
-#'                                 metric = "hsa_excess",
-#'                                 iso_levels = NULL,
-#'                                 swap_axes = FALSE)
+#'                                 colors_vec = c("darkcyan", "snow", "darkorange")) 
 #' 
 #' @export
 heatmap_combo_with_isoref_panel <- function(
+    dt_excess,
+    dt_isobolograms,
+    drug1_name,
+    drug2_name,
+    cl_names,
+    normalization_type = "GR",
+    metric = "smooth",
+    iso_levels = "0.5",
+    colors_vec = NULL,
+    no_breaks = 50,
+    swap_axes = FALSE) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
+  checkmate::assert_string(drug1_name)
+  checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
+  checkmate::assert_string(drug2_name)
+  checkmate::assert_choice(drug2_name, choices = dt_excess[[drug_name_2]])
+  checkmate::assert_character(cl_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  if (!is.null(iso_levels)) {
+    stopifnot("`iso_levels` must be a valid numeric value" = 
+                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
+  }
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(swap_axes)
+  
+  available_cls <- unique(dt_excess[[cellline_name]])
+  if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
+    cl_names  <- available_cls
+  } else if (!all(cl_names %in% available_cls)) {
+    cl_names <- cl_names[cl_names %in% available_cls]
+  }
+  
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_excess <- dt_excess[eval(filter_expr)]
+  
+  # filter data for combination cell line (drug x drug2)
+  dt_excess <-
+    dt_excess[get(cellline_name) %in% cl_names & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name]
+  
+  # check whether concentrations are  common for all cell line
+  ls_vec_conc <- lapply(cl_names, function(cl_nm) {
+    unique(dt_excess[get(cellline_name) == cl_nm, ][[conc]])
+  })
+  ls_vec_conc_2 <- lapply(cl_names, function(cl_nm) {
+    unique(dt_excess[get(cellline_name) == cl_nm, ][[conc_2]])
+  })
+  
+  panel <- if ("independent" %in% c(.get_combo_panel_type(ls_vec_conc), 
+                                    .get_combo_panel_type(ls_vec_conc_2))) {
+    heatmap_combo_with_isoref_panel_independent(
+      dt_excess = dt_excess,
+      dt_isobolograms = dt_isobolograms,
+      drug1_name = drug1_name,
+      drug2_name = drug2_name,
+      cl_names = cl_names,
+      normalization_type = normalization_type,
+      metric = metric,
+      iso_levels = iso_levels,
+      colors_vec = colors_vec,
+      no_breaks = no_breaks,
+      swap_axes = swap_axes)
+  } else {
+    heatmap_combo_with_isoref_panel_common(
+      dt_excess = dt_excess,
+      dt_isobolograms = dt_isobolograms,
+      drug1_name = drug1_name,
+      drug2_name = drug2_name,
+      cl_names = cl_names,
+      normalization_type = normalization_type,
+      metric = metric,
+      iso_levels = iso_levels,
+      colors_vec = colors_vec,
+      no_breaks = no_breaks,
+      swap_axes = swap_axes)
+  }
+  
+  # final
+  return(panel)
+}
+
+
+#' #' Plot panel of heatmaps with fitted and reference data for isobolograms
+#' 
+#' @inheritParams heatmap_combo_with_isoref_panel
+#'    
+#' @return \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
+#'    for isobolograms for selected drug and co-drug by list of cell lines
+#'    
+#' @keywords combo_plots
+#' @examples
+#' cl_names <-
+#'   c("cellline_AA", "cellline_EA", "cellline_IB", 
+#'   "cellline_MC", "cellline_BC", "cellline_FD")
+#' 
+#' drug1_name <- "drug_001"
+#' drug2_name <- "drug_026"
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+#' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names)
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names,
+#'                                        iso_levels = c("0.25", "0.5"))
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names,
+#'                                        metric = "hsa_excess",
+#'                                        iso_levels = c("0.25", "0.5"))
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names,
+#'                                        normalization_type = "RV",
+#'                                        iso_levels = NULL,
+#'                                        colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                        swap_axes = FALSE)
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names,
+#'                                        normalization_type = "RV",
+#'                                        iso_levels = NULL,
+#'                                        colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                        swap_axes = TRUE)
+#' 
+#' heatmap_combo_with_isoref_panel_common(dt_excess,
+#'                                        dt_isobolograms,
+#'                                        drug1_name, drug2_name,
+#'                                        cl_names,
+#'                                        metric = "hsa_excess",
+#'                                        iso_levels = NULL,
+#'                                        swap_axes = FALSE)
+#' 
+#' @export
+heatmap_combo_with_isoref_panel_common <- function(
     dt_excess,
     dt_isobolograms,
     drug1_name,
@@ -1350,6 +1481,22 @@ heatmap_combo_with_isoref_panel <- function(
   dt_isobolograms <-
     dt_isobolograms[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
   
+  # check for overlap of concentration
+  ls_vec_conc <- lapply(cl_names, function(cl_nm) {
+    unique(dt_excess[get(cellline_name) == cl_nm, ][[conc]])
+  })
+  ls_vec_conc_2 <- lapply(cl_names, function(cl_nm) {
+    unique(dt_excess[get(cellline_name) == cl_nm, ][[conc_2]])
+  })
+  if (.get_combo_panel_type(ls_vec_conc) != "common") {
+    stop("Concentration values for drug 1 are not common for all selected cell lines.
+          Consider using `heatmap_combo_with_isoref_panel_independent` function.")
+  }
+  if (.get_combo_panel_type(ls_vec_conc_2) != "common") {
+    stop("Concentration values for drug 2 are not common for all selected cell lines.
+          Consider using `heatmap_combo_with_isoref_panel_independent` function.")
+  }
+  
   # prep hm color palette
   hm_color_palette <- 
     if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
@@ -1400,6 +1547,7 @@ heatmap_combo_with_isoref_panel <- function(
   tile_height <- .get_tile_size(mrk_y)
   tile_width <- .get_tile_size(mrk_x)
   
+  # plot range
   range_x <- c(min(mrk_x) - 0.65 * tile_width, max(mrk_x) + 0.65 * tile_width)
   range_y <- c(min(mrk_y) - 0.65 * tile_height, max(mrk_y) + 0.65 * tile_height)
   
@@ -1522,6 +1670,148 @@ heatmap_combo_with_isoref_panel <- function(
       strip.text = ggplot2::element_text(size = 10, face = "bold", hjust = 0, margin = ggplot2::margin()))
   
   return(plt)
+}
+
+
+#' Plot panel of heatmaps with fitted and reference data for isobolograms
+#' 
+#' This function is dedicated to cases in which given cell lines are exposed to drugs of different concentrations 
+#' and have almost no or no common values.
+#'
+#' @inheritParams heatmap_combo_with_isoref_panel
+#'    
+#' @return \code{ggplot} object containing panel with heatmaps for fitted values and reference data 
+#'    for isobolograms for selected drug and co-drug by list of cell lines
+#'    
+#' @keywords combo_plots
+#' @examples
+#' cl_names <-
+#'   c("cellline_AA", "cellline_EA", "cellline_IB",
+#'   "cellline_MC", "cellline_BC", "cellline_FD")
+#' 
+#' drug1_name <- "drug_001"
+#' drug2_name <- "drug_026"
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+#' dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
+#' 
+#' heatmap_combo_with_isoref_panel_independent(dt_excess,
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names)
+#' 
+#' heatmap_combo_with_isoref_panel_independent(dt_excess,
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names,
+#'                                             iso_levels = c("0.25", "0.5"))
+#' 
+#' heatmap_combo_with_isoref_panel_independent(dt_excess,
+#'                                             dt_isobolograms,
+#'                                             drug1_name, drug2_name,
+#'                                             cl_names,
+#'                                             normalization_type = "RV",
+#'                                             iso_levels = NULL,
+#'                                             colors_vec = c("darkcyan", "snow", "darkorange"),
+#'                                             swap_axes = TRUE)
+#' 
+#' @export
+heatmap_combo_with_isoref_panel_independent <- function(
+    dt_excess,
+    dt_isobolograms,
+    drug1_name,
+    drug2_name,
+    cl_names,
+    normalization_type = "GR",
+    metric = "smooth",
+    iso_levels = "0.5",
+    colors_vec = NULL,
+    no_breaks = 50,
+    swap_axes = FALSE) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+  conc <- gDRutils::get_env_identifiers("concentration")
+  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  
+  checkmate::assert_data_table(dt_excess)
+  checkmate::assert_data_table(dt_isobolograms)
+  checkmate::assert_string(drug1_name)
+  checkmate::assert_choice(drug1_name, choices = dt_excess[[drug_name]])
+  checkmate::assert_string(drug2_name)
+  checkmate::assert_choice(drug2_name, choices = dt_excess[[drug_name_2]])
+  checkmate::assert_character(cl_names, null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  if (!is.null(iso_levels)) {
+    stopifnot("`iso_levels` must be a valid numeric value" = 
+                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
+  }
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_int(no_breaks, lower = 2)
+  checkmate::assert_flag(swap_axes)
+  
+  available_cls <- unique(dt_excess[[cellline_name]])
+  if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
+    cl_names  <- available_cls
+  } else if (!all(cl_names %in% available_cls)) {
+    cl_names <- cl_names[cl_names %in% available_cls]
+  }
+  
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
+  dt_excess <- dt_excess[eval(filter_expr)]
+  dt_isobolograms <- dt_isobolograms[eval(filter_expr)]
+  
+  # filter data for combination cell line (drug x drug2)
+  selected_combination <-
+    unique(dt_excess[get(cellline_name) %in% cl_names & get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, 
+                     .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
+  
+  dt_excess <-
+    dt_excess[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  dt_isobolograms <-
+    dt_isobolograms[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
+  
+  # removing cell line with no data
+  cl_names_with_data <- cl_names[cl_names %in% unique(dt_excess[get(cellline_name) %in% cl_names][[cellline_name]])]
+  
+  # panel title
+  panel_title <- sprintf("%s (%s) x %s (%s)",
+                         drug1_name,
+                         unique(dt_excess[get(drug_name) == drug1_name, ][[gnumber]]),
+                         drug2_name,
+                         unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
+  
+  plt_list <- lapply(cl_names_with_data, function(cl_nm) {
+    plt <- gDRplots::heatmap_combo_with_isoref(
+      dt_excess = dt_excess,
+      dt_isobolograms = dt_isobolograms,
+      drug1_name = drug1_name,
+      drug2_name = drug2_name,
+      cl_name = cl_nm,
+      normalization_type = normalization_type,
+      metric = metric,
+      iso_levels = iso_levels,
+      colors_vec = colors_vec,
+      no_breaks = no_breaks,
+      swap_axes = swap_axes)
+  })
+  names(plt_list) <- cl_names_with_data
+  
+  panel <- ggpubr::annotate_figure(
+    ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
+                      common.legend = TRUE, legend = "left"),
+    top = panel_title)
+  
+  # final panel
+  return(panel)
 }
 
 #' Calculate limit for combo heatmap with gDR assumptions
@@ -1716,4 +2006,99 @@ transform_log_conc <- function(conc_vec) {
     gDRutils::get_settings_from_json("EXCESS_PALETTE",
                                      system.file(package = "gDRplots", "settings.json"))
   )(no_breaks)
+}
+
+
+#' Check type of concentrations set for combination of drug per cell line
+#' 
+#' This function checks if the concentration vectors per cell line have common part or not.
+#' It is required to decide which function to use for plotting the heatmaps panel (the set of heatmaps
+#' with combo metrics plot for combination of selected drug with selected codrug, each heatmap per one cell line):
+#' \code{\link{heatmap_combo_with_isoref_panel_common}} that plot heatmaps with shared axes
+#' or \code{\link{heatmap_combo_with_isoref_panel_independent}} that plot heatmaps independently.
+#' 
+#' Possible combinations (0 is not taken into account as it is always present):
+#' \itemize{
+#'   \item \code{common}
+#'     \itemize{
+#'       \item all vectors have common part and start and end conc are the same\cr
+#'             0, 0.03, 0.1, 0.3, 1\cr
+#'       \item all vectors have common part and start and end conc are the same, but there are some gap\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
+#'             0, 0.003, 0.01, 0.03, ___, 0.3, 1\cr
+#'          }
+#'   \item \code{independent}
+#'     \itemize{
+#'       \item all vectors have common part and start conc are the same, but end conc is different (no gap)\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, __\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
+#'       \item no common part between vectors\cr
+#'             0, 0.003, 0.01, 0.03, __, __, __\cr
+#'             0, ____,  ____, ____, 0.1, 0.3, 1\cr
+#'       \item all vectors have common part but start and end conc are different (shifted range)\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1, __, __\cr
+#'             0, ____,  ____, 0.03, 0.1, 0.3, 1, 3, 10\cr
+#'          }
+#' }
+#' 
+#' @param ls_vec_conc a list with vectors with concentration per cell line
+#'
+#' @return a string decribing type of concentration list - one of:
+#' \itemize{
+#'   \item \code{common} vectors in the input list have common part; heatmaps in the panel
+#'   should be created jointly with function \code{\link{heatmap_combo_with_isoref_panel_common}}
+#'   \item \code{independent} vectors in the input list do not have common part; heatmaps in the panel
+#'   should be created independently with function \code{\link{heatmap_combo_with_isoref_panel_independent}}
+#' }
+#'
+#' @keywords internal
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @examples
+#' \dontrun{
+#' ls_conc <- list(c(0, 0.003, 0.01, 0.03), c(0, 0.003, 0.01, 0.03, 0.1))
+#' .get_combo_panel_type(ls_conc)
+#' }
+#' 
+.get_combo_panel_type <- function(ls_vec_conc) {
+  checkmate::assert_list(ls_vec_conc)
+  stopifnot("Must be a list with numeric vectors." = all(
+    vapply(ls_vec_conc, function(x) is.numeric(x), logical(1))
+  ))
+  
+  # find unique vectors
+  ls_vec_conc <- ls_vec_conc[!duplicated(lapply(ls_vec_conc, sort))]
+  ls_vec_conc <- ls_vec_conc[vapply(ls_vec_conc, function(x) NROW(x) > 0, logical(1))]
+  
+  if (NROW(ls_vec_conc) == 1) {
+    # there is only one concentration set
+    return("common")
+  } else {
+    # clean list 
+    digits <- max(vapply(ls_vec_conc, function(x) { 
+      max(nchar(as.character(x))) }, numeric(1)))
+    # clean unique vectors
+    ls_vec_conc_clean <- lapply(ls_vec_conc, function(x) {
+      x <- x[!is.na(x) & x > 0] # remove NAs & 0
+      x <- round(as.numeric(x), digits) # handle floating point differences
+      x
+    })
+    # common part of vectors
+    common_conc <- Reduce(intersect, ls_vec_conc_clean) 
+    # all posible values and start&end conditions
+    all_conc <- unique(unlist(ls_vec_conc_clean))
+    ls_range_conc <- lapply(ls_vec_conc_clean, function(x) which(all_conc %in% x))
+    start_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) min(x), numeric(1)))) == 1
+    end_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) max(x), numeric(1)))) == 1
+    
+    if (NROW(common_conc) == 0 || 
+        (all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1))) &&
+         !(start_is_same && end_is_same))) {
+      # each vector is fully independent or the shift between is too big
+      return("independent")
+    } else {
+      return("common")
+    }
+  }
 }

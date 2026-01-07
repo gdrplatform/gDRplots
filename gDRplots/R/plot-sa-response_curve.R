@@ -199,7 +199,7 @@ plot_dose_response_sa <- function(dt_metrics,
     min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
     max_val <- max(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) + 0.05
     data_range <- c(min_val, max_val)
-    
+
     # prep color palette
     color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
       get_qual_colors(NROW(group_names))
@@ -217,11 +217,13 @@ plot_dose_response_sa <- function(dt_metrics,
     # final plot
     plt <-
       ggplot2::ggplot(mapping = ggplot2::aes(x = log10(get(conc)), y = x, color = group_var, group = group_var)) +
-      ggplot2::geom_hline(yintercept = c(0, 1), color = hline_color) +
+      ggplot2::geom_hline(yintercept = c(-1, 0, 1), color = hline_color) +
+      ggplot2::geom_hline(yintercept = 0.5, color = hline_color, linetype = "dashed") +
       ggplot2::scale_color_manual(values = color_values,
                                   name = ifelse(group_var == cellline_name, "Cell Line", "Drug")) +
       ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
-      ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2)))
+      ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
+      ggplot2::scale_y_continuous(breaks = seq(-1, 1, by = 0.25))
     
     
     if (plot_averaged_flag && !is.null(dt_avg)) {

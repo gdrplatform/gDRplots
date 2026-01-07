@@ -19,7 +19,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug,  plt_1[["labels"]][["title"]]))
-  expect_length(plt_1[["layers"]], 3)
+  expect_length(plt_1[["layers"]], 4)
   expect_equal(ggplot2::get_guide_data(plt_1, "colour")[[".label"]],
                unique(dt_average[[group_var]]))
   
@@ -32,7 +32,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  colors_vec = rainbow(NROW(unique(dt_metrics[[group_var]]))))
   expect_is(plt_2, "gg")
   expect_equal(plt_2[["labels"]][["y"]], normalization_type)
-  expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[2]][["colour"]]),
+  expect_length(unique(ggplot2::ggplot_build(plt_2)$data[[3]][["colour"]]),
                 NROW(unique(dt_metrics[[group_var]])))
   
   subset_celline <- c("cellline_BA", "cellline_CA")
@@ -50,10 +50,10 @@ test_that("plot_dose_response_sa works as expected", {
                                  group_var = group_var)
   expect_is(plt_3, "gg")
   expect_equal(plt_3[["labels"]][["y"]], "GR")
-  expect_length(plt_3[["layers"]], 3)
+  expect_length(plt_3[["layers"]], 4)
   expect_equal(names(plt_3[["guides"]][["guides"]]), "colour")
   expect_equal(sort(ggplot2::get_guide_data(plt_3, "colour")[[".label"]]), sort(sel_grp_names))
-  expect_length(unique(ggplot2::ggplot_build(plt_3)$data[[3]]$colour), 1) # curve data only for 1 cell line
+  expect_length(unique(ggplot2::ggplot_build(plt_3)$data[[4]]$colour), 1) # curve data only for 1 cell line
   
   # scenario: lack of metric data at all -> plot only observation
   plt_4 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
@@ -63,8 +63,8 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(any(grepl("Concentration", plt_4[["labels"]][["x"]])))
-  expect_length(plt_4[["layers"]], 2)
-  expect_length(ggplot2::ggplot_build(plt_4)[["data"]], 2) # lack of fit lines
+  expect_length(plt_4[["layers"]], 3)
+  expect_length(ggplot2::ggplot_build(plt_4)[["data"]], 3) # lack of fit lines
   
   # scenario: plot by drugs 
   group_var <- drug_name
@@ -82,9 +82,9 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_5, "gg")
   expect_equal(plt_5[["labels"]][["y"]], normalization_type)
   expect_true(grepl(selected_celline, plt_5[["labels"]][["title"]]))
-  expect_length(plt_5[["layers"]], 2) # lack of fit lines
-  expect_length(ggplot2::ggplot_build(plt_5)[["data"]], 2) # lack of fit lines
-  expect_true(all(ls_col[c(1, 3)] %in% unique(ggplot2::ggplot_build(plt_5)$data[[2]][["colour"]])))
+  expect_length(plt_5[["layers"]], 3) # lack of fit lines
+  expect_length(ggplot2::ggplot_build(plt_5)[["data"]], 3) # lack of fit lines
+  expect_true(all(ls_col[c(1, 3)] %in% unique(ggplot2::ggplot_build(plt_5)$data[[3]][["colour"]])))
   
   # scenario: lack of metric data for selected `group_names`
   drug_name_subset <- c("drug_002", "drug_003", "drug_004", "drug_005", "drug_006")
@@ -98,10 +98,10 @@ test_that("plot_dose_response_sa works as expected", {
                                  group_names = drug_name_vec,
                                  normalization_type = normalization_type)
   expect_is(plt_6, "gg")
-  expect_length(plt_6[["layers"]], 3)
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[2]][["colour"]])), 
-               NROW(drug_name_vec))  # avg 
+  expect_length(plt_6[["layers"]], 4)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])), 
+               NROW(drug_name_vec))  # avg 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[4]][["colour"]])), 
                NROW(intersect(drug_name_subset, drug_name_vec))) # metric 
   
   # scenario: lack of averaged data for selected `group_names`
@@ -116,10 +116,10 @@ test_that("plot_dose_response_sa works as expected", {
                                  group_names = drug_name_vec,
                                  normalization_type = normalization_type)
   expect_is(plt_7, "gg")
-  expect_length(plt_7[["layers"]], 3)
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[2]][["colour"]])), 
-               NROW(intersect(drug_name_subset, drug_name_vec))) # avg 
+  expect_length(plt_7[["layers"]], 4)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])), 
+               NROW(intersect(drug_name_subset, drug_name_vec))) # avg 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[4]][["colour"]])), 
                NROW(drug_name_vec)) # metric
   
   # scenario: one drug is not available in data - plot for drugs
@@ -278,7 +278,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_16, "gg")
   expect_equal(plt_16[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug,  plt_16[["labels"]][["title"]]))
-  expect_length(plt_16[["layers"]], 2)
+  expect_length(plt_16[["layers"]], 3)
   expect_equal(ggplot2::get_guide_data(plt_16, "colour")[[".label"]],
                unique(dt_metrics[[cellline_name]]))
   
@@ -290,7 +290,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_17, "gg")
   expect_equal(plt_17[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug,  plt_17[["labels"]][["title"]]))
-  expect_length(plt_17[["layers"]], 2)
+  expect_length(plt_17[["layers"]], 3)
   expect_equal(ggplot2::get_guide_data(plt_17, "colour")[[".label"]],
                unique(dt_average[[cellline_name]]))
   
@@ -412,7 +412,7 @@ test_that("plot_dose_response_sa_by_CLs works as expected", {
                                          drug_name_vec = drug_name_vec)
   expect_is(plts_4, "list")
   expect_equal(names(plts_4), drug_name_vec)
-  expect_length(unique(ggplot2::ggplot_build(plts_4[[drug_name_vec[2]]])[["data"]][[2]][["colour"]]),
+  expect_length(unique(ggplot2::ggplot_build(plts_4[[drug_name_vec[2]]])[["data"]][[3]][["colour"]]),
                 NROW(cellline_name_vec))
   expect_length(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st drug
   expect_equal(ggplot2::get_guide_data(plts_4[[drug_name_vec[2]]], "colour")[[".label"]],
@@ -483,7 +483,7 @@ test_that("plot_dose_response_sa_by_drugs works as expected", {
                                            drug_name_vec = drug_name_vec)
   expect_is(plts_4, "list")
   expect_equal(names(plts_4), cellline_name_vec)
-  expect_length(unique(ggplot2::ggplot_build(plts_4[[cellline_name_vec[2]]])[["data"]][[2]][["colour"]]),
+  expect_length(unique(ggplot2::ggplot_build(plts_4[[cellline_name_vec[2]]])[["data"]][[3]][["colour"]]),
                 NROW(drug_name_vec))
   expect_length(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st cell line
   expect_equal(ggplot2::get_guide_data(plts_4[[cellline_name_vec[2]]], "colour")[[".label"]],

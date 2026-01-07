@@ -144,3 +144,65 @@ create_log_seq <- function(start, end, length) {
   sequence
 }                     
 
+#' Round numbers to unique string
+#' 
+#' Rounds a numeric vector to the minimum precision needed to ensure uniqueness
+#'
+#' @param num_vec a numeric vector to be rounded and change into character
+#' @param initial_digits numeric value for number of decimal places to start rounding with
+#'
+#' @returns a character vector of unique numeric strings.
+#' @examples
+#' \dontrun{
+#' vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000, 
+#'          0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000) 
+#' 
+#' .round_to_unique_string(num_vec)
+#' }
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @keywords internal
+.round_to_unique_string <- function(num_vec,
+                                    initial_digits = 4) {
+  
+  checkmate::assert_numeric(num_vec, any.missing = FALSE)
+  checkmate::assert_integerish(initial_digits, lower = 1)
+  
+  initial_rounded_vec <- round(num_vec, digits = initial_digits)
+  
+  final_char_vec <- format(initial_rounded_vec,
+                           scientific = FALSE,
+                           trim = TRUE)
+  
+  if (any(duplicated(final_char_vec))) {
+    unique_duplicates <- 
+      unique(initial_rounded_vec[duplicated(initial_rounded_vec) | duplicated(initial_rounded_vec, fromLast = TRUE)])
+    
+    for (d_val in unique_duplicates) {
+      i_dup <- which(initial_rounded_vec == d_val)
+      
+      vec_subset <- num_vec[i_dup]
+      max_digits <- max(nchar(format(vec_subset, scientific = FALSE)))
+      
+      # start the precision search from the next digit
+      d <- initial_digits + 1
+      while (d <= max_digits) {
+        vec_subset_rounded <- round(vec_subset, digits = d)
+        
+        if (NROW(unique(vec_subset_rounded)) == NROW(vec_subset)) {
+          # update the elements in the final_char_vec
+          final_char_vec[i_dup] <- format(vec_subset_rounded, 
+                                          scientific = FALSE,
+                                          trim = TRUE)
+          break
+        }
+        
+        d <- d + 1
+      }
+    }
+  }
+  
+  # final
+  return(final_char_vec)
+}
