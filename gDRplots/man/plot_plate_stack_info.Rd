@@ -2,42 +2,31 @@
 % Please edit documentation in R/plot-plate.R
 \name{plot_plate_stack_info}
 \alias{plot_plate_stack_info}
-\title{Plot plate data}
+\title{Plot plate data (Heatmap + Dose Ranks + Smart Legend + Explicit QC)}
 \usage{
 plot_plate_stack_info(
   dt_plate,
   ctrl_fail_threshold = 0.6,
   n_sd = 1,
-  use_sd_threshold = TRUE
+  use_sd_threshold = TRUE,
+  items_per_line = 4
 )
 }
 \arguments{
-\item{dt_plate}{The data table containing plate information}
+\item{dt_plate}{\code{data.table}. Input data containing plate layout, measurements, and standard gDR identifiers.}
 
-\item{ctrl_fail_threshold}{Numeric (0-1). Flags controls below `Mean(Ctrl) * this`. Default 0.6.}
+\item{ctrl_fail_threshold}{\code{numeric} (Default: 0.6). Flags control wells with a readout below \code{Mean(Controls) * ctrl_fail_threshold}.}
 
-\item{n_sd}{Numeric. Number of SDs above mean to flag high signals. Default 1 (High Sensitivity).}
+\item{n_sd}{\code{numeric} (Default: 1). Sets the upper limit for flagging high signals using the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.}
 
-\item{use_sd_threshold}{Logical. If TRUE, uses dynamic limit (`Mean + n_sd*SD`). If FALSE, uses fixed limit (`Mean * 1.1`).}
+\item{use_sd_threshold}{\code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.}
+
+\item{items_per_line}{\code{integer}. Number of doses to show per line in the legend. Default 4.}
 }
 \value{
 A named list of ggplot objects for each barcode
 }
 \description{
-Plot plate data
-}
-\examples{
-test_data <- data.table::data.table(
-  WellColumn = rep(1:12, each = 8),
-  clid = c("A", "A", "B", "B"),
-  WellRow = rep(LETTERS[1:8], times = 12),
-  Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-  Concentration = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
-  Concentration_2 = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
-  ReadoutValue = runif(96, min = 0, max = 100),
-  Barcode = rep(c("A", "B"), 48)
-  )
-plot_plate_stack_info(test_data)[["A"]]
+Plot plate data (Heatmap + Dose Ranks + Smart Legend + Explicit QC)
 }
 \keyword{QC_plot}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-pheatmap.R
 \name{pheatmap_with_anno_combo_metrics}
 \alias{pheatmap_with_anno_combo_metrics}
-\title{Plot Heatmap: Single Agents & Combinations (Merged Annotations)}
+\title{Plot heatmap with annotations for combo metrics data}
 \usage{
 pheatmap_with_anno_combo_metrics(
   dt_metrics,
@@ -24,23 +24,21 @@ pheatmap_with_anno_combo_metrics(
 )
 }
 \arguments{
-\item{dt_metrics}{\code{data.table} representing data from the \code{"Metrics"} assay,
-outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
-and single-agent \code{SummarizedExperiment}}
+\item{dt_metrics}{\code{data.table} representing data from the \code{metrics} assay, 
+outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}.
+Must contain \code{DrugName}, \code{DrugName_2}, \code{cotrt_value}, and \code{CellLineName}.}
 
-\item{dt_metrics_capped}{\code{data.table} representing data from the \code{"Metrics"} assay,
-the same as \code{dt_metrics} but with capped values with 
-\code{\link[gDRutils:cap_assay_infinities]{gDRutils::cap_assay_infinities}}}
+\item{dt_metrics_capped}{\code{data.table} (optional) representing capped data from the \code{metrics} assay;
+if provided, it is used instead of \code{dt_metrics}.}
 
-\item{normalization_type}{string with normalization types to be selected
-one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
+\item{normalization_type}{string representing the normalization type;
+one of: "GR", "RV".}
 
-\item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
-but the values from any numeric column can be displayed.}
+\item{metric}{string name of the metric to plot;
+e.g., "xc50", "x_inf", "ec50", "r2", "h_RV", "h_GR".}
 
-\item{fit_source}{string source name for metrics}
+\item{fit_source}{string representing the source of the fit; 
+defaults to "gDR".}
 
 \item{hm_title}{string plot title}
 
@@ -59,60 +57,24 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
 the default is \code{\link{compute_distances}} using Spearman method.}
 
-\item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
-Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding names from the required  \code{DrugName} column.
-Note that color schemes takes into account if variable is continuous or discrete.}
+\item{annotation_row}{\code{data.table} (optional) that specifies the annotations shown on the left side of the heatmap.
+\emph{Note: In this specific function, row annotations are largely auto-generated based on the 
+co-treatment (Fixed Drug) names and concentrations to ensure consistent formatting.}}
 
-\item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
-Each row defines the features for a specific column. The columns in the data and in the annotation
-are matched using corresponding names from the required  \code{CellLineName} column.
-Note that color schemes takes into account if variable is continuous or discrete.}
+\item{annotation_col}{\code{data.table} that specifies the annotations shown on the top of the heatmap.
+The rows in the annotation are matched using the \code{CellLineName} column.}
 
 \item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
-track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
-without \code{DrugName} and column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with valid color name for 
-each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
-Not described elements will be colored in default.}
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} 
+and \code{annotation_col}), and each list item is a named vector with a valid color name for 
+each value described in the annotations. Not described elements will be colored by default.}
 
 \item{max_hm_lbl_length}{numeric value for the maximum number of characters in the label;
 if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
 the default number.}
 }
 \description{
-A specialized heatmap for Single Agents and Combinations metrics data.
-
-\strong{Structure:}
-\itemize{
-   \item \strong{Single Agent Rows}: Fixed_Drugs are labeled as the untreated tag (e.g., "vehicle").
-   \item \strong{Combo Rows}: Fixed_Drugs show "Name (Concentration)".
-   \item \strong{Row Label}: Always displays the primary \code{DrugName}, with technical info (Gnumber_3/Concentration_3) removed.
-}
-}
-\examples{
-dt_metrics <- data.table::data.table(
-  DrugName = c(
-    "Ribociclib (Gnumber_3 = vehicle) (Concentration_3 = 0)", 
-    "Ribociclib", 
-    "Metformin (Concentration_3 = 0.5)", 
-    "Aspirin",
-    "Paracetamol"
-  ),
-  DrugName_2 = c("vehicle", "DrugB", "vehicle", "DrugC", "DrugC"),
-  cotrt_value = c(0, 0.5, 0, 1.2, 0.1),
-  CellLineName = rep(c("CL1", "CL2"), times = 3)[1:5],
-  normalization_type = "GR",
-  fit_source = "gDR",
-  xc50 = c(0.1, 0.05, 0.8, 0.2, 0.6),
-  DrugName_3 = c("vehicle", "vehicle", "DrugD", "vehicle", "vehicle"),
-  Concentration_3 = c(0, 0, 0.5, 0, 0)
-)
-
-res <- pheatmap_with_anno_combo_metrics(
-  dt_metrics, 
-  metric = "xc50", 
-  hm_title = "Example Combination Heatmap"
-)
-res$heatmap
+Plots a heatmap for metrics data (e.g., "xc50", "x_inf") covering both Single Agents and Combinations.
+Rows are sorted alphabetically by the primary drug, prioritizing Single Agent conditions first, 
+followed by combinations sorted by co-treatment name and concentration.
 }
