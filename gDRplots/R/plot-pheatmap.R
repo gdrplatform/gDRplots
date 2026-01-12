@@ -1165,7 +1165,7 @@ pheatmap_with_anno_combo <- function(
     }
     # data.table::nafill does not support character
     cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, "DrugCombination")]
-    data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
+    #data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
     annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% colnames(mat_cvd), ]
@@ -1956,45 +1956,35 @@ fill_ann_color_map <- function(dt_ann,
   }
 }
 
-#' Plot Heatmap: Single Agents & Combinations (Merged Annotations)
-#'
+#' Plot pretty heatmap with annotations for metrics data
+#' 
 #' @description
-#' A specialized heatmap for Single Agents and Combinations metrics data.
+#' Plots a heatmap for metrics data (e.g., "xc50", "x_inf") covering both Single Agents and Combinations.
+#' Rows are sorted alphabetically by the primary drug, prioritizing Single Agent conditions first, 
+#' followed by combinations sorted by co-treatment name and concentration.
 #'
-#' \strong{Structure:}
-#' \itemize{
-#'    \item \strong{Single Agent Rows}: Fixed_Drugs are labeled as the untreated tag (e.g., "vehicle").
-#'    \item \strong{Combo Rows}: Fixed_Drugs show "Name (Concentration)".
-#'    \item \strong{Row Label}: Always displays the primary \code{DrugName}, with technical info (Gnumber_3/Concentration_3) removed.
-#' }
-#'
+#' @param dt_metrics \code{data.table} representing data from the \code{metrics} assay, 
+#'    outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}.
+#'    Must contain \code{DrugName}, \code{DrugName_2}, \code{cotrt_value}, and \code{CellLineName}.
+#' @param dt_metrics_capped \code{data.table} (optional) representing capped data from the \code{metrics} assay;
+#'    if provided, it is used instead of \code{dt_metrics}.
+#' @param normalization_type string representing the normalization type;
+#'    one of: "GR", "RV".
+#' @param metric string name of the metric to plot;
+#'    e.g., "xc50", "x_inf", "ec50", "r2", "h_RV", "h_GR".
+#' @param fit_source string representing the source of the fit; 
+#'    defaults to "gDR".
+#' @param annotation_row \code{data.table} (optional) that specifies the annotations shown on the left side of the heatmap.
+#'    \emph{Note: In this specific function, row annotations are largely auto-generated based on the 
+#'    co-treatment (Fixed Drug) names and concentrations to ensure consistent formatting.}
+#' @param annotation_col \code{data.table} that specifies the annotations shown on the top of the heatmap.
+#'    The rows in the annotation are matched using the \code{CellLineName} column.
+#' @param annotation_colors named list for specifying \code{annotation_col} and \code{annotation_row} 
+#'    track colors manually; note list is named with annotation name (column names of \code{annotation_row} 
+#'    and \code{annotation_col}), and each list item is a named vector with a valid color name for 
+#'    each value described in the annotations. Not described elements will be colored by default.
 #' @inheritParams pheatmap_with_anno_sa
 #' @export
-#' @examples
-#' dt_metrics <- data.table::data.table(
-#'   DrugName = c(
-#'     "Ribociclib (Gnumber_3 = vehicle) (Concentration_3 = 0)", 
-#'     "Ribociclib", 
-#'     "Metformin (Concentration_3 = 0.5)", 
-#'     "Aspirin",
-#'     "Paracetamol"
-#'   ),
-#'   DrugName_2 = c("vehicle", "DrugB", "vehicle", "DrugC", "DrugC"),
-#'   cotrt_value = c(0, 0.5, 0, 1.2, 0.1),
-#'   CellLineName = rep(c("CL1", "CL2"), times = 3)[1:5],
-#'   normalization_type = "GR",
-#'   fit_source = "gDR",
-#'   xc50 = c(0.1, 0.05, 0.8, 0.2, 0.6),
-#'   DrugName_3 = c("vehicle", "vehicle", "DrugD", "vehicle", "vehicle"),
-#'   Concentration_3 = c(0, 0, 0.5, 0, 0)
-#' )
-#' 
-#' res <- pheatmap_with_anno_combo_metrics(
-#'   dt_metrics, 
-#'   metric = "xc50", 
-#'   hm_title = "Example Combination Heatmap"
-#' )
-#' res$heatmap
 pheatmap_with_anno_combo_metrics <- function(
     dt_metrics,
     dt_metrics_capped = NULL,
@@ -2022,27 +2012,38 @@ pheatmap_with_anno_combo_metrics <- function(
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_metrics_capped, null.ok = TRUE)
   
-  dt_to_use <- if (!is.null(dt_metrics_capped)) dt_metrics_capped else dt_metrics
+  if (!is.null(dt_metrics_capped)) {
+    dt_to_use <- dt_metrics_capped
+  } else {
+    dt_to_use <- dt_metrics
+  }
   
   req_cols <- c(drug_name_id, drug_name_id2, "cotrt_value", cellline_name_id, 
                 "normalization_type", "fit_source")
-  missing_cols <- setdiff(req_cols, names(dt_to_use))
-  if (length(missing_cols) > 0) stop(paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+  
+  # checkmate assertions for column existence
+  checkmate::assert_names(names(dt_to_use), must.include = req_cols)
   
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_sub <- dt_to_use[eval(filter_expr)]
   
-  if (nrow(dt_sub) == 0) stop("No data found for selected normalization/source.")
+  # checkmate assertion for non-empty data after filtering
+  checkmate::assert_data_table(dt_sub, min.rows = 1, .var.name = "dt_sub (filtered data)")
+  
   dt_sub <- data.table::copy(dt_sub)
   
+  # Clean up Drug Name (remove technical Gnumber/Concentration info)
   pattern <- "\\s*\\([^)]*(Gnumber_3|Concentration_3)[^)]*\\)"
   dt_sub[[drug_name_id]] <- trimws(gsub(pattern, "", dt_sub[[drug_name_id]]))
   
-  if ("dilution_drug" %in% names(dt_sub)) dt_sub <- dt_sub[dilution_drug != "codilution"]
+  if ("dilution_drug" %in% names(dt_sub)) {
+    dt_sub <- dt_sub[dilution_drug != "codilution"]
+  }
   
   dt_sub[is.na(cotrt_value), cotrt_value := 0]
   
+  # Prepare formatting columns
   dt_sub[, `:=`(
     Row_Display_Name = get(drug_name_id),
     Fixed_Name_1     = get(drug_name_id2),
@@ -2053,6 +2054,7 @@ pheatmap_with_anno_combo_metrics <- function(
   
   dt_sub[Fixed_Conc_1 == 0, Fixed_Name_1 := untreated_tag]
   
+  # Handle 3rd drug if present
   if ("DrugName_3" %in% names(dt_sub) && "Concentration_3" %in% names(dt_sub)) {
     dt_sub[is.na(Concentration_3), Concentration_3 := 0]
     
@@ -2062,8 +2064,9 @@ pheatmap_with_anno_combo_metrics <- function(
     )]
   }
   
-  dt_sub[, Fixed_Conc_1 := round(Fixed_Conc_1, 4)]
-  dt_sub[, Fixed_Conc_2 := round(Fixed_Conc_2, 4)]
+  # Use helper function for consistent rounding/formatting
+  dt_sub[, Fixed_Conc_1 := .round_to_unique_string(Fixed_Conc_1)]
+  dt_sub[, Fixed_Conc_2 := .round_to_unique_string(Fixed_Conc_2)]
   
   dt_sub[, Fixed_Label_1 := ifelse(Fixed_Name_1 == untreated_tag, untreated_tag, 
                                    paste0(Fixed_Name_1, " (", Fixed_Conc_1, ")"))]
@@ -2071,6 +2074,7 @@ pheatmap_with_anno_combo_metrics <- function(
   dt_sub[, Fixed_Label_2 := ifelse(Fixed_Name_2 == untreated_tag, untreated_tag, 
                                    paste0(Fixed_Name_2, " (", Fixed_Conc_2, ")"))]
   
+  # Create unique key for pivoting
   dt_sub[, Treatment_Key := paste(Row_Display_Name, Fixed_Label_1, Fixed_Label_2, sep = "__")]
   
   fm_string <- paste("Treatment_Key ~", cellline_name_id)
@@ -2082,24 +2086,32 @@ pheatmap_with_anno_combo_metrics <- function(
                                    fun.aggregate = mean, 
                                    na.rm = TRUE)
   }, error = function(e) {
-    stop("Error pivoting data. Ensure identifiers are unique.")
+    .stop_on_aggregation(e)
   })
   
   mat_cvd <- as.matrix(tab_dcast[, -1, with = FALSE])
   rownames(mat_cvd) <- tab_dcast[[1]]
   
+  # Cleanup empty rows/cols
   rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
   rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  
+  if (!all(rm_col)) {
+    mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+  }
+  if (!all(rm_row)) {
+    mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  }
   
   mat_cvd_raw <- mat_cvd
   
+  # Apply transformations if needed
   qmfun <- switch(metric, "xc50" = log10, identity)
   mat_cvd[] <- vapply(mat_cvd, function(x) qmfun(x), numeric(1))
   
   ls_output <- list(data = list(matrix = NULL, annotation_col = NULL, annotation_row = NULL), heatmap = NULL)
   
+  # Process Column Annotations
   if (!is.null(annotation_col)) {
     annotation_col <- .fill_pheatmap_annotation(annotation_col, t(mat_cvd), cellline_name_id)
     ls_output[["data"]][["annotation_col"]] <- annotation_col
@@ -2110,10 +2122,37 @@ pheatmap_with_anno_combo_metrics <- function(
     mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_col), drop = FALSE]
   }
   
+  # --- SORTING LOGIC START ---
+  # Extract metadata required for sorting
   row_meta <- unique(dt_sub[Treatment_Key %in% rownames(mat_cvd), 
-                            .(Treatment_Key, Row_Display_Name, Fixed_Label_1, Fixed_Label_2)])
-  row_meta <- row_meta[match(rownames(mat_cvd), row_meta$Treatment_Key), ]
+                            .(Treatment_Key, Row_Display_Name, 
+                              Fixed_Label_1, Fixed_Label_2,
+                              Fixed_Name_1, Fixed_Conc_1, 
+                              Fixed_Name_2, Fixed_Conc_2)])
   
+  # Sorting Priorities:
+  # 1. Primary Drug Name (Alphabetical)
+  # 2. Condition Type (Single Agents [untreated co-trt] first, then Combinations)
+  # 3. Co-treatment Name (Alphabetical)
+  # 4. Co-treatment Concentration (Ascending - note: string sorting used here as .round_to_unique_string returns string)
+  
+  ord <- order(
+    row_meta$Row_Display_Name,
+    row_meta$Fixed_Name_1 != untreated_tag,
+    row_meta$Fixed_Name_1,
+    as.numeric(row_meta$Fixed_Conc_1),
+    row_meta$Fixed_Name_2 != untreated_tag, 
+    row_meta$Fixed_Name_2,
+    as.numeric(row_meta$Fixed_Conc_2)
+  )
+  
+  row_meta <- row_meta[ord, ]
+  
+  # Reorder matrix based on sorted metadata
+  mat_cvd <- mat_cvd[row_meta$Treatment_Key, , drop = FALSE]
+  mat_cvd_raw <- mat_cvd_raw[row_meta$Treatment_Key, , drop = FALSE]
+
+  # Prepare Row Annotations for Heatmap
   anno_df <- data.frame(
     `Fixed_Drug` = row_meta$Fixed_Label_1,
     stringsAsFactors = FALSE
@@ -2126,8 +2165,13 @@ pheatmap_with_anno_combo_metrics <- function(
   rownames(anno_df) <- row_meta$Treatment_Key
   ls_output[["data"]][["annotation_row"]] <- anno_df
   
-  if (is.null(annotation_colors)) annotation_colors <- list()
-  if (!is.null(annotation_col)) annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+  # Handle Colors
+  if (is.null(annotation_colors)) {
+    annotation_colors <- list()
+  }
+  if (!is.null(annotation_col)) {
+    annotation_colors <- fill_ann_color_map(annotation_col, annotation_colors)
+  }
   
   for (nm in names(anno_df)) {
     levels_vec <- unique(anno_df[[nm]])
@@ -2145,30 +2189,64 @@ pheatmap_with_anno_combo_metrics <- function(
   
   row_labels_display <- row_meta$Row_Display_Name
   
+  # Trim Labels if necessary
   if (is.finite(max_hm_lbl_length)) {
-    if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) 
+    if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
       colnames(mat_cvd) <- .trim_labels(colnames(mat_cvd), max_hm_lbl_length)
-    if (any(nchar(row_labels_display) > max_hm_lbl_length)) 
+    }
+    if (any(nchar(row_labels_display) > max_hm_lbl_length)) {
       row_labels_display <- .trim_labels(row_labels_display, max_hm_lbl_length)
+    }
   }
   
-  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER", system.file(package = "gDRplots", "settings.json"))
-  can_cluster <- any(dim(mat_cvd) < max_dim)
+  # Determine Clustering Parameters
+  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                              system.file(package = "gDRplots", "settings.json"))
+  gDR_cluster_condition <- any(dim(mat_cvd) < max_dim)
   
-  cl_rows <- if(cluster_rows) .get_pheatmap_cluster_param(mat_cvd, distfun, can_cluster) else FALSE
-  cl_cols <- if(cluster_cols) .get_pheatmap_cluster_param(t(mat_cvd), distfun, can_cluster) else FALSE
+  if (cluster_rows) {
+    cl_rows <- .get_pheatmap_cluster_param(mat_cvd, distfun, gDR_cluster_condition)
+  } else {
+    cl_rows <- FALSE
+  }
   
-  min_val <- min(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE); max_val <- max(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE)
-  if (is.infinite(min_val)) min_val <- 0; if (is.infinite(max_val)) max_val <- 0
-  if (min_val == max_val) { max_val <- max_val + 0.1; min_val <- min_val - 0.1 }
+  if (cluster_cols) {
+    cl_cols <- .get_pheatmap_cluster_param(t(mat_cvd), distfun, gDR_cluster_condition)
+  } else {
+    cl_cols <- FALSE
+  }
+  
+  # Determine Breaks and Colors
+  min_val <- min(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE)
+  max_val <- max(mat_cvd[!is.infinite(mat_cvd)], na.rm = TRUE)
+  
+  if (is.infinite(min_val)) {
+    min_val <- 0
+  }
+  if (is.infinite(max_val)) {
+    max_val <- 0
+  }
+  if (min_val == max_val) {
+    max_val <- max_val + 0.1
+    min_val <- min_val - 0.1
+  }
   
   breaks <- seq(min_val, max_val, length.out = no_breaks + 1)
-  hm_colors <- if (is.null(colors_vec)) .get_smooth_palette(no_breaks) else grDevices::colorRampPalette(colors_vec)(no_breaks)
   
-  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd_raw, keep.rownames = "Treatment_Key")
+  if (is.null(colors_vec)) {
+    hm_colors <- .get_smooth_palette(no_breaks)
+  } else {
+    hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
+  }
   
-  if (is.na(hm_title)) hm_title <- "Single Agents & Combinations"
+  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd_raw,
+                                                               keep.rownames = "Treatment_Key")
   
+  if (is.na(hm_title)) {
+    hm_title <- paste0("Combination Metrics: ", metric)
+  }
+  
+  # Generate Heatmap
   ls_output[["heatmap"]] <- 
     pheatmap::pheatmap(
       mat = mat_cvd,

@@ -1,29 +1,25 @@
-#' Plot plate data
+#' Plot plate data (Heatmap + Dose Ranks + Smart Legend + Explicit QC)
 #' 
-#' @param dt_plate The data table containing plate information
-#' @param ctrl_fail_threshold Numeric (0-1). Flags controls below `Mean(Ctrl) * this`. Default 0.6.
-#' @param n_sd Numeric. Number of SDs above mean to flag high signals. Default 1 (High Sensitivity).
-#' @param use_sd_threshold Logical. If TRUE, uses dynamic limit (`Mean + n_sd*SD`). If FALSE, uses fixed limit (`Mean * 1.1`).
+#' @param dt_plate \code{data.table}. Input data containing plate layout, measurements, and standard gDR identifiers.
+#' @param ctrl_fail_threshold \code{numeric} (Default: 0.6). Flags control wells with a readout below \code{Mean(Controls) * ctrl_fail_threshold}.
+#' @param n_sd \code{numeric} (Default: 1). Sets the upper limit for flagging high signals using the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.
+#' @param use_sd_threshold \code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.
+#' @param items_per_line \code{integer}. Number of doses to show per line in the legend. Default 4.
 #' @return A named list of ggplot objects for each barcode
 #' @keywords QC_plot
-#' @examples
-#' test_data <- data.table::data.table(
-#'   WellColumn = rep(1:12, each = 8),
-#'   clid = c("A", "A", "B", "B"),
-#'   WellRow = rep(LETTERS[1:8], times = 12),
-#'   Gnumber = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-#'   Gnumber_2 = c(rep("untreated", 48), sample(1:5, size = 48, replace = TRUE)),
-#'   Concentration = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
-#'   Concentration_2 = sample(seq(0, 2.5, 1.25), 12, replace = TRUE),
-#'   ReadoutValue = runif(96, min = 0, max = 100),
-#'   Barcode = rep(c("A", "B"), 48)
-#'   )
-#' plot_plate_stack_info(test_data)[["A"]]
 #' @export
 plot_plate_stack_info <- function(dt_plate, 
-                                     ctrl_fail_threshold = 0.6, 
-                                     n_sd = 1,
-                                     use_sd_threshold = TRUE) {
+                                  ctrl_fail_threshold = 0.6, 
+                                  n_sd = 1,
+                                  use_sd_threshold = TRUE,
+                                  items_per_line = 4) {
+  
+  checkmate::assert_data_table(dt_plate)
+  checkmate::assert_number(ctrl_fail_threshold, lower = 0, upper = 1)
+  checkmate::assert_number(n_sd, lower = 0)
+  checkmate::assert_flag(use_sd_threshold)
+  checkmate::assert_int(items_per_line, lower = 1)
+  
   dt_plate_copy <- data.table::copy(dt_plate)
   
   concentration <- gDRutils::get_env_identifiers("concentration")
@@ -31,9 +27,12 @@ plot_plate_stack_info <- function(dt_plate,
   drug <- gDRutils::get_env_identifiers("drug")
   drug2 <- gDRutils::get_env_identifiers("drug2")
   cellline <- gDRutils::get_env_identifiers("cellline")
-  barcode <- gDRutils::get_env_identifiers("barcode")
+  barcode <- gDRutils::get_env_identifiers("barcode")[1]
   
-  plate_palette <- gDRutils::get_settings_from_json("PLATE_PALETTE", system.file(package = "gDRplots", "settings.json"))
+  
+  req_cols <- c("ReadoutValue", "WellRow", "WellColumn", concentration, drug, cellline, barcode)
+  checkmate::assert_names(names(dt_plate_copy), must.include = req_cols)
+  checkmate::assert_numeric(dt_plate_copy$ReadoutValue, any.missing = FALSE, .var.name = "ReadoutValue")
   
   checkmate::assert_data_table(dt_plate_copy)
   dt_plate_copy[, WellColumn := as.numeric(WellColumn)]
@@ -42,7 +41,29 @@ plot_plate_stack_info <- function(dt_plate,
   barcode_idf <- intersect(barcode, names(dt_plate_copy))
   if (NROW(barcode_idf) == 0) return(ggplot2::ggplot() + ggplot2::theme_void())
   
-  overall_color_mapping <- generate_color_mappings(dt_plate_copy) 
+  calc_dose_rank <- function(vals) {
+    vals <- round(vals, 6)
+    unique_doses <- sort(unique(vals[vals > 0]))
+    ranks <- character(length(vals))
+    ranks[vals == 0 | is.na(vals)] <- "-" 
+    if (length(unique_doses) > 0) {
+      positive_indices <- vals > 0 & !is.na(vals)
+      ranks[positive_indices] <- match(vals[positive_indices], unique_doses)
+    }
+    return(ranks)
+  }
+  
+  dt_plate_copy[, rank_1 := calc_dose_rank(get(concentration)), by = barcode_idf]
+  
+  has_combo <- concentration2 %in% colnames(dt_plate_copy) && drug2 %in% colnames(dt_plate_copy)
+  if (has_combo) {
+    dt_plate_copy[, rank_2 := calc_dose_rank(get(concentration2)), by = barcode_idf]
+  }
+  
+  drug_color_mapping <- generate_color_mappings(dt_plate_copy) 
+  
+  # Force solid shapes to ensure text inside is visible
+  solid_shapes <- c(16, 17, 15, 18, 19, 20, 8) 
   
   plate_list <- gDRutils::loop(unique(dt_plate_copy[[barcode_idf]]), function(x) {
     dt_plate_copy_subset <- dt_plate_copy[get(barcode_idf) == x]
@@ -58,93 +79,110 @@ plot_plate_stack_info <- function(dt_plate,
     
     mean_ctrl <- mean(dt_controls$ReadoutValue, na.rm = TRUE)
     sd_ctrl   <- sd(dt_controls$ReadoutValue, na.rm = TRUE)
-    if (is.na(sd_ctrl)) sd_ctrl <- 0
     
+    qc_valid <- is.finite(mean_ctrl)
+
     if (use_sd_threshold) {
-      limit_value <- mean_ctrl + (n_sd * sd_ctrl)
-      high_formula_desc <- paste0("Mean_Ctrl + ", n_sd, "*SD")
+      limit_desc <- paste0("Mean(Ctrl) + ", n_sd, "*SD")
     } else {
-      limit_value <- mean_ctrl * 1.1 
-      high_formula_desc <- "Mean_Ctrl + 10%"
+      limit_desc <- "Mean(Ctrl) + 10%"
+    }
+    low_desc <- paste0("Mean(Ctrl) * ", ctrl_fail_threshold)
+    
+    if (qc_valid) {
+      if (is.na(sd_ctrl)) sd_ctrl <- 0
+      limit_value <- if (use_sd_threshold) mean_ctrl + (n_sd * sd_ctrl) else mean_ctrl * 1.1 
+      low_limit_value <- mean_ctrl * ctrl_fail_threshold
+      bad_ctrl_rows <- dt_controls[ReadoutValue < low_limit_value]
+      suspicious_treated <- dt_treated[ReadoutValue > limit_value]
+      count_low <- nrow(bad_ctrl_rows)
+      count_high <- nrow(suspicious_treated)
+    } else {
+      count_low <- 0; count_high <- 0; limit_value <- NA; low_limit_value <- NA
+      bad_ctrl_rows <- dt_controls[0]; suspicious_treated <- dt_treated[0]
+    }
+
+    format_dose_list <- function(dose_vec, n_per_line) {
+      if (length(dose_vec) == 0) return("")
+      lbls <- paste(seq_along(dose_vec), signif(dose_vec, 3), sep = ": ")
+      grp <- ceiling(seq_along(lbls) / n_per_line)
+      lines <- tapply(lbls, grp, paste, collapse = " | ")
+      paste(lines, collapse = "<br>")
     }
     
-    low_limit_value <- mean_ctrl * ctrl_fail_threshold
-    low_formula_desc <- paste0("Mean_Ctrl * ", ctrl_fail_threshold)
-    
-    bad_ctrl_rows <- dt_controls[ReadoutValue < low_limit_value]
-    suspicious_treated <- dt_treated[ReadoutValue > limit_value]
-    
-    count_low <- nrow(bad_ctrl_rows)
-    count_high <- nrow(suspicious_treated)
-    
-    if (count_low == 0 && count_high == 0) {
-      subtitle_text <- "<span style='color:darkgreen;'>QC Status: <b>OK</b></span>"
-    } else {
-      msgs <- c()
-      if (count_low > 0) msgs <- c(msgs, paste0("<b>", count_low, "</b> Low Ctrls"))
-      if (count_high > 0) msgs <- c(msgs, paste0("<b>", count_high, "</b> High Artifacts"))
-      subtitle_text <- paste0("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
-    }
-    
-    caption_text <- paste0(
-      "<b>QC DIAGNOSTICS:</b><br>",
-      "<span style='color:red; font-size:14pt;'>&#9632;</span> ",
-      "<b>Low Control</b> (Edge Effect): value < ", round(low_limit_value, 1), 
-      " <span style='color:#777777; font-size:9pt;'>(", low_formula_desc, ")</span>",
-      "<br>",
-      "<span style='color:darkorange; font-size:14pt;'>&#9632;</span> ",
-      "<b>High Signal</b> (Artifact): value > ", round(limit_value, 1), 
-      " <span style='color:#777777; font-size:9pt;'>(", high_formula_desc, ")</span>"
-    )
-    
-    has_combo <- concentration2 %in% colnames(dt_plate_copy_subset) && drug2 %in% colnames(dt_plate_copy_subset)
-    doses <- sort(unique(unlist(dt_plate_copy_subset[, intersect(names(dt_plate_copy_subset), c(concentration, concentration2)), with = FALSE])))
-    gradient_colors <- grDevices::colorRampPalette(plate_palette)(length(doses))
-    names(gradient_colors) <- doses
-    
-    dt_plate_copy_subset[, (concentration) := factor(get(concentration), levels = doses)]
-    if (has_combo) dt_plate_copy_subset[, (concentration2) := factor(get(concentration2), levels = doses)]
-    
-    xmax_offset <- if (has_combo) 0 else 0.5
-    x_point_offset <- if (has_combo) -0.25 else 0
-    
-    p <- ggplot2::ggplot(dt_plate_copy_subset) +
-      ggplot2::geom_rect(ggplot2::aes(
-        xmin = WellColumn - 0.5, xmax = WellColumn + xmax_offset,
-        ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5,
-        fill = !!rlang::sym(concentration)
-      ), color = NA) +
-      ggplot2::geom_point(ggplot2::aes(
-        x = WellColumn + x_point_offset, y = WellRow,
-        color = !!rlang::sym(drug), shape = !!rlang::sym(cellline)
-      ), size = 3)
+    doses_1 <- sort(unique(dt_plate_copy_subset[[concentration]][dt_plate_copy_subset[[concentration]] > 0]))
+    dose_key_str <- format_dose_list(doses_1, items_per_line)
+    dose_legend <- paste0("<b>Dose Key (inside dots):</b><br>", dose_key_str)
     
     if (has_combo) {
-      p <- p + ggplot2::geom_rect(ggplot2::aes(
-        xmin = WellColumn, xmax = WellColumn + 0.5,
-        ymin = as.numeric(WellRow) - 0.5, ymax = as.numeric(WellRow) + 0.5,
-        fill = !!rlang::sym(concentration2)
-      ), color = NA) +
-        ggplot2::geom_point(ggplot2::aes(x = WellColumn + 0.25, y = WellRow, color = !!rlang::sym(drug2)), size = 3)
+      doses_2 <- sort(unique(dt_plate_copy_subset[[concentration2]][dt_plate_copy_subset[[concentration2]] > 0]))
+      if (!identical(doses_1, doses_2) && length(doses_2) > 0) {
+        dose_key_str_2 <- format_dose_list(doses_2, items_per_line)
+        dose_legend <- paste0(dose_legend, "<br><b>Drug 2 Key:</b><br>", dose_key_str_2)
+      }
     }
     
-    p <- p +
-      ggrepel::geom_text_repel(
-        data = dt_plate_copy_subset,
-        ggplot2::aes(x = WellColumn, y = WellRow, label = round(ReadoutValue, 1)),
-        color = "black", size = 3, bg.color = "white", bg.r = 0.05,
-        force = 0, nudge_y = -0.3, segment.color = NA
-      ) +
+    if (!qc_valid) {
+      subtitle_text <- "<span style='color:orange;'>QC Status: <b>No Controls</b></span>"
+      qc_legend <- "N/A"
+    } else {
+      if (count_low == 0 && count_high == 0) {
+        subtitle_text <- "<span style='color:darkgreen;'>QC Status: <b>OK</b></span>"
+      } else {
+        msgs <- c()
+        if (count_low > 0) msgs <- c(msgs, paste0("<b>", count_low, "</b> Low"))
+        if (count_high > 0) msgs <- c(msgs, paste0("<b>", count_high, "</b> High"))
+        subtitle_text <- paste0("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
+      }
+      
+      qc_legend <- paste0(
+        "<span style='color:red;'>&#9632;</span> <b>Low</b> ",
+        "<span style='color:#555; font-size:8pt;'>(< ", round(low_limit_value, 1), " [", low_desc, "])</span> | ",
+        "<span style='color:darkorange;'>&#9632;</span> <b>High</b> ",
+        "<span style='color:#555; font-size:8pt;'>(> ", round(limit_value, 1), " [", limit_desc, "])</span>"
+      )
+    }
+    
+    caption_text <- paste0(dose_legend, "<br><br><b>QC Flags:</b> ", qc_legend)
+    
+    offset_1 <- if (has_combo) {
+      -0.18
+      } else {
+        0
+      }
+    offset_2 <- 0.18
+    
+    p <- ggplot2::ggplot(dt_plate_copy_subset) +
+      ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow, fill = ReadoutValue)) +
+      ggplot2::geom_point(ggplot2::aes(
+        x = WellColumn + offset_1, y = WellRow,
+        color = !!rlang::sym(drug), shape = !!rlang::sym(cellline)
+      ), size = 4) +
+      ggplot2::geom_text(ggplot2::aes(
+        x = WellColumn + offset_1, y = WellRow, label = rank_1
+      ), color = "white", size = 2.5, fontface = "bold") +
+      
+      (if (has_combo) {
+        list(
+          ggplot2::geom_point(ggplot2::aes(
+            x = WellColumn + offset_2, y = WellRow, color = !!rlang::sym(drug2)
+          ), size = 4),
+          ggplot2::geom_text(ggplot2::aes(
+            x = WellColumn + offset_2, y = WellRow, label = rank_2
+          ), color = "white", size = 2.5, fontface = "bold")
+        )
+      } else NULL) +
+      
       ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", linewidth = 0.5) +
       ggplot2::geom_tile(data = bad_ctrl_rows, ggplot2::aes(x = WellColumn, y = WellRow),
-                         color = "red", fill = NA, linewidth = 0.75, width = 1, height = 1) +
+                         color = "red", fill = NA, linewidth = 1, width = 1, height = 1) +
       ggplot2::geom_tile(data = suspicious_treated, ggplot2::aes(x = WellColumn, y = WellRow),
-                         color = "darkorange", fill = NA, linewidth = 0.75, width = 1, height = 1) +
-      
-      ggplot2::scale_fill_manual(values = gradient_colors, name = concentration, limits = names(gradient_colors)) +
-      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_copy_subset$WellColumn)),
+                         color = "darkorange", fill = NA, linewidth = 1, width = 1, height = 1) +
+      ggplot2::scale_fill_gradient(low = "#FFFFFF", high = "#6FA8DC", name = "Readout") +
+      ggplot2::scale_x_continuous(breaks = sort(unique(dt_plate_copy_subset$WellColumn)), 
                                   labels = sort(unique(dt_plate_copy_subset$WellColumn)), position = "top") +
-      ggplot2::scale_color_manual(values = overall_color_mapping) +
+      ggplot2::scale_color_manual(values = drug_color_mapping) +
+      ggplot2::scale_shape_manual(values = solid_shapes) +
       
       ggplot2::labs(
         title = paste0("Plate ", x, " QC Analysis"), 
@@ -157,11 +195,9 @@ plot_plate_stack_info <- function(dt_plate,
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1),
                      plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"),
                      plot.subtitle = ggtext::element_markdown(hjust = 0.5, size = 11),
-                     plot.caption = ggtext::element_markdown(hjust = 0, size = 9, color = "#333333", lineheight = 1.3),
+                     plot.caption = ggtext::element_markdown(hjust = 0, size = 8, color = "#444444", lineheight = 1.2),
                      panel.grid.minor = ggplot2::element_blank(),
-                     panel.grid.major = ggplot2::element_blank()) +
-      
-      ggplot2::scale_shape_manual(values = scales::shape_pal()(length(unique(dt_plate_copy[[cellline]]))))
+                     panel.grid.major = ggplot2::element_blank())
     
     p
   })
