@@ -1279,6 +1279,86 @@ test_that("prep_pheatmap_matrix works as expected", {
                "Assertion on 'experiment_type' failed: Must be element of set")
 })
 
+test_that("pheatmap_with_anno_combo_metrics works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  
+  if (!"cotrt_value" %in% names(dt_metrics)) {
+    dt_metrics[, cotrt_value := Concentration_2]
+  }
+  if (!"fit_source" %in% names(dt_metrics)) {
+    dt_metrics[, fit_source := "gDR"]
+  }
+  
+  out_1 <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_metrics)$result
+  
+  expect_length(out_1, 2)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  
+  # Check Data structure
+  data_1 <- out_1[["data"]]
+  expect_is(data_1[["matrix"]], "data.table")
+  expect_true("Treatment_Key" %in% names(data_1[["matrix"]]))
+  
+  expected_cols <- c("Treatment_Key", unique(dt_metrics$CellLineName))
+  expect_true(all(expected_cols %in% names(data_1[["matrix"]])))
+  
+  anno_row_1 <- out_1[["data"]][["annotation_row"]]
+  expect_is(anno_row_1, "data.frame")
+  expect_true("Fixed_Drug" %in% names(anno_row_1))
+
+  dt_xc50 <- data.table::copy(dt_metrics)
+  dt_xc50[, xc50 := 0.5] # Set a constant value to verify aggregation easily
+  
+  out_xc50 <- pheatmap_with_anno_combo_metrics(
+    dt_metrics = dt_xc50, 
+    metric = "xc50", 
+    normalization_type = "GR"
+  )
+  
+  res_dt <- out_xc50[["data"]][["matrix"]]
+  
+  cl_col <- names(res_dt)[2] 
+  val_raw <- res_dt[[cl_col]][1]
+  
+  expect_equal(val_raw, 0.5)
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  drug_A <- unique(dt_metrics$DrugName)[1]
+  drug_B <- unique(dt_metrics$DrugName_2)[1]
+  
+  dt_sort <- dt_metrics[DrugName == drug_A & DrugName_2 == drug_B]
+  
+  dt_sort[1, `:=`(cotrt_value = 0, DrugName_2 = untreated_tag)] 
+  dt_sort[2, cotrt_value := 0.001]
+  dt_sort[3, cotrt_value := 1.0]
+  
+  out_sort <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_sort,
+                                                               cluster_rows = FALSE)$result
+  
+  sorted_keys <- out_sort[["data"]][["matrix"]]$Treatment_Key
+  
+  idx_untreated <- grep(paste0(untreated_tag, "__", untreated_tag), sorted_keys)
+  idx_low_conc  <- grep("0.0010", sorted_keys)
+  idx_high_conc <- grep("1.0000", sorted_keys)
+  
+  expect_true(idx_untreated < idx_low_conc)
+  expect_true(idx_low_conc < idx_high_conc)
+  
+  expect_error(
+    pheatmap_with_anno_combo_metrics(dt_metrics = "not_a_dt"),
+    "Assertion on 'dt_metrics' failed: Must be a data.table"
+  )
+  
+  dt_bad <- data.table::copy(dt_metrics)
+  dt_bad[, cotrt_value := NULL]
+  expect_error(
+    pheatmap_with_anno_combo_metrics(dt_metrics = dt_bad),
+    "Names must include the elements"
+  )
+})
+
 test_that("change_NA_into_char works", {
   test_vec <- list(11, " ", NA, "A", NULL)
   
