@@ -1165,7 +1165,7 @@ pheatmap_with_anno_combo <- function(
     }
     # data.table::nafill does not support character
     cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, "DrugCombination")]
-    #data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
+    data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
     annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     # select annotation acc to matrix
     annotation_row <- annotation_row[DrugCombination %in% colnames(mat_cvd), ]
