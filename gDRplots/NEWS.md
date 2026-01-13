@@ -1,3 +1,6 @@
+## gDRplots 0.0.98 - 2026-01-02
+* update x-axis label for `plot_volcano_assoc_panel`
+
 ## gDRplots 0.0.97 - 2025-12-02
 * update `heatmap_combo_with_isoref_panel` to work with not standard concentrations 
 
