@@ -15,11 +15,14 @@ plot_plate_stack_info(
 \arguments{
 \item{dt_plate}{\code{data.table}. Input data containing plate layout, measurements, and standard gDR identifiers.}
 
-\item{ctrl_fail_threshold}{\code{numeric} (Default: 0.6). Flags control wells with a readout below \code{Mean(Controls) * ctrl_fail_threshold}.}
+\item{ctrl_fail_threshold}{\code{numeric} (Default: 0.6). Flags control wells with a readout below
+\code{Mean(Controls) * ctrl_fail_threshold}.}
 
-\item{n_sd}{\code{numeric} (Default: 1). Sets the upper limit for flagging high signals using the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.}
+\item{n_sd}{\code{numeric} (Default: 1). Sets the upper limit for flagging high signals using
+the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.}
 
-\item{use_sd_threshold}{\code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.}
+\item{use_sd_threshold}{\code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic
+SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.}
 
 \item{items_per_line}{\code{integer}. Number of doses to show per line in the legend. Default 4.}
 }

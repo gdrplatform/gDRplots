@@ -57,7 +57,8 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
 the default is \code{\link{compute_distances}} using Spearman method.}
 
-\item{annotation_row}{\code{data.table} (optional) that specifies the annotations shown on the left side of the heatmap.
+\item{annotation_row}{\code{data.table} (optional) that specifies the annotations shown on
+the left side of the heatmap.
 \emph{Note: In this specific function, row annotations are largely auto-generated based on the 
 co-treatment (Fixed Drug) names and concentrations to ensure consistent formatting.}}
 

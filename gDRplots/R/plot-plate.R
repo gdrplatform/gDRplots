@@ -1,9 +1,12 @@
 #' Plot plate data (Heatmap + Dose Ranks + Smart Legend + Explicit QC)
 #' 
 #' @param dt_plate \code{data.table}. Input data containing plate layout, measurements, and standard gDR identifiers.
-#' @param ctrl_fail_threshold \code{numeric} (Default: 0.6). Flags control wells with a readout below \code{Mean(Controls) * ctrl_fail_threshold}.
-#' @param n_sd \code{numeric} (Default: 1). Sets the upper limit for flagging high signals using the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.
-#' @param use_sd_threshold \code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.
+#' @param ctrl_fail_threshold \code{numeric} (Default: 0.6). Flags control wells with a readout below
+#' \code{Mean(Controls) * ctrl_fail_threshold}.
+#' @param n_sd \code{numeric} (Default: 1). Sets the upper limit for flagging high signals using
+#' the formula \code{Mean(Controls) + (n_sd * SD(Controls))}.
+#' @param use_sd_threshold \code{logical} (Default: TRUE). If \code{TRUE}, uses the dynamic
+#' SD-based limit defined by \code{n_sd}. If \code{FALSE}, uses a fixed limit of \code{Mean(Controls) * 1.1}.
 #' @param items_per_line \code{integer}. Number of doses to show per line in the legend. Default 4.
 #' @return A named list of ggplot objects for each barcode
 #' @keywords QC_plot
@@ -98,8 +101,12 @@ plot_plate_stack_info <- function(dt_plate,
       count_low <- nrow(bad_ctrl_rows)
       count_high <- nrow(suspicious_treated)
     } else {
-      count_low <- 0; count_high <- 0; limit_value <- NA; low_limit_value <- NA
-      bad_ctrl_rows <- dt_controls[0]; suspicious_treated <- dt_treated[0]
+      count_low <- 0
+      count_high <- 0
+      limit_value <- NA
+      low_limit_value <- NA
+      bad_ctrl_rows <- dt_controls[0]
+      suspicious_treated <- dt_treated[0]
     }
 
     format_dose_list <- function(dose_vec, n_per_line) {
@@ -162,7 +169,7 @@ plot_plate_stack_info <- function(dt_plate,
         x = WellColumn + offset_1, y = WellRow, label = rank_1
       ), color = "white", size = 2.5, fontface = "bold") +
       
-      (if (has_combo) {
+      (if (has_combo){
         list(
           ggplot2::geom_point(ggplot2::aes(
             x = WellColumn + offset_2, y = WellRow, color = !!rlang::sym(drug2)
@@ -171,7 +178,9 @@ plot_plate_stack_info <- function(dt_plate,
             x = WellColumn + offset_2, y = WellRow, label = rank_2
           ), color = "white", size = 2.5, fontface = "bold")
         )
-      } else NULL) +
+      } else {
+        NULL
+        }) +
       
       ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", linewidth = 0.5) +
       ggplot2::geom_tile(data = bad_ctrl_rows, ggplot2::aes(x = WellColumn, y = WellRow),

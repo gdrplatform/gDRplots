@@ -1330,7 +1330,8 @@ pheatmap_with_anno_combo <- function(
 #'    e.g., "xc50", "x_inf", "ec50", "r2", "h_RV", "h_GR".
 #' @param fit_source string representing the source of the fit; 
 #'    defaults to "gDR".
-#' @param annotation_row \code{data.table} (optional) that specifies the annotations shown on the left side of the heatmap.
+#' @param annotation_row \code{data.table} (optional) that specifies the annotations shown on
+#'    the left side of the heatmap.
 #'    \emph{Note: In this specific function, row annotations are largely auto-generated based on the 
 #'    co-treatment (Fixed Drug) names and concentrations to ensure consistent formatting.}
 #' @param annotation_col \code{data.table} that specifies the annotations shown on the top of the heatmap.
