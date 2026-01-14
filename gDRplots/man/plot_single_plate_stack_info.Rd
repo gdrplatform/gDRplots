@@ -17,9 +17,11 @@ plot_single_plate_stack_info(
 \arguments{
 \item{dt_subset}{\code{data.table}. Subset of the plate data corresponding to a single barcode/plate.}
 
-\item{plate_id}{\code{character} (Optional). The identifier (barcode) of the plate. If \code{NULL}, attempts to extract it from the data.}
+\item{plate_id}{\code{character} (Optional). The identifier (barcode) of the plate.
+If \code{NULL}, attempts to extract it from the data.}
 
-\item{drug_color_mapping}{\code{character} (Optional). Named vector of color codes. If \code{NULL}, generated automatically.}
+\item{drug_color_mapping}{\code{character} (Optional). Named vector of color codes.
+If \code{NULL}, generated automatically.}
 
 \item{ctrl_fail_threshold}{\code{numeric} (Default: 0.6). Flags control wells with a readout below
 \code{Mean(Controls) * ctrl_fail_threshold}.}

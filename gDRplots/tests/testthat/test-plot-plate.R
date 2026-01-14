@@ -97,7 +97,9 @@ test_that("plot_single_plate_stack_info works as expected", {
   # Remove rank and ensure it plots (function should calculate rank internally)
   dt_norank <- data.table::copy(single_plate_data)
   # rank_1 is calculated inside the function if missing, so we ensure input doesn't have it
-  if("rank_1" %in% names(dt_norank)) dt_norank[, rank_1 := NULL]
+  if ("rank_1" %in% names(dt_norank)) {
+    dt_norank[, rank_1 := NULL]
+  }
   
   p_calc <- plot_single_plate_stack_info(dt_norank)
   expect_true(inherits(p_calc, "ggplot"))
@@ -112,7 +114,8 @@ test_that("plot_single_plate_stack_info works as expected", {
   p_shape_built <- ggplot2::ggplot_build(p_shape)
   
   # Find the main point layer (usually the first GeomPoint)
-  point_layer_idx <- which(vapply(p_shape_built$plot$layers, function(x) class(x$geom)[1], character(1)) == "GeomPoint")[1]
+  point_layer_idx <- which(vapply(p_shape_built$plot$layers, function(x) class(x$geom)[1],
+                                  character(1)) == "GeomPoint")[1]
   point_data <- p_shape_built$data[[point_layer_idx]]
   
   # Check that multiple shapes are rendered

@@ -86,8 +86,10 @@ plot_plate_stack_info <- function(dt_plate,
 #' Handles all necessary data transformations (factor conversion, ranking, color mapping) internally.
 #' 
 #' @param dt_subset \code{data.table}. Subset of the plate data corresponding to a single barcode/plate.
-#' @param plate_id \code{character} (Optional). The identifier (barcode) of the plate. If \code{NULL}, attempts to extract it from the data.
-#' @param drug_color_mapping \code{character} (Optional). Named vector of color codes. If \code{NULL}, generated automatically.
+#' @param plate_id \code{character} (Optional). The identifier (barcode) of the plate.
+#' If \code{NULL}, attempts to extract it from the data.
+#' @param drug_color_mapping \code{character} (Optional). Named vector of color codes.
+#' If \code{NULL}, generated automatically.
 #' @inheritParams plot_plate_stack_info
 #' 
 #' @return A \code{ggplot} object.
