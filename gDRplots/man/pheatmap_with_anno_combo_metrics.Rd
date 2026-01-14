@@ -142,3 +142,4 @@ hm_4 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_4[["gtable"]])
 
 }
+\keyword{pheat_ann}

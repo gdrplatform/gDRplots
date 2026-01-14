@@ -1383,7 +1383,7 @@ pheatmap_with_anno_combo <- function(
 #'     }
 #'   \item \code{heatmap} the \code{pheatmap} object.
 #' }
-#' 
+#' @keywords pheat_ann
 #' @export
 pheatmap_with_anno_combo_metrics <- function(
     dt_metrics,
