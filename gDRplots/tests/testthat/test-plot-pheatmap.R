@@ -1280,23 +1280,16 @@ test_that("prep_pheatmap_matrix works as expected", {
 })
 
 test_that("pheatmap_with_anno_combo_metrics works as expected", {
+  # --- Standard Combo (Double) ---
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
-  
-  if (!"cotrt_value" %in% names(dt_metrics)) {
-    dt_metrics[, cotrt_value := Concentration_2]
-  }
-  if (!"fit_source" %in% names(dt_metrics)) {
-    dt_metrics[, fit_source := "gDR"]
-  }
   
   out_1 <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_metrics)$result
   
   expect_length(out_1, 2)
   expect_equal(names(out_1), c("data", "heatmap"))
   
-  # Check Data structure
   data_1 <- out_1[["data"]]
   expect_is(data_1[["matrix"]], "data.table")
   expect_true("Treatment_Key" %in% names(data_1[["matrix"]]))
@@ -1307,9 +1300,9 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
   anno_row_1 <- out_1[["data"]][["annotation_row"]]
   expect_is(anno_row_1, "data.frame")
   expect_true("Fixed_Drug" %in% names(anno_row_1))
-
+  
   dt_xc50 <- data.table::copy(dt_metrics)
-  dt_xc50[, xc50 := 0.5] # Set a constant value to verify aggregation easily
+  dt_xc50[, xc50 := 0.5]
   
   out_xc50 <- pheatmap_with_anno_combo_metrics(
     dt_metrics = dt_xc50, 
@@ -1318,11 +1311,10 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
   )
   
   res_dt <- out_xc50[["data"]][["matrix"]]
-  
   cl_col <- names(res_dt)[2] 
   val_raw <- res_dt[[cl_col]][1]
   
-  expect_equal(val_raw, 0.5)
+  expect_equal(val_raw, 0.5) 
   
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
   drug_A <- unique(dt_metrics$DrugName)[1]
@@ -1357,6 +1349,32 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
     pheatmap_with_anno_combo_metrics(dt_metrics = dt_bad),
     "Names must include the elements"
   )
+  
+  # --- Triple Combo Support ---
+  mae_triple <- gDRutils::get_synthetic_data("combo_triple")
+  se_triple <- mae_triple[[gDRutils::get_supported_experiments("combo")]]
+  
+  dt_triple <- gDRutils::convert_se_assay_to_dt(se = se_triple, 
+                                                assay_name = "Metrics", 
+                                                merge_additional_variables = TRUE)
+  
+  out_triple <- purrr::quietly(pheatmap_with_anno_combo_metrics)(
+    dt_metrics = dt_triple,
+    normalization_type = "RV",
+    metric = "x_mean"
+  )$result
+  
+  expect_length(out_triple, 2)
+  expect_is(out_triple[["data"]][["matrix"]], "data.table")
+  
+  anno_row_triple <- out_triple[["data"]][["annotation_row"]]
+  expect_is(anno_row_triple, "data.frame")
+  expect_true("Fixed_Drug" %in% names(anno_row_triple))
+  expect_true("Fixed_Drug_2" %in% names(anno_row_triple))
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  real_labels <- anno_row_triple$Fixed_Drug_2[anno_row_triple$Fixed_Drug_2 != untreated_tag]
+  expect_gt(length(real_labels), 0)
 })
 
 test_that("change_NA_into_char works", {
