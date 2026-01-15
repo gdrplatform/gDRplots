@@ -73,9 +73,6 @@ Not described elements will be colored in default.}
 \item{max_hm_lbl_length}{numeric value for the maximum number of characters in the label;
 if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
 the default number.}
-
-\item{annotation_row}{\code{NULL}. This parameter is excluded from this function as row annotations 
-are auto-generated based on the combination components.}
 }
 \value{
 A named list with elements:

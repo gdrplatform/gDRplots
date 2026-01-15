@@ -49,7 +49,7 @@ test_data[Gnumber == "vehicle", Concentration := 0]
 test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
                                    rnorm(.N, 1000, 50), 
                                    rnorm(.N, 500, 100))]
-
+library(ggtext)
 plots <- plot_plate_stack_info(test_data)
 plots[[1]]
 

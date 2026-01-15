@@ -1323,8 +1323,6 @@ pheatmap_with_anno_combo <- function(
 #' @param dt_metrics \code{data.table} representing data from the \code{metrics} assay,
 #'    outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}.
 #'    Must contain \code{DrugName}, \code{DrugName_2}, \code{cotrt_value}, and \code{CellLineName}.
-#' @param annotation_row \code{NULL}. This parameter is excluded from this function as row annotations 
-#'    are auto-generated based on the combination components.
 #'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("combo_matrix_small")

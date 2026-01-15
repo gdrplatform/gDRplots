@@ -31,7 +31,7 @@
 #' test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
 #'                                    rnorm(.N, 1000, 50), 
 #'                                    rnorm(.N, 500, 100))]
-#' 
+#' library(ggtext)
 #' plots <- plot_plate_stack_info(test_data)
 #' plots[[1]]
 #' 
@@ -115,7 +115,8 @@ plot_plate_stack_info <- function(dt_plate,
 #' test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
 #'                                    rnorm(.N, 1000, 50), 
 #'                                    rnorm(.N, 1000 * (1 / (1 + Concentration)), 50))]
-#' 
+#'                                    
+#' library(ggtext)
 #' plot_single_plate_stack_info(test_data)
 #' 
 #' test_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)]
