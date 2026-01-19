@@ -122,7 +122,7 @@ pheatmap_qc <- function(
     }
   }
   # concentrations mapping (unique concs string instead of standardized concentrations)
-  conc_map <- data.table::data.table(concs = unique(c(tab_response[[conc]], tab_response[[conc_2]])))
+  conc_map <- data.table::data.table(concs = sort(unique(c(tab_response[[conc]], tab_response[[conc_2]]))))
   conc_map$rconcs <- as.numeric(round_to_unique_string(conc_map$concs, initial_digits = 6))
   
   tab_response <- merge(tab_response, conc_map, by.x = conc, by.y = "concs")
