@@ -9,7 +9,7 @@
   col_concs,
   col_labels,
   base_map,
-  untreated_tag = "untreated"
+  untreated_tag = gDRutils::get_env_identifiers("untreated_tag")
 )
 }
 \arguments{
@@ -21,7 +21,8 @@
 
 \item{base_map}{\code{character} named vector mapping drug names to their base (darkest) color.}
 
-\item{untreated_tag}{\code{character} identifier for untreated/vehicle controls. Default: "untreated".}
+\item{untreated_tag}{\code{character} vector of identifiers for untreated/vehicle controls. 
+Defaults to \code{gDRutils::get_env_identifiers("untreated_tag")}.}
 }
 \value{
 A named \code{character} vector of hex color codes.
@@ -29,8 +30,5 @@ A named \code{character} vector of hex color codes.
 \description{
 Internal helper to create a named vector of colors. Each drug is assigned a base color,
 and individual concentrations are assigned a gradient intensity of that color.
-}
-\author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
 }
 \keyword{internal}

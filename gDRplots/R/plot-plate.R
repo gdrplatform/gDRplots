@@ -186,7 +186,7 @@ plot_single_plate_stack_info <- function(dt_subset,
   dt_treated <- dt_subset[!is_ctrl]
   
   mean_ctrl <- mean(dt_controls$ReadoutValue, na.rm = TRUE)
-  sd_ctrl <- sd(dt_controls$ReadoutValue, na.rm = TRUE)
+  sd_ctrl <- stats::sd(dt_controls$ReadoutValue, na.rm = TRUE)
   qc_valid <- is.finite(mean_ctrl)
   
   if (use_sd_threshold) {

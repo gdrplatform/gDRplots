@@ -48,6 +48,19 @@ utils::globalVariables(
     "x_inf",
     "x_pos",
     "x_std",
-    "y_pos"
+    "y_pos",
+    "conc",
+    "dilution_drug",
+    "Fixed_Conc_1",
+    "Fixed_Conc_2",
+    "Fixed_Label_1",
+    "Fixed_Label_2",
+    "Fixed_Name_1",
+    "Fixed_Name_2",
+    "name",
+    "rank_1",
+    "rank_2",
+    "Row_Display_Name",
+    "Treatment_Key"
   ),
   utils::packageName())
