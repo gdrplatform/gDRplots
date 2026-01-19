@@ -121,9 +121,10 @@ pheatmap_qc <- function(
       if (nm == conc_2) tab_response[[conc_2]] <- as.numeric(tab_response[[conc_2]])
     }
   }
-  # standardization of concentration
-  conc_map <- gDRutils::map_conc_to_standardized_conc(tab_response[[conc]], 
-                                                      tab_response[[conc_2]])
+  # concentrations mapping (unique concs string instead of standardized concentrations)
+  conc_map <- data.table::data.table(concs = unique(c(tab_response[[conc]], tab_response[[conc_2]])))
+  conc_map$rconcs <- as.numeric(round_to_unique_string(conc_map$concs, initial_digits = 6))
+  
   tab_response <- merge(tab_response, conc_map, by.x = conc, by.y = "concs")
   tab_response <- merge(tab_response, conc_map, by.x = conc_2, by.y = "concs", suffixes = c("", "_2"))
   
