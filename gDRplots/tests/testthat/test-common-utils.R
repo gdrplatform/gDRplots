@@ -83,35 +83,35 @@ test_that("create_log_seq works as expected", {
   expect_error(create_log_seq(1, 2, 0))
 })
 
-test_that(".round_to_unique_string works as expected", {
+test_that("round_to_unique_string works as expected", {
   vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000, 
            0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000) 
   
-  res_1 <- .round_to_unique_string(vec) # default
+  res_1 <- round_to_unique_string(vec) # default
   expect_is(res_1, "character")
   expect_equal(res_1, 
                c("0.000000", "0.000003", "0.000013", sprintf("%.4f", vec[4:NROW(vec)])))
   
-  res_2 <- .round_to_unique_string(num_vec = vec, 
+  res_2 <- round_to_unique_string(num_vec = vec, 
                                    initial_digits = 3)
   expect_is(res_2, "character")
   expect_equal(res_2,
                c("0.000000", "0.000003", "0.000013", "0.000064", "0.000320",
                  sprintf("%.3f", vec[6:NROW(vec)])))
   
-  res_3 <- .round_to_unique_string(num_vec = vec, 
+  res_3 <- round_to_unique_string(num_vec = vec, 
                                    initial_digits = max(nchar(format(vec, scientific = FALSE))))
   expect_is(res_3, "character")
   expect_equal(res_3, format(vec, scientific = FALSE, trim = FALSE))
   
-  expect_error(.round_to_unique_string(num_vec = as.character(vec)),
+  expect_error(round_to_unique_string(num_vec = as.character(vec)),
                "Assertion on 'num_vec' failed: Must be of type 'numeric'")
-  expect_error(.round_to_unique_string(num_vec = c(vec, NA)),
+  expect_error(round_to_unique_string(num_vec = c(vec, NA)),
                "Assertion on 'num_vec' failed: Contains missing values")
-  expect_error(.round_to_unique_string(num_vec = vec,
+  expect_error(round_to_unique_string(num_vec = vec,
                                        initial_digits = "4"),
                "Assertion on 'initial_digits' failed: Must be of type 'integerish'")
-  expect_error(.round_to_unique_string(num_vec = vec,
+  expect_error(round_to_unique_string(num_vec = vec,
                                        initial_digits = 0),
                "Assertion on 'initial_digits' failed: Element 1 is not >= 1.")
 })
