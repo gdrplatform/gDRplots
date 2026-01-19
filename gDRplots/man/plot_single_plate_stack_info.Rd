@@ -45,27 +45,27 @@ Handles all necessary data transformations (factor conversion, ranking, color ma
 conc_series <- c(0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10)
 
 test_data <- data.table::data.table(
-  WellColumn = rep(1:12, each = 8),
-  WellRow = rep(LETTERS[1:8], times = 12),
-  clid = "CellLineA",
-  Barcode = "Plate_1"
+   WellColumn = rep(1:12, each = 8),
+   WellRow = rep(LETTERS[1:8], times = 12),
+   clid = "CellLineA",
+   Barcode = "Plate_1"
 )
 
-test_data[, Concentration := rep(conc_series, length.out = .N)]
-test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")]
-test_data[Gnumber == "vehicle", Concentration := 0]
+invisible(test_data[, Concentration := rep(conc_series, length.out = .N)])
+invisible(test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")])
+invisible(test_data[Gnumber == "vehicle", Concentration := 0])
 
-test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
-                                   rnorm(.N, 1000, 50), 
-                                   rnorm(.N, 1000 * (1 / (1 + Concentration)), 50))]
-                                   
+invisible(test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
+                                    rnorm(.N, 1000, 50), 
+                                    rnorm(.N, 1000 * (1 / (1 + Concentration)), 50))])
+                                     
 library(ggtext)
 plot_single_plate_stack_info(test_data)
 
-test_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)]
-test_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")]
+invisible(test_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)])
+invisible(test_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")])
 
-test_data[Gnumber_2 == "vehicle", Concentration_2 := 0]
+invisible(test_data[Gnumber_2 == "vehicle", Concentration_2 := 0])
 
 plot_single_plate_stack_info(test_data)
 

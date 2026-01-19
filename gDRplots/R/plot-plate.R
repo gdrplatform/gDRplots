@@ -18,32 +18,32 @@
 #' conc_series <- c(0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10)
 #' 
 #' test_data <- data.table::data.table(
-#'   WellColumn = sprintf("%02d", rep(1:12, each = 8)),
-#'   WellRow = rep(LETTERS[1:8], times = 12),
-#'   Barcode = rep(c("Plate_1", "Plate_2"), each = 48),
-#'   clid = "CellLineA"
+#'    WellColumn = sprintf("%02d", rep(1:12, each = 8)),
+#'    WellRow = rep(LETTERS[1:8], times = 12),
+#'    Barcode = rep(c("Plate_1", "Plate_2"), each = 48),
+#'    clid = "CellLineA"
 #' )
 #' 
-#' test_data[, Concentration := rep(rep(conc_series, length.out = 48), 2)]
-#' test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")]
-#' test_data[Gnumber == "vehicle", Concentration := 0]
+#' invisible(test_data[, Concentration := rep(rep(conc_series, length.out = 48), 2)])
+#' invisible(test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")])
+#' invisible(test_data[Gnumber == "vehicle", Concentration := 0])
 #' 
-#' test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
-#'                                    rnorm(.N, 1000, 50), 
-#'                                    rnorm(.N, 500, 100))]
+#' invisible(test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
+#'                                     rnorm(.N, 1000, 50), 
+#'                                     rnorm(.N, 500, 100))])
 #' library(ggtext)
 #' plots <- plot_plate_stack_info(test_data)
 #' plots[[1]]
 #' 
 #' combo_data <- data.table::copy(test_data)
-#' combo_data[, Barcode := "Plate_Combo"]
-#' combo_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)]
-#' combo_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")]
-#' combo_data[Gnumber_2 == "vehicle", Concentration_2 := 0]
+#' invisible(combo_data[, Barcode := "Plate_Combo"])
+#' invisible(combo_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)])
+#' invisible(combo_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")])
+#' invisible(combo_data[Gnumber_2 == "vehicle", Concentration_2 := 0])
 #' 
 #' combo_plots <- plot_plate_stack_info(combo_data)
 #' combo_plots[[1]]
-#' 
+#'
 plot_plate_stack_info <- function(dt_plate, 
                                   ctrl_fail_threshold = 0.6, 
                                   n_sd = 1,
@@ -102,30 +102,30 @@ plot_plate_stack_info <- function(dt_plate,
 #' conc_series <- c(0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10)
 #' 
 #' test_data <- data.table::data.table(
-#'   WellColumn = rep(1:12, each = 8),
-#'   WellRow = rep(LETTERS[1:8], times = 12),
-#'   clid = "CellLineA",
-#'   Barcode = "Plate_1"
+#'    WellColumn = rep(1:12, each = 8),
+#'    WellRow = rep(LETTERS[1:8], times = 12),
+#'    clid = "CellLineA",
+#'    Barcode = "Plate_1"
 #' )
 #' 
-#' test_data[, Concentration := rep(conc_series, length.out = .N)]
-#' test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")]
-#' test_data[Gnumber == "vehicle", Concentration := 0]
+#' invisible(test_data[, Concentration := rep(conc_series, length.out = .N)])
+#' invisible(test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")])
+#' invisible(test_data[Gnumber == "vehicle", Concentration := 0])
 #' 
-#' test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
-#'                                    rnorm(.N, 1000, 50), 
-#'                                    rnorm(.N, 1000 * (1 / (1 + Concentration)), 50))]
-#'                                    
+#' invisible(test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
+#'                                     rnorm(.N, 1000, 50), 
+#'                                     rnorm(.N, 1000 * (1 / (1 + Concentration)), 50))])
+#'                                      
 #' library(ggtext)
 #' plot_single_plate_stack_info(test_data)
 #' 
-#' test_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)]
-#' test_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")]
+#' invisible(test_data[, Concentration_2 := rep(rev(conc_series), length.out = .N)])
+#' invisible(test_data[, Gnumber_2 := ifelse(Concentration_2 == 0, "vehicle", "Drug_B")])
 #' 
-#' test_data[Gnumber_2 == "vehicle", Concentration_2 := 0]
+#' invisible(test_data[Gnumber_2 == "vehicle", Concentration_2 := 0])
 #' 
 #' plot_single_plate_stack_info(test_data)
-#' 
+#'
 plot_single_plate_stack_info <- function(dt_subset,
                                          plate_id = NULL,
                                          drug_color_mapping = NULL,
@@ -183,11 +183,11 @@ plot_single_plate_stack_info <- function(dt_subset,
   }
   
   dt_controls <- dt_subset[is_ctrl]
-  dt_treated  <- dt_subset[!is_ctrl]
+  dt_treated <- dt_subset[!is_ctrl]
   
   mean_ctrl <- mean(dt_controls$ReadoutValue, na.rm = TRUE)
-  sd_ctrl   <- sd(dt_controls$ReadoutValue, na.rm = TRUE)
-  qc_valid  <- is.finite(mean_ctrl)
+  sd_ctrl <- sd(dt_controls$ReadoutValue, na.rm = TRUE)
+  qc_valid <- is.finite(mean_ctrl)
   
   if (use_sd_threshold) {
     limit_desc <- paste0("Mean(Ctrl) + ", n_sd, "*SD")
@@ -212,8 +212,8 @@ plot_single_plate_stack_info <- function(dt_subset,
     bad_ctrl_rows <- dt_controls[ReadoutValue < low_limit_value]
     suspicious_treated <- dt_treated[ReadoutValue > limit_value]
     
-    count_low <- nrow(bad_ctrl_rows)
-    count_high <- nrow(suspicious_treated)
+    count_low <- NROW(bad_ctrl_rows)
+    count_high <- NROW(suspicious_treated)
   } else {
     count_low <- 0
     count_high <- 0

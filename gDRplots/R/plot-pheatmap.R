@@ -1382,6 +1382,7 @@ pheatmap_with_anno_combo <- function(
 #'   \item \code{heatmap} the \code{pheatmap} object.
 #' }
 #' @keywords pheat_ann
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' @export
 pheatmap_with_anno_combo_metrics <- function(
     dt_metrics,
@@ -1485,7 +1486,7 @@ pheatmap_with_anno_combo_metrics <- function(
   keep_c <- colSums(!is.na(mat_cvd)) > 0
   mat_cvd <- mat_cvd[keep_r, keep_c, drop = FALSE]
   
-  if (nrow(mat_cvd) == 0 || ncol(mat_cvd) == 0) {
+  if (NROW(mat_cvd) == 0 || NCOL(mat_cvd) == 0) {
     warning("Resulting matrix is empty after filtering/NA removal.")
     return(list(data = list(matrix = NULL), heatmap = NULL))
   }
@@ -1554,45 +1555,6 @@ pheatmap_with_anno_combo_metrics <- function(
     names(base_drug_colors) <- all_fixed_drugs
   } else {
     base_drug_colors <- character(0)
-  }
-
-  .get_gradient_colors <- function(col_names, col_concs, col_labels, base_map) {
-    
-    unique_drugs <- setdiff(unique(col_names), untreated_tag)
-    if (length(unique_drugs) == 0) {
-      return(character(0))
-    }
-    
-    final_colors <- c()
-    if (untreated_tag %in% col_labels) {
-      final_colors[untreated_tag] <- "#E0E0E0"
-    }
-    
-    dt_tmp <- data.table::data.table(name = col_names, conc = col_concs, label = col_labels)
-    dt_tmp <- unique(dt_tmp[name %in% unique_drugs])
-    
-    for (drug in unique_drugs) {
-      dt_drug <- dt_tmp[name == drug][order(suppressWarnings(as.numeric(conc)))]
-      if (nrow(dt_drug) == 0) {
-        next
-      }
-      
-      drug_labels <- dt_drug$label
-      n_steps <- length(drug_labels)
-      
-      base_col <- base_map[drug]
-      
-      grad_pal <- grDevices::colorRampPalette(c("#F5F5F5", base_col))(n_steps + 2)
-      grad_pal <- grad_pal[-(1:2)] 
-      
-      if (length(grad_pal) < n_steps) {
-        grad_pal <- rep(base_col, n_steps)
-      }
-      
-      names(grad_pal) <- drug_labels
-      final_colors <- c(final_colors, grad_pal)
-    }
-    return(final_colors)
   }
   
   if ("Fixed_Drug" %in% names(anno_df)) {
@@ -1670,7 +1632,10 @@ pheatmap_with_anno_combo_metrics <- function(
   
   breaks <- seq(min_val, max_val, length.out = no_breaks + 1)
   
-  hm_colors <- if (is.null(colors_vec)) {
+  
+  hm_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec,
+                                                      is_valid_color,
+                                                      logical(1)))) {
     .get_smooth_palette(no_breaks)
   } else {
     grDevices::colorRampPalette(colors_vec)(no_breaks)
@@ -2346,4 +2311,83 @@ fill_ann_color_map <- function(dt_ann,
     # final trimmed
     trimed_vec_lbl
   }
+}
+
+#' Generate Gradient Colors for Dose Legends
+#'
+#' Internal helper to create a named vector of colors. Each drug is assigned a base color,
+#' and individual concentrations are assigned a gradient intensity of that color.
+#'
+#' @param col_names \code{character} vector of drug names corresponding to the data rows.
+#' @param col_concs \code{numeric} or \code{character} vector of concentrations.
+#' @param col_labels \code{character} vector of labels to be used as names for the returned colors (e.g., "Drug 0.5").
+#' @param base_map \code{character} named vector mapping drug names to their base (darkest) color.
+#' @param untreated_tag \code{character} vector of identifiers for untreated/vehicle controls. 
+#' Defaults to \code{gDRutils::get_env_identifiers("untreated_tag")}.
+#'
+#' @return A named \code{character} vector of hex color codes.
+#' @keywords internal
+.get_gradient_colors <- function(col_names, 
+                                 col_concs, 
+                                 col_labels, 
+                                 base_map, 
+                                 untreated_tag = gDRutils::get_env_identifiers("untreated_tag")) {
+  
+  checkmate::assert_character(col_names)
+  checkmate::assert_atomic_vector(col_concs)
+  checkmate::assert_character(col_labels)
+  checkmate::assert_character(base_map, names = "named")
+  checkmate::assert_character(untreated_tag)
+  
+  if (!all(lengths(list(col_names, col_concs, col_labels)) == length(col_names))) {
+    stop("Input vectors (names, concs, labels) must have the same length.")
+  }
+  
+  unique_drugs <- setdiff(unique(col_names), untreated_tag)
+  
+  if (length(unique_drugs) > 0) {
+    if (!all(unique_drugs %in% names(base_map))) {
+      missing_drugs <- setdiff(unique_drugs, names(base_map))
+      stop(paste("Missing colors in base_map for:", paste(missing_drugs, collapse = ", ")))
+    }
+  }
+  
+  final_colors <- c()
+  
+  present_untrt_labels <- intersect(col_labels, untreated_tag)
+  if (length(present_untrt_labels) > 0) {
+    final_colors[present_untrt_labels] <- "#E0E0E0"
+  }
+  
+  if (length(unique_drugs) == 0) {
+    return(final_colors)
+  }
+  
+  dt_tmp <- data.table::data.table(name = col_names, conc = col_concs, label = col_labels)
+  dt_tmp <- unique(dt_tmp[name %in% unique_drugs])
+  
+  for (drug in unique_drugs) {
+    dt_drug <- dt_tmp[name == drug][order(suppressWarnings(as.numeric(conc)))]
+    
+    if (nrow(dt_drug) == 0) {
+      next
+    }
+    
+    drug_labels <- dt_drug$label
+    n_steps <- length(drug_labels)
+    
+    base_col <- base_map[drug]
+    
+    grad_pal <- grDevices::colorRampPalette(c("#F5F5F5", base_col))(n_steps + 2)
+    grad_pal <- grad_pal[-(1:2)] 
+    
+    if (length(grad_pal) < n_steps) {
+      grad_pal <- rep(base_col, n_steps)
+    }
+    
+    names(grad_pal) <- drug_labels
+    final_colors <- c(final_colors, grad_pal)
+  }
+  
+  return(final_colors)
 }

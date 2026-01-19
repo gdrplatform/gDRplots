@@ -139,4 +139,7 @@ hm_4 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_4[["gtable"]])
 
 }
+\author{
+Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+}
 \keyword{pheat_ann}

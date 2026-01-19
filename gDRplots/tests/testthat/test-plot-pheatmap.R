@@ -1992,3 +1992,22 @@ test_that(".trim_labels works as expected", {
                             max_lbl_length = "100"),
                "Assertion on 'max_lbl_length' failed: Must be of type 'number'")
 })
+
+test_that(".get_gradient_colors works as expected", {
+  res <- .get_gradient_colors(
+    col_names = c("DrugA", "DrugA", "untreated"),
+    col_concs = c(0.1, 10.0, 0),
+    col_labels = c("Low", "High", "untreated"),
+    base_map = c("DrugA" = "red")
+  )
+  
+  expect_equal(unname(res["untreated"]), "#E0E0E0")
+  
+  expect_equal(unname(res["High"]), "#FF0000")
+  expect_true(res["Low"] != "#FF0000")
+  
+  expect_error(
+    .get_gradient_colors("A", c(1, 2), "Label", c("A" = "#FF0000")),
+    "must have the same length"
+  )
+})
