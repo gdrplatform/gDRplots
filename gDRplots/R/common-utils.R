@@ -157,7 +157,7 @@ create_log_seq <- function(start, end, length) {
 #' vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000, 
 #'          0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000) 
 #' 
-#' round_to_unique_string(num_vec)
+#' round_to_unique_string(vec)
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
