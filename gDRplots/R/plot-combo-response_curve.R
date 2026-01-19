@@ -102,7 +102,7 @@ plot_dose_response_combo <- function(dt_average,
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),
-                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
+                             labels = round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
@@ -211,7 +211,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   checkmate::assert_character(d_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
-
+  
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
@@ -244,7 +244,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),
-                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
+                             labels = round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])

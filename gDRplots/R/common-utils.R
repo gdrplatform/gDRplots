@@ -43,7 +43,6 @@
 #' @author Alboukadel Kassambara \email{alboukadel.kassambara@@gmail.com}
 #'
 #' @export
-#'
 compute_distances <- function(x, 
                               method = "spearman", 
                               use = "pairwise.complete.obs", 
@@ -131,7 +130,7 @@ compute_distances <- function(x,
 #'
 #' @export 
 create_log_seq <- function(start, end, length) {
-
+  
   checkmate::assert_number(start, lower = 0, finite = TRUE)
   checkmate::assert_number(end, lower = 0, finite = TRUE)
   checkmate::assert_number(length, lower = 1, finite = TRUE)
@@ -151,20 +150,20 @@ create_log_seq <- function(start, end, length) {
 #' @param num_vec a numeric vector to be rounded and change into character
 #' @param initial_digits numeric value for number of decimal places to start rounding with
 #'
+#' @keywords utils
 #' @returns a character vector of unique numeric strings.
+#' 
 #' @examples
-#' \dontrun{
 #' vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000, 
 #'          0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000) 
 #' 
-#' .round_to_unique_string(num_vec)
-#' }
+#' round_to_unique_string(num_vec)
 #' 
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #' 
-#' @keywords internal
-.round_to_unique_string <- function(num_vec,
-                                    initial_digits = 4) {
+#' @export
+round_to_unique_string <- function(num_vec,
+                                   initial_digits = 4) {
   
   checkmate::assert_numeric(num_vec, any.missing = FALSE)
   checkmate::assert_integerish(initial_digits, lower = 1)
