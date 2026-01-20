@@ -60,6 +60,20 @@ test_that("plot_dose_response_combo works as expected", {
   expect_true(NROW(plt_5[["facet"]][["params"]]) > 0) # plot is faceted
   expect_true(grepl("conc_2", names(plt_5[["facet"]][["params"]][["facets"]])))
   
+  sel_conc <- c(0, 0.1, 1.0)
+  sel_colors <- c("#00008B", "#FF8C00", "#008B8B")
+  dt_average_conc <- dt_average[Concentration_2 %in% sel_conc]
+  plt_6 <- plot_dose_response_combo(dt_average = dt_average_conc,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name,
+                                    normalization_type = normalization_type,
+                                    colors_vec = sel_colors)
+  expect_is(plt_6, "gg")
+  expect_equal(plt_6[["labels"]][["y"]], "RV")
+  expect_equal(as.numeric(names(plt_6[["plot_env"]][["colormap"]])), sel_conc)
+  expect_equal(unname(plt_6[["plot_env"]][["colormap"]]), sel_colors)
+  
   expect_error(plot_dose_response_combo(dt_average = unlist(dt_average),
                                         drug1_name = drug1_name,
                                         drug2_name = drug2_name,
@@ -158,7 +172,7 @@ test_that("plot_dose_response_combo_panel works as expected", {
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], "GR")
   expect_true(all(plt_4[["plot_env"]][["colormap"]] ==
-               .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
+                    .get_combo_curves_colors(as.factor(unique(dt_average[["Concentration_2"]])))
   )) # default colors when invalid `colors_vec`
   
   plt_5 <- plot_dose_response_combo_panel(dt_average = dt_average,
