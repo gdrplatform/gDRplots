@@ -1279,6 +1279,104 @@ test_that("prep_pheatmap_matrix works as expected", {
                "Assertion on 'experiment_type' failed: Must be element of set")
 })
 
+test_that("pheatmap_with_anno_combo_metrics works as expected", {
+  # --- Standard Combo (Double) ---
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
+  
+  out_1 <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_metrics)$result
+  
+  expect_length(out_1, 2)
+  expect_equal(names(out_1), c("data", "heatmap"))
+  
+  data_1 <- out_1[["data"]]
+  expect_is(data_1[["matrix"]], "data.table")
+  expect_true("Treatment_Key" %in% names(data_1[["matrix"]]))
+  
+  expected_cols <- c("Treatment_Key", unique(dt_metrics$CellLineName))
+  expect_true(all(expected_cols %in% names(data_1[["matrix"]])))
+  
+  anno_row_1 <- out_1[["data"]][["annotation_row"]]
+  expect_is(anno_row_1, "data.frame")
+  expect_true("Fixed_Drug" %in% names(anno_row_1))
+  
+  dt_xc50 <- data.table::copy(dt_metrics)
+  dt_xc50[, xc50 := 0.5]
+  
+  out_xc50 <- pheatmap_with_anno_combo_metrics(
+    dt_metrics = dt_xc50, 
+    metric = "xc50", 
+    normalization_type = "GR"
+  )
+  
+  res_dt <- out_xc50[["data"]][["matrix"]]
+  cl_col <- names(res_dt)[2] 
+  val_raw <- res_dt[[cl_col]][1]
+  
+  expect_equal(val_raw, 0.5) 
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  drug_A <- unique(dt_metrics$DrugName)[1]
+  drug_B <- unique(dt_metrics$DrugName_2)[1]
+  
+  dt_sort <- dt_metrics[DrugName == drug_A & DrugName_2 == drug_B]
+  
+  dt_sort[1, `:=`(cotrt_value = 0, DrugName_2 = untreated_tag)] 
+  dt_sort[2, cotrt_value := 0.001]
+  dt_sort[3, cotrt_value := 1.0]
+  
+  out_sort <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_sort,
+                                                               cluster_rows = FALSE)$result
+  
+  sorted_keys <- out_sort[["data"]][["matrix"]]$Treatment_Key
+  
+  idx_untreated <- grep(paste0(untreated_tag, "__", untreated_tag), sorted_keys)
+  idx_low_conc  <- grep("0.0010", sorted_keys)
+  idx_high_conc <- grep("1.0000", sorted_keys)
+  
+  expect_true(idx_untreated < idx_low_conc)
+  expect_true(idx_low_conc < idx_high_conc)
+  
+  expect_error(
+    pheatmap_with_anno_combo_metrics(dt_metrics = "not_a_dt"),
+    "Assertion on 'dt_metrics' failed: Must be a data.table"
+  )
+  
+  dt_bad <- data.table::copy(dt_metrics)
+  dt_bad[, cotrt_value := NULL]
+  expect_error(
+    pheatmap_with_anno_combo_metrics(dt_metrics = dt_bad),
+    "Names must include the elements"
+  )
+  
+  # --- Triple Combo Support ---
+  mae_triple <- gDRutils::get_synthetic_data("combo_triple")
+  se_triple <- mae_triple[[gDRutils::get_supported_experiments("combo")]]
+  
+  dt_triple <- gDRutils::convert_se_assay_to_dt(se = se_triple, 
+                                                assay_name = "Metrics", 
+                                                merge_additional_variables = TRUE)
+  
+  out_triple <- purrr::quietly(pheatmap_with_anno_combo_metrics)(
+    dt_metrics = dt_triple,
+    normalization_type = "RV",
+    metric = "x_mean"
+  )$result
+  
+  expect_length(out_triple, 2)
+  expect_is(out_triple[["data"]][["matrix"]], "data.table")
+  
+  anno_row_triple <- out_triple[["data"]][["annotation_row"]]
+  expect_is(anno_row_triple, "data.frame")
+  expect_true("Fixed_Drug" %in% names(anno_row_triple))
+  expect_true("Fixed_Drug_2" %in% names(anno_row_triple))
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  real_labels <- anno_row_triple$Fixed_Drug_2[anno_row_triple$Fixed_Drug_2 != untreated_tag]
+  expect_gt(length(real_labels), 0)
+})
+
 test_that("change_NA_into_char works", {
   test_vec <- list(11, " ", NA, "A", NULL)
   
@@ -1893,4 +1991,23 @@ test_that(".trim_labels works as expected", {
   expect_error(.trim_labels(lbls_vec = ls_lbls,
                             max_lbl_length = "100"),
                "Assertion on 'max_lbl_length' failed: Must be of type 'number'")
+})
+
+test_that(".get_gradient_colors works as expected", {
+  res <- .get_gradient_colors(
+    col_names = c("DrugA", "DrugA", "untreated"),
+    col_concs = c(0.1, 10.0, 0),
+    col_labels = c("Low", "High", "untreated"),
+    base_map = c("DrugA" = "red")
+  )
+  
+  expect_equal(unname(res["untreated"]), "#E0E0E0")
+  
+  expect_equal(unname(res["High"]), "#FF0000")
+  expect_true(res["Low"] != "#FF0000")
+  
+  expect_error(
+    .get_gradient_colors("A", c(1, 2), "Label", c("A" = "#FF0000")),
+    "must have the same length"
+  )
 })
