@@ -1313,6 +1313,363 @@ pheatmap_with_anno_combo <- function(
   return(ls_output)
 }
 
+#' Plot heatmap with annotations for combo metrics data
+#'
+#' Plots a heatmap for metrics data (e.g., "xc50", "x_inf") covering both Single Agents and Combinations.
+#' Rows are sorted alphabetically by the primary drug, prioritizing Single Agent conditions first,
+#' followed by combinations sorted by co-treatment name and concentration.
+#'
+#' @inheritParams pheatmap_with_anno_sa
+#' @param dt_metrics \code{data.table} representing data from the \code{metrics} assay,
+#'    outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}.
+#'    Must contain \code{DrugName}, \code{DrugName_2}, \code{cotrt_value}, and \code{CellLineName}.
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#' 
+#' output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
+#'                                            normalization_type = "RV",
+#'                                            metric = "x_mean")
+#' hm_1 <- output[["heatmap"]]
+#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' 
+#' annotation_manual <- data.table::data.table(
+#'   CellLineName =
+#'     c("cellline_AA", "cellline_GB", "cellline_HB"),
+#'   mut_A = c(0, 1, 1),
+#'   mut_B = c("yes", "yes", "no")
+#' )
+#' annotation_map <- list(
+#'   mut_A = c("1" = "coral", "0" = "cadetblue"),
+#'   mut_B = c("yes" = "black", "no" = "grey90")
+#' )
+#' 
+#' output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
+#'                                            metric = "ec50",
+#'                                            normalization_type = "GR",
+#'                                            annotation_col = annotation_manual,
+#'                                            annotation_colors = annotation_map,
+#'                                            hm_title = get_hm_title(
+#'                                              normalization_type = "GR",
+#'                                              metric = "EC50 for combo data ",
+#'                                              dataset_name = "Combo data"))
+#' 
+#' 
+#' 
+#' mae <- gDRutils::get_synthetic_data("combo_triple")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics",
+#'                                                merge_additional_variables = TRUE)
+#' 
+#' output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
+#'                                            normalization_type = "RV",
+#'                                            metric = "x_mean")
+#' hm_4 <- output[["heatmap"]]
+#' ggpubr::as_ggplot(hm_4[["gtable"]])
+#'
+#' @return A named list with elements:
+#' \itemize{
+#'   \item \code{data} a list containing the information visualized in the heatmap:
+#'     \itemize{
+#'       \item \code{matrix} data shown in the heatmap for the selected metric.
+#'       \item \code{annotation_row} a table with row annotations (auto-generated).
+#'       \item \code{annotation_col} a table with column annotations, if provided.
+#'     }
+#'   \item \code{heatmap} the \code{pheatmap} object.
+#' }
+#' @keywords pheat_ann
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @export
+pheatmap_with_anno_combo_metrics <- function(
+    dt_metrics,
+    dt_metrics_capped = NULL,
+    normalization_type = "GR",
+    metric = "x_mean",
+    fit_source = "gDR",
+    hm_title = NA,
+    colors_vec = NULL,
+    no_breaks = 50,
+    cluster_rows = FALSE,
+    cluster_cols = TRUE,
+    distfun = compute_distances,
+    annotation_col = NULL,
+    annotation_colors = NULL,
+    max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+                                                         system.file(package = "gDRplots", "settings.json"))
+) {
+  
+  untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
+  drug_name_id  <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_id2 <- gDRutils::get_env_identifiers("drug_name2")
+  cellline_name_id <- gDRutils::get_env_identifiers("cellline_name")
+  
+  conc3 <- gDRutils::get_env_identifiers("concentration3")
+  drug3 <- gDRutils::get_env_identifiers("drug3")
+  drug_name_id3 <- gDRutils::get_env_identifiers("drug_name3")
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_data_table(dt_metrics_capped, null.ok = TRUE)
+  
+  dt_to_use <- if (!is.null(dt_metrics_capped)) {
+    dt_metrics_capped
+    } else {
+      dt_metrics
+    }
+  
+  req_cols <- c(drug_name_id, drug_name_id2, "cotrt_value", cellline_name_id, 
+                "normalization_type", "fit_source", "dilution_drug")
+  checkmate::assert_names(names(dt_to_use), must.include = req_cols)
+  
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_sub <- dt_to_use[eval(filter_expr)]
+  
+  dt_sub <- dt_sub[dilution_drug != "codilution"]
+  
+  checkmate::assert_data_table(dt_sub, min.rows = 1, .var.name = "dt_sub (filtered data)")
+  dt_sub <- data.table::copy(dt_sub)
+  
+  pattern <- paste0("\\s*\\([^)]*(", drug3, "|", conc3, ")[^)]*\\)")
+  dt_sub[, (drug_name_id) := trimws(gsub(pattern, "", get(drug_name_id)))]  
+  dt_sub[is.na(cotrt_value), cotrt_value := 0]
+  
+  dt_sub[, `:=`(
+    Row_Display_Name = get(drug_name_id),
+    Fixed_Name_1     = get(drug_name_id2),
+    Fixed_Conc_1     = as.numeric(cotrt_value),
+    Fixed_Name_2     = untreated_tag,
+    Fixed_Conc_2     = 0
+  )]
+  
+  dt_sub[Fixed_Conc_1 == 0, Fixed_Name_1 := untreated_tag]
+  
+  if (drug_name_id3 %in% names(dt_sub) && conc3 %in% names(dt_sub)) {
+    dt_sub[is.na(get(conc3)), (conc3) := 0]
+    dt_sub[get(conc3) > 0, `:=`(
+      Fixed_Name_2 = get(drug_name_id3),
+      Fixed_Conc_2 = as.numeric(get(conc3))
+    )]
+  }
+  
+  dt_sub[, Fixed_Conc_1 := .round_to_unique_string(Fixed_Conc_1)]
+  dt_sub[, Fixed_Conc_2 := .round_to_unique_string(Fixed_Conc_2)]
+  
+  dt_sub[, Fixed_Label_1 := ifelse(Fixed_Name_1 == untreated_tag, untreated_tag, 
+                                   paste0(Fixed_Name_1, " (", Fixed_Conc_1, ")"))]
+  
+  dt_sub[, Fixed_Label_2 := ifelse(Fixed_Name_2 == untreated_tag, untreated_tag, 
+                                   paste0(Fixed_Name_2, " (", Fixed_Conc_2, ")"))]
+  
+  dt_sub[, Treatment_Key := paste(Row_Display_Name, Fixed_Label_1, Fixed_Label_2, sep = "__")]
+  
+  
+  fm_string <- paste("Treatment_Key ~", cellline_name_id)
+  
+  tryCatch({
+    mat_dt <- data.table::dcast(dt_sub, 
+                                stats::as.formula(fm_string), 
+                                value.var = metric, 
+                                fun.aggregate = mean, 
+                                na.rm = TRUE)
+  }, error = function(e) {
+    .stop_on_aggregation(paste("pheatmap_with_anno_combo_metrics", e$message), fm_string)
+  })
+  
+  mat_cvd <- as.matrix(mat_dt[, -1, with = FALSE])
+  rownames(mat_cvd) <- mat_dt[[1]]
+  
+  keep_r <- rowSums(!is.na(mat_cvd)) > 0
+  keep_c <- colSums(!is.na(mat_cvd)) > 0
+  mat_cvd <- mat_cvd[keep_r, keep_c, drop = FALSE]
+  
+  if (NROW(mat_cvd) == 0 || NCOL(mat_cvd) == 0) {
+    warning("Resulting matrix is empty after filtering/NA removal.")
+    return(list(data = list(matrix = NULL), heatmap = NULL))
+  }
+  
+  mat_cvd_raw <- mat_cvd # Keep raw values for export
+  
+  if (metric == "xc50") {
+    mat_cvd <- log10(mat_cvd)
+  }
+  
+  ls_output <- list(data = list(matrix = NULL, annotation_col = NULL, annotation_row = NULL), heatmap = NULL)
+  
+  if (!is.null(annotation_col)) {
+    annotation_col <- .fill_pheatmap_annotation(annotation_col, t(mat_cvd), cellline_name_id)
+    ls_output[["data"]][["annotation_col"]] <- annotation_col
+    
+    rownames(annotation_col) <- annotation_col[[cellline_name_id]]
+    annotation_col <- annotation_col[, .SD, .SDcol = -cellline_name_id]
+    
+    mat_cvd <- mat_cvd[, rownames(annotation_col), drop = FALSE]
+    mat_cvd_raw <- mat_cvd_raw[, rownames(annotation_col), drop = FALSE]
+  }
+  
+  row_meta <- unique(dt_sub[Treatment_Key %in% rownames(mat_cvd), 
+                            .(Treatment_Key, Row_Display_Name, 
+                              Fixed_Label_1, Fixed_Label_2,
+                              Fixed_Name_1, Fixed_Conc_1, 
+                              Fixed_Name_2, Fixed_Conc_2)])
+  
+  ord <- order(
+    row_meta$Row_Display_Name,
+    row_meta$Fixed_Name_1 != untreated_tag,
+    row_meta$Fixed_Name_1,
+    suppressWarnings(as.numeric(row_meta$Fixed_Conc_1)),
+    row_meta$Fixed_Name_2 != untreated_tag, 
+    row_meta$Fixed_Name_2,
+    suppressWarnings(as.numeric(row_meta$Fixed_Conc_2))
+  )
+  row_meta <- row_meta[ord, ]
+  
+  mat_cvd <- mat_cvd[row_meta$Treatment_Key, , drop = FALSE]
+  mat_cvd_raw <- mat_cvd_raw[row_meta$Treatment_Key, , drop = FALSE]
+  
+  anno_df <- data.frame(Fixed_Drug = row_meta$Fixed_Label_1, stringsAsFactors = FALSE)
+  if (any(row_meta$Fixed_Label_2 != untreated_tag)) {
+    anno_df$Fixed_Drug_2 <- row_meta$Fixed_Label_2
+  }
+  rownames(anno_df) <- row_meta$Treatment_Key
+  ls_output[["data"]][["annotation_row"]] <- anno_df
+  
+  if (is.null(annotation_colors)) {
+    annotation_colors <- list()
+  }
+  if (!is.null(annotation_col)) {
+    annotation_colors <- fill_ann_color_map(ls_output[["data"]][["annotation_col"]], annotation_colors)
+  }
+  
+  all_fixed_drugs <- unique(row_meta$Fixed_Name_1)
+  if ("Fixed_Name_2" %in% names(row_meta)) {
+    all_fixed_drugs <- unique(c(all_fixed_drugs, row_meta$Fixed_Name_2))
+  }
+  all_fixed_drugs <- setdiff(all_fixed_drugs, untreated_tag)
+  
+  if (length(all_fixed_drugs) > 0) {
+    base_drug_colors <- get_qual_colors(length(all_fixed_drugs))
+    names(base_drug_colors) <- all_fixed_drugs
+  } else {
+    base_drug_colors <- character(0)
+  }
+  
+  if ("Fixed_Drug" %in% names(anno_df)) {
+    colors_1 <- .get_gradient_colors(
+      col_names  = row_meta$Fixed_Name_1,
+      col_concs  = row_meta$Fixed_Conc_1,
+      col_labels = row_meta$Fixed_Label_1,
+      base_map   = base_drug_colors
+    )
+    if (length(colors_1) > 0) {
+      annotation_colors[["Fixed_Drug"]] <- colors_1
+    }
+  }
+  
+  if ("Fixed_Drug_2" %in% names(anno_df)) {
+    colors_2 <- .get_gradient_colors(
+      col_names  = row_meta$Fixed_Name_2,
+      col_concs  = row_meta$Fixed_Conc_2,
+      col_labels = row_meta$Fixed_Label_2,
+      base_map   = base_drug_colors
+    )
+    if (length(colors_2) > 0) {
+      annotation_colors[["Fixed_Drug_2"]] <- colors_2
+    }
+  }
+  
+  row_labels_display <- row_meta$Row_Display_Name
+  
+  if (is.finite(max_hm_lbl_length)) {
+    if (any(nchar(colnames(mat_cvd)) > max_hm_lbl_length)) {
+      colnames(mat_cvd) <- .trim_labels(colnames(mat_cvd), max_hm_lbl_length)
+    }
+    if (any(nchar(row_labels_display) > max_hm_lbl_length)) {
+      row_labels_display <- .trim_labels(row_labels_display, max_hm_lbl_length)
+    }
+  }
+  
+  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
+                                              system.file(package = "gDRplots", "settings.json"))
+  can_cluster <- any(dim(mat_cvd) < max_dim)
+  
+  cl_rows <- if (cluster_rows) {
+    .get_pheatmap_cluster_param(mat_cvd, distfun, can_cluster)
+    } else {
+      FALSE
+    }
+  cl_cols <- if (cluster_cols) {
+    .get_pheatmap_cluster_param(t(mat_cvd), distfun, can_cluster) 
+    } else {
+      FALSE
+    }
+  
+  valid_vals <- mat_cvd[!is.infinite(mat_cvd)]
+  min_val <- if (length(valid_vals) > 0) {
+    min(valid_vals, na.rm = TRUE)
+    } else {
+      0
+    }
+  max_val <- if (length(valid_vals) > 0) {
+    max(valid_vals, na.rm = TRUE)
+    } else {
+      0
+    }
+  
+  if (min_val == max_val) {
+    max_val <- max_val + 0.1
+    min_val <- min_val - 0.1
+  }
+  if (is.infinite(min_val)) {
+    min_val <- 0
+  }
+  if (is.infinite(max_val)) {
+    max_val <- 0
+  }
+  
+  breaks <- seq(min_val, max_val, length.out = no_breaks + 1)
+  
+  
+  hm_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec,
+                                                      is_valid_color,
+                                                      logical(1)))) {
+    .get_smooth_palette(no_breaks)
+  } else {
+    grDevices::colorRampPalette(colors_vec)(no_breaks)
+  }
+  
+  ls_output[["data"]][["matrix"]] <- data.table::as.data.table(mat_cvd_raw, keep.rownames = "Treatment_Key")
+  
+  if (is.na(hm_title)) hm_title <- paste0("Combination Metrics: ", metric)
+  
+  ls_output[["heatmap"]] <- pheatmap::pheatmap(
+    mat = mat_cvd,
+    scale = "none",
+    display_numbers = !any(dim(mat_cvd) > c(15, 15)),
+    color = hm_colors,
+    breaks = breaks,
+    border_color = "lightgrey",
+    angle_col = 90,
+    main = hm_title,
+    fontsize = 8,
+    fontsize_col = .get_pheatmap_fontsize(mat_cvd, "col"),
+    fontsize_row = .get_pheatmap_fontsize(mat_cvd, "row"),
+    na_col = "darkgray",
+    cluster_rows = cl_rows,
+    cluster_cols = cl_cols,
+    annotation_row = anno_df,
+    annotation_col = annotation_col,
+    annotation_colors = annotation_colors,
+    labels_row = row_labels_display,
+    silent = TRUE
+  )
+  
+  return(ls_output)
+}
+
 
 # helpers ----
 #' Get Legend Title
@@ -1954,4 +2311,83 @@ fill_ann_color_map <- function(dt_ann,
     # final trimmed
     trimed_vec_lbl
   }
+}
+
+#' Generate Gradient Colors for Dose Legends
+#'
+#' Internal helper to create a named vector of colors. Each drug is assigned a base color,
+#' and individual concentrations are assigned a gradient intensity of that color.
+#'
+#' @param col_names \code{character} vector of drug names corresponding to the data rows.
+#' @param col_concs \code{numeric} or \code{character} vector of concentrations.
+#' @param col_labels \code{character} vector of labels to be used as names for the returned colors (e.g., "Drug 0.5").
+#' @param base_map \code{character} named vector mapping drug names to their base (darkest) color.
+#' @param untreated_tag \code{character} vector of identifiers for untreated/vehicle controls. 
+#' Defaults to \code{gDRutils::get_env_identifiers("untreated_tag")}.
+#'
+#' @return A named \code{character} vector of hex color codes.
+#' @keywords internal
+.get_gradient_colors <- function(col_names, 
+                                 col_concs, 
+                                 col_labels, 
+                                 base_map, 
+                                 untreated_tag = gDRutils::get_env_identifiers("untreated_tag")) {
+  
+  checkmate::assert_character(col_names)
+  checkmate::assert_atomic_vector(col_concs)
+  checkmate::assert_character(col_labels)
+  checkmate::assert_character(base_map, names = "named")
+  checkmate::assert_character(untreated_tag)
+  
+  if (!all(lengths(list(col_names, col_concs, col_labels)) == length(col_names))) {
+    stop("Input vectors (names, concs, labels) must have the same length.")
+  }
+  
+  unique_drugs <- setdiff(unique(col_names), untreated_tag)
+  
+  if (length(unique_drugs) > 0) {
+    if (!all(unique_drugs %in% names(base_map))) {
+      missing_drugs <- setdiff(unique_drugs, names(base_map))
+      stop(paste("Missing colors in base_map for:", paste(missing_drugs, collapse = ", ")))
+    }
+  }
+  
+  final_colors <- c()
+  
+  present_untrt_labels <- intersect(col_labels, untreated_tag)
+  if (length(present_untrt_labels) > 0) {
+    final_colors[present_untrt_labels] <- "#E0E0E0"
+  }
+  
+  if (length(unique_drugs) == 0) {
+    return(final_colors)
+  }
+  
+  dt_tmp <- data.table::data.table(name = col_names, conc = col_concs, label = col_labels)
+  dt_tmp <- unique(dt_tmp[name %in% unique_drugs])
+  
+  for (drug in unique_drugs) {
+    dt_drug <- dt_tmp[name == drug][order(suppressWarnings(as.numeric(conc)))]
+    
+    if (nrow(dt_drug) == 0) {
+      next
+    }
+    
+    drug_labels <- dt_drug$label
+    n_steps <- length(drug_labels)
+    
+    base_col <- base_map[drug]
+    
+    grad_pal <- grDevices::colorRampPalette(c("#F5F5F5", base_col))(n_steps + 2)
+    grad_pal <- grad_pal[-(1:2)] 
+    
+    if (length(grad_pal) < n_steps) {
+      grad_pal <- rep(base_col, n_steps)
+    }
+    
+    names(grad_pal) <- drug_labels
+    final_colors <- c(final_colors, grad_pal)
+  }
+  
+  return(final_colors)
 }

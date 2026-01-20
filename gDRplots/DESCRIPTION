@@ -1,7 +1,7 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.98
-Date: 2026-01-02
+Version: 0.0.99
+Date: 2026-01-13
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
              person("Janina", "Smola", role = "aut"),
@@ -19,6 +19,7 @@ Imports:
     fgsea,
     ggplot2 (>= 4.0.0),
     ggrepel,
+    ggtext,
     gDRutils (>= 1.6.0),
     pheatmap,
     RColorBrewer,
