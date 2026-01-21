@@ -1456,8 +1456,8 @@ pheatmap_with_anno_combo_metrics <- function(
     )]
   }
   
-  dt_sub[, Fixed_Conc_1 := .round_to_unique_string(Fixed_Conc_1)]
-  dt_sub[, Fixed_Conc_2 := .round_to_unique_string(Fixed_Conc_2)]
+  dt_sub[, Fixed_Conc_1 := round_to_unique_string(Fixed_Conc_1)]
+  dt_sub[, Fixed_Conc_2 := round_to_unique_string(Fixed_Conc_2)]
   
   dt_sub[, Fixed_Label_1 := ifelse(Fixed_Name_1 == untreated_tag, untreated_tag, 
                                    paste0(Fixed_Name_1, " (", Fixed_Conc_1, ")"))]
