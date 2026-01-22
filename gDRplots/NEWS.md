@@ -1,3 +1,6 @@
+## gDRplots 0.0.100 - 2026-01-19
+* update `pheatmap_qc` (change standardized concentrations into unique strings)
+
 ## gDRplots 0.0.99 - 2026-01-13
 * improve QC plots for plate
 * add heatmaps for combo metrics data

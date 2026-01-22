@@ -102,7 +102,7 @@ plot_dose_response_combo <- function(dt_average,
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),
-                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
+                             labels = round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
@@ -112,10 +112,10 @@ plot_dose_response_combo <- function(dt_average,
   ls_conc_2 <- unique(dt_avg[[conc_2]])
   if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     colormap <- .get_combo_curves_colors(ls_conc_2)
-  } else if (NROW(colors_vec) != NROW(ls_conc_2)) {
+  } else {
     colormap <- grDevices::colorRampPalette(colors_vec)(NROW(ls_conc_2))
     names(colormap) <- levels(ls_conc_2)
-  }
+  } 
   
   # set min and max values for y
   ymin <- min(c(0, min(dt_avg$x)))
@@ -211,7 +211,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   checkmate::assert_character(d_names, null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
-
+  
   
   available_drugs <- unique(dt_average[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
@@ -244,7 +244,7 @@ plot_dose_response_combo_panel <- function(dt_average,
   
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),
-                             labels = .round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
+                             labels = round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
   
   # handle conc = 0
   min_conc <- min(dt_avg[dt_avg[[conc]] > 0, ][[conc]])
