@@ -377,6 +377,212 @@ plot_boxplot_metric_sa_by_drugs <- function(
   return(plt)
 }
 
+#' Plot box plots for metric for single-agent data grouped by selected variable
+#' 
+#' @inheritParams plot_boxplot_metric_sa
+#' @param selection_var string name of selected main variable - one value from column 
+#'    \code{"CellLineName"} or \code{"DrugName"}
+#' @param selection_var string name of selected variable value from column \code{selection_var} 
+#'    to filter data for plotting;
+#' @param group_var string name of group variable; not numeric variablee from \code{dt_metrics} 
+#'    different than \code{selection_var} and not containing unique values for each row;
+#' @param group_names character vector with names to subset from column \code{group_var};
+#'    if \code{NULL} then all values will be plotted
+#' 
+#' @return \code{ggplot} object containing boxplots for selected single-agent metric 
+#'    grouped by selected variable
+#' 
+#' @keywords single-agent_plots
+#' 
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' 
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' 
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' 
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue")
+#' 
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue",
+#'                               bottom_percentile_lbl = TRUE)
+#' 
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue",
+#'                               grouped_flag = TRUE)
+#' 
+#' @export
+plot_boxplot_metric_sa_by_grp <- function(
+    dt_metrics,
+    selection_var,
+    selection_name,
+    group_var,
+    group_names = NULL,
+    normalization_type = "GR",
+    metric = "xc50",
+    fit_source = "gDR",
+    bottom_percentile = 0.1,
+    bottom_percentile_lbl = FALSE,
+    grouped_flag = FALSE,
+    colors_vec = NULL,
+    with_inf = FALSE
+) {
+  
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  tissue <- gDRutils::get_env_identifiers("cellline_tissue")
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_MOA <- gDRutils::get_env_identifiers("drug_moa")
+  numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
+  
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_choice(selection_var, choices = c(cellline_name, drug_name))
+  
+  # check input data
+  if (selection_var == cellline_name) {
+    point_var <- drug_name
+  } else if (selection_var == drug_name) {
+    point_var <- cellline_name
+  }
+  
+  checkmate::assert_string(selection_name)
+  checkmate::assert_choice(selection_name, choices = unique(dt_metrics[[selection_var]]))
+  checkmate::assert_string(group_var)
+  checkmate::assert_choice(group_var, 
+                           choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
+  # TODO add validation for number of levels >1 and !=NROW(dt_metrics)
+  checkmate::assert_choice(group_names, choices = unique(dt_metrics[[group_var]]), null.ok = TRUE)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  checkmate::assert_names(names(dt_metrics), 
+                          must.include = c(cellline_name, drug_name, selection_var, point_var, metric))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_number(bottom_percentile, lower = 0, upper = 1)
+  checkmate::assert_flag(bottom_percentile_lbl)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_flag(with_inf)
+  boxplot_fill <- 
+    gDRutils::get_settings_from_json("BOXPLOT_FILL",
+                                     system.file(package = "gDRplots", "settings.json"))
+  hline_color <- 
+    gDRutils::get_settings_from_json("HLINE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  jitter_poinst_color <- 
+    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  edge_color <- 
+    gDRutils::get_settings_from_json("EDGE_COLOR",
+                                     system.file(package = "gDRplots", "settings.json"))
+  
+  # filter data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_met <- dt_metrics[eval(filter_expr)]
+  dt_met <- dt_met[, c(group_var, point_var, metric), with = FALSE]
+  
+  if (metric == "xc50") {
+    dt_met[, (metric) := log10(get(metric))] 
+  }
+  
+  # coloring points by quantile
+  named_p_bottom <- 0.1
+  bottom_val <- quantile(dt_met[[metric]], named_p_bottom, na.rm = TRUE)
+  dt_met[, is_bottom := get(metric) <= bottom_val]
+  if (bottom_percentile_lbl) {
+    dt_met[, label := ifelse(is_bottom, get(point_var), NA_character_)]
+  } else {
+    dt_met[, label := ""]
+  }
+  
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
+  }
+  
+  # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names <- if (is.null(group_names)) {
+    unique(dt_met[[group_var]])
+  } else {
+    intersect(unique(dt_met[[group_var]]), group_names)
+  }
+  
+  plt_title <- sprintf("%s for %s by %s", 
+                       gDRplots::get_hm_title(metric, normalization_type), selection_name, group_var)
+  
+  data.table::setorderv(dt_met, group_var)
+  dt_met[[group_var]] <- factor(dt_met[[group_var]])
+  
+  if (grouped_flag) {
+    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      get_qual_colors(NROW(unique(dt_met[[group_var]])))
+    } else if (NROW(colors_vec) != NROW(unique(dt_met[[group_var]]))) {
+      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[group_var]])))
+    } else {
+      colors_vec
+    }
+    names(fill_colors) <- unique(dt_met[[group_var]])
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(group_var), 
+                                             y = get(metric),
+                                             label = label)) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = get(group_var)), 
+                            color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                            na.rm = TRUE, outliers = FALSE, show.legend = FALSE) +
+      ggplot2::scale_fill_manual(name = group_var, values = fill_colors) +
+      ggplot2::guides(fill = "none")
+    
+  } else {
+    fill_color <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
+      boxplot_fill
+    } else {
+      colors_vec[1]
+    }
+    
+    plt <- 
+      ggplot2::ggplot(data = dt_met,
+                      mapping = ggplot2::aes(x = get(group_var), 
+                                             y = get(metric),
+                                             label = label)) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
+      ggplot2::geom_boxplot(fill = fill_color, 
+                            color = edge_color, alpha = 0.25, staplewidth = 0.5,
+                            na.rm = TRUE, outliers = FALSE)
+  }
+  
+  # adding lbls and points
+  plt <- plt +
+    ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE) +
+    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), size = 2, alpha = 0.75,
+                         width = 0.2, height = 0, na.rm = TRUE, show.legend = TRUE) +
+    ggplot2::geom_hline(yintercept = bottom_val, color = "red", linetype = "dashed") +
+    ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = jitter_poinst_color))
+  
+  # final
+  plt <- plt +
+    ggplot2::labs(title = plt_title,
+                  y = get_hm_title(metric, normalization_type), 
+                  x = "",
+                  color = sprintf("Bottom %g%%", named_p_bottom * 100)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
+                   axis.text.y = ggplot2::element_text(size = 8),
+                   plot.title = ggplot2::element_text(size = 10),
+                   panel.grid.minor = ggplot2::element_blank())
+  
+  return(plt)
+} 
+
+
 #' Plot box plots for metric for combo data grouped by selected variable
 #' 
 #' @inheritParams plot_boxplot_metric_sa
