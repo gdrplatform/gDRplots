@@ -44,9 +44,7 @@ but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
 
-\item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
-and \code{drug_moa} - for \code{"DrugName"}}
+\item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
 for \code{grouped_flag} set as FALSE only first from vector will be used.}
@@ -82,6 +80,12 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_name = "drug_001",
                               group_var = "Tissue",
                               grouped_flag = TRUE)
+                              
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              colors_vec = c("darkcyan", "orange", "darkblue", "deeppink"))
 
 }
 \author{
