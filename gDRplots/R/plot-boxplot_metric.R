@@ -559,9 +559,12 @@ plot_boxplot_metric_sa_by_grp <- function(
                             na.rm = TRUE, outliers = FALSE)
   }
   
-  # adding lbls and points
+  # adding lbls and points colored by quantile
+  if (bottom_percentile_lbl) {
+    plt <- plt +
+      ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE)
+  }
   plt <- plt +
-    ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE) +
     ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), size = 2, alpha = 0.75,
                          width = 0.2, height = 0, na.rm = TRUE, show.legend = TRUE) +
     ggplot2::geom_hline(yintercept = bottom_val, color = "red", linetype = "dashed") +
