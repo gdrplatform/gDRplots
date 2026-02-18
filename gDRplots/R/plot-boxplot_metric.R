@@ -388,6 +388,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
+#' @param grouped_flag  logical flag whether the boxplots should be colored by \code{group_var}
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric 
 #'    grouped by selected variable
@@ -418,6 +419,12 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'                               selection_name = "drug_001",
 #'                               group_var = "Tissue",
 #'                               grouped_flag = TRUE)
+#'                               
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue",
+#'                               colors_vec = c("darkcyan", "orange", "darkblue", "deeppink"))
 #' 
 #' @export
 plot_boxplot_metric_sa_by_grp <- function(
