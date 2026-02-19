@@ -44,7 +44,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_length(plt_4[["layers"]], 4) # grouped_flag
   expect_length(plt_4[["guides"]]$guides, 2)
   expect_true(all(c("colour", "fill") %in% names(plt_4[["guides"]]$guides)))
-
+  
   ls_moa_col <- c("deeppink", "darkcyan", "orange", "darkblue", "gold")
   plt_5 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
                                            with_inf = TRUE,
@@ -233,6 +233,77 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
                sort(log10(dt_metrics[normalization_type == "GR", ][["xc50"]])))
   expect_equal(sort(ggplot2::get_panel_scales(plt_4)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
+})
+
+test_that("plot_boxplot_metric_sa_by_grp works as expected", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  
+  sel_var <- "DrugName"
+  sel_name <- "drug_001"
+  grp_var <- "Tissue"
+  
+  plt_1 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = grp_var) # default
+  expect_is(plt_1, "gg")
+  expect_length(plt_1[["layers"]], 5)
+  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+  expect_true(grepl("log10", plt_1[["labels"]][["y"]])) # xc50 in log10 scale
+  expect_true(grepl(sel_name, plt_1[["labels"]][["title"]]))
+  expect_true(grepl(grp_var, plt_1[["labels"]][["title"]]))
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[5]])[colour == "red"]), 10)
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 10)
+  
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var),
+               "Assertion on 'dt_metrics' failed: Must be a data.table")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = "unknown"),
+               "Assertion on 'group_var' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             metric = "xxx"),
+               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics[, -c("CellLineName")],
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = "CellLineName"),
+               "Assertion on 'group_var' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             fit_source = 1),
+               "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             grouped_flag = "yes"),
+               "Assertion on 'grouped_flag' failed: Must be of type 'logical flag'")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             with_inf = 0),
+               "Assertion on 'with_inf' failed: Must be of type 'logical flag'")
 })
 
 test_that("plot_boxplot_metric_combo works as expected", {
