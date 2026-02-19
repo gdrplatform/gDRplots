@@ -470,8 +470,9 @@ plot_boxplot_metric_sa_by_grp <- function(
   checkmate::assert_string(selection_name)
   checkmate::assert_choice(selection_name, choices = unique(dt_metrics[[selection_var]]))
   checkmate::assert_string(group_var)
-  checkmate::assert_choice(group_var, 
-                           choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
+  checkmate::assert_choice(
+    group_var, 
+    choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
   # TODO add validation for number of levels >1 and !=NROW(dt_metrics)
   checkmate::assert_choice(group_names, choices = unique(dt_metrics[[group_var]]), null.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
@@ -503,11 +504,11 @@ plot_boxplot_metric_sa_by_grp <- function(
   
   # coloring points by rank
   data.table::setorderv(dt_met, cols = metric)
-  dt_met[, `:=` (is_bottom = FALSE, label = "")]
+  dt_met[, `:=`(is_bottom = FALSE, label = "")]
   if (named_n_bottom > 0) {
     named_n_bottom_act <- min(named_n_bottom, NROW(dt_met)) # deal with less than n bigger than table
     dt_met <- 
-      dt_met[order(get(metric)), ][seq_len(named_n_bottom), `:=` (is_bottom = TRUE, label = get(point_var))]
+      dt_met[order(get(metric)), ][seq_len(named_n_bottom), `:=`(is_bottom = TRUE, label = get(point_var))]
   }
   
   if (metric == "xc50") {
