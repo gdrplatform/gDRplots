@@ -388,8 +388,11 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
-#' @param grouped_flag  logical flag whether the boxplots should be colored by \code{group_var}
-#' 
+#' @param named_n_bottom number of n-bottom \code{metric} values to be labeled on the plot
+#'    for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
+#'    and similarly vice versa
+#' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
+#'   
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric 
 #'    grouped by selected variable
 #' 
@@ -412,7 +415,13 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'                               selection_var = "DrugName",
 #'                               selection_name = "drug_001",
 #'                               group_var = "Tissue",
-#'                               bottom_percentile_lbl = TRUE)
+#'                               with_inf = TRUE)
+#' 
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue",
+#'                               named_n_bottom = 0)
 #' 
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
@@ -424,7 +433,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'                               selection_var = "DrugName",
 #'                               selection_name = "drug_001",
 #'                               group_var = "Tissue",
-#'                               colors_vec = c("darkcyan", "orange", "darkblue", "deeppink"))
+#'                               colors_vec = c("darkblue", "deeppink"))
 #' 
 #' @export
 plot_boxplot_metric_sa_by_grp <- function(
@@ -436,8 +445,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
-    bottom_percentile = 0.1,
-    bottom_percentile_lbl = FALSE,
+    named_n_bottom = 10,
     grouped_flag = FALSE,
     colors_vec = NULL,
     with_inf = FALSE
@@ -471,8 +479,7 @@ plot_boxplot_metric_sa_by_grp <- function(
   checkmate::assert_names(names(dt_metrics), 
                           must.include = c(cellline_name, drug_name, selection_var, point_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
-  checkmate::assert_number(bottom_percentile, lower = 0, upper = 1)
-  checkmate::assert_flag(bottom_percentile_lbl)
+  checkmate::assert_number(named_n_bottom, lower = 0)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   boxplot_fill <- 
@@ -494,18 +501,17 @@ plot_boxplot_metric_sa_by_grp <- function(
   dt_met <- dt_metrics[eval(filter_expr)]
   dt_met <- dt_met[, c(group_var, point_var, metric), with = FALSE]
   
-  if (metric == "xc50") {
-    dt_met[, (metric) := log10(get(metric))] 
+  # coloring points by rank
+  data.table::setorderv(dt_met, cols = metric)
+  dt_met[, `:=` (is_bottom = FALSE, label = "")]
+  if (named_n_bottom > 0) {
+    named_n_bottom_act <- min(named_n_bottom, NROW(dt_met)) # deal with less than n bigger than table
+    dt_met <- 
+      dt_met[order(get(metric)), ][seq_len(named_n_bottom), `:=` (is_bottom = TRUE, label = get(point_var))]
   }
   
-  # coloring points by quantile
-  named_p_bottom <- 0.1
-  bottom_val <- quantile(dt_met[[metric]], named_p_bottom, na.rm = TRUE)
-  dt_met[, is_bottom := get(metric) <= bottom_val]
-  if (bottom_percentile_lbl) {
-    dt_met[, label := ifelse(is_bottom, get(point_var), NA_character_)]
-  } else {
-    dt_met[, label := ""]
+  if (metric == "xc50") {
+    dt_met[, (metric) := log10(get(metric))] 
   }
   
   # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
@@ -515,16 +521,17 @@ plot_boxplot_metric_sa_by_grp <- function(
   
   # update group (it depends on user choice for `group_names` and `selection_name`)
   group_names <- if (is.null(group_names)) {
-    unique(dt_met[[group_var]])
+    sort(unique(dt_met[[group_var]]))
   } else {
-    intersect(unique(dt_met[[group_var]]), group_names)
+    sort(intersect(unique(dt_met[[group_var]]), group_names))
   }
   
   plt_title <- sprintf("%s for %s by %s", 
                        gDRplots::get_hm_title(metric, normalization_type), selection_name, group_var)
   
+  dt_met_lbl <- data.table::copy(dt_met)[!is.na(get(metric)), ]
   data.table::setorderv(dt_met, group_var)
-  dt_met[[group_var]] <- factor(dt_met[[group_var]])
+  dt_met[[group_var]] <- factor(dt_met[[group_var]], levels = group_names)
   
   if (grouped_flag) {
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
@@ -539,8 +546,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(group_var), 
-                                             y = get(metric),
-                                             label = label)) +
+                                             y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(ggplot2::aes(fill = get(group_var)), 
                             color = edge_color, alpha = 0.25, staplewidth = 0.5,
@@ -558,23 +564,29 @@ plot_boxplot_metric_sa_by_grp <- function(
     plt <- 
       ggplot2::ggplot(data = dt_met,
                       mapping = ggplot2::aes(x = get(group_var), 
-                                             y = get(metric),
-                                             label = label)) +
+                                             y = get(metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = fill_color, 
                             color = edge_color, alpha = 0.25, staplewidth = 0.5,
                             na.rm = TRUE, outliers = FALSE)
   }
   
-  # adding lbls and points colored by quantile
-  if (bottom_percentile_lbl) {
+  # adding lbls and points colored when bottom
+  if (named_n_bottom > 0) {
     plt <- plt +
-      ggrepel::geom_text_repel(size = 3, max.overlaps = 20, show.legend = FALSE)
+      ggrepel::geom_text_repel(data = dt_met_lbl,
+                               mapping = ggplot2::aes(x = get(group_var), 
+                                                      y = get(metric),
+                                                      label = label),
+                               size = 3, max.overlaps = 20, show.legend = FALSE) +
+      ggplot2::geom_hline(yintercept = max(dt_met[is_bottom == TRUE][[metric]]), 
+                          color = "red", linetype = "dashed")
   }
   plt <- plt +
-    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), size = 2, alpha = 0.75,
-                         width = 0.2, height = 0, na.rm = TRUE, show.legend = TRUE) +
-    ggplot2::geom_hline(yintercept = bottom_val, color = "red", linetype = "dashed") +
+    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), 
+                         size = 2, alpha = 0.75,
+                         width = 0.2, height = 0, na.rm = TRUE, 
+                         show.legend = (named_n_bottom > 0)) +
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = jitter_poinst_color))
   
   # final
@@ -582,7 +594,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "",
-                  color = sprintf("Bottom %g%%", named_p_bottom * 100)) +
+                  color = sprintf("Bottom %s", named_n_bottom)) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
