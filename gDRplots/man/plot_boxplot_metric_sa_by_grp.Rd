@@ -13,8 +13,7 @@ plot_boxplot_metric_sa_by_grp(
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
-  bottom_percentile = 0.1,
-  bottom_percentile_lbl = FALSE,
+  named_n_bottom = 10,
   grouped_flag = FALSE,
   colors_vec = NULL,
   with_inf = FALSE
@@ -43,6 +42,10 @@ one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization
 but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
+
+\item{named_n_bottom}{number of n-bottom \code{metric} values to be labeled on the plot
+for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
+and similarly vice versa}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
@@ -73,7 +76,13 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
                               selection_name = "drug_001",
                               group_var = "Tissue",
-                              bottom_percentile_lbl = TRUE)
+                              with_inf = TRUE)
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              named_n_bottom = 0)
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
@@ -85,7 +94,7 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
                               selection_name = "drug_001",
                               group_var = "Tissue",
-                              colors_vec = c("darkcyan", "orange", "darkblue", "deeppink"))
+                              colors_vec = c("darkblue", "deeppink"))
 
 }
 \author{
