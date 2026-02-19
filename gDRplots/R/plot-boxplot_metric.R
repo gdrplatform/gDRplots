@@ -452,9 +452,7 @@ plot_boxplot_metric_sa_by_grp <- function(
 ) {
   
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  tissue <- gDRutils::get_env_identifiers("cellline_tissue")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
-  drug_MOA <- gDRutils::get_env_identifiers("drug_moa")
   numeric_columns <- names(dt_metrics)[vapply(dt_metrics, is.numeric, logical(1))]
   
   checkmate::assert_data_table(dt_metrics)
@@ -481,6 +479,7 @@ plot_boxplot_metric_sa_by_grp <- function(
                           must.include = c(cellline_name, drug_name, selection_var, point_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_number(named_n_bottom, lower = 0)
+  checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   boxplot_fill <- 
