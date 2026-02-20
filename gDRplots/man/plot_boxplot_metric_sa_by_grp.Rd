@@ -69,7 +69,9 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "tissue_other")]
+invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", 
+                                                         "tissue_w", 
+                                                         "tissue_other")])
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",

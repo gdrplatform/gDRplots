@@ -66,7 +66,9 @@ se <- mae[[gDRutils::get_supported_experiments("combo")]]
 
 dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                               assay_name = "scores")
-dt_scores[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "tissue_other")]
+invisible(dt_scores[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", 
+                                                        "tissue_w", 
+                                                        "tissue_other")])
 
 plot_boxplot_metric_combo_by_grp(dt_scores,
                                  selection_var = "DrugName",
