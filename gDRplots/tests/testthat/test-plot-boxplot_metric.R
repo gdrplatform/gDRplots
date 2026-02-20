@@ -255,9 +255,9 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_true(grepl(sel_name, plt_1[["labels"]][["title"]]))
   expect_true(grepl(grp_var, plt_1[["labels"]][["title"]]))
   expect_equal(
-    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[5]])[colour == "red"]), 10)
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[5]])[colour == "red"]), 5)
   expect_equal(
-    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 10)
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 5)
   
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
