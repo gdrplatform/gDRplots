@@ -406,7 +406,9 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' 
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-#' dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "tissue_other")]
+#' invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", 
+#'                                                          "tissue_w", 
+#'                                                          "tissue_other")])
 #' 
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
@@ -516,9 +518,9 @@ plot_boxplot_metric_sa_by_grp <- function(
   data.table::setorderv(dt_met, cols = metric)
   dt_met[, `:=`(is_bottom = FALSE, label = "")]
   if (named_n_bottom > 0) {
-    named_n_bottom_act <- min(named_n_bottom, NROW(dt_met)) # deal with less than n bigger than table
+    named_n_bottom <- min(named_n_bottom, NROW(dt_met)) # deal with less than n bigger than table
     dt_met <- 
-      dt_met[order(get(metric)), ][seq_len(named_n_bottom_act), `:=`(is_bottom = TRUE, label = get(point_var))]
+      dt_met[order(get(metric)), ][seq_len(named_n_bottom), `:=`(is_bottom = TRUE, label = get(point_var))]
   }
   
   if (metric == "xc50") {
@@ -1014,7 +1016,9 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #' 
 #' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 #'                                               assay_name = "scores")
-#' dt_scores[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "tissue_other")]
+#' invisible(dt_scores[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", 
+#'                                                         "tissue_w", 
+#'                                                         "tissue_other")])
 #' 
 #' plot_boxplot_metric_combo_by_grp(dt_scores,
 #'                                  selection_var = "DrugName",
@@ -1121,9 +1125,9 @@ plot_boxplot_metric_combo_by_grp <- function(
   data.table::setorderv(dt_sco, cols = metric)
   dt_sco[, `:=`(is_bottom = FALSE, label = "")]
   if (named_n_bottom > 0) {
-    named_n_bottom_act <- min(named_n_bottom, NROW(dt_sco)) # deal with less than n bigger than table
+    named_n_bottom <- min(named_n_bottom, NROW(dt_sco)) # deal with less than n bigger than table
     dt_sco <- 
-      dt_sco[order(get(metric)), ][seq_len(named_n_bottom_act), `:=`(is_bottom = TRUE, label = get(point_var))]
+      dt_sco[order(get(metric)), ][seq_len(named_n_bottom), `:=`(is_bottom = TRUE, label = get(point_var))]
   }
   
   # update group (it depends on user choice for `group_names` and `selection_name`)
@@ -1203,7 +1207,8 @@ plot_boxplot_metric_combo_by_grp <- function(
   plt <- plt +
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
-                  x = "") +
+                  x = "",
+                  color = sprintf("Bottom %s", named_n_bottom)) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
