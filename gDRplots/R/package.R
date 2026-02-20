@@ -21,6 +21,7 @@ utils::globalVariables(
     "feat_val",
     "feature",
     "h",
+    "is_bottom",
     "iso_level",
     "iso_source",
     "label",
