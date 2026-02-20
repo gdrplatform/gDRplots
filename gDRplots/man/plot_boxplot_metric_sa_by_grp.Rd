@@ -13,7 +13,7 @@ plot_boxplot_metric_sa_by_grp(
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
-  named_n_bottom = 10,
+  named_n_bottom = 5,
   grouped_flag = FALSE,
   colors_vec = NULL,
   with_inf = FALSE
@@ -24,7 +24,10 @@ plot_boxplot_metric_sa_by_grp(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
 
-\item{selection_var}{string name of selected variable value from column \code{selection_var} 
+\item{selection_var}{string name of selected main variable - one value from column 
+\code{"CellLineName"} or \code{"DrugName"}}
+
+\item{selection_name}{string name of selected variable value from column \code{selection_var} 
 to filter data for plotting;}
 
 \item{group_var}{string name of group variable; not numeric variablee from \code{dt_metrics} 
@@ -66,11 +69,17 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "tissue_other")]
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
                               selection_name = "drug_001",
                               group_var = "Tissue")
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue_grp")
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
