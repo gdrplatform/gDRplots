@@ -655,7 +655,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 4)
   expect_true(grepl("HSA Score", plt_1[["labels"]][["y"]]))
-  expect_true(grepl(paste(sel_name, collapse = " \\+ "), plt_1[["labels"]][["title"]]))
+  expect_true(grepl(paste(sel_name, collapse = " x "), plt_1[["labels"]][["title"]]))
   expect_equal(plt_1[["labels"]][["colour"]], "Top 5")
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[4]])[colour == "red"]), 5)
