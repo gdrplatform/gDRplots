@@ -1094,7 +1094,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   # TODO add validation for number of levels >1 and !=NROW(dt_scores)
   checkmate::assert_subset(group_names, choices = unique(dt_scores[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_scores), 
                           must.include = c(cellline_name, drug_name, drug_name_2, group_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
