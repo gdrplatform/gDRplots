@@ -13,7 +13,8 @@ plot_boxplot_metric_sa_by_grp(
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
-  named_n_bottom = 5,
+  named_n = 5,
+  named_n_mode = "bottom",
   grouped_flag = FALSE,
   colors_vec = NULL,
   with_inf = FALSE
@@ -46,9 +47,11 @@ but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
 
-\item{named_n_bottom}{number of n-bottom \code{metric} values to be labeled on the plot
-for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
-and similarly vice versa}
+\item{named_n}{number of points to label based on the highest or lowest \code{metric} values;
+if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)}
+
+\item{named_n_mode}{string determines whether the labels are applied to the highest or lowest 
+values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
@@ -93,7 +96,7 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
                               selection_name = "drug_001",
                               group_var = "Tissue",
-                              named_n_bottom = 0)
+                              named_n = 0)
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",

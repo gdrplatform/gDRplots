@@ -13,7 +13,8 @@ plot_boxplot_metric_combo_by_grp(
   normalization_type = "GR",
   metric = "hsa_score",
   fit_source = "gDR",
-  named_n_bottom = 5,
+  named_n = 5,
+  named_n_mode = "top",
   grouped_flag = FALSE,
   colors_vec = NULL
 )
@@ -44,9 +45,11 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{fit_source}{string source name for metrics}
 
-\item{named_n_bottom}{number of n-bottom \code{metric} values to be labeled on the plot
-for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
-and similarly vice versa}
+\item{named_n}{number of points to label based on the highest or lowest \code{metric} values;
+if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)}
+
+\item{named_n_mode}{string determines whether the labels are applied to the highest or lowest 
+values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
