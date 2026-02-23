@@ -483,7 +483,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     group_var, 
     choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
   # TODO add validation for number of levels >1 and !=NROW(dt_metrics)
-  checkmate::assert_choice(group_names, choices = unique(dt_metrics[[group_var]]), null.ok = TRUE)
+  checkmate::assert_subset(group_names, choices = unique(dt_metrics[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_metrics), 
@@ -516,6 +516,13 @@ plot_boxplot_metric_sa_by_grp <- function(
   # select min required data for plotting
   dt_met <- dt_met[, c(group_var, point_var, metric), with = FALSE]
   
+  # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names <- if (is.null(group_names)) {
+    sort(unique(dt_met[[group_var]]))
+  } else {
+    sort(intersect(unique(dt_met[[group_var]]), group_names))
+  }
+  dt_met <- dt_met[get(group_var) %in% group_names, ]
   
   # coloring points by rank
   data.table::setorderv(dt_met, cols = metric)
@@ -540,13 +547,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     dt_met[is.infinite(get(metric)), (metric) := NA] 
   }
   
-  # update group (it depends on user choice for `group_names` and `selection_name`)
-  group_names <- if (is.null(group_names)) {
-    sort(unique(dt_met[[group_var]]))
-  } else {
-    sort(intersect(unique(dt_met[[group_var]]), group_names))
-  }
-  
+  # plot
   plt_title <- sprintf("%s for %s by %s", 
                        gDRplots::get_hm_title(metric, normalization_type), selection_name, group_var)
   
@@ -1091,7 +1092,7 @@ plot_boxplot_metric_combo_by_grp <- function(
     group_var, 
     choices = names(dt_scores)[!names(dt_scores) %in% c(numeric_columns, cellline_name, drug_name, drug_name_2)])
   # TODO add validation for number of levels >1 and !=NROW(dt_scores)
-  checkmate::assert_choice(group_names, choices = unique(dt_scores[[group_var]]), null.ok = TRUE)
+  checkmate::assert_subset(group_names, choices = unique(dt_scores[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
   checkmate::assert_names(names(dt_scores), 
@@ -1131,6 +1132,14 @@ plot_boxplot_metric_combo_by_grp <- function(
   # select min required data for plotting
   dt_sco <- dt_sco[, c(group_var, point_var, metric), with = FALSE]
   
+  # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names <- if (is.null(group_names)) {
+    sort(unique(dt_sco[[group_var]]))
+  } else {
+    sort(intersect(unique(dt_sco[[group_var]]), group_names))
+  }
+  dt_sco <- dt_sco[get(group_var) %in% group_names, ]
+  
   # coloring points by rank
   data.table::setorderv(dt_sco, cols = metric)
   dt_sco[, `:=`(is_labeled = FALSE, label = "")]
@@ -1145,13 +1154,7 @@ plot_boxplot_metric_combo_by_grp <- function(
     }
   }
   
-  # update group (it depends on user choice for `group_names` and `selection_name`)
-  group_names <- if (is.null(group_names)) {
-    sort(unique(dt_sco[[group_var]]))
-  } else {
-    sort(intersect(unique(dt_sco[[group_var]]), group_names))
-  }
-  
+  # plot
   plt_title <- sprintf("%s for %s by %s", 
                        gDRplots::get_hm_title(metric, normalization_type), 
                        paste(selection_name, collapse = " + "), 
@@ -1160,7 +1163,6 @@ plot_boxplot_metric_combo_by_grp <- function(
   dt_sco_lbl <- data.table::copy(dt_sco)[!is.na(get(metric)), ]
   data.table::setorderv(dt_sco, group_var)
   dt_sco[[group_var]] <- factor(dt_sco[[group_var]], levels = group_names)
-  
   
   if (grouped_flag) {
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
