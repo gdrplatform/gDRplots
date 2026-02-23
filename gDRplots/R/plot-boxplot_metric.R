@@ -389,9 +389,10 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
-#' @param named_n_bottom number of n-bottom \code{metric} values to be labeled on the plot
-#'    for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
-#'    and similarly vice versa
+#' @param named_n number of points to label based on the highest or lowest \code{metric} values;
+#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)
+#' @param named_n_mode string determines whether the labels are applied to the highest or lowest 
+#'    values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
 #'   
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric 
@@ -430,7 +431,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'                               selection_var = "DrugName",
 #'                               selection_name = "drug_001",
 #'                               group_var = "Tissue",
-#'                               named_n_bottom = 0)
+#'                               named_n = 0)
 #' 
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
@@ -454,7 +455,8 @@ plot_boxplot_metric_sa_by_grp <- function(
     normalization_type = "GR",
     metric = "xc50",
     fit_source = "gDR",
-    named_n_bottom = 5,
+    named_n = 5,
+    named_n_mode = "bottom",
     grouped_flag = FALSE,
     colors_vec = NULL,
     with_inf = FALSE
@@ -487,7 +489,8 @@ plot_boxplot_metric_sa_by_grp <- function(
   checkmate::assert_names(names(dt_metrics), 
                           must.include = c(cellline_name, drug_name, group_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
-  checkmate::assert_number(named_n_bottom, lower = 0)
+  checkmate::assert_number(named_n, lower = 0)
+  checkmate::assert_string(named_n_mode, pattern = "top|bottom")
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
@@ -512,15 +515,20 @@ plot_boxplot_metric_sa_by_grp <- function(
   dt_met <- dt_met[get(selection_var) == selection_name, ]
   # select min required data for plotting
   dt_met <- dt_met[, c(group_var, point_var, metric), with = FALSE]
- 
+  
   
   # coloring points by rank
   data.table::setorderv(dt_met, cols = metric)
-  dt_met[, `:=`(is_bottom = FALSE, label = "")]
-  if (named_n_bottom > 0) {
-    named_n_bottom <- min(named_n_bottom, NROW(dt_met)) # deal with less than n bigger than table
-    dt_met <- 
-      dt_met[order(get(metric)), ][seq_len(named_n_bottom), `:=`(is_bottom = TRUE, label = get(point_var))]
+  dt_met[, `:=`(is_labeled = FALSE, label = "")]
+  if (named_n > 0) {
+    named_n <- min(named_n, NROW(dt_met)) # deal with less than n bigger than table
+    if (named_n_mode == "top") {
+      dt_met <- 
+        dt_met[order(-get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
+    } else if (named_n_mode == "bottom") {
+      dt_met <- 
+        dt_met[order(get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
+    }
   }
   
   if (metric == "xc50") {
@@ -585,21 +593,19 @@ plot_boxplot_metric_sa_by_grp <- function(
   }
   
   # adding lbls and points colored when bottom
-  if (named_n_bottom > 0) {
+  if (named_n > 0) {
     plt <- plt +
       ggrepel::geom_text_repel(data = dt_met_lbl,
                                mapping = ggplot2::aes(x = get(group_var), 
                                                       y = get(metric),
                                                       label = label),
-                               size = 3, max.overlaps = 20, show.legend = FALSE) +
-      ggplot2::geom_hline(yintercept = max(dt_met[is_bottom == TRUE][[metric]]), 
-                          color = "red", linetype = "dashed")
+                               size = 3, max.overlaps = 20, show.legend = FALSE)
   }
   plt <- plt +
-    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), 
+    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_labeled), 
                          size = 2, alpha = 0.75,
                          width = 0.2, height = 0, na.rm = TRUE, 
-                         show.legend = (named_n_bottom > 0)) +
+                         show.legend = (named_n > 0)) +
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = jitter_poinst_color))
   
   # final
@@ -607,7 +613,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "",
-                  color = sprintf("Bottom %s", named_n_bottom)) +
+                  color = sprintf("%s %s", tools::toTitleCase(named_n_mode), named_n)) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
@@ -998,9 +1004,10 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
-#' @param named_n_bottom number of n-bottom \code{metric} values to be labeled on the plot
-#'    for \code{group_var} equal \code{"DrugName"} points will be labeled by \code{"CellLineName"}
-#'    and similarly vice versa
+#' @param named_n number of points to label based on the highest or lowest \code{metric} values;
+#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)
+#' @param named_n_mode string determines whether the labels are applied to the highest or lowest 
+#'    values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
 #' 
 #' @return \code{ggplot} object containing boxplots for selected combo metric 
@@ -1054,7 +1061,8 @@ plot_boxplot_metric_combo_by_grp <- function(
     normalization_type = "GR",
     metric = "hsa_score",
     fit_source = "gDR",
-    named_n_bottom = 5,
+    named_n = 5,
+    named_n_mode = "top",
     grouped_flag = FALSE,
     colors_vec = NULL
 ) {
@@ -1089,6 +1097,8 @@ plot_boxplot_metric_combo_by_grp <- function(
   checkmate::assert_names(names(dt_scores), 
                           must.include = c(cellline_name, drug_name, drug_name_2, group_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_number(named_n, lower = 0)
+  checkmate::assert_string(named_n_mode, pattern = "top|bottom")
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <- 
@@ -1123,11 +1133,16 @@ plot_boxplot_metric_combo_by_grp <- function(
   
   # coloring points by rank
   data.table::setorderv(dt_sco, cols = metric)
-  dt_sco[, `:=`(is_bottom = FALSE, label = "")]
-  if (named_n_bottom > 0) {
-    named_n_bottom <- min(named_n_bottom, NROW(dt_sco)) # deal with less than n bigger than table
-    dt_sco <- 
-      dt_sco[order(get(metric)), ][seq_len(named_n_bottom), `:=`(is_bottom = TRUE, label = get(point_var))]
+  dt_sco[, `:=`(is_labeled = FALSE, label = "")]
+  if (named_n > 0) {
+    named_n <- min(named_n, NROW(dt_sco)) # deal with less than n bigger than table
+    if (named_n_mode == "top") {
+      dt_sco <- 
+        dt_sco[order(-get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
+    } else if (named_n_mode == "bottom") {
+      dt_sco <- 
+        dt_sco[order(get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
+    }
   }
   
   # update group (it depends on user choice for `group_names` and `selection_name`)
@@ -1185,22 +1200,19 @@ plot_boxplot_metric_combo_by_grp <- function(
   }
   
   # adding lbls and points colored when bottom
-  if (named_n_bottom > 0) {
+  if (named_n > 0) {
     plt <- plt +
       ggrepel::geom_text_repel(data = dt_sco_lbl,
                                mapping = ggplot2::aes(x = get(group_var), 
                                                       y = get(metric),
                                                       label = label),
-                               size = 3, max.overlaps = 20, show.legend = FALSE) +
-      ggplot2::geom_hline(yintercept = max(dt_sco[is_bottom == TRUE][[metric]]), 
-                          color = "red", linetype = "dashed")
+                               size = 3, max.overlaps = 20, show.legend = FALSE)
   }
-  
   plt <- plt +
-    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_bottom), 
+    ggplot2::geom_jitter(mapping = ggplot2::aes(color = is_labeled), 
                          size = 2, alpha = 0.75,
                          width = 0.2, height = 0, na.rm = TRUE, 
-                         show.legend = (named_n_bottom > 0)) +
+                         show.legend = (named_n > 0)) +
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = jitter_poinst_color))
   
   # final
@@ -1208,7 +1220,7 @@ plot_boxplot_metric_combo_by_grp <- function(
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "",
-                  color = sprintf("Bottom %s", named_n_bottom)) +
+                  color = sprintf("%s %s", tools::toTitleCase(named_n_mode), named_n)) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
