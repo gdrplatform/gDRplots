@@ -249,13 +249,13 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                          selection_name = sel_name,
                                          group_var = grp_var) # default
   expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 5)
+  expect_length(plt_1[["layers"]], 4)
   expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
   expect_true(grepl("log10", plt_1[["labels"]][["y"]])) # xc50 in log10 scale
   expect_true(grepl(sel_name, plt_1[["labels"]][["title"]]))
   expect_true(grepl(grp_var, plt_1[["labels"]][["title"]]))
   expect_equal(
-    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[5]])[colour == "red"]), 5)
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[4]])[colour == "red"]), 5)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 5)
   
@@ -292,6 +292,18 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                              group_var = grp_var,
                                              fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             named_n = "all"),
+               "Assertion on 'named_n' failed: Must be of type 'number', not 'character'")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             named_n_mode = 5),
+               "Assertion on 'named_n_mode' failed: Must be of type 'string', not 'double'")
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
                                              selection_var = sel_var,
                                              selection_name = sel_name,
