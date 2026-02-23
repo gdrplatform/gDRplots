@@ -1071,7 +1071,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
-  
+
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(selection_var, choices = c(cellline_name, drug_name))
   
@@ -1157,7 +1157,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   # plot
   plt_title <- sprintf("%s for %s by %s", 
                        gDRplots::get_hm_title(metric, normalization_type), 
-                       paste(selection_name, collapse = " + "), 
+                       paste(selection_name, collapse = " x "), 
                        group_var)
   
   dt_sco_lbl <- data.table::copy(dt_sco)[!is.na(get(metric)), ]
