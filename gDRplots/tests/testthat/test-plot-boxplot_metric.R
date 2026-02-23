@@ -243,6 +243,9 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   sel_var <- "DrugName"
   sel_name <- "drug_001"
   grp_var <- "Tissue"
+  sel_var_2 <- "CellLineName"
+  sel_name_2 <- "cellline_MC"
+  grp_var_2 <- "drug_moa"
   
   plt_1 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
@@ -259,6 +262,100 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 5)
   
+  n_top <- 3
+  plt_2 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var_2,
+                                         selection_name = sel_name_2,
+                                         group_var = grp_var_2,
+                                         normalization_type = "RV",
+                                         metric = "x_max",
+                                         named_n = n_top,
+                                         named_n_mode = "top")
+  expect_is(plt_2, "gg")
+  expect_length(plt_2[["layers"]], 4)
+  expect_equal(plt_2[["labels"]][["colour"]], "Top 3")
+  expect_equal(plt_2[["labels"]][["y"]], "E Max")
+  expect_true(grepl(sel_name_2, plt_2[["labels"]][["title"]]))
+  expect_true(grepl(grp_var_2, plt_2[["labels"]][["title"]]))
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[4]])[colour == "red"]), n_top)
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[nchar(label) > 0]), n_top)
+  
+  col_vec <- c("darkblue", "orange", "lawngreen", "darkviolet")
+  plt_3 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = grp_var,
+                                         grouped_flag = TRUE,
+                                         colors_vec = col_vec)
+  expect_is(plt_3, "gg")
+  expect_length(plt_2[["layers"]], 4)
+  expect_true(all(col_vec %in% ggplot2::ggplot_build(plt_3)[["data"]][[2]]$fill))
+  
+  plt_4 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = grp_var,
+                                         metric = "h",
+                                         named_n = 0)
+  expect_is(plt_4, "gg")
+  expect_length(plt_4[["layers"]], 3) # no labels layer
+  expect_true(grepl("h", plt_4[["labels"]][["y"]])) 
+  expect_false(ggplot2::ggplot_build(plt_4)[["plot"]][["layers"]][["geom_jitter"]][["show.legend"]])
+  
+  plt_5 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = grp_var,
+                                         with_inf = TRUE)
+  expect_is(plt_5, "gg")
+  expect_length(plt_5[["layers"]], 4)
+  expect_true(any(is.infinite(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]])))
+  
+  grp_names <- c("tissue_w", "tissue_x")
+  plt_6 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = grp_var,
+                                         group_names = grp_names,
+                                         metric = "x_AOC")
+  expect_is(plt_6, "gg")
+  expect_length(plt_6[["layers"]], 4)
+  expect_true(grepl("AOC", plt_6[["labels"]][["y"]]))
+  expect_true(grepl(sel_name, plt_6[["labels"]][["title"]]))
+  expect_true(grepl(grp_var, plt_6[["labels"]][["title"]]))
+  expect_true(all(grp_names %in% ggplot2::get_panel_scales(plt_6)$x$get_labels()))
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_6)[["data"]][[4]])[colour == "red"]), 5)
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_6)[["data"]][[3]])[nchar(label) > 0]), 5)
+ 
+   # scenario: own groups
+  dt_metrics_grp <- 
+    data.table::copy(dt_metrics)[, tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "other")]
+  grp_col <- c("orange", "darkblue")
+  
+  plt_7 <- plot_boxplot_metric_sa_by_grp(dt_metrics_grp,
+                                         selection_var = sel_var,
+                                         selection_name = sel_name,
+                                         group_var = "tissue_grp",
+                                         normalization_type = "RV",
+                                         metric = "x_mean",
+                                         named_n = n_top,
+                                         named_n_mode = "top",
+                                         grouped_flag = TRUE,
+                                         colors_vec = grp_col)
+  expect_is(plt_7, "gg")
+  expect_length(plt_7[["layers"]], 4)
+  expect_true(all(c( "tissue_w", "other") %in% ggplot2::get_panel_scales(plt_7)$x$get_labels()))
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[4]])[colour == "red"]), n_top)
+  expect_equal(
+    NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[3]])[nchar(label) > 0]), n_top)
+  expect_equal(NROW(ggplot2::ggplot_build(plt_7)[["data"]][[2]]), 2)
+  expect_equal(ggplot2::ggplot_build(plt_7)[["data"]][[2]]$fill, grp_col)
+  
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
                                              selection_name = sel_name,
@@ -269,6 +366,12 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                              selection_name = sel_name,
                                              group_var = "unknown"),
                "Assertion on 'group_var' failed: Must be element of set")
+  expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             group_names = c("tissue_a", "tissue_b")),
+               "Assertion on 'group_names' failed: Must be a subset of")
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = dt_metrics,
                                              selection_var = sel_var,
                                              selection_name = sel_name,
