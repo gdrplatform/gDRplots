@@ -368,6 +368,14 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_true(grepl("infinite", ggplot2::ggplot_build(plt_8)[["plot"]][["labels"]][["caption"]]))
   expect_equal(NROW(ggplot2::ggplot_build(plt_8)[["data"]][[2]]$fill), 0)
   
+  dt_metrics_grp_oneitem <- data.table::copy(dt_metrics)[, oneitem_grp := sprintf("item_%s", .I)]
+  expect_error({
+    plot_boxplot_metric_sa_by_grp(dt_metrics_grp_oneitem,
+                                  selection_var = sel_var,
+                                  selection_name = sel_name,
+                                  group_var = "oneitem_grp")
+  }, "The `group_var` must have fewer unique values than total rows to create boxplots.")
+  
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
                                              selection_name = sel_name,
@@ -740,7 +748,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   expect_true(grepl("Bliss Score", plt_6[["labels"]][["y"]]))
   expect_true(grepl(sel_name_2, plt_6[["labels"]][["title"]]))
   expect_equal(ggplot2::ggplot_build(plt_6)[["data"]][[2]]$fill, col_vec[1:2]) 
-
+  
   # scenario: defined groups
   dt_scores_grp <- 
     data.table::copy(dt_scores)[, tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "other")]
