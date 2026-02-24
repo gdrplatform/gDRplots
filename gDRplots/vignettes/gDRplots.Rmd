@@ -218,7 +218,7 @@ plot_boxplot_metric_sa_by_drugs(dt_metrics_sa_capped,
 ```
 
 There is also a possibility to generate boxplot grouped by chosen variable for dedicated `DrugName` or `CellLineName`.
-Additionally n-bottom point are collored.
+Additionally, the n-bottom points are colored.
 
 ```{r plot_boxplot_metric_sa_by_grp_d, warning = FALSE, message = FALSE}
 plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
@@ -298,7 +298,7 @@ plot_boxplot_metric_combo_by_drugs(dt_scores)
 ```
 
 There is also a possibility to generate boxplot grouped by chosen variable for dedicated `DrugName` or `CellLineName`.
-Additionally n-top point are collored.
+Additionally, the n-top point are colored.
 
 ```{r plot_boxplot_metric_combo_by_grp_d, warning = FALSE, message = FALSE}
 plot_boxplot_metric_combo_by_grp(dt_scores,

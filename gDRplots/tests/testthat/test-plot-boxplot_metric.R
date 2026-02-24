@@ -599,7 +599,7 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   expect_true(grepl(NROW(ls_comb), plt_3[["labels"]][["title"]]))
 })
 
-test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
+test_that("plot_boxplot_metric_combo_by_drugs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,

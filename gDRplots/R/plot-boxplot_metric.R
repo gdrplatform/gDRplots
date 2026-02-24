@@ -385,7 +385,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'    \code{"CellLineName"} or \code{"DrugName"}
 #' @param selection_name string name of selected variable value from column \code{selection_var} 
 #'    to filter data for plotting;
-#' @param group_var string name of group variable; not numeric variablee from \code{dt_metrics} 
+#' @param group_var string name of group variable; not numeric variable from \code{dt_metrics} 
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
@@ -490,7 +490,8 @@ plot_boxplot_metric_sa_by_grp <- function(
                           must.include = c(cellline_name, drug_name, group_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_number(named_n, lower = 0)
-  checkmate::assert_string(named_n_mode, pattern = "top|bottom")
+  checkmate::assert_string(named_n_mode)
+  checkmate::assert_choice(named_n_mode, choices = c("top", "bottom"))
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
@@ -1001,7 +1002,7 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #'    \code{"CellLineName"} or \code{"DrugName"}
 #' @param selection_name string name of selected variable value from column \code{selection_var} 
 #'    to filter data for plotting;
-#' @param group_var string name of group variable; not numeric variablee from \code{dt_metrics} 
+#' @param group_var string name of group variable; not numeric variable from \code{dt_metrics} 
 #'    different than \code{selection_var} and not containing unique values for each row;
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
@@ -1099,7 +1100,8 @@ plot_boxplot_metric_combo_by_grp <- function(
                           must.include = c(cellline_name, drug_name, drug_name_2, group_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_number(named_n, lower = 0)
-  checkmate::assert_string(named_n_mode, pattern = "top|bottom")
+  checkmate::assert_string(named_n_mode)
+  checkmate::assert_choice(named_n_mode, choices = c("top", "bottom"))
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <- 

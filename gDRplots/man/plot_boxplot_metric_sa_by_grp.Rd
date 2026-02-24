@@ -31,7 +31,7 @@ and single-agent \code{SummarizedExperiment}}
 \item{selection_name}{string name of selected variable value from column \code{selection_var} 
 to filter data for plotting;}
 
-\item{group_var}{string name of group variable; not numeric variablee from \code{dt_metrics} 
+\item{group_var}{string name of group variable; not numeric variable from \code{dt_metrics} 
 different than \code{selection_var} and not containing unique values for each row;}
 
 \item{group_names}{character vector with names to subset from column \code{group_var};
