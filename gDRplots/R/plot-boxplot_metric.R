@@ -483,6 +483,7 @@ plot_boxplot_metric_sa_by_grp <- function(
     group_var, 
     choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
   # TODO add validation for number of levels >1 and !=NROW(dt_metrics)
+  stopifnot(NROW(unique(dt_metrics[[group_var]])) > 1)
   checkmate::assert_subset(group_names, choices = unique(dt_metrics[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
@@ -525,11 +526,33 @@ plot_boxplot_metric_sa_by_grp <- function(
   }
   dt_met <- dt_met[get(group_var) %in% group_names, ]
   
+  # check if there are more groups than rows in table
+  stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
+              data.table::uniqueN(dt_met[[group_var]]) < NROW(dt_met))
+  
+  # log10 for xc50
+  if (metric == "xc50") {
+    dt_met[get(metric) >= 0, (metric) := log10(get(metric))]
+  }
+  
+  if (all(is.na(dt_met[[metric]]))) {
+    caption_info <- "All values for selected metric are NAs."
+  } else if (all(is.infinite(dt_met[[metric]]))) {
+    caption_info <- "All values for selected metric are infinite."
+  } else {
+    caption_info <- NULL
+  }
+  
+  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
+  if (!with_inf) {
+    dt_met[is.infinite(get(metric)), (metric) := NA] 
+  }
+  
   # coloring points by rank
   data.table::setorderv(dt_met, cols = metric)
   dt_met[, `:=`(is_labeled = FALSE, label = "")]
   if (named_n > 0) {
-    named_n <- min(named_n, NROW(dt_met)) # deal with less than n bigger than table
+    named_n <- min(named_n, NROW(dt_met[!is.na(get(metric)), ])) # deal with less than n bigger than table
     if (named_n_mode == "top") {
       dt_met <- 
         dt_met[order(-get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
@@ -537,15 +560,6 @@ plot_boxplot_metric_sa_by_grp <- function(
       dt_met <- 
         dt_met[order(get(metric)), ][seq_len(named_n), `:=`(is_labeled = TRUE, label = get(point_var))]
     }
-  }
-  
-  if (metric == "xc50") {
-    dt_met[, (metric) := log10(get(metric))] 
-  }
-  
-  # handle -Inf (NA will be not shown on boxplots when with_inf = FALSE)
-  if (!with_inf) {
-    dt_met[is.infinite(get(metric)), (metric) := NA] 
   }
   
   # plot
@@ -615,7 +629,8 @@ plot_boxplot_metric_sa_by_grp <- function(
     ggplot2::labs(title = plt_title,
                   y = get_hm_title(metric, normalization_type), 
                   x = "",
-                  color = sprintf("%s %s", tools::toTitleCase(named_n_mode), named_n)) +
+                  color = sprintf("%s %s", tools::toTitleCase(named_n_mode), named_n),
+                  caption = caption_info) +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 90, vjust = 1, hjust = 1),
                    axis.text.y = ggplot2::element_text(size = 8),
@@ -1092,7 +1107,6 @@ plot_boxplot_metric_combo_by_grp <- function(
   checkmate::assert_choice(
     group_var, 
     choices = names(dt_scores)[!names(dt_scores) %in% c(numeric_columns, cellline_name, drug_name, drug_name_2)])
-  # TODO add validation for number of levels >1 and !=NROW(dt_scores)
   checkmate::assert_subset(group_names, choices = unique(dt_scores[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
@@ -1141,6 +1155,10 @@ plot_boxplot_metric_combo_by_grp <- function(
     sort(intersect(unique(dt_sco[[group_var]]), group_names))
   }
   dt_sco <- dt_sco[get(group_var) %in% group_names, ]
+  
+  # check if there are more groups than rows in table
+  stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
+              data.table::uniqueN(dt_sco[[group_var]]) < NROW(dt_sco))
   
   # coloring points by rank
   data.table::setorderv(dt_sco, cols = metric)

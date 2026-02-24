@@ -270,13 +270,15 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                          normalization_type = "RV",
                                          metric = "x_max",
                                          named_n = n_lbl,
-                                         named_n_mode = "top")
+                                         named_n_mode = "top",
+                                         colors_vec = "pinkish")
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 4)
   expect_equal(plt_2[["labels"]][["colour"]], "Top 3")
   expect_equal(plt_2[["labels"]][["y"]], "E Max")
   expect_true(grepl(sel_name_2, plt_2[["labels"]][["title"]]))
   expect_true(grepl(grp_var_2, plt_2[["labels"]][["title"]]))
+  expect_false(all(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]] == "pinkish")) # colors_vec ignored
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[4]])[colour == "red"]), n_lbl)
   expect_equal(
@@ -355,6 +357,16 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[3]])[nchar(label) > 0]), n_lbl)
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)[["data"]][[2]]), 2)
   expect_equal(ggplot2::ggplot_build(plt_7)[["data"]][[2]]$fill, grp_col)
+  
+  plt_8 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                         selection_var = sel_var,
+                                         selection_name = "drug_021",
+                                         group_var = grp_var) # default
+  
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 3)
+  expect_true(grepl("infinite", ggplot2::ggplot_build(plt_8)[["plot"]][["labels"]][["caption"]]))
+  expect_equal(NROW(ggplot2::ggplot_build(plt_8)[["data"]][[2]]$fill), 0)
   
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
@@ -708,10 +720,12 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                             selection_name = sel_name,
                                             group_var = grp_var,
                                             metric = "CIScore_50",
-                                            named_n = 0)
+                                            named_n = 0,
+                                            colors_vec = "pinkish")
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3) # no labels layer
   expect_true(grepl("CIScore 50", plt_5[["labels"]][["title"]])) 
+  expect_false(all(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]] == "pinkish")) # colors_vec ignored
   expect_false(ggplot2::ggplot_build(plt_5)[["plot"]][["layers"]][["geom_jitter"]][["show.legend"]])
   
   plt_6 <- plot_boxplot_metric_combo_by_grp(dt_scores,
