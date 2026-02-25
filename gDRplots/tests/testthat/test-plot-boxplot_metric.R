@@ -278,7 +278,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], "E Max")
   expect_true(grepl(sel_name_2, plt_2[["labels"]][["title"]]))
   expect_true(grepl(grp_var_2, plt_2[["labels"]][["title"]]))
-  expect_false(all(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]] == "pinkish")) # colors_vec ignored
+  expect_false(all(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]] == "pinkish")) # colors_vec ignored
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[4]])[colour == "red"]), n_lbl)
   expect_equal(
