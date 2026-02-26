@@ -28,10 +28,10 @@ and combo \code{SummarizedExperiment}}
 \code{"CellLineName"} or \code{"DrugName"}}
 
 \item{selection_name}{string name of selected variable value from column \code{selection_var} 
-to filter data for plotting;}
+to filter data for plotting}
 
-\item{group_var}{string name of group variable; not numeric variable from \code{dt_metrics} 
-different than \code{selection_var} and not containing unique values for each row;}
+\item{group_var}{string name of group variable; should to be not numeric variable from \code{dt_metrics} 
+different than \code{selection_var} and not containing unique values for each row}
 
 \item{group_names}{character vector with names to subset from column \code{group_var};
 if \code{NULL} then all values will be plotted}
@@ -41,20 +41,21 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
 one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
+depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 
 \item{named_n}{number of points to label based on the highest or lowest \code{metric} values;
-if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)}
+if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"}
+and similarly vice versa}
 
 \item{named_n_mode}{string determines whether the labels are applied to the highest or lowest 
-values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.}
+values of \code{metric}; one of: \code{"top"} or \code{"bottom"}}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
-for \code{grouped_flag} set as FALSE only first from vector will be used.}
+for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 }
 \value{
 \code{ggplot} object containing boxplots for selected combo metric 
