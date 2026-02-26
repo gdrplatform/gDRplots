@@ -5,11 +5,11 @@
 #'    and single-agent \code{SummarizedExperiment}
 #' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}
 #' @param normalization_type string with normalization types to be selected
-#'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#'    one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param metric string name of the metric;
 #'    one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
-#'    but the values from any numeric column can be displayed.
+#'    "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"),
+#'    but the values from any numeric column can be displayed
 #' @param fit_source string source name for metrics
 #' @param grouped_flag a logical flag whether the boxplots should be grouped and 
 #'    colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
@@ -18,7 +18,7 @@
 #'    for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
 #'    and similarly vice versa
 #' @param colors_vec character vector with colors (name or hex value) to color boxplots; 
-#'    for \code{grouped_flag} set as FALSE only first from vector will be used.
+#'    for \code{grouped_flag} set as \code{FALSE} only first from vector will be used
 #' @param with_inf a logical flag indicating whether infinite values should be shown on boxplots
 #' 
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric 
@@ -384,15 +384,16 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #' @param selection_var string name of selected main variable - one value from column 
 #'    \code{"CellLineName"} or \code{"DrugName"}
 #' @param selection_name string name of selected variable value from column \code{selection_var} 
-#'    to filter data for plotting;
-#' @param group_var string name of group variable; not numeric variable from \code{dt_metrics} 
-#'    different than \code{selection_var} and not containing unique values for each row;
+#'    to filter data for plotting
+#' @param group_var string name of group variable; should to be not numeric variable from \code{dt_metrics} 
+#'    different than \code{selection_var} and not containing unique values for each row
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
 #' @param named_n number of points to label based on the highest or lowest \code{metric} values;
-#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)
+#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"}
+#'    and similarly vice versa
 #' @param named_n_mode string determines whether the labels are applied to the highest or lowest 
-#'    values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.
+#'    values of \code{metric}; one of: \code{"top"} or \code{"bottom"}
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
 #'   
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric 
@@ -482,8 +483,6 @@ plot_boxplot_metric_sa_by_grp <- function(
   checkmate::assert_choice(
     group_var, 
     choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
-  # TODO add validation for number of levels >1 and !=NROW(dt_metrics)
-  stopifnot(NROW(unique(dt_metrics[[group_var]])) > 1)
   checkmate::assert_subset(group_names, choices = unique(dt_metrics[[group_var]]), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
@@ -529,6 +528,10 @@ plot_boxplot_metric_sa_by_grp <- function(
   # check if there are more groups than rows in table
   stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
               data.table::uniqueN(dt_met[[group_var]]) < NROW(dt_met))
+  # check if there are more groups than 1
+  if (NROW(unique(dt_met[[group_var]])) == 1) {
+    warning("The `group_var` sholud have more unique values than 1 to create boxplots.")
+  }
   
   # log10 for xc50
   if (metric == "xc50") {
@@ -649,12 +652,14 @@ plot_boxplot_metric_sa_by_grp <- function(
 #'   outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 #'   and combo \code{SummarizedExperiment}
 #' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"};
-#'   for \code{group_var} set as  \code{"DrugName"} points will be grouped by drug 
+#'   for \code{group_var} set as \code{"DrugName"} points will be grouped by drug 
 #'   combinations \code{"DrugName"} x \code{"DrugName_2"}
 #' @param metric string name of the combo metric;
 #'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
-#' 
+#'   depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param fit_source string source name for metrics
+
+
 #' @return \code{ggplot} object containing boxplots for selected combo metric 
 #'   grouped by \code{group_var}
 #' 
@@ -1016,15 +1021,16 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #' @param selection_var string name of selected main variable - one value from column 
 #'    \code{"CellLineName"} or \code{"DrugName"}
 #' @param selection_name string name of selected variable value from column \code{selection_var} 
-#'    to filter data for plotting;
-#' @param group_var string name of group variable; not numeric variable from \code{dt_metrics} 
-#'    different than \code{selection_var} and not containing unique values for each row;
+#'    to filter data for plotting
+#' @param group_var string name of group variable; should to be not numeric variable from \code{dt_metrics} 
+#'    different than \code{selection_var} and not containing unique values for each row
 #' @param group_names character vector with names to subset from column \code{group_var};
 #'    if \code{NULL} then all values will be plotted
 #' @param named_n number of points to label based on the highest or lowest \code{metric} values;
-#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"} (and vice versa)
+#'    if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"}
+#'    and similarly vice versa
 #' @param named_n_mode string determines whether the labels are applied to the highest or lowest 
-#'    values of \code{metric}; One of: \code{"top"} or \code{"bottom"}.
+#'    values of \code{metric}; one of: \code{"top"} or \code{"bottom"}
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
 #' 
 #' @return \code{ggplot} object containing boxplots for selected combo metric 
@@ -1087,7 +1093,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
   numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
-
+  
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(selection_var, choices = c(cellline_name, drug_name))
   
@@ -1159,6 +1165,10 @@ plot_boxplot_metric_combo_by_grp <- function(
   # check if there are more groups than rows in table
   stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
               data.table::uniqueN(dt_sco[[group_var]]) < NROW(dt_sco))
+  # check if there are more groups than 1
+  if (NROW(unique(dt_sco[[group_var]])) == 1) {
+    warning("The `group_var` sholud have more unique values than 1 to create boxplots.")
+  }
   
   # coloring points by rank
   data.table::setorderv(dt_sco, cols = metric)
