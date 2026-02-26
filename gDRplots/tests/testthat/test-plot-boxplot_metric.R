@@ -361,13 +361,24 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   plt_8 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
                                          selection_name = "drug_021",
-                                         group_var = grp_var) # default
+                                         group_var = grp_var)
   
   expect_is(plt_8, "gg")
   expect_length(plt_8[["layers"]], 3)
   expect_true(grepl("infinite", ggplot2::ggplot_build(plt_8)[["plot"]][["labels"]][["caption"]]))
   expect_equal(NROW(ggplot2::ggplot_build(plt_8)[["data"]][[2]]$fill), 0)
   
+  # scenario: one group
+  expect_warning({
+    plt_9 <- plot_boxplot_metric_sa_by_grp(dt_metrics[Tissue == "tissue_w"],
+                                           selection_var = sel_var,
+                                           selection_name = sel_name,
+                                           group_var = grp_var) 
+  }, "The `group_var` sholud have more unique values than 1 to create boxplots.")
+  expect_is(plt_9, "gg")
+  expect_length(plt_9[["layers"]], 4)
+  
+  # scenario: each row is one group
   dt_metrics_grp_oneitem <- data.table::copy(dt_metrics)[, oneitem_grp := sprintf("item_%s", .I)]
   expect_error({
     plot_boxplot_metric_sa_by_grp(dt_metrics_grp_oneitem,
@@ -771,6 +782,25 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[3]])[nchar(label) > 0]), 5)
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)[["data"]][[2]]), 2)
   expect_equal(ggplot2::ggplot_build(plt_7)[["data"]][[2]]$fill, grp_col)
+  
+  # scenario: one group
+  expect_warning({
+    plt_8 <- plot_boxplot_metric_combo_by_grp(dt_scores[Tissue == "tissue_w"],
+                                              selection_var = sel_var,
+                                              selection_name = sel_name,
+                                              group_var = grp_var) 
+  }, "The `group_var` sholud have more unique values than 1 to create boxplots.")
+  expect_is(plt_8, "gg")
+  expect_length(plt_8[["layers"]], 4)
+  
+  # scenario: each row is one group
+  dt_scores_grp_oneitem <- data.table::copy(dt_scores)[, oneitem_grp := sprintf("item_%s", .I)]
+  expect_error({
+    plot_boxplot_metric_combo_by_grp(dt_scores_grp_oneitem,
+                                     selection_var = sel_var,
+                                     selection_name = sel_name,
+                                     group_var = "oneitem_grp")
+  }, "The `group_var` must have fewer unique values than total rows to create boxplots.")
   
   expect_error(plot_boxplot_metric_combo_by_grp(dt_scores = unlist(dt_scores),
                                                 selection_var = sel_var,
