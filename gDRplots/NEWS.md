@@ -1,3 +1,6 @@
+## gDRplots 0.0.101 - 2026-02-18
+* add boxplot by group for metrics
+
 ## gDRplots 0.0.100 - 2026-01-19
 * update `pheatmap_qc` (change standardized concentrations into unique strings)
 

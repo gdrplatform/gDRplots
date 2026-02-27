@@ -25,8 +25,8 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
 one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
-but the values from any numeric column can be displayed.}
+"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"),
+but the values from any numeric column can be displayed}
 
 \item{fit_source}{string source name for metrics}
 
@@ -39,7 +39,7 @@ for \code{group_var} equal \code{"CellLineName"} points will be colored by \code
 and similarly vice versa}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
-for \code{grouped_flag} set as FALSE only first from vector will be used.}
+for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }

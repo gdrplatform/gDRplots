@@ -23,7 +23,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
 one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
-depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
+depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 
@@ -32,7 +32,7 @@ for \code{group_var} equal \code{"CellLineName"} points will be colored by \code
 and similarly vice versa}
 
 \item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
-for \code{grouped_flag} set as FALSE only first from vector will be used.}
+for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 }
 \value{
 \code{ggplot} object containing boxplots for selected combo metric

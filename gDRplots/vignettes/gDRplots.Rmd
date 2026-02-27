@@ -217,6 +217,24 @@ plot_boxplot_metric_sa_by_drugs(dt_metrics_sa_capped,
                                 colored_pts_flag = TRUE)
 ```
 
+There is also a possibility to generate boxplot grouped by chosen variable for dedicated `DrugName` or `CellLineName`.
+Additionally, the n-bottom points are colored.
+
+```{r plot_boxplot_metric_sa_by_grp_d, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
+                             selection_var = "DrugName",
+                             selection_name = "drug_002",
+                             group_var = "Tissue",
+                             named_n = 3)
+```
+```{r plot_boxplot_metric_sa_by_grp_cl, warning = FALSE, message = FALSE}
+plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
+                             selection_var = "CellLineName",
+                             selection_name = "cellline_BC",
+                             group_var = "drug_moa",
+                             named_n = 3)
+```
+
 ### Co-dilution Data
 
 The **pheatmap_with_anno_cd** function is dedicated to co-dilution experiments to generate a heatmap.
@@ -277,6 +295,25 @@ plot_boxplot_metric_combo_by_CLs(dt_scores)
 
 ```{r plot_boxplot_metric_combo_by_drugs, warning = FALSE, message = FALSE}
 plot_boxplot_metric_combo_by_drugs(dt_scores)
+```
+
+There is also a possibility to generate boxplot grouped by chosen variable for dedicated `DrugName` or `CellLineName`.
+Additionally, the n-top points are colored.
+
+```{r plot_boxplot_metric_combo_by_grp_d, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_grp(dt_scores,
+                                 selection_var = "DrugName",
+                                 selection_name = c("drug_002", "drug_026"),
+                                 group_var = "Tissue",
+                                 named_n = 3)
+```
+
+```{r plot_boxplot_metric_combo_by_grp_cl, warning = FALSE, message = FALSE}
+plot_boxplot_metric_combo_by_grp(dt_scores,
+                                 selection_var = "CellLineName",
+                                 selection_name = "cellline_BC",
+                                 group_var = "drug_moa_2",
+                                 named_n = 3)
 ```
 
 For experiments with drug combinations, users can visualize the full response matrix by using **heatmap_combo_metrics** function. 
