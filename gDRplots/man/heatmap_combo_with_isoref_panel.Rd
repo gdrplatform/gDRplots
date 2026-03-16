@@ -62,7 +62,7 @@ Plot panel of heatmaps with fitted and reference data for isobolograms
 }
 \examples{
 cl_names <-
-  c("cellline_AA", "cellline_EA", "cellline_IB", 
+  c("cellline_AA", "cellline_EA", "cellline_IB",
   "cellline_MC", "cellline_BC", "cellline_FD")
 
 drug1_name <- "drug_001"
@@ -79,14 +79,15 @@ heatmap_combo_with_isoref_panel(dt_excess,
                                 cl_names)
 
 dt_excess_2 <- data.table::copy(dt_excess)
-dt_excess_2[CellLineName \%in\% cl_names[1:2], Concentration := Concentration / 10]
+invisible(dt_excess_2[CellLineName \%in\% cl_names[1:2],
+                      Concentration := Concentration / 10])
 
 heatmap_combo_with_isoref_panel(dt_excess_2,
                                 dt_isobolograms,
                                 drug1_name, drug2_name,
                                 cl_names,
                                 iso_levels = c("0.25", "0.75"),
-                                colors_vec = c("darkcyan", "snow", "darkorange")) 
+                                colors_vec = c("darkcyan", "snow", "coral"))
 
 }
 \keyword{combo_plots}
