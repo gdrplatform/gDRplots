@@ -952,7 +952,8 @@ plot_combination_index <- function(
 #'                           dt_isobolograms,
 #'                           drug1_name, drug2_name,
 #'                           cl_name,
-#'                           metric = "hsa_excess")
+#'                           metric = "hsa_excess",
+#'                           iso_levels = c("-0.2", "0.2"))
 #'                           
 #' heatmap_combo_with_isoref(dt_excess,
 #'                           dt_isobolograms,
@@ -1248,6 +1249,7 @@ heatmap_combo_with_isoref <- function(
 #'                                 dt_isobolograms,
 #'                                 drug1_name, drug2_name,
 #'                                 cl_names,
+#'                                 iso_levels = c("0.25", "0.75"),
 #'                                 colors_vec = c("darkcyan", "snow", "darkorange")) 
 #' 
 #' @export
@@ -1284,7 +1286,7 @@ heatmap_combo_with_isoref_panel <- function(
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) {
     stopifnot("`iso_levels` must be a valid numeric value" = 
-                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
+                all(vapply(iso_levels, function(i) grepl("^[-]*0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
@@ -1384,7 +1386,7 @@ heatmap_combo_with_isoref_panel <- function(
 #'                                        drug1_name, drug2_name,
 #'                                        cl_names,
 #'                                        metric = "hsa_excess",
-#'                                        iso_levels = c("0.25", "0.5"))
+#'                                        iso_levels = c("-0.25", "0.25"))
 #' 
 #' heatmap_combo_with_isoref_panel_common(dt_excess,
 #'                                        dt_isobolograms,
@@ -1446,7 +1448,7 @@ heatmap_combo_with_isoref_panel_common <- function(
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) {
     stopifnot("`iso_levels` must be a valid numeric value" = 
-                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
+                all(vapply(iso_levels, function(i) grepl("^[-]*0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
@@ -1706,7 +1708,7 @@ heatmap_combo_with_isoref_panel_common <- function(
 #'                                             dt_isobolograms,
 #'                                             drug1_name, drug2_name,
 #'                                             cl_names,
-#'                                             iso_levels = c("0.25", "0.5"))
+#'                                             iso_levels = c("-0.25", "0.25"))
 #' 
 #' heatmap_combo_with_isoref_panel_independent(dt_excess,
 #'                                             dt_isobolograms,
@@ -1751,7 +1753,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
   checkmate::assert_character(iso_levels, null.ok = TRUE)
   if (!is.null(iso_levels)) {
     stopifnot("`iso_levels` must be a valid numeric value" = 
-                all(vapply(iso_levels, function(i) grepl("^0\\.?[0-9]*$", i), logical(1))))
+                all(vapply(iso_levels, function(i) grepl("^[-]*0\\.?[0-9]*$", i), logical(1))))
   }
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
@@ -1790,7 +1792,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
                          unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
   plt_list <- lapply(cl_names_with_data, function(cl_nm) {
-    plt <- gDRplots::heatmap_combo_with_isoref(
+    plt <- heatmap_combo_with_isoref(
       dt_excess = dt_excess,
       dt_isobolograms = dt_isobolograms,
       drug1_name = drug1_name,
@@ -1805,9 +1807,18 @@ heatmap_combo_with_isoref_panel_independent <- function(
   })
   names(plt_list) <- cl_names_with_data
   
+  # find the maximum legend 
+  if (!is.null(iso_levels)) {
+    dt_num_iso <- unique(dt_isobolograms[iso_level %in% iso_levels,.SD, .SDcols = c(cellline_name, "iso_level")])
+    lbl_legend <- dt_num_iso[,.N, by = cellline_name][order(N)][N == max(N), get(cellline_name)][[1]]
+  } else {
+    lbl_legend <- names(plt_list)[1]
+  }
+  
   panel <- ggpubr::annotate_figure(
     ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
-                      common.legend = TRUE, legend = "left"),
+                      common.legend = TRUE, legend.grob = ggpubr::get_legend(plt_list[[lbl_legend]]),
+                      legend = "left"),
     top = panel_title)
   
   # final panel

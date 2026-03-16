@@ -1,3 +1,6 @@
+## gDRplots 0.0.102 - 2026-03-16
+* fix issue with negative values of iso levels
+
 ## gDRplots 0.0.101 - 2026-02-18
 * add boxplot by group for metrics
 
