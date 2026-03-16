@@ -1226,7 +1226,7 @@ heatmap_combo_with_isoref <- function(
 #' @keywords combo_plots
 #' @examples
 #' cl_names <-
-#'   c("cellline_AA", "cellline_EA", "cellline_IB", 
+#'   c("cellline_AA", "cellline_EA", "cellline_IB",
 #'   "cellline_MC", "cellline_BC", "cellline_FD")
 #' 
 #' drug1_name <- "drug_001"
@@ -1243,14 +1243,15 @@ heatmap_combo_with_isoref <- function(
 #'                                 cl_names)
 #' 
 #' dt_excess_2 <- data.table::copy(dt_excess)
-#' dt_excess_2[CellLineName %in% cl_names[1:2], Concentration := Concentration / 10]
+#' invisible(dt_excess_2[CellLineName %in% cl_names[1:2],
+#'                       Concentration := Concentration / 10])
 #' 
 #' heatmap_combo_with_isoref_panel(dt_excess_2,
 #'                                 dt_isobolograms,
 #'                                 drug1_name, drug2_name,
 #'                                 cl_names,
 #'                                 iso_levels = c("0.25", "0.75"),
-#'                                 colors_vec = c("darkcyan", "snow", "darkorange")) 
+#'                                 colors_vec = c("darkcyan", "snow", "coral"))
 #' 
 #' @export
 heatmap_combo_with_isoref_panel <- function(
@@ -1809,8 +1810,9 @@ heatmap_combo_with_isoref_panel_independent <- function(
   
   # find the maximum legend 
   if (!is.null(iso_levels)) {
-    dt_num_iso <- unique(dt_isobolograms[iso_level %in% iso_levels,.SD, .SDcols = c(cellline_name, "iso_level")])
-    lbl_legend <- dt_num_iso[,.N, by = cellline_name][order(N)][N == max(N), get(cellline_name)][[1]]
+    dt_num_iso <- 
+      unique(dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = c(cellline_name, "iso_level")])
+    lbl_legend <- dt_num_iso[, .N, by = cellline_name][order(N)][N == max(N), get(cellline_name)][[1]]
   } else {
     lbl_legend <- names(plt_list)[1]
   }
