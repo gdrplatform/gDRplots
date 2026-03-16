@@ -78,7 +78,8 @@ heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
                           drug1_name, drug2_name,
                           cl_name,
-                          metric = "hsa_excess")
+                          metric = "hsa_excess",
+                          iso_levels = c("-0.2", "0.2"))
                           
 heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,

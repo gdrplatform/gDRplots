@@ -85,6 +85,7 @@ heatmap_combo_with_isoref_panel(dt_excess_2,
                                 dt_isobolograms,
                                 drug1_name, drug2_name,
                                 cl_names,
+                                iso_levels = c("0.25", "0.75"),
                                 colors_vec = c("darkcyan", "snow", "darkorange")) 
 
 }
