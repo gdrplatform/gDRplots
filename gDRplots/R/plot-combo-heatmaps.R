@@ -987,7 +987,8 @@ plot_combination_index <- function(
 #'                           cl_name,
 #'                           metric = "hsa_excess",
 #'                           iso_levels = c("0.25", "0.75"),
-#'                           colors_vec_iso = c("darkcyan", "darkblue"),
+#'                           colors_vec_iso = c("0.25" = "darkcyan",
+#'                                              "0.75" = "darkblue"),
 #'                           swap_axes = FALSE)
 #'                           
 #' @export
