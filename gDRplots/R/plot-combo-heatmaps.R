@@ -794,6 +794,7 @@ plot_combination_index <- function(
   checkmate::assert_character(iso_levels)
   checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
+  checkmate::assert_character(colors_vec_iso, null.ok = TRUE)
   hline_color <- 
     gDRutils::get_settings_from_json("HLINE_COLOR",
                                      system.file(package = "gDRplots", "settings.json"))
@@ -926,6 +927,8 @@ plot_combination_index <- function(
 #' @param colors_vec character vector of colors (valid name or hex) used in heatmap; 
 #'     the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
 #'     and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale
+#' @param colors_vec_iso character vector of colors (valid name or hex) used for the isolines; 
+#'     the default is the dark red-orange palette
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag whether to swap the axes with drugs of the heatmap
 #'
@@ -984,6 +987,7 @@ plot_combination_index <- function(
 #'                           cl_name,
 #'                           metric = "hsa_excess",
 #'                           iso_levels = c("0.25", "0.75"),
+#'                           colors_vec_iso = c("darkcyan", "darkblue"),
 #'                           swap_axes = FALSE)
 #'                           
 #' @export
@@ -997,6 +1001,7 @@ heatmap_combo_with_isoref <- function(
     metric = "smooth",
     iso_levels = "0.5",
     colors_vec = NULL,
+    colors_vec_iso = NULL,
     no_breaks = 50,
     swap_axes = FALSE) {
   
@@ -1017,9 +1022,10 @@ heatmap_combo_with_isoref <- function(
   checkmate::assert_choice(cl_name, choices = dt_excess[[cellline_name]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
-  checkmate::assert_character(iso_levels, null.ok = TRUE)
+  checkmate::assert_character(colors_vec_iso, null.ok = TRUE)
   if (!is.null(iso_levels)) checkmate::assert_numeric(as.numeric(iso_levels))
   checkmate::assert_character(colors_vec, null.ok = TRUE)
+  checkmate::assert_character(iso_levels, null.ok = TRUE)
   checkmate::assert_int(no_breaks, lower = 2)
   checkmate::assert_flag(swap_axes)
   
@@ -1153,7 +1159,16 @@ heatmap_combo_with_isoref <- function(
           dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
         
         # colors for isoline
-        iso_colors <- .get_iso_colors(available_iso_lvl)
+        iso_colors <- 
+          if (is.null(colors_vec_iso) || !all(vapply(colors_vec_iso, is_valid_color, logical(1)))) {
+            .get_iso_colors(iso_levels)
+          } else if (all(iso_levels %in% names(colors_vec_iso))) {
+            colors_vec_iso[iso_levels]
+          } else {
+            ls_ <- grDevices::colorRampPalette(colors_vec_iso)(NROW(available_iso_lvl))
+            names(ls_) <- iso_levels
+            ls_ 
+          }
         
         # plot
         label_prefix <- if (normalization_type == "GR") {
@@ -1197,8 +1212,8 @@ heatmap_combo_with_isoref <- function(
                                linewidth = 1) +
             ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash")) +
             ggplot2::scale_color_manual(values = iso_colors,
-                                        labels = iso_label,
-                                        breaks = available_iso_lvl) +
+                                        breaks = names(iso_colors),
+                                        labels = iso_label) +
             ggplot2::labs(linetype = normalization_type,
                           color = "Iso Levels")
         }
@@ -1624,7 +1639,7 @@ heatmap_combo_with_isoref_panel_common <- function(
         dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = req_cols]
       
       # colors for isoline
-      iso_colors <- .get_iso_colors(available_iso_lvl)
+      iso_colors <- .get_iso_colors(iso_levels)
       
       # plot
       label_prefix <- if (normalization_type == "GR") {
@@ -1655,6 +1670,7 @@ heatmap_combo_with_isoref_panel_common <- function(
                            linewidth = 1) +
         ggplot2::scale_linetype_manual(values = c("measured" = "solid", "expected" = "twodash")) +
         ggplot2::scale_color_manual(values = iso_colors,
+                                    breaks = names(iso_label),
                                     labels = iso_label) +
         ggplot2::labs(color = "Iso Levels",
                       linetype = normalization_type)
@@ -1710,6 +1726,13 @@ heatmap_combo_with_isoref_panel_common <- function(
 #'                                             drug1_name, drug2_name,
 #'                                             cl_names,
 #'                                             iso_levels = c("-0.25", "0.25"))
+#'                                             
+#' heatmap_combo_with_isoref_panel_independent(
+#'   dt_excess,
+#'   dt_isobolograms,
+#'   drug1_name, drug2_name,
+#'   cl_names = c("cellline_FD", "cellline_MC", "cellline_AA", "cellline_EA"),
+#'   iso_levels =  c("-0.25", "-0.05", "0.2", "0.65"))
 #' 
 #' heatmap_combo_with_isoref_panel_independent(dt_excess,
 #'                                             dt_isobolograms,
@@ -1792,6 +1815,9 @@ heatmap_combo_with_isoref_panel_independent <- function(
                          drug2_name,
                          unique(dt_excess[get(drug_name_2) == drug2_name, ][[gnumber_2]]))
   
+  # set consisten colors accros panels
+  colors_vec_iso <- .get_iso_colors(sort(unique(dt_isobolograms[iso_level %in% iso_levels][["iso_level"]])))
+  
   plt_list <- lapply(cl_names_with_data, function(cl_nm) {
     plt <- heatmap_combo_with_isoref(
       dt_excess = dt_excess,
@@ -1803,6 +1829,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
       metric = metric,
       iso_levels = iso_levels,
       colors_vec = colors_vec,
+      colors_vec_iso = colors_vec_iso,
       no_breaks = no_breaks,
       swap_axes = swap_axes)
   })
