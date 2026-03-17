@@ -534,7 +534,8 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_true(grepl("HSA Excess GR", plt_5[["labels"]][["fill"]]))
   expect_true(grepl("GR", plt_5[["labels"]][["linetype"]]))
   expect_length(names(plt_5[["guides"]][["guides"]]), NROW(c("fill", "linetype", "colour")))
-  
+                            
+  col_vec_iso = c("0.25" = "darkcyan", "0.75" = "darkblue")
   plt_6 <- heatmap_combo_with_isoref(dt_excess,
                                      dt_isobolograms,
                                      drug1_name, 
@@ -542,6 +543,7 @@ test_that("heatmap_combo_with_isoref works as expected", {
                                      cl_name, 
                                      metric = "hsa_excess",
                                      iso_levels = c("0.25", "0.75"),
+                                     colors_vec_iso = col_vec_iso,
                                      swap_axes = TRUE)
   expect_is(plt_6, "gg")
   expect_true(grepl(drug1_name, plt_6[["labels"]][["x"]]))
@@ -549,6 +551,8 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_true(grepl("HSA Excess GR", plt_6[["labels"]][["fill"]]))
   expect_true(grepl("Iso Levels", plt_6[["labels"]][["colour"]]))
   expect_length(names(plt_6[["guides"]][["guides"]]), NROW(c("fill", "linetype", "colour")))
+  expect_equal(unique(ggplot2::ggplot_build(plt_6)[["data"]][[2]][["colour"]]), 
+               unname(col_vec_iso))
   
   plt_1_swap_axes <- heatmap_combo_with_isoref(dt_excess,
                                                dt_isobolograms,
