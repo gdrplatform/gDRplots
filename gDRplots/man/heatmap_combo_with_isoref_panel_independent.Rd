@@ -84,6 +84,13 @@ heatmap_combo_with_isoref_panel_independent(dt_excess,
                                             drug1_name, drug2_name,
                                             cl_names,
                                             iso_levels = c("-0.25", "0.25"))
+                                            
+heatmap_combo_with_isoref_panel_independent(
+  dt_excess,
+  dt_isobolograms,
+  drug1_name, drug2_name,
+  cl_names = c("cellline_FD", "cellline_MC", "cellline_AA", "cellline_EA"),
+  iso_levels =  c("-0.25", "-0.05", "0.2", "0.65"))
 
 heatmap_combo_with_isoref_panel_independent(dt_excess,
                                             dt_isobolograms,

@@ -14,6 +14,7 @@ heatmap_combo_with_isoref(
   metric = "smooth",
   iso_levels = "0.5",
   colors_vec = NULL,
+  colors_vec_iso = NULL,
   no_breaks = 50,
   swap_axes = FALSE
 )
@@ -47,6 +48,9 @@ when \code{NULL} - no isolines will be displayed}
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
 the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
 and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
+
+\item{colors_vec_iso}{character vector of colors (valid name or hex) used for the isolines; 
+the default is the dark red-orange palette}
 
 \item{no_breaks}{numeric number of breaks on scale}
 
