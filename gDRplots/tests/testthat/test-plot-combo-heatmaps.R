@@ -535,7 +535,7 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_true(grepl("GR", plt_5[["labels"]][["linetype"]]))
   expect_length(names(plt_5[["guides"]][["guides"]]), NROW(c("fill", "linetype", "colour")))
                             
-  col_vec_iso = c("0.25" = "darkcyan", "0.75" = "darkblue")
+  col_vec_iso <- c("0.25" = "darkcyan", "0.75" = "darkblue")
   plt_6 <- heatmap_combo_with_isoref(dt_excess,
                                      dt_isobolograms,
                                      drug1_name, 
