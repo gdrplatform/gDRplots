@@ -768,7 +768,7 @@ plot_boxplot_metric_combo <- function(
   plt_title <- sprintf("Number of unique %s: %s", group_label, NROW(unique(dt_sco[[point_var]])))
   
   if (grouped_flag) {
-    data.table::setorderv(dt_sco, col_var)
+    data.table::setorderv(dt_sco, c(col_var, group_var))
     dt_sco[[group_var]] <- factor(dt_sco[[group_var]], levels = unique(dt_sco[[group_var]]))
     
     fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {

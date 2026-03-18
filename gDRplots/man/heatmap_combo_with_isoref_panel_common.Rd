@@ -89,7 +89,7 @@ heatmap_combo_with_isoref_panel_common(dt_excess,
                                        drug1_name, drug2_name,
                                        cl_names,
                                        metric = "hsa_excess",
-                                       iso_levels = c("0.25", "0.5"))
+                                       iso_levels = c("-0.25", "0.25"))
 
 heatmap_combo_with_isoref_panel_common(dt_excess,
                                        dt_isobolograms,

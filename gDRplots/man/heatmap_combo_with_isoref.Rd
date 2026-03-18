@@ -14,6 +14,7 @@ heatmap_combo_with_isoref(
   metric = "smooth",
   iso_levels = "0.5",
   colors_vec = NULL,
+  colors_vec_iso = NULL,
   no_breaks = 50,
   swap_axes = FALSE
 )
@@ -48,6 +49,9 @@ when \code{NULL} - no isolines will be displayed}
 the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
 and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 
+\item{colors_vec_iso}{character vector of colors (valid name or hex) used for the isolines; 
+the default is the dark red-orange palette}
+
 \item{no_breaks}{numeric number of breaks on scale}
 
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
@@ -78,7 +82,8 @@ heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
                           drug1_name, drug2_name,
                           cl_name,
-                          metric = "hsa_excess")
+                          metric = "hsa_excess",
+                          iso_levels = c("-0.2", "0.2"))
                           
 heatmap_combo_with_isoref(dt_excess,
                           dt_isobolograms,
@@ -109,6 +114,8 @@ heatmap_combo_with_isoref(dt_excess,
                           cl_name,
                           metric = "hsa_excess",
                           iso_levels = c("0.25", "0.75"),
+                          colors_vec_iso = c("0.25" = "darkcyan",
+                                             "0.75" = "darkblue"),
                           swap_axes = FALSE)
                           
 }
