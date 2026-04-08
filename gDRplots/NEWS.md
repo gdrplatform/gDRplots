@@ -1,5 +1,5 @@
 ## gDRplots 0.0.103 - 2026-04-08
-* fix issue with returning error for single boxplot
+* fix issue with returning error for boxplots
 
 ## gDRplots 0.0.102 - 2026-03-16
 * fix issue with negative values of iso levels
