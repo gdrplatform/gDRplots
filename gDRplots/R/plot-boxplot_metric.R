@@ -526,8 +526,9 @@ plot_boxplot_metric_sa_by_grp <- function(
   dt_met <- dt_met[get(group_var) %in% group_names, ]
   
   # check if there are more groups than rows in table
-  stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
-              data.table::uniqueN(dt_met[[group_var]]) < NROW(dt_met))
+  if (data.table::uniqueN(dt_met[[group_var]]) >= NROW(dt_met)) {
+    warning("Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
+  }
   # check if there are more groups than 1
   if (NROW(unique(dt_met[[group_var]])) == 1) {
     warning("The `group_var` sholud have more unique values than 1 to create boxplots.")
@@ -1163,8 +1164,9 @@ plot_boxplot_metric_combo_by_grp <- function(
   dt_sco <- dt_sco[get(group_var) %in% group_names, ]
   
   # check if there are more groups than rows in table
-  stopifnot("The `group_var` must have fewer unique values than total rows to create boxplots." = 
-              data.table::uniqueN(dt_sco[[group_var]]) < NROW(dt_sco))
+  if (data.table::uniqueN(dt_sco[[group_var]]) >= NROW(dt_sco)) {
+    warning("Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
+  }
   # check if there are more groups than 1
   if (NROW(unique(dt_sco[[group_var]])) == 1) {
     warning("The `group_var` sholud have more unique values than 1 to create boxplots.")
