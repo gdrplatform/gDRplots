@@ -306,7 +306,7 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(plt_18[["labels"]][["y"]], "GR")
   expect_true(all(
     (1 %in% as.numeric(ggplot2::get_panel_scales(plt_18)$y$get_labels())),
-    (plt_18$coordinates$limits$y[1] < 1 && 1 <plt_18$coordinates$limits$y[2])
+    (plt_18$coordinates$limits$y[1] < 1 && 1 < plt_18$coordinates$limits$y[2])
   ))
   
   # testing assertion
