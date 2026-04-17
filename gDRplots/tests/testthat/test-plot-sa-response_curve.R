@@ -299,7 +299,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_18 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                   dt_average = dt_avg_short,
                                   selection_name = selected_drug,
-                                  group_var = group_var,
+                                  group_var = "CellLineName",
                                   group_names = "cellline_BA",
                                   plot_fit_flag = FALSE)
   expect_is(plt_18, "gg")
