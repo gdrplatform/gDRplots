@@ -1,3 +1,6 @@
+## gDRplots 0.0.104 - 2026-04-22
+* fix subscript out of bounds in `heatmap_combo_with_isoref_panel_independent`
+
 ## gDRplots 0.0.103 - 2026-04-08
 * fix issue with returning error for boxplots
 
