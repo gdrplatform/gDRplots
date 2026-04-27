@@ -2,7 +2,7 @@ context("Test plot-chemical_genomics")
 
 # Load test data
 
-metrics_data <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
+metrics_data <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 
 test_that("analyze_cgs works correctly", {
   # test with a single cell line and single metric

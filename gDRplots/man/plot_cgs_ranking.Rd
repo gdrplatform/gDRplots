@@ -36,7 +36,7 @@ A ggplot2 object with cgs results
 Generates a ggplot2 visualization of chemical genomics screening data, highlighting GSEA results.
 }
 \examples{
-dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
+dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
 plot_cgs_ranking(results,
   cl_name = "CellLineName_1",

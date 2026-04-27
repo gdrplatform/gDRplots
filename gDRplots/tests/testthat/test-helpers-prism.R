@@ -437,7 +437,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   
   expect_error(prep_dt_depmap_meta(123), 
                "Assertion on 'meta_data_path' failed: Must be of type 'string'")
-  expect_error(prep_dt_depmap_meta("testdata/meta_data.qs"), 
+  expect_error(prep_dt_depmap_meta("testdata/meta_data.qs2"), 
                "Assertion on 'File ext must be csv' failed: Must be TRUE")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.csv"), 
                "Assertion on 'meta_data_path' failed: File does not exist")
@@ -484,7 +484,7 @@ test_that("prep_dt_depmap_feat works as expected", {
                                    meta_data_path = test_meta_data_path), 
                "Assertion on 'feat_data_path' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
-                                   meta_data_path = "testdata/meta_data.qs"),
+                                   meta_data_path = "testdata/meta_data.qs2"),
                "Assertion on 'File ext must be csv' failed: Must be TRUE")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = "testdata/meta_data.csv"),
