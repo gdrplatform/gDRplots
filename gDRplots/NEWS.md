@@ -1,3 +1,7 @@
+## gDRplots 0.0.106 - 2026-04-27
+* migrate from `qs` to `qs2` package
+* update batch file extension from `.qs` to `.qs2`
+
 ## gDRplots 0.0.105 - 2026-04-23
 * fix subscript out of bounds in `heatmap_combo_with_isoref_panel_independent`
 
