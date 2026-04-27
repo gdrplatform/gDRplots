@@ -29,7 +29,7 @@
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' 
 #' @examples
-#' dt_metrics <- qs2::qd_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
+#' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 #' analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 
 #' cellline1 <- "CellLineName_1"
@@ -185,7 +185,7 @@ analyze_cgs <- function(dt_metrics,
 #' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #' 
 #' @examples
-#' dt_metrics <- qs2::qd_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
+#' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 #' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
 #' plot_cgs_ranking(results,
 #'   cl_name = "CellLineName_1",
