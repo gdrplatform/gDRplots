@@ -844,7 +844,7 @@ test_that("prep_assoc_summary works as expected", {
   expect_message({
     tab_9 <- prep_assoc_summary(dir_path = d_path, 
                                 ls_file = ls_RV,
-                                read_file_fun = qs::qread)
+                                read_file_fun = qs2::qs_read)
   }, "An error occurred for file")
   expect_is(tab_9, "data.table")
   expect_length(tab_9, 0)

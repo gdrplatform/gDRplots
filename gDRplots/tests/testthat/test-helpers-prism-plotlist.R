@@ -296,7 +296,7 @@ test_that("create_PRISM_plot_list_sa works as expected", {
   expect_error(create_PRISM_plot_list_sa(drug_name_vec = d_names,   
                                          dt_metrics = dt_metrics,
                                          dt_average = dt_average,
-                                         meta_data_path = "path/meta_data.qs",
+                                         meta_data_path = "path/meta_data.qs2",
                                          feat_data_path = feat_data_path,
                                          feature_sets = feature_sets),
                "Assertion on 'File ext must be csv' failed: Must be TRUE")
@@ -593,7 +593,7 @@ test_that("create_PRISM_plot_list_combo works as expected", {
                                             drug2_name_vec = d_names_2,
                                             dt_metrics = dt_metrics,
                                             dt_scores = dt_scores,
-                                            meta_data_path = "path/meta_data.qs",
+                                            meta_data_path = "path/meta_data.qs2",
                                             feat_data_path = feat_data_path,
                                             feature_sets = feature_sets),
                "Assertion on 'File ext must be csv' failed: Must be TRUE")
