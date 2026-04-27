@@ -1,3 +1,6 @@
+## gDRplots 0.0.105 - 2026-04-23
+* fix subscript out of bounds in `heatmap_combo_with_isoref_panel_independent`
+
 ## gDRplots 0.0.104 - 2026-04-16
 * add max of y axis at 1 for dose-response curves for single-agent
 
