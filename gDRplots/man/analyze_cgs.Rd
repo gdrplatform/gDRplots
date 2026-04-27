@@ -47,7 +47,7 @@ This function analyzes chemical genomics (CGS) data, filters by compound mechani
 prepares the data for Gene Set Enrichment Analysis (GSEA), and performs GSEA for specified cell lines and metrics.
 }
 \examples{
-dt_metrics <- qs::qread(system.file("testdata/cgs_data.qs", package = "gDRplots"))
+dt_metrics <- qs2::qd_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 cellline1 <- "CellLineName_1"
 cellline2 <- "CellLineName_2"
