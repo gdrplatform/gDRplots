@@ -355,7 +355,7 @@ neutralize_spaces <- function(x,
 #'
 #' @keywords internal
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @export
 estimate_plot_size <- function(plt,
@@ -491,7 +491,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' 
 #' @keywords internal
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @export
 prep_double_table_chunk <- function(tbl_list,
@@ -788,7 +788,7 @@ prep_filename_path <- function(plt_list,
 #' generate_datatable(data.table::data.table(iris))
 #' 
 #' @keywords internal
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @export
 generate_datatable <- function(tab, 

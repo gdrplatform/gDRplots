@@ -11,7 +11,7 @@
 #' @return A named list of ggplot objects for each barcode
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @export
 #' @examples
@@ -95,7 +95,7 @@ plot_plate_stack_info <- function(dt_plate,
 #' @return A \code{ggplot} object.
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @export
 #' @examples
@@ -328,7 +328,7 @@ plot_single_plate_stack_info <- function(dt_subset,
 #' 
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' test_data <- data.table::data.table(
@@ -458,7 +458,7 @@ plot_plate <- function(dt_plate, column_name) {
 #' 
 #' @keywords internal
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @return A list containing color mappings for Gnumber and Gnumber_2
 generate_color_mappings <- function(dt_plate_subset,
@@ -494,7 +494,7 @@ generate_color_mappings <- function(dt_plate_subset,
 #' @param vals \code{numeric} vector of concentration values.
 #' @return A \code{character} vector of ranks.
 #' @keywords internal
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 .calc_dose_rank <- function(vals) {
   vals <- round(vals, 6)
   unique_doses <- sort(unique(vals[vals > 0]))
@@ -517,7 +517,7 @@ generate_color_mappings <- function(dt_plate_subset,
 #' @param n_per_line \code{integer} number of items to display per line.
 #' @return A single \code{character} string with HTML line breaks.
 #' @keywords internal
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 .format_dose_list <- function(dose_vec, n_per_line) {
   if (length(dose_vec) == 0) return("")
   
