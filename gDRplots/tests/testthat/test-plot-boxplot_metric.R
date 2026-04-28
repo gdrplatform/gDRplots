@@ -380,12 +380,12 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   
   # scenario: each row is one group
   dt_metrics_grp_oneitem <- data.table::copy(dt_metrics)[, oneitem_grp := sprintf("item_%s", .I)]
-  expect_error({
+  expect_warning({
     plot_boxplot_metric_sa_by_grp(dt_metrics_grp_oneitem,
                                   selection_var = sel_var,
                                   selection_name = sel_name,
                                   group_var = "oneitem_grp")
-  }, "The `group_var` must have fewer unique values than total rows to create boxplots.")
+  }, "Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
   
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
@@ -795,12 +795,12 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   
   # scenario: each row is one group
   dt_scores_grp_oneitem <- data.table::copy(dt_scores)[, oneitem_grp := sprintf("item_%s", .I)]
-  expect_error({
+  expect_warning({
     plot_boxplot_metric_combo_by_grp(dt_scores_grp_oneitem,
                                      selection_var = sel_var,
                                      selection_name = sel_name,
                                      group_var = "oneitem_grp")
-  }, "The `group_var` must have fewer unique values than total rows to create boxplots.")
+  }, "Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
   
   expect_error(plot_boxplot_metric_combo_by_grp(dt_scores = unlist(dt_scores),
                                                 selection_var = sel_var,

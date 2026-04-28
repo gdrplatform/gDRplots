@@ -838,12 +838,21 @@ test_that("heatmap_combo_with_isoref_panel_independent works as expected", {
   
   plt_4 <- heatmap_combo_with_isoref_panel_independent(dt_excess,
                                                        dt_isobolograms,
-                                                       drug1_name, 
+                                                       drug1_name,
                                                        drug2_name,
                                                        cl_names,
                                                        normalization_type = "GR",
                                                        iso_levels = c("-0.2", "0.5", "0.8", "0.99"))
-  
+
+  # iso_levels with no match in dt_isobolograms should not crash (fallback to first plot)
+  plt_no_iso <- heatmap_combo_with_isoref_panel_independent(dt_excess,
+                                                            dt_isobolograms,
+                                                            drug1_name,
+                                                            drug2_name,
+                                                            cl_names,
+                                                            iso_levels = "0.9999")
+  expect_is(plt_no_iso, "gg")
+
   expect_error(heatmap_combo_with_isoref_panel_independent(dt_excess = unlist(dt_excess),
                                                            dt_isobolograms = dt_isobolograms,
                                                            drug1_name = drug1_name,

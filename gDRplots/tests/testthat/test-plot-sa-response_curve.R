@@ -294,6 +294,21 @@ test_that("plot_dose_response_sa works as expected", {
   expect_equal(ggplot2::get_guide_data(plt_17, "colour")[[".label"]],
                unique(dt_average[[cellline_name]]))
   
+  # scenario: point under 0.5
+  dt_avg_short <- dt_average[Concentration > 0.01]
+  plt_18 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = dt_avg_short,
+                                  selection_name = selected_drug,
+                                  group_var = "CellLineName",
+                                  group_names = "cellline_BA",
+                                  plot_fit_flag = FALSE)
+  expect_is(plt_18, "gg")
+  expect_equal(plt_18[["labels"]][["y"]], "GR")
+  expect_true(all(
+    (1 %in% as.numeric(ggplot2::get_panel_scales(plt_18)$y$get_labels())),
+    (plt_18$coordinates$limits$y[1] < 1 && 1 < plt_18$coordinates$limits$y[2])
+  ))
+  
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
@@ -346,275 +361,276 @@ test_that("plot_dose_response_sa works as expected", {
                                      fit_source = 1),
                "Assertion on 'fit_source' failed: Must be of type 'string'")
 })
-
-test_that("plot_dose_response_sa_by_CLs works as expected", {
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
   
-  mae <- gDRutils::get_synthetic_data("small")
-  se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  
-  cellline_name_vec <- unique(dt_metrics[[cellline_name]])[2:5]
-  drug_name_vec <- unique(dt_metrics[[drug_name]])[5:7]
-  
-  plts_1 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
-                                         dt_average = dt_average)
-  expect_is(plts_1, "list")
-  expect_equal(names(plts_1), unique(dt_metrics[[drug_name]]))
-  expect_true(all(vapply(names(plts_1), 
-                         function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
-  
-  normalization_type <- "RV"
-  plts_2 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
-                                         dt_average = dt_average,
-                                         cellline_name_vec = cellline_name_vec,
-                                         drug_name_vec = drug_name_vec,
-                                         normalization_type = normalization_type,
-                                         colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
-  expect_is(plts_2, "list")
-  plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
-  expect_equal(names(plts_2), plotted_)
-  expect_true(all(vapply(seq_along(plts_2), 
-                         function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
-  expect_true(all(vapply(names(plts_2), 
-                         function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
-  
-  
-  # scenario: selected cell line is not available in data
-  cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
-  drug_name_vec_2 <- c(drug_name_vec, "drug_100")
-  
-  plts_3 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
-                                         dt_average = dt_average,
-                                         cellline_name_vec = cellline_name_vec_2,
-                                         drug_name_vec = drug_name_vec_2)
-  expect_is(plts_3, "list")
-  plotted_ <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
-  expect_equal(names(plts_3), plotted_)
-  plotted <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]])) # only available
-  expect_true(all(vapply(seq_along(plts_3), 
-                         function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
-  
-  # scenario: values for selected drug are NAs
-  dt_metrics_NA <- data.table::copy(dt_metrics)
-  ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
-  dt_metrics_NA[get(drug_name) == drug_name_vec[1], (ls_col_met) := NA]
-  
-  dt_average_NA <- data.table::copy(dt_average)
-  ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
-  dt_average_NA[get(drug_name) == drug_name_vec[1], (ls_col_avg) := NA]
-  
-  plts_4 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics_NA, 
-                                         dt_average = dt_average_NA,
-                                         cellline_name_vec = cellline_name_vec,
-                                         drug_name_vec = drug_name_vec)
-  expect_is(plts_4, "list")
-  expect_equal(names(plts_4), drug_name_vec)
-  expect_length(unique(ggplot2::ggplot_build(plts_4[[drug_name_vec[2]]])[["data"]][[3]][["colour"]]),
-                NROW(cellline_name_vec))
-  expect_length(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st drug
-  expect_equal(ggplot2::get_guide_data(plts_4[[drug_name_vec[2]]], "colour")[[".label"]],
-               cellline_name_vec) # legend is present
-})
-
-test_that("plot_dose_response_sa_by_drugs works as expected", {
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  clid <- gDRutils::get_env_identifiers("cellline")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  
-  mae <- gDRutils::get_synthetic_data("small")
-  se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  
-  cellline_name_vec <- unique(dt_metrics[[cellline_name]])[2:5]
-  drug_name_vec <- unique(dt_metrics[[drug_name]])[5:7]
-  
-  plts_1 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+  test_that("plot_dose_response_sa_by_CLs works as expected", {
+    cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+    drug_name <- gDRutils::get_env_identifiers("drug_name")
+    
+    mae <- gDRutils::get_synthetic_data("small")
+    se <- mae[[gDRutils::get_supported_experiments("sa")]]
+    dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+    dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+    
+    cellline_name_vec <- unique(dt_metrics[[cellline_name]])[2:5]
+    drug_name_vec <- unique(dt_metrics[[drug_name]])[5:7]
+    
+    plts_1 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                                            dt_average = dt_average)
-  expect_is(plts_1, "list")
-  expect_equal(names(plts_1), unique(dt_metrics[[cellline_name]]))
-  expect_true(all(vapply(names(plts_1), 
-                         function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
-  
-  normalization_type <- "RV"
-  plts_2 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+    expect_is(plts_1, "list")
+    expect_equal(names(plts_1), unique(dt_metrics[[drug_name]]))
+    expect_true(all(vapply(names(plts_1), 
+                           function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
+    
+    normalization_type <- "RV"
+    plts_2 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                                            dt_average = dt_average,
                                            cellline_name_vec = cellline_name_vec,
                                            drug_name_vec = drug_name_vec,
                                            normalization_type = normalization_type,
                                            colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
-  expect_is(plts_2, "list")
-  plotted_ <- intersect(cellline_name_vec, unique(dt_metrics[[cellline_name]]))
-  expect_equal(names(plts_2), plotted_)
-  expect_true(all(vapply(seq_along(plts_2), 
-                         function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
-  expect_true(all(vapply(names(plts_2), 
-                         function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
-  
-  cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
-  drug_name_vec_2 <- c(drug_name_vec, "drug_100")
-  
-  plts_3 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+    expect_is(plts_2, "list")
+    plotted_ <- intersect(drug_name_vec, unique(dt_metrics[[drug_name]]))
+    expect_equal(names(plts_2), plotted_)
+    expect_true(all(vapply(seq_along(plts_2), 
+                           function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
+    expect_true(all(vapply(names(plts_2), 
+                           function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
+    
+    
+    # scenario: selected cell line is not available in data
+    cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
+    drug_name_vec_2 <- c(drug_name_vec, "drug_100")
+    
+    plts_3 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics, 
                                            dt_average = dt_average,
                                            cellline_name_vec = cellline_name_vec_2,
                                            drug_name_vec = drug_name_vec_2)
-  expect_is(plts_3, "list")
-  plotted_ <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
-  expect_equal(names(plts_3),  plotted_)
-  plotted <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
-  expect_true(all(vapply(seq_along(plts_3), 
-                         function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
-  
-  # scenario: values for selected cell line are NAs
-  dt_metrics_NA <- data.table::copy(dt_metrics)
-  ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
-  dt_metrics_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_met) := NA]
-  
-  dt_average_NA <- data.table::copy(dt_average)
-  ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
-  dt_average_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_avg) := NA]
-  
-  plts_4 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics_NA, 
+    expect_is(plts_3, "list")
+    plotted_ <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
+    expect_equal(names(plts_3), plotted_)
+    plotted <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]])) # only available
+    expect_true(all(vapply(seq_along(plts_3), 
+                           function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
+    
+    # scenario: values for selected drug are NAs
+    dt_metrics_NA <- data.table::copy(dt_metrics)
+    ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
+    dt_metrics_NA[get(drug_name) == drug_name_vec[1], (ls_col_met) := NA]
+    
+    dt_average_NA <- data.table::copy(dt_average)
+    ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
+    dt_average_NA[get(drug_name) == drug_name_vec[1], (ls_col_avg) := NA]
+    
+    plts_4 <- plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics_NA, 
                                            dt_average = dt_average_NA,
                                            cellline_name_vec = cellline_name_vec,
                                            drug_name_vec = drug_name_vec)
-  expect_is(plts_4, "list")
-  expect_equal(names(plts_4), cellline_name_vec)
-  expect_length(unique(ggplot2::ggplot_build(plts_4[[cellline_name_vec[2]]])[["data"]][[3]][["colour"]]),
-                NROW(drug_name_vec))
-  expect_length(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st cell line
-  expect_equal(ggplot2::get_guide_data(plts_4[[cellline_name_vec[2]]], "colour")[[".label"]],
-               drug_name_vec) # legend is present
-})
-
-test_that("plot_dose_response_sa_qc works as expected", {
-  mae <- gDRutils::get_synthetic_data("small")
-  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+    expect_is(plts_4, "list")
+    expect_equal(names(plts_4), drug_name_vec)
+    expect_length(unique(ggplot2::ggplot_build(plts_4[[drug_name_vec[2]]])[["data"]][[3]][["colour"]]),
+                  NROW(cellline_name_vec))
+    expect_length(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st drug
+    expect_equal(ggplot2::get_guide_data(plts_4[[drug_name_vec[2]]], "colour")[[".label"]],
+                 cellline_name_vec) # legend is present
+  })
   
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  cl_name <- "cellline_BA"
-  d_name <- "drug_002"
+  test_that("plot_dose_response_sa_by_drugs works as expected", {
+    cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+    clid <- gDRutils::get_env_identifiers("cellline")
+    drug_name <- gDRutils::get_env_identifiers("drug_name")
+    
+    mae <- gDRutils::get_synthetic_data("small")
+    se <- mae[[gDRutils::get_supported_experiments("sa")]]
+    dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+    dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+    
+    cellline_name_vec <- unique(dt_metrics[[cellline_name]])[2:5]
+    drug_name_vec <- unique(dt_metrics[[drug_name]])[5:7]
+    
+    plts_1 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+                                             dt_average = dt_average)
+    expect_is(plts_1, "list")
+    expect_equal(names(plts_1), unique(dt_metrics[[cellline_name]]))
+    expect_true(all(vapply(names(plts_1), 
+                           function(nm) grepl(nm, plts_1[[nm]][["labels"]][["title"]]), logical(1))))
+    
+    normalization_type <- "RV"
+    plts_2 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+                                             dt_average = dt_average,
+                                             cellline_name_vec = cellline_name_vec,
+                                             drug_name_vec = drug_name_vec,
+                                             normalization_type = normalization_type,
+                                             colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
+    expect_is(plts_2, "list")
+    plotted_ <- intersect(cellline_name_vec, unique(dt_metrics[[cellline_name]]))
+    expect_equal(names(plts_2), plotted_)
+    expect_true(all(vapply(seq_along(plts_2), 
+                           function(i) grepl(normalization_type, plts_2[[i]]$labels$y), logical(1))))
+    expect_true(all(vapply(names(plts_2), 
+                           function(nm) grepl(nm, plts_2[[nm]][["labels"]][["title"]]), logical(1))))
+    
+    cellline_name_vec_2 <- c(cellline_name_vec, "cellline_XX")
+    drug_name_vec_2 <- c(drug_name_vec, "drug_100")
+    
+    plts_3 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics, 
+                                             dt_average = dt_average,
+                                             cellline_name_vec = cellline_name_vec_2,
+                                             drug_name_vec = drug_name_vec_2)
+    expect_is(plts_3, "list")
+    plotted_ <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
+    expect_equal(names(plts_3),  plotted_)
+    plotted <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
+    expect_true(all(vapply(seq_along(plts_3), 
+                           function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))
+    
+    # scenario: values for selected cell line are NAs
+    dt_metrics_NA <- data.table::copy(dt_metrics)
+    ls_col_met <- intersect(names(dt_metrics_NA), gDRutils::get_header("response_metrics"))
+    dt_metrics_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_met) := NA]
+    
+    dt_average_NA <- data.table::copy(dt_average)
+    ls_col_avg <- intersect(names(dt_average_NA), gDRutils::get_header("averaged_results"))
+    dt_average_NA[get(cellline_name) == cellline_name_vec[1], (ls_col_avg) := NA]
+    
+    plts_4 <- plot_dose_response_sa_by_drugs(dt_metrics = dt_metrics_NA, 
+                                             dt_average = dt_average_NA,
+                                             cellline_name_vec = cellline_name_vec,
+                                             drug_name_vec = drug_name_vec)
+    expect_is(plts_4, "list")
+    expect_equal(names(plts_4), cellline_name_vec)
+    expect_length(unique(ggplot2::ggplot_build(plts_4[[cellline_name_vec[2]]])[["data"]][[3]][["colour"]]),
+                  NROW(drug_name_vec))
+    expect_length(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st cell line
+    expect_equal(ggplot2::get_guide_data(plts_4[[cellline_name_vec[2]]], "colour")[[".label"]],
+                 drug_name_vec) # legend is present
+  })
   
-  plt_1 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
-                                    dt_average = dt_average,
-                                    cl_name = cl_name,
-                                    d_name = d_name)
-  expect_is(plt_1, "gg")
-  expect_equal(plt_1[["labels"]][["y"]], "GR")
-  expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
-  expect_true(grepl(d_name, plt_1[["labels"]][["colour"]]))
-  expect_length(plt_1[["layers"]], 5)
+  test_that("plot_dose_response_sa_qc works as expected", {
+    mae <- gDRutils::get_synthetic_data("small")
+    se <- mae[[gDRutils::get_supported_experiments("sa")]]
+    
+    dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+    dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+    cl_name <- "cellline_BA"
+    d_name <- "drug_002"
+    
+    plt_1 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                      dt_average = dt_average,
+                                      cl_name = cl_name,
+                                      d_name = d_name)
+    expect_is(plt_1, "gg")
+    expect_equal(plt_1[["labels"]][["y"]], "GR")
+    expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
+    expect_true(grepl(d_name, plt_1[["labels"]][["colour"]]))
+    expect_length(plt_1[["layers"]], 5)
+    
+    normalization_type <- "RV"
+    plt_2 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                      dt_average = dt_average,
+                                      cl_name = cl_name,
+                                      d_name = d_name, 
+                                      normalization_type = normalization_type)
+    expect_is(plt_2, "gg")
+    expect_equal(plt_2[["labels"]][["y"]], normalization_type)
+    
+    # lack of data in dt_metrics
+    dt_metrics_na <- data.table::copy(dt_metrics)
+    dt_metrics_na$x_inf <- NA
+    plt_3 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics_na,
+                                      dt_average = dt_average,
+                                      cl_name = cl_name,
+                                      d_name = d_name)
+    expect_is(plt_3, "gg")
+    expect_length(ggplot2::ggplot_build(plt_3)$data[[2]], 0) # no "Fitted Curve"
+    
+    # one concentration
+    plt_4 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
+                                      dt_average = dt_average[Concentration == 10, ],
+                                      cl_name = cl_name,
+                                      d_name = d_name)
+    expect_is(plt_4, "gg")
+    expect_length(ggplot2::ggplot_build(plt_4)$data[[2]], 0) # no "Fitted Curve"
+    
+    # empty plot
+    plt_5 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics[normalization_type == "RV", ],
+                                      dt_average = dt_average[normalization_type == "RV", ],
+                                      cl_name = cl_name,
+                                      d_name = d_name)
+    expect_is(plt_5, "gg")
+    expect_equal(plt_5[["labels"]][["y"]], "GR")
+    expect_true(grepl(cl_name, plt_5[["labels"]][["title"]]))
+    expect_true(any(grepl("Concentration", plt_5[["labels"]][["x"]])))
+    expect_length(ggplot2::ggplot_build(plt_5)[["data"]][[1]], 0)
+  })
   
-  normalization_type <- "RV"
-  plt_2 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
-                                    dt_average = dt_average,
-                                    cl_name = cl_name,
-                                    d_name = d_name, 
-                                    normalization_type = normalization_type)
-  expect_is(plt_2, "gg")
-  expect_equal(plt_2[["labels"]][["y"]], normalization_type)
+  test_that("plot_dose_response_sa_qc_panel works as expected", {
+    cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+    drug_name <- gDRutils::get_env_identifiers("drug_name")
+    
+    mae <- gDRutils::get_synthetic_data("small")
+    se <- mae[[gDRutils::get_supported_experiments("sa")]]
+    
+    dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+    dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+    cl_name <- "cellline_BA"
+    d_names <- c("drug_002", "drug_003", "drug_004")
+    
+    plt_1 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                            dt_average = dt_average,
+                                            cl_name = cl_name)
+    expect_is(plt_1, "gg")
+    expect_length(plt_1[["layers"]], 4)
+    expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
+    expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
+    
+    normalization_type <- "RV"
+    plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                            dt_average = dt_average,
+                                            cl_name = cl_name,
+                                            d_names = d_names,
+                                            normalization_type = normalization_type)
+    expect_is(plt_2, "gg")
+    expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
+    
+    ls_drug <- c(d_names, "drug_YY")
+    no_comb_err <- NROW(unique(
+      dt_average[get(drug_name) %in% ls_drug & get(cellline_name) == cl_name, c(cellline_name, drug_name), with = FALSE]
+    ))
+    plt_3 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                            dt_average = dt_average,
+                                            cl_name = cl_name,
+                                            d_names = ls_drug)
+    expect_is(plt_3, "gg")
+    expect_equal(plt_3[["labels"]][["y"]], "GR")
+    expect_equal(NROW(ggplot2::ggplot_build(plt_3)$data[[1]]), 2 * no_comb_err)
+    
+    dt_metrics_na <- data.table::copy(dt_metrics)
+    dt_metrics_na[DrugName == "drug_002"]$x_0 <- NA
+    no_curve <- NROW(unique(stats::na.omit(dt_metrics_na[DrugName %in% d_names])[["DrugName"]]))
+    plt_4 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics_na,
+                                            dt_average = dt_average,
+                                            cl_name = cl_name,
+                                            d_names = d_names)
+    expect_is(plt_4, "gg")
+    expect_equal(plt_4[["labels"]][["y"]], "GR")
+    expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)$data[[2]]["PANEL"])), no_curve)
+    
+    plt_5 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                            dt_average = dt_average[Concentration == 10, ],
+                                            cl_name = cl_name,
+                                            d_names = d_names)
+    expect_is(plt_5, "gg")
+    expect_length(ggplot2::ggplot_build(plt_5)$data[[2]], 0) # no "Fitted Curve"
+    
+    dt_average_na <- data.table::copy(dt_average)
+    dt_average_na <- dt_average_na[DrugName %in% d_names[1:2] | 
+                                     (DrugName == d_names[3] & Concentration == 10)]
+    no_curve <- NROW(dt_average_na[, data.table::uniqueN(Concentration), by = DrugName][V1 > 1])
+    plt_6 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
+                                            dt_average = dt_average_na,
+                                            cl_name = cl_name,
+                                            d_names = d_names)
+    expect_is(plt_6, "gg")
+    expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)$data[[2]]["PANEL"])), no_curve)
+  })
   
-  # lack of data in dt_metrics
-  dt_metrics_na <- data.table::copy(dt_metrics)
-  dt_metrics_na$x_inf <- NA
-  plt_3 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics_na,
-                                    dt_average = dt_average,
-                                    cl_name = cl_name,
-                                    d_name = d_name)
-  expect_is(plt_3, "gg")
-  expect_length(ggplot2::ggplot_build(plt_3)$data[[2]], 0) # no "Fitted Curve"
-  
-  # one concentration
-  plt_4 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics,
-                                    dt_average = dt_average[Concentration == 10, ],
-                                    cl_name = cl_name,
-                                    d_name = d_name)
-  expect_is(plt_4, "gg")
-  expect_length(ggplot2::ggplot_build(plt_4)$data[[2]], 0) # no "Fitted Curve"
-  
-  # empty plot
-  plt_5 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics[normalization_type == "RV", ],
-                                    dt_average = dt_average[normalization_type == "RV", ],
-                                    cl_name = cl_name,
-                                    d_name = d_name)
-  expect_is(plt_5, "gg")
-  expect_equal(plt_5[["labels"]][["y"]], "GR")
-  expect_true(grepl(cl_name, plt_5[["labels"]][["title"]]))
-  expect_true(any(grepl("Concentration", plt_5[["labels"]][["x"]])))
-  expect_length(ggplot2::ggplot_build(plt_5)[["data"]][[1]], 0)
-})
-
-test_that("plot_dose_response_sa_qc_panel works as expected", {
-  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  drug_name <- gDRutils::get_env_identifiers("drug_name")
-  
-  mae <- gDRutils::get_synthetic_data("small")
-  se <- mae[[gDRutils::get_supported_experiments("sa")]]
-  
-  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-  cl_name <- "cellline_BA"
-  d_names <- c("drug_002", "drug_003", "drug_004")
-  
-  plt_1 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
-                                          dt_average = dt_average,
-                                          cl_name = cl_name)
-  expect_is(plt_1, "gg")
-  expect_length(plt_1[["layers"]], 4)
-  expect_true(grepl(cl_name, plt_1[["labels"]][["title"]]))
-  expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
-  
-  normalization_type <- "RV"
-  plt_2 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
-                                          dt_average = dt_average,
-                                          cl_name = cl_name,
-                                          d_names = d_names,
-                                          normalization_type = normalization_type)
-  expect_is(plt_2, "gg")
-  expect_true(grepl(normalization_type, plt_2[["labels"]][["y"]]))
-  
-  ls_drug <- c(d_names, "drug_YY")
-  no_comb_err <- NROW(unique(
-    dt_average[get(drug_name) %in% ls_drug & get(cellline_name) == cl_name, c(cellline_name, drug_name), with = FALSE]
-  ))
-  plt_3 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
-                                          dt_average = dt_average,
-                                          cl_name = cl_name,
-                                          d_names = ls_drug)
-  expect_is(plt_3, "gg")
-  expect_equal(plt_3[["labels"]][["y"]], "GR")
-  expect_equal(NROW(ggplot2::ggplot_build(plt_3)$data[[1]]), 2 * no_comb_err)
-  
-  dt_metrics_na <- data.table::copy(dt_metrics)
-  dt_metrics_na[DrugName == "drug_002"]$x_0 <- NA
-  no_curve <- NROW(unique(stats::na.omit(dt_metrics_na[DrugName %in% d_names])[["DrugName"]]))
-  plt_4 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics_na,
-                                          dt_average = dt_average,
-                                          cl_name = cl_name,
-                                          d_names = d_names)
-  expect_is(plt_4, "gg")
-  expect_equal(plt_4[["labels"]][["y"]], "GR")
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)$data[[2]]["PANEL"])), no_curve)
-  
-  plt_5 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
-                                          dt_average = dt_average[Concentration == 10, ],
-                                          cl_name = cl_name,
-                                          d_names = d_names)
-  expect_is(plt_5, "gg")
-  expect_length(ggplot2::ggplot_build(plt_5)$data[[2]], 0) # no "Fitted Curve"
-  
-  dt_average_na <- data.table::copy(dt_average)
-  dt_average_na <- dt_average_na[DrugName %in% d_names[1:2] | 
-                                   (DrugName == d_names[3] & Concentration == 10)]
-  no_curve <- NROW(dt_average_na[, data.table::uniqueN(Concentration), by = DrugName][V1 > 1])
-  plt_6 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics,
-                                          dt_average = dt_average_na,
-                                          cl_name = cl_name,
-                                          d_names = d_names)
-  expect_is(plt_6, "gg")
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)$data[[2]]["PANEL"])), no_curve)
-})
