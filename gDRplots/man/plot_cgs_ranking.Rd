@@ -46,6 +46,6 @@ plot_cgs_ranking(results,
   max_results_with_sig = 15)
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{cgs_plots}

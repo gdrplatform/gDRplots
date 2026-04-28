@@ -64,6 +64,6 @@ combo_plots[[1]]
 
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{QC_plot}

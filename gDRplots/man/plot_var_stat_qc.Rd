@@ -55,6 +55,6 @@ plot_var_stat_qc(dt_assay = dt_metrics,
                          
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{QC_plot}

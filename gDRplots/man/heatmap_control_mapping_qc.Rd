@@ -48,6 +48,6 @@ heatmap_control_mapping_qc(dt_treat = dt_treat,
 
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{QC_plot}
