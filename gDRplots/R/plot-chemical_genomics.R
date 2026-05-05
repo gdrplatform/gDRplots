@@ -26,7 +26,7 @@
 #' }
 #' @keywords cgs_plots
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
@@ -182,7 +182,7 @@ analyze_cgs <- function(dt_metrics,
 #' 
 #' @keywords cgs_plots
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))

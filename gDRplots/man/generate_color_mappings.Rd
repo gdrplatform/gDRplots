@@ -21,6 +21,6 @@ A list containing color mappings for Gnumber and Gnumber_2
 Helper function to generate color mappings for Gnumber and Gnumber_2
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{internal}

@@ -1383,7 +1383,7 @@ pheatmap_with_anno_combo <- function(
 #'   \item \code{heatmap} the \code{pheatmap} object.
 #' }
 #' @keywords pheat_ann
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' @export
 pheatmap_with_anno_combo_metrics <- function(
     dt_metrics,

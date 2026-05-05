@@ -1,3 +1,6 @@
+## gDRplots 0.0.107 - 2026-04-28
+* update author email address
+
 ## gDRplots 0.0.106 - 2026-04-27
 * migrate from `qs` to `qs2` package
 * update batch file extension from `.qs` to `.qs2`

@@ -55,6 +55,6 @@ analyze_cgs(dt_metrics, "xc50", cl_name = NULL, cellline1, cellline2)
 
 }
 \author{
-Bartosz Czech \email{bartosz.czech@contractors.roche.com}
+Bartosz Czech \email{czech.bartosz@external.gene.com}
 }
 \keyword{cgs_plots}

@@ -13,7 +13,7 @@
 #'
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
@@ -109,7 +109,7 @@ plot_var_stat_qc <- function(dt_assay,
 #'
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
@@ -197,7 +197,7 @@ plot_fitting_acc <- function(dt_assay,
 #'
 #' @keywords QC_plot
 #' 
-#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #' 
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
