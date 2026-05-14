@@ -68,17 +68,17 @@ compute_distances <- function(x,
     # calculate correlation only for rows with non-zero variance
     # `rowsMaxs == rowMins` works for Inf and -Inf (opposite to `rowsSds > 0`)
     no_variance_rows_v <- which(matrixStats::rowMaxs(x) == matrixStats::rowMins(x))
-    valid_rows_v <- setdiff(seq_len(nrow(x)), no_variance_rows_v)
+    valid_rows_v <- setdiff(seq_len(NROW(x)), no_variance_rows_v)
     
     res_cor <- if (length(no_variance_rows_v) > 0) {
       
       # initialize correlation matrix to zeros
-      mat_v <- rep(0, nrow(x) * nrow(x))
+      mat_v <- rep(0, NROW(x) * NROW(x))
       mat_zero <-
         matrix(
           data = mat_v,
-          nrow = nrow(x),
-          ncol = nrow(x),
+          nrow = NROW(x),
+          ncol = NROW(x),
           dimnames = list(rownames(x), rownames(x))
         )
       

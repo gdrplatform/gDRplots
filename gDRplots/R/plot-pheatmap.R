@@ -2370,7 +2370,7 @@ fill_ann_color_map <- function(dt_ann,
   for (drug in unique_drugs) {
     dt_drug <- dt_tmp[name == drug][order(suppressWarnings(as.numeric(conc)))]
     
-    if (nrow(dt_drug) == 0) {
+    if (NROW(dt_drug) == 0) {
       next
     }
     
