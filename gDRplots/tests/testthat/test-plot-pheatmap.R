@@ -6,15 +6,15 @@ test_that("pheatmap_qc works as expected", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
   dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
                                                  assay_name = "Averaged")
-  
+
   hm_1 <- pheatmap_qc(dt_average = dt_average) # default
   expect_is(hm_1, "pheatmap")
   expect_equal(sort(hm_1$gtable$grobs[[3]]$label), sort(unique(dt_average$clid))) # row names
-  expect_equal(sort(hm_1$gtable$grobs[[5]]$label), 
+  expect_equal(sort(hm_1$gtable$grobs[[5]]$label),
                sort(unique(c(dt_average$Gnumber, dt_average$Gnumber_2)))) # annotation
   expect_is(hm_1[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_1[["tree_col"]], NA) # no dendrogram for cols
-  
+
   hm_2 <- pheatmap_qc(dt_average = dt_average,
                       normalization_type = "RV",
                       colors_vec = c("darkblue", "grey90"),
@@ -22,30 +22,30 @@ test_that("pheatmap_qc works as expected", {
                       lbl_by_DrugName = TRUE)
   expect_is(hm_2, "pheatmap")
   expect_equal(sort(hm_2$gtable$grobs[[3]]$label), sort(unique(dt_average$CellLineName))) # row names
-  expect_equal(sort(hm_2$gtable$grobs[[5]]$label), 
+  expect_equal(sort(hm_2$gtable$grobs[[5]]$label),
                sort(unique(c(dt_average$DrugName, dt_average$DrugName_2)))) # annotation
   expect_is(hm_2[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_2[["tree_col"]], NA) # no dendrogram for cols
-  
+
   # scenario: row with all NA
   dt_average_NA_r <- data.table::copy(dt_average)
   dt_average_NA_r[CellLineName == "cellline_AA"]$x <- NA
-  
+
   hm_3 <- pheatmap_qc(dt_average = dt_average_NA_r,
-                      lbl_by_CellLineName = TRUE) 
+                      lbl_by_CellLineName = TRUE)
   expect_is(hm_3, "pheatmap")
   expect_false("cellline_AA" %in% hm_3$gtable$grobs[[3]]$label)
-  
+
   # scenario: coll with all NA
   dt_average_NA_c <- data.table::copy(dt_average)
   dt_average_NA_c[DrugName == "drug_002"]$x_std <- NA
-  
+
   hm_4 <- pheatmap_qc(dt_average = dt_average_NA_c,
                       metric = "x_std",
-                      lbl_by_DrugName = TRUE) 
+                      lbl_by_DrugName = TRUE)
   expect_is(hm_4, "pheatmap")
   expect_false("drug_002" %in% hm_4$gtable$grobs[[5]]$label)
-  
+
   # combo experiments
   se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_average_combo <- gDRutils::convert_se_assay_to_dt(se = se_combo,
@@ -57,94 +57,94 @@ test_that("pheatmap_qc works as expected", {
   expect_equal(hm_5$gtable$grobs[[1]]$label, "Combo Data")
   expect_equal(hm_5[["tree_row"]], NA) # no dendrogram due cluster_rows = FALSE
   expect_equal(hm_5[["tree_col"]], NA) # no dendrogram for cols
-  
+
   # scenario: row with all NA
   dt_average_combo_NA_r <- data.table::copy(dt_average_combo)
   dt_average_combo_NA_r[CellLineName == "cellline_AA"]$x <- NA
-  
+
   hm_6 <- pheatmap_qc(dt_average = dt_average_combo_NA_r,
-                      lbl_by_CellLineName = TRUE) 
+                      lbl_by_CellLineName = TRUE)
   expect_is(hm_6, "pheatmap")
   expect_false("cellline_AA" %in% hm_6$gtable$grobs[[3]]$label)
-  
+
   # scenario: coll with all NA
   dt_average_combo_NA_c <- data.table::copy(dt_average_combo)
   dt_average_combo_NA_c[DrugName == "drug_002"]$x_std <- NA
-  
+
   hm_7 <- pheatmap_qc(dt_average = dt_average_combo_NA_c,
                       metric = "x_std",
-                      lbl_by_DrugName = TRUE) 
+                      lbl_by_DrugName = TRUE)
   expect_is(hm_7, "pheatmap")
   expect_false("drug_002" %in% hm_7$gtable$grobs[[5]]$label)
-  
+
   dt_average_combo_NA_c2 <- data.table::copy(dt_average_combo)
   dt_average_combo_NA_c2[DrugName_2 == "drug_026"]$x <- NA
-  
+
   hm_8 <- pheatmap_qc(dt_average = dt_average_combo_NA_c2,
-                      lbl_by_DrugName = TRUE) 
+                      lbl_by_DrugName = TRUE)
   expect_is(hm_8, "pheatmap")
   expect_false("drug_026" %in% hm_8$gtable$grobs[[5]]$label)
-  
+
   # co-dilution experiment
   mae <- gDRutils::get_synthetic_data("combo_codilution")
   se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
-  dt_average_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd, 
+  dt_average_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
                                                     assay_name = "Averaged")
-  
+
   hm_9 <- pheatmap_qc(dt_average = dt_average_cd) # default
   expect_is(hm_9, "pheatmap")
   expect_equal(sort(hm_9$gtable$grobs[[3]]$label), sort(unique(dt_average_cd$clid))) # row names
-  expect_equal(sort(hm_9$gtable$grobs[[5]]$label), 
+  expect_equal(sort(hm_9$gtable$grobs[[5]]$label),
                sort(unique(c(dt_average_cd$Gnumber, dt_average_cd$Gnumber_2)))) # annotation
   expect_is(hm_9[["tree_row"]], "hclust") # dendrogram
   expect_equal(hm_9[["tree_col"]], NA) # no dendrogram for cols
-  
+
   # scenario: row with all NA
   dt_average_cd_NA_r <- data.table::copy(dt_average_cd)
   dt_average_cd_NA_r[CellLineName == "cellline_AA"]$x <- NA
-  
+
   hm_10 <- pheatmap_qc(dt_average = dt_average_cd_NA_r,
-                       lbl_by_CellLineName = TRUE) 
+                       lbl_by_CellLineName = TRUE)
   expect_is(hm_10, "pheatmap")
   expect_false("cellline_AA" %in% hm_10$gtable$grobs[[3]]$label)
-  
+
   # scenario: coll with all NA
   dt_average_cd_NA_c <- data.table::copy(dt_average_cd)
   dt_average_cd_NA_c[DrugName == "drug_002"]$x_std <- NA
-  
+
   hm_11 <- pheatmap_qc(dt_average = dt_average_cd_NA_c,
                        metric = "x_std",
-                       lbl_by_DrugName = TRUE) 
+                       lbl_by_DrugName = TRUE)
   expect_is(hm_11, "pheatmap")
   expect_false("drug_002" %in% hm_11$gtable$grobs[[5]]$label)
-  
+
   # sceario all valuse in matrix is NA -> return NA heatmap
   dt_average_cd_NA_c2 <- data.table::copy(dt_average_cd)
   dt_average_cd_NA_c2[DrugName_2 == "drug_001"]$x <- NA
-  
+
   hm_12 <- pheatmap_qc(dt_average = dt_average_cd_NA_c2,
                        lbl_by_DrugName = TRUE)
   expect_is(hm_12, "pheatmap")
   expect_equal( # all NA has color red
     unique(as.vector(hm_12$gtable$grobs[[2]]$children[[1]]$gp$fill)), "red")
   expect_equal(range(as.numeric(hm_12$gtable$grobs[[6]]$children[[2]]$label)), c(0, 1))
-  
+
   # scenario: sa with definde colors and x_std
   ls_col <- c("#000000", "#00FFFF")
   hm_13 <- pheatmap_qc(dt_average = dt_average,
                        metric = "x_std",
                        colors_vec = ls_col,
-                       cluster_rows = FALSE) 
+                       cluster_rows = FALSE)
   expect_is(hm_13, "pheatmap")
   hm_13_bar <- hm_13$gtable$grobs[[5]]$children[[1]]$gp$fill
   expect_equal(hm_13_bar[1], ls_col[2]) # check rev
   expect_equal(hm_13_bar[NROW(hm_13_bar)], ls_col[1]) # check rev
-  
+
   # scenario: error is thrown on duplicates
   dt_average_dup <- data.table::rbindlist(list(dt_average, dt_average))
   expect_error(pheatmap_qc(dt_average = dt_average_dup),
                "Unexpected data aggregation")
-  
+
   # testing assertions
   expect_error(pheatmap_qc(dt_average = unlist(dt_average)),
                "Assertion on 'dt_average' failed: Must be a data.table")
@@ -188,19 +188,19 @@ test_that("pheatmap_with_anno_sa works as expected", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
   dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
-  dt_metrics_capped <- 
+  dt_metrics_capped <-
     gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
                                    assay_dt = dt_metrics,
                                    experiment_name = gDRutils::get_supported_experiments("sa"),
                                    capping_fold = 5)
-  
+
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
-  
+
   res_1 <- data.table::dcast(data = dt_metrics[normalization_type == "GR", ],
                              formula = CellLineName ~ DrugName, value.var = "xc50")
   data.table::setkey(res_1, NULL)
-  
+
   # scenario 1: default
   out_1 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
   expect_length(out_1, 2)
@@ -219,7 +219,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   expect_is(plt_1[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_1[["tree_col"]], "hclust") # clustering despite Inf
-  
+
   # scenario 2: selected metric & normalization_type and NA
   dt_metrics_na <- data.table::copy(dt_metrics)
   dt_metrics_na[DrugName %in% c("drug_021", "drug_026")]$x_max <- NA
@@ -227,9 +227,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
                              formula = CellLineName ~ DrugName, value.var = "x_max")
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
-  
+
   col_pal <- c("#0000FF", "#E5E5E5")
-  out_2 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_na, 
+  out_2 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_na,
                                  normalization_type = "RV",
                                  metric = "x_max",
                                  hm_title = "X MAX",
@@ -244,7 +244,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_2 <- out_2[["heatmap"]]
   expect_is(plt_2, "pheatmap")
   expect_equal(plt_2$gtable$grobs[[1]]$label, "X MAX")
-  expect_equal(sort(plt_2$gtable$grobs[[6]]$label), 
+  expect_equal(sort(plt_2$gtable$grobs[[6]]$label),
                sort(unique(dt_metrics_na[!is.na(x_max)]$DrugName))) # no rows with NA
   expect_is(plt_2[["tree_row"]], "hclust") # dendrogram
   expect_is(plt_2[["tree_col"]], "hclust") # dendrogram
@@ -252,8 +252,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
                     plt_2$gtable$grobs[[7]]$children[[1]]$gp$fill))
   expect_equal(unique(c(plt_2$gtable$grobs[[4]]$children[[2]]$gp$col)),
                "white")
-  
-  # scenario 3: annotations for row and col 
+
+  # scenario 3: annotations for row and col
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
     mut_A = c(1, 0),
@@ -267,14 +267,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   annotation_manual_na <- annotation_manual_row[unique(dt_metrics[, "DrugName"]), on = "DrugName"]
   data.table::setorderv(annotation_manual_na, cols = "group", na.last = TRUE)
   annotation_manual_na$group[is.na(annotation_manual_na$group)] <- "NA"
-  
+
   dt_metrics_one_val <- data.table::copy(dt_metrics)
   dt_metrics_one_val$xc50 <- 1
-  res_3 <- data.table::dcast(dt_metrics_one_val[normalization_type == "RV", ], 
-                             formula = CellLineName ~ DrugName, 
+  res_3 <- data.table::dcast(dt_metrics_one_val[normalization_type == "RV", ],
+                             formula = CellLineName ~ DrugName,
                              value.var = "xc50")
   data.table::setkey(res_3, NULL)
-  
+
   out_3 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_one_val,
                                  dt_metrics_capped = dt_metrics_capped,
                                  colors_vec = c("darkblue", "darkred"),
@@ -292,7 +292,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(anno_row_3, "data.table")
   expect_equal(anno_row_3, annotation_manual_na)
   expect_is(data_3[["matrix"]], "data.table")
-  expect_equal(data_3[["matrix"]], 
+  expect_equal(data_3[["matrix"]],
                res_3[, .SD, .SDcols = names(data_3[["matrix"]])][
                  order(match(CellLineName, data_3[["matrix"]]$CellLineName)), ])
   plt_3 <- out_3[["heatmap"]]
@@ -303,7 +303,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_3[["tree_col"]], "hclust") # clustering despite Inf
   expect_equal(unique(c(plt_3$gtable$grobs[[3]]$children[[2]]$gp$col)),
                "white") # darkbackbround
-  
+
   # scenario 4: incomplete annotations for col and color maps; and capped metrics
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue"),
@@ -312,7 +312,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   )
   annotation_manual_col_na <- data.table::copy(annotation_manual_col)
   annotation_manual_col_na[2, c("mut_A", "mut_B", "mut_C") := "NA"]
-  
+
   out_4 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                  dt_metrics_capped = dt_metrics_capped,
                                  annotation_col = annotation_manual_col[1, ],
@@ -326,7 +326,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   anno_4 <- out_4[["data"]][["annotation_col"]]
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_col_na)
-  expect_equal(data_4[["matrix"]], 
+  expect_equal(data_4[["matrix"]],
                res_1[order(match(CellLineName, anno_4$CellLineName))][])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
@@ -335,7 +335,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_4[["tree_col"]], "hclust") # clustering despite Inf
   expect_false(any(is.infinite(
     as.numeric(plt_4$gtable$grobs[[3]]$children[[2]]$label)))) # capped
-  
+
   # scenario 5: incomplete annotations for row
   annotation_manual_row <-
     unique(dt_metrics[, c("DrugName", "drug_moa"), with = FALSE])
@@ -348,8 +348,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
     drug_moa = c("moa_A" = "coral", "moa_D" = "cadetblue"),
     tested_AB = c("yes" = "black")
   )
-  
-  out_5 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics, 
+
+  out_5 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                  annotation_row = annotation_manual_row,
                                  annotation_colors = annotation_map_2)
   expect_length(out_5, 2)
@@ -361,7 +361,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   anno_5 <- out_5[["data"]][["annotation_row"]]
   expect_is(anno_5, "data.table")
   expect_equal(anno_5, annotation_manual_row)
-  expect_equal(data_5[["matrix"]], 
+  expect_equal(data_5[["matrix"]],
                res_1[, c("CellLineName", anno_5$DrugName), with = FALSE])
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
@@ -374,7 +374,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_false(any(plt_5$gtable$grobs[[8]]$children[[2]]$gp$fill %in% annotation_map_2$drug_moa))
   # because of missing colors, all anno was fill with new scheme
   expect_true("NA" %in% names(plt_5$gtable$grobs[[8]]$children[[5]]$gp$fill)) # filled
-  
+
   # scenario 6: rows are clustered, cols are not clustered
   out_6 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                  metric = "x_AOC_range",
@@ -383,18 +383,18 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(names(out_6), c("data", "heatmap"))
   data_6 <- out_6[["data"]]
   expect_is(data_6, "list")
-  expect_true(all(vapply(c("annotation_col", "annotation_row"), 
+  expect_true(all(vapply(c("annotation_col", "annotation_row"),
                          function(i) is.null(data_6[[i]]), logical(1))))
   plt_6 <- out_6[["heatmap"]]
   expect_is(plt_6, "pheatmap")
   expect_is(plt_6[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_6[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
-  
+
   # scenario 7: selected metric & normalization_type and -Inf in the data
   dt_metrics_inf <- data.table::copy(dt_metrics)
   dt_metrics_inf[DrugName %in% c("drug_021", "drug_026")]$x_max <- -Inf
   col_pal <- c("#FFA500", "#E5E5E5")
-  out_7 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_inf, 
+  out_7 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_inf,
                                  normalization_type = "RV",
                                  metric = "x_max",
                                  hm_title = "X MAX",
@@ -413,12 +413,12 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_7[["tree_col"]], "hclust") # clustering despite Inf
   expect_true(all(col_pal %in% plt_7$gtable$grobs[[7]]$children[[1]]$gp$fill))
   expect_equal(plt_7$gtable$grobs[[4]]$children[[2]]$gp$col, "black")
-  
+
   # scenario 8: all values are the same
   dt_metrics_eq <- data.table::copy(dt_metrics)
   val_eq <- 5
   dt_metrics_eq[normalization_type == "RV"]$ec50 <- val_eq
-  out_8 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_eq, 
+  out_8 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_eq,
                                  normalization_type = "RV",
                                  metric = "ec50")
   expect_length(out_8, 2)
@@ -429,7 +429,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(plt_8, "pheatmap")
   expect_equal(range(as.numeric(plt_8$gtable$grobs[[6]]$children[[2]]$label)),
                c(val_eq - 1, val_eq))
-  
+
   # scenario 9: long drug and annotation name
   dt_metrics_lng <- data.table::copy(dt_metrics)
   dt_metrics_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
@@ -446,8 +446,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
     drug_moa = c("moa_A" = "deeppink", "moa_D" = "cadetblue", moa_E = "gold"),
     lng_anno = c("short" = "black", "veryveryverylongnameofannotationfordrug" = "red")
   )
-  
-  out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+
+  out_9 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng,
                                  annotation_row = annotation_manual_row_9,
                                  annotation_colors = annotation_map_9)
   expect_length(out_9, 2)
@@ -458,7 +458,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_is(data_9[["matrix"]], "data.table")
   anno_9 <- out_9[["data"]][["annotation_row"]]
   expect_is(anno_9, "data.table")
-  expect_equal(anno_9, annotation_manual_row_9) # not trimmed 
+  expect_equal(anno_9, annotation_manual_row_9) # not trimmed
   expect_true(all(unique(anno_9$DrugName) %in% colnames(data_9[["matrix"]])))
   plt_9 <- out_9[["heatmap"]]
   expect_is(plt_9, "pheatmap")
@@ -469,14 +469,14 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len))
-  expect_true(all(annotation_map_9[["lng_anno"]] %in% 
+  expect_true(all(annotation_map_9[["lng_anno"]] %in%
                     unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "lng_anno"])))
-  expect_false(all(annotation_map_9[["drug_moa"]] %in% 
+  expect_false(all(annotation_map_9[["drug_moa"]] %in%
                      unique(plt_9[["gtable"]][["grobs"]][[6]][["gp"]][["fill"]][, "drug_moa"])))
   # because of missing colors, all anno was fill with new scheme
   expect_true("NA" %in% names(plt_9$gtable$grobs[[8]]$children[[5]]$gp$fill)) # filled
-  
-  out_10 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng, 
+
+  out_10 <- pheatmap_with_anno_sa(dt_metrics = dt_metrics_lng,
                                   annotation_row = annotation_manual_row_9,
                                   annotation_colors = annotation_map_9,
                                   max_hm_lbl_length = Inf)
@@ -484,9 +484,9 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_equal(names(out_10), c("data", "heatmap"))
   data_10 <- out_10[["data"]]
   expect_is(data_10, "list")
-  expect_equivalent(data_10[["matrix"]], 
+  expect_equivalent(data_10[["matrix"]],
                     data_9[["matrix"]][, .SD, .SDcols = names(data_10[["matrix"]])])
-  expect_equivalent(data_10[["annotation_row"]], 
+  expect_equivalent(data_10[["annotation_row"]],
                     data_9[["annotation_row"]][order(match(DrugName, data_10[["annotation_row"]]$DrugName)),
                                                .SD, .SDcols = names(data_10[["annotation_row"]])])
   plt_10 <- out_10[["heatmap"]]
@@ -494,8 +494,8 @@ test_that("pheatmap_with_anno_sa works as expected", {
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
   expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[3]][["label"]]) <= max_len))
-  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len)) 
-  
+  expect_false(all(nchar(plt_10[["gtable"]][["grobs"]][[8]][["children"]][[6]][["label"]]) <= max_len))
+
   # testing assertions
   expect_error(pheatmap_with_anno_sa(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
@@ -547,16 +547,16 @@ test_that("pheatmap_with_anno_cd works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_codilution")
   se <- mae[[gDRutils::get_supported_experiments("cd")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
-  
+
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
-  
+
   res_1 <- data.table::dcast(
     data = dt_metrics[normalization_type == "GR", ],
     formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
     value.var = "xc50")
   data.table::setkey(res_1, NULL)
-  
+
   # scenario 1: default
   out_1 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics) # default
   expect_length(out_1, 2)
@@ -575,7 +575,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
     sort(plt_1$gtable$grobs[[5]]$label),
     sort(paste(rdata[["DrugName"]], "x", paste0(rdata[["DrugName_2"]], "__", rdata[["Concentration_2"]]))))
   expect_true(all(vapply(plt_1$gtable$grobs[[3]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
-  
+
   annotation_manual_col <-
     unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
   annotation_manual_row <-
@@ -583,10 +583,10 @@ test_that("pheatmap_with_anno_cd works as expected", {
                       with = FALSE])
   annotation_map <-
     get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
-  
+
   # scenario 2: selected metric & normalization_type and annotations
   dt_metrics_2 <- data.table::copy(dt_metrics)
-  dt_metrics_2 <- dt_metrics_2[DrugName %in% unique(dt_metrics[["DrugName"]])[1:3] & 
+  dt_metrics_2 <- dt_metrics_2[DrugName %in% unique(dt_metrics[["DrugName"]])[1:3] &
                                  Concentration_2 %in% unique(dt_metrics[["Concentration_2"]])[1:4]]
   res_2 <- data.table::dcast(
     data = dt_metrics_2[normalization_type == "RV", ],
@@ -596,9 +596,9 @@ test_that("pheatmap_with_anno_cd works as expected", {
   anno_manual_row_res_2 <-
     unique(dt_metrics_2[, c("DrugName", "DrugName_2", "Concentration_2", "drug_moa", "drug_moa_2"),
                         with = FALSE])
-  
+
   col_pal <- c("#00008B", "#8B0000")
-  out_2 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2, 
+  out_2 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2,
                                  metric = "x_max",
                                  normalization_type = "RV",
                                  colors_vec = col_pal,
@@ -611,7 +611,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(data_2, "list")
   expect_equal(names(data_2), c("matrix", "annotation_col", "annotation_row"))
   expect_is(data_2[["matrix"]], "data.table")
-  expect_equal(data_2[["matrix"]], 
+  expect_equal(data_2[["matrix"]],
                res_2[, names(data_2[["matrix"]]), with = FALSE])
   anno_2 <- out_2[["data"]][["annotation_row"]]
   expect_is(anno_2, "data.table")
@@ -622,9 +622,9 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_2[["tree_col"]], "hclust") # cols are clustered
   expect_true(all(col_pal %in% plt_2$gtable$grobs[[11]]$children[[1]]$gp$fill))
   expect_equal(unique(c(plt_2$gtable$grobs[[3]]$children[[2]]$gp$col)), "white") # dark background
-  
+
   col_pal <- c("#FF8C00", "#D3D3D3")
-  out_2a <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2, 
+  out_2a <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_2,
                                   metric = "x_max",
                                   normalization_type = "RV",
                                   colors_vec = col_pal,
@@ -635,14 +635,14 @@ test_that("pheatmap_with_anno_cd works as expected", {
   plt_2a <- out_2a[["heatmap"]]
   expect_true(all(col_pal %in% plt_2a$gtable$grobs[[10]]$children[[1]]$gp$fill))
   expect_equal(unique(c(plt_2a$gtable$grobs[[2]]$children[[2]]$gp$col)), "black") # light background
-  
+
   # scenario 3: missing annotations row
   annotation_manual_row_res <- data.table::copy(annotation_manual_row)
   annotation_manual_row_res[1:20, c("drug_moa", "drug_moa_2")] <- "NA"
-  annotation_manual_row_na <- annotation_manual_row_res[21:NROW(annotation_manual_row_res), ]
+  annotation_manual_row_na <- annotation_manual_row_res[2:NROW(annotation_manual_row_res), ]
   annotation_map_na <- annotation_map[1:2]
-  
-  out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
+
+  out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                  metric = "x_max",
                                  normalization_type = "RV",
                                  cluster_cols = FALSE,
@@ -667,7 +667,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_equal(
     c(plt_3$gtable$grobs[[6]]$children[[1]]$label, plt_3$gtable$grobs[[6]]$children[[4]]$label),
     c("drug_moa_2", "drug_moa"))
-  
+
   # scenario 4: incomplete annotations for col and color maps
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue"),
@@ -683,8 +683,8 @@ test_that("pheatmap_with_anno_cd works as expected", {
                            mut_C = rep(c("AA", "BB"), length.out = NROW(annotation_manual_col)))
   )
   ls_anno_cat <- names(annotation_manual_col_na)[names(annotation_manual_col_na) != "CellLineName"]
-  
-  out_4 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics, 
+
+  out_4 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                  annotation_col = annotation_manual_col_na,
                                  annotation_colors = annotation_map)
   expect_length(out_4, 2)
@@ -695,24 +695,24 @@ test_that("pheatmap_with_anno_cd works as expected", {
   anno_4 <- out_4[["data"]][["annotation_col"]]
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_col_na)
-  expect_equal(data_4[["matrix"]], 
+  expect_equal(data_4[["matrix"]],
                res_1[order(match(CellLineName, anno_4$CellLineName))])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
-  expect_equal(plt_4$gtable$grobs[[7]]$label, ls_anno_cat) # col_annotation_names 
+  expect_equal(plt_4$gtable$grobs[[7]]$label, ls_anno_cat) # col_annotation_names
   expect_is(plt_4[["tree_row"]], "hclust") # clustering despite Inf
   expect_is(plt_4[["tree_col"]], "hclust") # clustering despite Inf
   expect_true(all(
-    vapply(c(1, 4, 7, 10), 
-           function(i) plt_4$gtable$grobs[[8]]$children[[i]]$label, 
+    vapply(c(1, 4, 7, 10),
+           function(i) plt_4$gtable$grobs[[8]]$children[[i]]$label,
            character(1)) %in% ls_anno_cat)) # annotation_legend
   expect_true("NA" %in% plt_4$gtable$grobs[[8]]$children[[6]]$label) # filled mut_B
-  
+
   # scenario 5: all values are the same
   dt_metrics_eq <- data.table::copy(dt_metrics)
   val_eq <- 100
   dt_metrics_eq$x_AOC <- val_eq
-  out_5 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_eq, 
+  out_5 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics_eq,
                                  metric = "x_AOC")
   expect_length(out_5, 2)
   expect_equal(names(out_5), c("data", "heatmap"))
@@ -722,7 +722,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_is(plt_5, "pheatmap")
   expect_equal(range(as.numeric(plt_5$gtable$grobs[[6]]$children[[2]]$label)),
                c(val_eq - 1, val_eq))
-  
+
   # testing assertions
   expect_error(pheatmap_with_anno_cd(dt_metrics = unlist(dt_metrics)),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
@@ -768,15 +768,15 @@ test_that("pheatmap_with_anno_combo works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix_small")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
-  
+
   cdata <- SummarizedExperiment::colData(se)
   rdata <- SummarizedExperiment::rowData(se)
-  
+
   res_1 <- data.table::dcast(data = dt_scores[normalization_type == "GR", ],
-                             formula = CellLineName ~ paste(DrugName, "x", DrugName_2), 
+                             formula = CellLineName ~ paste(DrugName, "x", DrugName_2),
                              value.var = "hsa_score")
   data.table::setkey(res_1, NULL)
-  
+
   # scenario 1: default
   out_1 <- pheatmap_with_anno_combo(dt_scores = dt_scores)
   expect_length(out_1, 2)
@@ -788,25 +788,25 @@ test_that("pheatmap_with_anno_combo works as expected", {
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(plt_1$gtable$grobs[[4]]$label, cdata[["CellLineName"]])
-  expect_equal(sort(plt_1$gtable$grobs[[5]]$label), 
+  expect_equal(sort(plt_1$gtable$grobs[[5]]$label),
                sort(sprintf("%s x %s", rdata$DrugName, rdata$DrugName_2)))
   expect_true(all(vapply(plt_1$gtable$grobs[[1]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
   expect_is(plt_1[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_1[["tree_col"]], "hclust") # cols are clustered
-  
+
   # scenario 2: selected metric & normalization_type and NA
   dt_scores_na <- data.table::copy(dt_scores)
   dt_scores_na[DrugName == "drug_004"]$bliss_score <- NA
   res_2 <- data.table::dcast(data = dt_scores_na[normalization_type == "RV", ],
-                             formula = CellLineName ~ paste(DrugName, "x", DrugName_2), 
+                             formula = CellLineName ~ paste(DrugName, "x", DrugName_2),
                              value.var = "bliss_score")
   res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
   drug_combo_names <- unique(sprintf("%s x %s",
-                                     dt_scores_na[!is.na(bliss_score)]$DrugName, 
+                                     dt_scores_na[!is.na(bliss_score)]$DrugName,
                                      dt_scores_na[!is.na(bliss_score)]$DrugName_2))
-  
-  out_2 <- pheatmap_with_anno_combo(dt_scores = dt_scores_na, 
+
+  out_2 <- pheatmap_with_anno_combo(dt_scores = dt_scores_na,
                                     normalization_type = "RV",
                                     metric = "bliss_score",
                                     hm_title = "RV Bliss Score",
@@ -825,7 +825,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(sort(plt_2$gtable$grobs[[5]]$label), sort(drug_combo_names))
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
-  
+
   # scenario 3: annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_GB", "cellline_HB"),
@@ -837,9 +837,9 @@ test_that("pheatmap_with_anno_combo works as expected", {
     mut_B = c("yes" = "black", "no" = "grey90"),
     mut_C = c("AA" = "yellow", "BB" = "green")
   )
-  
+
   col_pal <- c("#FFFFFF", "#00008B")
-  out_3 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
+  out_3 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     colors_vec = col_pal,
                                     cluster_rows = FALSE,
                                     annotation_col = annotation_manual_col,
@@ -858,7 +858,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_3[["tree_col"]], "hclust") # cols are clustered
   expect_true(all(col_pal %in% plt_3$gtable$grobs[[8]]$children[[1]]$gp$fill))
   expect_equal(plt_3$gtable$grobs[[2]]$children[[2]]$gp$col, "black")
-  
+
   # scenario 4: incomplete annotations for row and incomplete color maps
   annotation_map_4 <- list(
     grp_B = c("yes" = "black", "no" = "grey90"),
@@ -868,11 +868,11 @@ test_that("pheatmap_with_anno_combo works as expected", {
   annotation_manual_row <- unique(dt_scores[, ls_combo_col, with = FALSE])
   annotation_manual_row[["grp_B"]] <- c("yes", "yes", "yes", "no", "no", NA)
   annotation_manual_row[["grp_C"]] <- c("AA", "AA", "no_check", "BB", "no_check", "BB")
-  
+
   annotation_manual_row_res <- data.table::setorderv(
     data.table::copy(annotation_manual_row), cols = c("drug_moa", "drug_moa_2", "grp_B", "grp_C"), na.last = TRUE)
   annotation_manual_row_res <- annotation_manual_row_res[, lapply(.SD, change_NA_into_char)]
-  
+
   col_pal <- c("#ADD8EE", "#FF6644")
   out_4 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     colors_vec = col_pal,
@@ -886,7 +886,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   anno_4 <- out_4[["data"]][["annotation_row"]]
   expect_is(anno_4, "data.table")
   expect_equal(anno_4, annotation_manual_row_res)
-  expect_equal(data_4[["matrix"]], 
+  expect_equal(data_4[["matrix"]],
                res_1[, c("CellLineName", paste(anno_4$DrugName, "x", anno_4$DrugName_2)), with = FALSE])
   plt_4 <- out_4[["heatmap"]]
   expect_is(plt_4, "pheatmap")
@@ -895,7 +895,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
   expect_true(all(col_pal %in% plt_4$gtable$grobs[[9]]$children[[1]]$gp$fill))
   expect_equal(plt_4$gtable$grobs[[3]]$children[[2]]$gp$col, "black") #light background
-  
+
   # scenario 5: incomplete annotations for row and incomplete color maps
   annotation_map_5 <- list(
     drug_moa = c(moa_A = "lightblue", moa_B = "steelblue"),
@@ -904,12 +904,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   annotation_manual_row_na <- annotation_manual_row[2:5, ls_combo_col, with = FALSE]
   annotation_manual_row_res <- merge(
     annotation_manual_row_na,
-    unique(dt_scores[, c("DrugName", "DrugName_2"), with = FALSE]), 
+    unique(dt_scores[, c("DrugName", "DrugName_2"), with = FALSE]),
     by = c("DrugName", "DrugName_2"), all = TRUE)
   data.table::setorderv(annotation_manual_row_res, cols = c("drug_moa", "drug_moa_2"), na.last = TRUE)
   annotation_manual_row_res <- annotation_manual_row_res[, lapply(.SD, change_NA_into_char)]
-  
-  out_5 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
+
+  out_5 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     annotation_row = annotation_manual_row_na,
                                     annotation_colors = annotation_map_5)
   expect_length(out_5, 2)
@@ -920,13 +920,13 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(data_5[["matrix"]], res_1[, names(data_5[["matrix"]]), with = FALSE])
   anno_5 <- out_5[["data"]][["annotation_row"]]
   expect_is(anno_5, "data.table")
-  expect_equal(anno_5, annotation_manual_row_res) 
+  expect_equal(anno_5, annotation_manual_row_res)
   plt_5 <- out_5[["heatmap"]]
   expect_is(plt_5, "pheatmap")
   expect_equal(plt_5$gtable$grobs[[7]]$label, c("drug_moa", "drug_moa_2"))
   expect_is(plt_4[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_4[["tree_col"]], "hclust") # cols are clustered
-  
+
   # scenario 6: incomplete annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
     CellLineName = c("cellline_XX", "cellline_HB"),
@@ -936,13 +936,13 @@ test_that("pheatmap_with_anno_combo works as expected", {
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue")
   )
-  
-  annotation_manual_row_res <- 
+
+  annotation_manual_row_res <-
     merge(unique(dt_scores[, c("CellLineName"), with = FALSE]),
           annotation_manual_col, all.x = TRUE)[, lapply(.SD, change_NA_into_char, "NA")]
   data.table::setorderv(annotation_manual_row_res, order = c(-1L))
-  
-  out_6 <- pheatmap_with_anno_combo(dt_scores = dt_scores, 
+
+  out_6 <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                     cluster_rows = FALSE,
                                     annotation_col = annotation_manual_col,
                                     annotation_colors = annotation_map)
@@ -958,12 +958,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(plt_6$gtable$grobs[[6]]$label, c("mut_A", "mut_B"))
   expect_true(is.na(plt_6[["tree_row"]])) # rows aren't clustered
   expect_is(plt_6[["tree_col"]], "hclust") # cols are clustered
-  
+
   # scenario 7: NA in matrix
   dt_scores_NA <- data.table::copy(dt_scores)
   dt_scores_NA[3:5, ][["bliss_score"]] <- NA
-  
-  out_7 <- pheatmap_with_anno_combo(dt_scores = dt_scores_NA, 
+
+  out_7 <- pheatmap_with_anno_combo(dt_scores = dt_scores_NA,
                                     metric = "bliss_score",
                                     normalization_type = "RV",
                                     annotation_col = annotation_manual_col,
@@ -977,12 +977,12 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_7, "pheatmap")
   expect_is(plt_7[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_7[["tree_col"]], "hclust") # cols are clustered
-  
+
   # scenario 8: NA in matrix
   dt_scores_Inf <- data.table::copy(dt_scores)
   dt_scores_Inf[c(1:3, 5:7), ][["bliss_score"]] <- Inf
-  
-  out_8 <- pheatmap_with_anno_combo(dt_scores = dt_scores_Inf, 
+
+  out_8 <- pheatmap_with_anno_combo(dt_scores = dt_scores_Inf,
                                     metric = "bliss_score",
                                     normalization_type = "RV",
                                     annotation_col = annotation_manual_col,
@@ -996,7 +996,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_8, "pheatmap")
   expect_is(plt_8[["tree_row"]], "hclust") # rows are clustered
   expect_is(plt_8[["tree_col"]], "hclust") # cols are clustered
-  
+
   # scenario 9: only NAs in matrix
   dt_scores_NA <- data.table::copy(dt_scores)
   dt_scores_NA[["bliss_score"]] <- NA_integer_
@@ -1006,7 +1006,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
                                     normalization_type = "RV",
                                     annotation_col = annotation_manual_col,
                                     annotation_colors = annotation_map)
-  
+
   expect_length(out_9, 2)
   expect_equal(names(out_9), c("data", "heatmap"))
   data_9 <- out_9[["data"]]
@@ -1015,7 +1015,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
                c("matrix", "annotation_col", "annotation_row"))
   plt_9 <- out_9[["heatmap"]]
   expect_null(plt_9)
-  
+
   # scenario 10: long drug and annotation name
   dt_scores_lng <- data.table::copy(dt_scores)
   dt_scores_lng[CellLineName == "cellline_GB", ][["CellLineName"]] <- "cellline_GB_veryveryveryverylongname|ellline_GB"
@@ -1031,14 +1031,14 @@ test_that("pheatmap_with_anno_combo works as expected", {
     drug_moa_2 = c("moa_E" = "deeppink", "moa_D" = "cadetblue"),
     lng_anno = c("short" = "black", "veryveryverylongnameofannotationforcellline" = "red")
   )
-  
+
   out_10 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
                                      metric = "bliss_score",
                                      normalization_type = "RV",
                                      annotation_col = annotation_manual_col_10,
                                      annotation_row = annotation_manual_row_10,
                                      annotation_colors = annotation_map_10)
-  
+
   expect_length(out_10, 2)
   expect_equal(names(out_10), c("data", "heatmap"))
   data_10 <- out_10[["data"]]
@@ -1046,7 +1046,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(names(data_10), c("matrix", "annotation_col", "annotation_row"))
   expect_equivalent(data_10[["annotation_col"]], annotation_manual_col_10)
   expect_equivalent(
-    data_10[["annotation_row"]], 
+    data_10[["annotation_row"]],
     annotation_manual_row_10[order(match(DrugName, data_10[["annotation_row"]]$DrugName)), ][order(DrugName_2)])
   plt_10 <- out_10[["heatmap"]]
   expect_is(plt_10, "pheatmap")
@@ -1056,7 +1056,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(sum(grepl("\\.\\.\\.", plt_10[["gtable"]][["grobs"]][[5]][["label"]])), 2) # trimmed drug name
   expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[3]][["label"]]) <= max_len))
   expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[10]][["children"]][[6]][["label"]]) <= max_len))
-  
+
   dt_scores_lng[DrugName_2 == "drug_021"][["DrugName_2"]] <- "drug_021__VERYVERYVERYLONGNAMEOFDRUG|drug_021"
   out_11 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
                                      metric = "bliss_score",
@@ -1072,7 +1072,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_11, "pheatmap")
   expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[4]][["label"]])), 1) # trimmed cell line
   expect_equal(sum(grepl("\\.\\.\\.", plt_11[["gtable"]][["grobs"]][[5]][["label"]])), 4) # trimmed drug name
-  
+
   out_12 <- pheatmap_with_anno_combo(dt_scores = dt_scores_lng,
                                      metric = "bliss_score",
                                      normalization_type = "RV",
@@ -1083,7 +1083,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_is(plt_12, "pheatmap")
   expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[4]][["label"]]))) # not trimmed cell line
   expect_false(all(grepl("\\.\\.\\.", plt_12[["gtable"]][["grobs"]][[5]][["label"]]))) # not trimmed drug name
-  
+
   # testing assertions
   expect_error(pheatmap_with_anno_combo(dt_scores = unlist(dt_scores)),
                "Assertion on 'dt_scores' failed: Must be a data.table")
@@ -1129,24 +1129,24 @@ test_that("get_hm_title works as expected", {
   metric <- "xc50"
   normalization_type <- "GR"
   expect_equal(get_hm_title(metric, normalization_type), "log10(GR50)")
-  
+
   metric <- "bliss_score"
   normalization_type <- "RV"
   expect_equal(get_hm_title(metric, normalization_type), "Bliss Score RV")
-  
+
   dataset_name <- "Dataset AB123"
   metric <- "xc50"
   normalization_type <- "RV"
   expect_equal(get_hm_title(metric, normalization_type, dataset_name), "Dataset AB123 (log10(IC50))")
-  
+
   metric <- "hsa_score"
   normalization_type <- "GR"
   expect_equal(get_hm_title(metric, normalization_type, dataset_name), "Dataset AB123 (HSA Score GR)")
-  
+
   metric <- "x_mean_sd_custom_metric"
   normalization_type <- "RV"
   expect_equal(get_hm_title(metric, normalization_type), "RV Mean Sd Custom Metric")
-  
+
   metric <- "aggregated xc50"
   normalization_type <- "RV"
   expect_equal(get_hm_title(metric, normalization_type), "Aggregated IC50")
@@ -1161,18 +1161,18 @@ test_that("prep_pheatmap_matrix works as expected", {
                                                  assay_name = "Metrics")
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo,
                                                 assay_name = "scores")
-  
+
   mat_1 <- prep_pheatmap_matrix(dt_response = dt_metrics) # default
   expect_is(mat_1, "matrix")
   expect_equal(sort(rownames(mat_1)), sort(unique(dt_metrics[["CellLineName"]])))
   expect_equal(sort(colnames(mat_1)), sort(unique(dt_metrics[["DrugName"]])))
   expect_true(all(dt_metrics[normalization_type == "GR"][["xc50"]] %in% mat_1))
-  
+
   mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
                                 metric = "p_value")
   expect_is(mat_2, "matrix")
   expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
-  
+
   # scenario: combo data
   mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,
                                 metric = "hsa_score",
@@ -1180,16 +1180,16 @@ test_that("prep_pheatmap_matrix works as expected", {
                                 experiment_type = gDRutils::get_supported_experiments("combo"))
   expect_is(mat_3, "matrix")
   expect_equal(sort(rownames(mat_3)), sort(unique(dt_scores[["CellLineName"]])))
-  expect_equal(sort(colnames(mat_3)), 
+  expect_equal(sort(colnames(mat_3)),
                sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
   expect_true(all(dt_scores[normalization_type == "RV"][["hsa_score"]] %in% mat_3))
-  
+
   # scenario: codilution data
   mae <- gDRutils::get_synthetic_data("combo_codilution_small")
   se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
   dt_metrics_cd <- gDRutils::convert_se_assay_to_dt(se = se_cd,
                                                     assay_name = "Metrics")
-  
+
   mat_4 <- prep_pheatmap_matrix(dt_response = dt_metrics_cd,
                                 metric = "x_max",
                                 normalization_type = "RV",
@@ -1197,32 +1197,32 @@ test_that("prep_pheatmap_matrix works as expected", {
   expect_is(mat_4, "matrix")
   expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
   expect_equal(
-    sort(colnames(mat_4)), 
+    sort(colnames(mat_4)),
     sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
   expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
-  
+
   # scenario: NA-row
   dt_scores_NA <- data.table::copy(dt_scores)
   dt_scores_NA[CellLineName == "cellline_EA"][["bliss_score"]] <- NA
-  
+
   mat_5 <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
                                 metric = "bliss_score",
                                 normalization_type = "RV",
                                 experiment_type = gDRutils::get_supported_experiments("combo"))
   expect_is(mat_5, "matrix")
   expect_false("cellline_EA" %in% rownames(mat_5))
-  expect_equal(sort(colnames(mat_5)), 
+  expect_equal(sort(colnames(mat_5)),
                sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
   expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
-  
+
   # scenario: matrix 0x0 (all values are NAs)
   dt_metrics_NA <- data.table::copy(dt_metrics)
   dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
-  
+
   mat_6 <- prep_pheatmap_matrix(dt_response = dt_metrics_NA) # default
   expect_is(mat_6, "matrix")
   expect_equal(dim(mat_6), c(0, 0))
-  
+
   # scenario: error is thrown on duplicates
   ## single-agent data
   mae <- gDRutils::get_synthetic_data("small")
@@ -1233,7 +1233,7 @@ test_that("prep_pheatmap_matrix works as expected", {
     prep_pheatmap_matrix(dt_response = dt_metrics_dup, metric = "xc50"),
     "Unexpected data aggregation"
   )
-  
+
   ## combination data
   dt_scores_dup <- data.table::rbindlist(list(dt_scores, dt_scores))
   expect_error(
@@ -1244,7 +1244,7 @@ test_that("prep_pheatmap_matrix works as expected", {
     ),
     "Unexpected data aggregation"
   )
-  
+
   ## co-dilution data
   mae <- gDRutils::get_synthetic_data("combo_codilution")
   se <- mae[[gDRutils::get_supported_experiments("cd")]]
@@ -1258,7 +1258,7 @@ test_that("prep_pheatmap_matrix works as expected", {
     ),
     "Unexpected data aggregation"
   )
-  
+
   # testing assertions
   expect_error(prep_pheatmap_matrix(dt_response = as.list(dt_metrics)),
                "Assertion on 'dt_response' failed: Must be a data.table")
@@ -1284,94 +1284,94 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
-  
+
   out_1 <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_metrics)$result
-  
+
   expect_length(out_1, 2)
   expect_equal(names(out_1), c("data", "heatmap"))
-  
+
   data_1 <- out_1[["data"]]
   expect_is(data_1[["matrix"]], "data.table")
   expect_true("Treatment_Key" %in% names(data_1[["matrix"]]))
-  
+
   expected_cols <- c("Treatment_Key", unique(dt_metrics$CellLineName))
   expect_true(all(expected_cols %in% names(data_1[["matrix"]])))
-  
+
   anno_row_1 <- out_1[["data"]][["annotation_row"]]
   expect_is(anno_row_1, "data.frame")
   expect_true("Fixed_Drug" %in% names(anno_row_1))
-  
+
   dt_xc50 <- data.table::copy(dt_metrics)
   dt_xc50[, xc50 := 0.5]
-  
+
   out_xc50 <- pheatmap_with_anno_combo_metrics(
-    dt_metrics = dt_xc50, 
-    metric = "xc50", 
+    dt_metrics = dt_xc50,
+    metric = "xc50",
     normalization_type = "GR"
   )
-  
+
   res_dt <- out_xc50[["data"]][["matrix"]]
-  cl_col <- names(res_dt)[2] 
+  cl_col <- names(res_dt)[2]
   val_raw <- res_dt[[cl_col]][1]
-  
-  expect_equal(val_raw, 0.5) 
-  
+
+  expect_equal(val_raw, 0.5)
+
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
   drug_A <- unique(dt_metrics$DrugName)[1]
   drug_B <- unique(dt_metrics$DrugName_2)[1]
-  
+
   dt_sort <- dt_metrics[DrugName == drug_A & DrugName_2 == drug_B]
-  
-  dt_sort[1, `:=`(cotrt_value = 0, DrugName_2 = untreated_tag)] 
+
+  dt_sort[1, `:=`(cotrt_value = 0, DrugName_2 = untreated_tag)]
   dt_sort[2, cotrt_value := 0.001]
   dt_sort[3, cotrt_value := 1.0]
-  
+
   out_sort <- purrr::quietly(pheatmap_with_anno_combo_metrics)(dt_metrics = dt_sort,
                                                                cluster_rows = FALSE)$result
-  
+
   sorted_keys <- out_sort[["data"]][["matrix"]]$Treatment_Key
-  
+
   idx_untreated <- grep(paste0(untreated_tag, "__", untreated_tag), sorted_keys)
   idx_low_conc  <- grep("0.0010", sorted_keys)
   idx_high_conc <- grep("1.0000", sorted_keys)
-  
+
   expect_true(idx_untreated < idx_low_conc)
   expect_true(idx_low_conc < idx_high_conc)
-  
+
   expect_error(
     pheatmap_with_anno_combo_metrics(dt_metrics = "not_a_dt"),
     "Assertion on 'dt_metrics' failed: Must be a data.table"
   )
-  
+
   dt_bad <- data.table::copy(dt_metrics)
   dt_bad[, cotrt_value := NULL]
   expect_error(
     pheatmap_with_anno_combo_metrics(dt_metrics = dt_bad),
     "Names must include the elements"
   )
-  
+
   # --- Triple Combo Support ---
   mae_triple <- gDRutils::get_synthetic_data("combo_triple")
   se_triple <- mae_triple[[gDRutils::get_supported_experiments("combo")]]
-  
-  dt_triple <- gDRutils::convert_se_assay_to_dt(se = se_triple, 
-                                                assay_name = "Metrics", 
+
+  dt_triple <- gDRutils::convert_se_assay_to_dt(se = se_triple,
+                                                assay_name = "Metrics",
                                                 merge_additional_variables = TRUE)
-  
+
   out_triple <- purrr::quietly(pheatmap_with_anno_combo_metrics)(
     dt_metrics = dt_triple,
     normalization_type = "RV",
     metric = "x_mean"
   )$result
-  
+
   expect_length(out_triple, 2)
   expect_is(out_triple[["data"]][["matrix"]], "data.table")
-  
+
   anno_row_triple <- out_triple[["data"]][["annotation_row"]]
   expect_is(anno_row_triple, "data.frame")
   expect_true("Fixed_Drug" %in% names(anno_row_triple))
   expect_true("Fixed_Drug_2" %in% names(anno_row_triple))
-  
+
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
   real_labels <- anno_row_triple$Fixed_Drug_2[anno_row_triple$Fixed_Drug_2 != untreated_tag]
   expect_gt(length(real_labels), 0)
@@ -1379,12 +1379,12 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
 
 test_that("change_NA_into_char works", {
   test_vec <- list(11, " ", NA, "A", NULL)
-  
+
   expect_equal(change_NA_into_char(test_vec),
                c("11", " ", "NA", "A", "NULL"))
   expect_equal(change_NA_into_char(test_vec, "Unavailable"),
                c("11", " ", "Unavailable", "A", "NULL"))
-  
+
   expect_error(change_NA_into_char(test_vec, lbl_NA = 1),
                "Assertion on 'lbl_NA' failed: Must be of type 'string', not 'double'")
   expect_error(change_NA_into_char(test_vec, lbl_NA = NA),
@@ -1400,31 +1400,31 @@ test_that("get_ann_color_map works", {
   se <- mae[[gDRutils::get_supported_experiments("sa")]][2:3, ]
   dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
   dt_ann <- unique(dt_averaged[, .SD, .SDcols = c("Tissue", "ReferenceDivisionTime")])
-  
+
   result <- get_ann_color_map(dt_ann)
   expect_equal(NROW(result), NCOL(dt_ann))
   expect_equal(names(result), names(dt_ann))
   expect_equal(NROW(result[["Tissue"]]), NROW(unique(dt_ann[["Tissue"]])))
   expect_equal(NROW(result[["ReferenceDivisionTime"]]), NROW(unique(dt_ann[["ReferenceDivisionTime"]])))
-  expect_equal(NROW(unlist(result)), 
+  expect_equal(NROW(unlist(result)),
                sum(dt_ann[, lapply(.SD, data.table::uniqueN), .SDcols = names(dt_ann)]))
-  
+
   # the same lbl for different annotation column
   dt_ann_2 <- data.table::data.table(
     Tissue = c("tissue_x", "tissue_x", "unknown"),
     drug_moa = c("moa_A", "unknown", "unknown"),
     drug_moa_2 = c("unknown", "moa_AB", "moa_CD")
   )
-  
+
   result_2 <- get_ann_color_map(dt_ann_2)
   expect_equal(NROW(result_2), NCOL(dt_ann_2))
   expect_equal(names(result_2), names(dt_ann_2))
   expect_equal(NROW(result_2[["Tissue"]]), NROW(unique(dt_ann_2[["Tissue"]])))
   expect_equal(NROW(result_2[["drug_moa"]]), NROW(unique(dt_ann_2[["drug_moa"]])))
   expect_equal(NROW(result_2[["drug_moa_2"]]), NROW(unique(dt_ann_2[["drug_moa_2"]])))
-  expect_equal(NROW(unlist(result_2)), 
+  expect_equal(NROW(unlist(result_2)),
                sum(dt_ann_2[, lapply(.SD, data.table::uniqueN), .SDcols = names(dt_ann_2)]))
-  
+
   expect_error(get_ann_color_map(list()),
                "Assertion on 'dt_ann' failed: Must be a data.table")
 })
@@ -1436,23 +1436,23 @@ test_that("fill_ann_color_map works", {
     mut_B = c("yes", "yes", "no", NA, NA),
     mut_C = c("AA", "AA", "AB", NA, "B")
   )
-  
+
   annotation_map <- list(
     mut_A = c("1" = "coral", "0" = "cadetblue"), # should be removed as not enough long
-    mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"), 
+    mut_B = c("yes" = "black", "no" = "grey90", "not_checked" = "lightblue"),
     # should be filled with NA = "darkred";"not_checked" should be removed
     mut_C = c("AA" = "red", "AB" = "orange", "B" = "yellow") # should be filled with B = "black"
   )
-  
-  res <- fill_ann_color_map(dt_ann = annotation_manual, 
+
+  res <- fill_ann_color_map(dt_ann = annotation_manual,
                             map_ann = annotation_map)
-  
+
   expect_length(res, 2)
   expect_equal(names(res), c("mut_B", "mut_C"))
-  expect_equal(res[["mut_B"]], 
+  expect_equal(res[["mut_B"]],
                c(annotation_map[["mut_B"]][na.omit(unique(annotation_manual[["mut_B"]]))], "NA" = "darkred"))
   expect_equal(res[["mut_C"]], c(annotation_map[["mut_C"]], "NA" = "black"))
-  
+
   expect_error(fill_ann_color_map(dt_ann = unlist(annotation_manual)),
                "Assertion on 'dt_ann' failed: Must be a data.table")
   expect_error(fill_ann_color_map(dt_ann = annotation_manual, map_ann = NULL),
@@ -1463,77 +1463,77 @@ test_that(".get_pheatmap_cluster_param works as expected", {
   mat <- matrix(1:24, nrow = 4)
   rownames(mat) <- sprintf("row_%s", 1:4)
   colnames(mat) <- sprintf("col_%s", 1:6)
-  
+
   out_1 <- .get_pheatmap_cluster_param(mat)
   expect_is(out_1, "hclust")
   expect_equal(out_1$labels, rownames(mat))
   expect_equal(out_1$dist.method, "euclidean") # default for stats::dist
   expect_equal(out_1$method, "complete")
-  
+
   out_2 <- .get_pheatmap_cluster_param(t(mat))
   expect_is(out_2, "hclust")
   expect_equal(out_2$labels, colnames(mat))
-  
+
   out_3 <- .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
   expect_is(out_3, "hclust")
   expect_equal(out_3$labels, colnames(mat))
   expect_equal(out_3$dist.method, NULL) # hidden in compute_distances
   expect_equal(out_3$method, "complete")
-  
+
   add_cond <- any(dim(mat) > 10)
   out_4 <- .get_pheatmap_cluster_param(t(mat), additional_condition = add_cond)
   expect_is(out_4, "logical")
   expect_equal(out_4, add_cond)
-  
+
   out_5 <- .get_pheatmap_cluster_param(mat[1, , drop = FALSE]) # only one row
   expect_is(out_5, "logical")
   expect_false(out_5)
-  
+
   out_6 <- .get_pheatmap_cluster_param(mat[, 1, drop = FALSE]) # only one row
   expect_is(out_6, "hclust")
   expect_equal(out_6$labels, rownames(mat))
-  
+
   # scenario: matrix with NA
   mat_NA <- mat
   mat_NA[2, ] <- NA
-  
+
   out_7 <- .get_pheatmap_cluster_param(mat_NA)
   expect_is(out_7, "logical")
   expect_false(out_7) # default stats::dist does not handle NAs
-  
+
   out_8 <- .get_pheatmap_cluster_param(t(mat_NA), distfun = compute_distances)
   expect_is(out_8, "hclust")
   expect_equal(out_8$labels, colnames(mat))
-  
+
   out_9 <- .get_pheatmap_cluster_param(mat_NA, distfun = compute_distances, additional_condition = add_cond)
   expect_is(out_9, "logical")
   expect_equal(out_9, add_cond)
-  
+
   # scenario: matrix with -Inf/Inf
   mat_inf <- mat
   mat_inf[2, 2:3] <- Inf
   mat_inf[4, 3:4] <- -Inf
-  
+
   out_10 <- .get_pheatmap_cluster_param(mat_inf)
   expect_is(out_10, "logical")
   expect_false(out_10) # default stats::dist does not handle Inf
-  
+
   out_11 <- .get_pheatmap_cluster_param(t(mat_inf), distfun = compute_distances)
   expect_is(out_11, "hclust")
   expect_equal(out_11$labels, colnames(mat))
-  
+
   # scenario: matrix with -Inf/Inf and NAs
   mat_inf_na <- mat_inf
   mat_inf_na[3, 1:4] <- NA
-  
+
   out_12 <- .get_pheatmap_cluster_param(mat_inf_na)
   expect_is(out_12, "logical")
   expect_false(out_12) # default stats::dist does not handle Inf and NA
-  
+
   out_13 <- .get_pheatmap_cluster_param(t(mat_inf_na), distfun = compute_distances)
   expect_is(out_13, "hclust")
   expect_equal(out_13$labels, colnames(mat))
-  
+
   # testing assertions
   expect_error(.get_pheatmap_cluster_param(mat_to_cluster = list(mat)),
                "Assertion on 'mat_to_cluster' failed: Must be of type 'matrix'")
@@ -1551,38 +1551,38 @@ test_that(".fill_pheatmap_annotation works as expected", {
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  
+
   # single-agent ----
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se_sa <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_sa, assay_name = "Metrics")
-  
+
   cl_names <- unique(dt_metrics[[cellline_name]])
   d_names <- unique(dt_metrics[[drug_name]])
-  
+
   mat_sa <- prep_pheatmap_matrix(dt_response = dt_metrics,
                                  normalization_type = "GR",
                                  metric = "x_mean",
                                  experiment_type = gDRutils::get_supported_experiments("sa"))
   annotation_manual_row <-
     unique(dt_metrics[, c(drug_name, "drug_moa"), with = FALSE])
-  
+
   annotation_1 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_row,
                                             mat_with_metric = mat_sa,
                                             anno_var = drug_name) # default
   expect_equal(annotation_1, annotation_manual_row)
-  
+
   annotation_manual_col <-
     unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
-  
+
   annotation_2 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col,
                                             mat_with_metric = mat_sa,
                                             anno_var = cellline_name) # default
   expect_equal(annotation_2, annotation_manual_col)
-  
+
   # scenario: incomplete annotations for columns
   annotation_manual_col_na <- data.table::copy(annotation_manual_col)[c(4:8), ]
-  
+
   annotation_3 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_na,
                                             mat_with_metric = mat_sa,
                                             anno_var = cellline_name)
@@ -1590,7 +1590,7 @@ test_that(".fill_pheatmap_annotation works as expected", {
   res_3[!get(cellline_name) %in% annotation_manual_col_na[[cellline_name]], ][["Tissue"]] <- NA
   res_3[["Tissue"]] <- change_NA_into_char(res_3[["Tissue"]])
   expect_equal(annotation_3[order(get(cellline_name)), ], res_3[order(get(cellline_name)), ])
-  
+
   # scenario: annotation with extra items
   annotation_manual_col_lng <- data.table::data.table(
     CellLineName = c("cellline_XX", "cellline_YY", cl_names),
@@ -1600,42 +1600,42 @@ test_that(".fill_pheatmap_annotation works as expected", {
   annotation_4 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_col_lng,
                                             mat_with_metric = mat_sa,
                                             anno_var = cellline_name)
-  expect_equal(annotation_4[order(get(cellline_name)), ], 
+  expect_equal(annotation_4[order(get(cellline_name)), ],
                annotation_manual_col_lng[get(cellline_name) %in% cl_names, ][order(get(cellline_name)), ])
-  
+
   # codilution ----
   mae <- gDRutils::get_synthetic_data("combo_codilution_small")
   se_cd <- mae[[gDRutils::get_supported_experiments("cd")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se_cd, assay_name = "Metrics")
-  
+
   mat_cd <- prep_pheatmap_matrix(dt_response = dt_metrics,
                                  normalization_type = "GR",
                                  metric = "x_max",
                                  experiment_type = gDRutils::get_supported_experiments("cd"))
   annotation_manual_cd_col <-
     unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
-  
+
   annotation_5 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_cd_col,
                                             mat_with_metric = mat_cd,
                                             anno_var = cellline_name) # default
   expect_equal(annotation_5, annotation_manual_cd_col)
-  
+
   annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
                                                     "drug_moa", "drug_moa_2"),
                                                 with = FALSE])
   # TODO GDR-2791 annotation_6
-  
+
   annotation_manual_cd_row_na <- data.table::copy(annotation_manual_cd_row)[1:20, ]
-  
+
   # TODO GDR-2791 annotation_7
-  
+
   # combo ----
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se_combo, assay_name = "scores")
-  
+
   cl_names_combo <- unique(dt_scores[[cellline_name]])
-  
+
   mat_combo <- prep_pheatmap_matrix(dt_response = dt_scores,
                                     normalization_type = "GR",
                                     metric = "bliss_score",
@@ -1645,11 +1645,11 @@ test_that(".fill_pheatmap_annotation works as expected", {
                               unique(dt_scores[, c(drug_name, drug_name_2), with = FALSE])[[drug_name_2]])
   annotation_manual_combo_row <-
     unique(dt_scores[, c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2"), with = FALSE])
-  
+
   annotation_8 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row,
                                             mat_with_metric = mat_combo,
-                                            anno_var = drug_name) 
-  
+                                            anno_var = drug_name)
+
   # scenario: missing anno
   annotation_manual_combo_col_na <- data.table::data.table(
     CellLineName =
@@ -1657,27 +1657,27 @@ test_that(".fill_pheatmap_annotation works as expected", {
     mut_A = c(1, 1, 1, 0, 0),
     mut_B = c("yes", "yes", "no", "no", "no")
   )
-  
+
   annotation_9 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_col_na,
                                             mat_with_metric = mat_combo,
                                             anno_var = cellline_name)
   res_9 <- rbind(
-    data.table::copy(annotation_manual_combo_col_na), 
+    data.table::copy(annotation_manual_combo_col_na),
     data.table::data.table(
       CellLineName = cl_names_combo[!cl_names_combo %in% annotation_manual_combo_col_na[[cellline_name]]]),
     fill = TRUE
   )
   res_9[, (c("mut_A", "mut_B")) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = c("mut_A", "mut_B")]
   expect_equal(annotation_9[order(get(cellline_name)), ], res_9[order(get(cellline_name)), ])
-  
+
   # scenario: incomplete annotations for columns
   annotation_manual_combo_row_na <- data.table::copy(annotation_manual_combo_row)[c(4:8), ]
-  
+
   annotation_10 <- .fill_pheatmap_annotation(dt_anno = annotation_manual_combo_row_na,
                                              mat_with_metric = mat_combo,
                                              anno_var = drug_name)
-  # TODO GDR-2791 
-  
+  # TODO GDR-2791
+
   # testing assertions
   expect_error(.fill_pheatmap_annotation(dt_anno = as.list(annotation_manual_row),
                                          mat_with_metric = mat_sa,
@@ -1713,17 +1713,17 @@ test_that(".get_pheatmap_number_color works as expected", {
   breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
   colors_vec <- c("limegreen", "darkblue", "orange")
   hm_colors <- grDevices::colorRampPalette(colors_vec)(no_breaks)
-  
-  number_color <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                             colors_vec = hm_colors, 
+
+  number_color <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                             colors_vec = hm_colors,
                                              breaks = breaks) # default
-  
-  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat, 
-                                          colors_vec = hm_colors, 
+
+  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
                                           breaks = breaks,
                                           dark_color_font = "pinki"), number_color)
-  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat, 
-                                          colors_vec = hm_colors, 
+  expect_equal(.get_pheatmap_number_color(mat_with_metric = mat,
+                                          colors_vec = hm_colors,
                                           breaks = breaks,
                                           light_color_font = "darkly"), number_color)
   expect_equal(unique(c(number_color)), c("black", "white"))
@@ -1733,56 +1733,56 @@ test_that(".get_pheatmap_number_color works as expected", {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color), ifelse(res, "white", "black"))
-  
-  number_color_1 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_colors, 
+
+  number_color_1 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_colors,
                                                breaks = breaks,
                                                dark_color_font = "yellow",
                                                light_color_font = "blue4")
   expect_equal(c(number_color_1), ifelse(res, "yellow", "blue4"))
-  
+
   # scenario: invalid colors in colors_vec
   hm_col_invalid <- gsub("#", "", hm_colors)
-  number_color_2 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_col_invalid, 
+  number_color_2 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_col_invalid,
                                                breaks = breaks)
   expect_equal(number_color_2, "black")
-  
-  number_color_3 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_col_invalid, 
+
+  number_color_3 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_col_invalid,
                                                breaks = breaks,
                                                light_color_font = "blue4")
   expect_equal(number_color_3, "blue4")
-  
+
   # scenario: only not dark colors in colors_vec
   hm_col_light <- grDevices::colorRampPalette(c("deeppink", "lightblue"))(no_breaks)
-  number_color_4 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_col_light, 
+  number_color_4 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_col_light,
                                                breaks = breaks)
   expect_equal(number_color_4, "black")
-  
+
   # scenario: short breaks list
   min_no_breaks <- 2
   min_breaks <- seq(from = min(mat), to = max(mat), length.out = min_no_breaks + 1)
   hm_col_short <- grDevices::colorRampPalette(c("deeppink", "navyblue"))(min_no_breaks)
-  number_color_5 <- .get_pheatmap_number_color(mat_with_metric = mat, 
+  number_color_5 <- .get_pheatmap_number_color(mat_with_metric = mat,
                                                colors_vec = hm_col_short,
                                                breaks = min_breaks)
-  dark_range <- list(c(-Inf, min_breaks[2]), 
+  dark_range <- list(c(-Inf, min_breaks[2]),
                      c(min_breaks[2], Inf))[[which(vapply(hm_col_short, is_color_dark, logical(1)))]]
   res_5 <- vapply(c(mat), function(i) {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_5), ifelse(res_5, "white", "black"))
-  
+
   # scenario: NA in metric matrix
   mat_NA <- mat
   mat_NA[1, 1] <- NA
   mat_NA[1, 5] <- NA
-  number_color_6 <- .get_pheatmap_number_color(mat_with_metric = mat_NA, 
+  number_color_6 <- .get_pheatmap_number_color(mat_with_metric = mat_NA,
                                                colors_vec = hm_col_short,
                                                breaks = min_breaks)
-  dark_range <- list(c(-Inf, min_breaks[2]), 
+  dark_range <- list(c(-Inf, min_breaks[2]),
                      c(min_breaks[2], Inf))[[which(vapply(hm_col_short, is_color_dark, logical(1)))]]
   res_6 <- vapply(c(mat_NA), function(i) {
     if (is.na(i)) {
@@ -1792,62 +1792,62 @@ test_that(".get_pheatmap_number_color works as expected", {
     }
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_6), ifelse(res_6, "white", "black"))
-  
+
   # scenario: Inf in metric matrix
   mat_Inf <- mat
   mat_Inf[3, 2:4] <- Inf # color for max value
   mat_Inf[8:9, 5] <- -Inf # color for min value
-  number_color_7 <- .get_pheatmap_number_color(mat_with_metric = mat_Inf, 
+  number_color_7 <- .get_pheatmap_number_color(mat_with_metric = mat_Inf,
                                                colors_vec = hm_col_short,
                                                breaks = min_breaks)
   res_7 <- vapply(c(mat_Inf), function(i) {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_7), ifelse(res_7, "white", "black"))
-  
+
   # scenario: one range with one dark color
   no_breaks_short <- 5
   breaks_short <- seq(from = min(mat), to = max(mat), length.out = no_breaks_short + 1)
   colors_vec <- c("gold", "limegreen", "darkblue", "orange", "lightblue")
   hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
-  
-  number_color_8 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_colors_short, 
+
+  number_color_8 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_colors_short,
                                                breaks = breaks_short)
-  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")],
                   breaks_short[which(colors_vec == "darkblue") + 1])
   res_8 <- vapply(c(mat), function(i) {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_8), ifelse(res_8, "white", "black"))
-  
+
   colors_vec <- c("orange", "lightblue", "gold", "limegreen", "darkblue")
   hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
-  
-  number_color_9 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                               colors_vec = hm_colors_short, 
+
+  number_color_9 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                               colors_vec = hm_colors_short,
                                                breaks = breaks_short)
-  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")],
                   breaks_short[which(colors_vec == "darkblue") + 1])
   res_9 <- vapply(c(mat), function(i) {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_9), ifelse(res_9, "white", "black"))
-  
+
   colors_vec <- c("darkblue", "orange", "lightblue", "gold", "limegreen")
   hm_colors_short <- grDevices::colorRampPalette(colors_vec)(no_breaks_short)
-  
-  number_color_10 <- .get_pheatmap_number_color(mat_with_metric = mat, 
-                                                colors_vec = hm_colors_short, 
+
+  number_color_10 <- .get_pheatmap_number_color(mat_with_metric = mat,
+                                                colors_vec = hm_colors_short,
                                                 breaks = breaks_short)
-  dark_range <- c(breaks_short[which(colors_vec == "darkblue")], 
+  dark_range <- c(breaks_short[which(colors_vec == "darkblue")],
                   breaks_short[which(colors_vec == "darkblue") + 1])
   dark_range[1] <- -Inf
   res_10 <- vapply(c(mat), function(i) {
     dark_range[1] < i & i <= dark_range[2]
   }, FUN.VALUE = logical(1))
   expect_equal(c(number_color_10), ifelse(res_10, "white", "black"))
-  
+
   expect_error(.get_pheatmap_number_color(data.table::data.table(),
                                           colors_vec = hm_colors,
                                           breaks = breaks),
@@ -1889,33 +1889,33 @@ test_that(".get_pheatmap_fontsize works as expected", {
   mat_s <- matrix(-14:30, ncol = 5,
                   dimnames = list(letters[1:9], LETTERS[1:5]))
   mat_xl <- matrix(-10^3:99, ncol = 100)
-  
+
   res_1 <- .get_pheatmap_fontsize(mat_s) # default
   expect_is(res_1, "numeric")
   expect_equal(res_1, 8)
-  
+
   res_2 <- .get_pheatmap_fontsize(mat_xl) # default
   expect_is(res_2, "numeric")
   expect_equal(res_2, 8)
-  
-  res_3 <- .get_pheatmap_fontsize(mat_s, 
+
+  res_3 <- .get_pheatmap_fontsize(mat_s,
                                   threshold_count = 5)
   expect_equal(res_3, 4.8)
-  
+
   res_4 <- .get_pheatmap_fontsize(mat_xl,
                                   threshold_count = 20)
   expect_equal(res_4, 8) # default is row
-  
-  res_5 <- .get_pheatmap_fontsize(mat_s, 
+
+  res_5 <- .get_pheatmap_fontsize(mat_s,
                                   dimension = "col",
                                   threshold_count = 5)
   expect_equal(res_5, 8)
-  
-  res_6 <- .get_pheatmap_fontsize(mat_xl, 
+
+  res_6 <- .get_pheatmap_fontsize(mat_xl,
                                   dimension = "col",
                                   threshold_count = 20)
   expect_equal(res_6, 4.8)
-  
+
   expect_error(.get_pheatmap_fontsize(matrix = as.list(mat_s)),
                "Assertion on 'matrix' failed: Must be of type 'matrix'")
   expect_error(.get_pheatmap_fontsize(matrix = mat_s,
@@ -1930,57 +1930,57 @@ test_that(".trim_labels works as expected", {
   ls_lbls <- c(
     "short_lbl",
     "long_duplicates|lbl_123",
-    "veryveryverylong", 
-    "long_duplicates|lbl_1AB", 
+    "veryveryverylong",
+    "long_duplicates|lbl_1AB",
     "veryveryverylong|dup_AB|123",
     "long_duplicates|lbl_123AB",
     "veryveryverylong|dup_AB|all123"
   )
-  
+
   res_1 <- .trim_labels(lbls_vec = ls_lbls) # default - no trimming
   expect_is(res_1, "character")
   expect_length(res_1, NROW(ls_lbls))
   expect_true(all(res_1 == ls_lbls))
-  
-  res_2 <- .trim_labels(lbls_vec = ls_lbls, 
-                        max_lbl_length = 15) 
+
+  res_2 <- .trim_labels(lbls_vec = ls_lbls,
+                        max_lbl_length = 15)
   expect_is(res_2, "character")
   expect_length(res_2, NROW(ls_lbls))
   expect_length(unique(res_2), NROW(res_2)) # no duplicates
-  
-  res_3 <- .trim_labels(lbls_vec = ls_lbls, 
-                        max_lbl_length = max(nchar(ls_lbls))) 
+
+  res_3 <- .trim_labels(lbls_vec = ls_lbls,
+                        max_lbl_length = max(nchar(ls_lbls)))
   expect_is(res_3, "character")
   expect_length(res_3, NROW(ls_lbls))
   expect_equal(res_3, res_1)
-  
+
   # scenario: not unique string in vector
   ls_lbls_2 <- c(
     "short_lbl",
     "long_duplicates|lbl_123",
-    "veryveryverylong", 
-    "long_duplicates|lbl_1AB", 
+    "veryveryverylong",
+    "long_duplicates|lbl_1AB",
     "veryveryverylong|dup_AB|123",
     "long_duplicates|lbl_123AB",
     "short_lbl",
     "veryveryverylong|dup_AB|all123",
     "long_duplicates|lbl_1AB"
   )
-  
+
   res_4 <- .trim_labels(lbls_vec = ls_lbls_2) # default - no trimming
   expect_is(res_4, "character")
   expect_length(res_4, NROW(ls_lbls_2))
   expect_true(all(res_4 == ls_lbls_2))
-  
-  res_5 <- .trim_labels(lbls_vec = ls_lbls_2, 
-                        max_lbl_length = 10) 
+
+  res_5 <- .trim_labels(lbls_vec = ls_lbls_2,
+                        max_lbl_length = 10)
   expect_is(res_5, "character")
   expect_length(res_5, NROW(ls_lbls_2))
   expect_length(unique(res_5), NROW(unique(ls_lbls_2)))
   expect_true(all(duplicated(ls_lbls_2) == duplicated(ls_lbls_2)))
-  expect_true(all(vapply(names(res_5)[duplicated(res_5)], 
+  expect_true(all(vapply(names(res_5)[duplicated(res_5)],
                          function(nm) NROW(unique(res_5[[nm]])) == 1, logical(1))))
-  
+
   expect_error(.trim_labels(lbls_vec = 1:3),
                "Assertion on 'lbls_vec' failed: Must be of type 'character'")
   expect_error(.trim_labels(lbls_vec = c(ls_lbls, NA)),
@@ -2000,12 +2000,12 @@ test_that(".get_gradient_colors works as expected", {
     col_labels = c("Low", "High", "untreated"),
     base_map = c("DrugA" = "red")
   )
-  
+
   expect_equal(unname(res["untreated"]), "#E0E0E0")
-  
+
   expect_equal(unname(res["High"]), "#FF0000")
   expect_true(res["Low"] != "#FF0000")
-  
+
   expect_error(
     .get_gradient_colors("A", c(1, 2), "Label", c("A" = "#FF0000")),
     "must have the same length"

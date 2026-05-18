@@ -4,16 +4,16 @@ test_that("plot_boxplot_metric_sa works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  
-  plt_1 <- plot_boxplot_metric_sa(dt_metrics, 
+
+  plt_1 <- plot_boxplot_metric_sa(dt_metrics,
                                   group_var = "CellLineName") # default
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
   expect_true(grepl("log10", plt_1[["labels"]][["y"]])) # xc50 in log10 scale
   expect_true(grepl("drug", plt_1[["labels"]][["title"]]))
-  
-  plt_2 <- plot_boxplot_metric_sa(dt_metrics, 
+
+  plt_2 <- plot_boxplot_metric_sa(dt_metrics,
                                   group_var = "DrugName",
                                   normalization_type = "RV",
                                   metric = "x_max",
@@ -22,7 +22,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_true(grepl("E Max", plt_2[["labels"]][["y"]]))
   expect_true(grepl("celllines", plt_2[["labels"]][["title"]]))
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "darkgreen")
-  
+
   plt_3 <- plot_boxplot_metric_sa(dt_metrics,
                                   group_var = "CellLineName",
                                   metric = "x_inf",
@@ -31,9 +31,9 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_true(grepl("GR", plt_3[["labels"]][["y"]]))
   expect_true(grepl("Inf", plt_3[["labels"]][["y"]]))
   expect_equal(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]), "blue")
-  
+
   expect_message(
-    plt_4 <- plot_boxplot_metric_sa(dt_metrics, 
+    plt_4 <- plot_boxplot_metric_sa(dt_metrics,
                                     group_var = "DrugName",
                                     normalization_type = "RV",
                                     grouped_flag = TRUE,
@@ -44,12 +44,12 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_length(plt_4[["layers"]], 4) # grouped_flag
   expect_length(plt_4[["guides"]]$guides, 2)
   expect_true(all(c("colour", "fill") %in% names(plt_4[["guides"]]$guides)))
-  
+
   ls_moa_col <- c("deeppink", "darkcyan", "orange", "darkblue", "gold")
   plt_5 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
                                            with_inf = TRUE,
                                            grouped_flag = TRUE,
-                                           colors_vec = ls_moa_col) 
+                                           colors_vec = ls_moa_col)
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 4)
   expect_equal(sort(ggplot2::ggplot_build(plt_5)[["data"]][[4]][["y"]]),
@@ -57,7 +57,7 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_equal(sort(ggplot2::get_panel_scales(plt_5)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
   expect_equal(unique(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]]), ls_moa_col)
-  
+
   plt_6 <- plot_boxplot_metric_sa(dt_metrics,
                                   group_var = "CellLineName",
                                   metric = "x_AOC",
@@ -66,11 +66,11 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_length(plt_6[["layers"]], 3)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])),
                NROW(unique(dt_metrics[["DrugName"]])))
-  
+
   mae <- gDRutils::get_synthetic_data("medium")
   se_2 <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics_2 <- gDRutils::convert_se_assay_to_dt(se_2, "Metrics")
-  
+
   plt_7 <- plot_boxplot_metric_sa(dt_metrics_2,
                                   group_var = "CellLineName",
                                   metric = "x_mean",
@@ -80,9 +80,9 @@ test_that("plot_boxplot_metric_sa works as expected", {
   expect_length(plt_7[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["y"]]),
                sort(dt_metrics_2[normalization_type == "RV", ][["x_mean"]]))
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])), 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])),
                1) # too many points to be colored
-  
+
   plt_8 <- plot_boxplot_metric_sa(dt_metrics_2,
                                   group_var = "DrugName",
                                   metric = "x_mean",
@@ -90,9 +90,9 @@ test_that("plot_boxplot_metric_sa works as expected", {
                                   colored_pts_flag = TRUE)
   expect_is(plt_8, "gg")
   expect_length(plt_8[["layers"]], 3)
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_8)[["data"]][[3]][["colour"]])), 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_8)[["data"]][[3]][["colour"]])),
                1) # too many points to be colored
-  
+
   expect_error(plot_boxplot_metric_sa(dt_metrics = unlist(dt_metrics),
                                       group_var = "CellLineName"),
                "Assertion on 'dt_metrics' failed: Must be a data.table")
@@ -136,9 +136,9 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  
+
   plt_1 <- plot_boxplot_metric_sa_by_CLs(dt_metrics) # default
-  
+
   expect_is(plt_1, "gg")
   expect_true(grepl("GR", plt_1[["labels"]][["y"]]))
   expect_true(grepl("log10", plt_1[["labels"]][["y"]])) # xc50 in log10 scale
@@ -146,23 +146,23 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$get_labels()),
                sort(unique(dt_metrics[["CellLineName"]])))
-  
+
   plt_2 <- plot_boxplot_metric_sa_by_CLs(dt_metrics,
                                          metric = "x_max",
                                          grouped_flag = TRUE)
-  
+
   ls_lbl_x <- unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
   data.table::setorderv(ls_lbl_x, "Tissue")
   expect_is(plt_2, "gg")
   expect_length(plt_2[["layers"]], 4)
   expect_equal(ggplot2::get_panel_scales(plt_2)$x$get_labels(), ls_lbl_x[["CellLineName"]])
-  expect_length(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), 
+  expect_length(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]),
                 NROW(unique(ls_lbl_x[["Tissue"]])))
   expect_true(grepl(NROW(unique(dt_metrics[["DrugName"]])), plt_2[["labels"]][["title"]]))
-  
+
   plt_3 <- plot_boxplot_metric_sa_by_CLs(dt_metrics,
                                          colors_vec = "darkred",
-                                         with_inf = TRUE) 
+                                         with_inf = TRUE)
   expect_is(plt_3, "gg")
   expect_length(plt_3[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_3)[["data"]][[3]][["y"]]),
@@ -170,10 +170,10 @@ test_that("plot_boxplot_metric_sa_by_CLs works as expected", {
   expect_equal(sort(ggplot2::get_panel_scales(plt_3)$x$get_labels()),
                sort(unique(dt_metrics[["CellLineName"]])))
   expect_equal(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]), "darkred")
-  
+
   plt_4 <- plot_boxplot_metric_sa_by_CLs(dt_metrics,
-                                         metric = "p_value", 
-                                         colored_pts_flag = TRUE) 
+                                         metric = "p_value",
+                                         colored_pts_flag = TRUE)
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 3)
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[3]][["colour"]])),
@@ -184,9 +184,9 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  
+
   plt_1 <- plot_boxplot_metric_sa_by_drugs(dt_metrics) # default
-  
+
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
   expect_equal(plt_1[["labels"]][["y"]], get_hm_title("xc50", "GR"))
@@ -194,7 +194,7 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$get_labels()),
                sort(unique(dt_metrics[["DrugName"]])))
-  
+
   plt_2 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
                                            normalization_type = "RV",
                                            metric = "x_AOC",
@@ -204,7 +204,7 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], get_hm_title("x_AOC", "RV"))
   expect_length(plt_2[["layers"]], 3)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "gold")
-  
+
   plt_3 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
                                            metric = "x_max",
                                            colors_vec = c("darkred", "yellow"),
@@ -215,18 +215,18 @@ test_that("plot_boxplot_metric_sa_by_drugs works as expected", {
   expect_true(grepl(NROW(unique(dt_metrics[["CellLineName"]])), plt_3[["labels"]][["title"]]))
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_3)[["data"]][[3]][["colour"]])),
                NROW(unique(dt_metrics[["CellLineName"]])))
-  
+
   plt_4 <- plot_boxplot_metric_sa_by_drugs(dt_metrics,
                                            grouped_flag = TRUE,
                                            colors_vec = c("#0000FF", "#00FF00"),
                                            with_inf = TRUE)
-  
+
   ls_lbl_x <- unique(dt_metrics[, c("DrugName", "drug_moa"), with = FALSE])
   data.table::setorderv(ls_lbl_x, "drug_moa")
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 4)
   expect_equal(ggplot2::get_panel_scales(plt_4)$x$get_labels(), ls_lbl_x[["DrugName"]])
-  expect_length(unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]]), 
+  expect_length(unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]]),
                 NROW(unique(ls_lbl_x[["drug_moa"]])))
   expect_true(all(c("#0000FF", "#00FF00") %in% unique(ggplot2::ggplot_build(plt_4)[["data"]][[2]][["fill"]])))
   expect_equal(sort(ggplot2::ggplot_build(plt_4)[["data"]][[4]][["y"]]),
@@ -239,14 +239,14 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("sa")]]
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-  
+
   sel_var <- "DrugName"
   sel_name <- "drug_001"
   grp_var <- "Tissue"
   sel_var_2 <- "CellLineName"
   sel_name_2 <- "cellline_MC"
   grp_var_2 <- "drug_moa"
-  
+
   plt_1 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
                                          selection_name = sel_name,
@@ -261,7 +261,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[4]])[colour == "red"]), 5)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 5)
-  
+
   n_lbl <- 3
   plt_2 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var_2,
@@ -283,7 +283,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[4]])[colour == "red"]), n_lbl)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[nchar(label) > 0]), n_lbl)
-  
+
   col_vec <- c("darkblue", "orange", "lawngreen", "darkviolet")
   plt_3 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
@@ -294,7 +294,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_is(plt_3, "gg")
   expect_length(plt_2[["layers"]], 4)
   expect_true(all(col_vec %in% ggplot2::ggplot_build(plt_3)[["data"]][[2]]$fill))
-  
+
   plt_4 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
                                          selection_name = sel_name,
@@ -303,9 +303,9 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                          named_n = 0)
   expect_is(plt_4, "gg")
   expect_length(plt_4[["layers"]], 3) # no labels layer
-  expect_true(grepl("h", plt_4[["labels"]][["y"]])) 
+  expect_true(grepl("h", plt_4[["labels"]][["y"]]))
   expect_false(ggplot2::ggplot_build(plt_4)[["plot"]][["layers"]][["geom_jitter"]][["show.legend"]])
-  
+
   plt_5 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
                                          selection_name = sel_name,
@@ -314,7 +314,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 4)
   expect_true(any(is.infinite(ggplot2::ggplot_build(plt_5)[["data"]][[3]][["y"]])))
-  
+
   grp_names <- c("tissue_w", "tissue_x")
   plt_6 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
@@ -332,12 +332,12 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_6)[["data"]][[4]])[colour == "red"]), 5)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_6)[["data"]][[3]])[nchar(label) > 0]), 5)
-  
+
   # scenario: defined groups
-  dt_metrics_grp <- 
+  dt_metrics_grp <-
     data.table::copy(dt_metrics)[, tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "other")]
   grp_col <- c("orange", "darkblue")
-  
+
   plt_7 <- plot_boxplot_metric_sa_by_grp(dt_metrics_grp,
                                          selection_var = sel_var,
                                          selection_name = sel_name,
@@ -357,27 +357,27 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[3]])[nchar(label) > 0]), n_lbl)
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)[["data"]][[2]]), 2)
   expect_equal(ggplot2::ggplot_build(plt_7)[["data"]][[2]]$fill, grp_col)
-  
+
   plt_8 <- plot_boxplot_metric_sa_by_grp(dt_metrics,
                                          selection_var = sel_var,
                                          selection_name = "drug_021",
                                          group_var = grp_var)
-  
+
   expect_is(plt_8, "gg")
   expect_length(plt_8[["layers"]], 3)
   expect_true(grepl("infinite", ggplot2::ggplot_build(plt_8)[["plot"]][["labels"]][["caption"]]))
   expect_equal(NROW(ggplot2::ggplot_build(plt_8)[["data"]][[2]]$fill), 0)
-  
+
   # scenario: one group
   expect_warning({
     plt_9 <- plot_boxplot_metric_sa_by_grp(dt_metrics[Tissue == "tissue_w"],
                                            selection_var = sel_var,
                                            selection_name = sel_name,
-                                           group_var = grp_var) 
+                                           group_var = grp_var)
   }, "The `group_var` sholud have more unique values than 1 to create boxplots.")
   expect_is(plt_9, "gg")
   expect_length(plt_9[["layers"]], 4)
-  
+
   # scenario: each row is one group
   dt_metrics_grp_oneitem <- data.table::copy(dt_metrics)[, oneitem_grp := sprintf("item_%s", .I)]
   expect_warning({
@@ -386,7 +386,7 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
                                   selection_name = sel_name,
                                   group_var = "oneitem_grp")
   }, "Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
-  
+
   expect_error(plot_boxplot_metric_sa_by_grp(dt_metrics = unlist(dt_metrics),
                                              selection_var = sel_var,
                                              selection_name = sel_name,
@@ -463,8 +463,8 @@ test_that("plot_boxplot_metric_combo works as expected", {
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
-  
-  plt_1 <- plot_boxplot_metric_combo(dt_scores, 
+
+  plt_1 <- plot_boxplot_metric_combo(dt_scores,
                                      group_var = "CellLineName") # default
   expect_is(plt_1, "gg")
   expect_length(plt_1[["layers"]], 3)
@@ -473,8 +473,8 @@ test_that("plot_boxplot_metric_combo works as expected", {
   expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$get_labels()),
                sort(unique(dt_scores[["CellLineName"]])))
   expect_true(grepl(NROW(ls_comb), plt_1[["labels"]][["title"]]))
-  
-  plt_2 <- plot_boxplot_metric_combo(dt_scores, 
+
+  plt_2 <- plot_boxplot_metric_combo(dt_scores,
                                      group_var = "DrugName",
                                      normalization_type = "RV",
                                      metric = "bliss_score",
@@ -490,16 +490,16 @@ test_that("plot_boxplot_metric_combo works as expected", {
                sort(ls_comb))
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_2)[["data"]][[3]][["colour"]])),
                NROW(unique(dt_scores[["CellLineName"]])))
-  
+
   plt_3 <- plot_boxplot_metric_combo(dt_scores,
                                      group_var = "CellLineName",
                                      metric = "bliss_score",
                                      colors_vec = c("blue", "yellow"))
   expect_is(plt_3, "gg")
   expect_equal(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]), "blue")
-  
+
   expect_message(
-    plt_4 <- plot_boxplot_metric_combo(dt_scores, 
+    plt_4 <- plot_boxplot_metric_combo(dt_scores,
                                        group_var = "CellLineName",
                                        normalization_type = "RV",
                                        grouped_flag = TRUE,
@@ -510,9 +510,9 @@ test_that("plot_boxplot_metric_combo works as expected", {
   expect_length(plt_4[["layers"]], 4) # grouped_flag
   expect_length(plt_4[["guides"]]$guides, 2)
   expect_true(all(c("colour", "fill") %in% names(plt_4[["guides"]]$guides)))
-  
+
   expect_message(
-    plt_5 <- plot_boxplot_metric_combo(dt_scores, 
+    plt_5 <- plot_boxplot_metric_combo(dt_scores,
                                        group_var = "DrugName",
                                        normalization_type = "RV",
                                        grouped_flag = TRUE,
@@ -526,13 +526,13 @@ test_that("plot_boxplot_metric_combo works as expected", {
   expect_true("colour" %in% names(plt_5[["guides"]]$guides))
   expect_equal(sort(ggplot2::get_panel_scales(plt_5)$x$get_labels()),
                sort(ls_comb))
-  
+
   dt_scores_2 <- data.table::copy(dt_scores)
   ls_col_x <- c("CellLineName", "clid", "DrugName", "Gnumber")
   dt_scores_2[, (ls_col_x) := lapply(.SD, paste0, "X"), .SDcols = ls_col_x]
   dt_scores_2 <- rbind(dt_scores, dt_scores_2)
-  
-  plt_6 <- plot_boxplot_metric_combo(dt_scores_2, 
+
+  plt_6 <- plot_boxplot_metric_combo(dt_scores_2,
                                      group_var = "DrugName",
                                      normalization_type = "RV",
                                      colored_pts_flag = TRUE)
@@ -540,10 +540,10 @@ test_that("plot_boxplot_metric_combo works as expected", {
   expect_length(plt_6[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["y"]]),
                sort(dt_scores_2[normalization_type == "RV", ][["hsa_score"]]))
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])), 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)[["data"]][[3]][["colour"]])),
                1) # too many points to be colored
-  
-  plt_7 <- plot_boxplot_metric_combo(dt_scores_2, 
+
+  plt_7 <- plot_boxplot_metric_combo(dt_scores_2,
                                      group_var = "CellLineName",
                                      metric = "bliss_score",
                                      normalization_type = "RV",
@@ -552,9 +552,9 @@ test_that("plot_boxplot_metric_combo works as expected", {
   expect_length(plt_7[["layers"]], 3)
   expect_equal(sort(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["y"]]),
                sort(dt_scores_2[normalization_type == "RV", ][["bliss_score"]]))
-  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])), 
+  expect_equal(NROW(unique(ggplot2::ggplot_build(plt_7)[["data"]][[3]][["colour"]])),
                1) # too many points to be colored
-  
+
   expect_error(plot_boxplot_metric_combo(dt_scores = unlist(dt_scores),
                                          group_var = "CellLineName"),
                "Assertion on 'dt_scores' failed: Must be a data.table")
@@ -596,16 +596,16 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
-  
+
   plt_1 <- plot_boxplot_metric_combo_by_CLs(dt_scores) # default
-  
+
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], get_hm_title("hsa_score", "GR"))
   expect_true(grepl("drug", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$get_labels()),
                sort(unique(dt_scores[["CellLineName"]])))
-  
+
   plt_2 <- plot_boxplot_metric_combo_by_CLs(dt_scores,
                                             normalization_type = "RV",
                                             grouped_flag = TRUE,
@@ -614,18 +614,18 @@ test_that("plot_boxplot_metric_combo_by_CLs works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], get_hm_title("hsa_score", "RV"))
   expect_length(plt_2[["layers"]], 4)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "#FF0000")
-  
+
   plt_3 <- plot_boxplot_metric_combo_by_CLs(dt_scores,
                                             metric = "hsa_score",
                                             normalization_type = "RV",
                                             grouped_flag = TRUE,
                                             colors_vec = c("deeppink", "darkcyan", "orange", "darkblue"))
-  
+
   ls_lbl_x <- unique(dt_scores[, c("CellLineName", "Tissue"), with = FALSE])
   data.table::setorderv(ls_lbl_x, "Tissue")
   expect_is(plt_3, "gg")
   expect_equal(ggplot2::get_panel_scales(plt_3)$x$get_labels(), ls_lbl_x[["CellLineName"]])
-  expect_length(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]), 
+  expect_length(unique(ggplot2::ggplot_build(plt_3)[["data"]][[2]][["fill"]]),
                 NROW(unique(ls_lbl_x[["Tissue"]])))
   expect_true(grepl(NROW(ls_comb), plt_3[["labels"]][["title"]]))
 })
@@ -636,15 +636,15 @@ test_that("plot_boxplot_metric_combo_by_drugs works as expected", {
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "scores")
   ls_comb <- unique(paste(dt_scores[["DrugName"]], "x", dt_scores[["DrugName_2"]]))
-  
+
   plt_1 <- plot_boxplot_metric_combo_by_drugs(dt_scores) # default
-  
+
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], get_hm_title("hsa_score", "GR"))
   expect_true(grepl("celllines", plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 3)
   expect_equal(sort(ggplot2::get_panel_scales(plt_1)$x$get_labels()), sort(ls_comb))
-  
+
   plt_2 <- plot_boxplot_metric_combo_by_drugs(dt_scores,
                                               normalization_type = "RV",
                                               colors_vec = "gold")
@@ -652,12 +652,12 @@ test_that("plot_boxplot_metric_combo_by_drugs works as expected", {
   expect_equal(plt_2[["labels"]][["y"]], get_hm_title("hsa_score", "RV"))
   expect_length(plt_2[["layers"]], 3)
   expect_equal(unique(ggplot2::ggplot_build(plt_2)[["data"]][[2]][["fill"]]), "gold")
-  
+
   plt_4 <- plot_boxplot_metric_combo_by_drugs(dt_scores,
                                               normalization_type = "RV",
                                               metric = "bliss_score",
                                               colors_vec = c("#0000FF", "#00FF00"))
-  
+
   expect_is(plt_4, "gg")
   expect_equal(plt_4[["labels"]][["y"]], get_hm_title("bliss_score", "RV"))
   expect_equal(ggplot2::get_panel_scales(plt_4)$x$get_labels(), ls_comb)
@@ -669,16 +669,16 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   mae <- gDRutils::get_synthetic_data("combo_matrix")
   se <- mae[[gDRutils::get_supported_experiments("combo")]]
   dt_scores <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
-  
+
   # Set up variables for testing
   sel_var <- "DrugName"
   sel_name <- c("drug_001", "drug_021")
   grp_var <- "Tissue"
-  
+
   sel_var_2 <- "CellLineName"
   sel_name_2 <- "cellline_MC"
   grp_var_2 <- "drug_moa"
-  
+
   plt_1 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var,
                                             selection_name = sel_name,
@@ -692,7 +692,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[4]])[colour == "red"]), 5)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_1)[["data"]][[3]])[nchar(label) > 0]), 5)
-  
+
   n_lbl <- 3
   plt_2 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var_2,
@@ -710,7 +710,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)$data[[4]])[colour == "red"]), n_lbl)
   expect_equal(
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_2)[["data"]][[3]])[nchar(label) > 0]), n_lbl)
-  
+
   col_vec <- c("red", "blue", "green", "purple")
   plt_3 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var,
@@ -724,7 +724,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   expect_length(plt_3[["layers"]], 4)
   expect_true(grepl("CIScore 80", plt_3[["labels"]][["y"]]))
   expect_true(all(col_vec %in% ggplot2::ggplot_build(plt_3)$data[[2]]$fill))
-  
+
   grp_names <- c("tissue_x", "tissue_w")
   plt_4 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var,
@@ -733,7 +733,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                             group_names = grp_names)
   expect_is(plt_4, "gg")
   expect_true(all(grp_names %in% ggplot2::get_panel_scales(plt_4)$x$get_labels()))
-  
+
   plt_5 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var,
                                             selection_name = sel_name,
@@ -743,10 +743,10 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                             colors_vec = "pinkish")
   expect_is(plt_5, "gg")
   expect_length(plt_5[["layers"]], 3) # no labels layer
-  expect_true(grepl("CIScore 50", plt_5[["labels"]][["title"]])) 
+  expect_true(grepl("CIScore 50", plt_5[["labels"]][["title"]]))
   expect_false(all(ggplot2::ggplot_build(plt_5)[["data"]][[2]][["fill"]] == "pinkish")) # colors_vec ignored
   expect_false(ggplot2::ggplot_build(plt_5)[["plot"]][["layers"]][["geom_jitter"]][["show.legend"]])
-  
+
   plt_6 <- plot_boxplot_metric_combo_by_grp(dt_scores,
                                             selection_var = sel_var_2,
                                             selection_name = sel_name_2,
@@ -758,13 +758,13 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   expect_length(plt_6[["layers"]], 4)
   expect_true(grepl("Bliss Score", plt_6[["labels"]][["y"]]))
   expect_true(grepl(sel_name_2, plt_6[["labels"]][["title"]]))
-  expect_equal(ggplot2::ggplot_build(plt_6)[["data"]][[2]]$fill, col_vec[1:2]) 
-  
+  expect_equal(ggplot2::ggplot_build(plt_6)[["data"]][[2]]$fill, col_vec[1:2])
+
   # scenario: defined groups
-  dt_scores_grp <- 
+  dt_scores_grp <-
     data.table::copy(dt_scores)[, tissue_grp := data.table::fifelse(Tissue == "tissue_w", "tissue_w", "other")]
   grp_col <- c("orange", "darkblue")
-  
+
   plt_7 <- plot_boxplot_metric_combo_by_grp(dt_scores_grp,
                                             selection_var = sel_var,
                                             selection_name = sel_name,
@@ -782,17 +782,17 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
     NROW(data.table::as.data.table(ggplot2::ggplot_build(plt_7)[["data"]][[3]])[nchar(label) > 0]), 5)
   expect_equal(NROW(ggplot2::ggplot_build(plt_7)[["data"]][[2]]), 2)
   expect_equal(ggplot2::ggplot_build(plt_7)[["data"]][[2]]$fill, grp_col)
-  
+
   # scenario: one group
   expect_warning({
     plt_8 <- plot_boxplot_metric_combo_by_grp(dt_scores[Tissue == "tissue_w"],
                                               selection_var = sel_var,
                                               selection_name = sel_name,
-                                              group_var = grp_var) 
+                                              group_var = grp_var)
   }, "The `group_var` sholud have more unique values than 1 to create boxplots.")
   expect_is(plt_8, "gg")
   expect_length(plt_8[["layers"]], 4)
-  
+
   # scenario: each row is one group
   dt_scores_grp_oneitem <- data.table::copy(dt_scores)[, oneitem_grp := sprintf("item_%s", .I)]
   expect_warning({
@@ -801,7 +801,7 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                      selection_name = sel_name,
                                      group_var = "oneitem_grp")
   }, "Every group has only one value. Boxplots cannot be drawn properly, but individual points will be plotted.")
-  
+
   expect_error(plot_boxplot_metric_combo_by_grp(dt_scores = unlist(dt_scores),
                                                 selection_var = sel_var,
                                                 selection_name = sel_name,

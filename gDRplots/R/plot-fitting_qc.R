@@ -12,70 +12,70 @@
 #' @return \code{ggplot} object containing lollipop plot with stat value for each drug
 #'
 #' @keywords QC_plot
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' 
+#'
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 #' cl_name <- dt_metrics[["CellLineName"]][1]
-#' 
+#'
 #' plot_var_stat_qc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name)
-#'                          
+#'
 #' plot_var_stat_qc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name,
 #'                  metric = "r2",
 #'                  normalization_type = "RV")
-#'                          
+#'
 #' plot_var_stat_qc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name,
 #'                  metric = "x_AOC",
 #'                  normalization_type = "RV",
 #'                  with_table = TRUE)
-#'                          
+#'
 #' @export
 plot_var_stat_qc <- function(dt_assay,
                              cl_name,
                              metric = "r2",
-                             normalization_type = "GR", 
+                             normalization_type = "GR",
                              with_table = FALSE) {
-  
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   gnumber <- gDRutils::get_env_identifiers("drug")
-    
+
   checkmate::assert_data_table(dt_assay)
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
   checkmate::assert_choice(metric, choices = names(dt_assay))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_flag(with_table)
-  hline_color <- 
+  hline_color <-
     gDRutils::get_settings_from_json("HLINE_COLOR",
                                      system.file(package = "gDRplots", "settings.json"))
-  
-  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid]) 
-  
+
+  cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
+
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
   dt_assay <- dt_assay[eval(filter_expr)]
-  
+
   tab_subplot <- dt_assay[get(cellline_name) == cl_name, ]
-  
+
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
   color_palette <- get_qual_colors(NROW(unique(tab_subplot[[drug_name]])))
-  
-  plt <- ggplot2::ggplot(tab_subplot, 
+
+  plt <- ggplot2::ggplot(tab_subplot,
                          ggplot2::aes(x = get(drug_name), y = !!rlang::sym(metric))) +
     ggplot2::geom_hline(yintercept = 1, color = hline_color, linetype = "dashed") +
     ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
     ggplot2::geom_segment(
       ggplot2::aes(x = get(drug_name), xend = get(drug_name), y = 0, yend = !!rlang::sym(metric))) +
-    ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)), 
+    ggplot2::geom_point(ggplot2::aes(fill = get(drug_name), color = get(drug_name)),
                         alpha = 0.75, size = 5, shape = 21, stroke = 1) +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_manual(values = color_palette) +
@@ -83,15 +83,15 @@ plot_var_stat_qc <- function(dt_assay,
     ggplot2::labs(y = sprintf("%s for %s", metric, normalization_type), x = drug_name, title = plt_title) +
     ggplot2::theme(legend.position = "none",
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
-  
+
   if (with_table) {
     tab_metric <- ggpubr::ggtexttable(
-      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))], 
-      rows = NULL, theme = ggpubr::ttheme("light")) 
-    
+      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))],
+      rows = NULL, theme = ggpubr::ttheme("light"))
+
     plt <- ggpubr::ggarrange(plt, tab_metric, nrow = 1, widths = c(2, 1))
   }
-  
+
   return(plt)
 }
 
@@ -108,16 +108,16 @@ plot_var_stat_qc <- function(dt_assay,
 #' @return \code{ggplot} object containing panel with lollipop plots with r2 and rss values for each drug
 #'
 #' @keywords QC_plot
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' 
+#'
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
 #' cl_name <- dt_metrics[["CellLineName"]][1]
-#' 
+#'
 #' plot_fitting_acc(dt_assay = dt_metrics,
 #'                  cl_name = cl_name,
 #'                  normalization_type = "RV")
@@ -125,14 +125,14 @@ plot_var_stat_qc <- function(dt_assay,
 plot_fitting_acc <- function(dt_assay,
                              cl_name,
                              normalization_type = "GR") {
-  
+
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
-  
+
   checkmate::assert_data_table(dt_assay)
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  
+
   if (all(is.na(dt_assay[get(cellline_name) == cl_name, "r2"]))) {
     warning(sprintf("Missing data for %s in %s normalization type.", cl_name, normalization_type))
     return(ggplot2::ggplot() + ggplot2::theme_void())
@@ -141,12 +141,12 @@ plot_fitting_acc <- function(dt_assay,
   r2 <- plot_var_stat_qc(dt_assay,
                          cl_name,
                          metric = "r2",
-                         normalization_type = normalization_type, 
+                         normalization_type = normalization_type,
                          with_table = FALSE) +
     ggplot2::labs(x = NULL) +
     ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                    axis.ticks.x = ggplot2::element_blank())
-  
+
   r2 <- r2 +
     ggplot2::geom_text(data = subset(r2$data, p_value < 0.05),
                        ggplot2::aes(label = ifelse(p_value < 0.001, "***", ifelse(p_value < 0.01, "**", "*")),
@@ -155,17 +155,17 @@ plot_fitting_acc <- function(dt_assay,
                        size = 4,
                        vjust = 0) +
     ggplot2::labs(caption = "*** p < 0.001, ** p < 0.01, * p < 0.05")
-  
-  
+
+
   rss <- plot_var_stat_qc(dt_assay,
                           cl_name,
                           metric = "rss",
                           normalization_type = normalization_type,
                           with_table = FALSE) +
     ggplot2::labs(title = NULL)
-  
+
   rss$layers <- rss$layers[-1]
-  
+
   # Combine plots vertically (one on top of the other)
   combined_plot <- ggpubr::ggarrange(r2, rss, ncol = 1, heights = c(0.7, 0.7))
   metric_cols <- c("r2", "rss")
@@ -173,9 +173,9 @@ plot_fitting_acc <- function(dt_assay,
   data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
   data.table::setorder(data2table, "rss")
   tab_metric <- ggpubr::ggtexttable(
-    data2table, 
-    rows = NULL, theme = ggpubr::ttheme("light", base_size = 8)) 
-  
+    data2table,
+    rows = NULL, theme = ggpubr::ttheme("light", base_size = 8))
+
   ggpubr::ggarrange(combined_plot,
                     tab_metric,
                     nrow = 1,
@@ -196,66 +196,66 @@ plot_fitting_acc <- function(dt_assay,
 #' @return \code{pheatmap} object containing hetamap of mapping controls to treated
 #'
 #' @keywords QC_plot
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
-#' 
+#'
 #' dt_treat <- gDRutils::convert_se_assay_to_dt(se, "RawTreated")
 #' dt_controls <- gDRutils::convert_se_assay_to_dt(se, "Controls")
-#' 
+#'
 #' heatmap_control_mapping_qc(dt_treat = dt_treat,
 #'                            dt_controls = dt_controls)
-#' 
+#'
 #' heatmap_control_mapping_qc(dt_treat = dt_treat[1:1350, ],
 #'                            dt_controls = dt_controls)
-#' 
+#'
 #' dt_treat_NA <- dt_treat[-c(1:135, 270:405),]
 #' heatmap_control_mapping_qc(dt_treat = dt_treat_NA,
 #'                            dt_controls = dt_controls)
-#' 
+#'
 #' dt_controls_NA <- dt_controls[-c(1:305, 611:763, 1221:1750),]
 #' heatmap_control_mapping_qc(dt_treat = dt_treat,
 #'                            dt_controls = dt_controls_NA)
-#' 
+#'
 #' heatmap_control_mapping_qc(dt_treat = dt_treat,
 #'                            dt_controls = dt_controls[1:3660, ])
-#' 
-#' 
+#'
+#'
 #' @export
 heatmap_control_mapping_qc <- function(dt_treat,
                                        dt_controls) {
   checkmate::assert_data_table(dt_treat)
   checkmate::assert_data_table(dt_controls)
-  qc_heatmap_palette <- 
+  qc_heatmap_palette <-
     gDRutils::get_settings_from_json("QC_HEATMAP_PALETTE",
                                      system.file(package = "gDRplots", "settings.json"))
-  
-  # calculate the frequency of each (rID, cID) combination in Controls 
+
+  # calculate the frequency of each (rID, cID) combination in Controls
   frequency <- dt_controls[, .N, by = .(rId, cId)]
   # merge the frequency with the Treated data.table
   result <- merge(unique(dt_treat[, c("rId", "cId")]), frequency, by = c("rId", "cId"), all.x = TRUE)
-  
+
   # Convert the result to a matrix format suitable for pheatmap
   result_matrix <- data.table::dcast(result, rId ~ cId, value.var = "N")
   rownames <- result_matrix$rId
   result_matrix <- as.matrix(result_matrix[, !("rId"), with = FALSE])
   rownames(result_matrix) <- rownames
-  
+
   # Replace 0 with NA to use na_col for red color
   result_matrix[result_matrix == 0] <- NA
-  
+
   # Generate the breaks for integers
   maxval <- max(result_matrix, na.rm = TRUE)
   minval <- min(c(0, min(result_matrix, na.rm = TRUE)))
-  
+
   breaks <- seq(from = minval, to = maxval, by = 1)
   hm_color_palette <- grDevices::colorRampPalette(qc_heatmap_palette)(NROW(breaks) - 1)
-  
+
   unique_values <- unique(stats::na.omit(as.vector(result_matrix)))
-  
+
   # renaming rows and columns
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -267,7 +267,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   if (all(rownames(result_matrix) %in% unique(dt_treat$rId))) {
     if (drug_name_2 %in% names(dt_treat)) {
       # combo data
-      dict <- 
+      dict <-
         unique(dt_treat[, .SD, .SDcols = c("rId", drug_name, drug_name_2)])[order(rownames(result_matrix))]
       dict$drug_lbl <- paste(dict[[drug_name]], dict[[drug_name_2]], sep = " x ")
       rownames(result_matrix) <- dict[["drug_lbl"]]
@@ -277,7 +277,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
       rownames(result_matrix) <- dict[[drug_name]]
     }
   }
-  
+
   # Generate the heatmap
   pheatmap::pheatmap(result_matrix,
                      color = hm_color_palette,

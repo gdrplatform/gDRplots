@@ -9,9 +9,9 @@
 #' "x_mean", "x_AOC_range", "xc50", "ec50", "x_max".
 #' @param cl_name An optional string specifying a single cell line to analyze. If NULL (default),
 #' all cell lines in the data are analyzed. Should be NULL if \code{cellline1} and \code{cellline2} are provided.
-#' @param cellline1 An optional string representing the first cell line name. 
+#' @param cellline1 An optional string representing the first cell line name.
 #' Should be specified alongside \code{cellline2}.
-#' @param cellline2 An optional string representing the second cell line name. 
+#' @param cellline2 An optional string representing the second cell line name.
 #' Should be specified alongside \code{cellline1}.
 #' @param normalization_type A string with normalization types to be selected, one of:
 #' "GR" ("GRvalue") or "RV" ("RelativeViability").
@@ -25,9 +25,9 @@
 #'   \item \code{moa_list}: A list of DrugNames grouped by drug_moa.
 #' }
 #' @keywords cgs_plots
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @examples
 #' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 #' analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
@@ -35,7 +35,7 @@
 #' cellline1 <- "CellLineName_1"
 #' cellline2 <- "CellLineName_2"
 #' analyze_cgs(dt_metrics, "xc50", cl_name = NULL, cellline1, cellline2)
-#' 
+#'
 #' @export
 analyze_cgs <- function(dt_metrics,
                         metrics,
@@ -43,19 +43,19 @@ analyze_cgs <- function(dt_metrics,
                         cellline1 = NULL,
                         cellline2 = NULL,
                         normalization_type = "RV") {
-  
+
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   cellline <- gDRutils::get_env_identifiers("cellline_name")
-  
+
   # asserts
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_character(metrics, any.missing = FALSE)
   checkmate::assert_subset(metrics, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
   checkmate::assert_true(all(metrics %in% names(dt_metrics)))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  
+
   if (!is.null(cellline1) || !is.null(cellline2)) {
     checkmate::assert_string(cellline1, null.ok = FALSE)
     checkmate::assert_string(cellline2, null.ok = FALSE)
@@ -65,16 +65,16 @@ analyze_cgs <- function(dt_metrics,
     checkmate::assert_string(cl_name, null.ok = TRUE)
     checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
   }
-  
+
   # filter out unwanted drug moa
   dt_metrics <- dt_metrics[!eval(drug_moa) %in% c("unknown", "Unknown"), ]
-  
+
   # take care of Inf and NaN values in IC50 metrics
   if (any(is.infinite(dt_metrics$xc50))) {
     message("In `dt_metrics` some xc50 values are infinite.")
     dt_metrics <- dt_metrics[!is.infinite(get("xc50")), ]
   }
-  
+
   # prepare the data with specified metric differences
   metrics_diff <- prep_dt_response_metric_diff(dt_metrics,
                                                metric = metrics,
@@ -84,23 +84,23 @@ analyze_cgs <- function(dt_metrics,
                                                cellline2 = cellline2,
                                                normalization_type = normalization_type,
                                                additional_cols = drug_moa)
-  
+
   to_remove <- names(metrics_diff)[grepl("_fittings$", names(metrics_diff))]
   to_remove <- to_remove[!grepl("cotrt_diff", to_remove)]
   metrics_diff <- metrics_diff[, -c(to_remove), with = FALSE]
-  
+
   original <- grep("cotrt_diff|cellline_diff", names(metrics_diff), value = TRUE)
   new <- gsub(".*gDR_(log10_)?(.*)_cotrt_diff.*", "\\2", original)
   new <- gsub("_cellline_diff", "", new)
-  
+
   data.table::setnames(metrics_diff, original, new)
-  
+
   # create a list of DrugNames grouped by drug_moa, filtering out those with less than 4 unique drugs
   moa_list <- lapply(split(metrics_diff[[drug_name]], metrics_diff[[drug_moa]]), unique)
   moa_list <- moa_list[vapply(moa_list, length, FUN.VALUE = numeric(1)) > 3]
-  
+
   metrics_diff <- metrics_diff[eval(drug_moa) %chin% names(moa_list)]
-  
+
   # Determine FGSEA analysis path
   if (!is.null(cellline1) && !is.null(cellline2)) {
     # Perform FGSEA on the difference between the specified cell lines
@@ -112,10 +112,10 @@ analyze_cgs <- function(dt_metrics,
                                                    maxSize = 500,
                                                    minSize = 4,
                                                    nPermSimple = 1e5)$result
-      
+
       median_values <- metrics_diff[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
       names(median_values) <- metrics_diff[, unique(drug_moa)]
-      
+
       fgsea_result$median <- median_values[fgsea_result$pathway]
       data.table::setorder(fgsea_result, -NES)
       fgsea_result
@@ -133,7 +133,7 @@ analyze_cgs <- function(dt_metrics,
     } else {
       unique(metrics_diff[[cellline]])
     }
-    
+
     results <- lapply(cell_lines, function(cl) {
       data_subset <- metrics_diff[get(cellline) == cl]
       data_subset$normalization_type <- normalization_type
@@ -145,10 +145,10 @@ analyze_cgs <- function(dt_metrics,
                                                      maxSize = 500,
                                                      minSize = 4,
                                                      nPermSimple = 1e5)$result
-        
+
         median_values <- data_subset[, stats::median(get(metric), na.rm = TRUE), by = drug_moa]$V1
         names(median_values) <- data_subset[, unique(drug_moa)]
-        
+
         fgsea_result$median <- median_values[fgsea_result$pathway]
         data.table::setorder(fgsea_result, -NES)
         return(fgsea_result)
@@ -179,11 +179,11 @@ analyze_cgs <- function(dt_metrics,
 #' to plot when there are more than this number of significant values.
 #'
 #' @return A ggplot2 object with cgs results
-#' 
+#'
 #' @keywords cgs_plots
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @examples
 #' dt_metrics <- qs2::qs_read(system.file("testdata/cgs_data.qs2", package = "gDRplots"))
 #' results <- analyze_cgs(dt_metrics, metrics = c("xc50"), cl_name = "CellLineName_1")
@@ -200,25 +200,25 @@ plot_cgs_ranking <- function(results,
                              padj_threshold = 0.1,
                              top_results_no_sig = 5,
                              max_results_with_sig = 15) {
-  
+
   # identifiers
   drug_moa <- gDRutils::get_env_identifiers("drug_moa")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   norm_type <- gDRutils::get_env_identifiers("normalization_type")
-  
+
   # asserts
   checkmate::assert_list(results)
   checkmate::assert_string(cl_name, null.ok = FALSE)
   checkmate::assert_subset(cl_name, choices = names(results))
   checkmate::assert_string(metric, null.ok = FALSE)
   checkmate::assert_subset(metric, choices = names(results[[cl_name]]$fgsea), empty.ok = FALSE)
-  
-  
+
+
   # extract relevant data
   metrics_diff <- results[[cl_name]]$metrics_diff
   fgsea_results <- results[[cl_name]]$fgsea[[metric]]
   moa_groups_drugs <- results[[cl_name]]$moa_list
-  
+
   # prepare data for plotting
   plot_data <- data.table::copy(metrics_diff)
   plot_data$x_pos <- NROW(plot_data) - rank(plot_data[[metric]]) + 1
@@ -226,9 +226,9 @@ plot_cgs_ranking <- function(results,
   stats <- pmin(2, pmax(-2, stats))
   names(stats) <- plot_data[[drug_name]]
   stats <- stats[!is.na(plot_data[[drug_moa]])]
-  
+
   norm_type <- unique(metrics_diff[[norm_type]])
-  
+
   # filter significant GSEA results
   gsea_sign <- fgsea_results[padj < padj_threshold & !pathway %in% c("", "unknown")]
   if (NROW(gsea_sign) == 0) {
@@ -240,13 +240,13 @@ plot_cgs_ranking <- function(results,
   }
   gsea_sign[, y_pos := seq_len(.N)]
   gsea_sign[NES < 0, y_pos := -(seq_len(.N))]
-  
+
   # pre-calculate statistics
   stats <- plot_data[[metric]]
   threshold_count <- sum(stats > mean(stats))
   yrange <- diff(range(stats))
   mean_effect <- mean(stats)
-  
+
   # create the ggplot object
   plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!rlang::sym(metric))) +
     ggplot2::geom_col(color = gDRutils::get_settings_from_json("EDGE_COLOR",
@@ -263,7 +263,7 @@ plot_cgs_ranking <- function(results,
                         color = gDRutils::get_settings_from_json("HLINE_COLOR",
                                                                  system.file(package = "gDRplots", "settings.json"))) +
     ggplot2::geom_hline(yintercept = mean_effect, color = "black") +
-    ggplot2::geom_segment(x = threshold_count, xend = threshold_count, 
+    ggplot2::geom_segment(x = threshold_count, xend = threshold_count,
                           y = 0, yend = mean_effect + 0.2 * yrange,
                           color = "black") +
     ggplot2::annotate(geom = "text", x = threshold_count, y = mean_effect + 0.25 * yrange,
@@ -273,20 +273,20 @@ plot_cgs_ranking <- function(results,
                              ylim = c(-1.01 * yrange - 0.15 * yrange * NROW(gsea_sign), yrange + 0.01),
                              expand = FALSE, clip = "off") +
     ggplot2::theme(plot.margin = ggplot2::unit(c(1, 16, 1, 1), "lines"))
-  
+
   # define color palettes for the loop
   loop_colors <- gDRplots::get_qual_colors(NROW(gsea_sign))
-  
+
   for (i in seq_len(NROW(gsea_sign))) {
     pathway <- gsea_sign$pathway[i]
     x <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]]$x_pos
     stats_moa <- plot_data[get(drug_name) %in% moa_groups_drugs[[pathway]]][[metric]]
-    
+
     median_moa <- stats::median(stats_moa)
     count_above_median <- sum(stats > median_moa)
-    
+
     current_color <- loop_colors[i]
-    
+
     plt <- plt +
       ggplot2::geom_segment(
         data = data.frame(x = x),
