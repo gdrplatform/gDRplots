@@ -57,55 +57,6 @@
 #'                       group_names = group_names)
 #'
 #' @export
-#' Prepare the plot title for dose-response plots
-#' @noRd
-.prep_dr_plot_title <- function(dt_met, dt_avg, selection_name, main_var,
-                                group_var, drug_name, gnumber,
-                                cellline_name, clid) {
-  if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) return(selection_name)
-
-  dt_src <- if (NROW(dt_met) == 0) dt_avg else dt_met
-  dt_src <- unique(dt_src[get(main_var) == selection_name,
-                          c(drug_name, gnumber, cellline_name, clid), with = FALSE])
-
-  if (group_var == cellline_name) {
-    title_name <- unique(dt_src[[drug_name]])
-    title_id <- unique(dt_src[[gnumber]])
-  } else {
-    title_name <- unique(dt_src[[cellline_name]])
-    title_id <- unique(dt_src[[clid]])
-  }
-  sprintf("%s (%s)", title_name, title_id)
-}
-
-#' Prepare fitted data for dose-response curves
-#' @noRd
-.prep_dr_fitted_data <- function(dt_met, group_names, group_var, sel_conc, conc) {
-  if (!NROW(dt_met)) return(NULL)
-
-  dt_fit <- data.table::data.table()
-  for (grp_nm in group_names) {
-    sel_metrics <- dt_met[get(group_var) == grp_nm, ]
-    if (NROW(sel_metrics) == 0) next
-    dt_fit <- rbind(dt_fit,
-                    cbind(sel_metrics[, group_var, with = FALSE],
-                          data.table::data.table(
-                            conc_col = sel_conc,
-                            x = gDRutils::predict_efficacy_from_conc(sel_conc,
-                                                                     sel_metrics$x_inf,
-                                                                     sel_metrics$x_0,
-                                                                     sel_metrics$ec50,
-                                                                     sel_metrics$h)
-                          )
-                    )
-    )
-  }
-  if (!NROW(dt_fit)) return(NULL)
-  dt_fit <- dt_fit[!is.na(x)]
-  data.table::setnames(dt_fit, "conc_col", conc)
-  dt_fit
-}
-
 plot_dose_response_sa <- function(dt_metrics,
                                   dt_average,
                                   selection_name,
@@ -141,7 +92,11 @@ plot_dose_response_sa <- function(dt_metrics,
   checkmate::assert_string(fit_source, null.ok = TRUE)
 
   # check input data
-  main_var <- if (group_var == cellline_name) drug_name else cellline_name
+  if (group_var == cellline_name) {
+    main_var <- drug_name
+  } else if (group_var == drug_name) {
+    main_var <- cellline_name
+  }
   stopifnot("Empty plot was selected" = any(plot_averaged_flag, plot_fit_flag))
 
   # filter data for normalization type
@@ -152,11 +107,19 @@ plot_dose_response_sa <- function(dt_metrics,
 
   # filter data for selected main variable
   dt_met <- dt_met_norm[get(main_var) == selection_name, ]
-  dt_avg <- if (is.null(dt_avg_norm)) NULL else dt_avg_norm[get(main_var) == selection_name, ]
+  dt_avg <- if (is.null(dt_avg_norm)) {
+    NULL
+  } else {
+    dt_avg_norm[get(main_var) == selection_name, ]
+  }
 
   # update group (it depends on user choice for `group_names` and `selection_name`)
-  all_groups <- unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
-  group_names <- if (is.null(group_names)) all_groups else intersect(all_groups, group_names)
+  group_names <- if (is.null(group_names)) {
+    unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
+  } else {
+    intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))),
+              group_names)
+  }
 
   # filter data
   dt_met <- dt_met[get(group_var) %in% group_names, ][!is.na(x_inf) & !is.na(x_0) & !is.na(ec50) & !is.na(h)]
@@ -167,9 +130,21 @@ plot_dose_response_sa <- function(dt_metrics,
   if (!NROW(dt_met)) dt_met <- NULL
 
   # plot title
-  plt_title <- .prep_dr_plot_title(dt_met, dt_avg, selection_name, main_var,
-                                   group_var, drug_name, gnumber,
-                                   cellline_name, clid)
+  if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
+    plt_title <- selection_name
+  } else {
+    dt_src <- if (NROW(dt_met) == 0) dt_avg else dt_met
+    dt_src <- unique(dt_src[get(main_var) == selection_name, c(drug_name, gnumber, cellline_name, clid), with = FALSE])
+
+    if (group_var == cellline_name) {
+      title_name <- unique(dt_src[[drug_name]])
+      title_id <- unique(dt_src[[gnumber]])
+    } else {
+      title_name <- unique(dt_src[[cellline_name]])
+      title_id <- unique(dt_src[[clid]])
+    }
+    plt_title <- sprintf("%s (%s)", title_name, title_id)
+  }
 
   if (NROW(dt_met) == 0 && NROW(dt_avg) == 0) {
     plt <-
@@ -191,11 +166,38 @@ plot_dose_response_sa <- function(dt_metrics,
 
     # prep fitted data
     sel_conc <- 10 ^ (seq(conc_range[1], conc_range[2], 0.05))
-    dt_fit <- .prep_dr_fitted_data(dt_met, group_names, group_var, sel_conc, conc)
+
+    if (!NROW(dt_met)) {
+      dt_fit <- NULL
+    } else {
+      dt_fit <- data.table::data.table()
+      for (grp_nm in group_names) {
+        sel_metrics <- dt_met[get(group_var) == grp_nm, ]
+        if (NROW(sel_metrics) == 0) next
+        dt_fit <- rbind(dt_fit,
+                        cbind(sel_metrics[, group_var, with = FALSE],
+                              data.table::data.table(
+                                conc_col = sel_conc,
+                                x = gDRutils::predict_efficacy_from_conc(sel_conc,
+                                                                         sel_metrics$x_inf,
+                                                                         sel_metrics$x_0,
+                                                                         sel_metrics$ec50,
+                                                                         sel_metrics$h)
+                              )
+                        )
+        )
+      }
+      if (!NROW(dt_fit)) {
+        dt_fit <- NULL
+      } else {
+        dt_fit <- dt_fit[!is.na(x)]
+        data.table::setnames(dt_fit, "conc_col", conc)
+      }
+    }
 
     # prep value ranges for y-axis
     min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
-    max_val <- max(c(dt_avg$x, dt_fit$x, 1), na.rm = TRUE) + 0.05
+    max_val <- max(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) + 0.05
     data_range <- c(min_val, max_val)
 
     # prep color palette
@@ -222,6 +224,7 @@ plot_dose_response_sa <- function(dt_metrics,
       ggplot2::coord_cartesian(xlim = conc_range, ylim = data_range) +
       ggplot2::scale_x_continuous(breaks = -5:2, labels = c("1e-5", "1e-4", 10 ^ (-3:2))) +
       ggplot2::scale_y_continuous(breaks = seq(-1, 1, by = 0.25))
+
 
     if (plot_averaged_flag && !is.null(dt_avg)) {
       plt <- plt + ggplot2::geom_point(data = dt_avg, na.rm = TRUE)

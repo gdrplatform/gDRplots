@@ -157,7 +157,11 @@ heatmap_combo_metrics <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  label_prefix <- if (normalization_type == "GR") "GR" else "IC"
+  label_prefix <- if (normalization_type == "GR") {
+    "GR"
+  } else {
+    "IC"
+  }
   legend_lbl_iso <- sprintf("%s%s", label_prefix, 100 - 100 * as.numeric(available_iso_lvl))
 
   # prep hm color palette
@@ -183,8 +187,17 @@ heatmap_combo_metrics <- function(
   # plot data
   dt_ <- dt_excess[, c(conc, conc_2, metric), with = FALSE]
 
-  x_axis_drug <- if (swap_axes) drug1_name else drug2_name
-  y_axis_drug <- if (swap_axes) drug2_name else drug1_name
+  x_axis_drug <- if (swap_axes) {
+    drug1_name
+  } else {
+    drug2_name
+  }
+
+  y_axis_drug <- if (swap_axes) {
+    drug2_name
+  } else {
+    drug1_name
+  }
 
   x_axis_lab <- sprintf("%s [\U00B5M]", x_axis_drug)
   y_axis_lab <- sprintf("%s [\U00B5M]", y_axis_drug)
@@ -271,8 +284,36 @@ heatmap_combo_metrics <- function(
     }
 
     # add isoline
-    plt <- .add_iso_layers(plt, dt_isobolograms, available_iso_lvl, iso_colors,
-                           legend_lbl_iso, legend_title_iso, swap_axes)
+    if (NROW(available_iso_lvl)) { # isobolograms as lines
+      if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
+        # friendly for user with color vision deficiency
+        plt <- plt +
+          ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                          y = if (swap_axes) pos_x else pos_y,
+                                          color = iso_level,
+                                          linetype = iso_level)) +
+          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                      breaks = available_iso_lvl,
+                                      labels = legend_lbl_iso) +
+          ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
+                                         breaks = available_iso_lvl,
+                                         labels = legend_lbl_iso) +
+          ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+          ggplot2::labs(color = legend_title_iso,
+                        linetype = legend_title_iso)
+      } else {
+        plt <- plt +
+          ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                             ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                          y = if (swap_axes) pos_x else pos_y,
+                                          color = iso_level)) +
+          ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                      breaks = available_iso_lvl,
+                                      labels = legend_lbl_iso) +
+          ggplot2::labs(color = legend_title_iso)
+      }
+    }
   }
   return(plt)
 }
@@ -344,125 +385,6 @@ heatmap_combo_metrics <- function(
 #'                             swap_axes = TRUE)
 #'
 #' @export
-#' Add isoline layers to a combo heatmap plot
-#' @noRd
-.add_iso_layers <- function(plt, dt_isobolograms, available_iso_lvl, iso_colors,
-                            legend_lbl_iso, legend_title_iso, swap_axes, linewidth = 1) {
-  if (!NROW(available_iso_lvl)) return(plt)
-
-  iso_aes <- if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
-    ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
-                 y = if (swap_axes) pos_x else pos_y,
-                 color = iso_level, linetype = iso_level)
-  } else {
-    ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
-                 y = if (swap_axes) pos_x else pos_y,
-                 color = iso_level)
-  }
-
-  plt <- plt +
-    ggplot2::geom_path(data = dt_isobolograms, linewidth = linewidth, iso_aes) +
-    ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
-                                breaks = available_iso_lvl,
-                                labels = legend_lbl_iso) +
-    ggplot2::labs(color = legend_title_iso)
-
-  if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
-    plt <- plt +
-      ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
-                                     breaks = available_iso_lvl,
-                                     labels = legend_lbl_iso) +
-      ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
-      ggplot2::labs(linetype = legend_title_iso)
-  }
-  plt
-}
-
-#' Build the iso compare (CI) plot
-#' @noRd
-.build_iso_compare_plot <- function(dt_isobolograms, available_iso_lvl, iso_colors,
-                                    legend_lbl_iso, legend_title_iso,
-                                    drug1_name, drug2_name, plt_title, hline_color) {
-  plt_iso_compare <-
-    ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
-    ggplot2::geom_line(
-      data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
-    ggplot2::geom_hline(yintercept = 0, color = hline_color)
-
-  iso_aes <- if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
-    ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)
-  } else {
-    ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)
-  }
-
-  plt_iso_compare <- plt_iso_compare +
-    ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5, iso_aes) +
-    ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
-                                breaks = available_iso_lvl,
-                                labels = legend_lbl_iso) +
-    ggplot2::labs(color = legend_title_iso)
-
-  if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
-    plt_iso_compare <- plt_iso_compare +
-      ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
-                                     breaks = available_iso_lvl,
-                                     labels = legend_lbl_iso) +
-      ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
-      ggplot2::labs(linetype = legend_title_iso)
-  }
-
-  plt_iso_compare <- plt_iso_compare +
-    ggplot2::scale_y_continuous(breaks = -5:4,
-                                labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) + # nolint: paste_linter.
-    ggplot2::scale_x_continuous(breaks = -3:3,
-                                labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) + # nolint: paste_linter.
-    ggplot2::coord_cartesian(ylim = c(-5, 4)) +
-    ggplot2::labs(y = "CI",
-                  x = paste(drug2_name, "/", drug1_name, "ratio"),
-                  title = plt_title) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
-                   axis.text.y = ggplot2::element_text(size = 8),
-                   plot.title = ggplot2::element_text(size = 10),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   aspect.ratio = 1)
-  plt_iso_compare
-}
-
-#' Assemble combo heatmap panel from individual plots
-#' @noRd
-.assemble_combo_panel <- function(ls_plts, as_list, one_row_panel, main_title) {
-  if (as_list) {
-    ls_plts
-  } else if (one_row_panel) {
-    ggpubr::ggarrange(
-      plotlist = list(
-        ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-        ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-        ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-      ),
-      ncol = 3, common.legend = FALSE, legend = "left")
-  } else {
-    ggpubr::annotate_figure(
-      ggpubr::ggarrange(
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-            ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        common.legend = TRUE, nrow = 2),
-      top = main_title) +
-      ggpubr::bgcolor("white") + ggpubr::border("white")
-  }
-}
-
 heatmap_combo_metrics_panel <- function(
     dt_excess,
     dt_isobolograms = NULL,
@@ -542,7 +464,11 @@ heatmap_combo_metrics_panel <- function(
                         unique(dt_excess[get(cellline_name) == cl_name][[clid]]))
   # legend
   legend_title_iso <- "Iso Levels"
-  label_prefix <- if (normalization_type == "GR") "GR" else "IC"
+  label_prefix <- if (normalization_type == "GR") {
+    "GR"
+  } else {
+    "IC"
+  }
   legend_lbl_iso <- sprintf("%s%s", label_prefix, 100 - 100 * as.numeric(available_iso_lvl))
 
   # prep hm color palette
@@ -571,8 +497,17 @@ heatmap_combo_metrics_panel <- function(
 
     dt_ <- dt_excess[, c(conc, conc_2, mx_name), with = FALSE]
 
-    x_axis_drug <- if (swap_axes) drug1_name else drug2_name
-    y_axis_drug <- if (swap_axes) drug2_name else drug1_name
+    x_axis_drug <- if (swap_axes) {
+      drug1_name
+    } else {
+      drug2_name
+    }
+
+    y_axis_drug <- if (swap_axes) {
+      drug2_name
+    } else {
+      drug1_name
+    }
 
     x_axis_lab <- sprintf("%s [\U00B5M]", x_axis_drug)
     y_axis_lab <- sprintf("%s [\U00B5M]", y_axis_drug)
@@ -604,17 +539,25 @@ heatmap_combo_metrics_panel <- function(
       tile_height <- .get_tile_size(mrk_y)
       tile_width <- .get_tile_size(mrk_x)
 
-      hm_color_palette <- if (mx_name == "smooth") hm_color_palette_smooth else hm_color_palette_excess
+      # prep hm color palette
+      hm_color_palette <- if (mx_name == "smooth") {
+        hm_color_palette_smooth
+      } else {
+        hm_color_palette_excess
+      }
 
+      # legend title
       legend_title_fill <- sprintf("%s %s",
                                    gDRutils::prettify_flat_metrics(x = mx_name, human_readable = TRUE),
                                    normalization_type)
 
+      # prep limits
       limits <- prep_hm_limits(dt_[[mx_name]],
                                metric = mx_name,
                                normalization_type = normalization_type,
                                symmetric = mx_name != "smooth")
 
+      # base plot
       plt <-
         ggplot2::ggplot(dt_, ggplot2::aes(x = pos_x, y = pos_y)) +
         ggplot2::geom_tile(ggplot2::aes(fill = get(mx_name)), height = tile_height, width = tile_width) +
@@ -647,32 +590,137 @@ heatmap_combo_metrics_panel <- function(
             color = "black")
       }
 
-      plt <- .add_iso_layers(plt, dt_isobolograms, available_iso_lvl, iso_colors,
-                             legend_lbl_iso, legend_title_iso, swap_axes)
+      # add isoline
+      if (NROW(available_iso_lvl)) { # isobolograms as lines
+        if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
+          # friendly for user with color vision deficiency
+          plt <- plt +
+            ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            color = iso_level,
+                                            linetype = iso_level)) +
+            ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                        breaks = available_iso_lvl,
+                                        labels = legend_lbl_iso) +
+            ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
+                                           breaks = available_iso_lvl,
+                                           labels = legend_lbl_iso) +
+            ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+            ggplot2::labs(color = legend_title_iso,
+                          linetype = legend_title_iso)
+        } else {
+          plt <- plt +
+            ggplot2::geom_path(data = dt_isobolograms, linewidth = 1,
+                               ggplot2::aes(x = if (swap_axes) pos_y else pos_x,
+                                            y = if (swap_axes) pos_x else pos_y,
+                                            color = iso_level)) +
+            ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                        breaks = available_iso_lvl,
+                                        labels = legend_lbl_iso) +
+            ggplot2::labs(color = legend_title_iso)
+        }
+      }
     }
     plt
   })
   names(mx_plts) <- mx_names
 
   # isobolograms across range of concentration ratios
-  if (NROW(available_iso_lvl)) {
+  if (NROW(available_iso_lvl)) { # isobolograms as lines
     plt_title <- sprintf("%s for %s, T=%sh",
                          gDRutils::prettify_flat_metrics(x = "smooth", human_readable = TRUE),
                          normalization_type,
                          unique(dt_excess[get(cellline_name) == cl_name][[duration]]))
+
     if (as_list) plt_title <- paste(main_title, plt_title, sep = " : ")
+    # base plot
+    plt_iso_compare <-
+      ggplot2::ggplot(mapping = ggplot2::aes(x = log10_ratio_conc, y = log2_CI)) +
+      ggplot2::geom_line(
+        data = data.table::data.table(log10_ratio_conc = c(-2, 2), log2_CI = c(0, 0))) +
+      ggplot2::geom_hline(yintercept = 0, color = hline_color)
 
-    plt_iso_compare <- .build_iso_compare_plot(
-      dt_isobolograms, available_iso_lvl, iso_colors,
-      legend_lbl_iso, legend_title_iso,
-      drug1_name, drug2_name, plt_title, hline_color)
+    if (all(available_iso_lvl %in% c("0.25", "0.5", "0.75"))) {
+      # friendly for user with color vision deficiency
+      plt_iso_compare <- plt_iso_compare +
+        ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
+                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level, linetype = iso_level)) +
+        ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                    breaks = available_iso_lvl,
+                                    labels = legend_lbl_iso) +
+        ggplot2::scale_linetype_manual(values = c("solid", "twodash", "dashed"),
+                                       breaks = available_iso_lvl,
+                                       labels = legend_lbl_iso) +
+        ggplot2::theme(legend.key.width = ggplot2::unit(3, "line")) +
+        ggplot2::labs(color = legend_title_iso,
+                      linetype = legend_title_iso)
+    } else {
+      plt_iso_compare <- plt_iso_compare +
+        ggplot2::geom_path(data = dt_isobolograms, linewidth = 0.5,
+                           ggplot2::aes(x = log10_ratio_conc, y = log2_CI, color = iso_level)) +
+        ggplot2::scale_color_manual(values = iso_colors[available_iso_lvl],
+                                    breaks = available_iso_lvl,
+                                    labels = legend_lbl_iso) +
+        ggplot2::labs(color = legend_title_iso)
+    }
 
+    # add x and y scales
+    plt_iso_compare <- plt_iso_compare +
+      ggplot2::scale_y_continuous(breaks = -5:4,
+                                  labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+      ggplot2::scale_x_continuous(breaks = -3:3,
+                                  labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
+      ggplot2::coord_cartesian(ylim = c(-5, 4)) +
+      ggplot2::labs(y = "CI",
+                    x = paste(drug2_name, "/", drug1_name, "ratio"),
+                    title = plt_title) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8, angle = 45, vjust = 1, hjust = 1),
+                     axis.text.y = ggplot2::element_text(size = 8),
+                     plot.title = ggplot2::element_text(size = 10),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     aspect.ratio = 1)
+
+    # final plots
     ls_plts <- append(mx_plts, list(iso_compare = plt_iso_compare))
   } else {
     ls_plts <- mx_plts
   }
 
-  .assemble_combo_panel(ls_plts, as_list, one_row_panel, main_title)
+  final_plot <- if (as_list) {
+    ls_plts
+  } else if (one_row_panel) {
+    # build panel 3x1
+    ggpubr::ggarrange(
+      plotlist = list(
+        ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
+        ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+        ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
+      ),
+      ncol = 3, common.legend = FALSE, legend = "left")
+  } else {
+    # build panel 2x2
+    ggpubr::annotate_figure(
+      ggpubr::ggarrange(
+        ggpubr::ggarrange(
+          plotlist = list(
+            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
+            ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
+          ),
+          ncol = 2, common.legend = TRUE, legend = "left"),
+        ggpubr::ggarrange(
+          plotlist = list(
+            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
+          ),
+          ncol = 2, common.legend = TRUE, legend = "left"),
+        common.legend = TRUE, nrow = 2),
+      top = main_title) +
+      ggpubr::bgcolor("white") + ggpubr::border("white")
+  }
+  # final
+  final_plot
 }
 
 #' Plot line plot of combination index
@@ -838,9 +886,9 @@ plot_combination_index <- function(
   # add x and y scales
   plt <- plt +
     ggplot2::scale_y_continuous(breaks = -5:4,
-                                labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) + # nolint: paste_linter.
+                                labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
     ggplot2::scale_x_continuous(breaks = -3:3,
-                                labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) + # nolint: paste_linter.
+                                labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
     ggplot2::coord_cartesian(ylim = c(-5, 4)) +
     ggplot2::labs(y = "CI",
                   x = paste(drug2_name, "/", drug1_name, "ratio"),
@@ -1789,7 +1837,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
   names(plt_list) <- cl_names_with_data
 
   # find the maximum legend
-  if (!is.null(iso_levels) && any(iso_levels %in% unique(dt_isobolograms$iso_level))) {
+  if (!is.null(iso_levels)) {
     dt_num_iso <-
       unique(dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = c(cellline_name, "iso_level")])
     lbl_legend <- dt_num_iso[, .N, by = cellline_name][order(N)][N == max(N), get(cellline_name)][[1]]

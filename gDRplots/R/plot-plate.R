@@ -11,7 +11,7 @@
 #' @return A named list of ggplot objects for each barcode
 #' @keywords QC_plot
 #'
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #'
 #' @export
 #' @examples
@@ -95,7 +95,7 @@ plot_plate_stack_info <- function(dt_plate,
 #' @return A \code{ggplot} object.
 #' @keywords QC_plot
 #'
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #'
 #' @export
 #' @examples
@@ -126,67 +126,6 @@ plot_plate_stack_info <- function(dt_plate,
 #'
 #' plot_single_plate_stack_info(test_data)
 #'
-#' Compute QC thresholds and flag outlier wells
-#' @noRd
-.compute_plate_qc <- function(dt_controls, dt_treated, ctrl_fail_threshold,
-                              n_sd, use_sd_threshold) {
-  mean_ctrl <- mean(dt_controls$ReadoutValue, na.rm = TRUE)
-  sd_ctrl <- stats::sd(dt_controls$ReadoutValue, na.rm = TRUE)
-  qc_valid <- is.finite(mean_ctrl)
-
-  if (!qc_valid) {
-    return(list(qc_valid = FALSE, count_low = 0, count_high = 0,
-                limit_value = NA, low_limit_value = NA,
-                bad_ctrl_rows = dt_controls[0],
-                suspicious_treated = dt_treated[0]))
-  }
-
-  if (is.na(sd_ctrl)) sd_ctrl <- 0
-  limit_value <- if (use_sd_threshold) mean_ctrl + (n_sd * sd_ctrl) else mean_ctrl * 1.1
-  low_limit_value <- mean_ctrl * ctrl_fail_threshold
-
-  bad_ctrl_rows <- dt_controls[ReadoutValue < low_limit_value]
-  suspicious_treated <- dt_treated[ReadoutValue > limit_value]
-
-  list(qc_valid = TRUE,
-       count_low = NROW(bad_ctrl_rows), count_high = NROW(suspicious_treated),
-       limit_value = limit_value, low_limit_value = low_limit_value,
-       bad_ctrl_rows = bad_ctrl_rows, suspicious_treated = suspicious_treated)
-}
-
-#' Build QC subtitle and legend text for plate plot
-#' @noRd
-.build_plate_qc_text <- function(qc, use_sd_threshold, n_sd, ctrl_fail_threshold) {
-  limit_desc <- if (use_sd_threshold) paste0("Mean(Ctrl) + ", n_sd, "*SD") else "Mean(Ctrl) + 10%"
-  low_desc <- paste0("Mean(Ctrl) * ", ctrl_fail_threshold)
-
-  if (!qc$qc_valid) {
-    subtitle_text <- "<span style='color:orange;'>QC Status: <b>No Controls</b></span>"
-    qc_legend <- "N/A"
-  } else if (qc$count_low == 0 && qc$count_high == 0) {
-    subtitle_text <- "<span style='color:darkgreen;'>QC Status: <b>OK</b></span>"
-    qc_legend <- .format_qc_legend(qc$low_limit_value, low_desc, qc$limit_value, limit_desc)
-  } else {
-    msgs <- c()
-    if (qc$count_low > 0) msgs <- c(msgs, paste0("<b>", qc$count_low, "</b> Low"))
-    if (qc$count_high > 0) msgs <- c(msgs, paste0("<b>", qc$count_high, "</b> High"))
-    subtitle_text <- paste("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
-    qc_legend <- .format_qc_legend(qc$low_limit_value, low_desc, qc$limit_value, limit_desc)
-  }
-  list(subtitle_text = subtitle_text, qc_legend = qc_legend)
-}
-
-#' Format the QC legend string
-#' @noRd
-.format_qc_legend <- function(low_limit_value, low_desc, limit_value, limit_desc) {
-  paste0(
-    "<span style='color:red;'>&#9632;</span> <b>Low</b> ",
-    "<span style='color:#555; font-size:8pt;'>(< ", round(low_limit_value, 1), " [", low_desc, "])</span> | ",
-    "<span style='color:darkorange;'>&#9632;</span> <b>High</b> ",
-    "<span style='color:#555; font-size:8pt;'>(> ", round(limit_value, 1), " [", limit_desc, "])</span>"
-  )
-}
-
 plot_single_plate_stack_info <- function(dt_subset,
                                          plate_id = NULL,
                                          drug_color_mapping = NULL,
@@ -207,10 +146,10 @@ plot_single_plate_stack_info <- function(dt_subset,
   barcode <- gDRutils::get_env_identifiers("barcode")[1]
 
   if (is.null(plate_id)) {
-    plate_id <- if (barcode %in% names(dt_subset)) {
-      as.character(unique(dt_subset[[barcode]])[1])
+    if (barcode %in% names(dt_subset)) {
+      plate_id <- as.character(unique(dt_subset[[barcode]])[1])
     } else {
-      "Unknown"
+      plate_id <- "Unknown"
     }
   }
 
@@ -226,8 +165,10 @@ plot_single_plate_stack_info <- function(dt_subset,
   }
 
   has_combo <- concentration2 %in% names(dt_subset) && drug2 %in% names(dt_subset)
-  if (has_combo && !"rank_2" %in% names(dt_subset)) {
-    dt_subset[, rank_2 := .calc_dose_rank(get(concentration2))]
+  if (has_combo) {
+    if (!"rank_2" %in% names(dt_subset)) {
+      dt_subset[, rank_2 := .calc_dose_rank(get(concentration2))]
+    }
   }
 
   if (is.null(drug_color_mapping)) {
@@ -244,7 +185,43 @@ plot_single_plate_stack_info <- function(dt_subset,
   dt_controls <- dt_subset[is_ctrl]
   dt_treated <- dt_subset[!is_ctrl]
 
-  qc <- .compute_plate_qc(dt_controls, dt_treated, ctrl_fail_threshold, n_sd, use_sd_threshold)
+  mean_ctrl <- mean(dt_controls$ReadoutValue, na.rm = TRUE)
+  sd_ctrl <- stats::sd(dt_controls$ReadoutValue, na.rm = TRUE)
+  qc_valid <- is.finite(mean_ctrl)
+
+  if (use_sd_threshold) {
+    limit_desc <- paste0("Mean(Ctrl) + ", n_sd, "*SD")
+  } else {
+    limit_desc <- "Mean(Ctrl) + 10%"
+  }
+  low_desc <- paste0("Mean(Ctrl) * ", ctrl_fail_threshold)
+
+  if (qc_valid) {
+    if (is.na(sd_ctrl)) {
+      sd_ctrl <- 0
+    }
+
+    if (use_sd_threshold) {
+      limit_value <- mean_ctrl + (n_sd * sd_ctrl)
+    } else {
+      limit_value <- mean_ctrl * 1.1
+    }
+
+    low_limit_value <- mean_ctrl * ctrl_fail_threshold
+
+    bad_ctrl_rows <- dt_controls[ReadoutValue < low_limit_value]
+    suspicious_treated <- dt_treated[ReadoutValue > limit_value]
+
+    count_low <- NROW(bad_ctrl_rows)
+    count_high <- NROW(suspicious_treated)
+  } else {
+    count_low <- 0
+    count_high <- 0
+    limit_value <- NA
+    low_limit_value <- NA
+    bad_ctrl_rows <- dt_controls[0]
+    suspicious_treated <- dt_treated[0]
+  }
 
   doses_1 <- sort(unique(dt_subset[[concentration]][dt_subset[[concentration]] > 0]))
   dose_key_str <- .format_dose_list(doses_1, items_per_line)
@@ -258,11 +235,38 @@ plot_single_plate_stack_info <- function(dt_subset,
     }
   }
 
-  qc_text <- .build_plate_qc_text(qc, use_sd_threshold, n_sd, ctrl_fail_threshold)
+  if (!qc_valid) {
+    subtitle_text <- "<span style='color:orange;'>QC Status: <b>No Controls</b></span>"
+    qc_legend <- "N/A"
+  } else {
+    if (count_low == 0 && count_high == 0) {
+      subtitle_text <- "<span style='color:darkgreen;'>QC Status: <b>OK</b></span>"
+    } else {
+      msgs <- c()
+      if (count_low > 0) {
+        msgs <- c(msgs, paste0("<b>", count_low, "</b> Low"))
+      }
+      if (count_high > 0) {
+        msgs <- c(msgs, paste0("<b>", count_high, "</b> High"))
+      }
+      subtitle_text <- paste("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
+    }
 
-  caption_text <- paste0(dose_legend, "<br><br><b>QC Flags:</b> ", qc_text$qc_legend)
+    qc_legend <- paste0(
+      "<span style='color:red;'>&#9632;</span> <b>Low</b> ",
+      "<span style='color:#555; font-size:8pt;'>(< ", round(low_limit_value, 1), " [", low_desc, "])</span> | ",
+      "<span style='color:darkorange;'>&#9632;</span> <b>High</b> ",
+      "<span style='color:#555; font-size:8pt;'>(> ", round(limit_value, 1), " [", limit_desc, "])</span>"
+    )
+  }
 
-  offset_1 <- if (has_combo) -0.18 else 0
+  caption_text <- paste0(dose_legend, "<br><br><b>QC Flags:</b> ", qc_legend)
+
+  if (has_combo) {
+    offset_1 <- -0.18
+  } else {
+    offset_1 <- 0
+  }
   offset_2 <- 0.18
 
   combo_layers <- NULL
@@ -288,9 +292,9 @@ plot_single_plate_stack_info <- function(dt_subset,
     ), color = "white", size = 2.5, fontface = "bold") +
     combo_layers +
     ggplot2::geom_tile(ggplot2::aes(x = WellColumn, y = WellRow), fill = NA, color = "black", linewidth = 0.5) +
-    ggplot2::geom_tile(data = qc$bad_ctrl_rows, ggplot2::aes(x = WellColumn, y = WellRow),
+    ggplot2::geom_tile(data = bad_ctrl_rows, ggplot2::aes(x = WellColumn, y = WellRow),
                        color = "red", fill = NA, linewidth = 1, width = 1, height = 1) +
-    ggplot2::geom_tile(data = qc$suspicious_treated, ggplot2::aes(x = WellColumn, y = WellRow),
+    ggplot2::geom_tile(data = suspicious_treated, ggplot2::aes(x = WellColumn, y = WellRow),
                        color = "darkorange", fill = NA, linewidth = 1, width = 1, height = 1) +
     ggplot2::scale_fill_gradient(low = "#FFFFFF", high = "#6FA8DC", name = "Readout") +
     ggplot2::scale_x_continuous(breaks = sort(unique(dt_subset$WellColumn)),
@@ -299,7 +303,7 @@ plot_single_plate_stack_info <- function(dt_subset,
     ggplot2::scale_shape_manual(values = solid_shapes) +
     ggplot2::labs(
       title = paste0("Plate ", plate_id, " QC Analysis"),
-      subtitle = qc_text$subtitle_text,
+      subtitle = subtitle_text,
       caption = caption_text,
       x = "Column", y = "Row"
     ) +
@@ -324,7 +328,7 @@ plot_single_plate_stack_info <- function(dt_subset,
 #'
 #' @keywords QC_plot
 #'
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #'
 #' @examples
 #' test_data <- data.table::data.table(
@@ -454,7 +458,7 @@ plot_plate <- function(dt_plate, column_name) {
 #'
 #' @keywords internal
 #'
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 #'
 #' @return A list containing color mappings for Gnumber and Gnumber_2
 generate_color_mappings <- function(dt_plate_subset,
@@ -490,7 +494,7 @@ generate_color_mappings <- function(dt_plate_subset,
 #' @param vals \code{numeric} vector of concentration values.
 #' @return A \code{character} vector of ranks.
 #' @keywords internal
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 .calc_dose_rank <- function(vals) {
   vals <- round(vals, 6)
   unique_doses <- sort(unique(vals[vals > 0]))
@@ -513,7 +517,7 @@ generate_color_mappings <- function(dt_plate_subset,
 #' @param n_per_line \code{integer} number of items to display per line.
 #' @return A single \code{character} string with HTML line breaks.
 #' @keywords internal
-#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#' @author Bartosz Czech \email{bartosz.czech@@contractors.roche.com}
 .format_dose_list <- function(dose_vec, n_per_line) {
   if (length(dose_vec) == 0) return("")
 
