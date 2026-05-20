@@ -639,7 +639,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   # scenario 3: missing annotations row
   annotation_manual_row_res <- data.table::copy(annotation_manual_row)
   annotation_manual_row_res[1:20, c("drug_moa", "drug_moa_2")] <- "NA"
-  annotation_manual_row_na <- annotation_manual_row_res[2:NROW(annotation_manual_row_res), ]
+  annotation_manual_row_na <- annotation_manual_row_res[21:NROW(annotation_manual_row_res), ]
   annotation_map_na <- annotation_map[1:2]
 
   out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
