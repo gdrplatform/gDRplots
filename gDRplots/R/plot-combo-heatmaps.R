@@ -1837,7 +1837,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
   names(plt_list) <- cl_names_with_data
 
   # find the maximum legend
-  if (!is.null(iso_levels)) {
+  if (!is.null(iso_levels) && any(iso_levels %in% unique(dt_isobolograms$iso_level))) {
     dt_num_iso <-
       unique(dt_isobolograms[iso_level %in% iso_levels, .SD, .SDcols = c(cellline_name, "iso_level")])
     lbl_legend <- dt_num_iso[, .N, by = cellline_name][order(N)][N == max(N), get(cellline_name)][[1]]
