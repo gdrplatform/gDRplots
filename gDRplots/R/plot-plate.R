@@ -249,7 +249,7 @@ plot_single_plate_stack_info <- function(dt_subset,
       if (count_high > 0) {
         msgs <- c(msgs, paste0("<b>", count_high, "</b> High"))
       }
-      subtitle_text <- paste("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
+      subtitle_text <- paste0("<span style='color:red;'>QC ALERTS: ", paste(msgs, collapse = " | "), "</span>")
     }
 
     qc_legend <- paste0(

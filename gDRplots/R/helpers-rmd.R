@@ -100,7 +100,7 @@ prep_plot_chunk <- function(plt_list,
       header <- if (is.null(tabset_options)) {
         sprintf("%s %s\n\n", lvl, group_name)
       } else {
-        tabset_string <- paste("{.", paste(tabset_options, collapse = " ."), "}")
+        tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
         sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
       }
 
@@ -521,7 +521,7 @@ prep_double_table_chunk <- function(tbl_list,
     tabset_string <- if (is.null(tabset_options)) {
       ""
     } else {
-      paste("{.", paste(tabset_options, collapse = " ."), "}")
+      paste0("{.", paste(tabset_options, collapse = " ."), "}")
     }
 
     header <- c(
