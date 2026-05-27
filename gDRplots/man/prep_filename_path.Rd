@@ -23,12 +23,12 @@ If a nested list is provided, the inner lists should also be named.}
 \item{file_format}{string specifying the format of file}
 }
 \value{
-list of strings describing names or paths depending on the input; the list is structured 
+list of strings describing names or paths depending on the input; the list is structured
 like the input \code{plt_list} and retains the same names as \code{plt_list}.
 }
 \description{
 This function can creates lists that can be used as an input to \code{\link{prep_plot_chunk}} -
-param \code{link_list} and \code{dwn_list}. 
+param \code{link_list} and \code{dwn_list}.
 Depending on the inputs, outputted string will have a format:
 \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
 Note: An unnamed item in the list will be numbered.
@@ -49,15 +49,15 @@ prep_filename_path(plt_list = plotlist,
 nested_plotlist <- list()
 for (species in unique(iris$Species)) {
   nested_plotlist[[species]] <- list()
-  nested_plotlist[[species]][["Sepal"]] <- 
+  nested_plotlist[[species]][["Sepal"]] <-
     ggplot2::ggplot(iris[iris$Species == species, ],
                     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
-  nested_plotlist[[species]][["Petal"]] <- 
+  nested_plotlist[[species]][["Petal"]] <-
     ggplot2::ggplot(iris[iris$Species == species, ],
                     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
 }
 
-prep_filename_path(plt_list = nested_plotlist, 
+prep_filename_path(plt_list = nested_plotlist,
                    file_format = "png")
 }
 

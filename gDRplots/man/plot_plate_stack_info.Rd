@@ -46,8 +46,8 @@ invisible(test_data[, Concentration := rep(rep(conc_series, length.out = 48), 2)
 invisible(test_data[, Gnumber := ifelse(Concentration == 0, "vehicle", "Drug_A")])
 invisible(test_data[Gnumber == "vehicle", Concentration := 0])
 
-invisible(test_data[, ReadoutValue := ifelse(Gnumber == "vehicle", 
-                                    rnorm(.N, 1000, 50), 
+invisible(test_data[, ReadoutValue := ifelse(Gnumber == "vehicle",
+                                    rnorm(.N, 1000, 50),
                                     rnorm(.N, 500, 100))])
 library(ggtext)
 plots <- plot_plate_stack_info(test_data)

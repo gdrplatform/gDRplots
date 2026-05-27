@@ -25,7 +25,7 @@ logical flag determining if rows should be clustered or \code{hclust} object.
 The \code{cluster_rows} and \code{cluster_cols} parameters  pheatmap::pheatmap may take values:
 - boolean determining if rows/columns should be clustered
 - \code{hclust} object,
-this function allows to calculate proper value taking into account matrix, additional condition and 
+this function allows to calculate proper value taking into account matrix, additional condition and
 selected function used to compute the distance in \code{hclust} object
 }
 \details{

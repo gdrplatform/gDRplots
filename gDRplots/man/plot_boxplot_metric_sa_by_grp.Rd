@@ -25,13 +25,13 @@ plot_boxplot_metric_sa_by_grp(
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Metrics")}
 and single-agent \code{SummarizedExperiment}}
 
-\item{selection_var}{string name of selected main variable - one value from column 
+\item{selection_var}{string name of selected main variable - one value from column
 \code{"CellLineName"} or \code{"DrugName"}}
 
-\item{selection_name}{string name of selected variable value from column \code{selection_var} 
+\item{selection_name}{string name of selected variable value from column \code{selection_var}
 to filter data for plotting}
 
-\item{group_var}{string name of group variable; should to be not numeric variable from \code{dt_metrics} 
+\item{group_var}{string name of group variable; should to be not numeric variable from \code{dt_metrics}
 different than \code{selection_var} and not containing unique values for each row}
 
 \item{group_names}{character vector with names to subset from column \code{group_var};
@@ -41,7 +41,7 @@ if \code{NULL} then all values will be plotted}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"),
 but the values from any numeric column can be displayed}
 
@@ -51,18 +51,18 @@ but the values from any numeric column can be displayed}
 if \code{group_var} is \code{"DrugName"}, points are labeled by \code{"CellLineName"}
 and similarly vice versa}
 
-\item{named_n_mode}{string determines whether the labels are applied to the highest or lowest 
+\item{named_n_mode}{string determines whether the labels are applied to the highest or lowest
 values of \code{metric}; one of: \code{"top"} or \code{"bottom"}}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
 for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
-\code{ggplot} object containing boxplots for selected single-agent metric 
+\code{ggplot} object containing boxplots for selected single-agent metric
    grouped by selected variable
 }
 \description{
@@ -73,8 +73,8 @@ mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
-invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w", 
-                                                         "tissue_w", 
+invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w",
+                                                         "tissue_w",
                                                          "tissue_other")])
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
@@ -104,7 +104,7 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_name = "drug_001",
                               group_var = "Tissue",
                               grouped_flag = TRUE)
-                              
+
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
                               selection_name = "drug_001",

@@ -56,7 +56,7 @@ The function was originally named \code{computeDistances}
 
 \examples{
 x <- matrix(1:9, nrow = 3, ncol = 3)
-rownames(x) <- letters[seq(nrow(x))]
+rownames(x) <- letters[seq(NROW(x))]
 compute_distances(x)
 
 }

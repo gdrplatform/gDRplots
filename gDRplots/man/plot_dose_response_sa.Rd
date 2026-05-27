@@ -26,7 +26,7 @@ and single-agent \code{SummarizedExperiment}}
 outputted by \code{gDRutils::convert_se_assay_to_dt(se, "Averaged")}
 and single-agent \code{SummarizedExperiment}}
 
-\item{selection_name}{string name of selected main variable - one value from column 
+\item{selection_name}{string name of selected main variable - one value from column
 \code{"CellLineName"} or \code{"DrugName"}}
 
 \item{group_var}{string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"}}
@@ -74,7 +74,7 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_drug,
                       group_var = group_var,
                       group_names = celline_names)
-                    
+
 selected_cellline <- "cellline_HB"
 group_var <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -86,6 +86,6 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_cellline,
                       group_var = group_var,
                       group_names = group_names)
-                      
+
 }
 \keyword{single-agent_plots}

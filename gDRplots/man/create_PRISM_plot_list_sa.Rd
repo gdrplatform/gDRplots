@@ -54,7 +54,7 @@ These names should also correspond to the file names containing the feature data
 \item{clear_taxonomy_info}{logical flag whether to remove taxonomy information for gene names in table
 with the molecular feature sets from DepMap.}
 
-\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 }
 \value{

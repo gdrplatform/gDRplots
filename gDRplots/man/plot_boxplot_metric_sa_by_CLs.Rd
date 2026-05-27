@@ -24,27 +24,27 @@ and single-agent \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"),
 but the values from any numeric column can be displayed}
 
 \item{fit_source}{string source name for metrics}
 
-\item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+\item{grouped_flag}{a logical flag whether the boxplots should be grouped and
+colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"}
 and \code{drug_moa} - for \code{"DrugName"}}
 
 \item{colored_pts_flag}{a logical flag whether the points should be colored by grouped variable -
 for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
 and similarly vice versa}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
 for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
 \value{
-\code{ggplot} object containing boxplots for selected single-agent metric 
+\code{ggplot} object containing boxplots for selected single-agent metric
    grouped by cellline names
 }
 \description{
@@ -60,10 +60,10 @@ plot_boxplot_metric_sa_by_CLs(dt_metrics)
 
 plot_boxplot_metric_sa_by_CLs(dt_metrics,
                               grouped_flag = TRUE)
-                              
+
 plot_boxplot_metric_sa_by_CLs(dt_metrics,
                               with_inf = TRUE)
-                              
+
 plot_boxplot_metric_sa_by_CLs(dt_metrics,
                               metric = "x_AOC",
                               colors_vec = "gold")

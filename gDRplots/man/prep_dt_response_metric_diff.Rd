@@ -37,8 +37,8 @@ If set to NULL, the function will return a table for all available cell lines.}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-"x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50") 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
+"x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50")
 or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")}
 
 \item{fit_source}{string source name for metrics}
@@ -58,14 +58,14 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
                                                assay_name = "Metrics")
 d_name <- "drug_004"
 d_name2 <- "drug_026"
-dt_response <- 
+dt_response <-
   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
   metric = c("xc50", "x_mean", "x_max"))
 
 cellline1 <- "cellline_GB"
 cellline2 <- "cellline_HB"
 
-dt_response <- 
+dt_response <-
   prep_dt_response_metric_diff(dt_metrics, d_name = NULL, d_name2 = NULL,
   cellline1, cellline2,
   metric = c("xc50", "x_mean", "x_max"))

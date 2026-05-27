@@ -37,7 +37,7 @@ and combo \code{SummarizedExperiment}}
 \item{cl_name}{string with cell line to be plotted (identifiers \code{CellLineName})}
 
 \item{metric}{string name of combo metric;
-one of: "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}), 
+one of: "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}),
 "hsa_excess"("Bliss Excess GR" or "Bliss Excess RV")
 or "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")}
 
@@ -52,7 +52,7 @@ for smooth values; the default is the dark purple-light grey palette}
 \item{colors_vec_excess}{character vector of colors (valid name or hex codes) used in the heatmap
 for excess values; the default is the blue-light grey-red color scale}
 
-\item{limit}{numeric vector of length two providing limits of the scale. 
+\item{limit}{numeric vector of length two providing limits of the scale.
 Use NA to refer to the existing minimum or maximum}
 
 \item{no_breaks}{numeric number of breaks on scale}
@@ -62,7 +62,7 @@ Use NA to refer to the existing minimum or maximum}
 \item{show_values}{logical flag indicating whether to show values of the metric on the heatmap}
 }
 \value{
-\code{ggplot} object containing heatmap with the values for the selected combo metric 
+\code{ggplot} object containing heatmap with the values for the selected combo metric
    for selected drugs and cell line with selected isoline (when chosen)
 }
 \description{
@@ -83,14 +83,14 @@ heatmap_combo_metrics(dt_excess,
                       drug1_name, drug2_name,
                       cl_name,
                       normalization_type = "GR")
-                      
+
 heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
                       drug1_name, drug2_name,
                       cl_name,
                       normalization_type = "GR",
                       swap_axes = TRUE)
-        
+
 heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
                       drug1_name, drug2_name,
@@ -98,7 +98,7 @@ heatmap_combo_metrics(dt_excess,
                       metric = "hsa_excess",
                       normalization_type = "GR",
                       limit = c(NA, 0.1))
-                      
+
 cl_name <- "cellline_JE"
 drug1_name <- "drug_011"
 drug2_name <- "drug_026"
@@ -110,7 +110,7 @@ heatmap_combo_metrics(dt_excess,
                       metric = "bliss_excess",
                       normalization_type = "RV",
                       iso_levels = "0.5")
-                      
+
 heatmap_combo_metrics(dt_excess,
                       dt_isobolograms,
                       drug1_name, drug2_name,

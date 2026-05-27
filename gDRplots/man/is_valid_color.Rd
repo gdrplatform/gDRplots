@@ -13,7 +13,7 @@ is_valid_color(col_name)
 logical flag
 }
 \description{
-A name of color is valid when either is a color name 
+A name of color is valid when either is a color name
 listed by \code{\link[grDevices:colors]{grDevices::colors}}
 or a hexadecimal string of the form \code{#rrggbb}
 }

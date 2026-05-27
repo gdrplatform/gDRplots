@@ -11,7 +11,7 @@
 )
 }
 \arguments{
-\item{dt_anno}{\code{data.table} that specifies the annotations shown on left side of the heatmap 
+\item{dt_anno}{\code{data.table} that specifies the annotations shown on left side of the heatmap
 or shown above the heatmap - depending on the \code{anno_var}.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from the required \code{anno_var} column.}

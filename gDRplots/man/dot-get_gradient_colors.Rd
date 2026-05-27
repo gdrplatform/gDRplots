@@ -21,7 +21,7 @@
 
 \item{base_map}{\code{character} named vector mapping drug names to their base (darkest) color.}
 
-\item{untreated_tag}{\code{character} vector of identifiers for untreated/vehicle controls. 
+\item{untreated_tag}{\code{character} vector of identifiers for untreated/vehicle controls.
 Defaults to \code{gDRutils::get_env_identifiers("untreated_tag")}.}
 }
 \value{

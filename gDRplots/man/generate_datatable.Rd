@@ -14,11 +14,11 @@ generate_datatable(
 )
 }
 \arguments{
-\item{tab}{A dataset to be displayed in the datatable. Must be of class 
+\item{tab}{A dataset to be displayed in the datatable. Must be of class
 \code{data.table} or \code{DFrame}.}
 
-\item{options}{A list of options to customize the DataTable. Defaults to 
-\code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information 
+\item{options}{A list of options to customize the DataTable. Defaults to
+\code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information
 about the number of rows and pagination}
 
 \item{width}{A character string specifying the width of the table. Defaults to "100\%".}
@@ -33,9 +33,9 @@ about the number of rows and pagination}
 A \code{DT::datatable} object.
 }
 \description{
-This function creates a \code{DT::datatable} object with default settings for 
-horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
-It supports input data of types \code{data.table} or \code{DFrame}. 
+This function creates a \code{DT::datatable} object with default settings for
+horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}).
+It supports input data of types \code{data.table} or \code{DFrame}.
 Additional options and arguments can be passed to customize the table further.
 }
 \examples{

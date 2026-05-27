@@ -18,8 +18,8 @@ a character vector of unique numeric strings.
 Rounds a numeric vector to the minimum precision needed to ensure uniqueness
 }
 \examples{
-vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000, 
-         0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000) 
+vec <- c(0.00000000, 0.00000256, 0.00001280, 0.00006400, 0.00032000,
+         0.00160000, 0.00800000, 0.04000000, 0.20000000, 1.00000000)
 
 round_to_unique_string(vec)
 

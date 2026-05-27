@@ -20,7 +20,7 @@ outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
 or \code{\link{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data load from DepMap - for one metadata;
-(rows are samples, columns are metadata levels);  
+(rows are samples, columns are metadata levels);
 outputted by \code{\link{prep_dt_depmap_meta}}}
 
 \item{selected_feat_meta_col}{string with the name of the selected metadata from \code{dt_depmap}

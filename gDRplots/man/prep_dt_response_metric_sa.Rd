@@ -23,7 +23,7 @@ and single-agent \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
@@ -44,10 +44,10 @@ dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
 dt_response <-
   prep_dt_response_metric_sa(dt_metrics, d_name,
                              metric = c("xc50", "x_mean", "x_max"))
-                             
+
 dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
                                                 assay_name = "Averaged")
-dt_metrics_capped <- 
+dt_metrics_capped <-
   gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
                                  assay_dt = dt_metrics,
                                  experiment_name = gDRutils::get_supported_experiments("sa"),

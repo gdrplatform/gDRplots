@@ -18,7 +18,7 @@ outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
 or \code{\link{prep_dt_response_metric_diff}},}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap - for one feature;
-(rows are samples, columns are features). 
+(rows are samples, columns are features).
 outputted by \code{\link{prep_dt_depmap_feat}}}
 
 \item{selected_feat}{string with name of selected feature from \code{dt_depmap}}

@@ -26,7 +26,7 @@ and combo \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
@@ -45,7 +45,7 @@ dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
 d_name <- "drug_004"
 d_name2 <- "drug_026"
 dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2)
-dt_response <- 
+dt_response <-
   prep_dt_response_scores(dt_scores, d_name, d_name2,
                           metric = c("hsa_score", "bliss_score"))
 

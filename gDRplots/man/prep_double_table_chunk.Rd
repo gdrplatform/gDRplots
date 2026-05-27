@@ -19,16 +19,16 @@ and the inner lists represent metrics. Names are used as headings.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved,
 which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used 
+\item{tabset_options}{A character vector of options for the tabset. This is only used
 when \code{plt_list} is a nested list.
 Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 
-\item{sorting_opts}{A vector specifying global sorting options for all tables. 
+\item{sorting_opts}{A vector specifying global sorting options for all tables.
 Column names can be preceded by "-" to indicate descending order.}
 }
 \value{

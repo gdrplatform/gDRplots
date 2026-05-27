@@ -11,7 +11,7 @@ calc_assoc(X, Y)
 Must have the same number of rows as matrix \code{Y} or equal to length of vector \code{Y}}
 
 \item{Y}{\code{vector} or \code{matrix} experimental response data (rows are samples).
-When \code{Y} is a matrix must have the same number of rows as matrix \code{X}; 
+When \code{Y} is a matrix must have the same number of rows as matrix \code{X};
 when \code{y} is a vector - its length has to be equal to number of rows in matrix \code{X}.}
 }
 \value{
@@ -24,7 +24,7 @@ Calculate the linear model associations between dependent variables and response
 inspired by the \code{calc_assoc} function written by James Hawley
 }
 \examples{
-X <- matrix(rep(1:13, length.out = 42), nrow = 6, 
+X <- matrix(rep(1:13, length.out = 42), nrow = 6,
             dimnames = list(sprintf("row_\%s", 1:6), sprintf("feat_\%s", 1:7)))
 Y <- matrix(c(10:15, 110:115, 210:215), ncol = 3,
             dimnames = list(sprintf("row_\%s", 1:6), sprintf("met_\%s", 1:3)))

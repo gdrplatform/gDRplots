@@ -59,7 +59,7 @@ or 3x1 (containing only heatmaps for combination metrics); it is working only fo
 \item{show_values}{logical flag indicating whether to show values of the metric on the heatmap}
 }
 \value{
-\code{ggplot} object containing panel with heatmaps with value for excess assays for 
+\code{ggplot} object containing panel with heatmaps with value for excess assays for
    selected drugs and cell line with selected isoline and comparison of iso levels
    or list of \code{ggplot} object containing these plots.
 }
@@ -81,7 +81,7 @@ heatmap_combo_metrics_panel(dt_excess,
                             drug1_name, drug2_name,
                             cl_name,
                             normalization_type = "GR")
-                      
+
 cl_name <- "cellline_JE"
 drug1_name <- "drug_011"
 drug2_name <- "drug_026"
@@ -93,7 +93,7 @@ heatmap_combo_metrics_panel(dt_excess,
                             normalization_type = "RV",
                             iso_levels = "0.5",
                             as_list = TRUE)
-                            
+
 heatmap_combo_metrics_panel(dt_excess,
                             dt_isobolograms,
                             drug1_name, drug2_name,
