@@ -348,7 +348,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::guides(color = "none") +
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) + # nolint undesirable_function_linter.
       ggplot2::geom_smooth(ggplot2::aes(x = feat_val,
                                         y = get(selected_metric)),
                            color = "red",
@@ -630,7 +630,7 @@ plot_boxplot_num_panel <- function(dt_response,
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::scale_x_discrete(drop = FALSE) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) + # nolint undesirable_function_linter.
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8),
                      axis.text.y = ggplot2::element_text(size = 8),
                      plot.title = ggplot2::element_text(size = 12),
