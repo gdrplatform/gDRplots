@@ -668,9 +668,9 @@ heatmap_combo_metrics_panel <- function(
     # add x and y scales
     plt_iso_compare <- plt_iso_compare +
       ggplot2::scale_y_continuous(breaks = -5:4,
-                                  labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+                                  labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) + # nolint paste_linter
       ggplot2::scale_x_continuous(breaks = -3:3,
-                                  labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
+                                  labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) + # nolint paste_linter
       ggplot2::coord_cartesian(ylim = c(-5, 4)) +
       ggplot2::labs(y = "CI",
                     x = paste(drug2_name, "/", drug1_name, "ratio"),
@@ -886,9 +886,9 @@ plot_combination_index <- function(
   # add x and y scales
   plt <- plt +
     ggplot2::scale_y_continuous(breaks = -5:4,
-                                labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) +
+                                labels = c(paste0("1/", 2 ^ (5:1)), 2 ^ (0:4))) + # nolint paste_linter
     ggplot2::scale_x_continuous(breaks = -3:3,
-                                labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) +
+                                labels = c(paste0("1/", 10 ^ (3:1)), 10 ^ (0:3))) + # nolint paste_linter
     ggplot2::coord_cartesian(ylim = c(-5, 4)) +
     ggplot2::labs(y = "CI",
                   x = paste(drug2_name, "/", drug1_name, "ratio"),

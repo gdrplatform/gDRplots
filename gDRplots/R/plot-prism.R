@@ -215,7 +215,7 @@ plot_scatter_with_corr <- function(dt_response,
 #'
 #' @inheritParams plot_scatter_with_corr
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
-#' @param ncol number of plot column in panel
+#' @param n_cols number of plot column in panel
 #'
 #' @return \code{ggplot} object containing panel of scatter plot with correlation for selected features
 #'
@@ -228,7 +228,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
                                          dt_depmap,
                                          selected_feats,
                                          selected_feat_meta_col = NULL,
-                                         ncol = NULL) {
+                                         n_cols = NULL) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
 
@@ -237,7 +237,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
   checkmate::assert_character(selected_feats)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
-  checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
+  checkmate::assert_int(n_cols, lower = 1, null.ok = TRUE)
 
   selected_metric <- setdiff(names(dt_response),
                              c(cellline_name, "rId", "cId"))
@@ -348,7 +348,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       ggplot2::guides(color = "none") +
       ggplot2::scale_color_manual(values = c(yes = "red", no = "black", "NA" = "black")) +
       ggplot2::scale_alpha_manual(values = c(yes = 1, no = 1, "NA" = 0)) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = n_cols) +
       ggplot2::geom_smooth(ggplot2::aes(x = feat_val,
                                         y = get(selected_metric)),
                            color = "red",
@@ -473,7 +473,7 @@ plot_boxplot_num <- function(dt_response,
 #'
 #' @inheritParams plot_boxplot_num
 #' @param selected_feats character vector with names of selected features from \code{dt_depmap}
-#' @param ncol number of plot column in panel
+#' @param n_cols number of plot column in panel
 #'
 #' @return \code{ggplot} object containing boxplots for variable levels (0-1)
 #'
@@ -486,7 +486,7 @@ plot_boxplot_num_panel <- function(dt_response,
                                    dt_depmap,
                                    selected_feats,
                                    selected_feat_meta_col = NULL,
-                                   ncol = NULL) {
+                                   n_cols = NULL) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
 
@@ -495,7 +495,7 @@ plot_boxplot_num_panel <- function(dt_response,
   checkmate::assert_character(selected_feats)
   checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
-  checkmate::assert_int(ncol, lower = 1, null.ok = TRUE)
+  checkmate::assert_int(n_cols, lower = 1, null.ok = TRUE)
   boxplot_fill <-
     gDRutils::get_settings_from_json("BOXPLOT_FILL",
                                      system.file(package = "gDRplots", "settings.json"))
@@ -630,7 +630,7 @@ plot_boxplot_num_panel <- function(dt_response,
                     caption = unique(dt_response$rId)) +
       ggplot2::theme_bw() +
       ggplot2::scale_x_discrete(drop = FALSE) +
-      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = ncol) +
+      ggplot2::facet_wrap(~feat_lbl, scales = "free", ncol = n_cols) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(size = 8),
                      axis.text.y = ggplot2::element_text(size = 8),
                      plot.title = ggplot2::element_text(size = 12),
