@@ -864,7 +864,7 @@ plot_volcano_assoc_panel <- function(dt_response,
                                              dt_depmap = dt_depmap,
                                              selected_feats = top_4,
                                              selected_feat_meta_col = selected_feat_meta_col,
-                                             ncol = 2) +
+                                             n_cols = 2) +
       ggplot2::labs(title = "",
                     caption = "",
                     x = selected_feat_meta_col)
@@ -874,7 +874,7 @@ plot_volcano_assoc_panel <- function(dt_response,
                                        dt_depmap = dt_depmap,
                                        selected_feats = top_4,
                                        selected_feat_meta_col = selected_feat_meta_col,
-                                       ncol = 2) +
+                                       n_cols = 2) +
       ggplot2::labs(title = "",
                     caption = "",
                     x = selected_feat_meta_col)
