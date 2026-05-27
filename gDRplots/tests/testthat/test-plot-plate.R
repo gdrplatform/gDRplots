@@ -106,7 +106,7 @@ test_that("plot_single_plate_stack_info works as expected", {
 
   # 5. Multiple Shapes (Cell Lines)
   multi_shape_data <- data.table::copy(single_plate_data)
-  mid_point <- floor(nrow(multi_shape_data) / 2)
+  mid_point <- floor(NROW(multi_shape_data) / 2)
   multi_shape_data[seq_len(mid_point), clid := "CellLine_A"]
   multi_shape_data[(mid_point + 1):.N, clid := "CellLine_B"]
 

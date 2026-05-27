@@ -10,9 +10,9 @@ test_that("analyze_cgs works correctly", {
   expect_is(results, "list")
   expect_equal(names(results), "CellLineName_1")
   expect_is(results$CellLineName_1$fgsea$xc50, "data.table")
-  expect_gt(nrow(results$CellLineName_1$fgsea$xc50), 0) # Check for results
+  expect_gt(NROW(results$CellLineName_1$fgsea$xc50), 0) # Check for results
   expect_is(results$CellLineName_1$metrics_diff, "data.table")
-  expect_gt(nrow(results$CellLineName_1$metrics_diff), 0)
+  expect_gt(NROW(results$CellLineName_1$metrics_diff), 0)
   expect_is(results$CellLineName_1$moa_list, "list")
   expect_gt(length(results$CellLineName_1$moa_list), 0)
 

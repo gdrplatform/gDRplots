@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' x <- matrix(1:9, nrow = 3, ncol = 3)
-#' rownames(x) <- letters[seq(nrow(x))]
+#' rownames(x) <- letters[seq(NROW(x))]
 #' compute_distances(x)
 #'
 #' @return Object of class \code{dist}. NA and NaN are substituted by the value of \code{dummy}.

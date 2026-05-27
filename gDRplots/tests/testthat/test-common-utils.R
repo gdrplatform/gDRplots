@@ -6,7 +6,7 @@ test_that("compute_distances works as expected", {
   expect_error(compute_distances(y),
                "Assertion on 'x' failed: Must be of type 'numeric'")
   y <- matrix(seq_len(9), nrow = 3, ncol = 3)
-  rownames(y) <- letters[seq_len(nrow(y))]
+  rownames(y) <- letters[seq_len(NROW(y))]
   expect_error(compute_distances(y, method = "str"),
                "Assertion on 'method' failed: Must be element of set")
   expect_error(compute_distances(y, use = "str"),
@@ -18,7 +18,7 @@ test_that("compute_distances works as expected", {
 
   # all rows with variance
   x <- matrix(seq_len(9), nrow = 3, ncol = 3)
-  rownames(x) <- letters[seq_len(nrow(x))]
+  rownames(x) <- letters[seq_len(NROW(x))]
   expect_equal(as.numeric(compute_distances(x)), rep(0, 3))
   expect_equal(as.numeric(compute_distances(x, stand = TRUE)), rep(1, 3))
   diag(x) <- NA
@@ -27,34 +27,34 @@ test_that("compute_distances works as expected", {
   expect_equal(as.numeric(compute_distances(x, dummy = -Inf)), rep(-Inf, 3))
 
   xx <- matrix(-4:4, nrow = 3, ncol = 3)
-  rownames(xx) <- letters[seq_len(nrow(xx))]
+  rownames(xx) <- letters[seq_len(NROW(xx))]
   expect_equal(as.numeric(compute_distances(xx)), rep(0, 3))
   expect_equal(as.numeric(compute_distances(xx, stand = TRUE)), rep(1, 3))
   expect_equal(as.numeric(compute_distances(xx, method = "manhattan")), c(3, 6, 3))
 
   # single row with no variance
   a <- t(matrix(c(rep(1, 3), withr::with_seed(1234, sample(seq_len(100), 15))), nrow = 3, ncol = 6))
-  rownames(a) <- letters[seq_len(nrow(a))]
+  rownames(a) <- letters[seq_len(NROW(a))]
   expect_equal(sort(unique(as.numeric(compute_distances(a)))), seq(0, 2, 0.5))
 
   # single row with variance
   b <- t(matrix(c(rep(1, 15), withr::with_seed(1234, sample(seq_len(100), 3))), nrow = 3, ncol = 6))
-  rownames(b) <- letters[seq_len(nrow(b))]
+  rownames(b) <- letters[seq_len(NROW(b))]
   expect_equal(as.numeric(compute_distances(b)), rep(1, 15))
 
   # single row with variance - small
   y <- matrix(c(1, 1, 2, 1), nrow = 2, ncol = 2)
-  rownames(y) <- letters[seq_len(nrow(y))]
+  rownames(y) <- letters[seq_len(NROW(y))]
   expect_equal(as.numeric(compute_distances(y)), 1)
 
   # all rows with variance
   z <- matrix(withr::with_seed(1234, sample(seq_len(100), 9)), nrow = 3, ncol = 3)
-  rownames(z) <- letters[seq_len(nrow(z))]
+  rownames(z) <- letters[seq_len(NROW(z))]
   expect_equal(as.numeric(compute_distances(z)), c(0.5, 1.5, 2.0))
 
   # all rows with no variance
   y <- matrix(1, nrow = 3, ncol = 3)
-  rownames(y) <- letters[seq_len(nrow(y))]
+  rownames(y) <- letters[seq_len(NROW(y))]
   expect_equal(as.numeric(compute_distances(y)), rep(1, 3))
 })
 
