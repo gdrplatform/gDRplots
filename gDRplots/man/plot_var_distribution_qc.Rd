@@ -44,12 +44,12 @@ dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 plot_var_distribution_qc(dt_assay = dt_average,
                          cl_name = cl_name,
                          normalization_type = "RV")
-                         
+
 plot_var_distribution_qc(dt_assay = dt_average,
                          cl_name = cl_name,
                          metric = "x_std",
                          normalization_type = "RV")
-                         
+
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
 
@@ -58,11 +58,11 @@ cl_name <- dt_norm[["CellLineName"]][1]
 
 plot_var_distribution_qc(dt_assay = dt_norm,
                          cl_name = cl_name)
-                         
+
 dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
 plot_var_distribution_qc(dt_assay = dt_average,
                          cl_name = cl_name,
                          normalization_type = "RV")
-       
+
 }
 \keyword{QC_plot}

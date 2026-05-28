@@ -22,7 +22,7 @@ Load DepMap merged data for one selected metadata
 \examples{
 \dontrun{
 meta_data_path <- file.path(".", "Model.csv")
-dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path) 
+dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
 }
 }
 \keyword{internal}

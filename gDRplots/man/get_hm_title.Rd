@@ -29,6 +29,6 @@ get_hm_title(dataset_name = "Dateset DX123",
 
 get_hm_title(metric = "xc50",
              normalization_type = "GR")
-             
+
 }
 \keyword{pheat_ann}

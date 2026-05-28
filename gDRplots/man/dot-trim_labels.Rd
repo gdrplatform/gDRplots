@@ -21,7 +21,7 @@ Trim labels to the required number of characters
 \examples{
 \dontrun{
 ls_lbls <- c(
-  "short_lbl", "short_lbl", "veryveryverylong", 
+  "short_lbl", "short_lbl", "veryveryverylong",
   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 )
 

@@ -8,12 +8,12 @@
 #' If unnamed, ordinal numbers will be used.  Can be nested lists for tabbed output.
 #' If a nested list is provided, the inner lists should also be named.
 #' @param chunk_name A character string specifying the base name for the generated code chunks. Avoid spaces.
-#' @param link_list A named list of links to the location (relative paths) where plots are saved, 
+#' @param link_list A named list of links to the location (relative paths) where plots are saved,
 #' which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.
-#' @param dwn_list A named list of links to location (relative paths) where table or plots are saved, 
+#' @param dwn_list A named list of links to location (relative paths) where table or plots are saved,
 #' which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
-#' @param tabset_options A character vector of options for the tabset. This is only used 
+#' @param tabset_options A character vector of options for the tabset. This is only used
 #' when \code{plt_list} is a nested list.
 #' Possible values are "unnumbered", "tabset", and "tabset-dropdown".
 #'
@@ -47,11 +47,11 @@
 #' prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
 #' }
 #' @keywords internal
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
-#' 
+#'
 #' @export
 prep_plot_chunk <- function(plt_list,
                             chunk_name,
@@ -59,7 +59,7 @@ prep_plot_chunk <- function(plt_list,
                             dwn_list = NULL,
                             header_level = 3,
                             tabset_options = c("tabset", "tabset-dropdown")) {
-  
+
   checkmate::assert_list(plt_list)
   checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_list(dwn_list, null.ok = TRUE)
@@ -67,34 +67,34 @@ prep_plot_chunk <- function(plt_list,
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
                               pattern = "unnumbered|tabset|tabset-dropdown|tabset-fade|tabset-pills")
-  
+
   plt_list_name <- deparse(substitute(plt_list))
-  lvl <- paste0(rep("#", header_level), collapse = "")
-  
+  lvl <- strrep("#", header_level)
+
   # checking if the structure of plt_list and link_list is identical
   link_structure_condition <- if (inherits(plt_list[[1]], "list")) {
-    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) == 
+    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) ==
           unlist(lapply(seq_along(link_list), function(i) NROW(link_list[[i]]))))
   } else {
     NROW(plt_list) == NROW(link_list)
   }
   if (!link_structure_condition) link_list <- NULL
-  
+
   # checking if the structure of plt_list and dwn_list is identical
   dwn_structure_condition <- if (inherits(plt_list[[1]], "list")) {
-    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) == 
+    all(unlist(lapply(seq_along(plt_list), function(i) NROW(plt_list[[i]]))) ==
           unlist(lapply(seq_along(dwn_list), function(i) NROW(dwn_list[[i]]))))
   } else {
     NROW(plt_list) == NROW(dwn_list)
   }
   if (!dwn_structure_condition) dwn_list <- NULL
-  
+
   lapply(seq_along(plt_list), function(nm) {
     group_name <- if (is.null(names(plt_list)[nm])) {
       nm
     } else {
       names(plt_list)[nm]
-    }    
+    }
     if (inherits(plt_list[[nm]], "list")) {
       # nested list - use tabset options
       header <- if (is.null(tabset_options)) {
@@ -103,31 +103,31 @@ prep_plot_chunk <- function(plt_list,
         tabset_string <- paste0("{.", paste(tabset_options, collapse = " ."), "}")
         sprintf("%s %s %s\n\n", lvl, group_name, tabset_string)
       }
-      
+
       item_chunks <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
         item_name <- if (is.null(names(plt_list[[nm]])[i_nm])) {
           i_nm
         } else {
           names(plt_list[[nm]])[i_nm]
         }
-        
+
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
           if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]][[i_nm]]), "\n"),
           if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]][[i_nm]]), "\n"),
           sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
-                  chunk_name, 
+                  chunk_name,
                   gsub(" ", "", group_name, fixed = TRUE),
                   formatC(i_nm, width = nchar(NROW(plt_list[[nm]])) + 1, flag = "0"),
-                  plt_list_name, 
-                  nm, 
+                  plt_list_name,
+                  nm,
                   i_nm)
         )
         knitr::knit_expand(text = chunk)
       })
-      
+
       c(knitr::knit_expand(text = header), unlist(item_chunks))
-      
+
     } else {
       # not nested - no tabset, access element by index
       chunk <- c(
@@ -137,7 +137,7 @@ prep_plot_chunk <- function(plt_list,
         sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
                 chunk_name,
                 formatC(nm, width = nchar(NROW(plt_list)) + 1, flag = "0"),
-                plt_list_name, 
+                plt_list_name,
                 nm)
       )
       knitr::knit_expand(text = chunk)
@@ -194,13 +194,13 @@ prep_plot_chunk <- function(plt_list,
 #'
 #' }
 #' @return list of character vectors - input for \code{knitr::knit}
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
-#' 
+#'
 #' @export
 prep_nested_plot_chunk <- function(plt_list,
                                    chunk_name,
@@ -213,13 +213,13 @@ prep_nested_plot_chunk <- function(plt_list,
   checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_list(dwn_list, null.ok = TRUE)
   checkmate::assert_int(header_level, lower = 1)
-  
-  lvl_1 <- paste0(rep("#", header_level), collapse =  "")
-  lvl_2 <- paste0(rep("#", header_level + 1), collapse =  "")
-  lvl_3 <- paste0(rep("#", header_level + 2), collapse =  "")
-  lvl_4 <- paste0(rep("#", header_level + 3), collapse =  "")
+
+  lvl_1 <- strrep("#", header_level)
+  lvl_2 <- strrep("#", header_level + 1)
+  lvl_3 <- strrep("#", header_level + 2)
+  lvl_4 <- strrep("#", header_level + 3)
   plt_list_name <- deparse(substitute(plt_list))
-  
+
   # checking if the structure of plt_list and link_list is identical
   link_structure_condition <-
     all(
@@ -227,7 +227,7 @@ prep_nested_plot_chunk <- function(plt_list,
       vapply(names(plt_list), function(nm) {
         all(names(plt_list[[nm]]) == names(link_list[[nm]]),
             vapply(names(plt_list[[nm]]), function(nm_2) {
-              all(names(plt_list[[nm]][[nm_2]]) == names(link_list[[nm]][[nm_2]]), 
+              all(names(plt_list[[nm]][[nm_2]]) == names(link_list[[nm]][[nm_2]]),
                   vapply(names(plt_list[[nm]][[nm_2]]), function(nm_3) {
                     all(names(plt_list[[nm]][[nm_2]][[nm_3]]) == names(link_list[[nm]][[nm_2]][[nm_3]]))
                   }, logical(1))
@@ -237,7 +237,7 @@ prep_nested_plot_chunk <- function(plt_list,
       }, logical(1))
     )
   if (!link_structure_condition) link_list <- NULL
-  
+
   lapply(names(plt_list), function(nm_1) {
     c(
       sprintf("%s %s {.tabset}\n\n", lvl_1, nm_1),
@@ -254,25 +254,25 @@ prep_nested_plot_chunk <- function(plt_list,
                   sprintf("%s %s {.tabset .tabset-dropdown}\n\n", lvl_3, norm_title),
                   unlist(
                     lapply(names(plt_list[[nm_1]][[nm_2]][[nm_norm]]), function(nm_vis) {
-                      
+
                       chunk_name <- sprintf("%s__%s_%s_%s_%s",
                                             chunk_name, nm_1, nm_2, nm_norm, nm_vis)
-                      
+
                       link_vis <- if (!is.null(link_list)) {
                         c(create_zoom_link(link_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
                       } else {
                         ""
                       }
-                      
+
                       link_dwn <- if (!is.null(dwn_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]])) {
                         c(create_download_link(dwn_list[[nm_1]][[nm_2]][[nm_norm]][[nm_vis]]), "\n")
                       } else {
                         ""
                       }
-                      
+
                       plt_list_name <- sprintf('%s[["%s"]][["%s"]][["%s"]]',
                                                plt_list_name, nm_1, nm_2, nm_norm)
-                      
+
                       chunk <- c(
                         sprintf("%s %s \n\n", lvl_4, nm_vis),
                         link_vis,
@@ -280,7 +280,7 @@ prep_nested_plot_chunk <- function(plt_list,
                         sprintf("```{r %s, echo = FALSE}\n", chunk_name),
                         sprintf('%s[["{{nm_vis}}"]] \n```\n\n', plt_list_name)
                       )
-                      
+
                       knitr::knit_expand(text = chunk)
                     })
                   )
@@ -305,7 +305,7 @@ prep_nested_plot_chunk <- function(plt_list,
 #' escape_special_characters("AD/12")
 #'
 #' @return Original string with \code{:}s and \code{#}s and \code{/}s escaped
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
@@ -328,7 +328,7 @@ escape_special_characters <- function(x) {
 #' neutralize_spaces("drug_001 x drug_002", ".")
 #'
 #' @return String with spaces replaced by the specified character
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
@@ -346,7 +346,7 @@ neutralize_spaces <- function(x,
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
 #'
-#' @return named vector with optimal width and height used 
+#' @return named vector with optimal width and height used
 #'    in the \code{\link[ggplot2:ggsave]{ggplot2::ggsave}} function
 #'
 #' @examples
@@ -354,20 +354,20 @@ neutralize_spaces <- function(x,
 #' estimate_plot_size(p)
 #'
 #' @keywords internal
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @export
 estimate_plot_size <- function(plt,
                                base_width = 10,
                                base_height = 6,
                                scale_factor = 0.5) {
-  
+
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_numeric(base_width, lower = 0, finite = TRUE)
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
-  
+
   if (inherits(plt, "ggplot")) {
     # For ggplot2 objects
     plot_data <- ggplot2::ggplot_build(plt)$data
@@ -393,7 +393,7 @@ estimate_plot_size <- function(plt,
 #' @param format A string specifying the format for saving the plot; either "svg", "png", or "pdf". Default is "svg".
 #'
 #' @return \code{NULL}
-#' 
+#'
 #' @examples
 #' tmp_dir <- file.path(tempdir(), "plot_dir")
 #' dir.create(tmp_dir, showWarnings = FALSE)
@@ -402,29 +402,29 @@ estimate_plot_size <- function(plt,
 #'
 #' @keywords internal
 #' @seealso \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
-#' 
+#'
 #' @export
 save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
-  
+
   # Check if the directory exists and has write access
   dir_path <- dirname(path)
   if (!dir.exists(dir_path)) {
     stop("The specified directory does not exist.")
   }
-  
+
   if (file.access(dir_path, 2) != 0) {
     stop("The specified directory does not have write access.")
   }
-  
+
   # Estimate plot size
   plot_size <- estimate_plot_size(plt)
-  
+
   filename <- paste(path, format, sep = ".")
-  
-  
+
+
   # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
                   plot = plt,
@@ -434,22 +434,22 @@ save_plot <- function(plt, path, format = "svg") {
                   dpi = 300,
                   limitsize = FALSE,
                   device = format)
-  
+
   invisible(NULL)
 }
 
 #' Extract path of the executed R file
 #'
 #' @param test_mode logical flag whether the function be run in the test mode
-#' 
+#'
 #' @return string with the path to the executed Rscript file
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @export
 get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
-  
+
   # on Rstudio
   fpath <- if (.Platform$GUI == "RStudio" && !test_mode) {
     rstudioapi::getActiveDocumentContext()$path
@@ -472,7 +472,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' @inheritParams prep_plot_chunk
 #' @param tbl_list A doubly nested named list of tables. The outer list represents cell lines,
 #'   and the inner lists represent metrics. Names are used as headings.
-#' @param sorting_opts A vector specifying global sorting options for all tables. 
+#' @param sorting_opts A vector specifying global sorting options for all tables.
 #'   Column names can be preceded by "-" to indicate descending order.
 #'
 #' @return A list of character vectors. Each element corresponds to a cell line. Each character vector
@@ -488,11 +488,11 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2,
 #'   tabset_options = "tabset", sorting_opts = sorting_options)
 #' }
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @export
 prep_double_table_chunk <- function(tbl_list,
                                     chunk_name,
@@ -500,7 +500,7 @@ prep_double_table_chunk <- function(tbl_list,
                                     header_level = 3,
                                     tabset_options = c("tabset", "tabset-dropdown"),
                                     sorting_opts = NULL) {
-  
+
   checkmate::assert_list(tbl_list, min.len = 1)
   checkmate::assert_string(chunk_name)
   checkmate::assert_list(dwn_list, null.ok = TRUE)
@@ -508,39 +508,39 @@ prep_double_table_chunk <- function(tbl_list,
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
                               pattern = "unnumbered|tabset|tabset-dropdown")
   checkmate::assert_character(sorting_opts, null.ok = TRUE)
-  
+
   tbl_list_name <- deparse(substitute(tbl_list))
-  lvl <- paste0(rep("#", header_level), collapse = "")
-  inner_lvl <- paste0(rep("#", header_level), collapse = "") # Inner level is one greater
-  
+  lvl <- strrep("#", header_level)
+  inner_lvl <- strrep("#", header_level) # Inner level is one greater
+
   # checking if the structure of plt_list and dwn_list is identical
   dwn_structure_condition <- all(names(tbl_list) %in% names(dwn_list))
   if (!dwn_structure_condition) dwn_list <- NULL
-  
+
   lapply(names(tbl_list), function(cell_line) {
     tabset_string <- if (is.null(tabset_options)) {
       ""
     } else {
       paste0("{.", paste(tabset_options, collapse = " ."), "}")
     }
-    
+
     header <- c(
       sprintf("%s %s %s\n\n", lvl, cell_line, tabset_string),
       if (!is.null(dwn_list)) c(create_download_link(dwn_list[[cell_line]]), "\n")
     )
-    
+
     item_chunks <- lapply(names(tbl_list[[cell_line]]), function(metric) {
-      
+
       if (!is.null(sorting_opts) && length(sorting_opts) > 0) {
         sort_orders <- ifelse(grepl("^-", sorting_opts), "desc", "asc")
         sorted_columns <- gsub("^-", "", sorting_opts)
-        
+
         # check for column existence and filter out non-existing columns
         available_columns <- names(tbl_list[[cell_line]][[metric]])
         valid_indices <- match(sorted_columns, available_columns, nomatch = 0)
         valid_indices <- valid_indices[valid_indices > 0]
         sort_orders <- sort_orders[match(sorted_columns, available_columns, nomatch = 0) > 0]
-        
+
         if (length(valid_indices) > 0) {
           order_list <- lapply(seq_along(valid_indices), function(i) {
             list(valid_indices[i], sort_orders[i])
@@ -551,39 +551,39 @@ prep_double_table_chunk <- function(tbl_list,
       } else {
         order_list <- NULL
       }
-      
+
       chunk <- c(
         sprintf("%s# %s\n", inner_lvl, metric),
         sprintf("```{r %s_%s_%s, echo = FALSE}\n%s \n```\n\n",
-                chunk_name, 
-                cell_line, 
-                metric, 
+                chunk_name,
+                cell_line,
+                metric,
                 paste0(
                   "DT::formatRound(",
-                  "generate_datatable(", 
-                  tbl_list_name, 
+                  "generate_datatable(",
+                  tbl_list_name,
                   "[[\"", cell_line, "\"]][[\"", metric, "\"]], ",
-                  "options = ", 
-                  paste0("list(scrollX = TRUE, dom = \"t\"", 
-                         if (!is.null(order_list)) paste0(", order = ", deparse(order_list)), 
-                         ")"), 
+                  "options = ",
+                  paste0("list(scrollX = TRUE, dom = \"t\"",
+                         if (!is.null(order_list)) paste0(", order = ", deparse(order_list)),
+                         ")"),
                   "), ",
-                  "columns = names(Filter(is.numeric, ", 
-                  tbl_list_name, 
-                  "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ", 
+                  "columns = names(Filter(is.numeric, ",
+                  tbl_list_name,
+                  "[[\"", cell_line, "\"]][[\"", metric, "\"]])), ",
                   "digits = 5)"
                 )
         )
       )
       knitr::knit_expand(text = chunk)
     })
-    
+
     c(knitr::knit_expand(text = header), unlist(item_chunks))
   })
 }
 
 #' Prepare markdown chunk with zoom link
-#' 
+#'
 #' Generate markdown code for html link item which when clicked opens plot in new browser.
 #' The function output should be wrapped in \code{knitr::knit()}.
 #'
@@ -593,17 +593,17 @@ prep_double_table_chunk <- function(tbl_list,
 #' @return string with html link code
 #'
 #' @keywords internal
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
-#' 
+#'
 #' @export
 create_zoom_link <- function(img_path,
                              link_txt = "Zoom In for Details") {
   checkmate::assert_string(img_path, na.ok = TRUE)
   checkmate::assert_string(link_txt)
-  
+
   if (is.na(img_path)) {
     ""
   } else {
@@ -613,7 +613,7 @@ create_zoom_link <- function(img_path,
 }
 
 #' Prepare markdown chunk with download link
-#' 
+#'
 #' Generate markdown code with a html link item that, when clicked, downloads a file.
 #' The function output should be wrapped in \code{knitr::knit()}.
 #'
@@ -623,17 +623,17 @@ create_zoom_link <- function(img_path,
 #' @return string with html download code
 #'
 #' @keywords internal
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
-#' 
+#'
 #' @export
 create_download_link <- function(dwn_path,
                                  link_txt = "Download Table") {
   checkmate::assert_string(dwn_path, na.ok = TRUE)
   checkmate::assert_string(link_txt)
-  
+
   if (is.na(dwn_path)) {
     ""
   } else {
@@ -644,19 +644,19 @@ create_download_link <- function(dwn_path,
 
 
 #' Prepare list of names or paths
-#' 
+#'
 #' This function can creates lists that can be used as an input to \code{\link{prep_plot_chunk}} -
-#' param \code{link_list} and \code{dwn_list}. 
+#' param \code{link_list} and \code{dwn_list}.
 #' Depending on the inputs, outputted string will have a format:
 #' \emph{<path_file><prefix><name of item on the list>}\strong{.}\emph{<file_format>}
 #' Note: An unnamed item in the list will be numbered.
 #'
 #' @inheritParams prep_plot_chunk
 #' @param prefix string to be added as prefix to the name of file
-#' @param path_file string path to directory, where data will be read from 
+#' @param path_file string path to directory, where data will be read from
 #' @param file_format string specifying the format of file
 #'
-#' @return list of strings describing names or paths depending on the input; the list is structured 
+#' @return list of strings describing names or paths depending on the input; the list is structured
 #' like the input \code{plt_list} and retains the same names as \code{plt_list}.
 #'
 #' @examples
@@ -666,7 +666,7 @@ create_download_link <- function(dwn_path,
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
 #'     ggplot2::geom_point(ggplot2::aes(x = Sepal.Length, y = Sepal.Width))
 #' })
-#' 
+#'
 #' prep_filename_path(plt_list = plotlist,
 #'                    prefix = "iris__",
 #'                    path_file = file.path(".", "plots"))
@@ -675,43 +675,43 @@ create_download_link <- function(dwn_path,
 #' nested_plotlist <- list()
 #' for (species in unique(iris$Species)) {
 #'   nested_plotlist[[species]] <- list()
-#'   nested_plotlist[[species]][["Sepal"]] <- 
+#'   nested_plotlist[[species]][["Sepal"]] <-
 #'     ggplot2::ggplot(iris[iris$Species == species, ],
 #'                     ggplot2::aes(x = Sepal.Length, y = Sepal.Width)) + ggplot2::geom_point()
-#'   nested_plotlist[[species]][["Petal"]] <- 
+#'   nested_plotlist[[species]][["Petal"]] <-
 #'     ggplot2::ggplot(iris[iris$Species == species, ],
 #'                     ggplot2::aes(x = Petal.Length, y = Petal.Width)) + ggplot2::geom_point()
 #' }
-#' 
-#' prep_filename_path(plt_list = nested_plotlist, 
+#'
+#' prep_filename_path(plt_list = nested_plotlist,
 #'                    file_format = "png")
 #' }
 #'
 #' @keywords internal
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @seealso \code{\link{prep_plot_chunk}}
-#' 
+#'
 #' @export
 prep_filename_path <- function(plt_list,
                                prefix = NULL,
                                path_file = NULL,
                                file_format = NULL) {
-  
+
   checkmate::assert_list(plt_list)
   checkmate::assert_string(prefix, null.ok = TRUE)
   checkmate::assert_string(path_file, null.ok = TRUE)
   checkmate::assert_string(file_format, null.ok = TRUE)
-  
+
   ls_file_name <- lapply(seq_along(plt_list), function(nm) {
     lvl1_name <- if (is.null(names(plt_list)[nm])) {
       nm
     } else {
       names(plt_list)[nm]
-    }    
+    }
     if (inherits(plt_list[[nm]], "list")) {
-      
+
       ls_nested <- lapply(seq_along(plt_list[[nm]]), function(i_nm) {
         lvl2_name <- if (is.null(names(plt_list[[nm]])[i_nm])) {
           i_nm
@@ -732,13 +732,13 @@ prep_filename_path <- function(plt_list,
           file.path(path_file, file_name)
         }
       })
-      
+
       if (is.null(names(plt_list[[nm]]))) {
         names(ls_nested) <- seq_along(plt_list[[nm]])
       } else {
         names(ls_nested) <- names(plt_list[[nm]])
       }
-      
+
       ls_nested
     } else {
       # file name
@@ -756,7 +756,7 @@ prep_filename_path <- function(plt_list,
       }
     }
   })
-  
+
   if (is.null(names(plt_list))) {
     names(ls_file_name) <- seq_along(plt_list)
   } else {
@@ -768,31 +768,31 @@ prep_filename_path <- function(plt_list,
 
 #' Generate a customized datatable
 #'
-#' This function creates a \code{DT::datatable} object with default settings for 
-#' horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}). 
-#' It supports input data of types \code{data.table} or \code{DFrame}. 
+#' This function creates a \code{DT::datatable} object with default settings for
+#' horizontal scrolling (\code{scrollX = TRUE}) and no table controls (\code{dom = "t"}).
+#' It supports input data of types \code{data.table} or \code{DFrame}.
 #' Additional options and arguments can be passed to customize the table further.
 #'
-#' @param tab A dataset to be displayed in the datatable. Must be of class 
+#' @param tab A dataset to be displayed in the datatable. Must be of class
 #'   \code{data.table} or \code{DFrame}.
-#' @param options A list of options to customize the DataTable. Defaults to 
-#'   \code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information 
+#' @param options A list of options to customize the DataTable. Defaults to
+#'   \code{list(scrollX = TRUE, dom = "ftip")} - to display the search box, the table itself, information
 #'   about the number of rows and pagination
 #' @param width A character string specifying the width of the table. Defaults to "100\%".
 #' @param col_to_round A character vector with the names of the columns whose values should be rounded.
 #' @param digits A numeric value indicating the number of decimal places to be used for rounding
 #' @param ... Additional arguments passed to \code{DT::datatable}.
-#' 
+#'
 #' @return A \code{DT::datatable} object.
 #' @examples
 #' generate_datatable(data.table::data.table(iris))
-#' 
+#'
 #' @keywords internal
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
-#' 
+#'
 #' @export
-generate_datatable <- function(tab, 
-                               options = list(scrollX = TRUE, dom = "ftip"), 
+generate_datatable <- function(tab,
+                               options = list(scrollX = TRUE, dom = "ftip"),
                                width = "100%",
                                col_to_round = NULL,
                                digits = 3,
@@ -807,13 +807,13 @@ generate_datatable <- function(tab,
   num_col <- names(tab)[vapply(names(tab), function(nm) is.numeric(tab[[nm]]), logical(1))]
   checkmate::assert_subset(col_to_round, choices = num_col)
   checkmate::assert_number(digits, lower = 0)
-  
+
   tab_fin <- data.table::copy(data.table::as.data.table(tab))
-  
+
   if (!is.null(col_to_round)) {
     tab_fin[, (col_to_round) := lapply(.SD, round, digits), .SDcols = col_to_round]
   }
-  
+
   DT::datatable(tab_fin, options = options, width = width, ...)
 }
 
@@ -822,41 +822,41 @@ generate_datatable <- function(tab,
 #' @param dir_path A string path to the directory containing files with associations data.
 #' @param ls_file A character vector with names of files containing associations data.
 #' @param alpha A numeric cutoff to identify statistically significant correlations
-#' @param n_stat_sig_row A numeric value specifying the maximum number of statistically 
+#' @param n_stat_sig_row A numeric value specifying the maximum number of statistically
 #'    significant associations (rows) to include from each file.
 #' @param read_file_fun A function to read the data from file; default is \code{readxl::read_excel}
-#' @param as_list A logical flag indicating whether the result should be returned 
+#' @param as_list A logical flag indicating whether the result should be returned
 #'    as a list or as a table.
 #'
 #' @return A \code{DT::datatable} object.
-#' 
+#'
 #' @keywords internal
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
+#'
 #' @export
-prep_assoc_summary <- function(dir_path, 
+prep_assoc_summary <- function(dir_path,
                                ls_file,
                                alpha = 0.05,
                                n_stat_sig_row = 10,
                                read_file_fun = readxl::read_excel,
                                as_list = FALSE) {
-  
+
   checkmate::assert_directory_exists(dir_path)
   checkmate::assert_character(ls_file)
   checkmate::assert_number(alpha, lower = 0, upper = 1, finite = TRUE)
   checkmate::assert_number(n_stat_sig_row, lower = 1)
   checkmate::assert_function(read_file_fun)
   checkmate::assert_flag(as_list)
-  
+
   if (NROW(ls_file) == 1 && nchar(ls_file) < 5) return(NULL)
-  
-  ls_stat_sig <- list() 
+
+  ls_stat_sig <- list()
   for (f_name in ls_file) {
     file_path <- file.path(dir_path, f_name)
     if (!checkmate::test_file_exists(file_path)) next
-    
+
     tab_ <- tryCatch(data.table::as.data.table(read_file_fun(file_path)),
-                     error = function(e) { 
+                     error = function(e) {
                        message(sprintf("An error occurred for file `%s`:\n%s",
                                        f_name, e))
                      })
@@ -864,16 +864,16 @@ prep_assoc_summary <- function(dir_path,
     if (!checkmate::test_names(names(tab_), must.include = c("rho", "q_value"))) next
     # order table
     tab_$abs_rho <- abs(tab_$rho)
-    tab_ <- data.table::setorderv(tab_, 
+    tab_ <- data.table::setorderv(tab_,
                                   cols = c("q_value", "abs_rho"), order = c(1L, -1L))[, abs_rho := NULL]
     if (!as_list) tab_[["src"]] <- f_name
     # subset of stat sig
     tab_subset <- tab_[q_value < alpha, ]
     tab_subset <- tab_subset[seq_len(min(NROW(tab_subset), n_stat_sig_row)), ]
-    
+
     ls_stat_sig[[f_name]] <- tab_subset
   }
-  
+
   if (as_list) {
     ls_stat_sig
   } else {

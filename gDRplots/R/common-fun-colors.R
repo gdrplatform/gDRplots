@@ -1,20 +1,20 @@
 #' Determine whether or not a color name is valid
-#' 
-#' A name of color is valid when either is a color name 
+#'
+#' A name of color is valid when either is a color name
 #' listed by \code{\link[grDevices:colors]{grDevices::colors}}
-#' or a hexadecimal string of the form \code{#rrggbb} 
-#' 
+#' or a hexadecimal string of the form \code{#rrggbb}
+#'
 #' @param col_name string representing a valid color
-#' 
+#'
 #' @keywords utils_color
 #' @return logical flag
-#' 
+#'
 #' @examples
 #' is_valid_color("darkblue")
 #' is_valid_color("#FF8C00")
 #' is_valid_color("#FF8C00DC")
 #' is_valid_color("RED")
-#' 
+#'
 #' @export
 is_valid_color <- function(col_name) {
   checkmate::assert_string(col_name)
@@ -27,16 +27,16 @@ is_valid_color <- function(col_name) {
 }
 
 #' get_iso_colors
-#' 
-#' 
+#'
+#'
 #' @param  normalization_type charvec normalization_types expected in the data
 #' @keywords utils_color
 #'
 #' @return named charvec with iso colors
-#' 
-#' @examples 
+#'
+#' @examples
 #' get_iso_colors()
-#' 
+#'
 #' @export
 get_iso_colors <-
   function(normalization_type = c("RV", "GR")) {
@@ -51,7 +51,7 @@ get_iso_colors <-
       },
       character(1)
       )
-    } else {              
+    } else {
       colors <- vapply(iso_cutoff, function(x) {
         color_vector <- c(70, round((1 - x * .85) * 170), round((1.1 - x * .85) * 232))
         assert_RGB_format(color_vector)
@@ -59,14 +59,14 @@ get_iso_colors <-
       },
       character(1)
       )
-    } 
+    }
     names(colors) <- iso_cutoff
     colors
   }
 
 #' Assert whether number may code color in rgb
 #'
-#' @param x numeric vector describing rgb color 
+#' @param x numeric vector describing rgb color
 #' @keywords internal
 #'
 #' @return \code{x} invisible, if the check is not successful throws an error message.
@@ -82,59 +82,59 @@ assert_RGB_format <- function(x) {
 #' @param n number of required colors
 #'
 #' @return vector with hex colors from qualitative palettes
-#' 
+#'
 #' @examples
 #' get_qual_colors()
 #' get_qual_colors(0)
 #' get_qual_colors(5)
 #' get_qual_colors(35)
-#' 
+#'
 #' @keywords utils_color
-#' 
+#'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#' 
-#' @export 
+#'
+#' @export
 get_qual_colors <- function(n = NULL) {
   checkmate::assert_int(n, null.ok = TRUE, lower = 0)
-  
+
   if (identical(n, 0)) return("#000000") # to nicely stop function without error in `rep`
-  
+
   # list of colors: qualitative and friendly for user with color vision deficiency
   qual_col_pals <- RColorBrewer::brewer.pal.info[
     RColorBrewer::brewer.pal.info$category == "qual" &
       RColorBrewer::brewer.pal.info$colorblind == TRUE, ]
   all_colors <- unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
-  
+
   if (is.null(n)) return(all_colors)
-  
+
   # make all_colors longer
   if (n > length(all_colors)) {
     ls_light <- colorspace::lighten(all_colors, 0.3)
     ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
     all_colors <- append(all_colors, values = c(ls_light, ls_dark))
   }
-  
+
   rep(all_colors, length.out = n)
 }
 
 
 #' Determine whether or not a color is dark
-#' 
+#'
 #' @param col_name string representing a valid color
-#' 
+#'
 #' @examples
 #' is_color_dark("blue")
 #' is_color_dark("red")
 #' is_color_dark("#000000")
-#' 
+#'
 #' @keywords utils_color
 #' @return logical flag
-#' 
+#'
 #' @export
 is_color_dark <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be a valid color name" = gDRplots::is_valid_color(col_name))
-  
+
   get_col_luminance(col_name) <= 0.22
 }
 
@@ -142,7 +142,7 @@ is_color_dark <- function(col_name) {
 #' Calculate the luminance of a color
 #'
 #' @param col_name string representing a valid color
-#' 
+#'
 #' @examples
 #' get_col_luminance("blue")
 #' get_col_luminance("red")
@@ -152,12 +152,12 @@ is_color_dark <- function(col_name) {
 #'
 #' @keywords utils_color
 #' @return single element numeric vector
-#' 
+#'
 #' @export
 get_col_luminance <- function(col_name) {
   checkmate::assert_string(col_name)
   stopifnot("Must be a valid color name" = gDRplots::is_valid_color(col_name))
-  
+
   colrgb <- grDevices::col2rgb(col_name)
   lum <- lapply(colrgb, function(x) {
     x <- x / 255

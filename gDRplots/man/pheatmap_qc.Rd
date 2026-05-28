@@ -35,7 +35,7 @@ or "x_std" (standard deviation)}
 \item{hm_title}{string plot title}
 
 \item{colors_vec}{character vector of colors (valid name or hex) used in heatmap
-note that for \code{metric} "x" the first color will be assigned to the min value, and 
+note that for \code{metric} "x" the first color will be assigned to the min value, and
 the last one - to the max; for "x_std" - that will be reversed}
 
 \item{no_breaks}{numeric number of breaks on scale used for mapping values to colors}
@@ -44,7 +44,7 @@ the last one - to the max; for "x_std" - that will be reversed}
 the dendrogram will not be shown for the matrix with any dimension greater than 200.}
 
 \item{distfun}{function used to compute the distance (dissimilarity) between rows;
-used for the dendrogram when \code{cluster_rows} is set to TRUE; 
+used for the dendrogram when \code{cluster_rows} is set to TRUE;
 the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{lbl_by_CellLineName}{logical flag whether heatmap should be described by CellLineNames instead of clid}

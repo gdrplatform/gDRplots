@@ -16,7 +16,7 @@ prep_hm_limits(
 
 \item{metric}{string name of the combo metric;
 one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
-"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
+"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
 ("Bliss Excess GR" or "Bliss Excess RV")}
 
 \item{normalization_type}{string with normalization_types to be selected

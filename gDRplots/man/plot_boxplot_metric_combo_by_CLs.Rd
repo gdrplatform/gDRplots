@@ -23,24 +23,24 @@ and combo \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 
-\item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+\item{grouped_flag}{a logical flag whether the boxplots should be grouped and
+colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"}
 and \code{drug_moa} - for \code{"DrugName"}}
 
 \item{colored_pts_flag}{a logical flag whether the points should be colored by grouped variable -
 for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
 and similarly vice versa}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
 for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 }
 \value{
-\code{ggplot} object containing boxplots for selected combo metric 
+\code{ggplot} object containing boxplots for selected combo metric
   grouped by cell line names
 }
 \description{

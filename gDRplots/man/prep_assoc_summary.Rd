@@ -20,12 +20,12 @@ prep_assoc_summary(
 
 \item{alpha}{A numeric cutoff to identify statistically significant correlations}
 
-\item{n_stat_sig_row}{A numeric value specifying the maximum number of statistically 
+\item{n_stat_sig_row}{A numeric value specifying the maximum number of statistically
 significant associations (rows) to include from each file.}
 
 \item{read_file_fun}{A function to read the data from file; default is \code{readxl::read_excel}}
 
-\item{as_list}{A logical flag indicating whether the result should be returned 
+\item{as_list}{A logical flag indicating whether the result should be returned
 as a list or as a table.}
 }
 \value{

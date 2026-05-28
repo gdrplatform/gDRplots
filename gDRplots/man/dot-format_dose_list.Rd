@@ -15,7 +15,7 @@
 A single \code{character} string with HTML line breaks.
 }
 \description{
-Helper function to create a formatted string of dose ranks and values 
+Helper function to create a formatted string of dose ranks and values
 for the plot legend, breaking lines based on `n_per_line`.
 }
 \author{

@@ -20,15 +20,15 @@ If a nested list is provided, the inner lists should also be named.}
 
 \item{chunk_name}{A character string specifying the base name for the generated code chunks. Avoid spaces.}
 
-\item{link_list}{A named list of links to the location (relative paths) where plots are saved, 
+\item{link_list}{A named list of links to the location (relative paths) where plots are saved,
 which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.}
 
-\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved, 
+\item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved,
 which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 
-\item{tabset_options}{A character vector of options for the tabset. This is only used 
+\item{tabset_options}{A character vector of options for the tabset. This is only used
 when \code{plt_list} is a nested list.
 Possible values are "unnumbered", "tabset", and "tabset-dropdown".}
 }

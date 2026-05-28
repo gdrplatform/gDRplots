@@ -15,7 +15,7 @@ prep_pheatmap_matrix(
 \arguments{
 \item{dt_response}{\code{data.table} representing data from the \code{Metrics} assay,
 outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
-and single-agent \code{SummarizedExperiment} or 
+and single-agent \code{SummarizedExperiment} or
 \code{data.table} representing data from the \code{scores} assay,
 outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 and combo \code{SummarizedExperiment}}
@@ -24,8 +24,8 @@ and combo \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
+"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
 but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
@@ -58,7 +58,7 @@ mat <- prep_pheatmap_matrix(dt_response = dt_scores,
                             metric = "hsa_score",
                             normalization_type = "RV",
                             experiment_type = gDRutils::get_supported_experiments("combo"))
-                            
+
 }
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}

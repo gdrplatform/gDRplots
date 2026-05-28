@@ -12,18 +12,18 @@ prep_dt_depmap_feat(
 )
 }
 \arguments{
-\item{feat_data_path}{string with path to the directory containing the molecular 
+\item{feat_data_path}{string with path to the directory containing the molecular
 feature set file to load from DepMap.}
 
 \item{meta_data_path}{string with path to metadata file describing all cancer models/cell lines
-which are referenced by a dataset contained within the DepMap portal. 
+which are referenced by a dataset contained within the DepMap portal.
 It is usually a file named \code{Model.csv}.}
 
 \item{feature_set}{string containing the name of the molecular feature set to load from DepMap.
-This name should also correspond to the file containing the feature data 
+This name should also correspond to the file containing the feature data
 (without the extension, which is assumed to be \code{csv})}
 
-\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot 
+\item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 }
 \value{

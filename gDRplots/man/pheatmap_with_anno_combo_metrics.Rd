@@ -28,15 +28,15 @@ outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_a
 Must contain \code{DrugName}, \code{DrugName_2}, \code{cotrt_value}, and \code{CellLineName}.}
 
 \item{dt_metrics_capped}{\code{data.table} representing data from the \code{"Metrics"} assay,
-the same as \code{dt_metrics} but with capped values with 
+the same as \code{dt_metrics} but with capped values with
 \code{\link[gDRutils:cap_assay_infinities]{gDRutils::cap_assay_infinities}}}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
-"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean"); 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
+"x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean");
 but the values from any numeric column can be displayed.}
 
 \item{fit_source}{string source name for metrics}
@@ -63,15 +63,15 @@ Each row defines the features for a specific column. The columns in the data and
 are matched using corresponding names from the required  \code{CellLineName} column.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
-\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
-track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
-without \code{DrugName} and column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with valid color name for 
+\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row}
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} -
+without \code{DrugName} and column names of \code{annotation_col} -
+without \code{CellLineName}), each list item is named vector with valid color name for
 each value described in \code{annotation_row} and in \code{annotation_col} - respectively.
 Not described elements will be colored in default.}
 
 \item{max_hm_lbl_length}{numeric value for the maximum number of characters in the label;
-if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
+if set to Inf, no trimming will be performed; for better readability, it is recommended to use
 the default number.}
 }
 \value{

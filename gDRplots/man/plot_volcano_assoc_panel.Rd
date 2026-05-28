@@ -12,27 +12,27 @@ plot_volcano_assoc_panel(
 )
 }
 \arguments{
-\item{dt_response}{\code{data.table} with the experimental response data (rows are samples) 
+\item{dt_response}{\code{data.table} with the experimental response data (rows are samples)
 for one metric outputted by one of functions: \code{\link{prep_dt_response_metric_sa}},
 \code{\link{prep_dt_response_dose_sa}}, \code{\link{prep_dt_response_scores}}
-or \code{\link{prep_dt_response_metric_diff}}, 
+or \code{\link{prep_dt_response_metric_diff}},
 must have at least a column with \code{CellLineName} and a numeric column with metric values.}
 
 \item{dt_depmap}{\code{data.table} with dependent variables data loaded from DepMap
 where rows are samples, columns are features/metadata levels;
-one of: data for one feature outputted by \code{\link{prep_dt_depmap_feat}} or data 
+one of: data for one feature outputted by \code{\link{prep_dt_depmap_feat}} or data
 or data for one metadata outputted by \code{\link{prep_dt_depmap_meta}}}
 
 \item{selected_metric}{string name of the metric in \code{dt_response}}
 
-\item{selected_feat_meta_col}{string with name of selected feature from \code{dt_depmap} or 
+\item{selected_feat_meta_col}{string with name of selected feature from \code{dt_depmap} or
 the name of the selected metadata from \code{dt_depmap} - respectively}
 }
 \value{
 A named list with elements:
 \itemize{
   \item \code{assoc_data} table with association data
-  \item \code{panel} \code{ggplot} object containing a panel with volcano plot and depending 
+  \item \code{panel} \code{ggplot} object containing a panel with volcano plot and depending
      on data type: a scatter plots with correlation for top 4 variables or boxplots for variable levels
 }
 }

@@ -31,7 +31,7 @@ and combo \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
@@ -55,7 +55,7 @@ the default is \code{\link{compute_distances}} using Spearman method.}
 
 \item{annotation_row}{\code{data.table} that specifies the annotations shown on left side of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2} 
+are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2}
 columns. Both columns are required.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
@@ -64,15 +64,15 @@ Each row defines the features for a specific column. The columns in the data and
 are matched using corresponding names from the required  \code{CellLineName} column.
 Note that color schemes takes into account if variable is continuous or discrete.}
 
-\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
-track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
-without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with a valid color name for 
+\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row}
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} -
+without \code{DrugName} and \code{DrugName_2}, and column names of \code{annotation_col} -
+without \code{CellLineName}), each list item is named vector with a valid color name for
 each value described in \code{annotation_row}) and in \code{annotation_col}) - respectively.
 Not described elements will be colored in default.}
 
 \item{max_hm_lbl_length}{numeric value for the maximum number of characters in the label;
-if set to Inf, no trimming will be performed; for better readability, it is recommended to use 
+if set to Inf, no trimming will be performed; for better readability, it is recommended to use
 the default number.}
 }
 \value{
@@ -134,7 +134,7 @@ output <- pheatmap_with_anno_combo(dt_scores = dt_scores,
                                      dataset_name = "Combo Matrix - combo data"))
 hm_2 <- output[["heatmap"]]
 ggpubr::as_ggplot(hm_2[["gtable"]])
-            
+
 }
 \seealso{
 \code{\link[pheatmap]{pheatmap}}

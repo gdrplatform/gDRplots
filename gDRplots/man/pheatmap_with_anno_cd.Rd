@@ -29,7 +29,7 @@ and co-dilution \code{SummarizedExperiment}}
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the metric;
-one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}), 
+one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
 "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")}
 
 \item{fit_source}{string source name for metrics}
@@ -51,10 +51,10 @@ the dendrogram will not be shown for the matrix with any dimension greater than 
 used for the dendrogram when \code{cluster_rows} or \code{cluster_cols} is set to TRUE
 the default is \code{\link{compute_distances}} using Spearman method.}
 
-\item{annotation_row}{\code{data.table} that specifies the annotations shown on the left side 
+\item{annotation_row}{\code{data.table} that specifies the annotations shown on the left side
 of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
-are matched using corresponding names from the required  \code{DrugName}, 
+are matched using corresponding names from the required  \code{DrugName},
 \code{DrugName_2} and \code{Concentration_2} columns.
 Note that color schemes takes into account if the variable is continuous or discrete.}
 
@@ -63,10 +63,10 @@ Each row defines the features for a specific column. The columns in the data and
 are matched using corresponding names from the required  \code{CellLineName} column.
 Note that color schemes takes into account if the variable is continuous or discrete.}
 
-\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row} 
-track colors manually; note list is named with annotation name (column names of \code{annotation_row} - 
-without \code{DrugName} and column names of \code{annotation_col} - 
-without \code{CellLineName}), each list item is named vector with valid color name for 
+\item{annotation_colors}{named list for specifying \code{annotation_col} and \code{annotation_row}
+track colors manually; note list is named with annotation name (column names of \code{annotation_row} -
+without \code{DrugName} and column names of \code{annotation_col} -
+without \code{CellLineName}), each list item is named vector with valid color name for
 each value described in \code{annotation_row} and in \code{annotation_col}, respectively.
 Not described elements will be colored by default.}
 }

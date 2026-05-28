@@ -35,7 +35,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{iso_levels}{character vector with isobologram levels to be selected}
 
-\item{colors_vec_iso}{character vector of colors (valid name or hex) used for the isolines; 
+\item{colors_vec_iso}{character vector of colors (valid name or hex) used for the isolines;
 the default is the dark red-orange palette}
 }
 \value{
@@ -59,13 +59,13 @@ plot_combination_index(dt_excess,
                        drug1_name, drug2_name,
                        cl_name,
                        normalization_type = "GR")
-                       
+
 plot_combination_index(dt_excess,
                        dt_isobolograms,
                        drug1_name, drug2_name,
                        cl_name,
-                       normalization_type = "RV",                       
-                       colors_vec_iso = c("darkblue", "darkcyan"))                       
+                       normalization_type = "RV",
+                       colors_vec_iso = c("darkblue", "darkcyan"))
 
 cl_name <- "cellline_JE"
 drug1_name <- "drug_011"

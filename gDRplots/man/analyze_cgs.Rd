@@ -23,10 +23,10 @@ and columns specified in the `metrics` argument.}
 \item{cl_name}{An optional string specifying a single cell line to analyze. If NULL (default),
 all cell lines in the data are analyzed. Should be NULL if \code{cellline1} and \code{cellline2} are provided.}
 
-\item{cellline1}{An optional string representing the first cell line name. 
+\item{cellline1}{An optional string representing the first cell line name.
 Should be specified alongside \code{cellline2}.}
 
-\item{cellline2}{An optional string representing the second cell line name. 
+\item{cellline2}{An optional string representing the second cell line name.
 Should be specified alongside \code{cellline1}.}
 
 \item{normalization_type}{A string with normalization types to be selected, one of:

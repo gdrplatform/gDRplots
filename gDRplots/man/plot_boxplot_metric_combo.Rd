@@ -21,31 +21,31 @@ outputted by \code{gDRutils::convert_se_assay_to_dt(se, "scores")}
 and combo \code{SummarizedExperiment}}
 
 \item{group_var}{string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"};
-for \code{group_var} set as \code{"DrugName"} points will be grouped by drug 
+for \code{group_var} set as \code{"DrugName"} points will be grouped by drug
 combinations \code{"DrugName"} x \code{"DrugName_2"}}
 
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively 
+one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
 depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
 
 \item{fit_source}{string source name for metrics}
 
-\item{grouped_flag}{a logical flag whether the boxplots should be grouped and 
-colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"} 
+\item{grouped_flag}{a logical flag whether the boxplots should be grouped and
+colored by \code{Tissue} for \code{group_var} set as \code{"CellLineName"}
 and \code{drug_moa} - for \code{"DrugName"}}
 
 \item{colored_pts_flag}{a logical flag whether the points should be colored by grouped variable -
 for \code{group_var} equal \code{"CellLineName"} points will be colored by \code{"DrugName"}
 and similarly vice versa}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots; 
+\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
 for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
 }
 \value{
-\code{ggplot} object containing boxplots for selected combo metric 
+\code{ggplot} object containing boxplots for selected combo metric
   grouped by \code{group_var}
 }
 \description{
@@ -62,7 +62,7 @@ plot_boxplot_metric_combo(dt_scores,
                           group_var = "DrugName")
 
 plot_boxplot_metric_combo(dt_scores,
-                          group_var = "DrugName", 
+                          group_var = "DrugName",
                           colored_pts_flag = TRUE,
                           colors_vec = "grey")
 

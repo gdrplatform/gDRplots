@@ -1,3 +1,6 @@
+## gDRplots 0.0.108 - 2026-05-27
+* apply updated gDRstyle rules
+
 ## gDRplots 0.0.107 - 2026-04-28
 * update author email address
 

@@ -39,13 +39,13 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
 \item{metric}{string name of the combo metric;
 one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
-"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess" 
+"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
 ("Bliss Excess GR" or "Bliss Excess RV")}
 
 \item{iso_levels}{character vector with  isobologram levels to be selected;
 when \code{NULL} - no isolines will be displayed}
 
-\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap; 
+\item{colors_vec}{character vector of colors (valid name or hex) used in heatmap;
 the default depends on \code{metric}: for "smooth" - the dark purple-light grey palette
 and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 
@@ -54,11 +54,11 @@ and for "hsa_excess" and "bliss_excess" - the blue-light grey-red color scale}
 \item{swap_axes}{logical flag whether to swap the axes with drugs of the heatmap}
 }
 \value{
-\code{ggplot} object containing panel with heatmaps for fitted values and reference data 
+\code{ggplot} object containing panel with heatmaps for fitted values and reference data
    for isobolograms for selected drug and co-drug by list of cell lines
 }
 \description{
-This function is dedicated to cases in which given cell lines are exposed to drugs of different concentrations 
+This function is dedicated to cases in which given cell lines are exposed to drugs of different concentrations
 and have almost no or no common values.
 }
 \examples{
@@ -84,7 +84,7 @@ heatmap_combo_with_isoref_panel_independent(dt_excess,
                                             drug1_name, drug2_name,
                                             cl_names,
                                             iso_levels = c("-0.25", "0.25"))
-                                            
+
 heatmap_combo_with_isoref_panel_independent(
   dt_excess,
   dt_isobolograms,

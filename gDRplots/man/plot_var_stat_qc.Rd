@@ -41,18 +41,18 @@ cl_name <- dt_metrics[["CellLineName"]][1]
 
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name)
-                         
+
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  metric = "r2",
                  normalization_type = "RV")
-                         
+
 plot_var_stat_qc(dt_assay = dt_metrics,
                  cl_name = cl_name,
                  metric = "x_AOC",
                  normalization_type = "RV",
                  with_table = TRUE)
-                         
+
 }
 \author{
 Bartosz Czech \email{czech.bartosz@external.gene.com}
