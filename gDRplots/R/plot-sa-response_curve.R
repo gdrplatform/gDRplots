@@ -197,7 +197,7 @@ plot_dose_response_sa <- function(dt_metrics,
 
     # prep value ranges for y-axis
     min_val <- min(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) - 0.05
-    max_val <- max(c(dt_avg$x, dt_fit$x, 0), na.rm = TRUE) + 0.05
+    max_val <- max(c(dt_avg$x, dt_fit$x, 0, 1), na.rm = TRUE) + 0.05
     data_range <- c(min_val, max_val)
 
     # prep color palette
