@@ -438,7 +438,7 @@ test_that("prep_dt_depmap_meta works as expected", {
   expect_error(prep_dt_depmap_meta(123),
                "Assertion on 'meta_data_path' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.qs2"),
-               "Assertion on 'File ext must be csv' failed: Must be TRUE")
+               "Assertion on 'File extension must be exactly '.csv' or '.csv.gz'")
   expect_error(prep_dt_depmap_meta("testdata/meta_data.csv"),
                "Assertion on 'meta_data_path' failed: File does not exist")
   expect_error(prep_dt_depmap_meta(test_meta_data_path, metadata_col = 123),
@@ -485,7 +485,7 @@ test_that("prep_dt_depmap_feat works as expected", {
                "Assertion on 'feat_data_path' failed: Must be of type 'string'")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = "testdata/meta_data.qs2"),
-               "Assertion on 'File ext must be csv' failed: Must be TRUE")
+               "Assertion on 'File extension must be exactly '.csv' or '.csv.gz'")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = "testdata/meta_data.csv"),
                "Assertion on 'meta_data_path' failed: File does not exist")
@@ -496,7 +496,11 @@ test_that("prep_dt_depmap_feat works as expected", {
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = test_meta_data_path,
                                    feature_set = "some_feat"),
-               "Assertion on 'feat_path' failed: File does not exist")
+               "Assertion on 'feature_set' failed: File does not exist")
+  expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
+                                   meta_data_path = test_meta_data_path,
+                                   feature_set = "./some_feat"),
+               "Assertion on 'Must contain only alphanumeric characters, underscores, ")
   expect_error(prep_dt_depmap_feat(feat_data_path = test_feat_data_path,
                                    meta_data_path = test_meta_data_path,
                                    with_decoding = "decode"),
