@@ -1,3 +1,6 @@
+## gDRplots 0.0.109 - 2026-06-05
+* update vignettes
+
 ## gDRplots 0.0.108 - 2026-05-27
 * apply updated gDRstyle rules
 
