@@ -427,7 +427,7 @@ Also, when using the gDR model, the same control might be performed for the corr
 
 Before running the gDR pipeline, data are imported using the gDRimport package. This package facilitates the loading of data from Envision, Tecan, and other technologies. More information about the supported technologies and examples of how to import data can be found in our documentation.
 
-The plot_plate_stack_info and plot_plate functions allow for visualizing the plate design of the experiment. The plot_plate_stack_info function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
+The `plot_plate_stack_info` and `plot_plate` functions allow for visualizing the plate design of the experiment. The `plot_plate_stack_info` function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
 
 
 ```{r plot_plate, warning = FALSE, message = FALSE, eval = FALSE}
@@ -578,43 +578,38 @@ plot_fitting_acc(dt_assay = dt_metrics_sa,
 
 ## Correlation between PRISM and DepMap
 
-The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot
-with associations between the molecular features or the metadata and readout of interest.
+### Volcano plot
 
-Note: It requires dedicated input calculated with `prep_dt_assoc` function.
+The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot with associations between the molecular features or the metadata and readout of interest.
 
-Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data.
+_Note_: It requires dedicated input calculated with `prep_dt_assoc` function.
 
-![](plot_volcano_feat.png)
+Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data (numerical feature or categorical feature, respectively).
 
+![](plot_volcano_feat_scatt.png)
+
+![](plot_volcano_feat_box.png)
 ![](plot_volcano_meta.png)
+
+### Scatter plots with correlations
 
 Users can explore more detailed correlation between one selected feature and selected metric using **plot_scatter_with_corr** function.
 
-Note: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
+_Note_: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
 
-Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation
-for list of the DepMap features.
 
-![](plot_scatter_with_corr.png)
+Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation for list of the DepMap features as a table.
+
+### Boxplots
 
 Users can explore more detailed distribution of selected metric for selected level of metadata using **plot_boxplot_num** function.
 
-Note: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
-
-Users can also use **plot_boxplot_num_panel** to get a panel with the box plot with category distribution
-for list of the DepMap matadata.
-
-![](plot_boxplot_num.png)
+Users can also use **plot_boxplot_num_panel** to get a panel with the box plot with category distribution for list of the DepMap matadata.
 
 Users can also explore more detailed distribution for all lveles of selected metadata and selected metric using **plot_boxplot_meta** function.
 
-![](plot_boxplot_meta.png)
-
-Note: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
+_Note_: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
 with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
-
-
 
 # SessionInfo {-}
 
