@@ -39,7 +39,7 @@ The `gDRplots` package supports the following metrics:
 
 1. input data
 
-All plot functions require as an input data.table representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). such format is provided by the `gDRutils::convert_se_assay_to_dt` function.
+All plot functions require as an input `data.table` representation of the data in selected assay with added information from `colData` created based on the gDR data model (MultiAssayExperiment). such format is provided by the `gDRutils::convert_se_assay_to_dt` function.
 
 More details about the gDR data model user can find in the [gDRcore](https://www.bioconductor.org/packages/release/bioc/html/gDRcore.html){target="_blank"} package.
 
@@ -57,6 +57,7 @@ There is a group of functions that return **a panel** with a group of basic plot
 
 Used data:
 
+* single-agent experiment
 ```{r sa_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 sa_name <- gDRutils::get_supported_experiments("sa")
@@ -64,13 +65,19 @@ se_sa <- mae[[sa_name]]
 
 dt_norm_sa <-
   gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name =  "Normalized")
+                                   assay_name =  "Normalized",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_metrics_sa <-
   gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Metrics")
+                                   assay_name = "Metrics",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_average_sa <-
   gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Averaged")
+                                   assay_name = "Averaged",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_metrics_sa_capped <-
  gDRutils::cap_assay_infinities(conc_assay_dt = dt_average_sa,
                                 assay_dt = dt_metrics_sa,
@@ -79,6 +86,7 @@ dt_metrics_sa_capped <-
                                 capping_fold = 5)
 ```
 
+* codilution experiment
 ```{r cd_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_codilution_small")
 cd_name <- gDRutils::get_supported_experiments("cd")
@@ -86,15 +94,22 @@ se_cd <- mae[[cd_name]]
 
 dt_norm_cd <-
   gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name =  "Normalized")
+                                   assay_name =  "Normalized",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_metrics_cd <-
   gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Metrics")
+                                   assay_name = "Metrics",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_average_cd <-
   gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Averaged")
+                                   assay_name = "Averaged",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 ```
 
+* combination experiment
 ```{r combo_data, warning = FALSE, message = FALSE}
 mae <- gDRutils::get_synthetic_data("combo_matrix")
 combo_name <- gDRutils::get_supported_experiments("combo")
@@ -102,23 +117,46 @@ se_combo <- mae[[combo_name]]
 
 dt_norm_combo <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name =  "Normalized")
+                                   assay_name =  "Normalized",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_metrics_combo <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Metrics")
+                                   assay_name = "Metrics",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_average_combo <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Averaged")
+                                   assay_name = "Averaged",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_scores <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "scores")
+                                   assay_name = "scores",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_excess <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "excess")
+                                   assay_name = "excess",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_isobolograms <-
   gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "isobolograms")
+                                   assay_name = "isobolograms",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 ```
+
+<br>
+
+::: {.chunk .alert .alert-warning}
+**TIP**<br>
+It is highly recommended to use `gDRutils::convert_se_assay_to_dt` with 
+`unify_metadata = TRUE` and `merge_additional_variables = TRUE`. This prevents 
+errors caused by non-unique combinations of values in the `DrugName` and 
+`CellLineName` columns.
+:::
+
 
 ## Dose Response Plots
 
@@ -182,6 +220,7 @@ ggpubr::as_ggplot(hm[["gtable"]])
 
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
+
 
 The **plot_boxplot_metric_sa_by_CLs** and **plot_boxplot_metric_sa_by_drugs** functions are dedicated to single-agent experiments to generate boxplots grouped by `CellLineName` or `DrugName`, respectively.
 
@@ -388,7 +427,7 @@ Also, when using the gDR model, the same control might be performed for the corr
 
 Before running the gDR pipeline, data are imported using the gDRimport package. This package facilitates the loading of data from Envision, Tecan, and other technologies. More information about the supported technologies and examples of how to import data can be found in our documentation.
 
-The plot_plate_stack_info and plot_plate functions allow for visualizing the plate design of the experiment. The plot_plate_stack_info function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
+The `plot_plate_stack_info` and `plot_plate` functions allow for visualizing the plate design of the experiment. The `plot_plate_stack_info` function shows all the plate information on a single plot, while the plot_plate function displays information for a single plate on the plot.
 
 
 ```{r plot_plate, warning = FALSE, message = FALSE, eval = FALSE}
@@ -430,20 +469,28 @@ It allows to visually check whether the raw data and the control are correct and
 ```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE}
 dt_treat <-
   gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "RawTreated")
+                                   assay_name = "RawTreated",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_controls <-
   gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "Controls")
+                                   assay_name = "Controls",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
 
 dt_treat <-
   gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "RawTreated")
+                                   assay_name = "RawTreated",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 dt_controls <-
   gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "Controls")
+                                   assay_name = "Controls",
+                                   unify_metadata = TRUE,
+                                   merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
@@ -531,43 +578,38 @@ plot_fitting_acc(dt_assay = dt_metrics_sa,
 
 ## Correlation between PRISM and DepMap
 
-The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot
-with associations between the molecular features or the metadata and readout of interest.
+### Volcano plot
 
-Note: It requires dedicated input calculated with `prep_dt_assoc` function.
+The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot with associations between the molecular features or the metadata and readout of interest.
 
-Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data.
+_Note_: It requires dedicated input calculated with `prep_dt_assoc` function.
 
-![](plot_volcano_feat.png)
+Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data (numerical feature or categorical feature, respectively).
 
+![](plot_volcano_feat_scatt.png)
+
+![](plot_volcano_feat_box.png)
 ![](plot_volcano_meta.png)
+
+### Scatter plots with correlations
 
 Users can explore more detailed correlation between one selected feature and selected metric using **plot_scatter_with_corr** function.
 
-Note: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
+_Note_: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
 
-Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation
-for list of the DepMap features.
 
-![](plot_scatter_with_corr.png)
+Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation for list of the DepMap features as a table.
+
+### Boxplots
 
 Users can explore more detailed distribution of selected metric for selected level of metadata using **plot_boxplot_num** function.
 
-Note: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
-
-Users can also use **plot_boxplot_num_panel** to get a panel with the box plot with category distribution
-for list of the DepMap matadata.
-
-![](plot_boxplot_num.png)
+Users can also use **plot_boxplot_num_panel** to get a panel with the box plot with category distribution for list of the DepMap matadata.
 
 Users can also explore more detailed distribution for all lveles of selected metadata and selected metric using **plot_boxplot_meta** function.
 
-![](plot_boxplot_meta.png)
-
-Note: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
+_Note_: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
 with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
-
-
 
 # SessionInfo {-}
 

@@ -415,10 +415,10 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #'  feature set file to load from DepMap.
 #' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal.
-#'  It is usually a file named \code{Model.csv}.
+#'  It is usually a file named \code{Model.csv} or \code{Model.csv.gz}.
 #' @param feature_set string containing the name of the molecular feature set to load from DepMap.
 #'  This name should also correspond to the file containing the feature data
-#'  (without the extension, which is assumed to be \code{csv})
+#'  (without the extension, which is assumed to be \code{csv} or \code{csv.gz})
 #' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 #'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
 #'
@@ -446,11 +446,15 @@ prep_dt_depmap_feat <- function(feat_data_path,
 
   checkmate::assert_string(feat_data_path)
   checkmate::assert_string(feature_set)
+  checkmate::assert_string(feature_set, pattern = "^[a-zA-Z0-9._-]+$",
+    .var.name = "Must contain only alphanumeric characters, underscores, hyphens, or dots.")
   checkmate::assert_flag(with_decoding)
-  feat_path <- file.path(feat_data_path, paste0(feature_set, ".csv"))
-  checkmate::assert_file_exists(feat_path)
+  ext <- ifelse(file.exists(file.path(feat_data_path, paste0(feature_set, ".csv"))), ".csv", ".csv.gz")
+  feat_path <- file.path(feat_data_path, paste0(feature_set, ext))
+  checkmate::assert_file_exists(feat_path, .var.name = "feature_set")
   checkmate::assert_string(meta_data_path)
-  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
+  checkmate::assert_true(grepl("\\.csv(\\.gz)?$", meta_data_path, ignore.case = TRUE),
+                         .var.name = "File extension must be exactly '.csv' or '.csv.gz'")
   checkmate::assert_file_exists(meta_data_path)
 
 
@@ -495,7 +499,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #'
 #' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal.
-#'  It is usually a file named \code{Model.csv}.
+#'  It is usually a file named \code{Model.csv}  or \code{Model.csv.gz}
 #' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
 #'
 #' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
@@ -516,7 +520,8 @@ prep_dt_depmap_meta <- function(meta_data_path,
                                 metadata_col = "PatientRace") {
 
   checkmate::assert_string(meta_data_path)
-  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
+  checkmate::assert_true(grepl("\\.csv(\\.gz)?$", meta_data_path, ignore.case = TRUE),
+                         .var.name = "File extension must be exactly '.csv' or '.csv.gz'")
   checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_string(metadata_col)
   dt_depmap_model <- data.table::fread(meta_data_path)

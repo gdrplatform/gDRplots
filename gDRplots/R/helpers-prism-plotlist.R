@@ -39,11 +39,11 @@
 #' @param fit_source string source name for metrics
 #' @param meta_data_path string path to metadata file describing all cancer models/cell lines
 #'  which are referenced by a dataset contained within the DepMap portal.
-#'  It is usually a file named \code{Model.csv}.
+#'  It is usually a file named \code{Model.csv} or \code{Model.csv.gz}.
 #' @param feat_data_path string path to the directory containing the molecular feature set file to load from DepMap.
 #' @param feature_sets character vector containing the names of the molecular feature sets to load from DepMap.
 #'  These names should also correspond to the file names containing the feature data
-#'  (without the extension, which is assumed to be \code{csv})
+#'  (without the extension, which is assumed to be \code{csv} or \code{csv.gz})
 #' @param metadata_columns character vector with the metadata columns to load for DepMap cell lines
 #' @param clear_taxonomy_info logical flag whether to remove taxonomy information for gene names in table
 #'  with the molecular feature sets from DepMap.
@@ -87,7 +87,8 @@
   checkmate::assert_subset(normalization_type_vec, choices = c("GR", "RV"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(meta_data_path)
-  checkmate::assert_true(tools::file_ext(meta_data_path) == "csv", .var.name = "File ext must be csv")
+  checkmate::assert_true(grepl("\\.csv(\\.gz)?$", meta_data_path, ignore.case = TRUE),
+                         .var.name = "File extension must be exactly '.csv' or '.csv.gz'")
   checkmate::assert_file_exists(meta_data_path)
   checkmate::assert_character(metadata_columns, null.ok = TRUE)
   checkmate::assert_string(feat_data_path, null.ok = TRUE)
@@ -135,7 +136,8 @@
   if (!is.null(feat_data_path) && !is.null(feature_sets)) {
     checkmate::assert_directory_exists(feat_data_path)
     feature_sets <- feature_sets[vapply(feature_sets, function(f) {
-      file.exists(file.path(feat_data_path, paste0(f, ".csv")))
+      any(file.exists(file.path(feat_data_path, paste0(f, ".csv")),
+                      file.path(feat_data_path, paste0(f, ".csv.gz"))))
     }, logical(1))]
     if (NROW(feature_sets) == 0) feature_sets <- NULL
   }

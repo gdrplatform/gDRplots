@@ -17,11 +17,11 @@ feature set file to load from DepMap.}
 
 \item{meta_data_path}{string with path to metadata file describing all cancer models/cell lines
 which are referenced by a dataset contained within the DepMap portal.
-It is usually a file named \code{Model.csv}.}
+It is usually a file named \code{Model.csv} or \code{Model.csv.gz}.}
 
 \item{feature_set}{string containing the name of the molecular feature set to load from DepMap.
 This name should also correspond to the file containing the feature data
-(without the extension, which is assumed to be \code{csv})}
+(without the extension, which is assumed to be \code{csv} or \code{csv.gz})}
 
 \item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}

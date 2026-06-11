@@ -63,13 +63,13 @@ depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bli
 
 \item{meta_data_path}{string path to metadata file describing all cancer models/cell lines
 which are referenced by a dataset contained within the DepMap portal.
-It is usually a file named \code{Model.csv}.}
+It is usually a file named \code{Model.csv} or \code{Model.csv.gz}.}
 
 \item{feat_data_path}{string path to the directory containing the molecular feature set file to load from DepMap.}
 
 \item{feature_sets}{character vector containing the names of the molecular feature sets to load from DepMap.
 These names should also correspond to the file names containing the feature data
-(without the extension, which is assumed to be \code{csv})}
+(without the extension, which is assumed to be \code{csv} or \code{csv.gz})}
 
 \item{metadata_columns}{character vector with the metadata columns to load for DepMap cell lines}
 
