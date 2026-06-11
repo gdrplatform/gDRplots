@@ -1,0 +1,155 @@
+# Plot box plots for metric for single-agent data grouped by selected variable
+
+Plot box plots for metric for single-agent data grouped by selected
+variable
+
+## Usage
+
+``` r
+plot_boxplot_metric_sa_by_grp(
+  dt_metrics,
+  selection_var,
+  selection_name,
+  group_var,
+  group_names = NULL,
+  normalization_type = "GR",
+  metric = "xc50",
+  fit_source = "gDR",
+  named_n = 5,
+  named_n_mode = "bottom",
+  grouped_flag = FALSE,
+  colors_vec = NULL,
+  with_inf = FALSE
+)
+```
+
+## Arguments
+
+- dt_metrics:
+
+  data.table representing data from the `Metrics` assay, outputted by
+  `gDRutils::convert_se_assay_to_dt(se, "Metrics")` and single-agent
+  `SummarizedExperiment`
+
+- selection_var:
+
+  string name of selected main variable - one value from column
+  `"CellLineName"` or `"DrugName"`
+
+- selection_name:
+
+  string name of selected variable value from column `selection_var` to
+  filter data for plotting
+
+- group_var:
+
+  string name of group variable; should to be not numeric variable from
+  `dt_metrics` different than `selection_var` and not containing unique
+  values for each row
+
+- group_names:
+
+  character vector with names to subset from column `group_var`; if
+  `NULL` then all values will be plotted
+
+- normalization_type:
+
+  string with normalization types to be selected one of: "GR"
+  ("GRvalue") or "RV" ("RelativeViability")
+
+- metric:
+
+  string name of the metric; one of: "xc50" ("GR50" or "IC50" -
+  respectively depending on `normalization_type`), "x_max" ("GR Max" or
+  "E Max") or "x_mean" ("GR Mean" or "RV Mean"), but the values from any
+  numeric column can be displayed
+
+- fit_source:
+
+  string source name for metrics
+
+- named_n:
+
+  number of points to label based on the highest or lowest `metric`
+  values; if `group_var` is `"DrugName"`, points are labeled by
+  `"CellLineName"` and similarly vice versa
+
+- named_n_mode:
+
+  string determines whether the labels are applied to the highest or
+  lowest values of `metric`; one of: `"top"` or `"bottom"`
+
+- grouped_flag:
+
+  logical flag whether the boxplots should be colored by `group_var`
+
+- colors_vec:
+
+  character vector with colors (name or hex value) to color boxplots;
+  for `grouped_flag` set as `FALSE` only first from vector will be used
+
+- with_inf:
+
+  a logical flag indicating whether infinite values should be shown on
+  boxplots
+
+## Value
+
+`ggplot` object containing boxplots for selected single-agent metric
+grouped by selected variable
+
+## Author
+
+Janina Smoła <janina.smola@contractors.roche.com>
+
+## Examples
+
+``` r
+mae <- gDRutils::get_synthetic_data("combo_matrix")
+se <- mae[[gDRutils::get_supported_experiments("sa")]]
+
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w",
+                                                         "tissue_w",
+                                                         "tissue_other")])
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue")
+
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue_grp")
+
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              with_inf = TRUE)
+
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              named_n = 0)
+
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              grouped_flag = TRUE)
+
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue",
+                              colors_vec = c("darkblue", "deeppink"))
+
+```
