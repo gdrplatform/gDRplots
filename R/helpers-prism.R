@@ -1,0 +1,749 @@
+#' Prep table with metric values for single-agent experiment
+#'
+#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
+#'  and single-agent \code{SummarizedExperiment}
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param normalization_type string with normalization types to be selected
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
+#'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
+#' @param fit_source string source name for metrics
+#'
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @keywords prism_plots
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#' d_name <- "drug_004"
+#' dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
+#' dt_response <-
+#'   prep_dt_response_metric_sa(dt_metrics, d_name,
+#'                              metric = c("xc50", "x_mean", "x_max"))
+#'
+#' dt_averaged <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                 assay_name = "Averaged")
+#' dt_metrics_capped <-
+#'   gDRutils::cap_assay_infinities(conc_assay_dt = dt_averaged,
+#'                                  assay_dt = dt_metrics,
+#'                                  experiment_name = gDRutils::get_supported_experiments("sa"),
+#'                                  capping_fold = 5)
+#' d_name <- "drug_026"
+#' dt_response <- prep_dt_response_metric_sa(dt_metrics, d_name)
+#' dt_response <-
+#'   prep_dt_response_metric_sa(dt_metrics, d_name,
+#'                              metric = c("xc50", "x_mean", "x_max"))
+#'
+#' @export
+prep_dt_response_metric_sa <- function(dt_metrics,
+                                       d_name,
+                                       normalization_type = "RV",
+                                       metric = "xc50",
+                                       fit_source = "gDR") {
+
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(metric, any.missing = FALSE)
+  checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_response_metric <- dt_metrics[eval(filter_expr)]
+
+  # select required drug
+  dt_response_metric <- dt_response_metric[get(drug_name) == d_name, ]
+
+  # final
+  meta_col <- c("rId", "cId", cellline_name)
+  dt_response_metric <- dt_response_metric[, c(meta_col, metric), with = FALSE]
+
+  # for xc50 - metric should be in log10 scale
+  if (any(metric == "xc50")) {
+    dt_response_metric[["xc50"]] <- purrr::quietly(log10)(dt_response_metric[["xc50"]])$result
+  }
+  data.table::setnames(
+    dt_response_metric,
+    old = metric,
+    new = sprintf("%s_%s_%s", normalization_type, fit_source,
+                  ifelse(metric == "xc50", "log10_xc50", metric)))
+  dt_response_metric
+}
+
+#' Prep table with metric values by doses for single-agent experiment
+#'
+#' @param dt_average  \code{data.table} representing data from the \code{Averaged} assay,
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
+#'  and \code{SummarizedExperiment} with chosen data type: single-agent or combo
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param normalization_type string with normalization types to be selected
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "x" (value of "GR" or "RV" itself - respectively depending on \code{normalization_type}),
+#'  or "x_std" (standard deviation)
+#' @param fit_source string source name for metrics
+#'
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @keywords prism_plots
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Averaged")
+#' d_name <- "drug_004"
+#' dt_response <- prep_dt_response_dose_sa(dt_average, d_name)
+#'
+#' @export
+prep_dt_response_dose_sa <- function(dt_average,
+                                     d_name,
+                                     normalization_type = "RV",
+                                     metric = "x",
+                                     fit_source = "gDR") {
+  # TODO add ls_conc -> user can select conc
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  conc <- gDRutils::get_env_identifiers("concentration")
+
+  checkmate::assert_data_table(dt_average)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_choice(metric, choices = c("x", "x_std"))
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_response_dose <- dt_average[eval(filter_expr)]
+
+  # select required drug
+  dt_response_dose <- dt_response_dose[get(drug_name) == d_name, ]
+
+  dt_response_dose_fin <- data.table::dcast(
+    data = dt_response_dose,
+    formula = get(cellline_name) ~ get(conc),
+    value.var = metric,
+    fill = NA
+  )
+  data.table::setkey(dt_response_dose_fin, NULL)
+  ls_conc <- names(dt_response_dose_fin)[names(dt_response_dose_fin) != "cellline_name"]
+  data.table::setnames(
+    dt_response_dose_fin,
+    old = names(dt_response_dose_fin),
+    new = c(cellline_name, sprintf("%s_%s_%s_%s", normalization_type, fit_source, metric, ls_conc)))
+
+  # final
+  meta_col <- c("rId", "cId", cellline_name)
+  dt_response_dose_fin <-
+    unique(dt_response_dose[, meta_col, with = FALSE])[dt_response_dose_fin, on = cellline_name]
+  dt_response_dose_fin
+}
+
+#' Prep table with metric values for combination experiment
+#'
+#' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
+#'  and combo \code{SummarizedExperiment}
+#' @param d_name string with drug name to be plotted (identifiers \code{DrugName})
+#' @param d_name2 string with drug name to be plotted (identifiers \code{DrugName_2})
+#' @param normalization_type string with normalization types to be selected
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the combo metric;
+#'  one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
+#'  depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param fit_source string source name for metrics
+#'
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @keywords prism_plots
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_scores <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                               assay_name = "scores")
+#' d_name <- "drug_004"
+#' d_name2 <- "drug_026"
+#' dt_response <- prep_dt_response_scores(dt_scores, d_name, d_name2)
+#' dt_response <-
+#'   prep_dt_response_scores(dt_scores, d_name, d_name2,
+#'                           metric = c("hsa_score", "bliss_score"))
+#'
+#' @export
+prep_dt_response_scores <- function(dt_scores,
+                                    d_name,
+                                    d_name2,
+                                    normalization_type = "RV",
+                                    metric = "hsa_score",
+                                    fit_source = "gDR") {
+
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+
+  checkmate::assert_data_table(dt_scores)
+  checkmate::assert_string(d_name)
+  checkmate::assert_choice(d_name, choices = dt_scores[[drug_name]])
+  checkmate::assert_string(d_name2)
+  checkmate::assert_choice(d_name2, choices = dt_scores[[drug_name_2]])
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(metric, any.missing = FALSE)
+  checkmate::assert_subset(metric, choices = c("hsa_score", "bliss_score"), empty.ok = FALSE)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_response_scores <- dt_scores[eval(filter_expr)]
+
+  # select required drugs combination
+  dt_response_scores <- dt_response_scores[get(drug_name) == d_name & get(drug_name_2) == d_name2, ]
+
+  # final
+  meta_col <- c("rId", "cId", cellline_name)
+  dt_response_scores <- dt_response_scores[, c(meta_col, metric), with = FALSE]
+  data.table::setnames(dt_response_scores, old = metric,
+                       new = sprintf("%s_%s_%s", normalization_type, fit_source, metric))
+}
+
+
+#' Prep table with metric values for combination experiment
+#'
+#' @param dt_metrics \code{data.table} representing data from the \code{Metrics} assay,
+#'  outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
+#'  and combo \code{SummarizedExperiment}
+#' @param d_name string representing the drug name to be plotted (identifier \code{DrugName}).
+#'  If set to NULL, the function will return a table for all available DrugName
+#' @param d_name2 string representing the drug name to be plotted (identifier \code{DrugName_2}).
+#'  If set to NULL, the function will return a table for all available DrugName_2
+#' @param cellline1 string representing the first cell line name.
+#'  If set to NULL, the function will return a table for all available cell lines.
+#' @param cellline2 string representing the second cell line name.
+#'  If set to NULL, the function will return a table for all available cell lines.
+#' @param normalization_type string with normalization types to be selected
+#'  one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
+#' @param metric string name of the metric;
+#'  one of: "xc50" ("GR50" or "IC50" - respectively depending on \code{normalization_type}),
+#'  "x_max" ("GR Max" or "E Max"), "x_mean" ("GR Mean" or "RV Mean") "ec50" ("GEC50" or "EC50")
+#'  or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")
+#' @param fit_source string source name for metrics
+#' @param additional_cols character vector with additional cols that should be included in the output
+#'
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @keywords prism_plots
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("combo_matrix_small")
+#' se <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
+#'                                                assay_name = "Metrics")
+#' d_name <- "drug_004"
+#' d_name2 <- "drug_026"
+#' dt_response <-
+#'   prep_dt_response_metric_diff(dt_metrics, d_name, d_name2,
+#'   metric = c("xc50", "x_mean", "x_max"))
+#'
+#' cellline1 <- "cellline_GB"
+#' cellline2 <- "cellline_HB"
+#'
+#' dt_response <-
+#'   prep_dt_response_metric_diff(dt_metrics, d_name = NULL, d_name2 = NULL,
+#'   cellline1, cellline2,
+#'   metric = c("xc50", "x_mean", "x_max"))
+#'
+#' @export
+prep_dt_response_metric_diff <- function(dt_metrics,
+                                         d_name,
+                                         d_name2,
+                                         cellline1 = NULL,
+                                         cellline2 = NULL,
+                                         normalization_type = "RV",
+                                         metric = "xc50",
+                                         fit_source = "gDR",
+                                         additional_cols = NULL) {
+
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
+  drug_moa <- gDRutils::get_env_identifiers("drug_moa")
+  drug_moa_2 <- gDRutils::get_env_identifiers("drug_moa2")
+  gnumber <- gDRutils::get_env_identifiers("drug")
+  gnumber_2 <- gDRutils::get_env_identifiers("drug2")
+
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+
+  checkmate::assert_data_table(dt_metrics)
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  checkmate::assert_character(metric, any.missing = FALSE)
+  checkmate::assert_subset(metric, choices = c("x_mean", "x_AOC_range", "xc50", "ec50", "x_max"), empty.ok = FALSE)
+  checkmate::assert_string(fit_source, null.ok = TRUE)
+  checkmate::assert_choice(additional_cols, choices = names(dt_metrics), null.ok = TRUE)
+
+  if (!is.null(d_name)) {
+    checkmate::assert_string(d_name)
+    checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  }
+
+  if (!is.null(d_name2)) {
+    checkmate::assert_string(d_name2)
+    checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+  }
+
+  if (!is.null(cellline1)) {
+    checkmate::assert_string(cellline1)
+    checkmate::assert_choice(cellline1, choices = dt_metrics[[cellline_name]])
+  }
+
+  if (!is.null(cellline2)) {
+    checkmate::assert_string(cellline2)
+    checkmate::assert_choice(cellline2, choices = dt_metrics[[cellline_name]])
+  }
+
+  # select data for normalization type
+  filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
+                            list(norm_type = normalization_type, fit_src = fit_source))
+  dt_response_metric <- dt_metrics[eval(filter_expr)]
+
+  # select required drugs combination if specified
+  if (!is.null(d_name)) {
+    dt_response_metric <- dt_response_metric[get(drug_name) == d_name]
+  }
+
+  if (!is.null(d_name2)) {
+    dt_response_metric <- dt_response_metric[get(drug_name_2) == d_name2]
+  }
+
+  # select required cell lines if specified
+  if (!is.null(cellline1) && !is.null(cellline2)) {
+    dt_cellline_1 <- dt_response_metric[get(cellline_name) == cellline1]
+    dt_cellline_2 <- dt_response_metric[get(cellline_name) == cellline2]
+
+    # Calculate difference between cell lines
+    dt_cellline_diff <- merge(dt_cellline_1, dt_cellline_2,
+                              by = intersect(names(dt_response_metric),
+                                             c("dilution_drug", "cotrt_value", "ratio",
+                                               drug_name, drug_moa, gnumber,
+                                               drug_name_2, drug_moa_2, gnumber_2)),
+                              suffixes = c("_c1", "_c2"))
+    for (m in metric) {
+      dt_cellline_diff[, paste0(m, "_cellline_diff") := {
+        c1_value <- get(paste0(m, "_c1"))
+        c2_value <- get(paste0(m, "_c2"))
+
+        if (is.numeric(c1_value) && is.numeric(c2_value)) {
+          c1_value - c2_value
+        } else {
+          NA
+        }
+      }]
+    }
+    return(dt_cellline_diff[dt_cellline_diff$cotrt_value != 0,
+                            c(drug_name, drug_moa,
+                              drug_name_2, drug_moa_2,
+                              paste0(cellline_name, "_", c("c1", "c2")),
+                              paste0(metric, "_cellline_diff")), with = FALSE])
+  }
+
+  # for xc50 - metric should be in log10 scale
+  if (any(metric == "xc50")) {
+    dt_response_metric[["xc50"]] <- purrr::quietly(log10)(dt_response_metric[["xc50"]])$result
+  }
+
+  # create entries of non-zero co-trt
+  meta_col <- c("rId", "cId", cellline_name, drug_name, drug_name_2, additional_cols)
+  ls_cols <- c(meta_col, "cotrt_value", "dilution_drug", metric)
+  dt_non_zero <- data.table::copy(dt_response_metric)[cotrt_value != 0, .SD, .SDcols = ls_cols]
+  data.table::setnames(dt_non_zero, metric, paste0(metric, "_cotrt"))
+
+  # create entries of zero co-trt (single agent)
+  dt_zero <- data.table::copy(dt_response_metric)[cotrt_value == 0, .SD, .SDcols = ls_cols]
+  data.table::setnames(dt_zero,
+                       old = c("cotrt_value", metric),
+                       new = c("cotrt_value_zero", paste0(metric, "_cotrt_zero")))
+
+  # merge zero and non zero
+  dt_combo_merged <- dt_zero[dt_non_zero, on = c(meta_col, "dilution_drug"), nomatch = NULL]
+  dt_combo_merged[, cotrt_value_zero := NULL]
+
+  # calculate differences
+  dt_combo_diff <-
+    dt_combo_merged[, (paste0(metric, "_cotrt_diff")) := Map("-",
+                                                             mget(paste0(metric, "_cotrt")),
+                                                             mget(paste0(metric, "_cotrt_zero")))]
+  ls_col_met <-
+    colnames(dt_combo_diff)[!colnames(dt_combo_diff) %in% c(meta_col, "cotrt_value", "dilution_drug")]
+  ls_col_met_fin <- sprintf("%s_%s_%s", normalization_type, fit_source, ls_col_met)
+  data.table::setnames(dt_combo_diff, ls_col_met, ls_col_met_fin)
+
+  # concatenate meta_col into a single string with "+"
+  meta_col_str <- paste(meta_col, collapse = " + ")
+
+  # generate the formula using reformulate
+  dcast_formula <- stats::reformulate(c("cotrt_value", "dilution_drug"), response = meta_col_str)
+
+  dt_combo_diff <- data.table::dcast(
+    data = dt_combo_diff,
+    formula = dcast_formula,
+    value.var = ls_col_met_fin)
+  data.table::setkey(dt_combo_diff, NULL)
+
+  # change name fo xc50 to inform about log10
+  if (any(metric == "xc50")) {
+    xc50_col <- grep("xc50", names(dt_combo_diff))
+    new_xc50_names <- vapply(names(dt_combo_diff)[xc50_col],
+                             function(i) gsub("xc50", "log10_xc50", i), character(1), USE.NAMES = FALSE)
+    data.table::setnames(dt_combo_diff,
+                         old = names(dt_combo_diff)[xc50_col],
+                         new = new_xc50_names)
+  }
+
+  dt_combo_diff
+}
+
+#' Load DepMap merged data for one selected feature
+#'
+#' @param feat_data_path string with path to the directory containing the molecular
+#'  feature set file to load from DepMap.
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal.
+#'  It is usually a file named \code{Model.csv} or \code{Model.csv.gz}.
+#' @param feature_set string containing the name of the molecular feature set to load from DepMap.
+#'  This name should also correspond to the file containing the feature data
+#'  (without the extension, which is assumed to be \code{csv} or \code{csv.gz})
+#' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
+#'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
+#'
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
+#' \itemize{
+#'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),.
+#'   \item \code{selected_feat_meta_col} string name of feature.
+#' }
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' feat_data_path <- file.path(".", "depmapdata")
+#' meta_data_path <- file.path(".", "Model.csv")
+#' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
+#'                                       meta_data_path = meta_data_path)
+#' }
+#' @export
+prep_dt_depmap_feat <- function(feat_data_path,
+                                meta_data_path,
+                                feature_set = "CRISPRGeneEffect",
+                                with_decoding = FALSE
+) {
+
+  checkmate::assert_string(feat_data_path)
+  checkmate::assert_string(feature_set)
+  checkmate::assert_string(feature_set, pattern = "^[a-zA-Z0-9._-]+$",
+    .var.name = "Must contain only alphanumeric characters, underscores, hyphens, or dots.")
+  checkmate::assert_flag(with_decoding)
+  ext <- ifelse(file.exists(file.path(feat_data_path, paste0(feature_set, ".csv"))), ".csv", ".csv.gz")
+  feat_path <- file.path(feat_data_path, paste0(feature_set, ext))
+  checkmate::assert_file_exists(feat_path, .var.name = "feature_set")
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(grepl("\\.csv(\\.gz)?$", meta_data_path, ignore.case = TRUE),
+                         .var.name = "File extension must be exactly '.csv' or '.csv.gz'")
+  checkmate::assert_file_exists(meta_data_path)
+
+
+  # check whether feature is supported
+  dt_feat_2row <- data.table::fread(feat_path, nrows = 2, select = 1)
+  # assumption: first column is a key; supported is ModelId with pattern "ACH-[0-9]{6}"
+  supported_feature_condition <- grepl("ACH-[0-9]{6}", dt_feat_2row[1, 1])
+  dt_feat_2row <- NULL
+
+  # prep dt_depmap
+  if (supported_feature_condition) {
+    dt_feat_raw <- data.table::fread(feat_path)
+    # make proper naming
+    if (names(dt_feat_raw)[1] != "ModelID") {
+      data.table::setnames(dt_feat_raw,
+                           old = names(dt_feat_raw)[1], new = "ModelID")
+    }
+    # dict
+    dict_id <- prep_dt_depmap_meta(meta_data_path = meta_data_path,
+                                   metadata_col = "ModelID")[["dt_depmap"]]
+    dt_depmap <- dict_id[dt_feat_raw, on = "ModelID", nomatch = NULL]
+
+    # decoding
+    if (feature_set == "OmicsArmLevelCNA" && with_decoding) {
+      dt_depmap <- .prep_dt_OmicsArmLevelCNA(dt_depmap)
+    }
+    if (feature_set %in% c("OmicsSomaticMutationsMatrixHotspot",
+                           "OmicsSomaticMutationsMatrixDamaging") && with_decoding) {
+      dt_depmap <- .prep_dt_OmicsSomaticMutationsMatrix(dt_depmap)
+    }
+  } else {
+    message(sprintf("The `%s` feature is not supported.", feature_set))
+    dt_depmap <- NULL
+  }
+
+  return(list(dt_depmap = dt_depmap,
+              selected_feat_meta_col = feature_set))
+}
+
+
+#' Load DepMap merged data for one selected metadata
+#'
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
+#'  which are referenced by a dataset contained within the DepMap portal.
+#'  It is usually a file named \code{Model.csv}  or \code{Model.csv.gz}
+#' @param meta_data_path string with path to metadata file describing all cancer models/cell lines
+#'
+#' @return A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
+#' \itemize{
+#'   \item \code{dt_depmap} \code{data.table} with feature data from DepMap (wide format),
+#'   \item \code{selected_feat_meta_col} string name of metadata column.
+#' }
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' meta_data_path <- file.path(".", "Model.csv")
+#' dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
+#' }
+#' @export
+prep_dt_depmap_meta <- function(meta_data_path,
+                                metadata_col = "PatientRace") {
+
+  checkmate::assert_string(meta_data_path)
+  checkmate::assert_true(grepl("\\.csv(\\.gz)?$", meta_data_path, ignore.case = TRUE),
+                         .var.name = "File extension must be exactly '.csv' or '.csv.gz'")
+  checkmate::assert_file_exists(meta_data_path)
+  checkmate::assert_string(metadata_col)
+  dt_depmap_model <- data.table::fread(meta_data_path)
+
+  id_col <- c("ModelID", "CCLEName")
+  checkmate::assert_subset(c(id_col, metadata_col), choices = names(dt_depmap_model))
+
+  # subset
+  dt_depmap_model <- dt_depmap_model[, .SD, .SDcols = unique(c(id_col, metadata_col))]
+
+  if (metadata_col %in% id_col) {
+    dt_depmap <- dt_depmap_model
+  } else {
+    # prep meta column
+    if (is.numeric(dt_depmap_model[[metadata_col]]) ||
+        is.logical(dt_depmap_model[[metadata_col]]) ||
+        is.factor(dt_depmap_model[[metadata_col]])) {
+      dt_depmap_model[[metadata_col]] <- as.character(dt_depmap_model[[metadata_col]])
+    }
+    # character: consistent data (NA -> "NA" & "" -> "NA")
+    dt_depmap_model[, (metadata_col) := lapply(.SD, change_NA_into_char), .SDcols = metadata_col]
+    dt_depmap_model[, (metadata_col) := lapply(.SD, function(i) ifelse(i == "", "NA", i)), .SDcols = metadata_col]
+    # final
+    formula_object <- stats::reformulate(termlabels = metadata_col, response = paste(id_col, collapse = "+"))
+    dt_depmap <- data.table::dcast(
+      dt_depmap_model,
+      formula = formula_object,
+      fun.aggregate = length
+    )
+  }
+  data.table::setkey(dt_depmap, NULL)
+
+  return(list(dt_depmap = dt_depmap,
+              selected_feat_meta_col = metadata_col))
+}
+
+
+#' Prep table with calculated linear associations
+#'
+#' @param dt_response \code{data.table} with experimental response data (rows are samples) for one metric
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} or
+#'   \code{\link{prep_dt_depmap_meta}}
+#' @param selected_feat_meta_col string name of feature/meta column in DepMap
+#'
+#' @return A named list with elements, that may be input to \code{\link{plot_volcano_assoc}}
+#' \itemize{
+#'   \item \code{dt_assoc} \code{data.table} with calculated association values between
+#'      feature/meta of DepMap and selected metric,
+#'   \item \code{condition_info} string describing experiment condition (drugs),
+#'   \item \code{selected_feat_meta_col} string name of feature/meta.
+#' }
+#'
+#' @keywords prism_plots
+#'
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @export
+prep_dt_assoc <- function(dt_response,
+                          dt_depmap,
+                          selected_feat_meta_col = NULL) {
+
+  checkmate::assert_data_table(dt_response)
+  checkmate::assert_data_table(dt_depmap)
+  checkmate::assert_names(names(dt_depmap), must.include = "CCLEName")
+  checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
+
+  drug_name <- gDRutils::get_env_identifiers("drug_name")
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+
+  # checking input format
+  selected_metric <- setdiff(names(dt_response), c("rId", "cId", cellline_name))
+  stopifnot("Provide `dt_response` for one metric only." = NROW(selected_metric) == 1)
+  stopifnot("Column in `dt_response` with metric should be numeric." = is.numeric(dt_response[[selected_metric]]))
+  selected_feat_meta <- setdiff(names(dt_depmap), c("ModelID", "CCLEName"))
+  stopifnot("Provide `dt_depmap` with numeric values." =
+              all(vapply(dt_depmap[, selected_feat_meta, with = FALSE], is.numeric, logical(1))))
+
+  # result
+  # will be returned in this format when:
+  # 1) length (shared lines) < 6
+  # 2) all/one of the association calculation inputs will have only NA values
+  # 3) selected_metric values have no variance (due to cdsrmodels::lin_associations)
+  # otherwise association will be calculated
+  obj_assoc <- list(dt_assoc = data.table::data.table(feature = character(0),
+                                                      response = character(0),
+                                                      rho = numeric(0),
+                                                      q_value = numeric(0)),
+                    condition_info = unique(dt_response[["rId"]]),
+                    selected_metric = selected_metric,
+                    selected_feat_meta_col = selected_feat_meta_col)
+
+  # association will not be calculated if there are any Inf values in the selected_metric column
+  dt_response <- dt_response[!is.infinite(get(selected_metric)), ]
+
+
+  # shared cell line
+  depmap_lines <- dt_depmap[CCLEName != "", unique(CCLEName)]
+  response_lines <- dt_response[[cellline_name]]
+  shared_lines <- intersect(depmap_lines, response_lines)
+
+  if (NROW(shared_lines) >= 6) { # (the minimum degrees of freedom = 4) + 2
+    # subset the data.table and order it
+    X_dt <- dt_depmap[CCLEName %in% shared_lines, ]
+    data.table::setorder(X_dt, "CCLEName")
+    Y_dt <- dt_response[get(cellline_name) %in% shared_lines, ]
+    data.table::setorderv(Y_dt, cellline_name)
+
+    # convert to a matrix
+    X <- as.matrix(
+      X_dt[, .SD, .SDcols = c("CCLEName", selected_feat_meta)], rownames = "CCLEName"
+    )
+    Y <- as.matrix(
+      Y_dt[, .SD, .SDcols = c("CellLineName", selected_metric)], rownames = "CellLineName"
+    )
+
+    # remove col with all NA
+    X <- X[, colSums(is.na(X)) != NROW(X), drop = FALSE]
+
+    # association can only be calculated for conditions
+    X_condition <-
+      # cdsr_models does not handle 1 feat
+      sum(apply(X, 2, function(x) stats::sd(x, na.rm = TRUE) > 0 & sum(!is.na(x)) >= 6), na.rm = TRUE) > 1
+    Y_condition <-
+      # (n.min = 4) + 2 # nolint
+      NROW(stats::na.omit(Y)) >= 6 & stats::sd(Y[, 1], na.rm = TRUE) > 0
+    XY_condition <- sum(t(!is.na(X)) %*% (!is.na(Y)) >= 6) > 1
+
+    if (Y_condition && X_condition && XY_condition) {
+      # create dt_assoc
+      dt_assoc <- calc_assoc(X, Y)
+      # final
+      obj_assoc[["dt_assoc"]] <- dt_assoc[, c("feature", "response", "rho", "q_value"), with = FALSE]
+    }
+  }
+
+  return(obj_assoc)
+}
+
+
+#' Encode OmicsArmLevelCNA as not mutated and mutated
+#'
+#' OmicsArmLevelCNA is arm-level copy number alteration inferred using absolute copy number data
+#' from PureCN, method from the Ben-David et al. (2021) paper (https://www.nature.com/articles/s41586-020-03114-6).
+#' Chromosome arms: \emph{1} indicates arm-level gain, \emph{-1} indicates arm-level loss,
+#' and \emph{0} indicates copy-neutral.
+#'
+#' This function transform each chromosome column (e.g., \code{3p}) into two new binary columns:
+#' \code{3p_loss} and \code{3p_gain}. \code{3p_loss} is \emph{1} for values of \emph{-1} in the original column
+#' and \emph{0} otherwise. \code{3p_gain} is \emph{1} for values of \emph{1} in the original column
+#' and \emph{0} otherwise. The original chromosome column is then removed.
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsArmLevelCNA
+#'
+#' @return \code{data.table} with OmicsArmLevelCNA decoded as mutated - not mutated
+#'
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @keywords internal
+.prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_depmap)
+
+  ls_chro <- grep("^[0-9].*(p$|q$)", names(dt_depmap), value = TRUE)
+
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, paste0(ls_chro, "_loss") := lapply(.SD, function(x) {
+    data.table::fifelse(x == -1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_recoded[, paste0(ls_chro, "_gain") := lapply(.SD, function(x) {
+    data.table::fifelse(x == 1, 1, 0) }), .SDcols = ls_chro]
+  dt_depmap_recoded[, (ls_chro) := NULL]
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
+
+  return(dt_depmap_recoded)
+}
+
+#' Binarize somatic mutations in OmicsSomaticMutationsMatrixHotspot and OmicsSomaticMutationsMatrixDamaging
+#'
+#' OmicsSomaticMutationsMatrixHotspot is genotyped matrix determining for each cell line whether
+#' each gene has at least one hot spot mutation.
+#' A variant is considered a hot spot if it's present in one of the following:
+#' Hess et al. (2019) paper, OncoKB hotspot, COSMIC mutation significance tier 1.
+#'
+#' OmicsSomaticMutationsMatrixDamaging is genotyped matrix determining for each cell line whether
+#' each gene has at least one damaging mutation. A variant is considered a damaging mutation
+#' if LikelyLoF is True
+#'
+#' \emph{0} means no mutation; if there is one or more hot spot mutations or damaging mutations respectively,
+#' in the same gene for the same cell line, the allele frequencies are summed, and if the sum
+#' is greater than 0.95, a value of \emph{2} is assigned (representing a likely homozygous mutation),
+#' otherwise a value of \emph{1} is assigned (likely heterozygous).
+#'
+#' This function transforms each gene column into binary columns:
+#' \emph{0} indicates no mutation, and \emph{1} indicates mutation, regardless of zygosity
+#' (the original value was \emph{1} or \emph{2}).
+#'
+#' @param dt_depmap \code{data.table} with dependent variables data load from DepMap.
+#'   (rows are samples, columns are features or meta);
+#'   outputted by one of \code{\link{prep_dt_depmap_feat}} for OmicsSomaticMutationsMatrixHotspot
+#'   or OmicsSomaticMutationsMatrixDamaging
+#'
+#' @return \code{data.table} with OmicsSomaticMutationsMatrixHotspot or OmicsSomaticMutationsMatrixDamaging
+#'  decoded as not mutated and mutated
+#'
+#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @keywords internal
+.prep_dt_OmicsSomaticMutationsMatrix <- function(dt_depmap) {
+  checkmate::assert_data_table(dt_depmap)
+
+  ls_gene <-
+    names(dt_depmap)[vapply(names(dt_depmap), function(nm) is.numeric(dt_depmap[[nm]]), logical(1))]
+
+  dt_depmap_recoded <- data.table::copy(dt_depmap)
+  dt_depmap_recoded[, (ls_gene) := lapply(.SD, function(x) {
+    data.table::fifelse(x == 2, 1, x) }), .SDcols = ls_gene]
+
+  data.table::setkey(dt_depmap_recoded, NULL)
+  dt_depmap_recoded
+
+  return(dt_depmap_recoded)
+}

@@ -1,0 +1,37 @@
+url: ~
+template:
+  bootstrap: 5
+
+reference:
+- title: Single-agent plots
+  desc:  Function to plot drug response curves for single-agent data
+- contents:
+  - has_keyword("single-agent_plots")
+- title: Combo plots
+  desc:  Function to plot averaged values heatmaps for combo data
+- contents:
+  - has_keyword("combo_plots")
+- title: Quality control plots for Processing Report
+  desc:  QC plots for Processing Report with all helpers 
+- contents:
+  - has_keyword("QC_plot")
+- title: Pretty heatmap with annotation
+  desc:  Functions to plot annotated heatmap with helpers
+- contents:
+  - has_keyword("pheat_ann")
+- title: PRISM visualisation
+  desc:  Functions to plot PRISM visualisation with helpers
+- contents:
+  - has_keyword("prism_plots")
+- title: Color helpers
+  desc:  Plot color helpers
+- contents:
+  - has_keyword("utils_color")
+- title: Utils
+  desc:  Utils function
+- contents:
+  - has_keyword("utils")
+- title: Chemical genomics visualisation
+  desc:  Functions to plot chemical genomics visualisation with helpers
+- contents:
+  - has_keyword("cgs_plots")

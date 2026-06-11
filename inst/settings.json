@@ -1,0 +1,41 @@
+{
+  "SMOOTH_PALETTE": [
+    "#251739",
+    "#6742A1", 
+    "#B59FD7", 
+    "#F2F2F2"
+  ],
+  "EXCESS_PALETTE": [
+    "royalblue3", 
+    "royalblue1", 
+    "grey95", 
+    "grey95", 
+    "firebrick1", 
+    "firebrick3"
+  ],
+  "ISOLINE_PALETTE": [
+    "#F8D01A", 
+    "#F77316", 
+    "#C52B06"
+  ],
+  "COMBO_CURVES_PALETTE": [
+    "#2C2835",
+    "#57042C",
+    "#CC0666",
+    "#FB9C05",
+    "#FDE251",
+    "#D7F434"
+  ],
+  "PLATE_PALETTE": [
+    "#C6DBEF", 
+    "#08306B"
+  ],
+  "ZERO_CONC_SCALING_FACTOR": 100,
+  "MAX_DIM_MATRIX_CLUSTER": 200,
+  "MAX_HM_LBL_LENGTH": 35,
+  "QC_HEATMAP_PALETTE": ["#CEEFC8", "#76D364"],
+  "BOXPLOT_FILL": "#A6CEE3",
+  "HLINE_COLOR": "#B3B3B3",
+  "JITTER_POINST_COLOR": "#4C4C4C",
+  "EDGE_COLOR": "#A9A9A9"
+}

@@ -1,0 +1,54 @@
+Package: gDRplots
+Title: 'gDRplots'
+Version: 0.0.109
+Date: 2026-06-02
+Authors@R: c(
+             person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
+             person("Janina", "Smola", role = "aut"),
+             person("Bartosz", "Czech", role = "aut", comment = c(ORCID = "0000-0002-9908-3007")),
+             person("Arkadiusz", "Gladki", role=c("aut"), comment = c(ORCID = "0000-0002-7059-6378")),
+             person("gDR", "team", email = "gdr-support-d@gene.com", role = "cre",
+             comment = c(ORCID = "0009-0006-9310-1135"))
+             )
+Description: gDRplots is a package that stores functions for gDR static visualizations and their dedicated helpers.
+License: Artistic-2.0
+Imports:
+    checkmate,
+    data.table,
+    DT,
+    fgsea,
+    ggplot2 (>= 4.0.0),
+    ggrepel,
+    ggtext,
+    gDRutils (>= 1.6.0),
+    pheatmap,
+    RColorBrewer,
+    rstudioapi,
+    tools
+Suggests:
+    BiocStyle,
+    cdsrmodels,
+    colorspace,
+    gDRtestData (>= 1.6.0),
+    gDRstyle (>= 1.6.0),
+    ggpubr,
+    heatmaply,
+    jsonlite,
+    knitr,
+    matrixStats,
+    mockery,
+    purrr,
+    readxl,
+    rlang,
+    scales,
+    S4Vectors,
+    SummarizedExperiment,
+    svglite,
+    qs2,
+    testthat,
+    withr
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyLoad: yes
+RoxygenNote: 7.3.3
