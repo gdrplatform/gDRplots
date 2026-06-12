@@ -8,10 +8,8 @@
 
 - **Bartosz Czech**. Author. [](https://orcid.org/0000-0002-9908-3007)
 
-- **Arkadiusz Gladki**. Author.
+- **Arkadiusz Gladki**. Author, maintainer.
   [](https://orcid.org/0000-0002-7059-6378)
-
-- **gDR team**. Maintainer. [](https://orcid.org/0009-0006-9310-1135)
 
 ## Citation
 
