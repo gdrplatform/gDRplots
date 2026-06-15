@@ -100,6 +100,18 @@ plot_dose_response_combo <- function(dt_average,
 
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
 
+  # Ensure the drug with more dose levels is on the x-axis
+  n_conc_1 <- length(unique(dt_avg[[conc]][dt_avg[[conc]] > 0]))
+  n_conc_2 <- length(unique(dt_avg[[conc_2]][dt_avg[[conc_2]] > 0]))
+  if (n_conc_2 > n_conc_1) {
+    tmp <- dt_avg[[conc]]
+    data.table::set(dt_avg, j = conc, value = dt_avg[[conc_2]])
+    data.table::set(dt_avg, j = conc_2, value = tmp)
+    tmp_name <- drug1_name
+    drug1_name <- drug2_name
+    drug2_name <- tmp_name
+  }
+
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),
                              labels = round_to_unique_string(sort(unique(dt_avg[[conc_2]]))))
@@ -241,6 +253,26 @@ plot_dose_response_combo_panel <- function(dt_average,
 
   # filter data for combination cell line (drug x drug2)
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
+
+  # Ensure the drug with more dose levels is on the x-axis for each pair
+  pairs <- unique(dt_avg[, .SD, .SDcols = c(drug_name, drug_name_2)])
+  for (i in seq_len(nrow(pairs))) {
+    d1 <- pairs[[drug_name]][i]
+    d2 <- pairs[[drug_name_2]][i]
+    idx <- which(dt_avg[[drug_name]] == d1 & dt_avg[[drug_name_2]] == d2)
+    n_c1 <- length(unique(dt_avg[[conc]][idx][dt_avg[[conc]][idx] > 0]))
+    n_c2 <- length(unique(dt_avg[[conc_2]][idx][dt_avg[[conc_2]][idx] > 0]))
+    if (n_c2 > n_c1) {
+      old_conc <- dt_avg[[conc]][idx]
+      old_conc_2 <- dt_avg[[conc_2]][idx]
+      old_d <- dt_avg[[drug_name]][idx]
+      old_d2 <- dt_avg[[drug_name_2]][idx]
+      data.table::set(dt_avg, idx, conc, old_conc_2)
+      data.table::set(dt_avg, idx, conc_2, old_conc)
+      data.table::set(dt_avg, idx, drug_name, old_d2)
+      data.table::set(dt_avg, idx, drug_name_2, old_d)
+    }
+  }
 
   dt_avg[[conc_2]] <- factor(dt_avg[[conc_2]],
                              levels = sort(unique(dt_avg[[conc_2]])),

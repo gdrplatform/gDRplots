@@ -223,6 +223,54 @@ test_that("plot_dose_response_combo_panel works as expected", {
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
 })
 
+test_that("plot_dose_response_combo auto-orients axes by dose count", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+
+  cl_name <- "cellline_BC"
+  drug1_name <- "drug_011"
+  drug2_name <- "drug_021"
+
+  # Reduce drug1 to 2 dose levels so drug2 (9 doses) has more
+  concs_d1 <- sort(unique(
+    dt_average[DrugName == drug1_name & Concentration > 0]$Concentration
+  ))
+  dt_asym <- dt_average[
+    !(DrugName == drug1_name & Concentration > 0 &
+        !Concentration %in% concs_d1[1:2])
+  ]
+
+  plt <- plot_dose_response_combo(dt_average = dt_asym,
+                                  drug1_name = drug1_name,
+                                  drug2_name = drug2_name,
+                                  cl_name = cl_name)
+  expect_is(plt, "gg")
+  expect_true(grepl(drug2_name, deparse(plt[["labels"]][["x"]])))
+})
+
+test_that("plot_dose_response_combo_panel auto-orients axes by dose count", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+
+  cl_name <- "cellline_BC"
+  drug1_name <- "drug_011"
+
+  concs_d1 <- sort(unique(
+    dt_average[DrugName == drug1_name & Concentration > 0]$Concentration
+  ))
+  dt_asym <- dt_average[
+    !(DrugName == drug1_name & Concentration > 0 &
+        !Concentration %in% concs_d1[1:2])
+  ]
+
+  plt <- plot_dose_response_combo_panel(dt_average = dt_asym,
+                                        cl_name = cl_name,
+                                        d_names = drug1_name)
+  expect_is(plt, "gg")
+})
+
 test_that(".get_combo_curves_colors works as expected", {
   json_path <- system.file(package = "gDRplots", "settings.json")
   s <- gDRutils::get_settings_from_json(json_path = json_path)
