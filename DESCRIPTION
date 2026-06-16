@@ -47,8 +47,10 @@ Suggests:
     qs2,
     testthat,
     withr
-VignetteBuilder: 
+VignetteBuilder:
     knitr
+URL: https://github.com/gdrplatform/gDRplots, https://gdrplatform.github.io/gDRplots/
+BugReports: https://github.com/gdrplatform/gDRplots/issues
 Encoding: UTF-8
 LazyLoad: yes
 RoxygenNote: 7.3.3
