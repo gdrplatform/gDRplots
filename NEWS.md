@@ -1,3 +1,6 @@
+## gDRplots 0.0.110 - 2026-06-16
+* add LICENSE file (Artistic-2.0)
+
 ## gDRplots 0.0.109 - 2026-06-05
 * update vignettes
 
