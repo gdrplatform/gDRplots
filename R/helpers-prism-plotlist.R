@@ -198,17 +198,16 @@
   }
 
   # features and meta for looping
-  depmap_items <- data.table::data.table()
+  depmap_parts <- list()
   if (!is.null(feature_sets)) {
-    depmap_items <- rbind(depmap_items,
-                          data.table::data.table(feat_meta_name = feature_sets,
-                                                 feat_meta_type = "feature"))
+    depmap_parts[[length(depmap_parts) + 1L]] <-
+      data.table::data.table(feat_meta_name = feature_sets, feat_meta_type = "feature")
   }
   if (!is.null(metadata_columns)) {
-    depmap_items <- rbind(depmap_items,
-                          data.table::data.table(feat_meta_name = metadata_columns,
-                                                 feat_meta_type = "meta"))
+    depmap_parts[[length(depmap_parts) + 1L]] <-
+      data.table::data.table(feat_meta_name = metadata_columns, feat_meta_type = "meta")
   }
+  depmap_items <- data.table::rbindlist(depmap_parts)
 
   # final object
   ls_plot <- list()
@@ -439,11 +438,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   # create info column
   if (NROW(assoc_summary_RV) > 0) {
     tab_RV <- data.table::copy(assoc_summary_RV)
-    tab_RV[, c("drug_grid", "feat_meta") := data.table::rbindlist(
-      lapply(seq_len(NROW(tab_RV)), function(i) {
-        .get_info_from_name(tab_RV[["src"]][i], normalization_type = "RV")
-      }
-      ))]
+    info <- .get_info_from_names(tab_RV[["src"]], normalization_type = "RV")
+    tab_RV[, c("drug_grid", "feat_meta") := info]
     tab_RV[, src := NULL]
     data.table::setcolorder(tab_RV, "feat_meta")
     ls_RV <- split(tab_RV, by = "drug_grid")
@@ -453,11 +449,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 
   if (NROW(assoc_summary_GR) > 0) {
     tab_GR <- data.table::copy(assoc_summary_GR)
-    tab_GR[, c("drug_grid", "feat_meta") := data.table::rbindlist(
-      lapply(seq_len(NROW(tab_GR)), function(i) {
-        .get_info_from_name(tab_GR[["src"]][i], normalization_type = "GR")
-      }
-      ))]
+    info <- .get_info_from_names(tab_GR[["src"]], normalization_type = "GR")
+    tab_GR[, c("drug_grid", "feat_meta") := info]
     tab_GR[, src := NULL]
     data.table::setcolorder(tab_GR, "feat_meta")
     ls_GR <- split(tab_GR, by = "drug_grid")
@@ -519,4 +512,16 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
   feat_meta <- sub("_.*", "", desc_)
   list(drug_grid = drug_grid,
        feat_meta = feat_meta)
+}
+
+#' @keywords internal
+.get_info_from_names <- function(file_names,
+                                 normalization_type = "RV") {
+  checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
+  desc_ <- sub("^.*?__", "", file_names)
+  pattern <- sprintf("_%s_.*$", normalization_type)
+  desc_ <- sub(pattern, "", desc_)
+  drug_grid <- sub("^.*?_", "", desc_)
+  feat_meta <- sub("_.*$", "", desc_)
+  list(drug_grid = drug_grid, feat_meta = feat_meta)
 }

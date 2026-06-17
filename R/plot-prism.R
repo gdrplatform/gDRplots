@@ -257,8 +257,6 @@ plot_scatter_with_corr_panel <- function(dt_response,
     Y_dt <- dt_response[, c(cellline_name, selected_metric), with = FALSE]
     tab_plot <- Y_dt[X_dt, on = .(CellLineName = CCLEName), nomatch = NULL]
 
-    tab_plot_all <- data.table::data.table()
-
     if (sum(is.na(selected_feats)) > 1) {
       tmp <- data.table::data.table(selected_feats)
       tmp[, N := seq_len(.N), by = selected_feats]
@@ -267,8 +265,10 @@ plot_scatter_with_corr_panel <- function(dt_response,
     }
 
     feat_lbl_levels <- selected_feats
+    plot_parts <- vector("list", length(selected_feats))
 
-    for (selected_feat in selected_feats) {
+    for (fi in seq_along(selected_feats)) {
+      selected_feat <- selected_feats[[fi]]
 
       if (selected_feat %chin% available_feats) {
         # remove NA
@@ -286,16 +286,17 @@ plot_scatter_with_corr_panel <- function(dt_response,
           # add label for points driving the correlation
           dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
           top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
-          tab_plot_sel$label <- ""
-          tab_plot_sel[top_driving_corr, ]$label <- tab_plot_sel[top_driving_corr, ][[cellline_name]]
-          tab_plot_sel$col <- "no"
-          tab_plot_sel[top_driving_corr, ]$col <- "yes"
+          data.table::set(tab_plot_sel, j = "label", value = "")
+          data.table::set(tab_plot_sel, i = top_driving_corr, j = "label",
+                          value = tab_plot_sel[[cellline_name]][top_driving_corr])
+          data.table::set(tab_plot_sel, j = "col", value = "no")
+          data.table::set(tab_plot_sel, i = top_driving_corr, j = "col", value = "yes")
           tab_plot_sel$feat_lbl <- selected_feat
           data.table::setnames(tab_plot_sel, selected_feat, "feat_val")
         } else {
           # dummy data when all data is NA
           feat_lbl <- paste0(selected_feat, ": all NAs")
-          feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+          feat_lbl_levels[fi] <- feat_lbl
 
           tab_plot_sel <- data.table::data.table(
             cellline_name = "",
@@ -312,7 +313,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
       } else {
         # dummy data required for faceting
         feat_lbl <- paste0(selected_feat, ": all NAs")
-        feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+        feat_lbl_levels[fi] <- feat_lbl
 
         tab_plot_sel <- data.table::data.table(
           cellline_name = "",
@@ -326,8 +327,9 @@ plot_scatter_with_corr_panel <- function(dt_response,
                              old = c("cellline_name", "selected_metric"),
                              new = c(cellline_name, selected_metric))
       }
-      tab_plot_all <- rbind(tab_plot_all, tab_plot_sel)
+      plot_parts[[fi]] <- tab_plot_sel
     }
+    tab_plot_all <- data.table::rbindlist(plot_parts, fill = TRUE)
     # order vis as in selected_feats
     tab_plot_all$feat_lbl <- factor(tab_plot_all$feat_lbl, levels = feat_lbl_levels)
 
@@ -539,8 +541,6 @@ plot_boxplot_num_panel <- function(dt_response,
     ls_lbl <- unique(as.vector(as.matrix(tab_plot[, -c(cellline_name, selected_metric), with = FALSE])))
     dummy_feat_val <- ls_lbl[!is.na(ls_lbl)]
 
-    tab_plot_all <- data.table::data.table()
-
     if (sum(is.na(selected_feats)) > 1) {
       tmp <- data.table::data.table(selected_feats)
       tmp[, N := seq_len(.N), by = selected_feats]
@@ -550,8 +550,10 @@ plot_boxplot_num_panel <- function(dt_response,
     }
 
     feat_lbl_levels <- selected_feats
+    plot_parts <- vector("list", length(selected_feats))
 
-    for (selected_feat in selected_feats) {
+    for (fi in seq_along(selected_feats)) {
+      selected_feat <- selected_feats[[fi]]
 
       if (selected_feat %chin% available_feats) {
         # remove NA
@@ -564,7 +566,7 @@ plot_boxplot_num_panel <- function(dt_response,
         } else {
           # dummy data when all data is NA
           feat_lbl <- paste0(selected_feat, ": all NAs")
-          feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+          feat_lbl_levels[fi] <- feat_lbl
 
           tab_plot_tmp <- data.table::data.table(
             cellline_name = "",
@@ -579,7 +581,7 @@ plot_boxplot_num_panel <- function(dt_response,
       } else {
         # dummy data required for faceting
         feat_lbl <- paste0(selected_feat, ": all NAs")
-        feat_lbl_levels[which(selected_feats == selected_feat)] <- feat_lbl
+        feat_lbl_levels[fi] <- feat_lbl
 
         tab_plot_tmp <- data.table::data.table(
           cellline_name = "",
@@ -591,8 +593,9 @@ plot_boxplot_num_panel <- function(dt_response,
                              old = c("cellline_name", "selected_metric"),
                              new = c(cellline_name, selected_metric))
       }
-      tab_plot_all <- rbind(tab_plot_all, tab_plot_tmp)
+      plot_parts[[fi]] <- tab_plot_tmp
     }
+    tab_plot_all <- data.table::rbindlist(plot_parts, fill = TRUE)
 
     # prep value ranges for y-axis
     range_y <- range(tab_plot_all[!is.infinite(get(selected_metric)), ][[selected_metric]])
@@ -600,9 +603,8 @@ plot_boxplot_num_panel <- function(dt_response,
 
     # prep the number of items in each category
     tab_count_all <- tab_plot_all[!is.na(get(selected_metric)), .N, by = c("feat_val", "feat_lbl")]
-    tab_count_all_possible <- expand.grid(feat_val = unique(tab_plot_all$feat_val),
-                                          feat_lbl = unique(tab_plot_all$feat_lbl),
-                                          stringsAsFactors = FALSE)
+    tab_count_all_possible <- data.table::CJ(feat_val = unique(tab_plot_all$feat_val),
+                                              feat_lbl = unique(tab_plot_all$feat_lbl))
     # fill lacking labels
 
     if (NROW(tab_count_all) < NROW(tab_count_all_possible)) {
