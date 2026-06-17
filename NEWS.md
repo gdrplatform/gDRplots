@@ -1,5 +1,8 @@
-## gDRplots 0.0.113 - 2026-06-17
+## gDRplots 0.0.114 - 2026-06-17
 * improve report performance by eliminating ggplot_build and pre-filtering data in plot loops
+
+## gDRplots 0.0.113 - 2026-06-17
+* add auto-orient combo dose-response axes by dose count
 
 ## gDRplots 0.0.112 - 2026-06-16
 * migrate package URLs from GitLab to GitHub
