@@ -1,5 +1,5 @@
 ## gDRplots 0.0.113 - 2026-06-17
-* improve report performance by eliminating ggplot_build and pre-filtering data in plot loops
+* improve report generation performance by eliminating ggplot_build in size estimation and pre-filtering data in plot loops
 
 ## gDRplots 0.0.112 - 2026-06-16
 * migrate package URLs from GitLab to GitHub
