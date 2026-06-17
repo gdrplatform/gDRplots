@@ -315,12 +315,19 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
     cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
   }
 
+  filter_expr <- substitute(
+    normalization_type == norm_type & fit_source == "gDR",
+    list(norm_type = normalization_type)
+  )
+  dt_metrics_filtered <- dt_metrics[eval(filter_expr)]
+  dt_average_filtered <- if (!is.null(dt_average)) dt_average[eval(filter_expr)] else NULL
+
   plt_list <- list()
   for (d_name in drug_name_vec) {
 
     plt_list[[d_name]] <-
-      plot_dose_response_sa(dt_metrics = dt_metrics,
-                            dt_average = dt_average,
+      plot_dose_response_sa(dt_metrics = dt_metrics_filtered,
+                            dt_average = dt_average_filtered,
                             selection_name = d_name,
                             group_var = cellline_name,
                             group_names = cellline_name_vec,
