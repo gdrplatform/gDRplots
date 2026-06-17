@@ -124,6 +124,21 @@ test_that("plot_dose_response_combo works as expected", {
                                         cl_name = cl_name,
                                         split_by_conc = 1),
                "Assertion on 'split_by_conc' failed: Must be of type 'logical flag'")
+
+  # auto-orient: reduce drug1 to 2 dose levels so drug2 has more
+  concs_d1 <- sort(unique(
+    dt_average[DrugName == drug1_name & Concentration > 0]$Concentration
+  ))
+  dt_asym <- dt_average[
+    !(DrugName == drug1_name & Concentration > 0 &
+        !Concentration %in% concs_d1[1:2])
+  ]
+  plt_7 <- plot_dose_response_combo(dt_average = dt_asym,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name)
+  expect_is(plt_7, "gg")
+  expect_true(grepl(drug2_name, deparse(plt_7[["labels"]][["x"]])))
 })
 
 test_that("plot_dose_response_combo_panel works as expected", {
@@ -221,54 +236,26 @@ test_that("plot_dose_response_combo_panel works as expected", {
                                               cl_name = cl_name,
                                               colors_vec = 1:5),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
-})
 
-test_that("plot_dose_response_combo auto-orients axes by dose count", {
-  mae <- gDRutils::get_synthetic_data("combo_matrix")
-  se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-
-  cl_name <- "cellline_BC"
-  drug1_name <- "drug_011"
-  drug2_name <- "drug_021"
-
-  # Reduce drug1 to 2 dose levels so drug2 (9 doses) has more
+  # auto-orient: asymmetric concentrations across multiple drug pairs
+  cl_name_2 <- "cellline_BC"
+  drug1_name_2 <- "drug_011"
+  drug2_name_2 <- "drug_026"
   concs_d1 <- sort(unique(
-    dt_average[DrugName == drug1_name & Concentration > 0]$Concentration
+    dt_average[DrugName == drug1_name_2 & Concentration > 0]$Concentration
+  ))
+  concs_d2 <- sort(unique(
+    dt_average[DrugName_2 == drug2_name_2 & Concentration_2 > 0]$Concentration_2
   ))
   dt_asym <- dt_average[
-    !(DrugName == drug1_name & Concentration > 0 &
-        !Concentration %in% concs_d1[1:2])
+    !(DrugName == drug1_name_2 & Concentration > 0 &
+        !Concentration %in% concs_d1[1:2]) &
+      !(DrugName_2 == drug2_name_2 & Concentration_2 > 0 &
+          !Concentration_2 %in% concs_d2[3:4])
   ]
-
-  plt <- plot_dose_response_combo(dt_average = dt_asym,
-                                  drug1_name = drug1_name,
-                                  drug2_name = drug2_name,
-                                  cl_name = cl_name)
-  expect_is(plt, "gg")
-  expect_true(grepl(drug2_name, deparse(plt[["labels"]][["x"]])))
-})
-
-test_that("plot_dose_response_combo_panel auto-orients axes by dose count", {
-  mae <- gDRutils::get_synthetic_data("combo_matrix")
-  se <- mae[[gDRutils::get_supported_experiments("combo")]]
-  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
-
-  cl_name <- "cellline_BC"
-  drug1_name <- "drug_011"
-
-  concs_d1 <- sort(unique(
-    dt_average[DrugName == drug1_name & Concentration > 0]$Concentration
-  ))
-  dt_asym <- dt_average[
-    !(DrugName == drug1_name & Concentration > 0 &
-        !Concentration %in% concs_d1[1:2])
-  ]
-
-  plt <- plot_dose_response_combo_panel(dt_average = dt_asym,
-                                        cl_name = cl_name,
-                                        d_names = drug1_name)
-  expect_is(plt, "gg")
+  plt_7 <- plot_dose_response_combo_panel(dt_average = dt_asym,
+                                          cl_name = cl_name_2)
+  expect_is(plt_7, "gg")
 })
 
 test_that(".get_combo_curves_colors works as expected", {
