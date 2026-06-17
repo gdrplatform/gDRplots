@@ -404,12 +404,11 @@ estimate_plot_size <- function(plt,
 #' @seealso \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
 #'
 #' @export
-save_plot <- function(plt, path, format = "svg") {
+save_plot <- function(plt, path, format = "svg", width = NULL, height = NULL) {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
 
-  # Check if the directory exists and has write access
   dir_path <- dirname(path)
   if (!dir.exists(dir_path)) {
     stop("The specified directory does not exist.")
@@ -419,18 +418,19 @@ save_plot <- function(plt, path, format = "svg") {
     stop("The specified directory does not have write access.")
   }
 
-  # Estimate plot size
-  plot_size <- estimate_plot_size(plt)
+  if (is.null(width) || is.null(height)) {
+    plot_size <- estimate_plot_size(plt)
+    width <- width %||% plot_size[["width"]]
+    height <- height %||% plot_size[["height"]]
+  }
 
   filename <- paste(path, format, sep = ".")
 
-
-  # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
                   plot = plt,
                   units = "in",
-                  width = plot_size[["width"]],
-                  height = plot_size[["height"]],
+                  width = width,
+                  height = height,
                   dpi = 300,
                   limitsize = FALSE,
                   device = format)
