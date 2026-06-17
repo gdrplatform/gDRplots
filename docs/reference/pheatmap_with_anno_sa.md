@@ -85,7 +85,8 @@ pheatmap_with_anno_sa(
   function used to compute the distance (dissimilarity) between both
   rows and columns; used for the dendrogram when `cluster_rows` or
   `cluster_cols` is set to TRUE the default is
-  [`compute_distances`](compute_distances.md) using Spearman method.
+  [`compute_distances`](https://gdrplatform.github.io/gDRplots/reference/compute_distances.md)
+  using Spearman method.
 
 - annotation_row:
 

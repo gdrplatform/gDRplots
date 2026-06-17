@@ -20,7 +20,7 @@ list with color mapping for the annotations
 
 ## See also
 
-[`pheatmap_qc`](pheatmap_qc.md)
+[`pheatmap_qc`](https://gdrplatform.github.io/gDRplots/reference/pheatmap_qc.md)
 
 ## Author
 

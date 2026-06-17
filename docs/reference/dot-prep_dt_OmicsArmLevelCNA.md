@@ -18,7 +18,8 @@ loss, and *0* indicates copy-neutral.
 
   `data.table` with dependent variables data load from DepMap. (rows are
   samples, columns are features or meta); outputted by one of
-  [`prep_dt_depmap_feat`](prep_dt_depmap_feat.md) for OmicsArmLevelCNA
+  [`prep_dt_depmap_feat`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_feat.md)
+  for OmicsArmLevelCNA
 
 ## Value
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## gDRplots 0.0.112 - 2026-06-16
+
+- migrate package URLs from GitLab to GitHub
+
 ## gDRplots 0.0.111 - 2026-06-16
 
 - add LICENSE file (Artistic-2.0)

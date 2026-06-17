@@ -19,8 +19,9 @@ prep_dt_assoc(dt_response, dt_depmap, selected_feat_meta_col = NULL)
 
   `data.table` with dependent variables data load from DepMap. (rows are
   samples, columns are features or meta); outputted by one of
-  [`prep_dt_depmap_feat`](prep_dt_depmap_feat.md) or
-  [`prep_dt_depmap_meta`](prep_dt_depmap_meta.md)
+  [`prep_dt_depmap_feat`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_feat.md)
+  or
+  [`prep_dt_depmap_meta`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_meta.md)
 
 - selected_feat_meta_col:
 
@@ -29,7 +30,7 @@ prep_dt_assoc(dt_response, dt_depmap, selected_feat_meta_col = NULL)
 ## Value
 
 A named list with elements, that may be input to
-[`plot_volcano_assoc`](plot_volcano_assoc.md)
+[`plot_volcano_assoc`](https://gdrplatform.github.io/gDRplots/reference/plot_volcano_assoc.md)
 
 - `dt_assoc` `data.table` with calculated association values between
   feature/meta of DepMap and selected metric,

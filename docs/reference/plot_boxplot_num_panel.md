@@ -20,16 +20,17 @@ plot_boxplot_num_panel(
 
   `data.table` with experimental response data (rows are samples) for
   one metric outputted by one of functions:
-  [`prep_dt_response_metric_sa`](prep_dt_response_metric_sa.md),
-  [`prep_dt_response_dose_sa`](prep_dt_response_dose_sa.md),
-  [`prep_dt_response_scores`](prep_dt_response_scores.md) or
-  [`prep_dt_response_metric_diff`](prep_dt_response_metric_diff.md),
+  [`prep_dt_response_metric_sa`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_metric_sa.md),
+  [`prep_dt_response_dose_sa`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_dose_sa.md),
+  [`prep_dt_response_scores`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_scores.md)
+  or
+  [`prep_dt_response_metric_diff`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_metric_diff.md),
 
 - dt_depmap:
 
   `data.table` with dependent variables data loaded from DepMap - for
   one feature; (rows are samples, columns are features). outputted by
-  [`prep_dt_depmap_feat`](prep_dt_depmap_feat.md)
+  [`prep_dt_depmap_feat`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_feat.md)
 
 - selected_feats:
 

@@ -21,16 +21,18 @@ plot_boxplot_meta(
 
   `data.table` with experimental response data (rows are samples) for
   one metric outputted by one of functions:
-  [`prep_dt_response_metric_sa`](prep_dt_response_metric_sa.md),
-  [`prep_dt_response_dose_sa`](prep_dt_response_dose_sa.md),
-  [`prep_dt_response_scores`](prep_dt_response_scores.md) or
-  [`prep_dt_response_metric_diff`](prep_dt_response_metric_diff.md),
+  [`prep_dt_response_metric_sa`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_metric_sa.md),
+  [`prep_dt_response_dose_sa`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_dose_sa.md),
+  [`prep_dt_response_scores`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_scores.md)
+  or
+  [`prep_dt_response_metric_diff`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_metric_diff.md),
 
 - dt_depmap:
 
   `data.table` with dependent variables data load from DepMap - for one
   metadata; (rows are samples, columns are metadata levels); outputted
-  by [`prep_dt_depmap_meta`](prep_dt_depmap_meta.md)
+  by
+  [`prep_dt_depmap_meta`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_meta.md)
 
 - selected_feat_meta_col:
 

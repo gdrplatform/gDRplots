@@ -6,4 +6,4 @@ visualizations and their dedicated helpers.
 # Website
 
 A package website is available under [this
-link](https://gdr.pages.roche.com/gdrplots).
+link](https://gdrplatform.github.io/gDRplots/).

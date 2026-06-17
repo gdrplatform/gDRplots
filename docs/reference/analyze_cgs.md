@@ -50,7 +50,7 @@ analyze_cgs(
 
   A string with normalization types to be selected, one of: "GR"
   ("GRvalue") or "RV" ("RelativeViability"). Passed to
-  [`prep_dt_response_metric_diff`](prep_dt_response_metric_diff.md).
+  [`prep_dt_response_metric_diff`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_response_metric_diff.md).
 
 ## Value
 

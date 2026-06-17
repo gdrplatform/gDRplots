@@ -5,9 +5,9 @@ common part or not. It is required to decide which function to use for
 plotting the heatmaps panel (the set of heatmaps with combo metrics plot
 for combination of selected drug with selected codrug, each heatmap per
 one cell line):
-[`heatmap_combo_with_isoref_panel_common`](heatmap_combo_with_isoref_panel_common.md)
+[`heatmap_combo_with_isoref_panel_common`](https://gdrplatform.github.io/gDRplots/reference/heatmap_combo_with_isoref_panel_common.md)
 that plot heatmaps with shared axes or
-[`heatmap_combo_with_isoref_panel_independent`](heatmap_combo_with_isoref_panel_independent.md)
+[`heatmap_combo_with_isoref_panel_independent`](https://gdrplatform.github.io/gDRplots/reference/heatmap_combo_with_isoref_panel_independent.md)
 that plot heatmaps independently.
 
 ## Usage
@@ -28,11 +28,11 @@ a string decribing type of concentration list - one of:
 
 - `common` vectors in the input list have common part; heatmaps in the
   panel should be created jointly with function
-  [`heatmap_combo_with_isoref_panel_common`](heatmap_combo_with_isoref_panel_common.md)
+  [`heatmap_combo_with_isoref_panel_common`](https://gdrplatform.github.io/gDRplots/reference/heatmap_combo_with_isoref_panel_common.md)
 
 - `independent` vectors in the input list do not have common part;
   heatmaps in the panel should be created independently with function
-  [`heatmap_combo_with_isoref_panel_independent`](heatmap_combo_with_isoref_panel_independent.md)
+  [`heatmap_combo_with_isoref_panel_independent`](https://gdrplatform.github.io/gDRplots/reference/heatmap_combo_with_isoref_panel_independent.md)
 
 ## Details
 

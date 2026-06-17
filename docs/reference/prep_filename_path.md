@@ -1,9 +1,9 @@
 # Prepare list of names or paths
 
 This function can creates lists that can be used as an input to
-[`prep_plot_chunk`](prep_plot_chunk.md) - param `link_list` and
-`dwn_list`. Depending on the inputs, outputted string will have a
-format: *\<path_file\>\<prefix\>\<name of item on the
+[`prep_plot_chunk`](https://gdrplatform.github.io/gDRplots/reference/prep_plot_chunk.md) -
+param `link_list` and `dwn_list`. Depending on the inputs, outputted
+string will have a format: *\<path_file\>\<prefix\>\<name of item on the
 list\>***.***\<file_format\>* Note: An unnamed item in the list will be
 numbered.
 
@@ -47,7 +47,7 @@ as `plt_list`.
 
 ## See also
 
-[`prep_plot_chunk`](prep_plot_chunk.md)
+[`prep_plot_chunk`](https://gdrplatform.github.io/gDRplots/reference/prep_plot_chunk.md)
 
 ## Author
 

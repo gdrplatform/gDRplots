@@ -2,4 +2,4 @@
 
 ### All vignettes
 
-- [gDRplots](gDRplots.md):
+- [gDRplots](https://gdrplatform.github.io/gDRplots/articles/gDRplots.md):

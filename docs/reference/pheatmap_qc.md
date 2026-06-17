@@ -69,8 +69,9 @@ pheatmap_qc(
 
   function used to compute the distance (dissimilarity) between rows;
   used for the dendrogram when `cluster_rows` is set to TRUE; the
-  default is [`compute_distances`](compute_distances.md) using Spearman
-  method.
+  default is
+  [`compute_distances`](https://gdrplatform.github.io/gDRplots/reference/compute_distances.md)
+  using Spearman method.
 
 - lbl_by_CellLineName:
 

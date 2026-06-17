@@ -43,7 +43,7 @@ transposed source matrix as `mat_to_cluster`
 
 ## See also
 
-[`compute_distances`](compute_distances.md)
+[`compute_distances`](https://gdrplatform.github.io/gDRplots/reference/compute_distances.md)
 
 ## Author
 

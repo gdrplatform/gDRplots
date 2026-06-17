@@ -18,8 +18,8 @@ significance tier 1.
 
   `data.table` with dependent variables data load from DepMap. (rows are
   samples, columns are features or meta); outputted by one of
-  [`prep_dt_depmap_feat`](prep_dt_depmap_feat.md) for
-  OmicsSomaticMutationsMatrixHotspot or
+  [`prep_dt_depmap_feat`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_depmap_feat.md)
+  for OmicsSomaticMutationsMatrixHotspot or
   OmicsSomaticMutationsMatrixDamaging
 
 ## Value

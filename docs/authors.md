@@ -15,12 +15,17 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/gdrplatform/gDRplots/blob/main/DESCRIPTION)
+
 Hafner M, Smola J, Czech B, Scigocki D, Gladki A (2026). *gDRplots:
-'gDRplots'*. R package version 0.0.111.
+'gDRplots'*. R package version 0.0.112,
+<https://github.com/gdrplatform/gDRplots>.
 
     @Manual{,
       title = {gDRplots: 'gDRplots'},
       author = {Marc Hafner and Janina Smola and Bartosz Czech and Dariusz Scigocki and Arkadiusz Gladki},
       year = {2026},
-      note = {R package version 0.0.111},
+      note = {R package version 0.0.112},
+      url = {https://github.com/gdrplatform/gDRplots},
     }

@@ -45,7 +45,7 @@ prep_dt_response_dose_sa(
 ## Value
 
 `data.table` with selected metric, input to
-[`prep_dt_assoc`](prep_dt_assoc.md)
+[`prep_dt_assoc`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_assoc.md)
 
 ## Examples
 

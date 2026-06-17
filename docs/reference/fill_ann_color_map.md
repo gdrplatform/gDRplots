@@ -24,8 +24,8 @@ list with color mapping for the annotations with missing items filled in
 
 ## See also
 
-[`pheatmap_with_anno_sa`](pheatmap_with_anno_sa.md)
-[`pheatmap_with_anno_combo`](pheatmap_with_anno_combo.md)
+[`pheatmap_with_anno_sa`](https://gdrplatform.github.io/gDRplots/reference/pheatmap_with_anno_sa.md)
+[`pheatmap_with_anno_combo`](https://gdrplatform.github.io/gDRplots/reference/pheatmap_with_anno_combo.md)
 
 ## Author
 

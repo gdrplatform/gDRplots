@@ -43,7 +43,7 @@ prep_dt_depmap_feat(
 ## Value
 
 A named list with elements, that may be input to
-[`prep_dt_assoc`](prep_dt_assoc.md)
+[`prep_dt_assoc`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_assoc.md)
 
 - `dt_depmap` `data.table` with feature data from DepMap (wide format),.
 
