@@ -256,7 +256,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 
   # Ensure the drug with more dose levels is on the x-axis for each pair
   pairs <- unique(dt_avg[, .SD, .SDcols = c(drug_name, drug_name_2)])
-  for (i in seq_len(nrow(pairs))) {
+  for (i in seq_len(NROW(pairs))) {
     d1 <- pairs[[drug_name]][i]
     d2 <- pairs[[drug_name_2]][i]
     idx <- which(dt_avg[[drug_name]] == d1 & dt_avg[[drug_name_2]] == d2)
