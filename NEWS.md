@@ -1,3 +1,6 @@
+## gDRplots 0.0.113 - 2026-06-17
+* add auto-orient combo dose-response axes by dose count
+
 ## gDRplots 0.0.112 - 2026-06-16
 * migrate package URLs from GitLab to GitHub
 
