@@ -369,9 +369,26 @@ estimate_plot_size <- function(plt,
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
 
   if (inherits(plt, "ggplot")) {
-    # For ggplot2 objects
-    plot_data <- ggplot2::ggplot_build(plt)$data
-    num_elements <- length(unique(plot_data[[1]]$group))
+    # Count groups from plot data without expensive ggplot_build()
+    layer_data <- plt$layers[[1]]$data
+    if (is.null(layer_data) || inherits(layer_data, "waiver")) {
+      layer_data <- plt$data
+    }
+    num_elements <- tryCatch({
+      mapping <- plt$mapping
+      group_var <- if ("colour" %in% names(mapping)) {
+        rlang::as_name(mapping[["colour"]])
+      } else if ("group" %in% names(mapping)) {
+        rlang::as_name(mapping[["group"]])
+      } else {
+        NULL
+      }
+      if (!is.null(group_var) && group_var %in% names(layer_data)) {
+        length(unique(layer_data[[group_var]]))
+      } else {
+        1L
+      }
+    }, error = function(e) 1L)
     estimated_width <- base_width + num_elements * scale_factor
     estimated_height <- base_height + num_elements * scale_factor
   } else if (inherits(plt, "pheatmap")) {
@@ -404,7 +421,7 @@ estimate_plot_size <- function(plt,
 #' @seealso \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
 #'
 #' @export
-save_plot <- function(plt, path, format = "svg", width = NULL, height = NULL) {
+save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
@@ -418,19 +435,15 @@ save_plot <- function(plt, path, format = "svg", width = NULL, height = NULL) {
     stop("The specified directory does not have write access.")
   }
 
-  if (is.null(width) || is.null(height)) {
-    plot_size <- estimate_plot_size(plt)
-    width <- width %||% plot_size[["width"]]
-    height <- height %||% plot_size[["height"]]
-  }
+  plot_size <- estimate_plot_size(plt)
 
   filename <- paste(path, format, sep = ".")
 
   ggplot2::ggsave(filename = filename,
                   plot = plt,
                   units = "in",
-                  width = width,
-                  height = height,
+                  width = plot_size[["width"]],
+                  height = plot_size[["height"]],
                   dpi = 300,
                   limitsize = FALSE,
                   device = format)
