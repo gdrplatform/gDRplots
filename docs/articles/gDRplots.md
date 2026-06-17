@@ -852,7 +852,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRplots_0.0.112 BiocStyle_2.40.0
+#> [1] gDRplots_0.0.113 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] tidyselect_1.2.1            dplyr_1.2.1                
@@ -881,7 +881,7 @@ sessionInfo()
 #> [47] XVector_0.52.0              matrixStats_1.5.0          
 #> [49] vctrs_0.7.3                 Matrix_1.7-5               
 #> [51] jsonlite_2.0.0              carData_3.0-6              
-#> [53] bookdown_0.46               car_3.1-5                  
+#> [53] bookdown_0.47               car_3.1-5                  
 #> [55] IRanges_2.46.0              S4Vectors_0.50.1           
 #> [57] ggrepel_0.9.8               rstatix_0.7.3              
 #> [59] Formula_1.2-5               systemfonts_1.3.2          
