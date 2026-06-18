@@ -402,20 +402,15 @@ plot_boxplot_num <- function(dt_response,
   checkmate::assert_names(names(dt_depmap), must.include = c("CCLEName", selected_feat))
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   selected_metric <- setdiff(names(dt_response),
                              c(cellline_name, "rId", "cId"))
@@ -499,17 +494,13 @@ plot_boxplot_num_panel <- function(dt_response,
   checkmate::assert_string(selected_feat_meta_col, null.ok = TRUE)
   checkmate::assert_int(ncol, lower = 1, null.ok = TRUE) # nolint undesirable_function_linter.
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   selected_metric <- setdiff(names(dt_response),
                              c(cellline_name, "rId", "cId"))
@@ -685,17 +676,13 @@ plot_boxplot_meta <- function(dt_response,
   checkmate::assert_number(max_x_lbl_length, lower = 5)
   checkmate::assert_flag(with_inf)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   selected_metric <- setdiff(names(dt_response),
                              c(cellline_name, "rId", "cId"))

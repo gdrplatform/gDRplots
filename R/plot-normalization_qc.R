@@ -57,11 +57,9 @@ plot_var_distribution_qc <- function(dt_assay,
   checkmate::assert_numeric(dt_assay[[metric]])
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")

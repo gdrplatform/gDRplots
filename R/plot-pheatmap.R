@@ -83,8 +83,7 @@ pheatmap_qc <- function(
   checkmate::assert_flag(lbl_by_CellLineName)
   checkmate::assert_flag(lbl_by_DrugName)
   zero_conc_scaling_factor <-
-    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("ZERO_CONC_SCALING_FACTOR")
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -204,8 +203,7 @@ pheatmap_qc <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = mat_cvd,
@@ -424,8 +422,7 @@ pheatmap_with_anno_sa <- function(
     annotation_col = NULL,
     annotation_colors = NULL,
     max_hm_lbl_length =
-      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -588,8 +585,7 @@ pheatmap_with_anno_sa <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <-
@@ -897,8 +893,7 @@ pheatmap_with_anno_cd <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
@@ -1074,8 +1069,7 @@ pheatmap_with_anno_combo <- function(
     annotation_col = NULL,
     annotation_colors = NULL,
     max_hm_lbl_length =
-      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -1249,8 +1243,7 @@ pheatmap_with_anno_combo <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
@@ -1399,8 +1392,7 @@ pheatmap_with_anno_combo_metrics <- function(
     distfun = compute_distances,
     annotation_col = NULL,
     annotation_colors = NULL,
-    max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                                         system.file(package = "gDRplots", "settings.json"))
+    max_hm_lbl_length = .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
@@ -1593,8 +1585,7 @@ pheatmap_with_anno_combo_metrics <- function(
     }
   }
 
-  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                              system.file(package = "gDRplots", "settings.json"))
+  max_dim <- .get_setting("MAX_DIM_MATRIX_CLUSTER")
   can_cluster <- any(dim(mat_cvd) < max_dim)
 
   cl_rows <- if (cluster_rows) {

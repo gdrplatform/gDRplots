@@ -55,8 +55,7 @@ plot_var_stat_qc <- function(dt_assay,
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_flag(with_table)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
 
@@ -230,8 +229,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   checkmate::assert_data_table(dt_treat)
   checkmate::assert_data_table(dt_controls)
   qc_heatmap_palette <-
-    gDRutils::get_settings_from_json("QC_HEATMAP_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("QC_HEATMAP_PALETTE")
 
   # calculate the frequency of each (rID, cID) combination in Controls
   frequency <- dt_controls[, .N, by = .(rId, cId)]

@@ -430,8 +430,7 @@ heatmap_combo_metrics_panel <- function(
   checkmate::assert_flag(swap_axes)
   checkmate::assert_flag(show_values)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -796,8 +795,7 @@ plot_combination_index <- function(
   checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   checkmate::assert_character(colors_vec_iso, null.ok = TRUE)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -2000,8 +1998,7 @@ transform_log_conc <- function(conc_vec) {
 
   iso_colors <-
     grDevices::colorRampPalette(
-      gDRutils::get_settings_from_json("ISOLINE_PALETTE",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("ISOLINE_PALETTE")
     )(2 * NROW(iso_levels))[2 * seq_along(iso_levels)]
   names(iso_colors) <- iso_levels
 
@@ -2024,8 +2021,7 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
 
   grDevices::colorRampPalette(
-    gDRutils::get_settings_from_json("SMOOTH_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("SMOOTH_PALETTE")
   )(no_breaks)
 }
 
@@ -2044,8 +2040,7 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
 
   grDevices::colorRampPalette(
-    gDRutils::get_settings_from_json("EXCESS_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EXCESS_PALETTE")
   )(no_breaks)
 }
 
