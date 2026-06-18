@@ -370,7 +370,7 @@ estimate_plot_size <- function(plt,
 
   if (inherits(plt, "ggplot")) {
     # Count groups from plot data without expensive ggplot_build()
-    layer_data <- plt$layers[[1]]$data
+    layer_data <- if (length(plt$layers) > 0) plt$layers[[1]]$data else NULL
     if (is.null(layer_data) || inherits(layer_data, "waiver")) {
       layer_data <- plt$data
     }
