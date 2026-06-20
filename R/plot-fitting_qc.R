@@ -84,11 +84,9 @@ plot_var_stat_qc <- function(dt_assay,
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
 
   if (with_table) {
-    tab_metric <- ggpubr::ggtexttable(
-      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))],
-      rows = NULL, theme = ggpubr::ttheme("light"))
-
-    plt <- ggpubr::ggarrange(plt, tab_metric, nrow = 1, widths = c(2, 1))
+    tab_dt <- tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))]
+    tab_plt <- .table_to_ggplot(tab_dt)
+    plt <- patchwork::wrap_plots(plt, tab_plt, widths = c(2, 1))
   }
 
   return(plt)
@@ -166,20 +164,13 @@ plot_fitting_acc <- function(dt_assay,
   rss$layers <- rss$layers[-1]
 
   # Combine plots vertically (one on top of the other)
-  combined_plot <- ggpubr::ggarrange(r2, rss, ncol = 1, heights = c(0.7, 0.7))
+  combined_plot <- patchwork::wrap_plots(r2, rss, ncol = 1, heights = c(0.7, 0.7))
   metric_cols <- c("r2", "rss")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
   data.table::setorder(data2table, "rss")
-  tab_metric <- ggpubr::ggtexttable(
-    data2table,
-    rows = NULL, theme = ggpubr::ttheme("light", base_size = 8))
-
-  ggpubr::ggarrange(combined_plot,
-                    tab_metric,
-                    nrow = 1,
-                    widths = c(2, 1),
-                    heights = c(1, 1.2))
+  tab_plt <- .table_to_ggplot(data2table, base_size = 8)
+  patchwork::wrap_plots(combined_plot, tab_plt, widths = c(2, 1))
 }
 
 
@@ -287,4 +278,28 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      angle_col = 90,
                      legend_breaks = unique_values,
                      legend_labels = unique_values)
+}
+
+#' @keywords internal
+.table_to_ggplot <- function(dt, base_size = 10) {
+  dt <- data.table::copy(dt)
+  cols <- names(dt)
+  dt[, .row := .N - seq_len(.N) + 1L]
+  header_y <- max(dt$.row) + 1L
+  labels <- lapply(cols, function(col) {
+    vals <- as.character(dt[[col]])
+    vals <- ifelse(is.na(vals), "", vals)
+    data.table::data.table(
+      x = match(col, cols),
+      y = c(header_y, dt$.row),
+      label = c(col, vals),
+      fontface = c("bold", rep("plain", nrow(dt)))
+    )
+  })
+  lbl_dt <- data.table::rbindlist(labels)
+  ggplot2::ggplot(lbl_dt, ggplot2::aes(x = x, y = y, label = label)) +
+    ggplot2::geom_text(ggplot2::aes(fontface = fontface),
+                       size = base_size / 3, hjust = 0.5) +
+    ggplot2::theme_void() +
+    ggplot2::coord_cartesian(clip = "off")
 }
