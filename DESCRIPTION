@@ -32,7 +32,6 @@ Suggests:
     colorspace,
     gDRtestData (>= 1.6.0),
     gDRstyle (>= 1.6.0),
-    ggpubr,
     heatmaply,
     jsonlite,
     knitr,

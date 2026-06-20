@@ -216,7 +216,7 @@ output <- pheatmap_with_anno_sa(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
@@ -294,7 +294,7 @@ output <- pheatmap_with_anno_cd(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
@@ -319,7 +319,7 @@ output <- pheatmap_with_anno_combo(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 
 knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
@@ -525,17 +525,17 @@ The control heatmap is built for selected cell line names and drugs (for the com
 
 ```{r pheatmap_qc_sa, warning = FALSE, message = FALSE}
 hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
-ggpubr::as_ggplot(hm_sa[["gtable"]])
+patchwork::wrap_elements(hm_sa[["gtable"]])
 ```
 
 ```{r pheatmap_qc_cd, warning = FALSE, message = FALSE}
 hm_cd <- pheatmap_qc(dt_average = dt_average_cd)
-ggpubr::as_ggplot(hm_cd[["gtable"]])
+patchwork::wrap_elements(hm_cd[["gtable"]])
 ```
 
 ```{r pheatmap_qc_combo, warning = FALSE, message = FALSE}
 hm_combo <- pheatmap_qc(dt_average = dt_average_combo)
-ggpubr::as_ggplot(hm_combo[["gtable"]])
+patchwork::wrap_elements(hm_combo[["gtable"]])
 ```
 
 ### Accuracy of Fitting Dose-response Curves

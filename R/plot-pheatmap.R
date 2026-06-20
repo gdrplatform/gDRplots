@@ -38,8 +38,8 @@
 #'                     lbl_by_CellLineName = TRUE,
 #'                     lbl_by_DrugName = TRUE)
 #'
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -50,8 +50,8 @@
 #'                     metric = "x_std",
 #'                     cluster_rows = FALSE)
 #'
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
-#' ggpubr::as_ggplot(hm_4[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_4[["gtable"]])
 #'
 #' @keywords QC_plot
 #'
@@ -345,12 +345,12 @@ pheatmap_qc <- function(
 #'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 #' hm_0 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_0[["gtable"]])
+#' patchwork::wrap_elements(hm_0[["gtable"]])
 #'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
 #'                                 dt_metrics_capped = dt_metrics_capped)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -367,7 +367,7 @@ pheatmap_qc <- function(
 #'                                 annotation_col = annotation_manual_col,
 #'                                 annotation_colors = annotation_map)
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -388,7 +388,7 @@ pheatmap_qc <- function(
 #'                                   metric = "hsa_score",
 #'                                   dataset_name = "Combo Matrix - combo data"))
 #' hm_3 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -715,7 +715,7 @@ pheatmap_with_anno_sa <- function(
 #'
 #' output <- pheatmap_with_anno_cd(dt_metrics = dt_metrics)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -734,7 +734,7 @@ pheatmap_with_anno_sa <- function(
 #'                                 annotation_col = annotation_manual_col,
 #'                                 annotation_colors = annotation_map)
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -755,7 +755,7 @@ pheatmap_with_anno_sa <- function(
 #'                                   metric = "hsa_score",
 #'                                   dataset_name = "Co-dilution data"))
 #' hm_3 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -1013,7 +1013,7 @@ pheatmap_with_anno_cd <- function(
 #'                                    annotation_col = annotation_manual_col,
 #'                                    annotation_colors = annotation_map)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -1036,7 +1036,7 @@ pheatmap_with_anno_cd <- function(
 #'                                      metric = "hsa_score",
 #'                                      dataset_name = "Combo Matrix - combo data"))
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -1328,7 +1328,7 @@ pheatmap_with_anno_combo <- function(
 #'                                            normalization_type = "RV",
 #'                                            metric = "x_mean")
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -1363,7 +1363,7 @@ pheatmap_with_anno_combo <- function(
 #'                                            normalization_type = "RV",
 #'                                            metric = "x_mean")
 #' hm_4 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_4[["gtable"]])
+#' patchwork::wrap_elements(hm_4[["gtable"]])
 #'
 #' @return A named list with elements:
 #' \itemize{

@@ -122,7 +122,7 @@ test_that("heatmap_combo_metrics_panel works as expected", {
   dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
   dt_isobolograms <- gDRutils::convert_se_assay_to_dt(se, "isobolograms")
 
-  plts_1 <- # remove when ggpubr will be updated to ggplot2 v.4.0.0. # nolint
+  plts_1 <- # nolint
     purrr::quietly(heatmap_combo_metrics_panel)(dt_excess,
                                                 dt_isobolograms,
                                                 drug1_name,

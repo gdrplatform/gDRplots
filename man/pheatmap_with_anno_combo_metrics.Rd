@@ -18,8 +18,7 @@ pheatmap_with_anno_combo_metrics(
   distfun = compute_distances,
   annotation_col = NULL,
   annotation_colors = NULL,
-  max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-    system.file(package = "gDRplots", "settings.json"))
+  max_hm_lbl_length = .get_setting("MAX_HM_LBL_LENGTH")
 )
 }
 \arguments{
