@@ -691,32 +691,28 @@ heatmap_combo_metrics_panel <- function(
     ls_plts
   } else if (one_row_panel) {
     # build panel 3x1
-    ggpubr::ggarrange(
-      plotlist = list(
-        ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-        ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-        ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-      ),
-      ncol = 3, common.legend = FALSE, legend = "left")
+    patchwork::wrap_plots(
+      ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
+      ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess"),
+      ncol = 3
+    )
   } else {
-    # build panel 2x2
-    ggpubr::annotate_figure(
-      ggpubr::ggarrange(
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-            ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        common.legend = TRUE, nrow = 2),
-      top = main_title) +
-      ggpubr::bgcolor("white") + ggpubr::border("white")
+    # build panel 2x2 (or 3-plot if no isobolograms)
+    plot_list <- list(
+      ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none")
+    )
+    if (!is.null(ls_plts[["iso_compare"]])) {
+      plot_list <- c(plot_list, list(
+        ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
+      ))
+    }
+    plot_list <- c(plot_list, list(
+      ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
+      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
+    ))
+    patchwork::wrap_plots(plot_list, ncol = 2) +
+      patchwork::plot_annotation(title = main_title)
   }
   # final
   final_plot
@@ -1843,11 +1839,8 @@ heatmap_combo_with_isoref_panel_independent <- function(
     lbl_legend <- names(plt_list)[1]
   }
 
-  panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
-                      common.legend = TRUE, legend.grob = ggpubr::get_legend(plt_list[[lbl_legend]]),
-                      legend = "left"),
-    top = panel_title)
+  panel <- patchwork::wrap_plots(plt_list, ncol = 2) +
+    patchwork::plot_annotation(title = panel_title)
 
   # final panel
   return(panel)

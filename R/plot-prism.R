@@ -875,9 +875,8 @@ plot_volcano_assoc_panel <- function(dt_response,
            sprintf("%s__%s", selected_metric, selected_feat_meta_col),
            sprintf("%s__%s\n%s", selected_metric, selected_feat_meta_col, obj_assoc[["condition_info"]]))
 
-  panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = list(plt_vol, plt_side), widths = c(1, 1)),
-    top = panel_title)
+  panel <- patchwork::wrap_plots(plt_vol, plt_side, ncol = 2, widths = c(1, 1)) +
+    patchwork::plot_annotation(title = panel_title)
 
   # final
   return(list(assoc_data = assoc_data,

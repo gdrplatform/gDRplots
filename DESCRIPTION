@@ -21,6 +21,7 @@ Imports:
     ggrepel,
     ggtext,
     gDRutils (>= 1.6.0),
+    patchwork,
     pheatmap,
     RColorBrewer,
     rstudioapi,
@@ -53,4 +54,4 @@ URL: https://github.com/gdrplatform/gDRplots, https://gdrplatform.github.io/gDRp
 BugReports: https://github.com/gdrplatform/gDRplots/issues
 Encoding: UTF-8
 LazyLoad: yes
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0
