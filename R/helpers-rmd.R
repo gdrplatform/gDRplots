@@ -449,7 +449,7 @@ estimate_plot_size <- function(plt,
 #'
 #' @export
 save_plot <- function(plt, path, format = "svg") {
-  checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
+  checkmate::assert_multi_class(plt, c("ggplot", "pheatmap", "gtable", "grob"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
 
@@ -462,7 +462,11 @@ save_plot <- function(plt, path, format = "svg") {
     stop("The specified directory does not have write access.")
   }
 
-  plot_size <- estimate_plot_size(plt)
+  if (inherits(plt, c("gtable", "grob")) && !inherits(plt, c("ggplot", "pheatmap"))) {
+    plot_size <- c(width = 14, height = 12)
+  } else {
+    plot_size <- estimate_plot_size(plt)
+  }
 
   filename <- paste(path, format, sep = ".")
 
