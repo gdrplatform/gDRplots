@@ -28,8 +28,7 @@ test_that("plot_var_stat_qc works as expected", {
                             metric = "x_AOC",
                             normalization_type = "RV",
                             with_table = TRUE)
-  expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 2)
+  expect_s3_class(plt_3, "patchwork")
 
   expect_error(plot_var_stat_qc(dt_assay = unlist(dt_metrics),
                                 cl_name = cl_name),
