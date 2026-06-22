@@ -1,3 +1,6 @@
+## gDRplots 0.0.114 - 2026-06-22
+* update pacakge vignette
+
 ## gDRplots 0.0.113 - 2026-06-17
 * add auto-orient combo dose-response axes by dose count
 

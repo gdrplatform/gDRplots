@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 ```{r lib, echo=FALSE}
 library(gDRplots)
+library(gDRutils)
 ```
 
 # Overview
@@ -55,108 +56,132 @@ Basically all functions return **a ggplot object**, except for a few that return
 There is a group of functions that return **a panel** with a group of basic plots. The name of these functions always contains a word **panel**. E.g. a basic ggplot object - <u>one heatmap</u> for selected drug, co-drug and one cell line - is returned by `heatmap_combo_with_isoref`. And `heatmap_combo_with_isoref_panel` returns a ggplot object with <u>a panel with heatmaps</u> for selected drug, co-drug and list of cell lines.
 
 
-Used data:
+<u>Used data</u>:
 
-* single-agent experiment
+* single-agent experiment (synthetic data)
 ```{r sa_data, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-sa_name <- gDRutils::get_supported_experiments("sa")
+mae <- get_synthetic_data("combo_matrix")
+sa_name <- get_supported_experiments("sa")
 se_sa <- mae[[sa_name]]
 
 dt_norm_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_sa_capped <-
- gDRutils::cap_assay_infinities(conc_assay_dt = dt_average_sa,
-                                assay_dt = dt_metrics_sa,
-                                experiment_name = sa_name,
-                                col = "xc50",
-                                capping_fold = 5)
+  cap_assay_infinities(conc_assay_dt = dt_average_sa,
+                       assay_dt = dt_metrics_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
 ```
 
-* codilution experiment
+* codilution experiment (synthetic data)
 ```{r cd_data, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_codilution_small")
-cd_name <- gDRutils::get_supported_experiments("cd")
+mae <- get_synthetic_data("combo_codilution_small")
+cd_name <- get_supported_experiments("cd")
 se_cd <- mae[[cd_name]]
 
 dt_norm_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 ```
 
-* combination experiment
+* combination experiment (synthetic data)
 ```{r combo_data, warning = FALSE, message = FALSE}
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-combo_name <- gDRutils::get_supported_experiments("combo")
+mae <- get_synthetic_data("combo_matrix")
+combo_name <- get_supported_experiments("combo")
 se_combo <- mae[[combo_name]]
 
 dt_norm_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_scores <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "scores",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "scores",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_excess <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "excess",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "excess",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_isobolograms <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "isobolograms",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "isobolograms",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
+```
+
+* single-agent experiment for PRISM data
+```{r sa_prism_data, warning = FALSE, message = FALSE}
+mae_prism <- get_synthetic_data("prism")
+sa_name <- get_supported_experiments("sa")
+se_sa_prism <- mae_prism[[sa_name]]
+
+dt_norm_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name =  "Normalized")
+dt_metrics_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name = "Metrics")
+dt_average_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name = "Averaged")
+dt_metrics_prism_sa_capped <-
+  cap_assay_infinities(conc_assay_dt = dt_average_prism_sa,
+                       assay_dt = dt_metrics_prism_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
 ```
 
 <br>
 
 ::: {.chunk .alert .alert-warning}
 **TIP**<br>
-It is highly recommended to use `gDRutils::convert_se_assay_to_dt` with 
+It is highly recommended to use `convert_se_assay_to_dt` with 
 `unify_metadata = TRUE` and `merge_additional_variables = TRUE`. This prevents 
 errors caused by non-unique combinations of values in the `DrugName` and 
 `CellLineName` columns.
 :::
 
+<br>
 
 ## Dose Response Plots
 
@@ -186,10 +211,11 @@ The **plot_dose_response_combo** function is dedicated to combination experiment
 Users can also use **plot_dose_response_combo_panel** to get a panel with dose-response plots by selected cell line name.
 
 ```{r plot_dose_response_combo, warning = FALSE, message = FALSE}
-plot_dose_response_combo(dt_average = dt_average_combo,
-                         drug1_name = "drug_011",
-                         drug2_name = "drug_021",
-                         cl_name = "cellline_NE")
+plot_dose_response_combo(
+  dt_average = dt_average_combo,
+  drug1_name = "drug_011",
+  drug2_name = "drug_021",
+  cl_name = "cellline_NE")
 ```
 
 ## Metrics plot
@@ -261,17 +287,17 @@ Additionally, the n-bottom points are colored.
 
 ```{r plot_boxplot_metric_sa_by_grp_d, warning = FALSE, message = FALSE}
 plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
-                             selection_var = "DrugName",
-                             selection_name = "drug_002",
-                             group_var = "Tissue",
-                             named_n = 3)
+                              selection_var = "DrugName",
+                              selection_name = "drug_002",
+                              group_var = "Tissue",
+                              named_n = 3)
 ```
 ```{r plot_boxplot_metric_sa_by_grp_cl, warning = FALSE, message = FALSE}
 plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
-                             selection_var = "CellLineName",
-                             selection_name = "cellline_BC",
-                             group_var = "drug_moa",
-                             named_n = 3)
+                              selection_var = "CellLineName",
+                              selection_name = "cellline_BC",
+                              group_var = "drug_moa",
+                              named_n = 3)
 ```
 
 ### Co-dilution Data
@@ -468,29 +494,29 @@ It allows to visually check whether the raw data and the control are correct and
 
 ```{r heatmap_control_mapping_qc, warning = FALSE, message = FALSE}
 dt_treat <-
-  gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "RawTreated",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa,
+                         assay_name = "RawTreated",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_controls <-
-  gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "Controls",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa,
+                         assay_name = "Controls",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
 
 dt_treat <-
-  gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "RawTreated",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo,
+                         assay_name = "RawTreated",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_controls <-
-  gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "Controls",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo,
+                         assay_name = "Controls",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
@@ -578,38 +604,182 @@ plot_fitting_acc(dt_assay = dt_metrics_sa,
 
 ## Correlation between PRISM and DepMap
 
+Generating visualization with PRISM and DepMap is generetde for selected drug
+```{r sel_drug, warning = FALSE, message = FALSE}
+sel_drug <- unique(dt_norm_prism_sa$DrugName)[1]
+print(sel_drug)
+```
+and requires dedicated inputs. 
+ 
+First part is based on PRISM data prapred with one of functions:
+- `prep_dt_response_metric_sa` based on the "Metrics" assay for single-agent experiment
+- `prep_dt_response_dose_sa` based on the "Averaged" assay for single-agent experiment
+- `prep_dt_response_scores` based on the "scores" assay for combination experiment
+- `prep_dt_response_metric_diff` based on the "Metrics" assay for combination experiment
+
+```{r prism_dt_res, warning = FALSE, message = FALSE}
+dt_response <- prep_dt_response_metric_sa(
+  dt_metrics = dt_metrics_prism_sa,
+  d_name = sel_drug,
+  normalization_type = "RV",
+  metric = "x_mean"
+)
+```
+
+The second part based on DepMap data prapred with one of functions:
+
+- `prep_dt_depmap_meta` for metadata columns for selected cell line annotations or donor demographics
+
+```{r obj_meta, warning = FALSE, message = FALSE}
+meta_data_path <- 
+  system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+
+meta_col <- "OncotreeLineage"
+obj_depmap_meta <- prep_dt_depmap_meta(
+    meta_data_path = meta_data_path, 
+    metadata_col = meta_col)
+```
+
+- `prep_dt_depmap_feat` for selected feature
+
+```{r obj_feat, warning = FALSE, message = FALSE}
+feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+
+feature_set <- "OmicsCNGene"
+obj_depmap_feat <- prep_dt_depmap_feat(
+    feat_data_path = feat_data_path,
+    meta_data_path = meta_data_path,
+    feature_set = feature_set)
+
+feature_set_2 <- "OmicsSomaticMutationsMatrixDamaging"
+obj_depmap_feat_2 <- prep_dt_depmap_feat(
+    feat_data_path = feat_data_path,
+    meta_data_path = meta_data_path,
+    feature_set = feature_set_2,
+    with_decoding = TRUE)
+```
+
+For volcano visualization is also required object with calculated linear associations genarated with `prep_dt_assoc` function.
+
+```{r obj_assoc, warning = FALSE, message = FALSE}
+obj_assoc_meta <- prep_dt_assoc(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+
+obj_assoc_feta <- prep_dt_assoc(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+```
+
 ### Volcano plot
 
 The **plot_volcano_assoc** function is dedicated to PRISM experiments. This function returns the volcano plot with associations between the molecular features or the metadata and readout of interest.
 
-_Note_: It requires dedicated input calculated with `prep_dt_assoc` function.
+```{r plot_vol_meta, warning = FALSE, message = FALSE}
+plot_volcano_assoc(
+  dt_assoc = obj_assoc_meta$dt_assoc,
+  selected_feat_meta_col = obj_assoc_meta$selected_feat_meta_col,
+  selected_metric = obj_assoc_meta$selected_metric,
+  condition_info = obj_assoc_meta$condition_info)
+```
 
-Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data (numerical feature or categorical feature, respectively).
+```{r plot_vol_feat, warning = FALSE, message = FALSE}
+plot_volcano_assoc(
+  dt_assoc = obj_assoc_feta$dt_assoc,
+  selected_feat_meta_col = obj_assoc_feta$selected_feat_meta_col,
+  selected_metric = obj_assoc_feta$selected_metric,
+  condition_info = obj_assoc_feta$condition_info)
+```
 
-![](plot_volcano_feat_scatt.png)
+Users can also use **plot_volcano_assoc_panel** to get a panel with the volcano plot and scatter plots or box plots for interesting variables - according to the type of data. 
 
-![](plot_volcano_feat_box.png)
-![](plot_volcano_meta.png)
+This function returns the volcano panel itself and table with associations.
 
-### Scatter plots with correlations
+```{r plot_vol_meta_panel, warning = FALSE, message = FALSE}
+obj_res <- plot_volcano_assoc_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_metric = "RV_gDR_x_mean",
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+
+obj_res[["panel"]]
+
+generate_datatable(
+  obj_res[["assoc_data"]],
+  col_to_round = c("rho", "q_value", "neglog_q_value"))
+```
+
+```{r plot_vol_feat_panel, warning = FALSE, message = FALSE}
+obj_res <- plot_volcano_assoc_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_metric = "RV_gDR_x_mean",
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+
+obj_res[["panel"]]
+
+generate_datatable(
+  obj_res[["assoc_data"]],
+  col_to_round = c("rho", "q_value", "neglog_q_value"))
+```
+
+### Scatter plot with correlation
 
 Users can explore more detailed correlation between one selected feature and selected metric using **plot_scatter_with_corr** function.
 
-_Note_: It requires dedicated input calculated with `prep_dt_depmap_feat` function and one of the functions with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
+```{r plot_scatt, warning = FALSE, message = FALSE}
+plot_scatter_with_corr(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat = names(obj_depmap_feat$dt_depmap)[42],
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+```
 
+Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation for list of the DepMap features.
 
-Users can also use **plot_scatter_with_corr_panel** to get a panel with the scatter plot with correlation for list of the DepMap features as a table.
+```{r plot_scatt_panel, warning = FALSE, message = FALSE}
+plot_scatter_with_corr_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat = names(obj_depmap_feat$dt_depmap)[12:17],
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col,
+  ncol = 3)
+```
 
 ### Boxplots
 
 Users can explore more detailed distribution of selected metric for selected level of metadata using **plot_boxplot_num** function.
 
+```{r plot_box_num_meta, warning = FALSE, message = FALSE}
+plot_boxplot_num(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat = names(obj_depmap_meta$dt_depmap)[10],
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+```
+
+
 Users can also use **plot_boxplot_num_panel** to get a panel with the box plot with category distribution for list of the DepMap matadata.
+
+```{r plot_box_meta_panel, warning = FALSE, message = FALSE}
+plot_boxplot_num_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat = names(obj_depmap_meta$dt_depmap)[10:13],
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col,
+  ncol = 2)
+```
 
 Users can also explore more detailed distribution for all lveles of selected metadata and selected metric using **plot_boxplot_meta** function.
 
-_Note_: It requires dedicated input calculated with `prep_dt_depmap_meta` function and one of the functions
-with experimental response data for one metric: `prep_dt_response_metric_sa`, `prep_dt_response_dose_sa`, `prep_dt_response_scores` or `prep_dt_response_metric_diff`.
+```{r plot_box_meta, warning = FALSE, message = FALSE}
+plot_boxplot_meta(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+```
 
 # SessionInfo {-}
 
