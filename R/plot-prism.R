@@ -285,7 +285,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
           correlation <- sqrt(r_squared)
           # add label for points driving the correlation
           dist_cooks <- sort(stats::cooks.distance(fit), decreasing = TRUE)
-          top_driving_corr <- as.numeric(names(dist_cooks)[seq_len(5)])
+          top_driving_corr <- as.integer(names(dist_cooks)[seq_len(5)])
           data.table::set(tab_plot_sel, j = "label", value = "")
           data.table::set(tab_plot_sel, i = top_driving_corr, j = "label",
                           value = tab_plot_sel[[cellline_name]][top_driving_corr])
