@@ -293,7 +293,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
       x = match(col, cols),
       y = c(header_y, dt$.row),
       label = c(col, vals),
-      fontface = c("bold", rep("plain", nrow(dt)))
+      fontface = c("bold", rep("plain", NROW(dt)))
     )
   })
   lbl_dt <- data.table::rbindlist(labels)
