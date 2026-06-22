@@ -14,6 +14,15 @@ gDRplots is a package that stores functions for gDR static visualizations and th
 \note{
 To learn more about functions start with `help(package = "gDRplots")`
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/gdrplatform/gDRplots}
+  \item \url{https://gdrplatform.github.io/gDRplots/}
+  \item Report bugs at \url{https://github.com/gdrplatform/gDRplots/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com} (\href{https://orcid.org/0000-0002-7059-6378}{ORCID})
 
@@ -22,6 +31,7 @@ Authors:
   \item Marc Hafner (\href{https://orcid.org/0000-0003-1337-7598}{ORCID})
   \item Janina Smola
   \item Bartosz Czech (\href{https://orcid.org/0000-0002-9908-3007}{ORCID})
+  \item Dariusz Scigocki
 }
 
 }
