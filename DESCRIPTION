@@ -1,6 +1,6 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.114
+Version: 0.0.115
 Date: 2026-06-22
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
@@ -40,6 +40,7 @@ Suggests:
     purrr,
     readxl,
     rlang,
+    R.utils,
     scales,
     S4Vectors,
     SummarizedExperiment,
