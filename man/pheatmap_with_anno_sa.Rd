@@ -111,12 +111,12 @@ dt_metrics_capped <-
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 hm_0 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_0[["gtable"]])
+patchwork::wrap_elements(hm_0[["gtable"]])
 
 output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 dt_metrics_capped = dt_metrics_capped)
 hm_1 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_1[["gtable"]])
+patchwork::wrap_elements(hm_1[["gtable"]])
 
 annotation_manual_col <-
   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -133,7 +133,7 @@ output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                 annotation_col = annotation_manual_col,
                                 annotation_colors = annotation_map)
 hm_2 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_2[["gtable"]])
+patchwork::wrap_elements(hm_2[["gtable"]])
 
 annotation_manual <- data.table::data.table(
   CellLineName =
@@ -154,7 +154,7 @@ output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
                                   metric = "hsa_score",
                                   dataset_name = "Combo Matrix - combo data"))
 hm_3 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_3[["gtable"]])
+patchwork::wrap_elements(hm_3[["gtable"]])
 
 }
 \seealso{

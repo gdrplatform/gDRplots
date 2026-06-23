@@ -100,7 +100,7 @@ output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
                                            normalization_type = "RV",
                                            metric = "x_mean")
 hm_1 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_1[["gtable"]])
+patchwork::wrap_elements(hm_1[["gtable"]])
 
 annotation_manual <- data.table::data.table(
   CellLineName =
@@ -135,7 +135,7 @@ output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
                                            normalization_type = "RV",
                                            metric = "x_mean")
 hm_4 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_4[["gtable"]])
+patchwork::wrap_elements(hm_4[["gtable"]])
 
 }
 \author{
