@@ -1,3 +1,6 @@
+## gDRplots 0.0.115 - 2026-06-22
+* update dependencies
+
 ## gDRplots 0.0.114 - 2026-06-22
 * update pacakge vignette
 
