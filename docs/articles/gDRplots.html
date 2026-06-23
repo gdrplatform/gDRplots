@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.113</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.115</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,15 +47,18 @@
 
 
 
-
-<div class="row">
+<script src="gDRplots_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><link href="gDRplots_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="gDRplots_files/datatables-binding-0.34.0/datatables.js"></script><link href="gDRplots_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="gDRplots_files/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="gDRplots_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script><link href="gDRplots_files/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="gDRplots_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>gDRplots</h1>
                         <h4 data-toc-skip class="author">gDR team</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/gdrplatform/gDRplots/blob/main/vignettes/gDRplots.Rmd" class="external-link"><code>vignettes/gDRplots.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gdrplatform/gDRplots/blob/test_ci_pkgdown/vignettes/gDRplots.Rmd" class="external-link"><code>vignettes/gDRplots.Rmd</code></a></small>
       <div class="d-none name"><code>gDRplots.Rmd</code></div>
     </div>
 
@@ -131,106 +134,130 @@ by <code>heatmap_combo_with_isoref</code>. And
 <code>heatmap_combo_with_isoref_panel</code> returns a ggplot object
 with <u>a panel with heatmaps</u> for selected drug, co-drug and list of
 cell lines.</p>
-<p>Used data:</p>
+<p><u>Used data</u>:</p>
 <ul>
-<li>single-agent experiment</li>
+<li>single-agent experiment (synthetic data)</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_synthetic_data.html" class="external-link">get_synthetic_data</a></span><span class="op">(</span><span class="st">"combo_matrix"</span><span class="op">)</span></span>
-<span><span class="va">sa_name</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">get_synthetic_data</span><span class="op">(</span><span class="st">"combo_matrix"</span><span class="op">)</span></span>
+<span><span class="va">sa_name</span> <span class="op">&lt;-</span> <span class="fu">get_supported_experiments</span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span></span>
 <span><span class="va">se_sa</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="va">sa_name</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">dt_norm_sa</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
-<span>                                   assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
+<span>                         assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_metrics_sa</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_average_sa</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_metrics_sa_capped</span> <span class="op">&lt;-</span></span>
-<span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/cap_assay_infinities.html" class="external-link">cap_assay_infinities</a></span><span class="op">(</span>conc_assay_dt <span class="op">=</span> <span class="va">dt_average_sa</span>,</span>
-<span>                                assay_dt <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
-<span>                                experiment_name <span class="op">=</span> <span class="va">sa_name</span>,</span>
-<span>                                col <span class="op">=</span> <span class="st">"xc50"</span>,</span>
-<span>                                capping_fold <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">cap_assay_infinities</span><span class="op">(</span>conc_assay_dt <span class="op">=</span> <span class="va">dt_average_sa</span>,</span>
+<span>                       assay_dt <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
+<span>                       experiment_name <span class="op">=</span> <span class="va">sa_name</span>,</span>
+<span>                       col <span class="op">=</span> <span class="st">"xc50"</span>,</span>
+<span>                       capping_fold <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>codilution experiment</li>
+<li>codilution experiment (synthetic data)</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_synthetic_data.html" class="external-link">get_synthetic_data</a></span><span class="op">(</span><span class="st">"combo_codilution_small"</span><span class="op">)</span></span>
-<span><span class="va">cd_name</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">get_synthetic_data</span><span class="op">(</span><span class="st">"combo_codilution_small"</span><span class="op">)</span></span>
+<span><span class="va">cd_name</span> <span class="op">&lt;-</span> <span class="fu">get_supported_experiments</span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span></span>
 <span><span class="va">se_cd</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="va">cd_name</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">dt_norm_cd</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
-<span>                                   assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
+<span>                         assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_metrics_cd</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_average_cd</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_cd</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>combination experiment</li>
+<li>combination experiment (synthetic data)</li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_synthetic_data.html" class="external-link">get_synthetic_data</a></span><span class="op">(</span><span class="st">"combo_matrix"</span><span class="op">)</span></span>
-<span><span class="va">combo_name</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"combo"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">get_synthetic_data</span><span class="op">(</span><span class="st">"combo_matrix"</span><span class="op">)</span></span>
+<span><span class="va">combo_name</span> <span class="op">&lt;-</span> <span class="fu">get_supported_experiments</span><span class="op">(</span><span class="st">"combo"</span><span class="op">)</span></span>
 <span><span class="va">se_combo</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="va">combo_name</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">dt_norm_combo</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span>  <span class="st">"Normalized"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_metrics_combo</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Metrics"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_average_combo</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Averaged"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_scores</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"scores"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"scores"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_excess</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"excess"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"excess"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_isobolograms</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"isobolograms"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"isobolograms"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>single-agent experiment for PRISM data</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mae_prism</span> <span class="op">&lt;-</span> <span class="fu">get_synthetic_data</span><span class="op">(</span><span class="st">"prism"</span><span class="op">)</span></span>
+<span><span class="va">sa_name</span> <span class="op">&lt;-</span> <span class="fu">get_supported_experiments</span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span></span>
+<span><span class="va">se_sa_prism</span> <span class="op">&lt;-</span> <span class="va">mae_prism</span><span class="op">[[</span><span class="va">sa_name</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">dt_norm_prism_sa</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa_prism</span>,</span>
+<span>                         assay_name <span class="op">=</span>  <span class="st">"Normalized"</span><span class="op">)</span></span>
+<span><span class="va">dt_metrics_prism_sa</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa_prism</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Metrics"</span><span class="op">)</span></span>
+<span><span class="va">dt_average_prism_sa</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span>se <span class="op">=</span> <span class="va">se_sa_prism</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Averaged"</span><span class="op">)</span></span>
+<span><span class="va">dt_metrics_prism_sa_capped</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">cap_assay_infinities</span><span class="op">(</span>conc_assay_dt <span class="op">=</span> <span class="va">dt_average_prism_sa</span>,</span>
+<span>                       assay_dt <span class="op">=</span> <span class="va">dt_metrics_prism_sa</span>,</span>
+<span>                       experiment_name <span class="op">=</span> <span class="va">sa_name</span>,</span>
+<span>                       col <span class="op">=</span> <span class="st">"xc50"</span>,</span>
+<span>                       capping_fold <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
 <div class="chunk alert alert-warning">
 <p><strong>TIP</strong><br> It is highly recommended to use
-<code><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">gDRutils::convert_se_assay_to_dt</a></code> with
+<code>convert_se_assay_to_dt</code> with
 <code>unify_metadata = TRUE</code> and
 <code>merge_additional_variables = TRUE</code>. This prevents errors
 caused by non-unique combinations of values in the <code>DrugName</code>
 and <code>CellLineName</code> columns.</p>
 </div>
+<p><br></p>
 <div class="section level3">
 <h3 id="dose-response-plots">Dose Response Plots<a class="anchor" aria-label="anchor" href="#dose-response-plots"></a>
 </h3>
@@ -250,7 +277,7 @@ single-agent experiments.</p>
 <p>Users can also use <strong>plot_dose_response_sa_by_CLs</strong> or
 <strong>plot_dose_response_sa_by_drugs</strong> to get a list of
 dose-response plots by cell line names or by drugs accordingly.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dose_response_sa.html">plot_dose_response_sa</a></span><span class="op">(</span></span>
 <span>  dt_metrics <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
 <span>  dt_average <span class="op">=</span> <span class="va">dt_average_sa</span>,</span>
@@ -266,11 +293,12 @@ dose-response plots by cell line names or by drugs accordingly.</p>
 to combination experiments.</p>
 <p>Users can also use <strong>plot_dose_response_combo_panel</strong> to
 get a panel with dose-response plots by selected cell line name.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dose_response_combo.html">plot_dose_response_combo</a></span><span class="op">(</span>dt_average <span class="op">=</span> <span class="va">dt_average_combo</span>,</span>
-<span>                         drug1_name <span class="op">=</span> <span class="st">"drug_011"</span>,</span>
-<span>                         drug2_name <span class="op">=</span> <span class="st">"drug_021"</span>,</span>
-<span>                         cl_name <span class="op">=</span> <span class="st">"cellline_NE"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dose_response_combo.html">plot_dose_response_combo</a></span><span class="op">(</span></span>
+<span>  dt_average <span class="op">=</span> <span class="va">dt_average_combo</span>,</span>
+<span>  drug1_name <span class="op">=</span> <span class="st">"drug_011"</span>,</span>
+<span>  drug2_name <span class="op">=</span> <span class="st">"drug_021"</span>,</span>
+<span>  cl_name <span class="op">=</span> <span class="st">"cellline_NE"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_dose_response_combo-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
@@ -290,7 +318,7 @@ single-agent experiments to generate a heatmap.</p>
 by <code>drug MOA</code>. Users can also use their own annotations.</p>
 <p>This function returns the heatmap itself and a list of tables with
 data: a matrix and annotation vectors.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotation_manual_col</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics_sa</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CellLineName"</span>, <span class="st">"Tissue"</span><span class="op">)</span>, with <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">annotation_manual_row</span> <span class="op">&lt;-</span></span>
@@ -304,7 +332,7 @@ data: a matrix and annotation vectors.</p>
 <span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_with_anno_sa-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">output</span><span class="op">[[</span><span class="st">"data"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"matrix"</span><span class="op">]</span><span class="op">]</span>, escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -405,29 +433,29 @@ data: a matrix and annotation vectors.</p>
 <strong>plot_boxplot_metric_sa_by_drugs</strong> functions are dedicated
 to single-agent experiments to generate boxplots grouped by
 <code>CellLineName</code> or <code>DrugName</code>, respectively.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_CLs.html">plot_boxplot_metric_sa_by_CLs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_CLs-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_drugs.html">plot_boxplot_metric_sa_by_drugs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_drugs-1.png" class="r-plt" alt="" width="700"></p>
 <p>Additionally, user can colored boxplots by secondary variable - by
 <code>Tissue</code> or <code>drug MOA</code> respectively.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_CLs.html">plot_boxplot_metric_sa_by_CLs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
 <span>                              grouped_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_CLs_group-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_drugs.html">plot_boxplot_metric_sa_by_drugs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
 <span>                                grouped_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_drugs_group-1.png" class="r-plt" alt="" width="700"></p>
 <p>Or user can colored points by opposite primary variable - by
 <code>DrugName</code> or <code>CellLineName</code> respectively.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_CLs.html">plot_boxplot_metric_sa_by_CLs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
 <span>                              colored_pts_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_CLs_pts-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_drugs.html">plot_boxplot_metric_sa_by_drugs</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
 <span>                                colored_pts_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_drugs_pts-1.png" class="r-plt" alt="" width="700"></p>
@@ -435,19 +463,19 @@ to single-agent experiments to generate boxplots grouped by
 variable for dedicated <code>DrugName</code> or
 <code>CellLineName</code>. Additionally, the n-bottom points are
 colored.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_grp.html">plot_boxplot_metric_sa_by_grp</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
-<span>                             selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span>
-<span>                             selection_name <span class="op">=</span> <span class="st">"drug_002"</span>,</span>
-<span>                             group_var <span class="op">=</span> <span class="st">"Tissue"</span>,</span>
-<span>                             named_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_grp_d-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_grp.html">plot_boxplot_metric_sa_by_grp</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
-<span>                             selection_var <span class="op">=</span> <span class="st">"CellLineName"</span>,</span>
-<span>                             selection_name <span class="op">=</span> <span class="st">"cellline_BC"</span>,</span>
-<span>                             group_var <span class="op">=</span> <span class="st">"drug_moa"</span>,</span>
-<span>                             named_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span>                              selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span>
+<span>                              selection_name <span class="op">=</span> <span class="st">"drug_002"</span>,</span>
+<span>                              group_var <span class="op">=</span> <span class="st">"Tissue"</span>,</span>
+<span>                              named_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_grp_d-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_sa_by_grp.html">plot_boxplot_metric_sa_by_grp</a></span><span class="op">(</span><span class="va">dt_metrics_sa_capped</span>,</span>
+<span>                              selection_var <span class="op">=</span> <span class="st">"CellLineName"</span>,</span>
+<span>                              selection_name <span class="op">=</span> <span class="st">"cellline_BC"</span>,</span>
+<span>                              group_var <span class="op">=</span> <span class="st">"drug_moa"</span>,</span>
+<span>                              named_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_sa_by_grp_cl-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level4">
@@ -460,7 +488,7 @@ by <code>drug MOA</code> and <code>drug MOA 2</code>. Users can also use
 their own annotations.</p>
 <p>This function returns the heatmap itself and a list of tables with
 data: a matrix and annotation vectors.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotation_manual_col</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics_cd</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CellLineName"</span>, <span class="st">"Tissue"</span><span class="op">)</span>, with <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">annotation_manual_row</span> <span class="op">&lt;-</span></span>
@@ -474,7 +502,7 @@ data: a matrix and annotation vectors.</p>
 <span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_with_anno_cd-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">output</span><span class="op">[[</span><span class="st">"data"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"matrix"</span><span class="op">]</span><span class="op">]</span>, escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -612,7 +640,7 @@ by <code>drug MOA</code> and <code>co-drug MOA</code>. Users can also
 use their own annotations.</p>
 <p>This function returns the heatmap itself and a list of tables with
 data: a matrix and annotation vectors.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotation_manual_col</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_scores</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CellLineName"</span>, <span class="st">"Tissue"</span><span class="op">)</span>, with <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">annotation_manual_row</span> <span class="op">&lt;-</span></span>
@@ -626,7 +654,7 @@ data: a matrix and annotation vectors.</p>
 <span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_with_anno_combo-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">output</span><span class="op">[[</span><span class="st">"data"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"matrix"</span><span class="op">]</span><span class="op">]</span>, escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -760,24 +788,24 @@ to single-agent experiments to generate boxplots grouped by
 <code>DrugName_2</code>, respectively.</p>
 <p>Additionally, for boxplots grouped by <code>CellLineName</code> user
 can colored boxplots by secondary variable - by <code>Tissue</code>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_combo_by_CLs.html">plot_boxplot_metric_combo_by_CLs</a></span><span class="op">(</span><span class="va">dt_scores</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_combo_by_CLs-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_combo_by_drugs.html">plot_boxplot_metric_combo_by_drugs</a></span><span class="op">(</span><span class="va">dt_scores</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_combo_by_drugs-1.png" class="r-plt" alt="" width="700"></p>
 <p>There is also a possibility to generate boxplot grouped by chosen
 variable for dedicated <code>DrugName</code> or
 <code>CellLineName</code>. Additionally, the n-top points are
 colored.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_combo_by_grp.html">plot_boxplot_metric_combo_by_grp</a></span><span class="op">(</span><span class="va">dt_scores</span>,</span>
 <span>                                 selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span>
 <span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_002"</span>, <span class="st">"drug_026"</span><span class="op">)</span>,</span>
 <span>                                 group_var <span class="op">=</span> <span class="st">"Tissue"</span>,</span>
 <span>                                 named_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_boxplot_metric_combo_by_grp_d-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_metric_combo_by_grp.html">plot_boxplot_metric_combo_by_grp</a></span><span class="op">(</span><span class="va">dt_scores</span>,</span>
 <span>                                 selection_var <span class="op">=</span> <span class="st">"CellLineName"</span>,</span>
 <span>                                 selection_name <span class="op">=</span> <span class="st">"cellline_BC"</span>,</span>
@@ -799,7 +827,7 @@ at different ratios of the two drugs).</p>
 <p>Note that by default, this function returns a panel, but it can also
 return a list with the panel’s items (param
 <code>as_list = TRUE</code>).</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/heatmap_combo_metrics.html">heatmap_combo_metrics</a></span><span class="op">(</span>dt_excess <span class="op">=</span> <span class="va">dt_excess</span>,</span>
 <span>                      dt_isobolograms <span class="op">=</span> <span class="va">dt_isobolograms</span>,</span>
 <span>                      drug1_name <span class="op">=</span> <span class="st">"drug_001"</span>,</span>
@@ -808,7 +836,7 @@ return a list with the panel’s items (param
 <span>                      iso_levels <span class="op">=</span> <span class="st">"0.5"</span>,</span>
 <span>                      metric <span class="op">=</span> <span class="st">"smooth"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/heatmap_combo_metrics_panel-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/heatmap_combo_metrics.html">heatmap_combo_metrics</a></span><span class="op">(</span>dt_excess <span class="op">=</span> <span class="va">dt_excess</span>,</span>
 <span>                      dt_isobolograms <span class="op">=</span> <span class="va">dt_isobolograms</span>,</span>
@@ -818,7 +846,7 @@ return a list with the panel’s items (param
 <span>                      iso_levels <span class="op">=</span> <span class="st">"0.5"</span>,</span>
 <span>                      metric <span class="op">=</span> <span class="st">"hsa_excess"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/heatmap_combo_metrics_panel-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/heatmap_combo_metrics.html">heatmap_combo_metrics</a></span><span class="op">(</span>dt_excess <span class="op">=</span> <span class="va">dt_excess</span>,</span>
 <span>                      dt_isobolograms <span class="op">=</span> <span class="va">dt_isobolograms</span>,</span>
@@ -832,7 +860,7 @@ return a list with the panel’s items (param
 explore the dose-sparing effects for experiments with drug combinations.
 The Combination Index is displayed at different ratios of the two
 drugs.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_combination_index.html">plot_combination_index</a></span><span class="op">(</span>dt_excess <span class="op">=</span> <span class="va">dt_excess</span>,</span>
 <span>                       dt_isobolograms <span class="op">=</span> <span class="va">dt_isobolograms</span>,</span>
 <span>                       drug1_name <span class="op">=</span> <span class="st">"drug_001"</span>,</span>
@@ -847,7 +875,7 @@ normalization type.</p>
 <p>Users can also use <strong>heatmap_combo_with_isoref_panel</strong>
 to get a panel with heatmap for selected drug name and co-drug name and
 list of cell line names.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/heatmap_combo_with_isoref.html">heatmap_combo_with_isoref</a></span><span class="op">(</span>dt_excess <span class="op">=</span> <span class="va">dt_excess</span>,</span>
 <span>                          dt_isobolograms <span class="op">=</span> <span class="va">dt_isobolograms</span>,</span>
 <span>                          drug1_name <span class="op">=</span> <span class="st">"drug_001"</span>,</span>
@@ -879,7 +907,7 @@ functions allow for visualizing the plate design of the experiment. The
 <code>plot_plate_stack_info</code> function shows all the plate
 information on a single plot, while the plot_plate function displays
 information for a single plate on the plot.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load test data using gDRimport</span></span>
 <span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu">gDRimport</span><span class="fu">::</span><span class="fu">get_test_data</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -913,33 +941,33 @@ and controls into the appropriate nested tables.</p>
 to single-agent, co-dilution and combination experiments.</p>
 <p>It allows to visually check whether the raw data and the control are
 correct and have been correctly assigned and nothing is missing.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dt_treat</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_sa</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"RawTreated"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span><span class="va">se_sa</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"RawTreated"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_controls</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_sa</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Controls"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span><span class="va">se_sa</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Controls"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/heatmap_control_mapping_qc.html">heatmap_control_mapping_qc</a></span><span class="op">(</span>dt_treat <span class="op">=</span> <span class="va">dt_treat</span>,</span>
 <span>                           dt_controls <span class="op">=</span> <span class="va">dt_controls</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/heatmap_control_mapping_qc-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">dt_treat</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"RawTreated"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span><span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"RawTreated"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dt_controls</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_combo</span>,</span>
-<span>                                   assay_name <span class="op">=</span> <span class="st">"Controls"</span>,</span>
-<span>                                   unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                   merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">convert_se_assay_to_dt</span><span class="op">(</span><span class="va">se_combo</span>,</span>
+<span>                         assay_name <span class="op">=</span> <span class="st">"Controls"</span>,</span>
+<span>                         unify_metadata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         merge_additional_variables <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/heatmap_control_mapping_qc.html">heatmap_control_mapping_qc</a></span><span class="op">(</span>dt_treat <span class="op">=</span> <span class="va">dt_treat</span>,</span>
 <span>                           dt_controls <span class="op">=</span> <span class="va">dt_controls</span><span class="op">)</span></span></code></pre></div>
@@ -955,15 +983,15 @@ to single-agent, co-dilution and combination experiments.</p>
 <p>It allows to visually check whether the data distribution after
 normalization is correct and as expected on a set of violin plots by
 drug names.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_var_distribution_qc.html">plot_var_distribution_qc</a></span><span class="op">(</span>dt_assay <span class="op">=</span> <span class="va">dt_norm_sa</span>,</span>
 <span>                         cl_name <span class="op">=</span> <span class="st">"cellline_NE"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_var_distribution_qc-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_var_distribution_qc.html">plot_var_distribution_qc</a></span><span class="op">(</span>dt_assay <span class="op">=</span> <span class="va">dt_norm_cd</span>,</span>
 <span>                         cl_name <span class="op">=</span> <span class="st">"cellline_BA"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_var_distribution_qc-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_var_distribution_qc.html">plot_var_distribution_qc</a></span><span class="op">(</span>dt_assay <span class="op">=</span> <span class="va">dt_norm_combo</span>,</span>
 <span>                         cl_name <span class="op">=</span> <span class="st">"cellline_NE"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_var_distribution_qc-3.png" class="r-plt" alt="" width="700"></p>
@@ -980,15 +1008,15 @@ metrics are as expected.</p>
 <p>The control heatmap is built for selected cell line names and drugs
 (for the combination experiment - also for co-drug) that are ordered by
 concentration.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hm_sa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pheatmap_qc.html">pheatmap_qc</a></span><span class="op">(</span>dt_average <span class="op">=</span> <span class="va">dt_average_sa</span><span class="op">)</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_sa</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_qc_sa-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hm_cd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pheatmap_qc.html">pheatmap_qc</a></span><span class="op">(</span>dt_average <span class="op">=</span> <span class="va">dt_average_cd</span><span class="op">)</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_cd</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_qc_cd-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hm_combo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pheatmap_qc.html">pheatmap_qc</a></span><span class="op">(</span>dt_average <span class="op">=</span> <span class="va">dt_average_combo</span><span class="op">)</span></span>
 <span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_combo</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/pheatmap_qc_combo-1.png" class="r-plt" alt="" width="700"></p>
@@ -1006,7 +1034,7 @@ reflect correctly the measured data after normalization.</p>
 <p>Users can also use <strong>plot_dose_response_sa_qc_panel</strong> to
 get a panel with the dose-response curves - fitted and averaged - for
 list of cell line names.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dose_response_sa_qc.html">plot_dose_response_sa_qc</a></span><span class="op">(</span>dt_metrics <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
 <span>                         dt_average <span class="op">=</span> <span class="va">dt_average_sa</span>,</span>
 <span>                         cl_name <span class="op">=</span> <span class="st">"cellline_AA"</span>,</span>
@@ -1021,7 +1049,7 @@ single-agent experiments.</p>
 <p>It allows to visually check values for the selected metric (from
 <em>metric assay</em>) and selected cell line name on lollipop plots by
 the list of drugs.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_var_stat_qc.html">plot_var_stat_qc</a></span><span class="op">(</span>dt_assay <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
 <span>                 cl_name <span class="op">=</span> <span class="st">"cellline_AA"</span>,</span>
 <span>                 metric <span class="op">=</span> <span class="st">"x_mean"</span><span class="op">)</span></span></code></pre></div>
@@ -1031,7 +1059,7 @@ single-agent experiments.</p>
 <p>It allows to visually check the fitting precision (<code>R2</code>
 and <code>RSS</code> values on one panel) on lollipop plots for selected
 cell line name by the list of drugs.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_fitting_acc.html">plot_fitting_acc</a></span><span class="op">(</span>dt_assay <span class="op">=</span> <span class="va">dt_metrics_sa</span>,</span>
 <span>                 cl_name <span class="op">=</span> <span class="st">"cellline_EA"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gDRplots_files/figure-html/plot_fitting_acc-1.png" class="r-plt" alt="" width="700"></p>
@@ -1040,6 +1068,74 @@ cell line name by the list of drugs.</p>
 <div class="section level3">
 <h3 id="correlation-between-prism-and-depmap">Correlation between PRISM and DepMap<a class="anchor" aria-label="anchor" href="#correlation-between-prism-and-depmap"></a>
 </h3>
+<p>Generating visualization with PRISM and DepMap is generetde for
+selected drug</p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sel_drug</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_norm_prism_sa</span><span class="op">$</span><span class="va">DrugName</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sel_drug</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "GDC-8025"</span></span></code></pre></div>
+<p>and requires dedicated inputs.</p>
+<p>First part is based on PRISM data prapred with one of functions: -
+<code>prep_dt_response_metric_sa</code> based on the “Metrics” assay for
+single-agent experiment - <code>prep_dt_response_dose_sa</code> based on
+the “Averaged” assay for single-agent experiment -
+<code>prep_dt_response_scores</code> based on the “scores” assay for
+combination experiment - <code>prep_dt_response_metric_diff</code> based
+on the “Metrics” assay for combination experiment</p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dt_response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_response_metric_sa.html">prep_dt_response_metric_sa</a></span><span class="op">(</span></span>
+<span>  dt_metrics <span class="op">=</span> <span class="va">dt_metrics_prism_sa</span>,</span>
+<span>  d_name <span class="op">=</span> <span class="va">sel_drug</span>,</span>
+<span>  normalization_type <span class="op">=</span> <span class="st">"RV"</span>,</span>
+<span>  metric <span class="op">=</span> <span class="st">"x_mean"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The second part based on DepMap data prapred with one of
+functions:</p>
+<ul>
+<li>
+<code>prep_dt_depmap_meta</code> for metadata columns for selected
+cell line annotations or donor demographics</li>
+</ul>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">meta_data_path</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data/Model.csv.gz"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">meta_col</span> <span class="op">&lt;-</span> <span class="st">"OncotreeLineage"</span></span>
+<span><span class="va">obj_depmap_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_depmap_meta.html">prep_dt_depmap_meta</a></span><span class="op">(</span></span>
+<span>    meta_data_path <span class="op">=</span> <span class="va">meta_data_path</span>, </span>
+<span>    metadata_col <span class="op">=</span> <span class="va">meta_col</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>
+<code>prep_dt_depmap_feat</code> for selected feature</li>
+</ul>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feat_data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feature_set</span> <span class="op">&lt;-</span> <span class="st">"OmicsCNGene"</span></span>
+<span><span class="va">obj_depmap_feat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_depmap_feat.html">prep_dt_depmap_feat</a></span><span class="op">(</span></span>
+<span>    feat_data_path <span class="op">=</span> <span class="va">feat_data_path</span>,</span>
+<span>    meta_data_path <span class="op">=</span> <span class="va">meta_data_path</span>,</span>
+<span>    feature_set <span class="op">=</span> <span class="va">feature_set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feature_set_2</span> <span class="op">&lt;-</span> <span class="st">"OmicsSomaticMutationsMatrixDamaging"</span></span>
+<span><span class="va">obj_depmap_feat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_depmap_feat.html">prep_dt_depmap_feat</a></span><span class="op">(</span></span>
+<span>    feat_data_path <span class="op">=</span> <span class="va">feat_data_path</span>,</span>
+<span>    meta_data_path <span class="op">=</span> <span class="va">meta_data_path</span>,</span>
+<span>    feature_set <span class="op">=</span> <span class="va">feature_set_2</span>,</span>
+<span>    with_decoding <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>For volcano visualization is also required object with calculated
+linear associations genarated with <code>prep_dt_assoc</code>
+function.</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_assoc_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_assoc.html">prep_dt_assoc</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_assoc_feta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_dt_assoc.html">prep_dt_assoc</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="volcano-plot">Volcano plot<a class="anchor" aria-label="anchor" href="#volcano-plot"></a>
 </h4>
@@ -1047,31 +1143,81 @@ cell line name by the list of drugs.</p>
 PRISM experiments. This function returns the volcano plot with
 associations between the molecular features or the metadata and readout
 of interest.</p>
-<p><em>Note</em>: It requires dedicated input calculated with
-<code>prep_dt_assoc</code> function.</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano_assoc.html">plot_volcano_assoc</a></span><span class="op">(</span></span>
+<span>  dt_assoc <span class="op">=</span> <span class="va">obj_assoc_meta</span><span class="op">$</span><span class="va">dt_assoc</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_assoc_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span>,</span>
+<span>  selected_metric <span class="op">=</span> <span class="va">obj_assoc_meta</span><span class="op">$</span><span class="va">selected_metric</span>,</span>
+<span>  condition_info <span class="op">=</span> <span class="va">obj_assoc_meta</span><span class="op">$</span><span class="va">condition_info</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_vol_meta-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano_assoc.html">plot_volcano_assoc</a></span><span class="op">(</span></span>
+<span>  dt_assoc <span class="op">=</span> <span class="va">obj_assoc_feta</span><span class="op">$</span><span class="va">dt_assoc</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_assoc_feta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span>,</span>
+<span>  selected_metric <span class="op">=</span> <span class="va">obj_assoc_feta</span><span class="op">$</span><span class="va">selected_metric</span>,</span>
+<span>  condition_info <span class="op">=</span> <span class="va">obj_assoc_feta</span><span class="op">$</span><span class="va">condition_info</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_vol_feat-1.png" class="r-plt" alt="" width="700"></p>
 <p>Users can also use <strong>plot_volcano_assoc_panel</strong> to get a
 panel with the volcano plot and scatter plots or box plots for
-interesting variables - according to the type of data (numerical feature
-or categorical feature, respectively).</p>
-<p><img src="plot_volcano_feat_scatt.png"></p>
-<p><img src="plot_volcano_feat_box.png"><img src="plot_volcano_meta.png"></p>
+interesting variables - according to the type of data.</p>
+<p>This function returns the volcano panel itself and table with
+associations.</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_volcano_assoc_panel.html">plot_volcano_assoc_panel</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_metric <span class="op">=</span> <span class="st">"RV_gDR_x_mean"</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_res</span><span class="op">[[</span><span class="st">"panel"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_vol_meta_panel-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/generate_datatable.html">generate_datatable</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj_res</span><span class="op">[[</span><span class="st">"assoc_data"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  col_to_round <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rho"</span>, <span class="st">"q_value"</span>, <span class="st">"neglog_q_value"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"],["Pleura","Skin","Kidney","Liver","Bladder/Urinary Tract","Soft Tissue","Cervix","Peripheral Nervous System","Fibroblast","Prostate","Bowel","CNS/Brain","Vulva/Vagina","Testis","Breast","Ampulla of Vater","Adrenal Gland","Eye","Biliary Tract","Esophagus/Stomach","Lung","Bone","Thyroid","Ovary/Fallopian Tube","Uterus","Myeloid","Pancreas","Head and Neck","Lymphoid"],["RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean"],[-0.164,0.117,-0.106,-0.106,-0.101,-0.079,0.078,0.076,-0.078,0.08,0.068,-0.07099999999999999,-0.046,0.054,0.056,0.046,0.014,0.022,-0.046,0.048,0.054,0.027,0.002,-0.027,-0.013,0.001,0.004,-0.001,0.008],[0.001,0.027,0.06,0.078,0.095,0.152,0.196,0.236,0.27,0.298,0.325,0.349,0.374,0.397,0.419,0.438,0.456,0.473,0.49,0.507,0.522,0.537,0.55,0.5639999999999999,0.577,0.589,0.6,0.611,0.622],[3.159,1.564,1.223,1.107,1.023,0.819,0.707,0.627,0.569,0.526,0.487,0.457,0.427,0.401,0.378,0.359,0.341,0.325,0.31,0.295,0.283,0.27,0.259,0.249,0.239,0.23,0.222,0.214,0.206]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>feature<\/th>\n      <th>response<\/th>\n      <th>rho<\/th>\n      <th>q_value<\/th>\n      <th>neglog_q_value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"dom":"ftip","columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"feature","targets":1},{"name":"response","targets":2},{"name":"rho","targets":3},{"name":"q_value","targets":4},{"name":"neglog_q_value","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script><div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_volcano_assoc_panel.html">plot_volcano_assoc_panel</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_metric <span class="op">=</span> <span class="st">"RV_gDR_x_mean"</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_res</span><span class="op">[[</span><span class="st">"panel"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_vol_feat_panel-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/generate_datatable.html">generate_datatable</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj_res</span><span class="op">[[</span><span class="st">"assoc_data"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  col_to_round <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rho"</span>, <span class="st">"q_value"</span>, <span class="st">"neglog_q_value"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div id="htmlwidget-e5c8c404fe174e4c81bd" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e5c8c404fe174e4c81bd">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150"],["ZNF534 (147658)","ZNF615 (284370)","TGFB1 (7040)","CIC (23152)","CNOT3 (4849)","SETD2 (29072)","PRSS57 (400668)","ZNF180 (7733)","RHOA (387)","ZC3H4 (23211)","FAM174C (55009)","IRF3 (3661)","NLRP4 (147945)","DNAJA4 (55466)","CLK3 (1198)","ZIM3 (114026)","RAF1 (5894)","NWD1 (284434)","PBRM1 (55193)","U2AF1 (7307)","NPAP1 (23742)","SCAF4 (57466)","NEFM (4741)","RPS6KA4 (8986)","EBF2 (64641)","DST (667)","KLHDC7A (127707)","MLH1 (4292)","MLLT10 (8028)","ZSCAN20 (7579)","FAM83B (222584)","TSC2 (7249)","PDCD6IP (10015)","DHX15 (1665)","AMOT (154796)","HCRTR2 (3062)","OR6C1 (390321)","LBR (3930)","CSMD2 (114784)","MUC16 (94025)","DMXL2 (23312)","SYT13 (57586)","H3-3A (3020)","ABCC9 (10060)","EPHB1 (2047)","FGFR3 (2261)","DCAF12L2 (340578)","DENND4C (55667)","TGFBR2 (7048)","PIK3CD (5293)","ACACB (32)","DNMT3A (1788)","CEBPA (1050)","ZBED2 (79413)","ARID1B (57492)","SOX30 (11063)","ATRX (546)","CNOT9 (9125)","CHI3L2 (1117)","TRAT1 (50852)","ACVR1B (91)","ZNF140 (7699)","HFM1 (164045)","USF3 (205717)","BCL6 (604)","BCL2L11 (10018)","KIF20B (9585)","RASA1 (5921)","MB21D2 (151963)","MYO7B (4648)","SF3B1 (23451)","ERCC3 (2071)","FLACC1 (130540)","FBXW7 (55294)","RALB (5899)","SORCS3 (22986)","OR1N2 (138882)","SMARCD1 (6602)","AR (367)","CUEDC2 (79004)","ASTN1 (460)","IDH1 (3417)","NDUFS1 (4719)","ZDBF2 (57683)","CHEK2 (11200)","BRCA2 (675)","UPF2 (26019)","SPOCK3 (50859)","SPTA1 (6708)","CNTNAP2 (26047)","PCDHA12 (56137)","FOXP1 (27086)","KMT2D (8085)","SH3RF2 (153769)","SLCO6A1 (133482)","PIM1 (5292)","RAD50 (10111)","RXRA (6256)","FBXL4 (26235)","PRKAG1 (5571)","KCNA4 (3739)","NQO1 (1728)","KCNQ5 (56479)","GPR107 (57720)","RTKN2 (219790)","HEXD (284004)","H3C2 (8358)","NFE2L2 (4780)","SYNE1 (23345)","KDM6A (7403)","CARD11 (84433)","ABCA1 (19)","CHD4 (1108)","MAP3K4 (4216)","MYOCD (93649)","TP53 (7157)","SACS (26278)","ASXL3 (80816)","FMN2 (56776)","ZNF732 (654254)","LYST (1130)","LOXHD1 (125336)","OR8D1 (283159)","SMAD2 (4087)","RNF152 (220441)","OR2A5 (393046)","PDSS1 (23590)","DICER1 (23405)","DSC3 (1825)","ACTR10 (55860)","SPOP (8405)","OR4M1 (441670)","FGFR1 (2260)","POT1 (25913)","OR4A15 (81328)","ZHX3 (23051)","PTP4A3 (11156)","ATM (472)","BCL2 (596)","SRCIN1 (80725)","PPP1R3A (5506)","JAK2 (3717)","NFATC2 (4773)","ZNF7 (7553)","RICTOR (253260)","UGT3A2 (167127)","MET (4233)","CDK4 (1019)","ALK (238)","MYCN (4613)"],["RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean","RV_gDR_x_mean"],[-0.148,-0.142,-0.136,-0.132,-0.126,-0.116,-0.114,-0.111,-0.108,-0.105,-0.105,-0.103,-0.102,0.119,0.113,-0.092,-0.091,-0.08500000000000001,-0.08400000000000001,-0.083,0.093,-0.076,-0.078,0.08500000000000001,-0.07199999999999999,0.08400000000000001,-0.068,-0.067,-0.074,-0.065,0.077,0.076,-0.059,-0.059,0.074,0.07099999999999999,0.06900000000000001,0.068,-0.049,-0.05,0.064,-0.05,0.063,0.075,0.061,-0.052,0.059,-0.053,-0.041,-0.04,0.051,-0.031,-0.051,0.051,-0.035,0.049,0.051,0.043,-0.038,0.045,0.037,0.04,-0.046,0.044,0.053,-0.02,-0.023,0.039,0.052,-0.019,0.033,-0.017,-0.008999999999999999,-0.012,-0.031,-0.013,-0.024,0.024,0.041,-0.01,0.045,-0,-0.004,-0.001,-0.017,0.04,-0.017,-0.007,0.038,0.042,0.006,-0.024,0.015,0.026,0.01,0.037,-0,-0.011,0.018,0.013,-0.028,-0.003,0.023,-0.005,-0.035,-0.014,0.024,0.016,0.008999999999999999,-0.014,-0.031,-0.001,0.034,-0.004,0.031,0.008,-0.001,-0.012,0.02,-0.023,0.01,-0.005,0.022,0.016,-0.01,0.023,0.003,0.003,0.002,0.022,0.019,0.025,-0.022,0.006,0.017,0.003,0.022,0.018,0,-0.006,-0,-0.022,0.007,0.039,0.006,0.014,-0.01,-0.05,0.019,0.052],[0.003,0.004,0.005,0.007,0.01,0.017,0.023,0.028,0.035,0.041,0.047,0.053,0.058,0.065,0.076,0.08500000000000001,0.095,0.107,0.117,0.128,0.141,0.154,0.166,0.18,0.194,0.206,0.218,0.229,0.24,0.251,0.262,0.273,0.284,0.294,0.304,0.314,0.324,0.334,0.343,0.352,0.361,0.37,0.379,0.387,0.395,0.403,0.411,0.418,0.426,0.433,0.44,0.447,0.454,0.46,0.466,0.473,0.479,0.484,0.49,0.496,0.501,0.507,0.512,0.517,0.522,0.526,0.531,0.536,0.54,0.544,0.549,0.553,0.5570000000000001,0.5610000000000001,0.5649999999999999,0.569,0.572,0.576,0.58,0.583,0.586,0.59,0.593,0.596,0.6,0.603,0.606,0.609,0.612,0.615,0.618,0.62,0.623,0.626,0.629,0.631,0.634,0.636,0.639,0.641,0.644,0.646,0.648,0.651,0.653,0.655,0.657,0.659,0.662,0.664,0.666,0.668,0.67,0.672,0.674,0.676,0.677,0.679,0.681,0.6830000000000001,0.6850000000000001,0.6870000000000001,0.6879999999999999,0.6899999999999999,0.6919999999999999,0.694,0.695,0.697,0.699,0.7,0.702,0.704,0.705,0.707,0.709,0.71,0.712,0.713,0.715,0.716,0.718,0.719,0.721,0.723,0.724,0.726,0.727,0.729,0.73,0.732],[2.542,2.406,2.273,2.155,2.019,1.773,1.642,1.552,1.458,1.384,1.325,1.276,1.235,1.184,1.12,1.069,1.02,0.972,0.931,0.894,0.851,0.8129999999999999,0.78,0.744,0.713,0.6870000000000001,0.662,0.64,0.62,0.601,0.582,0.5639999999999999,0.547,0.532,0.517,0.503,0.49,0.477,0.465,0.453,0.442,0.431,0.422,0.412,0.403,0.395,0.386,0.378,0.371,0.364,0.357,0.35,0.343,0.337,0.331,0.326,0.32,0.315,0.31,0.305,0.3,0.295,0.291,0.287,0.283,0.279,0.275,0.271,0.268,0.264,0.261,0.257,0.254,0.251,0.248,0.245,0.242,0.24,0.237,0.234,0.232,0.229,0.227,0.225,0.222,0.22,0.218,0.215,0.213,0.211,0.209,0.207,0.205,0.203,0.202,0.2,0.198,0.196,0.195,0.193,0.191,0.19,0.188,0.187,0.185,0.184,0.182,0.181,0.179,0.178,0.177,0.175,0.174,0.173,0.172,0.17,0.169,0.168,0.167,0.166,0.164,0.163,0.162,0.161,0.16,0.159,0.158,0.157,0.156,0.155,0.154,0.153,0.152,0.151,0.15,0.149,0.148,0.147,0.146,0.145,0.144,0.143,0.142,0.141,0.14,0.139,0.138,0.137,0.136,0.135]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>feature<\/th>\n      <th>response<\/th>\n      <th>rho<\/th>\n      <th>q_value<\/th>\n      <th>neglog_q_value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"dom":"ftip","columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"feature","targets":1},{"name":"response","targets":2},{"name":"rho","targets":3},{"name":"q_value","targets":4},{"name":"neglog_q_value","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level4">
-<h4 id="scatter-plots-with-correlations">Scatter plots with correlations<a class="anchor" aria-label="anchor" href="#scatter-plots-with-correlations"></a>
+<h4 id="scatter-plot-with-correlation">Scatter plot with correlation<a class="anchor" aria-label="anchor" href="#scatter-plot-with-correlation"></a>
 </h4>
 <p>Users can explore more detailed correlation between one selected
 feature and selected metric using
 <strong>plot_scatter_with_corr</strong> function.</p>
-<p><em>Note</em>: It requires dedicated input calculated with
-<code>prep_dt_depmap_feat</code> function and one of the functions with
-experimental response data for one metric:
-<code>prep_dt_response_metric_sa</code>,
-<code>prep_dt_response_dose_sa</code>,
-<code>prep_dt_response_scores</code> or
-<code>prep_dt_response_metric_diff</code>.</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_scatter_with_corr.html">plot_scatter_with_corr</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span><span class="op">)</span><span class="op">[</span><span class="fl">42</span><span class="op">]</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_scatt-1.png" class="r-plt" alt="" width="700"></p>
 <p>Users can also use <strong>plot_scatter_with_corr_panel</strong> to
 get a panel with the scatter plot with correlation for list of the
-DepMap features as a table.</p>
+DepMap features.</p>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_scatter_with_corr_panel.html">plot_scatter_with_corr_panel</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">dt_depmap</span><span class="op">)</span><span class="op">[</span><span class="fl">12</span><span class="op">:</span><span class="fl">17</span><span class="op">]</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">$</span><span class="va">selected_feat_meta_col</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_scatt_panel-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level4">
 <h4 id="boxplots">Boxplots<a class="anchor" aria-label="anchor" href="#boxplots"></a>
@@ -1079,26 +1225,40 @@ DepMap features as a table.</p>
 <p>Users can explore more detailed distribution of selected metric for
 selected level of metadata using <strong>plot_boxplot_num</strong>
 function.</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_num.html">plot_boxplot_num</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span><span class="op">)</span><span class="op">[</span><span class="fl">10</span><span class="op">]</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_box_num_meta-1.png" class="r-plt" alt="" width="700"></p>
 <p>Users can also use <strong>plot_boxplot_num_panel</strong> to get a
 panel with the box plot with category distribution for list of the
 DepMap matadata.</p>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_num_panel.html">plot_boxplot_num_panel</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span><span class="op">)</span><span class="op">[</span><span class="fl">10</span><span class="op">:</span><span class="fl">13</span><span class="op">]</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_box_meta_panel-1.png" class="r-plt" alt="" width="700"></p>
 <p>Users can also explore more detailed distribution for all lveles of
 selected metadata and selected metric using
 <strong>plot_boxplot_meta</strong> function.</p>
-<p><em>Note</em>: It requires dedicated input calculated with
-<code>prep_dt_depmap_meta</code> function and one of the functions with
-experimental response data for one metric:
-<code>prep_dt_response_metric_sa</code>,
-<code>prep_dt_response_dose_sa</code>,
-<code>prep_dt_response_scores</code> or
-<code>prep_dt_response_metric_diff</code>.</p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boxplot_meta.html">plot_boxplot_meta</a></span><span class="op">(</span></span>
+<span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span>
+<span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">dt_depmap</span>,</span>
+<span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_meta</span><span class="op">$</span><span class="va">selected_feat_meta_col</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gDRplots_files/figure-html/plot_box_meta-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="sessioninfo">SessionInfo<a class="anchor" aria-label="anchor" href="#sessioninfo"></a>
 </h2>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.6.0 (2026-04-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -1121,54 +1281,71 @@ experimental response data for one metric:
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] gDRplots_0.0.113 BiocStyle_2.40.0</span></span>
+<span><span class="co">#&gt; [1] gDRutils_1.11.3  gDRplots_0.0.115 BiocStyle_2.40.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] tidyselect_1.2.1            dplyr_1.2.1                </span></span>
-<span><span class="co">#&gt;  [3] farver_2.1.2                S7_0.2.2                   </span></span>
-<span><span class="co">#&gt;  [5] fastmap_1.2.0               BumpyMatrix_1.20.0         </span></span>
-<span><span class="co">#&gt;  [7] stringfish_0.19.0           digest_0.6.39              </span></span>
-<span><span class="co">#&gt;  [9] lifecycle_1.0.5             gDRutils_1.10.0            </span></span>
-<span><span class="co">#&gt; [11] magrittr_2.0.5              compiler_4.6.0             </span></span>
-<span><span class="co">#&gt; [13] rlang_1.2.0                 sass_0.4.10                </span></span>
-<span><span class="co">#&gt; [15] tools_4.6.0                 yaml_2.3.12                </span></span>
-<span><span class="co">#&gt; [17] data.table_1.18.4           knitr_1.51                 </span></span>
-<span><span class="co">#&gt; [19] ggsignif_0.6.4              S4Arrays_1.12.0            </span></span>
-<span><span class="co">#&gt; [21] labeling_0.4.3              htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt; [23] DelayedArray_0.38.2         RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt; [25] abind_1.4-8                 withr_3.0.2                </span></span>
-<span><span class="co">#&gt; [27] purrr_1.2.2                 BiocGenerics_0.58.1        </span></span>
-<span><span class="co">#&gt; [29] desc_1.4.3                  grid_4.6.0                 </span></span>
-<span><span class="co">#&gt; [31] stats4_4.6.0                ggpubr_0.6.3               </span></span>
-<span><span class="co">#&gt; [33] colorspace_2.1-2            ggplot2_4.0.3              </span></span>
-<span><span class="co">#&gt; [35] scales_1.4.0                MultiAssayExperiment_1.38.0</span></span>
-<span><span class="co">#&gt; [37] SummarizedExperiment_1.42.0 cli_3.6.6                  </span></span>
-<span><span class="co">#&gt; [39] rmarkdown_2.31              ragg_1.5.2                 </span></span>
-<span><span class="co">#&gt; [41] generics_0.1.4              otel_0.2.0                 </span></span>
-<span><span class="co">#&gt; [43] RcppParallel_5.1.11-2       cachem_1.1.0               </span></span>
-<span><span class="co">#&gt; [45] stringr_1.6.0               BiocManager_1.30.27        </span></span>
-<span><span class="co">#&gt; [47] XVector_0.52.0              matrixStats_1.5.0          </span></span>
-<span><span class="co">#&gt; [49] vctrs_0.7.3                 Matrix_1.7-5               </span></span>
-<span><span class="co">#&gt; [51] jsonlite_2.0.0              carData_3.0-6              </span></span>
-<span><span class="co">#&gt; [53] bookdown_0.47               car_3.1-5                  </span></span>
-<span><span class="co">#&gt; [55] IRanges_2.46.0              S4Vectors_0.50.1           </span></span>
-<span><span class="co">#&gt; [57] ggrepel_0.9.8               rstatix_0.7.3              </span></span>
-<span><span class="co">#&gt; [59] Formula_1.2-5               systemfonts_1.3.2          </span></span>
-<span><span class="co">#&gt; [61] jquerylib_0.1.4             tidyr_1.3.2                </span></span>
-<span><span class="co">#&gt; [63] glue_1.8.1                  pkgdown_2.2.0              </span></span>
-<span><span class="co">#&gt; [65] cowplot_1.2.0               stringi_1.8.7              </span></span>
-<span><span class="co">#&gt; [67] gtable_0.3.6                GenomicRanges_1.64.0       </span></span>
-<span><span class="co">#&gt; [69] tibble_3.3.1                pillar_1.11.1              </span></span>
-<span><span class="co">#&gt; [71] htmltools_0.5.9             Seqinfo_1.2.0              </span></span>
-<span><span class="co">#&gt; [73] R6_2.6.1                    textshaping_1.0.5          </span></span>
-<span><span class="co">#&gt; [75] evaluate_1.0.5              lattice_0.22-9             </span></span>
-<span><span class="co">#&gt; [77] Biobase_2.72.0              backports_1.5.1            </span></span>
-<span><span class="co">#&gt; [79] pheatmap_1.0.13             broom_1.0.13               </span></span>
-<span><span class="co">#&gt; [81] bslib_0.11.0                Rcpp_1.1.1-1.1             </span></span>
-<span><span class="co">#&gt; [83] gridExtra_2.3               SparseArray_1.12.2         </span></span>
-<span><span class="co">#&gt; [85] checkmate_2.3.4             qs2_0.2.2                  </span></span>
-<span><span class="co">#&gt; [87] xfun_0.58                   fs_2.1.0                   </span></span>
-<span><span class="co">#&gt; [89] MatrixGenerics_1.24.0       pkgconfig_2.0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1] gridExtra_2.3               rlang_1.2.0                </span></span>
+<span><span class="co">#&gt;   [3] magrittr_2.0.5              otel_0.2.0                 </span></span>
+<span><span class="co">#&gt;   [5] matrixStats_1.5.0           compiler_4.6.0             </span></span>
+<span><span class="co">#&gt;   [7] mgcv_1.9-4                  systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.7.3                 stringr_1.6.0              </span></span>
+<span><span class="co">#&gt;  [11] pkgconfig_2.0.3             fastmap_1.2.0              </span></span>
+<span><span class="co">#&gt;  [13] backports_1.5.1             XVector_0.52.0             </span></span>
+<span><span class="co">#&gt;  [15] labeling_0.4.3              rmarkdown_2.31             </span></span>
+<span><span class="co">#&gt;  [17] preprocessCore_1.74.0       ragg_1.5.2                 </span></span>
+<span><span class="co">#&gt;  [19] purrr_1.2.2                 xfun_0.59                  </span></span>
+<span><span class="co">#&gt;  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               </span></span>
+<span><span class="co">#&gt;  [23] jsonlite_2.0.0              DelayedArray_0.38.2        </span></span>
+<span><span class="co">#&gt;  [25] irlba_2.3.7                 cluster_2.1.8.2            </span></span>
+<span><span class="co">#&gt;  [27] broom_1.0.13                parallel_4.6.0             </span></span>
+<span><span class="co">#&gt;  [29] R6_2.6.1                    bslib_0.11.0               </span></span>
+<span><span class="co">#&gt;  [31] stringi_1.8.7               RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt;  [33] SQUAREM_2026.1              rpart_4.1.27               </span></span>
+<span><span class="co">#&gt;  [35] car_3.1-5                   GenomicRanges_1.64.0       </span></span>
+<span><span class="co">#&gt;  [37] jquerylib_0.1.4             Rcpp_1.1.1-1.1             </span></span>
+<span><span class="co">#&gt;  [39] Seqinfo_1.2.0               bookdown_0.47              </span></span>
+<span><span class="co">#&gt;  [41] SummarizedExperiment_1.42.0 iterators_1.0.14           </span></span>
+<span><span class="co">#&gt;  [43] knitr_1.51                  WGCNA_1.74                 </span></span>
+<span><span class="co">#&gt;  [45] base64enc_0.1-6             R.utils_2.13.0             </span></span>
+<span><span class="co">#&gt;  [47] IRanges_2.46.0              nnet_7.3-20                </span></span>
+<span><span class="co">#&gt;  [49] splines_4.6.0               Matrix_1.7-5               </span></span>
+<span><span class="co">#&gt;  [51] tidyselect_1.2.1            rstudioapi_0.19.0          </span></span>
+<span><span class="co">#&gt;  [53] abind_1.4-8                 yaml_2.3.12                </span></span>
+<span><span class="co">#&gt;  [55] stringfish_0.19.0           doParallel_1.0.17          </span></span>
+<span><span class="co">#&gt;  [57] codetools_0.2-20            lattice_0.22-9             </span></span>
+<span><span class="co">#&gt;  [59] tibble_3.3.1                Biobase_2.72.0             </span></span>
+<span><span class="co">#&gt;  [61] withr_3.0.3                 BumpyMatrix_1.20.0         </span></span>
+<span><span class="co">#&gt;  [63] S7_0.2.2                    evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt;  [65] foreign_0.8-91              desc_1.4.3                 </span></span>
+<span><span class="co">#&gt;  [67] survival_3.8-6              RcppParallel_5.1.11-2      </span></span>
+<span><span class="co">#&gt;  [69] pillar_1.11.1               BiocManager_1.30.27        </span></span>
+<span><span class="co">#&gt;  [71] ggpubr_0.6.3                MatrixGenerics_1.24.0      </span></span>
+<span><span class="co">#&gt;  [73] carData_3.0-6               DT_0.34.0                  </span></span>
+<span><span class="co">#&gt;  [75] checkmate_2.3.4             foreach_1.5.2              </span></span>
+<span><span class="co">#&gt;  [77] stats4_4.6.0                generics_0.1.4             </span></span>
+<span><span class="co">#&gt;  [79] invgamma_1.2                truncnorm_1.0-9            </span></span>
+<span><span class="co">#&gt;  [81] S4Vectors_0.50.1            ggplot2_4.0.3              </span></span>
+<span><span class="co">#&gt;  [83] scales_1.4.0                ashr_2.2-63                </span></span>
+<span><span class="co">#&gt;  [85] qs2_0.2.2                   glue_1.8.1                 </span></span>
+<span><span class="co">#&gt;  [87] Hmisc_5.2-6                 pheatmap_1.0.13            </span></span>
+<span><span class="co">#&gt;  [89] tools_4.6.0                 data.table_1.18.4          </span></span>
+<span><span class="co">#&gt;  [91] ggsignif_0.6.4              fs_2.1.0                   </span></span>
+<span><span class="co">#&gt;  [93] fastcluster_1.3.0           cowplot_1.2.0              </span></span>
+<span><span class="co">#&gt;  [95] grid_4.6.0                  impute_1.86.0              </span></span>
+<span><span class="co">#&gt;  [97] tidyr_1.3.2                 crosstalk_1.2.2            </span></span>
+<span><span class="co">#&gt;  [99] colorspace_2.1-2            nlme_3.1-169               </span></span>
+<span><span class="co">#&gt; [101] htmlTable_2.5.0             Formula_1.2-5              </span></span>
+<span><span class="co">#&gt; [103] cli_3.6.6                   textshaping_1.0.5          </span></span>
+<span><span class="co">#&gt; [105] mixsqp_0.3-54               S4Arrays_1.12.0            </span></span>
+<span><span class="co">#&gt; [107] dplyr_1.2.1                 gtable_0.3.6               </span></span>
+<span><span class="co">#&gt; [109] cdsrmodels_0.1.0            R.methodsS3_1.8.2          </span></span>
+<span><span class="co">#&gt; [111] rstatix_0.7.3               dynamicTreeCut_1.63-1      </span></span>
+<span><span class="co">#&gt; [113] sass_0.4.10                 digest_0.6.39              </span></span>
+<span><span class="co">#&gt; [115] BiocGenerics_0.58.1         SparseArray_1.12.2         </span></span>
+<span><span class="co">#&gt; [117] ggrepel_0.9.8               htmlwidgets_1.6.4          </span></span>
+<span><span class="co">#&gt; [119] farver_2.1.2                htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt; [121] pkgdown_2.2.0               R.oo_1.27.1                </span></span>
+<span><span class="co">#&gt; [123] lifecycle_1.0.5</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

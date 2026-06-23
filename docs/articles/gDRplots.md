@@ -54,109 +54,134 @@ co-drug and one cell line - is returned by `heatmap_combo_with_isoref`.
 And `heatmap_combo_with_isoref_panel` returns a ggplot object with *a
 panel with heatmaps* for selected drug, co-drug and list of cell lines.
 
-Used data:
+*Used data*:
 
-- single-agent experiment
+- single-agent experiment (synthetic data)
 
 ``` r
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-sa_name <- gDRutils::get_supported_experiments("sa")
+mae <- get_synthetic_data("combo_matrix")
+sa_name <- get_supported_experiments("sa")
 se_sa <- mae[[sa_name]]
 
 dt_norm_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_sa <-
-  gDRutils::convert_se_assay_to_dt(se = se_sa,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_sa,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_sa_capped <-
- gDRutils::cap_assay_infinities(conc_assay_dt = dt_average_sa,
-                                assay_dt = dt_metrics_sa,
-                                experiment_name = sa_name,
-                                col = "xc50",
-                                capping_fold = 5)
+  cap_assay_infinities(conc_assay_dt = dt_average_sa,
+                       assay_dt = dt_metrics_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
 ```
 
-- codilution experiment
+- codilution experiment (synthetic data)
 
 ``` r
-mae <- gDRutils::get_synthetic_data("combo_codilution_small")
-cd_name <- gDRutils::get_supported_experiments("cd")
+mae <- get_synthetic_data("combo_codilution_small")
+cd_name <- get_supported_experiments("cd")
 se_cd <- mae[[cd_name]]
 
 dt_norm_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_cd <-
-  gDRutils::convert_se_assay_to_dt(se = se_cd,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_cd,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 ```
 
-- combination experiment
+- combination experiment (synthetic data)
 
 ``` r
-mae <- gDRutils::get_synthetic_data("combo_matrix")
-combo_name <- gDRutils::get_supported_experiments("combo")
+mae <- get_synthetic_data("combo_matrix")
+combo_name <- get_supported_experiments("combo")
 se_combo <- mae[[combo_name]]
 
 dt_norm_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name =  "Normalized",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name =  "Normalized",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_metrics_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Metrics",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "Metrics",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_average_combo <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "Averaged",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "Averaged",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_scores <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "scores",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "scores",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_excess <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "excess",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "excess",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_isobolograms <-
-  gDRutils::convert_se_assay_to_dt(se = se_combo,
-                                   assay_name = "isobolograms",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se = se_combo,
+                         assay_name = "isobolograms",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
+```
+
+- single-agent experiment for PRISM data
+
+``` r
+mae_prism <- get_synthetic_data("prism")
+sa_name <- get_supported_experiments("sa")
+se_sa_prism <- mae_prism[[sa_name]]
+
+dt_norm_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name =  "Normalized")
+dt_metrics_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name = "Metrics")
+dt_average_prism_sa <-
+  convert_se_assay_to_dt(se = se_sa_prism,
+                         assay_name = "Averaged")
+dt_metrics_prism_sa_capped <-
+  cap_assay_infinities(conc_assay_dt = dt_average_prism_sa,
+                       assay_dt = dt_metrics_prism_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
 ```
 
   
 
 **TIP**  
-It is highly recommended to use
-[`gDRutils::convert_se_assay_to_dt`](https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html)
-with `unify_metadata = TRUE` and `merge_additional_variables = TRUE`.
-This prevents errors caused by non-unique combinations of values in the
+It is highly recommended to use `convert_se_assay_to_dt` with
+`unify_metadata = TRUE` and `merge_additional_variables = TRUE`. This
+prevents errors caused by non-unique combinations of values in the
 `DrugName` and `CellLineName` columns.
+
+  
 
 ### Dose Response Plots
 
@@ -199,10 +224,11 @@ Users can also use **plot_dose_response_combo_panel** to get a panel
 with dose-response plots by selected cell line name.
 
 ``` r
-plot_dose_response_combo(dt_average = dt_average_combo,
-                         drug1_name = "drug_011",
-                         drug2_name = "drug_021",
-                         cl_name = "cellline_NE")
+plot_dose_response_combo(
+  dt_average = dt_average_combo,
+  drug1_name = "drug_011",
+  drug2_name = "drug_021",
+  cl_name = "cellline_NE")
 ```
 
 ![](gDRplots_files/figure-html/plot_dose_response_combo-1.png)
@@ -315,20 +341,20 @@ n-bottom points are colored.
 
 ``` r
 plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
-                             selection_var = "DrugName",
-                             selection_name = "drug_002",
-                             group_var = "Tissue",
-                             named_n = 3)
+                              selection_var = "DrugName",
+                              selection_name = "drug_002",
+                              group_var = "Tissue",
+                              named_n = 3)
 ```
 
 ![](gDRplots_files/figure-html/plot_boxplot_metric_sa_by_grp_d-1.png)
 
 ``` r
 plot_boxplot_metric_sa_by_grp(dt_metrics_sa_capped,
-                             selection_var = "CellLineName",
-                             selection_name = "cellline_BC",
-                             group_var = "drug_moa",
-                             named_n = 3)
+                              selection_var = "CellLineName",
+                              selection_name = "cellline_BC",
+                              group_var = "drug_moa",
+                              named_n = 3)
 ```
 
 ![](gDRplots_files/figure-html/plot_boxplot_metric_sa_by_grp_cl-1.png)
@@ -614,15 +640,15 @@ correct and have been correctly assigned and nothing is missing.
 
 ``` r
 dt_treat <-
-  gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "RawTreated",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa,
+                         assay_name = "RawTreated",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_controls <-
-  gDRutils::convert_se_assay_to_dt(se_sa,
-                                   assay_name = "Controls",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa,
+                         assay_name = "Controls",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
@@ -633,15 +659,15 @@ heatmap_control_mapping_qc(dt_treat = dt_treat,
 ``` r
 
 dt_treat <-
-  gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "RawTreated",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo,
+                         assay_name = "RawTreated",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 dt_controls <-
-  gDRutils::convert_se_assay_to_dt(se_combo,
-                                   assay_name = "Controls",
-                                   unify_metadata = TRUE,
-                                   merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo,
+                         assay_name = "Controls",
+                         unify_metadata = TRUE,
+                         merge_additional_variables = TRUE)
 
 heatmap_control_mapping_qc(dt_treat = dt_treat,
                            dt_controls = dt_controls)
@@ -776,56 +802,224 @@ plot_fitting_acc(dt_assay = dt_metrics_sa,
 
 ### Correlation between PRISM and DepMap
 
+Generating visualization with PRISM and DepMap is generetde for selected
+drug
+
+``` r
+sel_drug <- unique(dt_norm_prism_sa$DrugName)[1]
+print(sel_drug)
+#> [1] "GDC-8025"
+```
+
+and requires dedicated inputs.
+
+First part is based on PRISM data prapred with one of functions: -
+`prep_dt_response_metric_sa` based on the “Metrics” assay for
+single-agent experiment - `prep_dt_response_dose_sa` based on the
+“Averaged” assay for single-agent experiment - `prep_dt_response_scores`
+based on the “scores” assay for combination experiment -
+`prep_dt_response_metric_diff` based on the “Metrics” assay for
+combination experiment
+
+``` r
+dt_response <- prep_dt_response_metric_sa(
+  dt_metrics = dt_metrics_prism_sa,
+  d_name = sel_drug,
+  normalization_type = "RV",
+  metric = "x_mean"
+)
+```
+
+The second part based on DepMap data prapred with one of functions:
+
+- `prep_dt_depmap_meta` for metadata columns for selected cell line
+  annotations or donor demographics
+
+``` r
+meta_data_path <- 
+  system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+
+meta_col <- "OncotreeLineage"
+obj_depmap_meta <- prep_dt_depmap_meta(
+    meta_data_path = meta_data_path, 
+    metadata_col = meta_col)
+```
+
+- `prep_dt_depmap_feat` for selected feature
+
+``` r
+feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+
+feature_set <- "OmicsCNGene"
+obj_depmap_feat <- prep_dt_depmap_feat(
+    feat_data_path = feat_data_path,
+    meta_data_path = meta_data_path,
+    feature_set = feature_set)
+
+feature_set_2 <- "OmicsSomaticMutationsMatrixDamaging"
+obj_depmap_feat_2 <- prep_dt_depmap_feat(
+    feat_data_path = feat_data_path,
+    meta_data_path = meta_data_path,
+    feature_set = feature_set_2,
+    with_decoding = TRUE)
+```
+
+For volcano visualization is also required object with calculated linear
+associations genarated with `prep_dt_assoc` function.
+
+``` r
+obj_assoc_meta <- prep_dt_assoc(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+
+obj_assoc_feta <- prep_dt_assoc(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+```
+
 #### Volcano plot
 
 The **plot_volcano_assoc** function is dedicated to PRISM experiments.
 This function returns the volcano plot with associations between the
 molecular features or the metadata and readout of interest.
 
-*Note*: It requires dedicated input calculated with `prep_dt_assoc`
-function.
+``` r
+plot_volcano_assoc(
+  dt_assoc = obj_assoc_meta$dt_assoc,
+  selected_feat_meta_col = obj_assoc_meta$selected_feat_meta_col,
+  selected_metric = obj_assoc_meta$selected_metric,
+  condition_info = obj_assoc_meta$condition_info)
+```
+
+![](gDRplots_files/figure-html/plot_vol_meta-1.png)
+
+``` r
+plot_volcano_assoc(
+  dt_assoc = obj_assoc_feta$dt_assoc,
+  selected_feat_meta_col = obj_assoc_feta$selected_feat_meta_col,
+  selected_metric = obj_assoc_feta$selected_metric,
+  condition_info = obj_assoc_feta$condition_info)
+```
+
+![](gDRplots_files/figure-html/plot_vol_feat-1.png)
 
 Users can also use **plot_volcano_assoc_panel** to get a panel with the
 volcano plot and scatter plots or box plots for interesting variables -
-according to the type of data (numerical feature or categorical feature,
-respectively).
+according to the type of data.
 
-![](plot_volcano_feat_scatt.png)
+This function returns the volcano panel itself and table with
+associations.
 
-![](plot_volcano_feat_box.png)![](plot_volcano_meta.png)
+``` r
+obj_res <- plot_volcano_assoc_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_metric = "RV_gDR_x_mean",
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
 
-#### Scatter plots with correlations
+obj_res[["panel"]]
+```
+
+![](gDRplots_files/figure-html/plot_vol_meta_panel-1.png)
+
+``` r
+
+generate_datatable(
+  obj_res[["assoc_data"]],
+  col_to_round = c("rho", "q_value", "neglog_q_value"))
+```
+
+``` r
+obj_res <- plot_volcano_assoc_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_metric = "RV_gDR_x_mean",
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+
+obj_res[["panel"]]
+```
+
+![](gDRplots_files/figure-html/plot_vol_feat_panel-1.png)
+
+``` r
+
+generate_datatable(
+  obj_res[["assoc_data"]],
+  col_to_round = c("rho", "q_value", "neglog_q_value"))
+```
+
+#### Scatter plot with correlation
 
 Users can explore more detailed correlation between one selected feature
 and selected metric using **plot_scatter_with_corr** function.
 
-*Note*: It requires dedicated input calculated with
-`prep_dt_depmap_feat` function and one of the functions with
-experimental response data for one metric: `prep_dt_response_metric_sa`,
-`prep_dt_response_dose_sa`, `prep_dt_response_scores` or
-`prep_dt_response_metric_diff`.
+``` r
+plot_scatter_with_corr(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat = names(obj_depmap_feat$dt_depmap)[42],
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col)
+```
+
+![](gDRplots_files/figure-html/plot_scatt-1.png)
 
 Users can also use **plot_scatter_with_corr_panel** to get a panel with
-the scatter plot with correlation for list of the DepMap features as a
-table.
+the scatter plot with correlation for list of the DepMap features.
+
+``` r
+plot_scatter_with_corr_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat$dt_depmap,
+  selected_feat = names(obj_depmap_feat$dt_depmap)[12:17],
+  selected_feat_meta_col = obj_depmap_feat$selected_feat_meta_col,
+  ncol = 3)
+```
+
+![](gDRplots_files/figure-html/plot_scatt_panel-1.png)
 
 #### Boxplots
 
 Users can explore more detailed distribution of selected metric for
 selected level of metadata using **plot_boxplot_num** function.
 
+``` r
+plot_boxplot_num(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat = names(obj_depmap_meta$dt_depmap)[10],
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+```
+
+![](gDRplots_files/figure-html/plot_box_num_meta-1.png)
+
 Users can also use **plot_boxplot_num_panel** to get a panel with the
 box plot with category distribution for list of the DepMap matadata.
+
+``` r
+plot_boxplot_num_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat = names(obj_depmap_meta$dt_depmap)[10:13],
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col,
+  ncol = 2)
+```
+
+![](gDRplots_files/figure-html/plot_box_meta_panel-1.png)
 
 Users can also explore more detailed distribution for all lveles of
 selected metadata and selected metric using **plot_boxplot_meta**
 function.
 
-*Note*: It requires dedicated input calculated with
-`prep_dt_depmap_meta` function and one of the functions with
-experimental response data for one metric: `prep_dt_response_metric_sa`,
-`prep_dt_response_dose_sa`, `prep_dt_response_scores` or
-`prep_dt_response_metric_diff`.
+``` r
+plot_boxplot_meta(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_meta$dt_depmap,
+  selected_feat_meta_col = obj_depmap_meta$selected_feat_meta_col)
+```
+
+![](gDRplots_files/figure-html/plot_box_meta-1.png)
 
 ## SessionInfo
 
@@ -852,52 +1046,69 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRplots_0.0.113 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.3  gDRplots_0.0.115 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] tidyselect_1.2.1            dplyr_1.2.1                
-#>  [3] farver_2.1.2                S7_0.2.2                   
-#>  [5] fastmap_1.2.0               BumpyMatrix_1.20.0         
-#>  [7] stringfish_0.19.0           digest_0.6.39              
-#>  [9] lifecycle_1.0.5             gDRutils_1.10.0            
-#> [11] magrittr_2.0.5              compiler_4.6.0             
-#> [13] rlang_1.2.0                 sass_0.4.10                
-#> [15] tools_4.6.0                 yaml_2.3.12                
-#> [17] data.table_1.18.4           knitr_1.51                 
-#> [19] ggsignif_0.6.4              S4Arrays_1.12.0            
-#> [21] labeling_0.4.3              htmlwidgets_1.6.4          
-#> [23] DelayedArray_0.38.2         RColorBrewer_1.1-3         
-#> [25] abind_1.4-8                 withr_3.0.2                
-#> [27] purrr_1.2.2                 BiocGenerics_0.58.1        
-#> [29] desc_1.4.3                  grid_4.6.0                 
-#> [31] stats4_4.6.0                ggpubr_0.6.3               
-#> [33] colorspace_2.1-2            ggplot2_4.0.3              
-#> [35] scales_1.4.0                MultiAssayExperiment_1.38.0
-#> [37] SummarizedExperiment_1.42.0 cli_3.6.6                  
-#> [39] rmarkdown_2.31              ragg_1.5.2                 
-#> [41] generics_0.1.4              otel_0.2.0                 
-#> [43] RcppParallel_5.1.11-2       cachem_1.1.0               
-#> [45] stringr_1.6.0               BiocManager_1.30.27        
-#> [47] XVector_0.52.0              matrixStats_1.5.0          
-#> [49] vctrs_0.7.3                 Matrix_1.7-5               
-#> [51] jsonlite_2.0.0              carData_3.0-6              
-#> [53] bookdown_0.47               car_3.1-5                  
-#> [55] IRanges_2.46.0              S4Vectors_0.50.1           
-#> [57] ggrepel_0.9.8               rstatix_0.7.3              
-#> [59] Formula_1.2-5               systemfonts_1.3.2          
-#> [61] jquerylib_0.1.4             tidyr_1.3.2                
-#> [63] glue_1.8.1                  pkgdown_2.2.0              
-#> [65] cowplot_1.2.0               stringi_1.8.7              
-#> [67] gtable_0.3.6                GenomicRanges_1.64.0       
-#> [69] tibble_3.3.1                pillar_1.11.1              
-#> [71] htmltools_0.5.9             Seqinfo_1.2.0              
-#> [73] R6_2.6.1                    textshaping_1.0.5          
-#> [75] evaluate_1.0.5              lattice_0.22-9             
-#> [77] Biobase_2.72.0              backports_1.5.1            
-#> [79] pheatmap_1.0.13             broom_1.0.13               
-#> [81] bslib_0.11.0                Rcpp_1.1.1-1.1             
-#> [83] gridExtra_2.3               SparseArray_1.12.2         
-#> [85] checkmate_2.3.4             qs2_0.2.2                  
-#> [87] xfun_0.58                   fs_2.1.0                   
-#> [89] MatrixGenerics_1.24.0       pkgconfig_2.0.3
+#>   [1] gridExtra_2.3               rlang_1.2.0                
+#>   [3] magrittr_2.0.5              otel_0.2.0                 
+#>   [5] matrixStats_1.5.0           compiler_4.6.0             
+#>   [7] mgcv_1.9-4                  systemfonts_1.3.2          
+#>   [9] vctrs_0.7.3                 stringr_1.6.0              
+#>  [11] pkgconfig_2.0.3             fastmap_1.2.0              
+#>  [13] backports_1.5.1             XVector_0.52.0             
+#>  [15] labeling_0.4.3              rmarkdown_2.31             
+#>  [17] preprocessCore_1.74.0       ragg_1.5.2                 
+#>  [19] purrr_1.2.2                 xfun_0.59                  
+#>  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               
+#>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
+#>  [25] irlba_2.3.7                 cluster_2.1.8.2            
+#>  [27] broom_1.0.13                parallel_4.6.0             
+#>  [29] R6_2.6.1                    bslib_0.11.0               
+#>  [31] stringi_1.8.7               RColorBrewer_1.1-3         
+#>  [33] SQUAREM_2026.1              rpart_4.1.27               
+#>  [35] car_3.1-5                   GenomicRanges_1.64.0       
+#>  [37] jquerylib_0.1.4             Rcpp_1.1.1-1.1             
+#>  [39] Seqinfo_1.2.0               bookdown_0.47              
+#>  [41] SummarizedExperiment_1.42.0 iterators_1.0.14           
+#>  [43] knitr_1.51                  WGCNA_1.74                 
+#>  [45] base64enc_0.1-6             R.utils_2.13.0             
+#>  [47] IRanges_2.46.0              nnet_7.3-20                
+#>  [49] splines_4.6.0               Matrix_1.7-5               
+#>  [51] tidyselect_1.2.1            rstudioapi_0.19.0          
+#>  [53] abind_1.4-8                 yaml_2.3.12                
+#>  [55] stringfish_0.19.0           doParallel_1.0.17          
+#>  [57] codetools_0.2-20            lattice_0.22-9             
+#>  [59] tibble_3.3.1                Biobase_2.72.0             
+#>  [61] withr_3.0.3                 BumpyMatrix_1.20.0         
+#>  [63] S7_0.2.2                    evaluate_1.0.5             
+#>  [65] foreign_0.8-91              desc_1.4.3                 
+#>  [67] survival_3.8-6              RcppParallel_5.1.11-2      
+#>  [69] pillar_1.11.1               BiocManager_1.30.27        
+#>  [71] ggpubr_0.6.3                MatrixGenerics_1.24.0      
+#>  [73] carData_3.0-6               DT_0.34.0                  
+#>  [75] checkmate_2.3.4             foreach_1.5.2              
+#>  [77] stats4_4.6.0                generics_0.1.4             
+#>  [79] invgamma_1.2                truncnorm_1.0-9            
+#>  [81] S4Vectors_0.50.1            ggplot2_4.0.3              
+#>  [83] scales_1.4.0                ashr_2.2-63                
+#>  [85] qs2_0.2.2                   glue_1.8.1                 
+#>  [87] Hmisc_5.2-6                 pheatmap_1.0.13            
+#>  [89] tools_4.6.0                 data.table_1.18.4          
+#>  [91] ggsignif_0.6.4              fs_2.1.0                   
+#>  [93] fastcluster_1.3.0           cowplot_1.2.0              
+#>  [95] grid_4.6.0                  impute_1.86.0              
+#>  [97] tidyr_1.3.2                 crosstalk_1.2.2            
+#>  [99] colorspace_2.1-2            nlme_3.1-169               
+#> [101] htmlTable_2.5.0             Formula_1.2-5              
+#> [103] cli_3.6.6                   textshaping_1.0.5          
+#> [105] mixsqp_0.3-54               S4Arrays_1.12.0            
+#> [107] dplyr_1.2.1                 gtable_0.3.6               
+#> [109] cdsrmodels_0.1.0            R.methodsS3_1.8.2          
+#> [111] rstatix_0.7.3               dynamicTreeCut_1.63-1      
+#> [113] sass_0.4.10                 digest_0.6.39              
+#> [115] BiocGenerics_0.58.1         SparseArray_1.12.2         
+#> [117] ggrepel_0.9.8               htmlwidgets_1.6.4          
+#> [119] farver_2.1.2                htmltools_0.5.9            
+#> [121] pkgdown_2.2.0               R.oo_1.27.1                
+#> [123] lifecycle_1.0.5
 ```
