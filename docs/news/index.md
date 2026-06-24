@@ -1,5 +1,9 @@
 # Changelog
 
+## gDRplots 0.0.116 - 2026-06-23
+
+- update pkgdown
+
 ## gDRplots 0.0.115 - 2026-06-22
 
 - update dependencies
