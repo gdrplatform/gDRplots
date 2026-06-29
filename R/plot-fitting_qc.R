@@ -170,7 +170,9 @@ plot_fitting_acc <- function(dt_assay,
   data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
   data.table::setorder(data2table, "rss")
   tab_plt <- .table_to_ggplot(data2table, base_size = 8)
-  patchwork::wrap_plots(combined_plot, tab_plt, widths = c(2, 1))
+  patchwork::wrap_plots(combined_plot,
+                       tab_plt,
+                       widths = c(2, 1))
 }
 
 
@@ -280,8 +282,20 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      legend_labels = unique_values)
 }
 
+#' Render a data.table as a text-based ggplot table
+#'
+#' @param dt data.table to render
+#' @param base_size numeric base font size (default 10)
+#' @return ggplot object displaying the table
+#'
+#' @examples
+#' dt <- data.table::data.table(drug = c("A", "B"), r2 = c(0.9, 0.8))
+#' .table_to_ggplot(dt)
+#'
 #' @keywords internal
 .table_to_ggplot <- function(dt, base_size = 10) {
+  checkmate::assert_data_table(dt, min.rows = 1)
+  checkmate::assert_number(base_size, lower = 1)
   dt <- data.table::copy(dt)
   cols <- names(dt)
   dt[, .row := .N - seq_len(.N) + 1L]

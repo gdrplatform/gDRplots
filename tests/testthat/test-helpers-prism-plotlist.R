@@ -752,3 +752,16 @@ test_that(".get_info_from_name works as expected", {
                                    normalization_type = "XX"),
                "Assertion on 'normalization_type' failed: Must be element of set")
 })
+
+test_that(".get_info_from_names works as expected", {
+  f_n <- "plt__FEAT_DRUG_ABC_RV_AUC"
+  res <- .get_info_from_names(f_n, normalization_type = "RV")
+  expect_is(res, "list")
+  expect_length(res, 2)
+  expect_equal(res, list(drug_grid = "DRUG_ABC", feat_meta = "FEAT"))
+
+  expect_error(.get_info_from_names(123),
+               "Assertion on 'file_names' failed")
+  expect_error(.get_info_from_names(f_n, normalization_type = "XX"),
+               "Assertion on 'normalization_type' failed")
+})

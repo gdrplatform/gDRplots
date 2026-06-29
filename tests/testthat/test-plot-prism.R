@@ -1061,7 +1061,6 @@ test_that("plot_volcano_assoc_panel works as expected", {
   expect_is(obj_4, "list")
   plt_4 <- obj_4[["panel"]]
   expect_is(plt_4, "gg")
-  expect_is(plt_4, "gg")
   tab_4 <- obj_4[["assoc_data"]]
   expect_null(tab_4, "data.table") # empty data
 

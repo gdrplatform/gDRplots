@@ -514,9 +514,20 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
        feat_meta = feat_meta)
 }
 
+#' Extract drug grid and feature metadata from file names
+#'
+#' @param file_names character vector of file names following the
+#'   pattern \code{prefix__feat_drug_NORM_...}
+#' @param normalization_type string normalization type ("GR" or "RV")
+#' @return named list with \code{drug_grid} and \code{feat_meta}
+#'
+#' @examples
+#' .get_info_from_names("plt__metricA_DrugX_RV_extra", "RV")
+#'
 #' @keywords internal
 .get_info_from_names <- function(file_names,
                                  normalization_type = "RV") {
+  checkmate::assert_character(file_names, min.len = 1)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   desc_ <- sub("^.*?__", "", file_names)
   pattern <- sprintf("_%s_.*$", normalization_type)
