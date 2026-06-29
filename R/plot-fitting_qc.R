@@ -293,19 +293,23 @@ heatmap_control_mapping_qc <- function(dt_treat,
 #' .table_to_ggplot(dt)
 #'
 #' @keywords internal
-.table_to_ggplot <- function(dt, base_size = 10) {
+.table_to_ggplot <- function(dt, base_size = 10, digits = 3) {
   checkmate::assert_data_table(dt, min.rows = 1)
   checkmate::assert_number(base_size, lower = 1)
   dt <- data.table::copy(dt)
+  num_cols <- names(dt)[vapply(dt, is.numeric, logical(1))]
+  for (col in num_cols) {
+    data.table::set(dt, j = col, value = round(dt[[col]], digits))
+  }
   cols <- names(dt)
-  dt[, .row := .N - seq_len(.N) + 1L]
-  header_y <- max(dt$.row) + 1L
+  row_idx <- rev(seq_len(NROW(dt)))
+  header_y <- NROW(dt) + 1L
   labels <- lapply(cols, function(col) {
     vals <- as.character(dt[[col]])
     vals <- ifelse(is.na(vals), "", vals)
     data.table::data.table(
       x = match(col, cols),
-      y = c(header_y, dt$.row),
+      y = c(header_y, row_idx),
       label = c(col, vals),
       fontface = c("bold", rep("plain", NROW(dt)))
     )

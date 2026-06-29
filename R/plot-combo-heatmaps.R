@@ -691,36 +691,38 @@ heatmap_combo_metrics_panel <- function(
     ls_plts
   } else if (one_row_panel) {
     # build panel 3x1 (matching original ggarrange layout)
-    patchwork::wrap_plots(
-      ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-      ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess"),
-      ncol = 3
-    ) +
-      patchwork::plot_layout(guides = "collect") &
+    smooth_plt <- ls_plts[["smooth"]] +
+      ggplot2::guides(linetype = "none", color = "none") +
       ggplot2::theme(legend.position = "left")
+    hsa_plt <- ls_plts[["hsa_excess"]] +
+      ggplot2::labs(fill = "Excess") +
+      ggplot2::theme(legend.position = "left")
+    bliss_plt <- ls_plts[["bliss_excess"]] +
+      ggplot2::labs(fill = "Excess") +
+      ggplot2::guides(fill = "none", linetype = "none", color = "none")
+    patchwork::wrap_plots(smooth_plt, hsa_plt, bliss_plt, ncol = 3)
   } else {
     # build panel 2x2 (or 3-plot if no isobolograms)
-    # top row: smooth + isobolograms (if available)
-    top_plots <- list(
-      ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none")
-    )
+    # top row
+    smooth_plt <- ls_plts[["smooth"]] +
+      ggplot2::theme(legend.position = "left")
+    top_plots <- list(smooth_plt)
     if (!is.null(ls_plts[["iso_compare"]])) {
-      top_plots <- c(top_plots, list(
-        ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
-      ))
+      iso_plt <- ls_plts[["iso_compare"]] +
+        ggplot2::guides(linetype = "none", color = "none")
+      top_plots <- c(top_plots, list(iso_plt))
     }
     top_row <- patchwork::wrap_plots(top_plots, ncol = length(top_plots))
-    # bottom row: excess heatmaps
-    bottom_row <- patchwork::wrap_plots(
-      ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess"),
-      ncol = 2
-    )
-    patchwork::wrap_plots(top_row, bottom_row, ncol = 1) +
-      patchwork::plot_annotation(title = main_title) +
-      patchwork::plot_layout(guides = "collect") &
+    # bottom row — keep legend only on first, hide on second
+    hsa_plt <- ls_plts[["hsa_excess"]] +
+      ggplot2::labs(fill = "Excess") +
       ggplot2::theme(legend.position = "left")
+    bliss_plt <- ls_plts[["bliss_excess"]] +
+      ggplot2::labs(fill = "Excess") +
+      ggplot2::guides(fill = "none", linetype = "none", color = "none")
+    bottom_row <- patchwork::wrap_plots(hsa_plt, bliss_plt, ncol = 2)
+    patchwork::wrap_plots(top_row, bottom_row, ncol = 1) +
+      patchwork::plot_annotation(title = main_title)
   }
   # final
   final_plot
