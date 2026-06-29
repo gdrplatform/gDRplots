@@ -466,8 +466,10 @@ save_plot <- function(plt, path, format = "svg") {
 
   # Estimate plot size
   if (inherits(plt, c("gtable", "grob")) && !inherits(plt, c("ggplot", "pheatmap"))) {
-    # TODO: move default grob dimensions to settings.json (GDR-XXXX)
-    plot_size <- c(width = 14, height = 12)
+    plot_size <- c(
+      width = .get_setting("DEFAULT_GROB_WIDTH"),
+      height = .get_setting("DEFAULT_GROB_HEIGHT")
+    )
   } else {
     plot_size <- estimate_plot_size(plt)
   }
