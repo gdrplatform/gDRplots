@@ -101,8 +101,8 @@ plot_dose_response_combo <- function(dt_average,
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
 
   # Ensure the drug with more dose levels is on the x-axis
-  n_conc_1 <- sum(unique(dt_avg[[conc]]) > 0, na.rm = TRUE)
-  n_conc_2 <- sum(unique(dt_avg[[conc_2]]) > 0, na.rm = TRUE)
+  n_conc_1 <- sum(unique(dt_avg[[conc]]) > 0)
+  n_conc_2 <- sum(unique(dt_avg[[conc_2]]) > 0)
   if (n_conc_2 > n_conc_1) {
     tmp <- dt_avg[[conc]]
     data.table::set(dt_avg, j = conc, value = dt_avg[[conc_2]])
@@ -261,8 +261,8 @@ plot_dose_response_combo_panel <- function(dt_average,
     d1 <- pairs[[drug_name]][i]
     d2 <- pairs[[drug_name_2]][i]
     idx <- which(dt_avg[[drug_name]] == d1 & dt_avg[[drug_name_2]] == d2)
-    n_conc_1 <- sum(unique(dt_avg[[conc]][idx]) > 0, na.rm = TRUE)
-    n_conc_2 <- sum(unique(dt_avg[[conc_2]][idx]) > 0, na.rm = TRUE)
+    n_conc_1 <- sum(unique(dt_avg[[conc]][idx]) > 0)
+    n_conc_2 <- sum(unique(dt_avg[[conc_2]][idx]) > 0)
     if (n_conc_2 > n_conc_1) {
       old_conc <- dt_avg[[conc]][idx]
       old_conc_2 <- dt_avg[[conc_2]][idx]
