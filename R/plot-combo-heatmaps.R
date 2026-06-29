@@ -690,29 +690,37 @@ heatmap_combo_metrics_panel <- function(
   final_plot <- if (as_list) {
     ls_plts
   } else if (one_row_panel) {
-    # build panel 3x1
+    # build panel 3x1 (matching original ggarrange layout)
     patchwork::wrap_plots(
       ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
       ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
       ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess"),
       ncol = 3
-    )
+    ) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "left")
   } else {
     # build panel 2x2 (or 3-plot if no isobolograms)
-    plot_list <- list(
+    # top row: smooth + isobolograms (if available)
+    top_plots <- list(
       ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none")
     )
     if (!is.null(ls_plts[["iso_compare"]])) {
-      plot_list <- c(plot_list, list(
+      top_plots <- c(top_plots, list(
         ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
       ))
     }
-    plot_list <- c(plot_list, list(
+    top_row <- patchwork::wrap_plots(top_plots, ncol = length(top_plots))
+    # bottom row: excess heatmaps
+    bottom_row <- patchwork::wrap_plots(
       ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-    ))
-    patchwork::wrap_plots(plot_list, ncol = 2) +
-      patchwork::plot_annotation(title = main_title)
+      ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess"),
+      ncol = 2
+    )
+    patchwork::wrap_plots(top_row, bottom_row, ncol = 1) +
+      patchwork::plot_annotation(title = main_title) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "left")
   }
   # final
   final_plot
