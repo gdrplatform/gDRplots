@@ -14,7 +14,7 @@
 #' which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.
 #' @param saved_plot_list A character vector or list of absolute paths to pre-saved plot files (e.g. SVG).
 #' When provided, plots are embedded from these files instead of re-rendering the ggplot objects,
-#' which avoids expensive double-rendering and can dramatically speed up report generation.
+#' which avoids expensive double-rendering and can speed up report generation.
 #' Must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
 #' @param tabset_options A character vector of options for the tabset. This is only used
@@ -68,6 +68,7 @@ prep_plot_chunk <- function(plt_list,
   checkmate::assert_list(plt_list)
   checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_list(dwn_list, null.ok = TRUE)
+  # accepts both list and character vector of paths
   checkmate::assert(
     checkmate::check_list(saved_plot_list, null.ok = TRUE),
     checkmate::check_character(saved_plot_list, null.ok = TRUE)
@@ -453,6 +454,7 @@ save_plot <- function(plt, path, format = "svg") {
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
 
+  # Check if the directory exists and has write access
   dir_path <- dirname(path)
   if (!dir.exists(dir_path)) {
     stop("The specified directory does not exist.")
@@ -462,7 +464,9 @@ save_plot <- function(plt, path, format = "svg") {
     stop("The specified directory does not have write access.")
   }
 
+  # Estimate plot size
   if (inherits(plt, c("gtable", "grob")) && !inherits(plt, c("ggplot", "pheatmap"))) {
+    # TODO: move default grob dimensions to settings.json (GDR-XXXX)
     plot_size <- c(width = 14, height = 12)
   } else {
     plot_size <- estimate_plot_size(plt)
@@ -470,6 +474,7 @@ save_plot <- function(plt, path, format = "svg") {
 
   filename <- paste(path, format, sep = ".")
 
+  # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,
                   plot = plt,
                   units = "in",

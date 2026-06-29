@@ -1,7 +1,6 @@
 ## gDRplots 0.0.117 - 2026-06-29
 * replace ggpubr with patchwork for combo heatmap panels and fitting QC
 * add gtable/grob support in save_plot
-* use NROW instead of nrow per linter rules
 
 ## gDRplots 0.0.116 - 2026-06-23
 * update pkgdown
