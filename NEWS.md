@@ -1,5 +1,16 @@
-## gDRplots 0.0.114 - 2026-06-17
-* improve report performance by eliminating ggplot_build and pre-filtering data in plot loops
+## gDRplots 0.0.117 - 2026-06-29
+* replace ggpubr with patchwork for combo heatmap panels and fitting QC
+* add gtable/grob support in save_plot
+* use NROW instead of nrow per linter rules
+
+## gDRplots 0.0.116 - 2026-06-23
+* update pkgdown
+
+## gDRplots 0.0.115 - 2026-06-22
+* update dependencies
+
+## gDRplots 0.0.114 - 2026-06-22
+* update package vignette
 
 ## gDRplots 0.0.113 - 2026-06-17
 * add auto-orient combo dose-response axes by dose count
