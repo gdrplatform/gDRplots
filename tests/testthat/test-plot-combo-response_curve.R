@@ -258,6 +258,24 @@ test_that("plot_dose_response_combo_panel works as expected", {
   expect_is(plt_7, "gg")
 })
 
+test_that("plot_dose_response_combo_panel handles RV-only cell line with GR request", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+
+  cl_name <- "cellline_BC"
+  dt_rv_only <- dt_average[
+    !(CellLineName == cl_name & normalization_type == "GR")
+  ]
+
+  result <- plot_dose_response_combo_panel(
+    dt_average = dt_rv_only,
+    cl_name = cl_name,
+    normalization_type = "GR"
+  )
+  expect_null(result)
+})
+
 test_that(".get_combo_curves_colors works as expected", {
   json_path <- system.file(package = "gDRplots", "settings.json")
   s <- gDRutils::get_settings_from_json(json_path = json_path)
