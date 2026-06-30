@@ -156,8 +156,8 @@ test_that(".table_to_ggplot works as expected", {
   plt <- gDRplots:::.table_to_ggplot(dt)
   expect_is(plt, "gg")
   build <- ggplot2::ggplot_build(plt)
-  expect_true("label" %in% names(build$data[[1]]))
-  expect_equal(NROW(build$data[[1]]), 6L) # 2 columns * (1 header + 2 rows)
+  expect_true("label" %in% names(build$data[[2]]))
+  expect_equal(NROW(build$data[[2]]), 6L) # 2 columns * (1 header + 2 rows)
 
   expect_error(gDRplots:::.table_to_ggplot("not a dt"),
                "Assertion on 'dt' failed")
