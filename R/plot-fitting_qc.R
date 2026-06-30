@@ -302,8 +302,10 @@ heatmap_control_mapping_qc <- function(dt_treat,
     data.table::set(dt, j = col, value = round(dt[[col]], digits))
   }
   cols <- names(dt)
-  row_idx <- rev(seq_len(NROW(dt)))
-  header_y <- NROW(dt) + 1L
+  n_rows <- NROW(dt)
+  n_cols <- length(cols)
+  row_idx <- rev(seq_len(n_rows))
+  header_y <- n_rows + 1L
   labels <- lapply(cols, function(col) {
     vals <- as.character(dt[[col]])
     vals <- ifelse(is.na(vals), "", vals)
@@ -311,13 +313,24 @@ heatmap_control_mapping_qc <- function(dt_treat,
       x = match(col, cols),
       y = c(header_y, row_idx),
       label = c(col, vals),
-      fontface = c("bold", rep("plain", NROW(dt)))
+      fontface = c("bold", rep("plain", n_rows))
     )
   })
   lbl_dt <- data.table::rbindlist(labels)
+  pad <- 0.45
+  line_color <- "grey70"
+  h_lines <- data.table::data.table(
+    y = c(header_y + pad, header_y - pad, 1L - pad),
+    xmin = 1 - pad, xmax = n_cols + pad
+  )
   ggplot2::ggplot(lbl_dt, ggplot2::aes(x = x, y = y, label = label)) +
+    ggplot2::geom_segment(
+      data = h_lines,
+      ggplot2::aes(x = xmin, xend = xmax, y = y, yend = y),
+      inherit.aes = FALSE, color = line_color, linewidth = 0.3
+    ) +
     ggplot2::geom_text(ggplot2::aes(fontface = fontface),
-                       size = base_size / 3, hjust = 0.5) +
+                       size = base_size / 2.5, hjust = 0.5) +
     ggplot2::theme_void() +
     ggplot2::coord_cartesian(clip = "off")
 }
