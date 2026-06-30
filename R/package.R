@@ -64,6 +64,8 @@ utils::globalVariables(
     "Row_Display_Name",
     "Treatment_Key",
     "fontface",
+    "xmin",
+    "xmax",
     "y"
   ),
   utils::packageName())
