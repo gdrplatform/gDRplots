@@ -93,7 +93,7 @@ plot_dose_response_combo <- function(dt_average,
   selected_combination <-
     drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
 
-  if (nrow(selected_combination) == 0L) {
+  if (NROW(selected_combination) == 0L) {
     return(NULL)
   }
 
@@ -247,7 +247,7 @@ plot_dose_response_combo_panel <- function(dt_average,
     unique(dt_avg[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
   selected_combination <- selected_combination[get(drug_name) %in% d_names, ]
 
-  if (nrow(selected_combination) == 0L) {
+  if (NROW(selected_combination) == 0L) {
     return(NULL)
   }
 
