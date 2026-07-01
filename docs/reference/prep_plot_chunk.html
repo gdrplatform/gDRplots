@@ -51,6 +51,7 @@ sections for grouped plots.</p>
 <span>  <span class="va">chunk_name</span>,</span>
 <span>  link_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  dwn_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  saved_plot_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  header_level <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  tabset_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tabset"</span>, <span class="st">"tabset-dropdown"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -78,6 +79,13 @@ which when clicked, will be displayed in a new browser tab. It must have the sam
 <dt id="arg-dwn-list">dwn_list<a class="anchor" aria-label="anchor" href="#arg-dwn-list"></a></dt>
 <dd><p>A named list of links to location (relative paths) where table or plots are saved,
 which when clocked, will be downloaded. It must have the same structure as <code>plt_list</code>.</p></dd>
+
+
+<dt id="arg-saved-plot-list">saved_plot_list<a class="anchor" aria-label="anchor" href="#arg-saved-plot-list"></a></dt>
+<dd><p>A character vector or list of absolute paths to pre-saved plot files (e.g. SVG).
+When provided, plots are embedded from these files instead of re-rendering the ggplot objects,
+which avoids expensive double-rendering and can dramatically speed up report generation.
+Must have the same structure as <code>plt_list</code>.</p></dd>
 
 
 <dt id="arg-header-level">header_level<a class="anchor" aria-label="anchor" href="#arg-header-level"></a></dt>

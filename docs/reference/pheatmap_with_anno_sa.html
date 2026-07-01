@@ -55,8 +55,7 @@
 <span>  annotation_row <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotation_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotation_colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  max_hm_lbl_length <span class="op">=</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_settings_from_json.html" class="external-link">get_settings_from_json</a></span><span class="op">(</span><span class="st">"MAX_HM_LBL_LENGTH"</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"gDRplots"</span>, <span class="st">"settings.json"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  max_hm_lbl_length <span class="op">=</span> <span class="fu">.get_setting</span><span class="op">(</span><span class="st">"MAX_HM_LBL_LENGTH"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -185,13 +184,13 @@ the default number.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">pheatmap_with_anno_sa</span><span class="op">(</span>dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">hm_0</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_0</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">wrap_elements</a></span><span class="op">(</span><span class="va">hm_0</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pheatmap_with_anno_sa-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">pheatmap_with_anno_sa</span><span class="op">(</span>dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span>,</span></span>
 <span class="r-in"><span>                                dt_metrics_capped <span class="op">=</span> <span class="va">dt_metrics_capped</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">hm_1</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_1</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">wrap_elements</a></span><span class="op">(</span><span class="va">hm_1</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pheatmap_with_anno_sa-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">annotation_manual_col</span> <span class="op">&lt;-</span></span></span>
@@ -209,7 +208,7 @@ the default number.</p></dd>
 <span class="r-in"><span>                                annotation_col <span class="op">=</span> <span class="va">annotation_manual_col</span>,</span></span>
 <span class="r-in"><span>                                annotation_colors <span class="op">=</span> <span class="va">annotation_map</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">hm_2</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_2</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">wrap_elements</a></span><span class="op">(</span><span class="va">hm_2</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pheatmap_with_anno_sa-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">annotation_manual</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span></span>
@@ -231,7 +230,7 @@ the default number.</p></dd>
 <span class="r-in"><span>                                  metric <span class="op">=</span> <span class="st">"hsa_score"</span>,</span></span>
 <span class="r-in"><span>                                  dataset_name <span class="op">=</span> <span class="st">"Combo Matrix - combo data"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">hm_3</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">[[</span><span class="st">"heatmap"</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">ggpubr</span><span class="fu">::</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/as_ggplot.html" class="external-link">as_ggplot</a></span><span class="op">(</span><span class="va">hm_3</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_elements.html" class="external-link">wrap_elements</a></span><span class="op">(</span><span class="va">hm_3</span><span class="op">[[</span><span class="st">"gtable"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pheatmap_with_anno_sa-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

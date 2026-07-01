@@ -108,9 +108,9 @@ hm_2 <- pheatmap_qc(dt_average = dt_average,
                     lbl_by_CellLineName = TRUE,
                     lbl_by_DrugName = TRUE)
 
-ggpubr::as_ggplot(hm_1[["gtable"]])
+patchwork::wrap_elements(hm_1[["gtable"]])
 
-ggpubr::as_ggplot(hm_2[["gtable"]])
+patchwork::wrap_elements(hm_2[["gtable"]])
 
 
 se <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -122,8 +122,8 @@ hm_4 <- pheatmap_qc(dt_average = dt_average,
                     metric = "x_std",
                     cluster_rows = FALSE)
 
-ggpubr::as_ggplot(hm_3[["gtable"]])
+patchwork::wrap_elements(hm_3[["gtable"]])
 
-ggpubr::as_ggplot(hm_4[["gtable"]])
+patchwork::wrap_elements(hm_4[["gtable"]])
 
 ```

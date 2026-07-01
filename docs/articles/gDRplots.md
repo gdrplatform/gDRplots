@@ -263,7 +263,7 @@ output <- pheatmap_with_anno_sa(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_with_anno_sa-1.png)
@@ -382,7 +382,7 @@ output <- pheatmap_with_anno_cd(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_with_anno_cd-1.png)
@@ -420,7 +420,7 @@ output <- pheatmap_with_anno_combo(
   annotation_row = annotation_manual_row,
   annotation_col = annotation_manual_col)
 hm <- output[["heatmap"]]
-ggpubr::as_ggplot(hm[["gtable"]])
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_with_anno_combo-1.png)
@@ -725,21 +725,21 @@ concentration.
 
 ``` r
 hm_sa <- pheatmap_qc(dt_average = dt_average_sa)
-ggpubr::as_ggplot(hm_sa[["gtable"]])
+patchwork::wrap_elements(hm_sa[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_qc_sa-1.png)
 
 ``` r
 hm_cd <- pheatmap_qc(dt_average = dt_average_cd)
-ggpubr::as_ggplot(hm_cd[["gtable"]])
+patchwork::wrap_elements(hm_cd[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_qc_cd-1.png)
 
 ``` r
 hm_combo <- pheatmap_qc(dt_average = dt_average_combo)
-ggpubr::as_ggplot(hm_combo[["gtable"]])
+patchwork::wrap_elements(hm_combo[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/pheatmap_qc_combo-1.png)
@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.3  gDRplots_0.0.117 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.4  gDRplots_0.0.117 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.2.0                
@@ -1061,54 +1061,50 @@ sessionInfo()
 #>  [19] purrr_1.2.2                 xfun_0.59                  
 #>  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
-#>  [25] irlba_2.3.7                 cluster_2.1.8.2            
-#>  [27] broom_1.0.13                parallel_4.6.1             
-#>  [29] R6_2.6.1                    bslib_0.11.0               
-#>  [31] stringi_1.8.7               RColorBrewer_1.1-3         
-#>  [33] SQUAREM_2026.1              rpart_4.1.27               
-#>  [35] car_3.1-5                   GenomicRanges_1.64.0       
-#>  [37] jquerylib_0.1.4             Rcpp_1.1.1-1.1             
-#>  [39] Seqinfo_1.2.0               bookdown_0.47              
-#>  [41] SummarizedExperiment_1.42.0 iterators_1.0.14           
-#>  [43] knitr_1.51                  WGCNA_1.74                 
-#>  [45] base64enc_0.1-6             R.utils_2.13.0             
-#>  [47] IRanges_2.46.0              nnet_7.3-20                
-#>  [49] splines_4.6.1               Matrix_1.7-5               
-#>  [51] tidyselect_1.2.1            rstudioapi_0.19.0          
-#>  [53] abind_1.4-8                 yaml_2.3.12                
-#>  [55] stringfish_0.19.0           doParallel_1.0.17          
-#>  [57] codetools_0.2-20            lattice_0.22-9             
-#>  [59] tibble_3.3.1                Biobase_2.72.0             
-#>  [61] withr_3.0.3                 BumpyMatrix_1.20.0         
-#>  [63] S7_0.2.2                    evaluate_1.0.5             
-#>  [65] foreign_0.8-91              desc_1.4.3                 
-#>  [67] survival_3.8-6              RcppParallel_5.1.11-2      
-#>  [69] pillar_1.11.1               BiocManager_1.30.27        
-#>  [71] ggpubr_0.6.3                MatrixGenerics_1.24.0      
-#>  [73] carData_3.0-6               DT_0.34.0                  
-#>  [75] checkmate_2.3.4             foreach_1.5.2              
-#>  [77] stats4_4.6.1                generics_0.1.4             
-#>  [79] invgamma_1.2                truncnorm_1.0-9            
-#>  [81] S4Vectors_0.50.1            ggplot2_4.0.3              
-#>  [83] scales_1.4.0                ashr_2.2-63                
-#>  [85] qs2_0.2.2                   glue_1.8.1                 
-#>  [87] Hmisc_5.2-6                 pheatmap_1.0.13            
-#>  [89] tools_4.6.1                 data.table_1.18.4          
-#>  [91] ggsignif_0.6.4              fs_2.1.0                   
-#>  [93] fastcluster_1.3.0           cowplot_1.2.0              
-#>  [95] grid_4.6.1                  impute_1.86.0              
-#>  [97] tidyr_1.3.2                 crosstalk_1.2.2            
-#>  [99] colorspace_2.1-2            nlme_3.1-169               
-#> [101] htmlTable_2.5.0             Formula_1.2-5              
-#> [103] cli_3.6.6                   textshaping_1.0.5          
-#> [105] mixsqp_0.3-54               S4Arrays_1.12.0            
-#> [107] dplyr_1.2.1                 gtable_0.3.6               
-#> [109] cdsrmodels_0.1.0            R.methodsS3_1.8.2          
-#> [111] rstatix_0.7.3               dynamicTreeCut_1.63-1      
-#> [113] sass_0.4.10                 digest_0.6.39              
-#> [115] BiocGenerics_0.58.1         SparseArray_1.12.2         
-#> [117] ggrepel_0.9.8               htmlwidgets_1.6.4          
-#> [119] farver_2.1.2                htmltools_0.5.9            
-#> [121] pkgdown_2.2.0               R.oo_1.27.1                
-#> [123] lifecycle_1.0.5
+#>  [25] irlba_2.3.7                 parallel_4.6.1             
+#>  [27] cluster_2.1.8.2             R6_2.6.1                   
+#>  [29] bslib_0.11.0                stringi_1.8.7              
+#>  [31] RColorBrewer_1.1-3          SQUAREM_2026.1             
+#>  [33] rpart_4.1.27                GenomicRanges_1.64.0       
+#>  [35] jquerylib_0.1.4             Rcpp_1.1.1-1.1             
+#>  [37] Seqinfo_1.2.0               bookdown_0.47              
+#>  [39] SummarizedExperiment_1.42.0 iterators_1.0.14           
+#>  [41] knitr_1.51                  WGCNA_1.74                 
+#>  [43] base64enc_0.1-6             R.utils_2.13.0             
+#>  [45] IRanges_2.46.0              Matrix_1.7-5               
+#>  [47] splines_4.6.1               nnet_7.3-20                
+#>  [49] tidyselect_1.2.1            rstudioapi_0.19.0          
+#>  [51] abind_1.4-8                 yaml_2.3.12                
+#>  [53] stringfish_0.19.0           doParallel_1.0.17          
+#>  [55] codetools_0.2-20            lattice_0.22-9             
+#>  [57] tibble_3.3.1                Biobase_2.72.0             
+#>  [59] withr_3.0.3                 BumpyMatrix_1.20.0         
+#>  [61] S7_0.2.2                    evaluate_1.0.5             
+#>  [63] foreign_0.8-91              desc_1.4.3                 
+#>  [65] survival_3.8-6              RcppParallel_5.1.11-2      
+#>  [67] pillar_1.11.1               BiocManager_1.30.27        
+#>  [69] MatrixGenerics_1.24.0       DT_0.34.0                  
+#>  [71] checkmate_2.3.4             foreach_1.5.2              
+#>  [73] stats4_4.6.1                generics_0.1.4             
+#>  [75] invgamma_1.2                truncnorm_1.0-9            
+#>  [77] S4Vectors_0.50.1            ggplot2_4.0.3              
+#>  [79] scales_1.4.0                ashr_2.2-63                
+#>  [81] qs2_0.2.2                   glue_1.8.1                 
+#>  [83] pheatmap_1.0.13             Hmisc_5.2-6                
+#>  [85] tools_4.6.1                 data.table_1.18.4          
+#>  [87] fs_2.1.0                    fastcluster_1.3.0          
+#>  [89] grid_4.6.1                  impute_1.86.0              
+#>  [91] crosstalk_1.2.2             colorspace_2.1-2           
+#>  [93] nlme_3.1-169                patchwork_1.3.2            
+#>  [95] htmlTable_2.5.0             Formula_1.2-5              
+#>  [97] cli_3.6.6                   textshaping_1.0.5          
+#>  [99] mixsqp_0.3-54               S4Arrays_1.12.0            
+#> [101] dplyr_1.2.1                 gtable_0.3.6               
+#> [103] cdsrmodels_0.1.0            R.methodsS3_1.8.2          
+#> [105] dynamicTreeCut_1.63-1       sass_0.4.10                
+#> [107] digest_0.6.39               BiocGenerics_0.58.1        
+#> [109] SparseArray_1.12.2          ggrepel_0.9.8              
+#> [111] htmlwidgets_1.6.4           farver_2.1.2               
+#> [113] htmltools_0.5.9             pkgdown_2.2.0              
+#> [115] R.oo_1.27.1                 lifecycle_1.0.5
 ```

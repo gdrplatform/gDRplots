@@ -140,7 +140,7 @@ dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se,
 
 output <- pheatmap_with_anno_cd(dt_metrics = dt_metrics)
 hm_1 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_1[["gtable"]])
+patchwork::wrap_elements(hm_1[["gtable"]])
 
 
 annotation_manual_col <-
@@ -160,7 +160,7 @@ output <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                 annotation_col = annotation_manual_col,
                                 annotation_colors = annotation_map)
 hm_2 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_2[["gtable"]])
+patchwork::wrap_elements(hm_2[["gtable"]])
 
 
 annotation_manual <- data.table::data.table(
@@ -182,6 +182,6 @@ output <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
                                   metric = "hsa_score",
                                   dataset_name = "Co-dilution data"))
 hm_3 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_3[["gtable"]])
+patchwork::wrap_elements(hm_3[["gtable"]])
 
 ```
