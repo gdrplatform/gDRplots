@@ -94,17 +94,13 @@ plot_boxplot_metric_sa <- function(
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   if (grouped_flag && colored_pts_flag) {
     message("Please, choose only one coloring option: either `grouped_flag` or `colored_pts_flag`.")
@@ -496,17 +492,13 @@ plot_boxplot_metric_sa_by_grp <- function(
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(with_inf)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -736,17 +728,13 @@ plot_boxplot_metric_combo <- function(
   checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   if (grouped_flag && colored_pts_flag) {
     message("Please, choose only one coloring option: either `grouped_flag` or `colored_pts_flag`.")
@@ -909,17 +897,13 @@ plot_boxplot_metric_combo_by_CLs <- function(
   checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   plt <-
     plot_boxplot_metric_combo(
@@ -988,17 +972,13 @@ plot_boxplot_metric_combo_by_drugs <- function(
   checkmate::assert_flag(colored_pts_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   plt <-
     plot_boxplot_metric_combo(
@@ -1126,17 +1106,13 @@ plot_boxplot_metric_combo_by_grp <- function(
   checkmate::assert_flag(grouped_flag)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   boxplot_fill <-
-    gDRutils::get_settings_from_json("BOXPLOT_FILL",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("BOXPLOT_FILL")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
   jitter_poinst_color <-
-    gDRutils::get_settings_from_json("JITTER_POINST_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("JITTER_POINST_COLOR")
   edge_color <-
-    gDRutils::get_settings_from_json("EDGE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EDGE_COLOR")
 
   # filter data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,

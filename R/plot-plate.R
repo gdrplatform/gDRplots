@@ -355,9 +355,7 @@ plot_plate <- function(dt_plate, column_name) {
   well_position <- gDRutils::get_env_identifiers("well_position")
   barcode <- gDRutils::get_env_identifiers("barcode")
 
-  plate_palette <- gDRutils::get_settings_from_json(
-    "PLATE_PALETTE",
-    system.file(package = "gDRplots", "settings.json"))
+  plate_palette <- .get_setting("PLATE_PALETTE")
 
   checkmate::assert_data_table(dt_plate_copy)
   checkmate::assert_names(names(dt_plate_copy),

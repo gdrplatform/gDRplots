@@ -249,8 +249,7 @@ plot_cgs_ranking <- function(results,
 
   # create the ggplot object
   plt <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x_pos, y = !!rlang::sym(metric))) +
-    ggplot2::geom_col(color = gDRutils::get_settings_from_json("EDGE_COLOR",
-                                                               system.file(package = "gDRplots", "settings.json"))) +
+    ggplot2::geom_col(color = .get_setting("EDGE_COLOR")) +
     ggplot2::labs(title = cl_name,
                   y = bquote(~ Delta ~ .(metric) ~ "for" ~ .(norm_type)),
                   x = "Ranked drugs",
@@ -260,8 +259,7 @@ plot_cgs_ranking <- function(results,
                   ) +
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = 0,
-                        color = gDRutils::get_settings_from_json("HLINE_COLOR",
-                                                                 system.file(package = "gDRplots", "settings.json"))) +
+                        color = .get_setting("HLINE_COLOR")) +
     ggplot2::geom_hline(yintercept = mean_effect, color = "black") +
     ggplot2::geom_segment(x = threshold_count, xend = threshold_count,
                           y = 0, yend = mean_effect + 0.2 * yrange,

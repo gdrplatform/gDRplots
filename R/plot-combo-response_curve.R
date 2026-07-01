@@ -60,8 +60,7 @@ plot_dose_response_combo <- function(dt_average,
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   zero_conc_scaling_factor <-
-    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("ZERO_CONC_SCALING_FACTOR")
 
   checkmate::assert_data_table(dt_average)
   checkmate::assert_choice(drug1_name, choices = unique(dt_average[[drug_name]]))
@@ -72,8 +71,7 @@ plot_dose_response_combo <- function(dt_average,
   checkmate::assert_character(colors_vec, null.ok = TRUE)
   checkmate::assert_flag(split_by_conc)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # plt title
   cl_clid <- unique(dt_average[get(cellline_name) == cl_name, ][[clid]])
@@ -210,11 +208,9 @@ plot_dose_response_combo_panel <- function(dt_average,
   conc <- gDRutils::get_env_identifiers("concentration")
   conc_2 <- gDRutils::get_env_identifiers("concentration2")
   zero_conc_scaling_factor <-
-    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("ZERO_CONC_SCALING_FACTOR")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   checkmate::assert_data_table(dt_average)
   checkmate::assert_string(cl_name)
@@ -349,8 +345,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 
   conc_2_colors <-
     grDevices::colorRampPalette(
-      gDRutils::get_settings_from_json("COMBO_CURVES_PALETTE",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("COMBO_CURVES_PALETTE")
     )(2 * NROW(ls_conc_2))[2 * seq_along(ls_conc_2)]
   names(conc_2_colors) <- levels(ls_conc_2)
 

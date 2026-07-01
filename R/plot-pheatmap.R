@@ -38,8 +38,8 @@
 #'                     lbl_by_CellLineName = TRUE,
 #'                     lbl_by_DrugName = TRUE)
 #'
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' se <- mae[[gDRutils::get_supported_experiments("combo")]]
 #' dt_average <- gDRutils::convert_se_assay_to_dt(se = se,
@@ -50,8 +50,8 @@
 #'                     metric = "x_std",
 #'                     cluster_rows = FALSE)
 #'
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
-#' ggpubr::as_ggplot(hm_4[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_4[["gtable"]])
 #'
 #' @keywords QC_plot
 #'
@@ -83,8 +83,7 @@ pheatmap_qc <- function(
   checkmate::assert_flag(lbl_by_CellLineName)
   checkmate::assert_flag(lbl_by_DrugName)
   zero_conc_scaling_factor <-
-    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("ZERO_CONC_SCALING_FACTOR")
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -204,8 +203,7 @@ pheatmap_qc <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = mat_cvd,
@@ -347,12 +345,12 @@ pheatmap_qc <- function(
 #'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics)
 #' hm_0 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_0[["gtable"]])
+#' patchwork::wrap_elements(hm_0[["gtable"]])
 #'
 #' output <- pheatmap_with_anno_sa(dt_metrics = dt_metrics,
 #'                                 dt_metrics_capped = dt_metrics_capped)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -369,7 +367,7 @@ pheatmap_qc <- function(
 #'                                 annotation_col = annotation_manual_col,
 #'                                 annotation_colors = annotation_map)
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -390,7 +388,7 @@ pheatmap_qc <- function(
 #'                                   metric = "hsa_score",
 #'                                   dataset_name = "Combo Matrix - combo data"))
 #' hm_3 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -424,8 +422,7 @@ pheatmap_with_anno_sa <- function(
     annotation_col = NULL,
     annotation_colors = NULL,
     max_hm_lbl_length =
-      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -588,8 +585,7 @@ pheatmap_with_anno_sa <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <-
@@ -719,7 +715,7 @@ pheatmap_with_anno_sa <- function(
 #'
 #' output <- pheatmap_with_anno_cd(dt_metrics = dt_metrics)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
@@ -738,7 +734,7 @@ pheatmap_with_anno_sa <- function(
 #'                                 annotation_col = annotation_manual_col,
 #'                                 annotation_colors = annotation_map)
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -759,7 +755,7 @@ pheatmap_with_anno_sa <- function(
 #'                                   metric = "hsa_score",
 #'                                   dataset_name = "Co-dilution data"))
 #' hm_3 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_3[["gtable"]])
+#' patchwork::wrap_elements(hm_3[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -897,8 +893,7 @@ pheatmap_with_anno_cd <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
@@ -1018,7 +1013,7 @@ pheatmap_with_anno_cd <- function(
 #'                                    annotation_col = annotation_manual_col,
 #'                                    annotation_colors = annotation_map)
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -1041,7 +1036,7 @@ pheatmap_with_anno_cd <- function(
 #'                                      metric = "hsa_score",
 #'                                      dataset_name = "Combo Matrix - combo data"))
 #' hm_2 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_2[["gtable"]])
+#' patchwork::wrap_elements(hm_2[["gtable"]])
 #'
 #' @keywords pheat_ann
 #'
@@ -1074,8 +1069,7 @@ pheatmap_with_anno_combo <- function(
     annotation_col = NULL,
     annotation_colors = NULL,
     max_hm_lbl_length =
-      gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -1249,8 +1243,7 @@ pheatmap_with_anno_combo <- function(
 
   # dendrogram
   max_dim_matrix_cluster <-
-    gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("MAX_DIM_MATRIX_CLUSTER")
   gDR_cluster_condition <- any(dim(t_mat_cvd) < max_dim_matrix_cluster)  # gDR standard
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
@@ -1335,7 +1328,7 @@ pheatmap_with_anno_combo <- function(
 #'                                            normalization_type = "RV",
 #'                                            metric = "x_mean")
 #' hm_1 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_1[["gtable"]])
+#' patchwork::wrap_elements(hm_1[["gtable"]])
 #'
 #' annotation_manual <- data.table::data.table(
 #'   CellLineName =
@@ -1370,7 +1363,7 @@ pheatmap_with_anno_combo <- function(
 #'                                            normalization_type = "RV",
 #'                                            metric = "x_mean")
 #' hm_4 <- output[["heatmap"]]
-#' ggpubr::as_ggplot(hm_4[["gtable"]])
+#' patchwork::wrap_elements(hm_4[["gtable"]])
 #'
 #' @return A named list with elements:
 #' \itemize{
@@ -1399,8 +1392,7 @@ pheatmap_with_anno_combo_metrics <- function(
     distfun = compute_distances,
     annotation_col = NULL,
     annotation_colors = NULL,
-    max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-                                                         system.file(package = "gDRplots", "settings.json"))
+    max_hm_lbl_length = .get_setting("MAX_HM_LBL_LENGTH")
 ) {
 
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
@@ -1593,8 +1585,7 @@ pheatmap_with_anno_combo_metrics <- function(
     }
   }
 
-  max_dim <- gDRutils::get_settings_from_json("MAX_DIM_MATRIX_CLUSTER",
-                                              system.file(package = "gDRplots", "settings.json"))
+  max_dim <- .get_setting("MAX_DIM_MATRIX_CLUSTER")
   can_cluster <- any(dim(mat_cvd) < max_dim)
 
   cl_rows <- if (cluster_rows) {

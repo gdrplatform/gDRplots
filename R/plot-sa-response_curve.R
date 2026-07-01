@@ -74,11 +74,9 @@ plot_dose_response_sa <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
   zero_conc_scaling_factor <-
-    gDRutils::get_settings_from_json("ZERO_CONC_SCALING_FACTOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("ZERO_CONC_SCALING_FACTOR")
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_data_table(dt_average, null.ok = TRUE)
@@ -170,23 +168,24 @@ plot_dose_response_sa <- function(dt_metrics,
     if (!NROW(dt_met)) {
       dt_fit <- NULL
     } else {
-      dt_fit <- data.table::data.table()
-      for (grp_nm in group_names) {
+      fit_parts <- vector("list", length(group_names))
+      for (gi in seq_along(group_names)) {
+        grp_nm <- group_names[[gi]]
         sel_metrics <- dt_met[get(group_var) == grp_nm, ]
         if (NROW(sel_metrics) == 0) next
-        dt_fit <- rbind(dt_fit,
-                        cbind(sel_metrics[, group_var, with = FALSE],
-                              data.table::data.table(
-                                conc_col = sel_conc,
-                                x = gDRutils::predict_efficacy_from_conc(sel_conc,
-                                                                         sel_metrics$x_inf,
-                                                                         sel_metrics$x_0,
-                                                                         sel_metrics$ec50,
-                                                                         sel_metrics$h)
-                              )
-                        )
+        fit_parts[[gi]] <- cbind(
+          sel_metrics[, group_var, with = FALSE],
+          data.table::data.table(
+            conc_col = sel_conc,
+            x = gDRutils::predict_efficacy_from_conc(sel_conc,
+                                                     sel_metrics$x_inf,
+                                                     sel_metrics$x_0,
+                                                     sel_metrics$ec50,
+                                                     sel_metrics$h)
+          )
         )
       }
+      dt_fit <- data.table::rbindlist(fit_parts[lengths(fit_parts) > 0])
       if (!NROW(dt_fit)) {
         dt_fit <- NULL
       } else {
@@ -315,12 +314,19 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
     cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
   }
 
+  filter_expr <- substitute(
+    normalization_type == norm_type & fit_source == "gDR",
+    list(norm_type = normalization_type)
+  )
+  dt_metrics_filtered <- dt_metrics[eval(filter_expr)]
+  dt_average_filtered <- if (!is.null(dt_average)) dt_average[eval(filter_expr)] else NULL
+
   plt_list <- list()
   for (d_name in drug_name_vec) {
 
     plt_list[[d_name]] <-
-      plot_dose_response_sa(dt_metrics = dt_metrics,
-                            dt_average = dt_average,
+      plot_dose_response_sa(dt_metrics = dt_metrics_filtered,
+                            dt_average = dt_average_filtered,
                             selection_name = d_name,
                             group_var = cellline_name,
                             group_names = cellline_name_vec,
@@ -477,8 +483,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
   checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -627,8 +632,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
   checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # filter data for normalization_type and fit_source
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -657,11 +661,9 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   dt_average_plot <- dt_average[selected_combination, on = c(cellline_name, drug_name)]
   dt_metrics_plot <- dt_metrics[selected_combination, on = c(cellline_name, drug_name)]
 
-  dt_reconstructed_fit <- data.table::data.table(drug_name = character(),
-                                                 conc = numeric(),
-                                                 x = numeric())
-
-  for (d_name in d_names) {
+  fit_parts <- vector("list", length(d_names))
+  for (di in seq_along(d_names)) {
+    d_name <- d_names[[di]]
     dt_met_plot <- dt_metrics_plot[get(drug_name) == d_name, ]
     dt_avg_plot <- dt_average_plot[get(drug_name) == d_name, ]
 
@@ -670,21 +672,28 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
       max_conc <- max(dt_avg_plot[[conc]])
       sampled_conc <- create_log_seq(min_conc, max_conc, 50)
 
-      fitted_curve_sampled <- gDRutils::predict_efficacy_from_conc(sampled_conc,
-                                                                   dt_met_plot$x_inf,
-                                                                   dt_met_plot$x_0,
-                                                                   dt_met_plot$ec50,
-                                                                   dt_met_plot$h)
-      dt_fit <- data.table::data.table(
+      fit_parts[[di]] <- data.table::data.table(
         drug_name = d_name,
         conc = sampled_conc,
-        x = fitted_curve_sampled
+        x = gDRutils::predict_efficacy_from_conc(sampled_conc,
+                                                 dt_met_plot$x_inf,
+                                                 dt_met_plot$x_0,
+                                                 dt_met_plot$ec50,
+                                                 dt_met_plot$h)
       )
-
-      dt_reconstructed_fit <- rbind(dt_reconstructed_fit, dt_fit)
     }
   }
-  data.table::setnames(dt_reconstructed_fit, c("drug_name", "conc"), c(drug_name, conc))
+  dt_reconstructed_fit <- data.table::rbindlist(
+    fit_parts[lengths(fit_parts) > 0]
+  )
+  if (NROW(dt_reconstructed_fit)) {
+    data.table::setnames(dt_reconstructed_fit, c("drug_name", "conc"), c(drug_name, conc))
+  } else {
+    dt_reconstructed_fit <- data.table::data.table(
+      drug_name = character(), conc = numeric(), x = numeric()
+    )
+    data.table::setnames(dt_reconstructed_fit, c("drug_name", "conc"), c(drug_name, conc))
+  }
 
   # panel title
   cl_clid <- unique(dt_metrics[get(cellline_name) == cl_name, ][[clid]])

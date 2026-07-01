@@ -62,6 +62,10 @@ utils::globalVariables(
     "rank_1",
     "rank_2",
     "Row_Display_Name",
-    "Treatment_Key"
+    "Treatment_Key",
+    "fontface",
+    "xmin",
+    "xmax",
+    "y"
   ),
   utils::packageName())

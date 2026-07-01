@@ -9,6 +9,7 @@ prep_plot_chunk(
   chunk_name,
   link_list = NULL,
   dwn_list = NULL,
+  saved_plot_list = NULL,
   header_level = 3,
   tabset_options = c("tabset", "tabset-dropdown")
 )
@@ -25,6 +26,11 @@ which when clicked, will be displayed in a new browser tab. It must have the sam
 
 \item{dwn_list}{A named list of links to location (relative paths) where table or plots are saved,
 which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.}
+
+\item{saved_plot_list}{A character vector or list of absolute paths to pre-saved plot files (e.g. SVG).
+When provided, plots are embedded from these files instead of re-rendering the ggplot objects,
+which avoids expensive double-rendering and can dramatically speed up report generation.
+Must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
 

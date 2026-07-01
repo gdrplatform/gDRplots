@@ -430,8 +430,7 @@ heatmap_combo_metrics_panel <- function(
   checkmate::assert_flag(swap_axes)
   checkmate::assert_flag(show_values)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -691,33 +690,43 @@ heatmap_combo_metrics_panel <- function(
   final_plot <- if (as_list) {
     ls_plts
   } else if (one_row_panel) {
-    # build panel 3x1
-    ggpubr::ggarrange(
-      plotlist = list(
-        ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-        ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-        ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-      ),
-      ncol = 3, common.legend = FALSE, legend = "left")
+    # build panel 3x1 (matching original ggarrange layout)
+    smooth_plt <- ls_plts[["smooth"]] +
+      ggplot2::guides(linetype = "none", color = "none") +
+      ggplot2::theme(legend.position = "left")
+    hsa_plt <- ls_plts[["hsa_excess"]] +
+      ggplot2::labs(fill = "Excess") +
+      ggplot2::theme(legend.position = "left")
+    bliss_plt <- ls_plts[["bliss_excess"]] +
+      ggplot2::labs(fill = "Excess") +
+      ggplot2::guides(fill = "none", linetype = "none", color = "none")
+    patchwork::wrap_plots(smooth_plt, hsa_plt, bliss_plt, ncol = 3)
   } else {
-    # build panel 2x2
-    ggpubr::annotate_figure(
-      ggpubr::ggarrange(
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["smooth"]] + ggplot2::guides(linetype = "none", color = "none"),
-            ls_plts[["iso_compare"]] + ggplot2::guides(linetype = "none", color = "none")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        ggpubr::ggarrange(
-          plotlist = list(
-            ls_plts[["hsa_excess"]] + ggplot2::labs(fill = "Excess"),
-            ls_plts[["bliss_excess"]] + ggplot2::labs(fill = "Excess")
-          ),
-          ncol = 2, common.legend = TRUE, legend = "left"),
-        common.legend = TRUE, nrow = 2),
-      top = main_title) +
-      ggpubr::bgcolor("white") + ggpubr::border("white")
+    # build panel 2x2 (or 3-plot if no isobolograms)
+    # top row
+    smooth_plt <- ls_plts[["smooth"]]
+    top_plots <- list(smooth_plt)
+    if (!is.null(ls_plts[["iso_compare"]])) {
+      iso_plt <- ls_plts[["iso_compare"]] +
+        ggplot2::guides(linetype = "none", color = "none")
+      top_plots <- c(top_plots, list(iso_plt))
+    }
+    top_row <- patchwork::wrap_plots(top_plots, ncol = length(top_plots)) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "left")
+    # bottom row
+    hsa_plt <- ls_plts[["hsa_excess"]] +
+      ggplot2::labs(fill = "Excess")
+    bliss_plt <- ls_plts[["bliss_excess"]] +
+      ggplot2::labs(fill = "Excess")
+    bottom_row <- patchwork::wrap_plots(hsa_plt, bliss_plt, ncol = 2) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "left")
+    patchwork::wrap_plots(top_row, bottom_row, ncol = 1) +
+      patchwork::plot_annotation(
+        title = main_title,
+        theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      )
   }
   # final
   final_plot
@@ -796,8 +805,7 @@ plot_combination_index <- function(
   checkmate::assert_names(names(dt_isobolograms), must.include = "iso_level")
   checkmate::assert_character(colors_vec_iso, null.ok = TRUE)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   # data filtering and processing
   filter_expr <- substitute(normalization_type == norm_type, list(norm_type = normalization_type))
@@ -1845,11 +1853,8 @@ heatmap_combo_with_isoref_panel_independent <- function(
     lbl_legend <- names(plt_list)[1]
   }
 
-  panel <- ggpubr::annotate_figure(
-    ggpubr::ggarrange(plotlist = plt_list, widths = c(1, 1),
-                      common.legend = TRUE, legend.grob = ggpubr::get_legend(plt_list[[lbl_legend]]),
-                      legend = "left"),
-    top = panel_title)
+  panel <- patchwork::wrap_plots(plt_list, ncol = 2) +
+    patchwork::plot_annotation(title = panel_title)
 
   # final panel
   return(panel)
@@ -2000,8 +2005,7 @@ transform_log_conc <- function(conc_vec) {
 
   iso_colors <-
     grDevices::colorRampPalette(
-      gDRutils::get_settings_from_json("ISOLINE_PALETTE",
-                                       system.file(package = "gDRplots", "settings.json"))
+      .get_setting("ISOLINE_PALETTE")
     )(2 * NROW(iso_levels))[2 * seq_along(iso_levels)]
   names(iso_colors) <- iso_levels
 
@@ -2024,8 +2028,7 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
 
   grDevices::colorRampPalette(
-    gDRutils::get_settings_from_json("SMOOTH_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("SMOOTH_PALETTE")
   )(no_breaks)
 }
 
@@ -2044,8 +2047,7 @@ transform_log_conc <- function(conc_vec) {
   checkmate::assert_int(no_breaks, lower = 2)
 
   grDevices::colorRampPalette(
-    gDRutils::get_settings_from_json("EXCESS_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("EXCESS_PALETTE")
   )(no_breaks)
 }
 

@@ -55,8 +55,7 @@ plot_var_stat_qc <- function(dt_assay,
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_flag(with_table)
   hline_color <-
-    gDRutils::get_settings_from_json("HLINE_COLOR",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("HLINE_COLOR")
 
   cl_clid <- unique(dt_assay[get(cellline_name) == cl_name, clid])
 
@@ -85,11 +84,9 @@ plot_var_stat_qc <- function(dt_assay,
                    axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))
 
   if (with_table) {
-    tab_metric <- ggpubr::ggtexttable(
-      tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))],
-      rows = NULL, theme = ggpubr::ttheme("light"))
-
-    plt <- ggpubr::ggarrange(plt, tab_metric, nrow = 1, widths = c(2, 1))
+    tab_dt <- tab_subplot[, .SD, .SDcols = c(drug_name, metric)][order(get(metric))]
+    tab_plt <- .table_to_ggplot(tab_dt)
+    plt <- patchwork::wrap_plots(plt, tab_plt, widths = c(2, 1))
   }
 
   return(plt)
@@ -167,20 +164,15 @@ plot_fitting_acc <- function(dt_assay,
   rss$layers <- rss$layers[-1]
 
   # Combine plots vertically (one on top of the other)
-  combined_plot <- ggpubr::ggarrange(r2, rss, ncol = 1, heights = c(0.7, 0.7))
+  combined_plot <- patchwork::wrap_plots(r2, rss, ncol = 1, heights = c(0.7, 0.7))
   metric_cols <- c("r2", "rss")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   data2table <- r2$data[, c(drug_name, metric_cols), with = FALSE]
   data.table::setorder(data2table, "rss")
-  tab_metric <- ggpubr::ggtexttable(
-    data2table,
-    rows = NULL, theme = ggpubr::ttheme("light", base_size = 8))
-
-  ggpubr::ggarrange(combined_plot,
-                    tab_metric,
-                    nrow = 1,
-                    widths = c(2, 1),
-                    heights = c(1, 1.2))
+  tab_plt <- .table_to_ggplot(data2table, base_size = 8)
+  patchwork::wrap_plots(combined_plot,
+                       tab_plt,
+                       widths = c(2, 1))
 }
 
 
@@ -230,8 +222,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
   checkmate::assert_data_table(dt_treat)
   checkmate::assert_data_table(dt_controls)
   qc_heatmap_palette <-
-    gDRutils::get_settings_from_json("QC_HEATMAP_PALETTE",
-                                     system.file(package = "gDRplots", "settings.json"))
+    .get_setting("QC_HEATMAP_PALETTE")
 
   # calculate the frequency of each (rID, cID) combination in Controls
   frequency <- dt_controls[, .N, by = .(rId, cId)]
@@ -289,4 +280,57 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      angle_col = 90,
                      legend_breaks = unique_values,
                      legend_labels = unique_values)
+}
+
+#' Render a data.table as a text-based ggplot table
+#'
+#' @param dt data.table to render
+#' @param base_size numeric base font size (default 10)
+#' @return ggplot object displaying the table
+#'
+#' @examples
+#' dt <- data.table::data.table(drug = c("A", "B"), r2 = c(0.9, 0.8))
+#' .table_to_ggplot(dt)
+#'
+#' @keywords internal
+.table_to_ggplot <- function(dt, base_size = 10, digits = 3) {
+  checkmate::assert_data_table(dt, min.rows = 1)
+  checkmate::assert_number(base_size, lower = 1)
+  dt <- data.table::copy(dt)
+  num_cols <- names(dt)[vapply(dt, is.numeric, logical(1))]
+  for (col in num_cols) {
+    data.table::set(dt, j = col, value = round(dt[[col]], digits))
+  }
+  cols <- names(dt)
+  n_rows <- NROW(dt)
+  n_cols <- length(cols)
+  row_idx <- rev(seq_len(n_rows))
+  header_y <- n_rows + 1L
+  labels <- lapply(cols, function(col) {
+    vals <- as.character(dt[[col]])
+    vals <- ifelse(is.na(vals), "", vals)
+    data.table::data.table(
+      x = match(col, cols),
+      y = c(header_y, row_idx),
+      label = c(col, vals),
+      fontface = c("bold", rep("plain", n_rows))
+    )
+  })
+  lbl_dt <- data.table::rbindlist(labels)
+  pad <- 0.45
+  line_color <- "grey70"
+  h_lines <- data.table::data.table(
+    y = c(header_y + pad, header_y - pad, 1L - pad),
+    xmin = 1 - pad, xmax = n_cols + pad
+  )
+  ggplot2::ggplot(lbl_dt, ggplot2::aes(x = x, y = y, label = label)) +
+    ggplot2::geom_segment(
+      data = h_lines,
+      ggplot2::aes(x = xmin, xend = xmax, y = y, yend = y),
+      inherit.aes = FALSE, color = line_color, linewidth = 0.3
+    ) +
+    ggplot2::geom_text(ggplot2::aes(fontface = fontface),
+                       size = base_size / 2.5, hjust = 0.5) +
+    ggplot2::theme_void() +
+    ggplot2::coord_cartesian(clip = "off")
 }

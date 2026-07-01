@@ -18,8 +18,7 @@ pheatmap_with_anno_combo_metrics(
   distfun = compute_distances,
   annotation_col = NULL,
   annotation_colors = NULL,
-  max_hm_lbl_length = gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
-    system.file(package = "gDRplots", "settings.json"))
+  max_hm_lbl_length = .get_setting("MAX_HM_LBL_LENGTH")
 )
 }
 \arguments{
@@ -101,7 +100,7 @@ output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
                                            normalization_type = "RV",
                                            metric = "x_mean")
 hm_1 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_1[["gtable"]])
+patchwork::wrap_elements(hm_1[["gtable"]])
 
 annotation_manual <- data.table::data.table(
   CellLineName =
@@ -136,7 +135,7 @@ output <- pheatmap_with_anno_combo_metrics(dt_metrics = dt_metrics,
                                            normalization_type = "RV",
                                            metric = "x_mean")
 hm_4 <- output[["heatmap"]]
-ggpubr::as_ggplot(hm_4[["gtable"]])
+patchwork::wrap_elements(hm_4[["gtable"]])
 
 }
 \author{

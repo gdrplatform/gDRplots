@@ -28,8 +28,7 @@ test_that("plot_var_stat_qc works as expected", {
                             metric = "x_AOC",
                             normalization_type = "RV",
                             with_table = TRUE)
-  expect_is(plt_3, "gg")
-  expect_length(plt_3[["layers"]], 2)
+  expect_s3_class(plt_3, "patchwork")
 
   expect_error(plot_var_stat_qc(dt_assay = unlist(dt_metrics),
                                 cl_name = cl_name),
@@ -150,4 +149,16 @@ test_that("heatmap_control_mapping_qc works as expected", {
   expect_error(heatmap_control_mapping_qc(dt_treat = treat,
                                           dt_controls = as.list(controls)),
                "Assertion on 'dt_controls' failed: Must be a data.table")
+})
+
+test_that(".table_to_ggplot works as expected", {
+  dt <- data.table::data.table(drug = c("DrugA", "DrugB"), r2 = c(0.95, 0.82))
+  plt <- gDRplots:::.table_to_ggplot(dt)
+  expect_is(plt, "gg")
+  build <- ggplot2::ggplot_build(plt)
+  expect_true("label" %in% names(build$data[[2]]))
+  expect_equal(NROW(build$data[[2]]), 6L) # 2 columns * (1 header + 2 rows)
+
+  expect_error(gDRplots:::.table_to_ggplot("not a dt"),
+               "Assertion on 'dt' failed")
 })

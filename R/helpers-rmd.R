@@ -12,6 +12,10 @@
 #' which when clicked, will be displayed in a new browser tab. It must have the same structure as \code{plt_list}.
 #' @param dwn_list A named list of links to location (relative paths) where table or plots are saved,
 #' which when clocked, will be downloaded. It must have the same structure as \code{plt_list}.
+#' @param saved_plot_list A character vector or list of absolute paths to pre-saved plot files (e.g. SVG).
+#' When provided, plots are embedded from these files instead of re-rendering the ggplot objects,
+#' which avoids expensive double-rendering and can speed up report generation.
+#' Must have the same structure as \code{plt_list}.
 #' @param header_level An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).
 #' @param tabset_options A character vector of options for the tabset. This is only used
 #' when \code{plt_list} is a nested list.
@@ -57,17 +61,24 @@ prep_plot_chunk <- function(plt_list,
                             chunk_name,
                             link_list = NULL,
                             dwn_list = NULL,
+                            saved_plot_list = NULL,
                             header_level = 3,
                             tabset_options = c("tabset", "tabset-dropdown")) {
 
   checkmate::assert_list(plt_list)
   checkmate::assert_list(link_list, null.ok = TRUE)
   checkmate::assert_list(dwn_list, null.ok = TRUE)
+  # accepts both list and character vector of paths
+  checkmate::assert(
+    checkmate::check_list(saved_plot_list, null.ok = TRUE),
+    checkmate::check_character(saved_plot_list, null.ok = TRUE)
+  )
   checkmate::assert_string(chunk_name)
   checkmate::assert_int(header_level, lower = 1)
   checkmate::assert_character(tabset_options, null.ok = TRUE, any.missing = FALSE,
                               pattern = "unnumbered|tabset|tabset-dropdown|tabset-fade|tabset-pills")
 
+  use_saved <- !is.null(saved_plot_list)
   plt_list_name <- deparse(substitute(plt_list))
   lvl <- strrep("#", header_level)
 
@@ -88,6 +99,18 @@ prep_plot_chunk <- function(plt_list,
     NROW(plt_list) == NROW(dwn_list)
   }
   if (!dwn_structure_condition) dwn_list <- NULL
+
+  .make_plot_code <- function(saved_path, plt_ref, chunk_label) {
+    if (use_saved && !is.null(saved_path) && file.exists(saved_path)) {
+      paste0(
+        "```{r ", chunk_label, ', echo = FALSE, out.width = "100%%"}\n',
+        'knitr::include_graphics("', saved_path, '")\n',
+        "```\n\n"
+      )
+    } else {
+      sprintf("```{r %s, echo = FALSE}\n%s \n```\n\n", chunk_label, plt_ref)
+    }
+  }
 
   lapply(seq_along(plt_list), function(nm) {
     group_name <- if (is.null(names(plt_list)[nm])) {
@@ -111,17 +134,19 @@ prep_plot_chunk <- function(plt_list,
           names(plt_list[[nm]])[i_nm]
         }
 
+        chunk_label <- sprintf("%s_%s_%s",
+          chunk_name,
+          gsub(" ", "", group_name, fixed = TRUE),
+          formatC(i_nm, width = nchar(NROW(plt_list[[nm]])) + 1, flag = "0")
+        )
+        plt_ref <- sprintf("%s[[%d]][[%d]]", plt_list_name, nm, i_nm)
+        saved_path <- if (use_saved) saved_plot_list[[nm]][[i_nm]] else NULL
+
         chunk <- c(
           sprintf("%s# %s\n", lvl, item_name),
           if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]][[i_nm]]), "\n"),
           if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]][[i_nm]]), "\n"),
-          sprintf("```{r %s_%s_%s, echo = FALSE}\n%s[[%d]][[%d]] \n```\n\n",
-                  chunk_name,
-                  gsub(" ", "", group_name, fixed = TRUE),
-                  formatC(i_nm, width = nchar(NROW(plt_list[[nm]])) + 1, flag = "0"),
-                  plt_list_name,
-                  nm,
-                  i_nm)
+          .make_plot_code(saved_path, plt_ref, chunk_label)
         )
         knitr::knit_expand(text = chunk)
       })
@@ -130,15 +155,18 @@ prep_plot_chunk <- function(plt_list,
 
     } else {
       # not nested - no tabset, access element by index
+      chunk_label <- sprintf("%s_%s",
+        chunk_name,
+        formatC(nm, width = nchar(NROW(plt_list)) + 1, flag = "0")
+      )
+      plt_ref <- sprintf("%s[[%d]]", plt_list_name, nm)
+      saved_path <- if (use_saved) saved_plot_list[[nm]] else NULL
+
       chunk <- c(
         sprintf("%s %s\n", lvl, group_name),
         if (!is.null(link_list)) c(create_zoom_link(link_list[[nm]]), "\n"),
         if (!is.null(dwn_list)) c(create_download_link(dwn_list[[nm]]), "\n"),
-        sprintf("```{r %s_%s, echo = FALSE}\n%s[[%d]] \n```\n\n",
-                chunk_name,
-                formatC(nm, width = nchar(NROW(plt_list)) + 1, flag = "0"),
-                plt_list_name,
-                nm)
+        .make_plot_code(saved_path, plt_ref, chunk_label)
       )
       knitr::knit_expand(text = chunk)
     }
@@ -369,9 +397,26 @@ estimate_plot_size <- function(plt,
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
 
   if (inherits(plt, "ggplot")) {
-    # For ggplot2 objects
-    plot_data <- ggplot2::ggplot_build(plt)$data
-    num_elements <- length(unique(plot_data[[1]]$group))
+    # Count groups from plot data without expensive ggplot_build()
+    layer_data <- if (length(plt$layers) > 0) plt$layers[[1]]$data else NULL
+    if (is.null(layer_data) || inherits(layer_data, "waiver")) {
+      layer_data <- plt$data
+    }
+    num_elements <- tryCatch({
+      mapping <- plt$mapping
+      group_var <- if ("colour" %in% names(mapping)) {
+        rlang::as_name(mapping[["colour"]])
+      } else if ("group" %in% names(mapping)) {
+        rlang::as_name(mapping[["group"]])
+      } else {
+        NULL
+      }
+      if (!is.null(group_var) && group_var %in% names(layer_data)) {
+        length(unique(layer_data[[group_var]]))
+      } else {
+        1L
+      }
+    }, error = function(e) 1L)
     estimated_width <- base_width + num_elements * scale_factor
     estimated_height <- base_height + num_elements * scale_factor
   } else if (inherits(plt, "pheatmap")) {
@@ -405,7 +450,7 @@ estimate_plot_size <- function(plt,
 #'
 #' @export
 save_plot <- function(plt, path, format = "svg") {
-  checkmate::assert_multi_class(plt, c("ggplot", "pheatmap"))
+  checkmate::assert_multi_class(plt, c("ggplot", "pheatmap", "gtable", "grob"))
   checkmate::assert_string(path)
   checkmate::assert_choice(format, choices = c("svg", "png", "pdf"))
 
@@ -420,10 +465,16 @@ save_plot <- function(plt, path, format = "svg") {
   }
 
   # Estimate plot size
-  plot_size <- estimate_plot_size(plt)
+  if (inherits(plt, c("gtable", "grob")) && !inherits(plt, c("ggplot", "pheatmap"))) {
+    plot_size <- c(
+      width = .get_setting("DEFAULT_GROB_WIDTH"),
+      height = .get_setting("DEFAULT_GROB_HEIGHT")
+    )
+  } else {
+    plot_size <- estimate_plot_size(plt)
+  }
 
   filename <- paste(path, format, sep = ".")
-
 
   # Save the plot in the specified format
   ggplot2::ggsave(filename = filename,

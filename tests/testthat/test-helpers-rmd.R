@@ -402,7 +402,7 @@ test_that("save_plot throws error for unsupported plot type", {
   file_path <- file.path(temp_dir, "test_plot")
 
   expect_error(save_plot(p, file_path, "svg"),
-               "Assertion on 'plt' failed: Must inherit from class 'ggplot'/'pheatmap', but has class 'list'.")
+               "Assertion on 'plt' failed")
 })
 
 test_that("save_plot throws error for non-existent directory", {
