@@ -73,13 +73,6 @@ plot_dose_response_combo <- function(dt_average,
   hline_color <-
     .get_setting("HLINE_COLOR")
 
-  # check input data
-  drugs_combination <-
-    unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
-  stopifnot("combination of drugs and cell line does not exist" =
-              any(drug2_name %in% drugs_combination[[drug_name_2]],
-                  drug1_name %in% drugs_combination[[drug_name]]))
-
   # plt title
   cl_clid <- unique(dt_average[get(cellline_name) == cl_name, ][[clid]])
   plt_title <- sprintf("%s (%s)", cl_name, cl_clid)
@@ -92,9 +85,15 @@ plot_dose_response_combo <- function(dt_average,
   required_cols <- c(cellline_name, drug_name, drug_name_2, conc, conc_2, "x")
   dt_avg <- dt_avg[get(cellline_name) == cl_name, ][, .SD, .SDcols = required_cols]
 
-  # filter data for combination cell line (drug x drug2)
+  # check input data after normalization filter
+  drugs_combination <-
+    unique(dt_avg[, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
   selected_combination <-
     drugs_combination[get(drug_name) == drug1_name & get(drug_name_2) == drug2_name, ]
+
+  if (NROW(selected_combination) == 0L) {
+    return(NULL)
+  }
 
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
 
@@ -221,20 +220,6 @@ plot_dose_response_combo_panel <- function(dt_average,
   checkmate::assert_character(colors_vec, null.ok = TRUE)
 
 
-  available_drugs <- unique(dt_average[[drug_name]])
-  if (is.null(d_names) || all(!d_names %in% available_drugs)) {
-    d_names  <- available_drugs
-  } else if (!all(d_names %in% available_drugs)) {
-    d_names <- d_names[d_names %in% available_drugs]
-  }
-
-  # check input data
-  selected_combination <-
-    unique(dt_average[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
-  selected_combination <- selected_combination[get(drug_name) %in% d_names, ]
-  stopifnot("combination of drugs and cell line does not exist" =
-              any(d_names %in% selected_combination[[drug_name]]))
-
   # panel title
   cl_clid <- unique(dt_average[get(cellline_name) == cl_name, ][[clid]])
   panel_title <- sprintf("%s (%s)", cl_name, cl_clid)
@@ -246,6 +231,21 @@ plot_dose_response_combo_panel <- function(dt_average,
   # and selected cell line
   required_cols <- c(cellline_name, drug_name, drug_name_2, conc, conc_2, "x")
   dt_avg <- dt_avg[, .SD, .SDcols = required_cols]
+
+  available_drugs <- unique(dt_avg[[drug_name]])
+  if (is.null(d_names) || all(!d_names %in% available_drugs)) {
+    d_names  <- available_drugs
+  } else if (!all(d_names %in% available_drugs)) {
+    d_names <- d_names[d_names %in% available_drugs]
+  }
+
+  selected_combination <-
+    unique(dt_avg[get(cellline_name) == cl_name, .SD, .SDcols = c(cellline_name, drug_name, drug_name_2)])
+  selected_combination <- selected_combination[get(drug_name) %in% d_names, ]
+
+  if (NROW(selected_combination) == 0L) {
+    return(NULL)
+  }
 
   # filter data for combination cell line (drug x drug2)
   dt_avg <- dt_avg[selected_combination, on = c(cellline_name, drug_name, drug_name_2)]
