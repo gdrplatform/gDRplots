@@ -1,5 +1,9 @@
 # Changelog
 
+## gDRplots 0.0.117 - 2026-06-29
+
+- fix combo curve plot crash for missing normalization data
+
 ## gDRplots 0.0.116 - 2026-06-23
 
 - update pkgdown

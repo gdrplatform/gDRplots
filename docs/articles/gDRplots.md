@@ -1025,7 +1025,7 @@ plot_boxplot_meta(
 
 ``` r
 sessionInfo()
-#> R version 4.6.0 (2026-04-24)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.4 LTS
 #> 
@@ -1046,12 +1046,12 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.3  gDRplots_0.0.116 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.3  gDRplots_0.0.117 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] gridExtra_2.3               rlang_1.2.0                
+#>   [1] gridExtra_2.3.1             rlang_1.2.0                
 #>   [3] magrittr_2.0.5              otel_0.2.0                 
-#>   [5] matrixStats_1.5.0           compiler_4.6.0             
+#>   [5] matrixStats_1.5.0           compiler_4.6.1             
 #>   [7] mgcv_1.9-4                  systemfonts_1.3.2          
 #>   [9] vctrs_0.7.3                 stringr_1.6.0              
 #>  [11] pkgconfig_2.0.3             fastmap_1.2.0              
@@ -1062,7 +1062,7 @@ sessionInfo()
 #>  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
 #>  [25] irlba_2.3.7                 cluster_2.1.8.2            
-#>  [27] broom_1.0.13                parallel_4.6.0             
+#>  [27] broom_1.0.13                parallel_4.6.1             
 #>  [29] R6_2.6.1                    bslib_0.11.0               
 #>  [31] stringi_1.8.7               RColorBrewer_1.1-3         
 #>  [33] SQUAREM_2026.1              rpart_4.1.27               
@@ -1073,7 +1073,7 @@ sessionInfo()
 #>  [43] knitr_1.51                  WGCNA_1.74                 
 #>  [45] base64enc_0.1-6             R.utils_2.13.0             
 #>  [47] IRanges_2.46.0              nnet_7.3-20                
-#>  [49] splines_4.6.0               Matrix_1.7-5               
+#>  [49] splines_4.6.1               Matrix_1.7-5               
 #>  [51] tidyselect_1.2.1            rstudioapi_0.19.0          
 #>  [53] abind_1.4-8                 yaml_2.3.12                
 #>  [55] stringfish_0.19.0           doParallel_1.0.17          
@@ -1087,16 +1087,16 @@ sessionInfo()
 #>  [71] ggpubr_0.6.3                MatrixGenerics_1.24.0      
 #>  [73] carData_3.0-6               DT_0.34.0                  
 #>  [75] checkmate_2.3.4             foreach_1.5.2              
-#>  [77] stats4_4.6.0                generics_0.1.4             
+#>  [77] stats4_4.6.1                generics_0.1.4             
 #>  [79] invgamma_1.2                truncnorm_1.0-9            
 #>  [81] S4Vectors_0.50.1            ggplot2_4.0.3              
 #>  [83] scales_1.4.0                ashr_2.2-63                
 #>  [85] qs2_0.2.2                   glue_1.8.1                 
 #>  [87] Hmisc_5.2-6                 pheatmap_1.0.13            
-#>  [89] tools_4.6.0                 data.table_1.18.4          
+#>  [89] tools_4.6.1                 data.table_1.18.4          
 #>  [91] ggsignif_0.6.4              fs_2.1.0                   
 #>  [93] fastcluster_1.3.0           cowplot_1.2.0              
-#>  [95] grid_4.6.0                  impute_1.86.0              
+#>  [95] grid_4.6.1                  impute_1.86.0              
 #>  [97] tidyr_1.3.2                 crosstalk_1.2.2            
 #>  [99] colorspace_2.1-2            nlme_3.1-169               
 #> [101] htmlTable_2.5.0             Formula_1.2-5              
