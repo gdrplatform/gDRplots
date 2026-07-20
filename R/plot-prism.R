@@ -134,6 +134,17 @@ plot_volcano_assoc <- function(dt_assoc,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   GeneExpr = stats::rnorm(10)
+#' )
+#' plot_scatter_with_corr(dt_response, dt_depmap, selected_feat = "GeneExpr")
+#'
 #' @export
 plot_scatter_with_corr <- function(dt_response,
                                    dt_depmap,
@@ -222,6 +233,19 @@ plot_scatter_with_corr <- function(dt_response,
 #' @keywords prism_plots
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   GeneExprA = stats::rnorm(10),
+#'   GeneExprB = stats::rnorm(10)
+#' )
+#' plot_scatter_with_corr_panel(dt_response, dt_depmap,
+#'                              selected_feats = c("GeneExprA", "GeneExprB"))
 #'
 #' @export
 plot_scatter_with_corr_panel <- function(dt_response,
@@ -388,6 +412,17 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   Mutation = as.integer(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0))
+#' )
+#' plot_boxplot_num(dt_response, dt_depmap, selected_feat = "Mutation")
+#'
 #' @export
 plot_boxplot_num <- function(dt_response,
                              dt_depmap,
@@ -477,6 +512,19 @@ plot_boxplot_num <- function(dt_response,
 #' @keywords prism_plots
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   MutA = as.integer(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0)),
+#'   MutB = as.integer(c(0, 1, 0, 1, 0, 1, 0, 1, 0, 1))
+#' )
+#' plot_boxplot_num_panel(dt_response, dt_depmap,
+#'                        selected_feats = c("MutA", "MutB"))
 #'
 #' @export
 plot_boxplot_num_panel <- function(dt_response,
@@ -658,6 +706,20 @@ plot_boxplot_num_panel <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   Lung = as.integer(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0)),
+#'   Breast = as.integer(c(0, 1, 0, 1, 0, 0, 0, 0, 0, 0)),
+#'   Other = as.integer(c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1))
+#' )
+#' plot_boxplot_meta(dt_response, dt_depmap,
+#'                   selected_feat_meta_col = "PrimaryDisease")
+#'
 #' @export
 plot_boxplot_meta <- function(dt_response,
                               dt_depmap,
@@ -810,6 +872,21 @@ plot_boxplot_meta <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   GeneExprA = stats::rnorm(10),
+#'   GeneExprB = stats::rnorm(10),
+#'   GeneExprC = stats::rnorm(10)
+#' )
+#' plot_volcano_assoc_panel(dt_response, dt_depmap,
+#'                          selected_metric = "xc50",
+#'                          selected_feat_meta_col = "OmicsSignaturesProfile")
+#'
 #' @export
 plot_volcano_assoc_panel <- function(dt_response,
                                      dt_depmap,
@@ -893,7 +970,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' @return a string describing type of data - "numeric" or "categorical"
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' tab_cat <- data.table::data.table(
 #'   ID = sprintf("ID_%s", seq_len(5)),
 #'   brown = c(0, 1, 1, 0, 0),
@@ -965,7 +1042,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #'     when \code{n_top} will be higher than number of available features - only available will be returned.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
 #'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
 #' X <- matrix(

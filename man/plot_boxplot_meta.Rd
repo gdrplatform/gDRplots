@@ -38,6 +38,21 @@ outputted by \code{\link{prep_dt_depmap_meta}}}
 \description{
 Plot boxplot for metric values grouped by metadata from DepMap
 }
+\examples{
+dt_response <- data.table::data.table(
+  CellLineName = paste0("CL", 1:10),
+  xc50 = stats::rnorm(10)
+)
+dt_depmap <- data.table::data.table(
+  CCLEName = paste0("CL", 1:10),
+  Lung = as.integer(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0)),
+  Breast = as.integer(c(0, 1, 0, 1, 0, 0, 0, 0, 0, 0)),
+  Other = as.integer(c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1))
+)
+plot_boxplot_meta(dt_response, dt_depmap,
+                  selected_feat_meta_col = "PrimaryDisease")
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

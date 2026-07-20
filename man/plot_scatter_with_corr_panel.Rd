@@ -35,6 +35,20 @@ outputted by \code{\link{prep_dt_depmap_feat}}}
 \description{
 Plot panel with scatter with correlation
 }
+\examples{
+dt_response <- data.table::data.table(
+  CellLineName = paste0("CL", 1:10),
+  xc50 = stats::rnorm(10)
+)
+dt_depmap <- data.table::data.table(
+  CCLEName = paste0("CL", 1:10),
+  GeneExprA = stats::rnorm(10),
+  GeneExprB = stats::rnorm(10)
+)
+plot_scatter_with_corr_panel(dt_response, dt_depmap,
+                             selected_feats = c("GeneExprA", "GeneExprB"))
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

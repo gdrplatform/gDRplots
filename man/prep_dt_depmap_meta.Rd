@@ -20,7 +20,7 @@ A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 Load DepMap merged data for one selected metadata
 }
 \examples{
-\dontrun{
+\donttest{
 meta_data_path <- file.path(".", "Model.csv")
 dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
 }

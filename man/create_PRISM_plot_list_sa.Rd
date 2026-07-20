@@ -67,6 +67,18 @@ A named list with elements:
 \description{
 Create a nested list of plots for PRISM data with single-agent metrics
 }
+\examples{
+\donttest{
+create_PRISM_plot_list_sa(
+  drug_name_vec = c("DrugA"),
+  dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
+  meta_data_path = "path/to/Model.csv",
+  feat_data_path = "path/to/feature_dir",
+  feature_sets = c("OmicsSignaturesProfile")
+)
+}
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

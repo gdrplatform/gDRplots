@@ -19,7 +19,7 @@ character vectors with trimmed labels
 Trim labels to the required number of characters
 }
 \examples{
-\dontrun{
+\donttest{
 ls_lbls <- c(
   "short_lbl", "short_lbl", "veryveryverylong",
   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"

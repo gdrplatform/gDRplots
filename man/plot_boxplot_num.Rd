@@ -32,6 +32,18 @@ that has 0-1 values only (categorical character but without relation one-to-one 
 \description{
 Plot boxplot for categorical features
 }
+\examples{
+dt_response <- data.table::data.table(
+  CellLineName = paste0("CL", 1:10),
+  xc50 = stats::rnorm(10)
+)
+dt_depmap <- data.table::data.table(
+  CCLEName = paste0("CL", 1:10),
+  Mutation = as.integer(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0))
+)
+plot_boxplot_num(dt_response, dt_depmap, selected_feat = "Mutation")
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

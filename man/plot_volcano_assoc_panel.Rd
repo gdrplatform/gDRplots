@@ -39,6 +39,22 @@ A named list with elements:
 \description{
 Plot panel with volcano plot and according to the data type - scatter plots or box plots
 }
+\examples{
+dt_response <- data.table::data.table(
+  CellLineName = paste0("CL", 1:10),
+  xc50 = stats::rnorm(10)
+)
+dt_depmap <- data.table::data.table(
+  CCLEName = paste0("CL", 1:10),
+  GeneExprA = stats::rnorm(10),
+  GeneExprB = stats::rnorm(10),
+  GeneExprC = stats::rnorm(10)
+)
+plot_volcano_assoc_panel(dt_response, dt_depmap,
+                         selected_metric = "xc50",
+                         selected_feat_meta_col = "OmicsSignaturesProfile")
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

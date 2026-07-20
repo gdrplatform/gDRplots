@@ -333,7 +333,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ls_conc <- factor(c("0.001", "0.01", "1"))
 #' .get_combo_curves_colors(ls_conc)
 #' }

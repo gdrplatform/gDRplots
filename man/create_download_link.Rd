@@ -18,6 +18,11 @@ string with html download code
 Generate markdown code with a html link item that, when clicked, downloads a file.
 The function output should be wrapped in \code{knitr::knit()}.
 }
+\examples{
+create_download_link("tables/results.xlsx")
+create_download_link(NA)
+
+}
 \seealso{
 \code{\link[knitr:knit]{knitr::knit}}
 }

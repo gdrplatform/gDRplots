@@ -34,7 +34,7 @@ list of character vectors - input for \code{knitr::knit}
 Function output should be generated with \code{knitr::knit(text = unlist(<result>))}
 }
 \examples{
-\dontrun{
+\donttest{
 mae <- gDRutils::get_synthetic_data("small")
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")

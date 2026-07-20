@@ -34,6 +34,16 @@ A \code{DT::datatable} object.
 \description{
 Prepare summary table with statistically significant associations
 }
+\examples{
+\donttest{
+prep_assoc_summary(
+  dir_path = "path/to/assoc/results",
+  ls_file = c("chunk__feat_DrugA_RV_gDR_log10_xc50.xlsx"),
+  alpha = 0.05
+)
+}
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

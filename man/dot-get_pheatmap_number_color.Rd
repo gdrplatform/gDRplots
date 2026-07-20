@@ -31,7 +31,7 @@ named \code{matrix} with number color
 Compute color for number font in pheatmap::pheatmap based on given color palette and breaks
 }
 \examples{
-\dontrun{
+\donttest{
 mat <- matrix(-14:30, ncol = 5,
               dimnames = list(letters[1:9], LETTERS[1:5]))
 no_breaks <- 15

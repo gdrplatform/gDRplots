@@ -431,7 +431,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' feat_data_path <- file.path(".", "depmapdata")
 #' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
@@ -511,7 +511,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
 #' }
@@ -579,6 +579,19 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #' @keywords prism_plots
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @examples
+#' dt_response <- data.table::data.table(
+#'   CellLineName = paste0("CL", 1:10),
+#'   xc50 = stats::rnorm(10)
+#' )
+#' dt_depmap <- data.table::data.table(
+#'   CCLEName = paste0("CL", 1:10),
+#'   GeneExprA = stats::rnorm(10),
+#'   GeneExprB = stats::rnorm(10)
+#' )
+#' prep_dt_assoc(dt_response, dt_depmap,
+#'               selected_feat_meta_col = "OmicsSignaturesProfile")
 #'
 #' @export
 prep_dt_assoc <- function(dt_response,

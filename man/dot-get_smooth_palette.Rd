@@ -16,7 +16,7 @@ gDR palette for smooth values with given \code{no_breaks}
 Get color palette for the smooth values
 }
 \examples{
-\dontrun{
+\donttest{
 .get_smooth_palette(25)
 }
 }

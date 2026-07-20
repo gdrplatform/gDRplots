@@ -327,6 +327,17 @@
 #'
 #' @keywords prism_plots
 #'
+#' @examples
+#' \donttest{
+#' create_PRISM_plot_list_sa(
+#'   drug_name_vec = c("DrugA"),
+#'   dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
+#'   meta_data_path = "path/to/Model.csv",
+#'   feat_data_path = "path/to/feature_dir",
+#'   feature_sets = c("OmicsSignaturesProfile")
+#' )
+#' }
+#'
 #' @export
 create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       dt_metrics,
@@ -372,6 +383,18 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
+#'
+#' @examples
+#' \donttest{
+#' create_PRISM_plot_list_combo(
+#'   drug1_name_vec = c("DrugA"),
+#'   drug2_name_vec = c("DrugB"),
+#'   dt_metrics = gDRutils::convert_se_assay_to_dt(se_combo, "Metrics"),
+#'   meta_data_path = "path/to/Model.csv",
+#'   feat_data_path = "path/to/feature_dir",
+#'   feature_sets = c("OmicsSignaturesProfile")
+#' )
+#' }
 #'
 #' @export
 create_PRISM_plot_list_combo <- function(drug1_name_vec,
@@ -421,6 +444,15 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
+#'
+#' @examples
+#' assoc_rv <- data.table::data.table(
+#'   feature = "KRAS",
+#'   rho = 0.5,
+#'   q_value = 0.01,
+#'   src = "chunk__OmicsSignaturesProfile_DrugA_RV_gDR_log10_xc50.xlsx"
+#' )
+#' create_PRISM_summary_list(assoc_summary_RV = assoc_rv)
 #'
 #' @export
 create_PRISM_summary_list <- function(assoc_summary_RV,
@@ -491,14 +523,9 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#'
-#' @examples
-#' \dontrun{
-#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-#' .get_info_from_name(f_n)
-#' }
 #'
 .get_info_from_name <- function(file_name,
                                 normalization_type = "RV") {
@@ -521,10 +548,8 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' @param normalization_type string normalization type ("GR" or "RV")
 #' @return named list with \code{drug_grid} and \code{feat_meta}
 #'
-#' @examples
-#' .get_info_from_names("plt__metricA_DrugX_RV_extra", "RV")
-#'
 #' @keywords internal
+#' @noRd
 .get_info_from_names <- function(file_names,
                                  normalization_type = "RV") {
   checkmate::assert_character(file_names, min.len = 1)

@@ -41,7 +41,7 @@ Handles doubly nested lists, allowing for tabbed sections for cell lines and the
 The inner header level (for metrics) is automatically set to one level greater than the outer header level.
 }
 \examples{
-\dontrun{
+\donttest{
 nested_tables <- list(
   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])

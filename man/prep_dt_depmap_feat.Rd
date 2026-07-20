@@ -37,7 +37,7 @@ A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 Load DepMap merged data for one selected feature
 }
 \examples{
-\dontrun{
+\donttest{
 feat_data_path <- file.path(".", "depmapdata")
 meta_data_path <- file.path(".", "Model.csv")
 dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,

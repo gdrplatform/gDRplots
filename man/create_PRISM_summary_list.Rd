@@ -19,6 +19,16 @@ A list of table split by drug name and normalization type
 \description{
 Create a list of PRISM association table
 }
+\examples{
+assoc_rv <- data.table::data.table(
+  feature = "KRAS",
+  rho = 0.5,
+  q_value = 0.01,
+  src = "chunk__OmicsSignaturesProfile_DrugA_RV_gDR_log10_xc50.xlsx"
+)
+create_PRISM_summary_list(assoc_summary_RV = assoc_rv)
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

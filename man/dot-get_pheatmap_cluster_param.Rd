@@ -32,7 +32,7 @@ selected function used to compute the distance in \code{hclust} object
 To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
 }
 \examples{
-\dontrun{
+\donttest{
 mat <- matrix(1:24, nrow = 4)
 rownames(mat) <- sprintf("row_\%s", 1:4)
 colnames(mat) <- sprintf("col_\%s", 1:6)

@@ -1513,10 +1513,10 @@ pheatmap_with_anno_combo_metrics <- function(
     row_meta$Row_Display_Name,
     row_meta$Fixed_Name_1 != untreated_tag,
     row_meta$Fixed_Name_1,
-    suppressWarnings(as.numeric(row_meta$Fixed_Conc_1)),
+    as.numeric(ifelse(grepl("^[0-9.eE+-]+$", row_meta$Fixed_Conc_1), row_meta$Fixed_Conc_1, NA)),
     row_meta$Fixed_Name_2 != untreated_tag,
     row_meta$Fixed_Name_2,
-    suppressWarnings(as.numeric(row_meta$Fixed_Conc_2))
+    as.numeric(ifelse(grepl("^[0-9.eE+-]+$", row_meta$Fixed_Conc_2), row_meta$Fixed_Conc_2, NA))
   )
   row_meta <- row_meta[ord, ]
 
@@ -1843,6 +1843,10 @@ prep_pheatmap_matrix <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' change_NA_into_char(c(1, NA, 3))
+#' change_NA_into_char(c("a", NA, "b"), lbl_NA = "missing")
+#'
 #' @export
 change_NA_into_char <- function(x,
                                 lbl_NA = "NA") {
@@ -1981,7 +1985,7 @@ fill_ann_color_map <- function(dt_ann,
 #' @seealso \code{\link{compute_distances}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' mat <- matrix(1:24, nrow = 4)
 #' rownames(mat) <- sprintf("row_%s", 1:4)
 #' colnames(mat) <- sprintf("col_%s", 1:6)
@@ -2106,7 +2110,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @return named \code{matrix} with number color
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' mat <- matrix(-14:30, ncol = 5,
 #'               dimnames = list(letters[1:9], LETTERS[1:5]))
 #' no_breaks <- 15
@@ -2236,7 +2240,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @returns character vectors with trimmed labels
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ls_lbls <- c(
 #'   "short_lbl", "short_lbl", "veryveryverylong",
 #'   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
@@ -2340,7 +2344,7 @@ fill_ann_color_map <- function(dt_ann,
   if (length(unique_drugs) > 0) {
     if (!all(unique_drugs %in% names(base_map))) {
       missing_drugs <- setdiff(unique_drugs, names(base_map))
-      stop(paste("Missing colors in base_map for:", toString(missing_drugs)))
+      stop("Missing colors in base_map for: ", toString(missing_drugs))
     }
   }
 
@@ -2359,7 +2363,7 @@ fill_ann_color_map <- function(dt_ann,
   dt_tmp <- unique(dt_tmp[name %in% unique_drugs])
 
   for (drug in unique_drugs) {
-    dt_drug <- dt_tmp[name == drug][order(suppressWarnings(as.numeric(conc)))]
+    dt_drug <- dt_tmp[name == drug][order(as.numeric(ifelse(grepl("^[0-9.eE+-]+$", conc), conc, NA)))]
 
     if (NROW(dt_drug) == 0) {
       next
@@ -2371,7 +2375,7 @@ fill_ann_color_map <- function(dt_ann,
     base_col <- base_map[drug]
 
     grad_pal <- grDevices::colorRampPalette(c("#F5F5F5", base_col))(n_steps + 2)
-    grad_pal <- grad_pal[-(1:2)]
+    grad_pal <- grad_pal[-seq_len(2)]
 
     if (length(grad_pal) < n_steps) {
       grad_pal <- rep(base_col, n_steps)

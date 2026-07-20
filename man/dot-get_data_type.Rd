@@ -20,7 +20,7 @@ a string describing type of data - "numeric" or "categorical"
 Check data type
 }
 \examples{
-\dontrun{
+\donttest{
 tab_cat <- data.table::data.table(
   ID = sprintf("ID_\%s", seq_len(5)),
   brown = c(0, 1, 1, 0, 0),

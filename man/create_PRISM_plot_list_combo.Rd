@@ -75,6 +75,19 @@ A named list with elements:
 \description{
 Create a nested list of plots for PRISM data with combo metrics
 }
+\examples{
+\donttest{
+create_PRISM_plot_list_combo(
+  drug1_name_vec = c("DrugA"),
+  drug2_name_vec = c("DrugB"),
+  dt_metrics = gDRutils::convert_se_assay_to_dt(se_combo, "Metrics"),
+  meta_data_path = "path/to/Model.csv",
+  feat_data_path = "path/to/feature_dir",
+  feature_sets = c("OmicsSignaturesProfile")
+)
+}
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

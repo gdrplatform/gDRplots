@@ -28,7 +28,7 @@
 #' is a list of markdown chunks for each tab.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Simple list of plots
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -184,7 +184,7 @@ prep_plot_chunk <- function(plt_list,
 #' @inheritParams prep_plot_chunk
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' mae <- gDRutils::get_synthetic_data("small")
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -497,6 +497,11 @@ save_plot <- function(plt, path, format = "svg") {
 #'
 #' @keywords internal
 #'
+#' @examples
+#' \donttest{
+#' get_r_file_path()
+#' }
+#'
 #' @export
 get_r_file_path <-  function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
@@ -530,7 +535,7 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'   represents markdown code for the cell line's tabset.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' nested_tables <- list(
 #'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
@@ -649,6 +654,10 @@ prep_double_table_chunk <- function(tbl_list,
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #'
+#' @examples
+#' create_zoom_link("plots/scatter.svg")
+#' create_zoom_link(NA)
+#'
 #' @export
 create_zoom_link <- function(img_path,
                              link_txt = "Zoom In for Details") {
@@ -678,6 +687,10 @@ create_zoom_link <- function(img_path,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
+#'
+#' @examples
+#' create_download_link("tables/results.xlsx")
+#' create_download_link(NA)
 #'
 #' @export
 create_download_link <- function(dwn_path,
@@ -711,7 +724,7 @@ create_download_link <- function(dwn_path,
 #' like the input \code{plt_list} and retains the same names as \code{plt_list}.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Simple list of plots
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -884,6 +897,15 @@ generate_datatable <- function(tab,
 #' @keywords internal
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @examples
+#' \donttest{
+#' prep_assoc_summary(
+#'   dir_path = "path/to/assoc/results",
+#'   ls_file = c("chunk__feat_DrugA_RV_gDR_log10_xc50.xlsx"),
+#'   alpha = 0.05
+#' )
+#' }
+#'
 #' @export
 prep_assoc_summary <- function(dir_path,
                                ls_file,
@@ -908,8 +930,7 @@ prep_assoc_summary <- function(dir_path,
 
     tab_ <- tryCatch(data.table::as.data.table(read_file_fun(file_path)),
                      error = function(e) {
-                       message(sprintf("An error occurred for file `%s`:\n%s",
-                                       f_name, e))
+                       message("An error occurred for file `", f_name, "`: ", conditionMessage(e))
                      })
     if (!NROW(tab_)) next
     if (!checkmate::test_names(names(tab_), must.include = c("rho", "q_value"))) next

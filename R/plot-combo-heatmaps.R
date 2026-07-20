@@ -1875,7 +1875,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 #' prep_hm_limits(vec)
 #' prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
@@ -1941,7 +1941,7 @@ prep_hm_limits <- function(num_vec,
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' vec <- c(0, 0.003, 0.01, 0.03)
 #' transform_log_conc(vec)
 #' }
@@ -1993,7 +1993,7 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
 #' .get_iso_colors(ls_iso_lvl)
 #' }
@@ -2021,7 +2021,7 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' .get_smooth_palette(25)
 #' }
 .get_smooth_palette <- function(no_breaks) {
@@ -2040,7 +2040,7 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @keywords internal
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' .get_excess_palette(20)
 #' }
 .get_excess_palette <- function(no_breaks) {
@@ -2099,7 +2099,7 @@ transform_log_conc <- function(conc_vec) {
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ls_conc <- list(c(0, 0.003, 0.01, 0.03), c(0, 0.003, 0.01, 0.03, 0.1))
 #' .get_combo_panel_type(ls_conc)
 #' }

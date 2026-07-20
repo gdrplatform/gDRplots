@@ -31,7 +31,7 @@ capped limits (min and max) for given numeric vector
 Calculate limit for combo heatmap with gDR assumptions
 }
 \examples{
-\dontrun{
+\donttest{
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 prep_hm_limits(vec)
 prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
