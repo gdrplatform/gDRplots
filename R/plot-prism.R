@@ -878,6 +878,7 @@ plot_boxplot_meta <- function(dt_response,
 #'   xc50 = stats::rnorm(10)
 #' )
 #' dt_depmap <- data.table::data.table(
+#'   ModelID = paste0("ACH-", 1:10),
 #'   CCLEName = paste0("CL", 1:10),
 #'   GeneExprA = stats::rnorm(10),
 #'   GeneExprB = stats::rnorm(10),

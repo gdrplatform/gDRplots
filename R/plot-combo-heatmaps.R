@@ -1874,6 +1874,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #' @return capped limits (min and max) for given numeric vector
 #'
 #' @keywords internal
+#' @noRd
 #' @examples
 #' \donttest{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
@@ -1940,6 +1941,7 @@ prep_hm_limits <- function(num_vec,
 #'    is replaced with one step less in the dose dilution
 #'
 #' @keywords internal
+#' @noRd
 #' @examples
 #' \donttest{
 #' vec <- c(0, 0.003, 0.01, 0.03)
@@ -1992,6 +1994,7 @@ transform_log_conc <- function(conc_vec) {
 #' @return gDR palette for isoline given in \code{iso_levels}
 #'
 #' @keywords internal
+#' @noRd
 #' @examples
 #' \donttest{
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
@@ -2020,6 +2023,7 @@ transform_log_conc <- function(conc_vec) {
 #' @return gDR palette for smooth values with given \code{no_breaks}
 #'
 #' @keywords internal
+#' @noRd
 #' @examples
 #' \donttest{
 #' .get_smooth_palette(25)
@@ -2039,6 +2043,7 @@ transform_log_conc <- function(conc_vec) {
 #' @return gDR palette for excess values with given \code{no_breaks}
 #'
 #' @keywords internal
+#' @noRd
 #' @examples
 #' \donttest{
 #' .get_excess_palette(20)
@@ -2095,6 +2100,7 @@ transform_log_conc <- function(conc_vec) {
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
