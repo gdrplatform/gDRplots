@@ -930,7 +930,7 @@ prep_assoc_summary <- function(dir_path,
 
     tab_ <- tryCatch(data.table::as.data.table(read_file_fun(file_path)),
                      error = function(e) {
-                       message("An error occurred for file `", f_name, "`: ", conditionMessage(e))
+                       message("Could not read file `", f_name, "`: ", conditionMessage(e))
                      })
     if (!NROW(tab_)) next
     if (!checkmate::test_names(names(tab_), must.include = c("rho", "q_value"))) next
