@@ -1,3 +1,6 @@
+## gDRplots 0.0.118 - 2026-07-22
+* prepare package for Bioconductor submission: add biocViews, add runnable examples to exported functions, fix BiocCheck notes, add package-specific note filters
+
 ## gDRplots 0.0.117 - 2026-06-29
 * replace ggpubr with patchwork for combo heatmap panels and fitting QC
 * add gtable/grob support in save_plot
