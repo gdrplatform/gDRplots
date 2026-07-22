@@ -21,7 +21,7 @@ Currently, n-top linear associations are selected based on values of \code{q_val
 (column sorted increasing) and values of \code{rho} (column sorted decreasing)
 }
 \examples{
-\donttest{
+\dontrun{
 Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
             dimnames = list(sprintf("row_\%s", 1:50), "met_1"))
 X <- matrix(

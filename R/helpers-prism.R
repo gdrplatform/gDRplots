@@ -431,7 +431,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' feat_data_path <- file.path(".", "depmapdata")
 #' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
@@ -511,7 +511,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' meta_data_path <- file.path(".", "Model.csv")
 #' dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
 #' }

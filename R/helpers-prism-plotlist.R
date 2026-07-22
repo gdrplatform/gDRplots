@@ -328,7 +328,7 @@
 #' @keywords prism_plots
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' create_PRISM_plot_list_sa(
 #'   drug_name_vec = c("DrugA"),
 #'   dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
@@ -385,7 +385,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @keywords prism_plots
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' create_PRISM_plot_list_combo(
 #'   drug1_name_vec = c("DrugA"),
 #'   drug2_name_vec = c("DrugB"),

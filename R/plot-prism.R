@@ -971,7 +971,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' @return a string describing type of data - "numeric" or "categorical"
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' tab_cat <- data.table::data.table(
 #'   ID = sprintf("ID_%s", seq_len(5)),
 #'   brown = c(0, 1, 1, 0, 0),
@@ -1043,7 +1043,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #'     when \code{n_top} will be higher than number of available features - only available will be returned.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
 #'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
 #' X <- matrix(

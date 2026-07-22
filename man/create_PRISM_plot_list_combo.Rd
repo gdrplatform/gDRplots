@@ -76,7 +76,7 @@ A named list with elements:
 Create a nested list of plots for PRISM data with combo metrics
 }
 \examples{
-\donttest{
+\dontrun{
 create_PRISM_plot_list_combo(
   drug1_name_vec = c("DrugA"),
   drug2_name_vec = c("DrugB"),

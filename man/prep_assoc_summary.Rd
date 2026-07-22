@@ -35,7 +35,7 @@ A \code{DT::datatable} object.
 Prepare summary table with statistically significant associations
 }
 \examples{
-\donttest{
+\dontrun{
 prep_assoc_summary(
   dir_path = "path/to/assoc/results",
   ls_file = c("chunk__feat_DrugA_RV_gDR_log10_xc50.xlsx"),

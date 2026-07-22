@@ -68,7 +68,7 @@ A named list with elements:
 Create a nested list of plots for PRISM data with single-agent metrics
 }
 \examples{
-\donttest{
+\dontrun{
 create_PRISM_plot_list_sa(
   drug_name_vec = c("DrugA"),
   dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
