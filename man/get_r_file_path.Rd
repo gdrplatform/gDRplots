@@ -15,4 +15,10 @@ string with the path to the executed Rscript file
 \description{
 Extract path of the executed R file
 }
+\examples{
+\dontrun{
+get_r_file_path()
+}
+
+}
 \keyword{internal}

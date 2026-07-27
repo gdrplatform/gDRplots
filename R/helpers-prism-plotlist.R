@@ -327,6 +327,19 @@
 #'
 #' @keywords prism_plots
 #'
+#' @examples
+#' mae <- qs2::qs_read(system.file("testdata/finalMAE_prism.qs2", package = "gDRtestData"))
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' drug_name <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
+#' create_PRISM_plot_list_sa(
+#'   drug_name_vec = drug_name,
+#'   dt_metrics = dt_metrics,
+#'   meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+#'   feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+#'   feature_sets = c("CRISPRGeneEffect")
+#' )
+#'
 #' @export
 create_PRISM_plot_list_sa <- function(drug_name_vec,
                                       dt_metrics,
@@ -372,6 +385,22 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
+#'
+#' @examples
+#' mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
+#'                                  package = "gDRtestData"))
+#' se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_combo, "Metrics")
+#' drug1 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
+#' drug2 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name2")]])[1]
+#' create_PRISM_plot_list_combo(
+#'   drug1_name_vec = drug1,
+#'   drug2_name_vec = drug2,
+#'   dt_metrics = dt_metrics,
+#'   meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+#'   feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+#'   feature_sets = c("CRISPRGeneEffect")
+#' )
 #'
 #' @export
 create_PRISM_plot_list_combo <- function(drug1_name_vec,
@@ -421,6 +450,15 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
+#'
+#' @examples
+#' dir_path <- system.file("testdata", package = "gDRplots")
+#' ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+#' assoc_tab <- prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
+#' create_PRISM_summary_list(
+#'   assoc_summary_RV = assoc_tab[grepl("RV", assoc_tab[["src"]]), ],
+#'   assoc_summary_GR = assoc_tab[grepl("GR", assoc_tab[["src"]]), ]
+#' )
 #'
 #' @export
 create_PRISM_summary_list <- function(assoc_summary_RV,
@@ -490,15 +528,16 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #'   \item \code{feat_meta} a string with omic name (feature or meta)
 #' }
 #'
+#' @examples
+#' \donttest{
+#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
+#' gDRplots:::.get_info_from_name(f_n)
+#' }
+#'
 #' @keywords internal
+
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
-#'
-#' @examples
-#' \dontrun{
-#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-#' .get_info_from_name(f_n)
-#' }
 #'
 .get_info_from_name <- function(file_name,
                                 normalization_type = "RV") {
@@ -522,9 +561,12 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' @return named list with \code{drug_grid} and \code{feat_meta}
 #'
 #' @examples
-#' .get_info_from_names("plt__metricA_DrugX_RV_extra", "RV")
+#' \donttest{
+#' gDRplots:::.get_info_from_names("plt__metricA_DrugX_RV_extra", "RV")
+#' }
 #'
 #' @keywords internal
+
 .get_info_from_names <- function(file_names,
                                  normalization_type = "RV") {
   checkmate::assert_character(file_names, min.len = 1)

@@ -75,6 +75,23 @@ A named list with elements:
 \description{
 Create a nested list of plots for PRISM data with combo metrics
 }
+\examples{
+mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
+                                 package = "gDRtestData"))
+se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se_combo, "Metrics")
+drug1 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
+drug2 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name2")]])[1]
+create_PRISM_plot_list_combo(
+  drug1_name_vec = drug1,
+  drug2_name_vec = drug2,
+  dt_metrics = dt_metrics,
+  meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+  feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+  feature_sets = c("CRISPRGeneEffect")
+)
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

@@ -17,6 +17,11 @@ character (for NA -> given string)
 \description{
 Change NA into given string
 }
+\examples{
+change_NA_into_char(c(1, NA, 3))
+change_NA_into_char(c("a", NA, "b"), lbl_NA = "missing")
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }

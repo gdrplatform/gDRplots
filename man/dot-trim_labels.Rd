@@ -19,14 +19,14 @@ character vectors with trimmed labels
 Trim labels to the required number of characters
 }
 \examples{
-\dontrun{
+\donttest{
 ls_lbls <- c(
   "short_lbl", "short_lbl", "veryveryverylong",
   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 )
 
-.trim_labels(lbls_vec = ls_lbls)
-.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
+gDRplots:::.trim_labels(lbls_vec = ls_lbls)
+gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 }
 
 }

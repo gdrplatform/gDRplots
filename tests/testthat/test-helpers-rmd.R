@@ -345,7 +345,9 @@ p1 <- ggplot2::ggplot(ggplot2::mpg, ggplot2::aes(displ, hwy, color = class)) + g
 
 # Example pheatmap object
 mat <- matrix(rnorm(100), 10, 10)
+pdf(NULL)
 p2 <- pheatmap::pheatmap(mat)
+dev.off()
 
 test_that("estimate_plot_size works for ggplot object", {
   size <- estimate_plot_size(p1)
@@ -366,7 +368,9 @@ test_that("estimate_plot_size handles invalid inputs", {
   expect_error(estimate_plot_size(invalid_plot),
                "Assertion on 'plt' failed: Must inherit from class 'ggplot'/'pheatmap', but has class 'list'.")
 
+  pdf(NULL)
   invalid_plot_2 <- plot(1:10, 1:10, cex = 2, pch = 20, col = "pink")
+  dev.off()
   expect_error(estimate_plot_size(invalid_plot_2),
                "Assertion on 'plt' failed: Must inherit from class 'ggplot'/'pheatmap'")
 
@@ -845,7 +849,7 @@ test_that("prep_assoc_summary works as expected", {
     tab_9 <- prep_assoc_summary(dir_path = d_path,
                                 ls_file = ls_RV,
                                 read_file_fun = qs2::qs_read)
-  }, "An error occurred for file")
+  }, "Could not read file")
   expect_is(tab_9, "data.table")
   expect_length(tab_9, 0)
 

@@ -17,7 +17,7 @@ numeric vector with log10 concentration values; log10 for concentration equal 0 
 Transform concentrations values with log10
 }
 \examples{
-\dontrun{
+\donttest{
 vec <- c(0, 0.003, 0.01, 0.03)
 transform_log_conc(vec)
 }

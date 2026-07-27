@@ -18,6 +18,11 @@ string with html link code
 Generate markdown code for html link item which when clicked opens plot in new browser.
 The function output should be wrapped in \code{knitr::knit()}.
 }
+\examples{
+create_zoom_link("plots/scatter.svg")
+create_zoom_link(NA)
+
+}
 \seealso{
 \code{\link[knitr:knit]{knitr::knit}}
 }

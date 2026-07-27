@@ -289,10 +289,13 @@ heatmap_control_mapping_qc <- function(dt_treat,
 #' @return ggplot object displaying the table
 #'
 #' @examples
+#' \donttest{
 #' dt <- data.table::data.table(drug = c("A", "B"), r2 = c(0.9, 0.8))
-#' .table_to_ggplot(dt)
+#' gDRplots:::.table_to_ggplot(dt)
+#' }
 #'
 #' @keywords internal
+
 .table_to_ggplot <- function(dt, base_size = 10, digits = 3) {
   checkmate::assert_data_table(dt, min.rows = 1)
   checkmate::assert_number(base_size, lower = 1)

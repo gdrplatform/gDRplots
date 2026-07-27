@@ -332,10 +332,11 @@ plot_dose_response_combo_panel <- function(dt_average,
 #' @return gDR palette for Concentration_2 given in \code{ls_conc_2}
 #'
 #' @keywords internal
+
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ls_conc <- factor(c("0.001", "0.01", "1"))
-#' .get_combo_curves_colors(ls_conc)
+#' gDRplots:::.get_combo_curves_colors(ls_conc)
 #' }
 .get_combo_curves_colors <- function(ls_conc_2) {
   checkmate::assert_factor(ls_conc_2)

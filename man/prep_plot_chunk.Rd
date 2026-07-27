@@ -29,7 +29,7 @@ which when clocked, will be downloaded. It must have the same structure as \code
 
 \item{saved_plot_list}{A character vector or list of absolute paths to pre-saved plot files (e.g. SVG).
 When provided, plots are embedded from these files instead of re-rendering the ggplot objects,
-which avoids expensive double-rendering and can dramatically speed up report generation.
+which avoids expensive double-rendering and can speed up report generation.
 Must have the same structure as \code{plt_list}.}
 
 \item{header_level}{An integer specifying the markdown header level to use (e.g., 1 for `#`, 2 for `##`, etc.).}
@@ -51,7 +51,7 @@ The function handles both simple lists of plots and nested lists, allowing for t
 sections for grouped plots.
 }
 \examples{
-\dontrun{
+\donttest{
 # Simple list of plots
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +

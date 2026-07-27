@@ -32,21 +32,22 @@ selected function used to compute the distance in \code{hclust} object
 To compute the correct value when clustering columns - use the transposed source matrix as \code{mat_to_cluster}
 }
 \examples{
-\dontrun{
+\donttest{
 mat <- matrix(1:24, nrow = 4)
 rownames(mat) <- sprintf("row_\%s", 1:4)
 colnames(mat) <- sprintf("col_\%s", 1:6)
-.get_pheatmap_cluster_param(mat)
-.get_pheatmap_cluster_param(t(mat))
-.get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+gDRplots:::.get_pheatmap_cluster_param(mat)
+gDRplots:::.get_pheatmap_cluster_param(t(mat))
+gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
 
 mat[2,2] <- NA
 mat[2,1] <- Inf
-.get_pheatmap_cluster_param(mat)
-.get_pheatmap_cluster_param(mat, distfun = compute_distances)
-.get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+gDRplots:::.get_pheatmap_cluster_param(mat)
+gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances)
+gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
 add_cond <- NCOL(mat) > 10
-.get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances,
+                                        additional_condition = add_cond)
 }
 
 }

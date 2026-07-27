@@ -27,9 +27,9 @@ Assumption:
 - <gDR_metric_name> starts with normalization type that is \code{RV} or \code{GR}
 }
 \examples{
-\dontrun{
+\donttest{
 f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-.get_info_from_name(f_n)
+gDRplots:::.get_info_from_name(f_n)
 }
 
 }

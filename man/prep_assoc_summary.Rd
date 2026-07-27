@@ -34,6 +34,12 @@ A \code{DT::datatable} object.
 \description{
 Prepare summary table with statistically significant associations
 }
+\examples{
+dir_path <- system.file("testdata", package = "gDRplots")
+ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
+
+}
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }
