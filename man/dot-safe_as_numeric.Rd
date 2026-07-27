@@ -15,4 +15,8 @@ numeric vector
 \description{
 Converts only values that match a numeric pattern to numeric; others become NA.
 }
+\examples{
+gDRplots:::.safe_as_numeric(c("0.01", "0.1", "untreated", NA))
+
+}
 \keyword{internal}

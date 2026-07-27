@@ -1865,6 +1865,9 @@ change_NA_into_char <- function(x,
 #'
 #' @return numeric vector
 #'
+#' @examples
+#' gDRplots:::.safe_as_numeric(c("0.01", "0.1", "untreated", NA))
+#'
 #' @keywords internal
 
 .safe_as_numeric <- function(x) {
