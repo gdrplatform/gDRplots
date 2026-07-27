@@ -35,13 +35,9 @@ A \code{DT::datatable} object.
 Prepare summary table with statistically significant associations
 }
 \examples{
-\dontrun{
-prep_assoc_summary(
-  dir_path = "path/to/assoc/results",
-  ls_file = c("chunk__feat_DrugA_RV_gDR_log10_xc50.xlsx"),
-  alpha = 0.05
-)
-}
+dir_path <- system.file("testdata", package = "gDRplots")
+ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
 
 }
 \author{

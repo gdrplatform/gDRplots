@@ -25,8 +25,8 @@ ls_lbls <- c(
   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 )
 
-.trim_labels(lbls_vec = ls_lbls)
-.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
+gDRplots:::.trim_labels(lbls_vec = ls_lbls)
+gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 }
 
 }

@@ -68,15 +68,17 @@ A named list with elements:
 Create a nested list of plots for PRISM data with single-agent metrics
 }
 \examples{
-\dontrun{
+mae <- qs2::qs_read(system.file("testdata/finalMAE_prism.qs2", package = "gDRtestData"))
+se <- mae[[gDRutils::get_supported_experiments("sa")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+drug_name <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
 create_PRISM_plot_list_sa(
-  drug_name_vec = c("DrugA"),
-  dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
-  meta_data_path = "path/to/Model.csv",
-  feat_data_path = "path/to/feature_dir",
-  feature_sets = c("OmicsSignaturesProfile")
+  drug_name_vec = drug_name,
+  dt_metrics = dt_metrics,
+  meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+  feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+  feature_sets = c("CRISPRGeneEffect")
 )
-}
 
 }
 \author{

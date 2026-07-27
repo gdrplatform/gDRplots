@@ -498,7 +498,7 @@ save_plot <- function(plt, path, format = "svg") {
 #' @keywords internal
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_r_file_path()
 #' }
 #'
@@ -535,15 +535,13 @@ get_r_file_path <-  function(test_mode = FALSE) {
 #'   represents markdown code for the cell line's tabset.
 #'
 #' @examples
-#' \donttest{
 #' nested_tables <- list(
 #'   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
 #'   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 #' )
-#' sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
+#' sorting_options <- c("cyl", "-hp")
 #' prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2,
 #'   tabset_options = "tabset", sorting_opts = sorting_options)
-#' }
 #'
 #' @keywords internal
 #'
@@ -724,7 +722,6 @@ create_download_link <- function(dwn_path,
 #' like the input \code{plt_list} and retains the same names as \code{plt_list}.
 #'
 #' @examples
-#' \donttest{
 #' # Simple list of plots
 #' plotlist <- lapply(unique(iris$Species), function(iris_name) {
 #'   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -749,7 +746,6 @@ create_download_link <- function(dwn_path,
 #'
 #' prep_filename_path(plt_list = nested_plotlist,
 #'                    file_format = "png")
-#' }
 #'
 #' @keywords internal
 #'
@@ -898,13 +894,9 @@ generate_datatable <- function(tab,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' \dontrun{
-#' prep_assoc_summary(
-#'   dir_path = "path/to/assoc/results",
-#'   ls_file = c("chunk__feat_DrugA_RV_gDR_log10_xc50.xlsx"),
-#'   alpha = 0.05
-#' )
-#' }
+#' dir_path <- system.file("testdata", package = "gDRplots")
+#' ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+#' prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
 #'
 #' @export
 prep_assoc_summary <- function(dir_path,

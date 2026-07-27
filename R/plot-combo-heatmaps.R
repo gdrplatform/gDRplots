@@ -1998,7 +1998,7 @@ transform_log_conc <- function(conc_vec) {
 #' @examples
 #' \donttest{
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
-#' .get_iso_colors(ls_iso_lvl)
+#' gDRplots:::.get_iso_colors(ls_iso_lvl)
 #' }
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
@@ -2026,7 +2026,7 @@ transform_log_conc <- function(conc_vec) {
 #' @noRd
 #' @examples
 #' \donttest{
-#' .get_smooth_palette(25)
+#' gDRplots:::.get_smooth_palette(25)
 #' }
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
@@ -2046,7 +2046,7 @@ transform_log_conc <- function(conc_vec) {
 #' @noRd
 #' @examples
 #' \donttest{
-#' .get_excess_palette(20)
+#' gDRplots:::.get_excess_palette(20)
 #' }
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
@@ -2107,7 +2107,7 @@ transform_log_conc <- function(conc_vec) {
 #' @examples
 #' \donttest{
 #' ls_conc <- list(c(0, 0.003, 0.01, 0.03), c(0, 0.003, 0.01, 0.03, 0.1))
-#' .get_combo_panel_type(ls_conc)
+#' gDRplots:::.get_combo_panel_type(ls_conc)
 #' }
 #'
 .get_combo_panel_type <- function(ls_vec_conc) {

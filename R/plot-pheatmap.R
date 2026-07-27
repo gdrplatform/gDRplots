@@ -1513,10 +1513,10 @@ pheatmap_with_anno_combo_metrics <- function(
     row_meta$Row_Display_Name,
     row_meta$Fixed_Name_1 != untreated_tag,
     row_meta$Fixed_Name_1,
-    as.numeric(ifelse(grepl("^[0-9.eE+-]+$", row_meta$Fixed_Conc_1), row_meta$Fixed_Conc_1, NA)),
+    .safe_as_numeric(row_meta$Fixed_Conc_1),
     row_meta$Fixed_Name_2 != untreated_tag,
     row_meta$Fixed_Name_2,
-    as.numeric(ifelse(grepl("^[0-9.eE+-]+$", row_meta$Fixed_Conc_2), row_meta$Fixed_Conc_2, NA))
+    .safe_as_numeric(row_meta$Fixed_Conc_2)
   )
   row_meta <- row_meta[ord, ]
 
@@ -1857,6 +1857,22 @@ change_NA_into_char <- function(x,
 }
 
 
+#' Safely convert a character vector to numeric
+#'
+#' Converts only values that match a numeric pattern to numeric; others become NA.
+#'
+#' @param x character vector to convert
+#'
+#' @return numeric vector
+#'
+#' @keywords internal
+#' @noRd
+.safe_as_numeric <- function(x) {
+  x <- as.character(x)
+  as.numeric(data.table::fifelse(grepl("^[0-9.eE+-]+$", x), x, NA_character_))
+}
+
+
 #' Create color map for annotation
 #'
 #' @param dt_ann \code{data.table} with the annotations
@@ -1989,17 +2005,18 @@ fill_ann_color_map <- function(dt_ann,
 #' mat <- matrix(1:24, nrow = 4)
 #' rownames(mat) <- sprintf("row_%s", 1:4)
 #' colnames(mat) <- sprintf("col_%s", 1:6)
-#' .get_pheatmap_cluster_param(mat)
-#' .get_pheatmap_cluster_param(t(mat))
-#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' gDRplots:::.get_pheatmap_cluster_param(mat)
+#' gDRplots:::.get_pheatmap_cluster_param(t(mat))
+#' gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
 #'
 #' mat[2,2] <- NA
 #' mat[2,1] <- Inf
-#' .get_pheatmap_cluster_param(mat)
-#' .get_pheatmap_cluster_param(mat, distfun = compute_distances)
-#' .get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+#' gDRplots:::.get_pheatmap_cluster_param(mat)
+#' gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances)
+#' gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
 #' add_cond <- NCOL(mat) > 10
-#' .get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
+#' gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances,
+#'                                         additional_condition = add_cond)
 #' }
 #'
 #' @keywords internal
@@ -2118,7 +2135,7 @@ fill_ann_color_map <- function(dt_ann,
 #' ls_colors <- c("limegreen", "darkblue", "orange")
 #' hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
 #'
-#' number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
+#' number_color <- gDRplots:::.get_pheatmap_number_color(mat, hm_colors, breaks)
 #'
 #' pheatmap::pheatmap(mat,
 #'                    breaks = breaks,
@@ -2246,8 +2263,8 @@ fill_ann_color_map <- function(dt_ann,
 #'   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 #' )
 #'
-#' .trim_labels(lbls_vec = ls_lbls)
-#' .trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
+#' gDRplots:::.trim_labels(lbls_vec = ls_lbls)
+#' gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 #' }
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
@@ -2363,7 +2380,7 @@ fill_ann_color_map <- function(dt_ann,
   dt_tmp <- unique(dt_tmp[name %in% unique_drugs])
 
   for (drug in unique_drugs) {
-    dt_drug <- dt_tmp[name == drug][order(as.numeric(ifelse(grepl("^[0-9.eE+-]+$", conc), conc, NA)))]
+    dt_drug <- dt_tmp[name == drug][order(.safe_as_numeric(conc))]
 
     if (NROW(dt_drug) == 0) {
       next

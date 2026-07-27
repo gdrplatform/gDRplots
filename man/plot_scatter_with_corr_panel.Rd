@@ -36,17 +36,21 @@ outputted by \code{\link{prep_dt_depmap_feat}}}
 Plot panel with scatter with correlation
 }
 \examples{
-dt_response <- data.table::data.table(
-  CellLineName = paste0("CL", 1:10),
-  xc50 = stats::rnorm(10)
-)
-dt_depmap <- data.table::data.table(
-  CCLEName = paste0("CL", 1:10),
-  GeneExprA = stats::rnorm(10),
-  GeneExprB = stats::rnorm(10)
-)
-plot_scatter_with_corr_panel(dt_response, dt_depmap,
-                             selected_feats = c("GeneExprA", "GeneExprB"))
+mae_prism <- gDRutils::get_synthetic_data("prism")
+se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+dt_response <- prep_dt_response_metric_sa(
+  dt_metrics = dt_metrics,
+  d_name = unique(dt_metrics[["DrugName"]])[1],
+  normalization_type = "RV", metric = "x_mean")
+feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+obj_depmap_feat <- prep_dt_depmap_feat(feat_data_path, meta_data_path,
+                                       feature_set = "OmicsCNGene")
+plot_scatter_with_corr_panel(
+  dt_response = dt_response,
+  dt_depmap = obj_depmap_feat[["dt_depmap"]],
+  selected_feats = names(obj_depmap_feat[["dt_depmap"]])[3:5])
 
 }
 \author{

@@ -34,7 +34,6 @@ Depending on the inputs, outputted string will have a format:
 Note: An unnamed item in the list will be numbered.
 }
 \examples{
-\donttest{
 # Simple list of plots
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -59,7 +58,6 @@ for (species in unique(iris$Species)) {
 
 prep_filename_path(plt_list = nested_plotlist,
                    file_format = "png")
-}
 
 }
 \seealso{

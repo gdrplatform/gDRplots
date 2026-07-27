@@ -135,15 +135,21 @@ plot_volcano_assoc <- function(dt_assoc,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   CCLEName = paste0("CL", 1:10),
-#'   GeneExpr = stats::rnorm(10)
-#' )
-#' plot_scatter_with_corr(dt_response, dt_depmap, selected_feat = "GeneExpr")
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_feat <- prep_dt_depmap_feat(feat_data_path, meta_data_path,
+#'                                        feature_set = "OmicsCNGene")
+#' plot_scatter_with_corr(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_feat[["dt_depmap"]],
+#'   selected_feat = names(obj_depmap_feat[["dt_depmap"]])[3])
 #'
 #' @export
 plot_scatter_with_corr <- function(dt_response,
@@ -235,17 +241,21 @@ plot_scatter_with_corr <- function(dt_response,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   CCLEName = paste0("CL", 1:10),
-#'   GeneExprA = stats::rnorm(10),
-#'   GeneExprB = stats::rnorm(10)
-#' )
-#' plot_scatter_with_corr_panel(dt_response, dt_depmap,
-#'                              selected_feats = c("GeneExprA", "GeneExprB"))
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_feat <- prep_dt_depmap_feat(feat_data_path, meta_data_path,
+#'                                        feature_set = "OmicsCNGene")
+#' plot_scatter_with_corr_panel(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_feat[["dt_depmap"]],
+#'   selected_feats = names(obj_depmap_feat[["dt_depmap"]])[3:5])
 #'
 #' @export
 plot_scatter_with_corr_panel <- function(dt_response,
@@ -413,15 +423,19 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   CCLEName = paste0("CL", 1:10),
-#'   Mutation = as.integer(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0))
-#' )
-#' plot_boxplot_num(dt_response, dt_depmap, selected_feat = "Mutation")
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_meta <- prep_dt_depmap_meta(meta_data_path, metadata_col = "OncotreeLineage")
+#' plot_boxplot_num(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_meta[["dt_depmap"]],
+#'   selected_feat = names(obj_depmap_meta[["dt_depmap"]])[3])
 #'
 #' @export
 plot_boxplot_num <- function(dt_response,
@@ -514,17 +528,19 @@ plot_boxplot_num <- function(dt_response,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   CCLEName = paste0("CL", 1:10),
-#'   MutA = as.integer(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0)),
-#'   MutB = as.integer(c(0, 1, 0, 1, 0, 1, 0, 1, 0, 1))
-#' )
-#' plot_boxplot_num_panel(dt_response, dt_depmap,
-#'                        selected_feats = c("MutA", "MutB"))
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_meta <- prep_dt_depmap_meta(meta_data_path, metadata_col = "OncotreeLineage")
+#' plot_boxplot_num_panel(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_meta[["dt_depmap"]],
+#'   selected_feats = names(obj_depmap_meta[["dt_depmap"]])[3:5])
 #'
 #' @export
 plot_boxplot_num_panel <- function(dt_response,
@@ -707,18 +723,19 @@ plot_boxplot_num_panel <- function(dt_response,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   CCLEName = paste0("CL", 1:10),
-#'   Lung = as.integer(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0)),
-#'   Breast = as.integer(c(0, 1, 0, 1, 0, 0, 0, 0, 0, 0)),
-#'   Other = as.integer(c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1))
-#' )
-#' plot_boxplot_meta(dt_response, dt_depmap,
-#'                   selected_feat_meta_col = "PrimaryDisease")
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_meta <- prep_dt_depmap_meta(meta_data_path, metadata_col = "OncotreeLineage")
+#' plot_boxplot_meta(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_meta[["dt_depmap"]],
+#'   selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
 #'
 #' @export
 plot_boxplot_meta <- function(dt_response,
@@ -873,20 +890,22 @@ plot_boxplot_meta <- function(dt_response,
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @examples
-#' dt_response <- data.table::data.table(
-#'   CellLineName = paste0("CL", 1:10),
-#'   xc50 = stats::rnorm(10)
-#' )
-#' dt_depmap <- data.table::data.table(
-#'   ModelID = paste0("ACH-", 1:10),
-#'   CCLEName = paste0("CL", 1:10),
-#'   GeneExprA = stats::rnorm(10),
-#'   GeneExprB = stats::rnorm(10),
-#'   GeneExprC = stats::rnorm(10)
-#' )
-#' plot_volcano_assoc_panel(dt_response, dt_depmap,
-#'                          selected_metric = "xc50",
-#'                          selected_feat_meta_col = "OmicsSignaturesProfile")
+#' mae_prism <- gDRutils::get_synthetic_data("prism")
+#' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
+#' dt_response <- prep_dt_response_metric_sa(
+#'   dt_metrics = dt_metrics,
+#'   d_name = unique(dt_metrics[["DrugName"]])[1],
+#'   normalization_type = "RV", metric = "x_mean")
+#' feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+#' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
+#' obj_depmap_feat <- prep_dt_depmap_feat(feat_data_path, meta_data_path,
+#'                                        feature_set = "OmicsCNGene")
+#' plot_volcano_assoc_panel(
+#'   dt_response = dt_response,
+#'   dt_depmap = obj_depmap_feat[["dt_depmap"]],
+#'   selected_metric = "RV_gDR_x_mean",
+#'   selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
 #'
 #' @export
 plot_volcano_assoc_panel <- function(dt_response,
@@ -971,14 +990,14 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' @return a string describing type of data - "numeric" or "categorical"
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' tab_cat <- data.table::data.table(
 #'   ID = sprintf("ID_%s", seq_len(5)),
 #'   brown = c(0, 1, 1, 0, 0),
 #'   blue = c(1, 0, NA, 0, 1),
 #'   green = c(0, 0, 0, 1, 0)
 #' )
-#' .get_data_type(dt_ = tab_cat, desc_col = "ID")
+#' gDRplots:::.get_data_type(dt_ = tab_cat, desc_col = "ID")
 #'
 #' tab_feat <- data.table::data.table(
 #'   ID = sprintf("ID_%s", seq_len(5)),
@@ -987,7 +1006,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #'   med = c(1, 1, NA, 0, 1),
 #'   high = c(0, 1, 0, 1, 0)
 #' )
-#' .get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
+#' gDRplots:::.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
 #' }
 #' @keywords prism_plots
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
@@ -1043,7 +1062,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #'     when \code{n_top} will be higher than number of available features - only available will be returned.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
 #'             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
 #' X <- matrix(
@@ -1052,7 +1071,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #'   nrow = 50,
 #'   dimnames = list(sprintf("row_%s", 1:50), sprintf("feat_%s", 1:20)))
 #' tab_assoc <- calc_assoc(X, Y)
-#' .get_n_top_asssoc(tab_assoc)
+#' gDRplots:::.get_n_top_asssoc(tab_assoc)
 #' }
 #'
 #' @keywords prism_plots

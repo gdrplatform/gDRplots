@@ -20,9 +20,7 @@ A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 Load DepMap merged data for one selected metadata
 }
 \examples{
-\dontrun{
-meta_data_path <- file.path(".", "Model.csv")
+meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
 dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
-}
 }
 \keyword{internal}

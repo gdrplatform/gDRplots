@@ -39,7 +39,7 @@ breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
 ls_colors <- c("limegreen", "darkblue", "orange")
 hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
 
-number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
+number_color <- gDRplots:::.get_pheatmap_number_color(mat, hm_colors, breaks)
 
 pheatmap::pheatmap(mat,
                    breaks = breaks,

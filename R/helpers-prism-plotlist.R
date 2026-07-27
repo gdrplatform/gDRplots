@@ -328,15 +328,17 @@
 #' @keywords prism_plots
 #'
 #' @examples
-#' \dontrun{
+#' mae <- qs2::qs_read(system.file("testdata/finalMAE_prism.qs2", package = "gDRtestData"))
+#' se <- mae[[gDRutils::get_supported_experiments("sa")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+#' drug_name <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
 #' create_PRISM_plot_list_sa(
-#'   drug_name_vec = c("DrugA"),
-#'   dt_metrics = gDRutils::convert_se_assay_to_dt(se_sa, "Metrics"),
-#'   meta_data_path = "path/to/Model.csv",
-#'   feat_data_path = "path/to/feature_dir",
-#'   feature_sets = c("OmicsSignaturesProfile")
+#'   drug_name_vec = drug_name,
+#'   dt_metrics = dt_metrics,
+#'   meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+#'   feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+#'   feature_sets = c("CRISPRGeneEffect")
 #' )
-#' }
 #'
 #' @export
 create_PRISM_plot_list_sa <- function(drug_name_vec,
@@ -522,6 +524,12 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #'   \item \code{feat_meta} a string with omic name (feature or meta)
 #' }
 #'
+#' @examples
+#' \donttest{
+#' f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
+#' gDRplots:::.get_info_from_name(f_n)
+#' }
+#'
 #' @keywords internal
 #' @noRd
 #'
@@ -547,6 +555,11 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #'   pattern \code{prefix__feat_drug_NORM_...}
 #' @param normalization_type string normalization type ("GR" or "RV")
 #' @return named list with \code{drug_grid} and \code{feat_meta}
+#'
+#' @examples
+#' \donttest{
+#' gDRplots:::.get_info_from_names("plt__metricA_DrugX_RV_extra", "RV")
+#' }
 #'
 #' @keywords internal
 #' @noRd
