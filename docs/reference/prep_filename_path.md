@@ -56,7 +56,6 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 # Simple list of plots
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -66,6 +65,15 @@ plotlist <- lapply(unique(iris$Species), function(iris_name) {
 prep_filename_path(plt_list = plotlist,
                    prefix = "iris__",
                    path_file = file.path(".", "plots"))
+#> $`1`
+#> [1] "./plots/iris__1"
+#> 
+#> $`2`
+#> [1] "./plots/iris__2"
+#> 
+#> $`3`
+#> [1] "./plots/iris__3"
+#> 
 
 # Nested list of plots for tabbed output
 nested_plotlist <- list()
@@ -81,5 +89,28 @@ for (species in unique(iris$Species)) {
 
 prep_filename_path(plt_list = nested_plotlist,
                    file_format = "png")
-} # }
+#> $setosa
+#> $setosa$Sepal
+#> [1] "Sepal.png"
+#> 
+#> $setosa$Petal
+#> [1] "Petal.png"
+#> 
+#> 
+#> $versicolor
+#> $versicolor$Sepal
+#> [1] "Sepal.png"
+#> 
+#> $versicolor$Petal
+#> [1] "Petal.png"
+#> 
+#> 
+#> $virginica
+#> $virginica$Sepal
+#> [1] "Sepal.png"
+#> 
+#> $virginica$Petal
+#> [1] "Petal.png"
+#> 
+#> 
 ```

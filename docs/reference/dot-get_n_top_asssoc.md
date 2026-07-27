@@ -30,7 +30,7 @@ returned.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 Y <- matrix(seq(0.5, 2, length.out = 50), nrow = 50,
             dimnames = list(sprintf("row_%s", 1:50), "met_1"))
 X <- matrix(
@@ -39,6 +39,7 @@ X <- matrix(
   nrow = 50,
   dimnames = list(sprintf("row_%s", 1:50), sprintf("feat_%s", 1:20)))
 tab_assoc <- calc_assoc(X, Y)
-.get_n_top_asssoc(tab_assoc)
-} # }
+gDRplots:::.get_n_top_asssoc(tab_assoc)
+#> [1] "feat_11" "feat_8"  "feat_15" "feat_1" 
+# }
 ```

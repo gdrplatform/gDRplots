@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.118</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,6 +131,92 @@ and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme</p><
     <p>Janina Smoła <a href="mailto:janina.smola@contractors.roche.com">janina.smola@contractors.roche.com</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">qs2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qs2/man/qs_read.html" class="external-link">qs_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"testdata/finalMAE_prism.qs2"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">dt_metrics</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se</span>, <span class="st">"Metrics"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">drug_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/identifiers.html" class="external-link">get_env_identifiers</a></span><span class="op">(</span><span class="st">"drug_name"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">create_PRISM_plot_list_sa</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  drug_name_vec <span class="op">=</span> <span class="va">drug_name</span>,</span></span>
+<span class="r-in"><span>  dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span>,</span></span>
+<span class="r-in"><span>  meta_data_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data/Model.csv.gz"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  feat_data_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  feature_sets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRISPRGeneEffect"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`GDC-8025`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`GDC-8025`$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_log10_xc50</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_sa-1.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_x_mean</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_sa-2.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_x_max</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_sa-3.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`GDC-8025`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`GDC-8025`$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_log10_xc50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      feature          response         rho     q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;            &lt;char&gt;       &lt;num&gt;       &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   FGFR1 RV_gDR_log10_xc50  0.33979097 0.003069564     2.51292337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:   FOXP1 RV_gDR_log10_xc50  0.15165775 0.443164057     0.35343547</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:    BCL2 RV_gDR_log10_xc50  0.14298724 0.591219704     0.22825110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:    TP53 RV_gDR_log10_xc50 -0.19118940 0.666613242     0.17612606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:    DSC3 RV_gDR_log10_xc50  0.14608629 0.713441788     0.14664146</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 145:   SF3B1 RV_gDR_log10_xc50 -0.02123908 0.946104103     0.02406107</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 146:   KMT2D RV_gDR_log10_xc50 -0.01340607 0.946324813     0.02395977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 147:   U2AF1 RV_gDR_log10_xc50 -0.02160233 0.946546062     0.02385825</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 148:    RHOA RV_gDR_log10_xc50 -0.02909737 0.946773401     0.02375395</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    CDK4 RV_gDR_log10_xc50 -0.06813350 0.947026529     0.02363785</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_x_mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      feature      response          rho      q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;        &lt;char&gt;        &lt;num&gt;        &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   FGFR1 RV_gDR_x_mean  0.293106529 2.913225e-11    10.53562599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    TP53 RV_gDR_x_mean -0.148226553 9.231880e-03     2.03470986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:    JAK2 RV_gDR_x_mean  0.113757797 1.985975e-01     0.70202617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:     CIC RV_gDR_x_mean -0.087622859 3.114935e-01     0.50655098</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:    CDK4 RV_gDR_x_mean -0.077563596 3.854880e-01     0.41398915</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 145:  RICTOR RV_gDR_x_mean  0.023985942 8.653591e-01     0.06280365</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 146:   U2AF1 RV_gDR_x_mean  0.007235126 8.659303e-01     0.06251708</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 147:  NFE2L2 RV_gDR_x_mean  0.024250178 8.665097e-01     0.06222657</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 148:    RHOA RV_gDR_x_mean  0.006994082 8.671018e-01     0.06192993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:   KMT2D RV_gDR_x_mean  0.037048856 8.677244e-01     0.06161818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`GDC-8025`$RV$RV_gDR_x_max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      feature     response          rho      q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;       &lt;char&gt;        &lt;num&gt;        &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:   FGFR1 RV_gDR_x_max  0.195605854 0.0001257931      3.9003433</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:    RAF1 RV_gDR_x_max -0.124550350 0.0477535114      1.3209947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:    CDK4 RV_gDR_x_max -0.113555600 0.0728986016      1.1372808</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:    RXRA RV_gDR_x_max  0.120542996 0.0971801709      1.0124223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:    CHD4 RV_gDR_x_max -0.101488117 0.1247265632      0.9040410</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 145:   U2AF1 RV_gDR_x_max -0.010956099 0.7162334723      0.1449454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 146:   H3-3A RV_gDR_x_max -0.004571759 0.7172936121      0.1443030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 147:    POT1 RV_gDR_x_max  0.010742777 0.7183433953      0.1436679</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 148:    RHOA RV_gDR_x_max  0.042633228 0.7194681062      0.1429885</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149:    TSC2 RV_gDR_x_max -0.010164816 0.7206948251      0.1422486</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -140,7 +226,7 @@ and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme</p><
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

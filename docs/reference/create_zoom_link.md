@@ -31,3 +31,12 @@ string with html link code
 ## Author
 
 Janina Smoła <janina.smola@contractors.roche.com>
+
+## Examples
+
+``` r
+create_zoom_link("plots/scatter.svg")
+#> [1] "<a href=\"plots/scatter.svg\" target=\"_blank\">🔍 Zoom In for Details</a>"
+create_zoom_link(NA)
+#> [1] ""
+```

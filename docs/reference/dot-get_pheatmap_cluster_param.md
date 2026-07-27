@@ -52,20 +52,60 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 mat <- matrix(1:24, nrow = 4)
 rownames(mat) <- sprintf("row_%s", 1:4)
 colnames(mat) <- sprintf("col_%s", 1:6)
-.get_pheatmap_cluster_param(mat)
-.get_pheatmap_cluster_param(t(mat))
-.get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+gDRplots:::.get_pheatmap_cluster_param(mat)
+#> 
+#> Call:
+#> stats::hclust(d = distfun(mat_to_cluster))
+#> 
+#> Cluster method   : complete 
+#> Distance         : euclidean 
+#> Number of objects: 4 
+#> 
+gDRplots:::.get_pheatmap_cluster_param(t(mat))
+#> 
+#> Call:
+#> stats::hclust(d = distfun(mat_to_cluster))
+#> 
+#> Cluster method   : complete 
+#> Distance         : euclidean 
+#> Number of objects: 6 
+#> 
+gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
+#> 
+#> Call:
+#> stats::hclust(d = distfun(mat_to_cluster))
+#> 
+#> Cluster method   : complete 
+#> Number of objects: 6 
+#> 
 
 mat[2,2] <- NA
 mat[2,1] <- Inf
-.get_pheatmap_cluster_param(mat)
-.get_pheatmap_cluster_param(mat, distfun = compute_distances)
-.get_pheatmap_cluster_param(t(mat), distfun = compute_distances)
+gDRplots:::.get_pheatmap_cluster_param(mat)
+#> [1] FALSE
+gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances)
+#> 
+#> Call:
+#> stats::hclust(d = distfun(mat_to_cluster))
+#> 
+#> Cluster method   : complete 
+#> Number of objects: 4 
+#> 
+gDRplots:::.get_pheatmap_cluster_param(t(mat), distfun = gDRplots::compute_distances)
+#> 
+#> Call:
+#> stats::hclust(d = distfun(mat_to_cluster))
+#> 
+#> Cluster method   : complete 
+#> Number of objects: 6 
+#> 
 add_cond <- NCOL(mat) > 10
-.get_pheatmap_cluster_param(mat, distfun = compute_distances, additional_condition = add_cond)
-} # }
+gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distances,
+                                        additional_condition = add_cond)
+#> [1] FALSE
+# }
 ```

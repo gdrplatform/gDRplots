@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.118</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,15 +67,24 @@ if set to Inf, no trimming will be performed</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">ls_lbls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"short_lbl"</span>, <span class="st">"short_lbl"</span>, <span class="st">"veryveryverylong"</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"long_duplicates|lbl_1AB"</span>, <span class="st">"long_duplicates|lbl_1AB"</span>, <span class="st">"long_duplicates|lbl_123"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">.trim_labels</span><span class="op">(</span>lbls_vec <span class="op">=</span> <span class="va">ls_lbls</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.trim_labels</span><span class="op">(</span>lbls_vec <span class="op">=</span> <span class="va">ls_lbls</span>, max_lbl_length <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="fu">gDRplots</span><span class="fu">:::</span><span class="fu">.trim_labels</span><span class="op">(</span>lbls_vec <span class="op">=</span> <span class="va">ls_lbls</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "short_lbl"               "short_lbl"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "veryveryverylong"        "long_duplicates|lbl_1AB"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "long_duplicates|lbl_1AB" "long_duplicates|lbl_123"</span>
+<span class="r-in"><span><span class="fu">gDRplots</span><span class="fu">:::</span><span class="fu">.trim_labels</span><span class="op">(</span>lbls_vec <span class="op">=</span> <span class="va">ls_lbls</span>, max_lbl_length <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   short_lbl                   short_lbl </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "short_lbl"                 "short_lbl" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            veryveryverylong     long_duplicates|lbl_1AB </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           "veryveryvery..." "long_duplicates|lbl_1A..." </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     long_duplicates|lbl_1AB     long_duplicates|lbl_123 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "long_duplicates|lbl_1A..." "long_duplicates|lbl_12..." </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -88,7 +97,7 @@ if set to Inf, no trimming will be performed</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

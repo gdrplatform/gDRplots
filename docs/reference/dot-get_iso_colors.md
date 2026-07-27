@@ -21,8 +21,10 @@ gDR palette for isoline given in `iso_levels`
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 ls_iso_lvl <- c("0.25", "0.5", "0.75")
-.get_iso_colors(ls_iso_lvl)
-} # }
+gDRplots:::.get_iso_colors(ls_iso_lvl)
+#>      0.25       0.5      0.75 
+#> "#F7AA18" "#ED6412" "#C52B06" 
+# }
 ```

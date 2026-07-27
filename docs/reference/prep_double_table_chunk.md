@@ -67,13 +67,21 @@ Bartosz Czech <czech.bartosz@external.gene.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 nested_tables <- list(
   CellLine1 = list(MetricA = mtcars[1:5, ], MetricB = mtcars[6:10, ]),
   CellLine2 = list(MetricC = iris[1:5, ], MetricD = iris[6:10, ])
 )
-sorting_options <- c("cyl", "-hp") # Apply the same sorting to all tables
+sorting_options <- c("cyl", "-hp")
 prep_double_table_chunk(nested_tables, "nested_tables", header_level = 2,
   tabset_options = "tabset", sorting_opts = sorting_options)
-} # }
+#> [[1]]
+#> [1] "## CellLine1 {.tabset}\n\n"                                                                                                                                                                                                                                                                                                                                         
+#> [2] "### MetricA\n\n```{r nested_tables_CellLine1_MetricA, echo = FALSE}\nDT::formatRound(generate_datatable(nested_tables[[\"CellLine1\"]][[\"MetricA\"]], options = list(scrollX = TRUE, dom = \"t\", order = list(list(2L, \"asc\"), list(4L, \"desc\")))), columns = names(Filter(is.numeric, nested_tables[[\"CellLine1\"]][[\"MetricA\"]])), digits = 5) \n```\n\n"
+#> [3] "### MetricB\n\n```{r nested_tables_CellLine1_MetricB, echo = FALSE}\nDT::formatRound(generate_datatable(nested_tables[[\"CellLine1\"]][[\"MetricB\"]], options = list(scrollX = TRUE, dom = \"t\", order = list(list(2L, \"asc\"), list(4L, \"desc\")))), columns = names(Filter(is.numeric, nested_tables[[\"CellLine1\"]][[\"MetricB\"]])), digits = 5) \n```\n\n"
+#> 
+#> [[2]]
+#> [1] "## CellLine2 {.tabset}\n\n"                                                                                                                                                                                                                                                                                    
+#> [2] "### MetricC\n\n```{r nested_tables_CellLine2_MetricC, echo = FALSE}\nDT::formatRound(generate_datatable(nested_tables[[\"CellLine2\"]][[\"MetricC\"]], options = list(scrollX = TRUE, dom = \"t\")), columns = names(Filter(is.numeric, nested_tables[[\"CellLine2\"]][[\"MetricC\"]])), digits = 5) \n```\n\n"
+#> [3] "### MetricD\n\n```{r nested_tables_CellLine2_MetricD, echo = FALSE}\nDT::formatRound(generate_datatable(nested_tables[[\"CellLine2\"]][[\"MetricD\"]], options = list(scrollX = TRUE, dom = \"t\")), columns = names(Filter(is.numeric, nested_tables[[\"CellLine2\"]][[\"MetricD\"]])), digits = 5) \n```\n\n"
+#> 
 ```

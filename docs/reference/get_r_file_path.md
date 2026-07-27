@@ -17,3 +17,11 @@ get_r_file_path(test_mode = FALSE)
 ## Value
 
 string with the path to the executed Rscript file
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+get_r_file_path()
+} # }
+```

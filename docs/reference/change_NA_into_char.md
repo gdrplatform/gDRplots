@@ -25,3 +25,12 @@ character (for NA -\> given string)
 ## Author
 
 Janina Smoła <janina.smola@contractors.roche.com>
+
+## Examples
+
+``` r
+change_NA_into_char(c(1, NA, 3))
+#> [1] "1"  "NA" "3" 
+change_NA_into_char(c("a", NA, "b"), lbl_NA = "missing")
+#> [1] "a"       "missing" "b"      
+```

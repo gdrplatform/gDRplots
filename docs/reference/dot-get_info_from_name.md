@@ -39,8 +39,14 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 f_n <- "name_chunk__FEAT_DRUG_ABC_RV_gDR_log10_xc50.xlsx"
-.get_info_from_name(f_n)
-} # }
+gDRplots:::.get_info_from_name(f_n)
+#> $drug_grid
+#> [1] "DRUG_ABC"
+#> 
+#> $feat_meta
+#> [1] "FEAT"
+#> 
+# }
 ```

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.118</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,96 @@ type of "GR Value", outputted by <code><a href="prep_assoc_summary.html">gDRplot
     <p>Janina Smoła <a href="mailto:janina.smola@contractors.roche.com">janina.smola@contractors.roche.com</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dir_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"testdata"</span>, package <span class="op">=</span> <span class="st">"gDRplots"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ls_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_path</span>, pattern <span class="op">=</span> <span class="st">"[.]xlsx$"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">assoc_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_assoc_summary.html">prep_assoc_summary</a></span><span class="op">(</span>dir_path <span class="op">=</span> <span class="va">dir_path</span>, ls_file <span class="op">=</span> <span class="va">ls_file</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">create_PRISM_summary_list</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  assoc_summary_RV <span class="op">=</span> <span class="va">assoc_tab</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"RV"</span>, <span class="va">assoc_tab</span><span class="op">[[</span><span class="st">"src"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="op">]</span>,</span></span>
+<span class="r-in"><span>  assoc_summary_GR <span class="op">=</span> <span class="va">assoc_tab</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"GR"</span>, <span class="va">assoc_tab</span><span class="op">[[</span><span class="st">"src"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_001$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     feat_meta    feature      response   rho q_value neglog_q_value drug_grid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;     &lt;char&gt;        &lt;char&gt; &lt;num&gt;   &lt;num&gt;          &lt;num&gt;    &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   featNUX NU_006_X1F  RV_gDR_x_max  0.05  0.0035       2.455932  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   featNUX NU_021_X1U  RV_gDR_x_max  0.05  0.0035       2.455932  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   featNUX NU_002_X1B  RV_gDR_x_max  0.40  0.0060       2.221849  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   featNUX NU_025_X1Y  RV_gDR_x_max  0.05  0.0110       1.958607  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   featNUX NU_009_X1I  RV_gDR_x_max -1.00  0.0135       1.869666  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   featNUX NU_020_X1T  RV_gDR_x_max -0.30  0.0235       1.628932  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   featNUX NU_010_X1J  RV_gDR_x_max  0.05  0.0285       1.545155  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   featNUX NU_008_X1H  RV_gDR_x_max -0.65  0.0310       1.508638  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   featNUX NU_001_X1A  RV_gDR_x_max -1.00  0.0335       1.474955  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   featNUX NU_017_X1Q  RV_gDR_x_max -0.30  0.0460       1.337242  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:   featNUX NU_023_X1W RV_gDR_x_mean -0.15  0.0070       2.154902  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:   featNUX NU_017_X1Q RV_gDR_x_mean -0.50  0.0295       1.530178  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:   featNUX NU_011_X1K RV_gDR_x_mean  1.25  0.0355       1.449772  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_001$GR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     feat_meta    feature          response   rho q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;     &lt;char&gt;            &lt;char&gt; &lt;num&gt;   &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   metaGRP GRP_007_XC GR_gDR_log10_xc50  0.75  0.0190       1.721246</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   metaGRP GRP_006_XC      GR_gDR_x_max  0.05  0.0035       2.455932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   metaGRP GRP_021_XC      GR_gDR_x_max  0.05  0.0035       2.455932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   metaGRP GRP_002_XC      GR_gDR_x_max  0.40  0.0060       2.221849</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   metaGRP GRP_025_XC      GR_gDR_x_max  0.05  0.0110       1.958607</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   metaGRP GRP_009_XC      GR_gDR_x_max -1.00  0.0135       1.869666</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   metaGRP GRP_020_XC      GR_gDR_x_max -0.30  0.0235       1.628932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   metaGRP GRP_010_XC      GR_gDR_x_max  0.05  0.0285       1.545155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   metaGRP GRP_008_XC      GR_gDR_x_max -0.65  0.0310       1.508638</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   metaGRP GRP_001_XC      GR_gDR_x_max -1.00  0.0335       1.474955</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:   metaGRP GRP_017_XC      GR_gDR_x_max -0.30  0.0460       1.337242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     drug_grid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:  drug_001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_002$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    feat_meta    feature      response   rho q_value neglog_q_value drug_grid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;        &lt;char&gt; &lt;num&gt;   &lt;num&gt;          &lt;num&gt;    &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   metaGRP GRP_016_XC RV_gDR_x_mean  0.55  0.0485       1.314258  drug_002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_002_RV_gDR_x_mean.xlsx</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_002_RV_gDR_x_mean.xlsx$GR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    feat_meta    feature      response   rho q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;        &lt;char&gt; &lt;num&gt;   &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   metaGRP GRP_016_XC RV_gDR_x_mean  0.55  0.0485       1.314258</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      drug_grid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: drug_002_RV_gDR_x_mean.xlsx</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_003$GR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    feat_meta    feature          response   rho q_value neglog_q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;            &lt;char&gt; &lt;num&gt;   &lt;num&gt;          &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   featNUX NU_023_X1W GR_gDR_log10_xc50 -0.15  0.0070       2.154902</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   featNUX NU_017_X1Q GR_gDR_log10_xc50 -0.50  0.0295       1.530178</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   featNUX NU_011_X1K GR_gDR_log10_xc50  1.25  0.0355       1.449772</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    drug_grid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  drug_003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  drug_003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  drug_003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -75,7 +165,7 @@ type of "GR Value", outputted by <code><a href="prep_assoc_summary.html">gDRplot
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.118</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,6 +74,50 @@ outputted by one of <code><a href="prep_dt_depmap_feat.html">prep_dt_depmap_feat
     <p>Janina Smoła <a href="mailto:janina.smola@contractors.roche.com">janina.smola@contractors.roche.com</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mae_prism</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_synthetic_data.html" class="external-link">get_synthetic_data</a></span><span class="op">(</span><span class="st">"prism"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">se_prism</span> <span class="op">&lt;-</span> <span class="va">mae_prism</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">dt_metrics</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_prism</span>, <span class="st">"Metrics"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dt_response</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_dt_response_metric_sa.html">prep_dt_response_metric_sa</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span>,</span></span>
+<span class="r-in"><span>  d_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics</span><span class="op">[[</span><span class="st">"DrugName"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  normalization_type <span class="op">=</span> <span class="st">"RV"</span>, metric <span class="op">=</span> <span class="st">"x_mean"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">feat_data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">meta_data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data/Model.csv.gz"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj_depmap_feat</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_dt_depmap_feat.html">prep_dt_depmap_feat</a></span><span class="op">(</span><span class="va">feat_data_path</span>, <span class="va">meta_data_path</span>,</span></span>
+<span class="r-in"><span>                                       feature_set <span class="op">=</span> <span class="st">"OmicsCNGene"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">prep_dt_assoc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  dt_response <span class="op">=</span> <span class="va">dt_response</span>,</span></span>
+<span class="r-in"><span>  dt_depmap <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">[[</span><span class="st">"dt_depmap"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  selected_feat_meta_col <span class="op">=</span> <span class="va">obj_depmap_feat</span><span class="op">[[</span><span class="st">"selected_feat_meta_col"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $dt_assoc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              feature      response           rho     q_value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               &lt;char&gt;        &lt;char&gt;         &lt;num&gt;       &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1:      ABCA1 (19) RV_gDR_x_mean -0.0005082346 0.667729711</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2:   ABCC9 (10060) RV_gDR_x_mean  0.0748785160 0.386959685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3:      ACACB (32) RV_gDR_x_mean  0.0506714309 0.440011930</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4:  ACTR10 (55860) RV_gDR_x_mean  0.0215449751 0.700357070</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5:     ACVR1B (91) RV_gDR_x_mean  0.0373464528 0.501222920</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 146: ZNF534 (147658) RV_gDR_x_mean -0.1482499643 0.002867780</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 147: ZNF615 (284370) RV_gDR_x_mean -0.1424800139 0.003925022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 148:     ZNF7 (7553) RV_gDR_x_mean  0.0390147465 0.722562541</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 149: ZNF732 (654254) RV_gDR_x_mean -0.0230505747 0.683037687</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150:  ZSCAN20 (7579) RV_gDR_x_mean -0.0645321004 0.250615186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $condition_info</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "G00106_GDC-8025_TEAD1|TEAD2|TEAD3|TEAD4_120"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $selected_metric</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "RV_gDR_x_mean"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $selected_feat_meta_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "OmicsCNGene"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -83,7 +127,7 @@ outputted by one of <code><a href="prep_dt_depmap_feat.html">prep_dt_depmap_feat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

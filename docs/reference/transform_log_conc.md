@@ -22,8 +22,9 @@ equal 0 (-Inf) is replaced with one step less in the dose dilution
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 vec <- c(0, 0.003, 0.01, 0.03)
 transform_log_conc(vec)
-} # }
+#> Error in transform_log_conc(vec): could not find function "transform_log_conc"
+# }
 ```

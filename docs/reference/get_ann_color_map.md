@@ -30,9 +30,7 @@ Janina Smoła <janina.smola@contractors.roche.com>
 
 ``` r
 mae <- gDRutils::get_synthetic_data("small")
-#> Loading required namespace: MultiAssayExperiment
 se <- mae[[gDRutils::get_supported_experiments("sa")]][2:5, ]
-#> Loading required namespace: BumpyMatrix
 dt_average <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Averaged")
 dt_ann <- dt_average[,.SD, .SDcols = c("Tissue", "ReferenceDivisionTime")]
 

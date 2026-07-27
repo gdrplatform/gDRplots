@@ -1,6 +1,5 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://gdrplatform.github.io/gDRplots/404.html</loc></url>
-<url><loc>https://gdrplatform.github.io/gDRplots/LICENSE-text.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/PULL_REQUEST_TEMPLATE.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/articles/gDRplots.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/articles/index.html</loc></url>
@@ -28,6 +27,7 @@
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_excess_palette.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_gradient_colors.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_info_from_name.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_info_from_names.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_iso_colors.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_n_top_asssoc.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_pheatmap_cluster_param.html</loc></url>
@@ -38,7 +38,9 @@
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-order_assoc_result.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-prep_dt_OmicsArmLevelCNA.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-prep_dt_OmicsSomaticMutationsMatrix.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-safe_as_numeric.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-stop_on_aggregation.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-table_to_ggplot.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-trim_labels.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/escape_special_characters.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/estimate_plot_size.html</loc></url>

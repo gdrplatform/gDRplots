@@ -31,3 +31,12 @@ string with html download code
 ## Author
 
 Janina Smoła <janina.smola@contractors.roche.com>
+
+## Examples
+
+``` r
+create_download_link("tables/results.xlsx")
+#> [1] "<a href=\"tables/results.xlsx\" download>💾 Download Table</a>"
+create_download_link(NA)
+#> [1] ""
+```

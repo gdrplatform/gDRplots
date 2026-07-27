@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.117</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.118</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,6 +143,907 @@ and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme</p><
     <p>Janina Smoła <a href="mailto:janina.smola@contractors.roche.com">janina.smola@contractors.roche.com</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">qs2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/qs2/man/qs_read.html" class="external-link">qs_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"testdata/finalMAE_combo_matrix_small.qs2"</span>,</span></span>
+<span class="r-in"><span>                                 package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: MultiAssayExperiment</span>
+<span class="r-in"><span><span class="va">se_combo</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/get_supported_experiments.html" class="external-link">get_supported_experiments</a></span><span class="op">(</span><span class="st">"combo"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">dt_metrics</span> <span class="op">&lt;-</span> <span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html" class="external-link">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se_combo</span>, <span class="st">"Metrics"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: BumpyMatrix</span>
+<span class="r-in"><span><span class="va">drug1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/identifiers.html" class="external-link">get_env_identifiers</a></span><span class="op">(</span><span class="st">"drug_name"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">drug2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dt_metrics</span><span class="op">[[</span><span class="fu">gDRutils</span><span class="fu">::</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/identifiers.html" class="external-link">get_env_identifiers</a></span><span class="op">(</span><span class="st">"drug_name2"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">create_PRISM_plot_list_combo</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  drug1_name_vec <span class="op">=</span> <span class="va">drug1</span>,</span></span>
+<span class="r-in"><span>  drug2_name_vec <span class="op">=</span> <span class="va">drug2</span>,</span></span>
+<span class="r-in"><span>  dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span>,</span></span>
+<span class="r-in"><span>  meta_data_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data/Model.csv.gz"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  feat_data_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"depmap_data"</span>, package <span class="op">=</span> <span class="st">"gDRtestData"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  feature_sets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRISPRGeneEffect"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-1.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-2.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-3.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-4.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-5.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-6.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-7.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-8.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-9.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-10.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-11.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-12.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-13.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-14.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-15.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-16.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-17.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-18.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-19.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-20.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-21.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-22.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-23.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-24.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-25.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-26.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-27.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-28.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-29.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-30.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-31.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-32.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-33.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-34.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-35.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-36.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-37.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-38.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-39.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-40.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-41.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-42.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-43.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-44.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-45.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-46.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-47.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-48.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-49.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-50.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-51.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-52.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-53.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-54.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-55.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-56.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-57.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-58.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-59.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-60.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-61.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-62.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-63.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-64.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-65.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-66.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-67.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-68.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-69.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-70.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-71.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-72.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-73.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-74.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-75.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-76.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-77.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-78.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-79.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-80.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-81.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-82.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-83.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-84.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-85.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-86.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-87.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-88.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-89.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-90.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-91.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-92.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-93.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-94.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-95.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-96.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-97.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-98.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-99.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-100.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-101.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-102.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-103.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-104.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-105.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-106.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-107.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-108.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-109.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-110.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-111.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-112.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-113.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-114.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-115.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-116.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-117.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-118.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-119.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-120.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-121.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-122.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-123.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-124.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-125.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-126.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-127.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-128.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-129.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-130.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-131.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-132.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-133.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-134.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-135.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-136.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-137.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-138.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-139.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-140.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-141.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-142.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_1</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-143.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_2</span>
+<span class="r-plt img"><img src="create_PRISM_plot_list_combo-144.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -152,7 +1053,7 @@ and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme</p><
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

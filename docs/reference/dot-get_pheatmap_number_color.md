@@ -49,7 +49,7 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 mat <- matrix(-14:30, ncol = 5,
               dimnames = list(letters[1:9], LETTERS[1:5]))
 no_breaks <- 15
@@ -57,7 +57,7 @@ breaks <- seq(from = min(mat), to = max(mat), length.out = no_breaks + 1)
 ls_colors <- c("limegreen", "darkblue", "orange")
 hm_colors <- grDevices::colorRampPalette(ls_colors)(no_breaks)
 
-number_color <- .get_pheatmap_number_color(mat, hm_colors, breaks)
+number_color <- gDRplots:::.get_pheatmap_number_color(mat, hm_colors, breaks)
 
 pheatmap::pheatmap(mat,
                    breaks = breaks,
@@ -66,5 +66,6 @@ pheatmap::pheatmap(mat,
                    number_color = number_color,
                    cluster_rows = FALSE,
                    cluster_cols = FALSE)
-} # }
+
+# }
 ```

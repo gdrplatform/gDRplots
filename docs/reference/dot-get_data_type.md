@@ -31,14 +31,15 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 tab_cat <- data.table::data.table(
   ID = sprintf("ID_%s", seq_len(5)),
   brown = c(0, 1, 1, 0, 0),
   blue = c(1, 0, NA, 0, 1),
   green = c(0, 0, 0, 1, 0)
 )
-.get_data_type(dt_ = tab_cat, desc_col = "ID")
+gDRplots:::.get_data_type(dt_ = tab_cat, desc_col = "ID")
+#> [1] "categorical"
 
 tab_feat <- data.table::data.table(
   ID = sprintf("ID_%s", seq_len(5)),
@@ -47,6 +48,7 @@ tab_feat <- data.table::data.table(
   med = c(1, 1, NA, 0, 1),
   high = c(0, 1, 0, 1, 0)
 )
-.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
-} # }
+gDRplots:::.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
+#> [1] "num_as_cat"
+# }
 ```

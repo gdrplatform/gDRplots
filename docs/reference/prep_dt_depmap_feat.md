@@ -52,10 +52,8 @@ A named list with elements, that may be input to
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-feat_data_path <- file.path(".", "depmapdata")
-meta_data_path <- file.path(".", "Model.csv")
+feat_data_path <- system.file("depmap_data", package = "gDRtestData")
+meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
 dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
                                       meta_data_path = meta_data_path)
-} # }
 ```

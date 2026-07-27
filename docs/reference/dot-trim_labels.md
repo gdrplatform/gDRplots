@@ -30,13 +30,22 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 ls_lbls <- c(
   "short_lbl", "short_lbl", "veryveryverylong",
   "long_duplicates|lbl_1AB", "long_duplicates|lbl_1AB", "long_duplicates|lbl_123"
 )
 
-.trim_labels(lbls_vec = ls_lbls)
-.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
-} # }
+gDRplots:::.trim_labels(lbls_vec = ls_lbls)
+#> [1] "short_lbl"               "short_lbl"              
+#> [3] "veryveryverylong"        "long_duplicates|lbl_1AB"
+#> [5] "long_duplicates|lbl_1AB" "long_duplicates|lbl_123"
+gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
+#>                   short_lbl                   short_lbl 
+#>                 "short_lbl"                 "short_lbl" 
+#>            veryveryverylong     long_duplicates|lbl_1AB 
+#>           "veryveryvery..." "long_duplicates|lbl_1A..." 
+#>     long_duplicates|lbl_1AB     long_duplicates|lbl_123 
+#> "long_duplicates|lbl_1A..." "long_duplicates|lbl_12..." 
+# }
 ```

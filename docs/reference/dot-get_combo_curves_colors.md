@@ -21,8 +21,10 @@ gDR palette for Concentration_2 given in `ls_conc_2`
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 ls_conc <- factor(c("0.001", "0.01", "1"))
-.get_combo_curves_colors(ls_conc)
-} # }
+gDRplots:::.get_combo_curves_colors(ls_conc)
+#>     0.001      0.01         1 
+#> "#57042C" "#FB9C05" "#D7F434" 
+# }
 ```

@@ -50,8 +50,8 @@ prep_plot_chunk(
   A character vector or list of absolute paths to pre-saved plot files
   (e.g. SVG). When provided, plots are embedded from these files instead
   of re-rendering the ggplot objects, which avoids expensive
-  double-rendering and can dramatically speed up report generation. Must
-  have the same structure as `plt_list`.
+  double-rendering and can speed up report generation. Must have the
+  same structure as `plt_list`.
 
 - header_level:
 
@@ -85,7 +85,7 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 # Simple list of plots
 plotlist <- lapply(unique(iris$Species), function(iris_name) {
   ggplot2::ggplot(iris[iris$Species == iris_name, c("Sepal.Length", "Sepal.Width")]) +
@@ -94,6 +94,15 @@ plotlist <- lapply(unique(iris$Species), function(iris_name) {
 names(plotlist) <- unique(iris$Species)
 
 prep_plot_chunk(plotlist, "iris")
+#> [[1]]
+#> [1] "### setosa\n\n```{r iris_01, echo = FALSE}\nplotlist[[1]] \n```\n\n"
+#> 
+#> [[2]]
+#> [1] "### versicolor\n\n```{r iris_02, echo = FALSE}\nplotlist[[2]] \n```\n\n"
+#> 
+#> [[3]]
+#> [1] "### virginica\n\n```{r iris_03, echo = FALSE}\nplotlist[[3]] \n```\n\n"
+#> 
 
 # Nested list of plots for tabbed output
 nested_plotlist <- list()
@@ -106,5 +115,20 @@ for (species in unique(iris$Species)) {
 }
 
 prep_plot_chunk(nested_plotlist, "iris_nested", tabset_options = c("tabset", "unnumbered"))
-} # }
+#> [[1]]
+#> [1] "### setosa {.tabset .unnumbered}\n\n"                                                         
+#> [2] "#### Sepal\n\n```{r iris_nested_setosa_01, echo = FALSE}\nnested_plotlist[[1]][[1]] \n```\n\n"
+#> [3] "#### Petal\n\n```{r iris_nested_setosa_02, echo = FALSE}\nnested_plotlist[[1]][[2]] \n```\n\n"
+#> 
+#> [[2]]
+#> [1] "### versicolor {.tabset .unnumbered}\n\n"                                                         
+#> [2] "#### Sepal\n\n```{r iris_nested_versicolor_01, echo = FALSE}\nnested_plotlist[[2]][[1]] \n```\n\n"
+#> [3] "#### Petal\n\n```{r iris_nested_versicolor_02, echo = FALSE}\nnested_plotlist[[2]][[2]] \n```\n\n"
+#> 
+#> [[3]]
+#> [1] "### virginica {.tabset .unnumbered}\n\n"                                                         
+#> [2] "#### Sepal\n\n```{r iris_nested_virginica_01, echo = FALSE}\nnested_plotlist[[3]][[1]] \n```\n\n"
+#> [3] "#### Petal\n\n```{r iris_nested_virginica_02, echo = FALSE}\nnested_plotlist[[3]][[2]] \n```\n\n"
+#> 
+# }
 ```

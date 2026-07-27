@@ -115,3 +115,904 @@ A named list with elements:
 ## Author
 
 Janina Smoła <janina.smola@contractors.roche.com>
+
+## Examples
+
+``` r
+mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
+                                 package = "gDRtestData"))
+#> Loading required namespace: MultiAssayExperiment
+se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+dt_metrics <- gDRutils::convert_se_assay_to_dt(se_combo, "Metrics")
+#> Loading required namespace: BumpyMatrix
+drug1 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
+drug2 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name2")]])[1]
+create_PRISM_plot_list_combo(
+  drug1_name_vec = drug1,
+  drug2_name_vec = drug2,
+  dt_metrics = dt_metrics,
+  meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+  feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+  feature_sets = c("CRISPRGeneEffect")
+)
+#> $ls_plot
+#> $ls_plot$CRISPRGeneEffect
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_2
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_1
+
+#> 
+#> $ls_plot$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_2
+
+#> 
+#> 
+#> 
+#> 
+#> 
+#> $ls_assoc_data
+#> $ls_assoc_data$CRISPRGeneEffect
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_zero_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_zero_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_zero_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_log10_xc50_cotrt_diff_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_mean_cotrt_diff_3.16_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.001_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.00316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.01_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.0316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_0.316_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_1_drug_2
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_1
+#> NULL
+#> 
+#> $ls_assoc_data$CRISPRGeneEffect$`drug_004 x drug_021`$RV$RV_gDR_x_max_cotrt_diff_3.16_drug_2
+#> NULL
+#> 
+#> 
+#> 
+#> 
+#> 
+```

@@ -72,8 +72,9 @@ Janina Smoła <janina.smola@contractors.roche.com>
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 ls_conc <- list(c(0, 0.003, 0.01, 0.03), c(0, 0.003, 0.01, 0.03, 0.1))
-.get_combo_panel_type(ls_conc)
-} # }
+gDRplots:::.get_combo_panel_type(ls_conc)
+#> [1] "common"
+# }
 ```

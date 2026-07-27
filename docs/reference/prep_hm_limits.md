@@ -42,9 +42,11 @@ capped limits (min and max) for given numeric vector
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 prep_hm_limits(vec)
+#> Error in prep_hm_limits(vec): could not find function "prep_hm_limits"
 prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
-} # }
+#> Error in prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE): could not find function "prep_hm_limits"
+# }
 ```
