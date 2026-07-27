@@ -387,16 +387,20 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #' @keywords prism_plots
 #'
 #' @examples
-#' \dontrun{
+#' mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
+#'                                  package = "gDRtestData"))
+#' se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
+#' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_combo, "Metrics")
+#' drug1 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name")]])[1]
+#' drug2 <- unique(dt_metrics[[gDRutils::get_env_identifiers("drug_name2")]])[1]
 #' create_PRISM_plot_list_combo(
-#'   drug1_name_vec = c("DrugA"),
-#'   drug2_name_vec = c("DrugB"),
-#'   dt_metrics = gDRutils::convert_se_assay_to_dt(se_combo, "Metrics"),
-#'   meta_data_path = "path/to/Model.csv",
-#'   feat_data_path = "path/to/feature_dir",
-#'   feature_sets = c("OmicsSignaturesProfile")
+#'   drug1_name_vec = drug1,
+#'   drug2_name_vec = drug2,
+#'   dt_metrics = dt_metrics,
+#'   meta_data_path = system.file("depmap_data/Model.csv.gz", package = "gDRtestData"),
+#'   feat_data_path = system.file("depmap_data", package = "gDRtestData"),
+#'   feature_sets = c("CRISPRGeneEffect")
 #' )
-#' }
 #'
 #' @export
 create_PRISM_plot_list_combo <- function(drug1_name_vec,
@@ -448,13 +452,13 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
 #' @keywords prism_plots
 #'
 #' @examples
-#' assoc_rv <- data.table::data.table(
-#'   feature = "KRAS",
-#'   rho = 0.5,
-#'   q_value = 0.01,
-#'   src = "chunk__OmicsSignaturesProfile_DrugA_RV_gDR_log10_xc50.xlsx"
+#' dir_path <- system.file("testdata", package = "gDRplots")
+#' ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+#' assoc_tab <- prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
+#' create_PRISM_summary_list(
+#'   assoc_summary_RV = assoc_tab[grepl("RV", assoc_tab[["src"]]), ],
+#'   assoc_summary_GR = assoc_tab[grepl("GR", assoc_tab[["src"]]), ]
 #' )
-#' create_PRISM_summary_list(assoc_summary_RV = assoc_rv)
 #'
 #' @export
 create_PRISM_summary_list <- function(assoc_summary_RV,

@@ -20,13 +20,13 @@ A list of table split by drug name and normalization type
 Create a list of PRISM association table
 }
 \examples{
-assoc_rv <- data.table::data.table(
-  feature = "KRAS",
-  rho = 0.5,
-  q_value = 0.01,
-  src = "chunk__OmicsSignaturesProfile_DrugA_RV_gDR_log10_xc50.xlsx"
+dir_path <- system.file("testdata", package = "gDRplots")
+ls_file <- list.files(dir_path, pattern = "[.]xlsx$")
+assoc_tab <- prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
+create_PRISM_summary_list(
+  assoc_summary_RV = assoc_tab[grepl("RV", assoc_tab[["src"]]), ],
+  assoc_summary_GR = assoc_tab[grepl("GR", assoc_tab[["src"]]), ]
 )
-create_PRISM_summary_list(assoc_summary_RV = assoc_rv)
 
 }
 \author{
