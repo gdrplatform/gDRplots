@@ -295,7 +295,7 @@ heatmap_control_mapping_qc <- function(dt_treat,
 #' }
 #'
 #' @keywords internal
-#' @noRd
+
 .table_to_ggplot <- function(dt, base_size = 10, digits = 3) {
   checkmate::assert_data_table(dt, min.rows = 1)
   checkmate::assert_number(base_size, lower = 1)

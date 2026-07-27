@@ -531,7 +531,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' }
 #'
 #' @keywords internal
-#' @noRd
+
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
@@ -562,7 +562,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' }
 #'
 #' @keywords internal
-#' @noRd
+
 .get_info_from_names <- function(file_names,
                                  normalization_type = "RV") {
   checkmate::assert_character(file_names, min.len = 1)

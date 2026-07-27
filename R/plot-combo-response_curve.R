@@ -332,7 +332,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 #' @return gDR palette for Concentration_2 given in \code{ls_conc_2}
 #'
 #' @keywords internal
-#' @noRd
+
 #' @examples
 #' \donttest{
 #' ls_conc <- factor(c("0.001", "0.01", "1"))

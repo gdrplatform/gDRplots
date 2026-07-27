@@ -1866,7 +1866,7 @@ change_NA_into_char <- function(x,
 #' @return numeric vector
 #'
 #' @keywords internal
-#' @noRd
+
 .safe_as_numeric <- function(x) {
   x <- as.character(x)
   as.numeric(data.table::fifelse(grepl("^[0-9.eE+-]+$", x), x, NA_character_))
