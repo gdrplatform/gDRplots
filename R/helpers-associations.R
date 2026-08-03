@@ -151,11 +151,14 @@ calc_assoc <- function(X, Y) {
 
 #' Compute pairwise linear associations between columns of X and Y
 #'
-#' Inline reimplementation of \code{cdsrmodels::lin_associations} to remove the
-#' GitHub-only dependency.  Uses \code{\link[WGCNA:cor]{WGCNA::cor}} for fast
-#' pairwise correlation on large matrices and
-#' \code{\link[ashr:ash]{ashr::ash}} for empirical-Bayes shrinkage of effect
-#' sizes.
+#' Inline reimplementation of \code{lin_associations} from the
+#' \href{https://github.com/cancerdatasci/cdsrmodels}{cdsrmodels} package
+#' (MIT License, Broad Institute / DepMap Portal) to remove the GitHub-only
+#' dependency.  The algorithm and output structure are unchanged; only the
+#' package dependency is replaced.  Uses
+#' \code{\link[WGCNA:cor]{WGCNA::cor}} for fast pairwise correlation on large
+#' matrices and \code{\link[ashr:ash]{ashr::ash}} for empirical-Bayes
+#' shrinkage of effect sizes.
 #'
 #' @param X \code{matrix} of independent variables (rows = samples, cols = features).
 #' @param Y \code{matrix} or \code{vector} of response variables (rows = samples).
@@ -171,15 +174,16 @@ calc_assoc <- function(X, Y) {
 #'   \code{beta.se}, \code{p.val}, \code{q.val}, and \code{res.table}
 #'   (a \code{data.frame} from \code{ashr}).
 #'
-#' @importFrom WGCNA cor
 #' @importFrom ashr ash
+#' @importFrom dplyr bind_rows
+#' @importFrom WGCNA cor
 #' @importFrom stats pt p.adjust sd
 #'
 #' @keywords internal
 .lin_associations <- function(X, Y, n.min = 4L, shrinkage = TRUE,
                               alpha = 0, MHC_direction = NULL) {
   if (is.null(MHC_direction)) {
-    MHC_direction <- if (length(Y) >= length(X)) "y" else "x"
+    MHC_direction <- if (length(Y) >= length(X)) "x" else "y"
   }
 
   X.NA <- !is.finite(X)
@@ -214,11 +218,12 @@ calc_assoc <- function(X, Y) {
     if (MHC_direction == "y") {
       for (ix in seq_len(NCOL(p.val))) {
         fin <- is.finite(p.val[, ix])
+        feat_names <- rownames(p.val)[fin]
         res <- ashr::ash(beta[fin, ix], pmax(beta.se[fin, ix], 1e-10),
                          mixcompdist = "halfuniform", alpha = alpha)$result
         if (!is.null(res)) {
           res$dep.var <- colnames(Y)[ix]
-          res$ind.var <- rownames(res)
+          res$ind.var <- feat_names
           res$p.val <- p.val[fin, ix]
           res.table[[ix]] <- res
         }
@@ -232,14 +237,17 @@ calc_assoc <- function(X, Y) {
           error = function(e) NULL
         )
         if (!is.null(res)) {
-          res$dep.var <- rownames(res)
-          res$ind.var <- colnames(Y)[ix]
+          res$ind.var <- rownames(p.val)[ix]
+          y_col <- colnames(Y)[ix]
+          if (!is.null(y_col) && !is.na(y_col)) res$dep.var <- y_col
           res$p.val <- p.val[ix, fin]
           res.table[[ix]] <- res
         }
       }
     }
-    res.table <- data.table::rbindlist(res.table, fill = TRUE)
+    non_null <- Filter(Negate(is.null), res.table)
+    if (length(non_null) == 0L) stop("Error: all input values are missing")
+    res.table <- dplyr::bind_rows(non_null)
   } else {
     res.table <- NULL
   }

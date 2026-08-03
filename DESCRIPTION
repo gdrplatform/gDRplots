@@ -16,6 +16,7 @@ biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedA
 Imports:
     ashr,
     checkmate,
+    dplyr,
     data.table,
     DT,
     fgsea,

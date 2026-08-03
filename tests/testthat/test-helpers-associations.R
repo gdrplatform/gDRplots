@@ -256,6 +256,44 @@ test_that("calc_assoc works as expected", {
   expect_true(all(colnames(Y_big) %in% res_15$response))
 })
 
+test_that(".lin_associations returns correct structure and values", {
+  res <- .lin_associations(X, Y)
+  expect_type(res, "list")
+  expect_named(res, c("N", "rho", "beta", "beta.se", "p.val", "q.val", "res.table"))
+
+  expect_true(is.matrix(res$rho))
+  expect_equal(dim(res$rho), c(NCOL(X), NCOL(Y)))
+  expect_true(is.matrix(res$p.val))
+  expect_true(all(res$p.val >= 0 & res$p.val <= 1, na.rm = TRUE))
+
+  # res.table from ashr should have one row per feature with finite p-value
+  expect_true(is.data.frame(res$res.table) || data.table::is.data.table(res$res.table))
+  expect_true(NROW(res$res.table) > 0L)
+  expect_true("betahat" %in% names(res$res.table))
+
+  # vector Y
+  res_vec <- .lin_associations(X, Y_vec)
+  expect_named(res_vec, c("N", "rho", "beta", "beta.se", "p.val", "q.val", "res.table"))
+  expect_equal(dim(res_vec$rho), c(NCOL(X), 1L))
+
+  # multi-column Y
+  res_multi <- .lin_associations(X, Y_all)
+  expect_equal(dim(res_multi$rho), c(NCOL(X), NCOL(Y_all)))
+  expect_equal(dim(res_multi$p.val), c(NCOL(X), NCOL(Y_all)))
+
+  # zero-variance column in Y: sy[col]=0 sets p.val[,col] to NA explicitly
+  # verified through calc_assoc (which handles this before calling .lin_associations)
+  Y_no_var_col <- Y_all
+  Y_no_var_col[, 2] <- 0.5  # zero variance
+  expect_warning(
+    res_nvc <- calc_assoc(X, Y_no_var_col),
+    "The following columns in Y have no variance"
+  )
+  expect_true(all(is.na(res_nvc[response == colnames(Y_all)[2],
+                                 setdiff(names(res_nvc), c("feature", "response")),
+                                 with = FALSE])))
+})
+
 test_that(".order_assoc_result works as expected", {
   tab_assoc <- data.table::data.table(
     betahat = withr::with_seed(42, sample(seq(-4.2, 2.1, 0.35), 4)),
