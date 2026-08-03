@@ -175,7 +175,6 @@ calc_assoc <- function(X, Y) {
 #'   (a \code{data.frame} from \code{ashr}).
 #'
 #' @importFrom ashr ash
-#' @importFrom dplyr bind_rows
 #' @importFrom WGCNA cor
 #' @importFrom stats pt p.adjust sd
 #'
@@ -247,7 +246,7 @@ calc_assoc <- function(X, Y) {
     }
     non_null <- Filter(Negate(is.null), res.table)
     if (length(non_null) == 0L) stop("Error: all input values are missing")
-    res.table <- dplyr::bind_rows(non_null)
+    res.table <- data.table::rbindlist(non_null, fill = TRUE)
   } else {
     res.table <- NULL
   }
