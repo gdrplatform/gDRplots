@@ -14,6 +14,7 @@ Description: gDRplots is a package that stores functions for gDR static visualiz
 License: Artistic-2.0
 biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedAssays
 Imports:
+    ashr,
     checkmate,
     data.table,
     DT,
@@ -26,10 +27,10 @@ Imports:
     pheatmap,
     RColorBrewer,
     rstudioapi,
-    tools
+    tools,
+    WGCNA
 Suggests:
     BiocStyle,
-    cdsrmodels,
     colorspace,
     gDRtestData (>= 1.6.0),
     gDRstyle (>= 1.6.0),

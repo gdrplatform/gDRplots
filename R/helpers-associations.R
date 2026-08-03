@@ -19,8 +19,6 @@
 #'             dimnames = list(sprintf("row_%s", 1:6), sprintf("met_%s", 1:3)))
 #' tab_assoc <- calc_assoc(X, Y)
 #'
-#' @seealso \code{\link[cdsrmodels:lin_associations]{cdsrmodels::lin_associations}}
-#'
 #' @keywords internal
 #'
 #' @export
@@ -88,8 +86,7 @@ calc_assoc <- function(X, Y) {
     dt_na <- NULL
   }
 
-  # use `cdsr_models` to calculate the linear model coefficients efficiently on large matrices
-  res <- cdsrmodels::lin_associations(X = X, Y = Y)
+  res <- .lin_associations(X = X, Y = Y)
 
   # convert results from a `matrix` to a `data.table`
   dt_res <- data.table::as.data.table(res$res.table)
@@ -149,4 +146,104 @@ calc_assoc <- function(X, Y) {
                                "p_value", "q_value", "s_value"),
                        skip_absent = TRUE)
   res_dt
+}
+
+
+#' Compute pairwise linear associations between columns of X and Y
+#'
+#' Inline reimplementation of \code{cdsrmodels::lin_associations} to remove the
+#' GitHub-only dependency.  Uses \code{\link[WGCNA:cor]{WGCNA::cor}} for fast
+#' pairwise correlation on large matrices and
+#' \code{\link[ashr:ash]{ashr::ash}} for empirical-Bayes shrinkage of effect
+#' sizes.
+#'
+#' @param X \code{matrix} of independent variables (rows = samples, cols = features).
+#' @param Y \code{matrix} or \code{vector} of response variables (rows = samples).
+#' @param n.min integer; minimum number of finite paired observations required
+#'   to compute a p-value (default 4).
+#' @param shrinkage logical; apply \code{ashr} shrinkage (default \code{TRUE}).
+#' @param alpha numeric; \code{ashr} alpha parameter (default 0).
+#' @param MHC_direction character; \code{"x"} or \code{"y"} — direction of
+#'   multiple-hypothesis correction.  Defaults to \code{"y"} when
+#'   \code{ncol(Y) >= ncol(X)}, otherwise \code{"x"}.
+#'
+#' @return Named list with elements \code{N}, \code{rho}, \code{beta},
+#'   \code{beta.se}, \code{p.val}, \code{q.val}, and \code{res.table}
+#'   (a \code{data.frame} from \code{ashr}).
+#'
+#' @importFrom WGCNA cor
+#' @importFrom ashr ash
+#' @importFrom stats pt p.adjust sd
+#'
+#' @keywords internal
+.lin_associations <- function(X, Y, n.min = 4L, shrinkage = TRUE,
+                              alpha = 0, MHC_direction = NULL) {
+  if (is.null(MHC_direction)) {
+    MHC_direction <- if (length(Y) >= length(X)) "y" else "x"
+  }
+
+  X.NA <- !is.finite(X)
+  X[X.NA] <- NA
+  Y.NA <- !is.finite(Y)
+  Y[Y.NA] <- NA
+
+  N <- (t(!X.NA) %*% (!Y.NA)) - 2L
+
+  f_sd <- function(A) {
+    if (is.matrix(A)) apply(A, 2L, stats::sd, na.rm = TRUE) else stats::sd(A, na.rm = TRUE)
+  }
+  sx <- f_sd(X)
+  sy <- f_sd(Y)
+
+  rho <- WGCNA::cor(X, Y, use = "pairwise.complete.obs")
+  beta <- t(t(rho / sx) * sy)
+  beta.se <- t(t(sqrt(1 - rho^2) / sx) * sy) / sqrt(N)
+  p.val <- 2 * stats::pt(-abs(beta / beta.se), N)
+  p.val[N < n.min] <- NA
+  p.val[(sx == 0) | !is.finite(sx), ] <- NA
+  p.val[, (sy == 0) | !is.finite(sy)] <- NA
+
+  if (MHC_direction == "y") {
+    q.val <- apply(p.val, 2L, function(x) stats::p.adjust(x, method = "BH"))
+  } else {
+    q.val <- t(apply(p.val, 1L, function(x) stats::p.adjust(x, method = "BH")))
+  }
+
+  if (shrinkage) {
+    res.table <- vector("list", if (MHC_direction == "y") NCOL(p.val) else NROW(p.val))
+    if (MHC_direction == "y") {
+      for (ix in seq_len(NCOL(p.val))) {
+        fin <- is.finite(p.val[, ix])
+        res <- ashr::ash(beta[fin, ix], pmax(beta.se[fin, ix], 1e-10),
+                         mixcompdist = "halfuniform", alpha = alpha)$result
+        if (!is.null(res)) {
+          res$dep.var <- colnames(Y)[ix]
+          res$ind.var <- rownames(res)
+          res$p.val <- p.val[fin, ix]
+          res.table[[ix]] <- res
+        }
+      }
+    } else {
+      for (ix in seq_len(NROW(p.val))) {
+        fin <- is.finite(p.val[ix, ])
+        res <- tryCatch(
+          ashr::ash(beta[ix, fin], pmax(beta.se[ix, fin], 1e-10),
+                    mixcompdist = "halfuniform", alpha = alpha)$result,
+          error = function(e) NULL
+        )
+        if (!is.null(res)) {
+          res$dep.var <- rownames(res)
+          res$ind.var <- colnames(Y)[ix]
+          res$p.val <- p.val[ix, fin]
+          res.table[[ix]] <- res
+        }
+      }
+    }
+    res.table <- data.table::rbindlist(res.table, fill = TRUE)
+  } else {
+    res.table <- NULL
+  }
+
+  list(N = N, rho = rho, beta = beta, beta.se = beta.se,
+       p.val = p.val, q.val = q.val, res.table = res.table)
 }
