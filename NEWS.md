@@ -1,3 +1,6 @@
+## gDRplots 0.0.119 - 2026-08-03
+* replace cdsrmodels dependency with inline lin_associations implementation using WGCNA and ashr
+
 ## gDRplots 0.0.118 - 2026-07-22
 * add runnable examples to exported functions
 * fix BiocCheck notes (signal keyword in message, @noRd for internal functions)
