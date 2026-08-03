@@ -10,7 +10,10 @@ Authors@R: c(
              person("Arkadiusz", "Gladki", role=c("aut", "cre"), email="gladki.arkadiusz@gmail.com",
                    comment = c(ORCID = "0000-0002-7059-6378"))
              )
-Description: gDRplots is a package that stores functions for gDR static visualizations and their dedicated helpers.
+Description: gDRplots provides static visualization functions for the gDR
+    drug response platform. It includes dose-response curve plots, heatmaps,
+    waterfall charts, combination synergy visualizations, and chemical
+    genomics association plots, along with dedicated helper utilities.
 License: Artistic-2.0
 biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedAssays
 Imports:
