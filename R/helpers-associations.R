@@ -245,7 +245,7 @@ calc_assoc <- function(X, Y) {
       }
     }
     non_null <- Filter(Negate(is.null), res.table)
-    if (length(non_null) == 0L) stop("Error: all input values are missing")
+    if (length(non_null) == 0L) stop("all input values are missing")
     res.table <- data.table::rbindlist(non_null, fill = TRUE)
   } else {
     res.table <- NULL

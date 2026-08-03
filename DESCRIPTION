@@ -14,8 +14,11 @@ Description: gDRplots provides static visualization functions for the gDR
     drug response platform. It includes dose-response curve plots, heatmaps,
     waterfall charts, combination synergy visualizations, and chemical
     genomics association plots, along with dedicated helper utilities.
+    Functions support both single-agent and combination drug screens,
+    enabling exploration of dose-response data from high-throughput assays.
 License: Artistic-2.0
-biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedAssays
+biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedAssays,
+    SingleCell, GeneSetEnrichment, Normalization
 Imports:
     ashr,
     checkmate,
