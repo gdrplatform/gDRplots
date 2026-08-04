@@ -19,8 +19,7 @@ Description: gDRplots provides static visualization functions and dedicated help
     analysis (Bliss, HSA excess maps, isobologram plots).
 License: Artistic-2.0
 biocViews: Software, Visualization, QualityControl, Normalization,
-    CellBasedAssays, HighThroughputScreening, DoseResponse,
-    PharmacogeneticsAndPharmacogenomics
+    CellBasedAssays, Pharmacogenomics, MicrotitrePlateAssay
 Imports:
     ashr,
     checkmate,
@@ -65,3 +64,4 @@ BugReports: https://github.com/gdrplatform/gDRplots/issues
 Encoding: UTF-8
 LazyLoad: yes
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.1
