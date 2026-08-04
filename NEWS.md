@@ -1,3 +1,6 @@
+## gDRplots 0.99.0 - 2026-08-04
+* bump version to 0.99.0 for Bioconductor submission
+
 ## gDRplots 0.0.119 - 2026-08-03
 * replace cdsrmodels dependency with inline lin_associations implementation using WGCNA and ashr
 
