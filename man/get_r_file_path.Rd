@@ -16,7 +16,7 @@ string with the path to the executed Rscript file
 Extract path of the executed R file
 }
 \examples{
-\donttest{
+\dontrun{
 get_r_file_path()
 }
 

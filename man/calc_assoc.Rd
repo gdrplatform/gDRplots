@@ -31,7 +31,4 @@ Y <- matrix(c(10:15, 110:115, 210:215), ncol = 3,
 tab_assoc <- calc_assoc(X, Y)
 
 }
-\seealso{
-\code{\link[cdsrmodels:lin_associations]{cdsrmodels::lin_associations}}
-}
 \keyword{internal}
