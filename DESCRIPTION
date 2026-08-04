@@ -11,12 +11,11 @@ Authors@R: c(
                    comment = c(ORCID = "0000-0002-7059-6378"))
              )
 Description: gDRplots provides static visualization functions and dedicated helpers
-    for the gDR drug response platform. Designed for high-throughput screening (HTS),
-    pharmacogenomics, and chemical genomics research, it enables comprehensive analysis
-    of single-agent, co-dilution, and drug combination cell viability assays. The package
-    supports quality control (plate layouts, concentration-response curves), metric
-    visualization (heatmaps, waterfall charts, boxplots), and combination synergy
-    analysis (Bliss, HSA excess maps, isobologram plots).
+    for the gDR drug response platform. It includes dose-response curve plots, heatmaps,
+    boxplots, combination synergy visualizations (Bliss, HSA excess maps, isobologram
+    plots), chemical genomics association plots, and PRISM correlation plots.
+    Functions support both single-agent and combination drug screens, enabling
+    exploration of dose-response data from high-throughput assays.
 License: Artistic-2.0
 biocViews: Software, Visualization, QualityControl, Normalization,
     CellBasedAssays, Pharmacogenomics, MicrotitrePlateAssay
