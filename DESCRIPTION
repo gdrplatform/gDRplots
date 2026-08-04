@@ -1,6 +1,6 @@
 Package: gDRplots
 Title: 'gDRplots'
-Version: 0.0.119
+Version: 0.0.120
 Date: 2026-06-29
 Authors@R: c(
              person("Marc", "Hafner", role=c("aut"), comment = c(ORCID = "0000-0003-1337-7598")),
@@ -10,15 +10,17 @@ Authors@R: c(
              person("Arkadiusz", "Gladki", role=c("aut", "cre"), email="gladki.arkadiusz@gmail.com",
                    comment = c(ORCID = "0000-0002-7059-6378"))
              )
-Description: gDRplots provides static visualization functions for the gDR
-    drug response platform. It includes dose-response curve plots, heatmaps,
-    waterfall charts, combination synergy visualizations, and chemical
-    genomics association plots, along with dedicated helper utilities.
-    Functions support both single-agent and combination drug screens,
-    enabling exploration of dose-response data from high-throughput assays.
+Description: gDRplots provides static visualization functions and dedicated helpers
+    for the gDR drug response platform. Designed for high-throughput screening (HTS),
+    pharmacogenomics, and chemical genomics research, it enables comprehensive analysis
+    of single-agent, co-dilution, and drug combination cell viability assays. The package
+    supports quality control (plate layouts, concentration-response curves), metric
+    visualization (heatmaps, waterfall charts, boxplots), and combination synergy
+    analysis (Bliss, HSA excess maps, isobologram plots).
 License: Artistic-2.0
-biocViews: Software, Visualization, Pharmacogenomics, GeneExpression, CellBasedAssays,
-    SingleCell, GeneSetEnrichment, Normalization
+biocViews: Software, Visualization, QualityControl, Normalization,
+    CellBasedAssays, HighThroughputScreening, DoseResponse,
+    PharmacogeneticsAndPharmacogenomics
 Imports:
     ashr,
     checkmate,

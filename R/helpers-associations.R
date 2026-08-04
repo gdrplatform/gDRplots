@@ -86,6 +86,7 @@ calc_assoc <- function(X, Y) {
     dt_na <- NULL
   }
 
+  # calculate the linear model coefficients efficiently on large matrices
   res <- .lin_associations(X = X, Y = Y)
 
   # convert results from a `matrix` to a `data.table`
@@ -154,9 +155,8 @@ calc_assoc <- function(X, Y) {
 #' Inline reimplementation of \code{lin_associations} from the
 #' \href{https://github.com/cancerdatasci/cdsrmodels}{cdsrmodels} package
 #' (MIT License, Broad Institute / DepMap Portal) to remove the GitHub-only
-#' dependency.  The algorithm and output structure are unchanged; only the
-#' package dependency is replaced.  Uses
-#' \code{\link[WGCNA:cor]{WGCNA::cor}} for fast pairwise correlation on large
+#' package dependency is replaced.
+#' Uses \code{\link[WGCNA:cor]{WGCNA::cor}} for fast pairwise correlation on large
 #' matrices and \code{\link[ashr:ash]{ashr::ash}} for empirical-Bayes
 #' shrinkage of effect sizes.
 #'
@@ -174,13 +174,13 @@ calc_assoc <- function(X, Y) {
 #'   \code{beta.se}, \code{p.val}, \code{q.val}, and \code{res.table}
 #'   (a \code{data.frame} from \code{ashr}).
 #'
-#' @importFrom ashr ash
-#' @importFrom WGCNA cor
-#' @importFrom stats pt p.adjust sd
-#'
 #' @keywords internal
-.lin_associations <- function(X, Y, n.min = 4L, shrinkage = TRUE,
-                              alpha = 0, MHC_direction = NULL) {
+.lin_associations <- function(X,
+                              Y,
+                              n.min = 4L,
+                              shrinkage = TRUE,
+                              alpha = 0,
+                              MHC_direction = NULL) {
   if (is.null(MHC_direction)) {
     MHC_direction <- if (length(Y) >= length(X)) "x" else "y"
   }
