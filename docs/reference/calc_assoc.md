@@ -32,10 +32,6 @@ calc_assoc(X, Y)
 
 inspired by the `calc_assoc` function written by James Hawley
 
-## See also
-
-[`cdsrmodels::lin_associations`](https://rdrr.io/pkg/cdsrmodels/man/lin_associations.html)
-
 ## Examples
 
 ``` r

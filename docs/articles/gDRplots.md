@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.5  gDRplots_0.0.118 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.8  gDRplots_0.0.119 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
@@ -1063,7 +1063,7 @@ sessionInfo()
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
 #>  [25] irlba_2.3.7                 parallel_4.6.1             
 #>  [27] cluster_2.1.8.2             R6_2.6.1                   
-#>  [29] bslib_0.11.0                stringi_1.8.7              
+#>  [29] bslib_0.12.0                stringi_1.8.7              
 #>  [31] RColorBrewer_1.1-3          SQUAREM_2026.1             
 #>  [33] rpart_4.1.27                GenomicRanges_1.64.0       
 #>  [35] jquerylib_0.1.4             Rcpp_1.1.2                 
@@ -1081,7 +1081,7 @@ sessionInfo()
 #>  [59] withr_3.0.3                 BumpyMatrix_1.20.0         
 #>  [61] S7_0.2.2                    evaluate_1.0.5             
 #>  [63] foreign_0.8-91              desc_1.4.3                 
-#>  [65] survival_3.8-6              RcppParallel_6.1.0         
+#>  [65] survival_3.8-6              RcppParallel_6.2.0         
 #>  [67] pillar_1.11.1               BiocManager_1.30.27        
 #>  [69] MatrixGenerics_1.24.0       DT_0.34.0                  
 #>  [71] checkmate_2.3.4             foreach_1.5.2              
@@ -1096,15 +1096,15 @@ sessionInfo()
 #>  [89] grid_4.6.1                  impute_1.86.0              
 #>  [91] crosstalk_1.2.2             colorspace_2.1-3           
 #>  [93] nlme_3.1-169                patchwork_1.3.2            
-#>  [95] htmlTable_2.5.0             Formula_1.2-5              
+#>  [95] htmlTable_2.5.0             Formula_1.2-6              
 #>  [97] cli_3.6.6                   textshaping_1.0.5          
 #>  [99] mixsqp_0.3-54               S4Arrays_1.12.0            
 #> [101] dplyr_1.2.1                 gtable_0.3.6               
-#> [103] cdsrmodels_0.1.0            R.methodsS3_1.8.2          
-#> [105] dynamicTreeCut_1.63-1       sass_0.4.10                
-#> [107] digest_0.6.39               BiocGenerics_0.58.1        
-#> [109] SparseArray_1.12.2          ggrepel_0.9.8              
-#> [111] htmlwidgets_1.6.4           farver_2.1.2               
-#> [113] htmltools_0.5.9             pkgdown_2.2.1              
-#> [115] R.oo_1.27.1                 lifecycle_1.0.5
+#> [103] R.methodsS3_1.8.2           dynamicTreeCut_1.63-1      
+#> [105] sass_0.4.10                 digest_0.6.39              
+#> [107] BiocGenerics_0.58.1         SparseArray_1.12.2         
+#> [109] ggrepel_0.9.8               htmlwidgets_1.6.4          
+#> [111] farver_2.1.2                htmltools_0.5.9            
+#> [113] pkgdown_2.2.1               R.oo_1.27.1                
+#> [115] lifecycle_1.0.5
 ```
