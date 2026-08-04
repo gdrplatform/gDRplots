@@ -1,6 +1,3 @@
-## gDRplots 0.0.120 - 2026-08-04
-* address review feedback: update biocViews, expand Description, improve .lin_associations style
-
 ## gDRplots 0.0.119 - 2026-08-03
 * replace cdsrmodels dependency with inline lin_associations implementation using WGCNA and ashr
 
