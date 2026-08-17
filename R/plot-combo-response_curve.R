@@ -234,7 +234,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 
   available_drugs <- unique(dt_avg[[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
-    d_names  <- available_drugs
+    d_names <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
     d_names <- d_names[d_names %in% available_drugs]
   }

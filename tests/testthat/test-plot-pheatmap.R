@@ -463,7 +463,7 @@ test_that("pheatmap_with_anno_sa works as expected", {
   plt_9 <- out_9[["heatmap"]]
   expect_is(plt_9, "pheatmap")
   expect_equal(plt_9$gtable$grobs[[7]]$label, c("lng_anno", "drug_moa"))
-  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+  max_len <- gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
                                                system.file(package = "gDRplots", "settings.json"))
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
   expect_true(all(nchar(plt_9[["gtable"]][["grobs"]][[5]][["label"]]) <= max_len)) # trimmed drug name
@@ -1050,7 +1050,7 @@ test_that("pheatmap_with_anno_combo works as expected", {
     annotation_manual_row_10[order(match(DrugName, data_10[["annotation_row"]]$DrugName)), ][order(DrugName_2)])
   plt_10 <- out_10[["heatmap"]]
   expect_is(plt_10, "pheatmap")
-  max_len <-  gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
+  max_len <- gDRutils::get_settings_from_json("MAX_HM_LBL_LENGTH",
                                                system.file(package = "gDRplots", "settings.json"))
   expect_true(all(nchar(plt_10[["gtable"]][["grobs"]][[4]][["label"]]) <= max_len)) # trimmed cell line
   expect_equal(sum(grepl("\\.\\.\\.", plt_10[["gtable"]][["grobs"]][[5]][["label"]])), 2) # trimmed drug name
@@ -1332,7 +1332,7 @@ test_that("pheatmap_with_anno_combo_metrics works as expected", {
   sorted_keys <- out_sort[["data"]][["matrix"]]$Treatment_Key
 
   idx_untreated <- grep(paste0(untreated_tag, "__", untreated_tag), sorted_keys)
-  idx_low_conc  <- grep("0.0010", sorted_keys)
+  idx_low_conc <- grep("0.0010", sorted_keys)
   idx_high_conc <- grep("1.0000", sorted_keys)
 
   expect_true(idx_untreated < idx_low_conc)

@@ -503,7 +503,7 @@ save_plot <- function(plt, path, format = "svg") {
 #' }
 #'
 #' @export
-get_r_file_path <-  function(test_mode = FALSE) {
+get_r_file_path <- function(test_mode = FALSE) {
   checkmate::assert_flag(test_mode)
 
   # on Rstudio

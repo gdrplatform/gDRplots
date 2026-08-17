@@ -244,7 +244,7 @@ pheatmap_qc <- function(
   minval <- min(c(0, min_mat))
 
   breaks <- seq(from = minval, to = maxval, length.out = no_breaks + 1)
-  hm_color_palette <-   grDevices::colorRampPalette(colors_vec)(no_breaks)
+  hm_color_palette <- grDevices::colorRampPalette(colors_vec)(no_breaks)
   if (metric == "x_std") hm_color_palette <- rev(hm_color_palette)
 
   fontsize_row <- .get_pheatmap_fontsize(mat_cvd, "row")
@@ -1396,7 +1396,7 @@ pheatmap_with_anno_combo_metrics <- function(
 ) {
 
   untreated_tag <- gDRutils::get_env_identifiers("untreated_tag")[1]
-  drug_name_id  <- gDRutils::get_env_identifiers("drug_name")
+  drug_name_id <- gDRutils::get_env_identifiers("drug_name")
   drug_name_id2 <- gDRutils::get_env_identifiers("drug_name2")
   cellline_name_id <- gDRutils::get_env_identifiers("cellline_name")
 
@@ -1432,10 +1432,10 @@ pheatmap_with_anno_combo_metrics <- function(
 
   dt_sub[, `:=`(
     Row_Display_Name = get(drug_name_id),
-    Fixed_Name_1     = get(drug_name_id2),
-    Fixed_Conc_1     = as.numeric(cotrt_value),
-    Fixed_Name_2     = untreated_tag,
-    Fixed_Conc_2     = 0
+    Fixed_Name_1 = get(drug_name_id2),
+    Fixed_Conc_1 = as.numeric(cotrt_value),
+    Fixed_Name_2 = untreated_tag,
+    Fixed_Conc_2 = 0
   )]
 
   dt_sub[Fixed_Conc_1 == 0, Fixed_Name_1 := untreated_tag]
@@ -1552,10 +1552,10 @@ pheatmap_with_anno_combo_metrics <- function(
 
   if ("Fixed_Drug" %in% names(anno_df)) {
     colors_1 <- .get_gradient_colors(
-      col_names  = row_meta$Fixed_Name_1,
-      col_concs  = row_meta$Fixed_Conc_1,
+      col_names = row_meta$Fixed_Name_1,
+      col_concs = row_meta$Fixed_Conc_1,
       col_labels = row_meta$Fixed_Label_1,
-      base_map   = base_drug_colors
+      base_map = base_drug_colors
     )
     if (length(colors_1) > 0) {
       annotation_colors[["Fixed_Drug"]] <- colors_1
@@ -1564,10 +1564,10 @@ pheatmap_with_anno_combo_metrics <- function(
 
   if ("Fixed_Drug_2" %in% names(anno_df)) {
     colors_2 <- .get_gradient_colors(
-      col_names  = row_meta$Fixed_Name_2,
-      col_concs  = row_meta$Fixed_Conc_2,
+      col_names = row_meta$Fixed_Name_2,
+      col_concs = row_meta$Fixed_Conc_2,
       col_labels = row_meta$Fixed_Label_2,
-      base_map   = base_drug_colors
+      base_map = base_drug_colors
     )
     if (length(colors_2) > 0) {
       annotation_colors[["Fixed_Drug_2"]] <- colors_2
@@ -1698,7 +1698,7 @@ get_hm_title <- function(metric = "xc50",
 
   if (metric == "xc50") title_metric <- sprintf("log10(%s)", title_metric)
 
-  hm_title <- if (!is.null(dataset_name))  {
+  hm_title <- if (!is.null(dataset_name)) {
     sprintf("%s (%s)", dataset_name, title_metric)
   } else {
     title_metric

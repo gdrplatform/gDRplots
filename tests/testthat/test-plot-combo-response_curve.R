@@ -150,7 +150,7 @@ test_that("plot_dose_response_combo_panel works as expected", {
   d_names <- unique(dt_average$DrugName)[2:3]
 
   no_comb_all <- NROW(unique(
-    dt_average[CellLineName == cl_name,  c("CellLineName", "DrugName", "DrugName_2"), with = FALSE]
+    dt_average[CellLineName == cl_name, c("CellLineName", "DrugName", "DrugName_2"), with = FALSE]
   ))
   no_comb <- NROW(unique(
     dt_average[DrugName %in% d_names & CellLineName == cl_name,

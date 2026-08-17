@@ -302,16 +302,16 @@ plot_dose_response_sa_by_CLs <- function(dt_metrics,
 
   available_drugs <- unique(dt_metrics[[drug_name]])
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
-    drug_name_vec  <- available_drugs
+    drug_name_vec <- available_drugs
   } else if (!all(drug_name_vec %in% available_drugs)) {
-    drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+    drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
   }
 
   available_cellline <- unique(dt_metrics[[cellline_name]])
   if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
     cellline_name_vec <- available_cellline
   } else if (!all(cellline_name_vec %in% available_cellline)) {
-    cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
+    cellline_name_vec <- cellline_name_vec[cellline_name_vec %in% available_cellline]
   }
 
   filter_expr <- substitute(
@@ -398,14 +398,14 @@ plot_dose_response_sa_by_drugs <- function(dt_metrics,
   if (is.null(cellline_name_vec) || all(!cellline_name_vec %in% available_cellline)) {
     cellline_name_vec <- available_cellline
   } else if (!all(cellline_name_vec %in% available_cellline)) {
-    cellline_name_vec <- cellline_name_vec[cellline_name_vec  %in% available_cellline]
+    cellline_name_vec <- cellline_name_vec[cellline_name_vec %in% available_cellline]
   }
 
   available_drugs <- unique(dt_metrics[[drug_name]])
   if (is.null(drug_name_vec) || all(!drug_name_vec %in% available_drugs)) {
-    drug_name_vec  <- available_drugs
+    drug_name_vec <- available_drugs
   } else if (!all(drug_name_vec %in% available_drugs)) {
-    drug_name_vec <- drug_name_vec[drug_name_vec  %in% available_drugs]
+    drug_name_vec <- drug_name_vec[drug_name_vec %in% available_drugs]
   }
 
   plt_list <- list()
@@ -541,7 +541,7 @@ plot_dose_response_sa_qc <- function(dt_metrics,
         ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve", group = "Fitted Curve")) +
       ggplot2::geom_errorbar(
         data = dt_average_plot,
-        ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std,
+        ggplot2::aes(x = get(conc), y = x, ymin = x - x_std, ymax = x + x_std,
                      color = "Errors Bar"),
         width = 0.1, position = ggplot2::position_dodge(0.1)) +
       ggplot2::geom_point(
@@ -642,7 +642,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
 
   available_drugs <- unique(dt_metrics[get(cellline_name) %in% cl_name, ][[drug_name]])
   if (is.null(d_names) || all(!d_names %in% available_drugs)) {
-    d_names  <- available_drugs
+    d_names <- available_drugs
   } else if (!all(d_names %in% available_drugs)) {
     d_names <- d_names[d_names %in% available_drugs]
   }
@@ -711,7 +711,7 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
       ggplot2::aes(x = get(conc), y = x, color = "Fitted Curve")) +
     ggplot2::geom_errorbar(
       data = dt_average_plot,
-      ggplot2::aes(x = get(conc), y = x,  ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
+      ggplot2::aes(x = get(conc), y = x, ymin = x - x_std, ymax = x + x_std, color = "Errors Bar"),
       width = 0.1, position = ggplot2::position_dodge(0.1)) +
     ggplot2::geom_point(
       data = dt_average_plot,

@@ -18,7 +18,7 @@ test_that("plot_dose_response_sa works as expected", {
                                  group_var = group_var) # default
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
-  expect_true(grepl(selected_drug,  plt_1[["labels"]][["title"]]))
+  expect_true(grepl(selected_drug, plt_1[["labels"]][["title"]]))
   expect_length(plt_1[["layers"]], 4)
   expect_equal(ggplot2::get_guide_data(plt_1, "colour")[[".label"]],
                unique(dt_average[[group_var]]))
@@ -277,7 +277,7 @@ test_that("plot_dose_response_sa works as expected", {
                                   group_var = cellline_name) # default
   expect_is(plt_16, "gg")
   expect_equal(plt_16[["labels"]][["y"]], "GR")
-  expect_true(grepl(selected_drug,  plt_16[["labels"]][["title"]]))
+  expect_true(grepl(selected_drug, plt_16[["labels"]][["title"]]))
   expect_length(plt_16[["layers"]], 3)
   expect_equal(ggplot2::get_guide_data(plt_16, "colour")[[".label"]],
                unique(dt_metrics[[cellline_name]]))
@@ -289,7 +289,7 @@ test_that("plot_dose_response_sa works as expected", {
                                   group_var = cellline_name) # default
   expect_is(plt_17, "gg")
   expect_equal(plt_17[["labels"]][["y"]], "GR")
-  expect_true(grepl(selected_drug,  plt_17[["labels"]][["title"]]))
+  expect_true(grepl(selected_drug, plt_17[["labels"]][["title"]]))
   expect_length(plt_17[["layers"]], 3)
   expect_equal(ggplot2::get_guide_data(plt_17, "colour")[[".label"]],
                unique(dt_average[[cellline_name]]))
@@ -478,7 +478,7 @@ test_that("plot_dose_response_sa works as expected", {
                                              drug_name_vec = drug_name_vec_2)
     expect_is(plts_3, "list")
     plotted_ <- intersect(cellline_name_vec_2, unique(dt_metrics[[cellline_name]]))
-    expect_equal(names(plts_3),  plotted_)
+    expect_equal(names(plts_3), plotted_)
     plotted <- intersect(drug_name_vec_2, unique(dt_metrics[[drug_name]]))
     expect_true(all(vapply(seq_along(plts_3),
                            function(i) all(plts_3[[i]]$plot_env$group_names == plotted), logical(1))))

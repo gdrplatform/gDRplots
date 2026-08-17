@@ -431,7 +431,7 @@ plot_plate <- function(dt_plate, column_name) {
 
 
     if (continuous) {
-      p <- p + ggplot2::scale_fill_gradient(low =  plate_palette[[1]],
+      p <- p + ggplot2::scale_fill_gradient(low = plate_palette[[1]],
                                             high = plate_palette[[2]])
     } else {
       p <- p + ggplot2::scale_fill_manual(values = gradient_colors,

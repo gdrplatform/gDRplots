@@ -90,7 +90,7 @@ heatmap_combo_metrics <- function(
     cl_name,
     metric = "smooth",
     normalization_type = "GR",
-    iso_levels =  c("0.25", "0.5", "0.75"),
+    iso_levels = c("0.25", "0.5", "0.75"),
     colors_vec_smooth = NULL,
     colors_vec_excess = NULL,
     limit = NULL,
@@ -166,7 +166,7 @@ heatmap_combo_metrics <- function(
 
   # prep hm color palette
   hm_color_palette_smooth <-
-    if (is.null(colors_vec_smooth)  || !all(vapply(colors_vec_smooth, is_valid_color, logical(1)))) {
+    if (is.null(colors_vec_smooth) || !all(vapply(colors_vec_smooth, is_valid_color, logical(1)))) {
       .get_smooth_palette(no_breaks)
     } else {
       grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
@@ -257,7 +257,7 @@ heatmap_combo_metrics <- function(
       ggplot2::labs(x = x_axis_lab,
                     y = y_axis_lab,
                     title = plt_title,
-                    fill = legend_title_fill)  +
+                    fill = legend_title_fill) +
       ggplot2::scale_x_continuous(breaks = mrk_x,
                                   labels = lbl_x,
                                   expand = c(0, 0)) +
@@ -276,7 +276,7 @@ heatmap_combo_metrics <- function(
                      aspect.ratio = 1)
 
     if (show_values) {
-      plt <-  plt +
+      plt <- plt +
         ggplot2::geom_text(
           ggplot2::aes(label = ifelse(is.na(get(metric)), "", sprintf("%.2f", get(metric)))),
           size = 2,
@@ -472,7 +472,7 @@ heatmap_combo_metrics_panel <- function(
 
   # prep hm color palette
   hm_color_palette_smooth <-
-    if (is.null(colors_vec_smooth)  || !all(vapply(colors_vec_smooth, is_valid_color, logical(1)))) {
+    if (is.null(colors_vec_smooth) || !all(vapply(colors_vec_smooth, is_valid_color, logical(1)))) {
       .get_smooth_palette(no_breaks)
     } else {
       grDevices::colorRampPalette(colors_vec_smooth)(no_breaks + 1)
@@ -563,7 +563,7 @@ heatmap_combo_metrics_panel <- function(
         ggplot2::labs(x = x_axis_lab,
                       y = y_axis_lab,
                       title = plt_title,
-                      fill = legend_title_fill)  +
+                      fill = legend_title_fill) +
         ggplot2::scale_x_continuous(breaks = mrk_x,
                                     labels = lbl_x,
                                     expand = c(0, 0)) +
@@ -783,7 +783,7 @@ plot_combination_index <- function(
     drug2_name,
     cl_name,
     normalization_type = "GR",
-    iso_levels =  c("0.25", "0.5", "0.75"),
+    iso_levels = c("0.25", "0.5", "0.75"),
     colors_vec_iso = NULL) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
@@ -1319,7 +1319,7 @@ heatmap_combo_with_isoref_panel <- function(
 
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
-    cl_names  <- available_cls
+    cl_names <- available_cls
   } else if (!all(cl_names %in% available_cls)) {
     cl_names <- cl_names[cl_names %in% available_cls]
   }
@@ -1481,7 +1481,7 @@ heatmap_combo_with_isoref_panel_common <- function(
 
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
-    cl_names  <- available_cls
+    cl_names <- available_cls
   } else if (!all(cl_names %in% available_cls)) {
     cl_names <- cl_names[cl_names %in% available_cls]
   }
@@ -1794,7 +1794,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
 
   available_cls <- unique(dt_excess[[cellline_name]])
   if (is.null(cl_names) || all(!cl_names %in% available_cls)) {
-    cl_names  <- available_cls
+    cl_names <- available_cls
   } else if (!all(cl_names %in% available_cls)) {
     cl_names <- cl_names[cl_names %in% available_cls]
   }
