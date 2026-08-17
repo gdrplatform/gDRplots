@@ -42,4 +42,5 @@ gDRplots:::.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }
+\keyword{internal}
 \keyword{prism_plots}

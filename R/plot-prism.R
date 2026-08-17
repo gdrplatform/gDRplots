@@ -1010,6 +1010,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' }
 #' @keywords prism_plots
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @keywords internal
 .get_data_type <- function(dt_,
                            desc_col = NULL) {
 
@@ -1075,6 +1076,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' }
 #'
 #' @keywords prism_plots
+#' @keywords internal
 .get_n_top_asssoc <- function(dt_assoc,
                               n_top = 4) {
 

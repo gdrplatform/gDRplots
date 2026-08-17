@@ -338,6 +338,7 @@ plot_dose_response_combo_panel <- function(dt_average,
 #' ls_conc <- factor(c("0.001", "0.01", "1"))
 #' gDRplots:::.get_combo_curves_colors(ls_conc)
 #' }
+#' @keywords internal
 .get_combo_curves_colors <- function(ls_conc_2) {
   checkmate::assert_factor(ls_conc_2)
 

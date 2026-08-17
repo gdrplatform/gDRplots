@@ -93,4 +93,5 @@ For user, it is contained in a single-purpose function, depending on the experim
 \author{
 Janina Smoła \email{janina.smola@contractors.roche.com}
 }
+\keyword{internal}
 \keyword{prism_plots}

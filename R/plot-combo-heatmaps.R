@@ -1882,6 +1882,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #' prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
 #' }
 #'
+#' @keywords internal
 prep_hm_limits <- function(num_vec,
                            metric = "smooth",
                            normalization_type = "GR",
@@ -1948,6 +1949,7 @@ prep_hm_limits <- function(num_vec,
 #' transform_log_conc(vec)
 #' }
 #'
+#' @keywords internal
 transform_log_conc <- function(conc_vec) {
   checkmate::assert_numeric(conc_vec, lower = 0, any.missing = FALSE, finite = TRUE)
 
@@ -2000,6 +2002,7 @@ transform_log_conc <- function(conc_vec) {
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
 #' gDRplots:::.get_iso_colors(ls_iso_lvl)
 #' }
+#' @keywords internal
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
 
@@ -2028,6 +2031,7 @@ transform_log_conc <- function(conc_vec) {
 #' \donttest{
 #' gDRplots:::.get_smooth_palette(25)
 #' }
+#' @keywords internal
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
 
@@ -2048,6 +2052,7 @@ transform_log_conc <- function(conc_vec) {
 #' \donttest{
 #' gDRplots:::.get_excess_palette(20)
 #' }
+#' @keywords internal
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
 
@@ -2110,6 +2115,7 @@ transform_log_conc <- function(conc_vec) {
 #' gDRplots:::.get_combo_panel_type(ls_conc)
 #' }
 #'
+#' @keywords internal
 .get_combo_panel_type <- function(ls_vec_conc) {
   checkmate::assert_list(ls_vec_conc)
   stopifnot("Must be a list with numeric vectors." = all(
