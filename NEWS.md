@@ -1,6 +1,6 @@
 ## gDRplots 0.99.1 - 2026-08-17
 * remove alignment whitespace flagged by the gDRstyle linter
-* mark internal helper functions with @keywords internal
+* document internal helper functions with @keywords internal
 
 ## gDRplots 0.99.0 - 2026-08-04
 * bump version to 0.99.0 for Bioconductor submission
