@@ -34,4 +34,5 @@ gDRplots:::.get_n_top_asssoc(tab_assoc)
 }
 
 }
+\keyword{internal}
 \keyword{prism_plots}

@@ -133,14 +133,14 @@ calc_assoc <- function(X, Y) {
   checkmate::assert_data_table(res_dt)
 
   ls_col <- c("ind.var", "dep.var", "betahat", "sebetahat", "PosteriorMean",
-              "PosteriorSD",  "NegativeProb", "PositiveProb", "rho",
+              "PosteriorSD", "NegativeProb", "PositiveProb", "rho",
               "p.val", "qvalue", "svalue", "lfsr", "lfdr")
   ls_col <- intersect(ls_col, names(res_dt)) # removre"dep.var" for vector
   res_dt <- res_dt[, (ls_col), with = FALSE]
   # rename
   data.table::setnames(res_dt,
                        old = c("ind.var", "dep.var", "betahat", "sebetahat",
-                               "PosteriorMean", "PosteriorSD",  "NegativeProb", "PositiveProb",
+                               "PosteriorMean", "PosteriorSD", "NegativeProb", "PositiveProb",
                                "p.val", "qvalue", "svalue"),
                        new = c("feature", "response", "est_beta", "est_beta_se",
                                "posterior_mean", "posterior_sd", "prob_negative", "prob_positive",

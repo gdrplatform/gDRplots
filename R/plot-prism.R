@@ -75,7 +75,7 @@ plot_volcano_assoc <- function(dt_assoc,
     tab_plot <- data.table::setorderv(data.table::copy(dt_assoc), cols = "q_value")
 
     # prep column with statistically significant
-    tab_plot[, stat_sig :=  data.table::fifelse(q_value <= alpha, "yes", "no")]
+    tab_plot[, stat_sig := data.table::fifelse(q_value <= alpha, "yes", "no")]
 
     # downsample non-statistically significant dots
     if (!is.null(max_N) && NROW(tab_plot[stat_sig == "no", ]) > max_N) {
@@ -208,7 +208,7 @@ plot_scatter_with_corr <- function(dt_response,
 
     plt <-
       ggplot2::ggplot(data = tab_plot,
-                      mapping =  ggplot2::aes(x = get(selected_feat),
+                      mapping = ggplot2::aes(x = get(selected_feat),
                                               y = get(selected_metric),
                                               label = label,
                                               color = col)) +
@@ -495,7 +495,7 @@ plot_boxplot_num <- function(dt_response,
 
     plt <-
       ggplot2::ggplot(data = tab_plot,
-                      mapping =  ggplot2::aes(x = get(selected_feat),
+                      mapping = ggplot2::aes(x = get(selected_feat),
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, staplewidth = 0.5,
@@ -674,7 +674,7 @@ plot_boxplot_num_panel <- function(dt_response,
 
     plt <-
       ggplot2::ggplot(data = tab_plot_all,
-                      mapping =  ggplot2::aes(x = xlbl,
+                      mapping = ggplot2::aes(x = xlbl,
                                               y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, staplewidth = 0.5,
@@ -820,7 +820,7 @@ plot_boxplot_meta <- function(dt_response,
     plt <-
       ggplot2::ggplot(
         data = tab_plot,
-        mapping =  ggplot2::aes(x = get(selected_feat_meta_col),
+        mapping = ggplot2::aes(x = get(selected_feat_meta_col),
                                 y = get(selected_metric))) +
       ggplot2::geom_hline(yintercept = 0, color = hline_color, linetype = "solid") +
       ggplot2::geom_boxplot(fill = boxplot_fill, color = edge_color, alpha = 0.25, staplewidth = 0.5,
@@ -1010,6 +1010,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' }
 #' @keywords prism_plots
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @keywords internal
 .get_data_type <- function(dt_,
                            desc_col = NULL) {
 
@@ -1075,6 +1076,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' }
 #'
 #' @keywords prism_plots
+#' @keywords internal
 .get_n_top_asssoc <- function(dt_assoc,
                               n_top = 4) {
 

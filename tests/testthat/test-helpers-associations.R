@@ -21,7 +21,7 @@ Y_feat <- matrix(c(10:16), ncol = 1,
 # big matrix
 n_big <- 50
 X_big <- matrix(
-  withr::with_seed(42, sample(c(0, 1, NA), size =  20 * n_big, replace = TRUE, prob = c(0.9, 0.09, 0.01))),
+  withr::with_seed(42, sample(c(0, 1, NA), size = 20 * n_big, replace = TRUE, prob = c(0.9, 0.09, 0.01))),
   nrow = n_big, dimnames = list(sprintf("row_%s", 1:n_big), sprintf("feat_%s", 1:20)))
 Y_big <- as.matrix(data.table::data.table(
   met_11 = withr::with_seed(42, rnorm(n = n_big, mean = -0.05, sd = 0.11)),

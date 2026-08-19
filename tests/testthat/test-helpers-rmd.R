@@ -250,7 +250,7 @@ test_that("prep_nested_plot_chunk works as expected", {
       dwnlist[[drug]][[cl]][["RV"]] <- dwn_RV
     }
   }
-  no_plots_in_section <-  NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color)
+  no_plots_in_section <- NROW(unique(dt_metrics$CellLineName)) * NROW(c("GR", "RV")) * NROW(ls_color)
 
   res_1 <- prep_nested_plot_chunk(plt_list = plotlist,
                                   chunk_name = "metric_col") # default

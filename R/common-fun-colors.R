@@ -110,7 +110,7 @@ get_qual_colors <- function(n = NULL) {
   # make all_colors longer
   if (n > length(all_colors)) {
     ls_light <- colorspace::lighten(all_colors, 0.3)
-    ls_dark <-  colorspace::darken(all_colors, 0.3) # darker
+    ls_dark <- colorspace::darken(all_colors, 0.3) # darker
     all_colors <- append(all_colors, values = c(ls_light, ls_dark))
   }
 

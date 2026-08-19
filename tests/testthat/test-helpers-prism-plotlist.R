@@ -15,14 +15,14 @@ test_that(".create_PRISM_plot_list works as expected", {
                                                  assay_name = "Averaged")
   d_names_sa <- c("drug_021", "drug_026")
 
-  res_1  <- .create_PRISM_plot_list(experiment_type = "sa",
+  res_1 <- .create_PRISM_plot_list(experiment_type = "sa",
                                     dt_metrics_sa = dt_metrics_sa,
                                     drug1_name_vec = d_names_sa,
                                     meta_data_path = meta_data_path,
                                     feat_data_path = feat_data_path,
                                     feature_sets = feature_sets) # default
 
-  res_1_w  <- create_PRISM_plot_list_sa(drug_name_vec = d_names_sa,
+  res_1_w <- create_PRISM_plot_list_sa(drug_name_vec = d_names_sa,
                                         dt_metrics = dt_metrics_sa,
                                         meta_data_path = meta_data_path,
                                         feat_data_path = feat_data_path,

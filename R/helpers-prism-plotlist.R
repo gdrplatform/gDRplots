@@ -59,6 +59,7 @@
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
 #' @keywords prism_plots
+#' @keywords internal
 .create_PRISM_plot_list <- function(experiment_type,
                                     dt_metrics_sa,
                                     dt_metrics_combo = NULL,
@@ -539,6 +540,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #'
 #' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
 #'
+#' @keywords internal
 .get_info_from_name <- function(file_name,
                                 normalization_type = "RV") {
 
