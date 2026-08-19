@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.8  gDRplots_0.99.0  BiocStyle_2.40.0
+#> [1] gDRutils_1.11.9  gDRplots_0.99.1  BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
@@ -1063,7 +1063,7 @@ sessionInfo()
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
 #>  [25] irlba_2.3.7                 parallel_4.6.1             
 #>  [27] cluster_2.1.8.2             R6_2.6.1                   
-#>  [29] bslib_0.12.0                stringi_1.8.7              
+#>  [29] bslib_0.12.0                stringi_1.8.9              
 #>  [31] RColorBrewer_1.1-3          SQUAREM_2026.1             
 #>  [33] rpart_4.1.27                GenomicRanges_1.64.0       
 #>  [35] jquerylib_0.1.4             Rcpp_1.1.2                 
@@ -1075,7 +1075,7 @@ sessionInfo()
 #>  [47] splines_4.6.1               nnet_7.3-20                
 #>  [49] tidyselect_1.2.1            rstudioapi_0.19.0          
 #>  [51] abind_1.4-8                 yaml_2.3.12                
-#>  [53] stringfish_0.19.0           doParallel_1.0.17          
+#>  [53] stringfish_0.19.2           doParallel_1.0.17          
 #>  [55] codetools_0.2-20            lattice_0.22-9             
 #>  [57] tibble_3.3.1                Biobase_2.72.0             
 #>  [59] withr_3.0.3                 BumpyMatrix_1.20.0         
