@@ -64,6 +64,6 @@ prep_filename_path(plt_list = nested_plotlist,
 \code{\link{prep_plot_chunk}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

@@ -19,5 +19,6 @@ Get color palette for the smooth values
 \donttest{
 gDRplots:::.get_smooth_palette(25)
 }
+
 }
 \keyword{internal}

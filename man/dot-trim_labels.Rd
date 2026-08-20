@@ -31,6 +31,6 @@ gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

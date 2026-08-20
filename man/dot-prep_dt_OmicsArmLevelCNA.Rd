@@ -27,6 +27,6 @@ and \emph{0} otherwise. \code{3p_gain} is \emph{1} for values of \emph{1} in the
 and \emph{0} otherwise. The original chromosome column is then removed.
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

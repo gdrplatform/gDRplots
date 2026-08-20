@@ -20,5 +20,6 @@ Get color palette for the dose response curves for combination data
 ls_conc <- factor(c("0.001", "0.01", "1"))
 gDRplots:::.get_combo_curves_colors(ls_conc)
 }
+
 }
 \keyword{internal}

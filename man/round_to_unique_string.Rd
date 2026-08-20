@@ -25,6 +25,6 @@ round_to_unique_string(vec)
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{utils}

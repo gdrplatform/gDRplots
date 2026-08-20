@@ -28,6 +28,6 @@ one of: \code{CellLineName} for rows or \code{DrugName} for column.}
 Prep annotation data.table acc to metric matrix for pheatmap::pheatmat
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

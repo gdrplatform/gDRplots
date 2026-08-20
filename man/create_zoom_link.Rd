@@ -27,6 +27,6 @@ create_zoom_link(NA)
 \code{\link[knitr:knit]{knitr::knit}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

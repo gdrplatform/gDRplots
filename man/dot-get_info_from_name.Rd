@@ -34,6 +34,6 @@ gDRplots:::.get_info_from_name(f_n)
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

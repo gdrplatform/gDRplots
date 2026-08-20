@@ -20,5 +20,6 @@ Get color palette for the isobologram levels
 ls_iso_lvl <- c("0.25", "0.5", "0.75")
 gDRplots:::.get_iso_colors(ls_iso_lvl)
 }
+
 }
 \keyword{internal}

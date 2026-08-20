@@ -37,6 +37,6 @@ This function transforms each gene column into binary columns:
 (the original value was \emph{1} or \emph{2}).
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

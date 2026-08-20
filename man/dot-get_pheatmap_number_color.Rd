@@ -52,6 +52,6 @@ pheatmap::pheatmap(mat,
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

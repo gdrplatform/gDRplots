@@ -61,6 +61,6 @@ mat <- prep_pheatmap_matrix(dt_response = dt_scores,
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{pheat_ann}

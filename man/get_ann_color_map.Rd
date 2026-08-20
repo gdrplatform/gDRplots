@@ -28,6 +28,6 @@ get_ann_color_map(dt_ann)
 \code{\link{pheatmap_qc}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{utils_color}

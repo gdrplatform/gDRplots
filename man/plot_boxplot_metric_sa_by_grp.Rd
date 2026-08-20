@@ -113,6 +113,6 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{single-agent_plots}
