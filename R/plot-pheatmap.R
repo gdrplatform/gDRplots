@@ -392,7 +392,7 @@ pheatmap_qc <- function(
 #'
 #' @keywords pheat_ann
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @return A named list with elements:
 #' \itemize{
@@ -759,7 +759,7 @@ pheatmap_with_anno_sa <- function(
 #'
 #' @keywords pheat_ann
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @return A named list with elements:
 #' \itemize{
@@ -1040,7 +1040,7 @@ pheatmap_with_anno_cd <- function(
 #'
 #' @keywords pheat_ann
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @return A named list with elements:
 #' \itemize{
@@ -1727,7 +1727,7 @@ get_hm_title <- function(metric = "xc50",
 #'
 #' @keywords pheat_ann
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @return matrix with values for selected metric with \code{CellLinName} in the rows
 #'    and  \code{DrugName} (or combination of \code{DrugName} and \code{DrugName_2}) in the columns
@@ -1841,7 +1841,7 @@ prep_pheatmap_matrix <- function(dt_response,
 #' @return character (for NA -> given string)
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' change_NA_into_char(c(1, NA, 3))
@@ -1894,7 +1894,7 @@ change_NA_into_char <- function(x,
 #'
 #' @keywords utils_color
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @export
 get_ann_color_map <- function(dt_ann) {
@@ -1944,7 +1944,7 @@ get_ann_color_map <- function(dt_ann) {
 #'
 #' @keywords utils_color
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @export
 fill_ann_color_map <- function(dt_ann,
@@ -2023,7 +2023,7 @@ fill_ann_color_map <- function(dt_ann,
 #' }
 #'
 #' @keywords internal
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 .get_pheatmap_cluster_param <- function(mat_to_cluster,
                                         distfun = stats::dist,
                                         additional_condition = TRUE) {
@@ -2055,7 +2055,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @return \code{data.table} with annotation updated to \code{mat_with_metric}
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .fill_pheatmap_annotation <- function(
@@ -2102,7 +2102,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @keywords internal
 #'
-#' @author Arkadiusz Gladki \email{arkadiusz.gladki@@contractors.roche.com}
+#' @author Arkadiusz Gladki \email{arkadiusz.gladki@@external.roche.com}
 #'
 #' @return \code{NULL}
 .stop_on_aggregation <- function(fname, formula) {
@@ -2149,7 +2149,7 @@ fill_ann_color_map <- function(dt_ann,
 #'                    cluster_cols = FALSE)
 #' }
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .get_pheatmap_number_color <- function(mat_with_metric,
@@ -2227,7 +2227,7 @@ fill_ann_color_map <- function(dt_ann,
 #'
 #' @return numeric value of font size.
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .get_pheatmap_fontsize <- function(matrix,
@@ -2270,7 +2270,7 @@ fill_ann_color_map <- function(dt_ann,
 #' gDRplots:::.trim_labels(lbls_vec = ls_lbls, max_lbl_length = 15)
 #' }
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .trim_labels <- function(lbls_vec,
