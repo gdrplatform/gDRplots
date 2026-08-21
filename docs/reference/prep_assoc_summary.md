@@ -51,7 +51,7 @@ A [`DT::datatable`](https://rdrr.io/pkg/DT/man/datatable.html) object.
 
 ## Author
 
-Janina Smoła <janina.smola@contractors.roche.com>
+Janina Smoła <janina.smola@external.roche.com>
 
 ## Examples
 

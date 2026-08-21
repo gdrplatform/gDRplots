@@ -27,4 +27,4 @@ idea from: https://github.com/Rdatatable/data.table/issues/5386
 
 ## Author
 
-Arkadiusz Gladki <arkadiusz.gladki@contractors.roche.com>
+Arkadiusz Gladki <arkadiusz.gladki@external.roche.com>

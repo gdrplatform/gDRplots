@@ -26,7 +26,7 @@ a string describing type of data - "numeric" or "categorical"
 
 ## Author
 
-Janina Smoła <janina.smola@contractors.roche.com>
+Janina Smoła <janina.smola@external.roche.com>
 
 ## Examples
 

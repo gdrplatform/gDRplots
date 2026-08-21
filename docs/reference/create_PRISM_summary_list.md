@@ -28,7 +28,7 @@ A list of table split by drug name and normalization type
 
 ## Author
 
-Janina Smoła <janina.smola@contractors.roche.com>
+Janina Smoła <janina.smola@external.roche.com>
 
 ## Examples
 

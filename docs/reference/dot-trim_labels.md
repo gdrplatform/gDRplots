@@ -25,7 +25,7 @@ character vectors with trimmed labels
 
 ## Author
 
-Janina Smoła <janina.smola@contractors.roche.com>
+Janina Smoła <janina.smola@external.roche.com>
 
 ## Examples
 

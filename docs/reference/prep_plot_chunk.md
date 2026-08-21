@@ -80,7 +80,7 @@ the "items" element is a list of markdown chunks for each tab.
 
 ## Author
 
-Janina Smoła <janina.smola@contractors.roche.com>
+Janina Smoła <janina.smola@external.roche.com>
 
 ## Examples
 
