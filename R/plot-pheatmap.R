@@ -1869,7 +1869,6 @@ change_NA_into_char <- function(x,
 #' gDRplots:::.safe_as_numeric(c("0.01", "0.1", "untreated", NA))
 #'
 #' @keywords internal
-
 .safe_as_numeric <- function(x) {
   x <- as.character(x)
   as.numeric(data.table::fifelse(grepl("^[0-9.eE+-]+$", x), x, NA_character_))
@@ -2342,6 +2341,7 @@ fill_ann_color_map <- function(dt_ann,
 #' Defaults to \code{gDRutils::get_env_identifiers("untreated_tag")}.
 #'
 #' @return A named \code{character} vector of hex color codes.
+#'
 #' @keywords internal
 .get_gradient_colors <- function(col_names,
                                  col_concs,

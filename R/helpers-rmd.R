@@ -891,6 +891,7 @@ generate_datatable <- function(tab,
 #' @return A \code{DT::datatable} object.
 #'
 #' @keywords internal
+#'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples

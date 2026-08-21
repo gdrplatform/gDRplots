@@ -491,8 +491,10 @@ generate_color_mappings <- function(dt_plate_subset,
 #'
 #' @param vals \code{numeric} vector of concentration values.
 #' @return A \code{character} vector of ranks.
-#' @keywords internal
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#'
+#' @keywords internal
 .calc_dose_rank <- function(vals) {
   vals <- round(vals, 6)
   unique_doses <- sort(unique(vals[vals > 0]))
@@ -513,9 +515,12 @@ generate_color_mappings <- function(dt_plate_subset,
 #'
 #' @param dose_vec \code{numeric} vector of unique positive doses.
 #' @param n_per_line \code{integer} number of items to display per line.
+#'
 #' @return A single \code{character} string with HTML line breaks.
-#' @keywords internal
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#'
+#' @keywords internal
 .format_dose_list <- function(dose_vec, n_per_line) {
   if (length(dose_vec) == 0) return("")
 
