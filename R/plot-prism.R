@@ -132,7 +132,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -238,7 +238,7 @@ plot_scatter_with_corr <- function(dt_response,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -420,7 +420,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -525,7 +525,7 @@ plot_boxplot_num <- function(dt_response,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -720,7 +720,7 @@ plot_boxplot_num_panel <- function(dt_response,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -887,7 +887,7 @@ plot_boxplot_meta <- function(dt_response,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -1009,7 +1009,7 @@ plot_volcano_assoc_panel <- function(dt_response,
 #' gDRplots:::.get_data_type(dt_ = tab_feat, desc_col = c("ID", "grp"))
 #' }
 #' @keywords prism_plots
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #' @keywords internal
 .get_data_type <- function(dt_,
                            desc_col = NULL) {

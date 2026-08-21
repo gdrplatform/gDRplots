@@ -23,6 +23,6 @@ change_NA_into_char(c("a", NA, "b"), lbl_NA = "missing")
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

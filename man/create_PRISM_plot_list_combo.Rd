@@ -93,6 +93,6 @@ create_PRISM_plot_list_combo(
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{prism_plots}

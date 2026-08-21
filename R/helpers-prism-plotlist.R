@@ -56,7 +56,7 @@
 #'   \item \code{ls_assoc_data} nested list of table with association data
 #' }
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords prism_plots
 #' @keywords internal
@@ -324,7 +324,7 @@
 #'
 #' @inherit .create_PRISM_plot_list return
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords prism_plots
 #'
@@ -383,7 +383,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'
 #' @inherit .create_PRISM_plot_list return
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords prism_plots
 #'
@@ -448,7 +448,7 @@ create_PRISM_plot_list_combo <- function(drug1_name_vec,
 #'
 #' @return A list of table split by drug name and normalization type
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords prism_plots
 #'
@@ -535,10 +535,7 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' gDRplots:::.get_info_from_name(f_n)
 #' }
 #'
-#' @keywords internal
-
-#'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .get_info_from_name <- function(file_name,
@@ -568,7 +565,6 @@ create_PRISM_summary_list <- function(assoc_summary_RV,
 #' }
 #'
 #' @keywords internal
-
 .get_info_from_names <- function(file_names,
                                  normalization_type = "RV") {
   checkmate::assert_character(file_names, min.len = 1)

@@ -140,6 +140,6 @@ patchwork::wrap_elements(hm_3[["gtable"]])
 \code{\link[pheatmap:pheatmap]{pheatmap::pheatmap}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{pheat_ann}

@@ -1873,8 +1873,6 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #'
 #' @return capped limits (min and max) for given numeric vector
 #'
-#' @keywords internal
-
 #' @examples
 #' \donttest{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
@@ -1941,8 +1939,6 @@ prep_hm_limits <- function(num_vec,
 #' @return numeric vector with log10 concentration values; log10 for concentration equal 0 (-Inf)
 #'    is replaced with one step less in the dose dilution
 #'
-#' @keywords internal
-
 #' @examples
 #' \donttest{
 #' vec <- c(0, 0.003, 0.01, 0.03)
@@ -1995,13 +1991,12 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @return gDR palette for isoline given in \code{iso_levels}
 #'
-#' @keywords internal
-
 #' @examples
 #' \donttest{
 #' ls_iso_lvl <- c("0.25", "0.5", "0.75")
 #' gDRplots:::.get_iso_colors(ls_iso_lvl)
 #' }
+#'
 #' @keywords internal
 .get_iso_colors <- function(iso_levels) {
   checkmate::assert_character(iso_levels)
@@ -2025,12 +2020,11 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @return gDR palette for smooth values with given \code{no_breaks}
 #'
-#' @keywords internal
-
 #' @examples
 #' \donttest{
 #' gDRplots:::.get_smooth_palette(25)
 #' }
+#'
 #' @keywords internal
 .get_smooth_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
@@ -2046,12 +2040,11 @@ transform_log_conc <- function(conc_vec) {
 #'
 #' @return gDR palette for excess values with given \code{no_breaks}
 #'
-#' @keywords internal
-
 #' @examples
 #' \donttest{
 #' gDRplots:::.get_excess_palette(20)
 #' }
+#'
 #' @keywords internal
 .get_excess_palette <- function(no_breaks) {
   checkmate::assert_int(no_breaks, lower = 2)
@@ -2104,10 +2097,8 @@ transform_log_conc <- function(conc_vec) {
 #'   should be created independently with function \code{\link{heatmap_combo_with_isoref_panel_independent}}
 #' }
 #'
-#' @keywords internal
-
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' \donttest{

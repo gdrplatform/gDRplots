@@ -52,7 +52,7 @@
 #' }
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #'
@@ -225,7 +225,7 @@ prep_plot_chunk <- function(plt_list,
 #'
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #'
@@ -648,7 +648,7 @@ prep_double_table_chunk <- function(tbl_list,
 #'
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #'
@@ -682,7 +682,7 @@ create_zoom_link <- function(img_path,
 #'
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @seealso \code{\link[knitr:knit]{knitr::knit}}
 #'
@@ -749,7 +749,7 @@ create_download_link <- function(dwn_path,
 #'
 #' @keywords internal
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @seealso \code{\link{prep_plot_chunk}}
 #'
@@ -848,6 +848,7 @@ prep_filename_path <- function(plt_list,
 #' generate_datatable(data.table::data.table(iris))
 #'
 #' @keywords internal
+#'
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #'
 #' @export
@@ -891,7 +892,8 @@ generate_datatable <- function(tab,
 #' @return A \code{DT::datatable} object.
 #'
 #' @keywords internal
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#'
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' dir_path <- system.file("testdata", package = "gDRplots")

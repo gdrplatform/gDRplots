@@ -76,6 +76,6 @@ prep_nested_plot_chunk(plotlist, "metric_value")
 \code{\link[knitr:knit]{knitr::knit}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

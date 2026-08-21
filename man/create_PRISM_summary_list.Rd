@@ -30,6 +30,6 @@ create_PRISM_summary_list(
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{prism_plots}

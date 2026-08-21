@@ -41,6 +41,6 @@ prep_assoc_summary(dir_path = dir_path, ls_file = ls_file)
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

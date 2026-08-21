@@ -9,7 +9,7 @@
 package help page
 }
 \description{
-gDRplots provides static visualization functions and dedicated helpers for the gDR drug response platform. Designed for high-throughput screening (HTS), pharmacogenomics, and chemical genomics research, it enables comprehensive analysis of single-agent, co-dilution, and drug combination cell viability assays. The package supports quality control (plate layouts, concentration-response curves), metric visualization (heatmaps, waterfall charts, boxplots), and combination synergy analysis (Bliss, HSA excess maps, isobologram plots).
+gDRplots provides static visualization functions and dedicated helpers for the gDR drug response platform. Designed for high-throughput screening (HTS), pharmacogenomics, and chemical genomics research, it enables comprehensive analysis of single-agent, co-dilution, and drug combination cell viability assays. The package supports quality control (plate layouts, control mapping), data normalization inspection, dose-response curves, distribution boxplots, drug synergy heatmaps with overlaid isobolograms, and combination index plots. Additionally, it integrates with PRISM and DepMap datasets to generate volcano plots and correlation scatter plots for molecular feature associations.
 }
 \note{
 To learn more about functions start with `help(package = "gDRplots")`
@@ -28,6 +28,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com} (\href{https://orcid.org/0000-0002-7059-6378}{ORCID})
   \item Marc Hafner (\href{https://orcid.org/0000-0003-1337-7598}{ORCID})
   \item Janina Smola
   \item Bartosz Czech (\href{https://orcid.org/0000-0002-9908-3007}{ORCID})

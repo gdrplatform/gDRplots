@@ -159,7 +159,7 @@ create_log_seq <- function(start, end, length) {
 #'
 #' round_to_unique_string(vec)
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @export
 round_to_unique_string <- function(num_vec,

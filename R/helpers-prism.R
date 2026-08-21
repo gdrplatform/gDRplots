@@ -574,7 +574,7 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #'
 #' @keywords prism_plots
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @examples
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
@@ -694,7 +694,7 @@ prep_dt_assoc <- function(dt_response,
 #'
 #' @return \code{data.table} with OmicsArmLevelCNA decoded as mutated - not mutated
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .prep_dt_OmicsArmLevelCNA <- function(dt_depmap) {
@@ -742,7 +742,7 @@ prep_dt_assoc <- function(dt_response,
 #' @return \code{data.table} with OmicsSomaticMutationsMatrixHotspot or OmicsSomaticMutationsMatrixDamaging
 #'  decoded as not mutated and mutated
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 .prep_dt_OmicsSomaticMutationsMatrix <- function(dt_depmap) {

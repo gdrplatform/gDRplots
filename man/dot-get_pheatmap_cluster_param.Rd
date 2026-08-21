@@ -55,6 +55,6 @@ gDRplots:::.get_pheatmap_cluster_param(mat, distfun = gDRplots::compute_distance
 \code{\link{compute_distances}}
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}

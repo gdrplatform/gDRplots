@@ -91,7 +91,7 @@ assert_RGB_format <- function(x) {
 #'
 #' @keywords utils_color
 #'
-#' @author Janina Smoła \email{janina.smola@@contractors.roche.com}
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @export
 get_qual_colors <- function(n = NULL) {

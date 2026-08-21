@@ -61,6 +61,6 @@ plot_boxplot_metric_combo_by_drugs(dt_scores,
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{combo_plots}

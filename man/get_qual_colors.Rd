@@ -23,6 +23,6 @@ get_qual_colors(35)
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{utils_color}

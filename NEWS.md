@@ -1,3 +1,6 @@
+## gDRplots 0.99.2 - 2026-08-20
+* update contact email addresses
+
 ## gDRplots 0.99.1 - 2026-08-17
 * remove alignment whitespace flagged by the gDRstyle linter
 * document internal helper functions with @keywords internal

@@ -81,6 +81,6 @@ plot_boxplot_metric_combo(
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{combo_plots}

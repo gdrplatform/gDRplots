@@ -59,6 +59,6 @@ plot_volcano_assoc_panel(
 
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{prism_plots}

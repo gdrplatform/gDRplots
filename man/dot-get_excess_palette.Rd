@@ -19,5 +19,6 @@ Get color palette for the excess values
 \donttest{
 gDRplots:::.get_excess_palette(20)
 }
+
 }
 \keyword{internal}

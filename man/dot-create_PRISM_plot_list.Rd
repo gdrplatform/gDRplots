@@ -91,7 +91,7 @@ This internal function was created to avoid code duplication and maintain consis
 For user, it is contained in a single-purpose function, depending on the experiment type.
 }
 \author{
-Janina Smoła \email{janina.smola@contractors.roche.com}
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}
 \keyword{prism_plots}
