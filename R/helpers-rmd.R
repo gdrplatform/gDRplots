@@ -848,6 +848,7 @@ prep_filename_path <- function(plt_list,
 #' generate_datatable(data.table::data.table(iris))
 #'
 #' @keywords internal
+#' 
 #' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
 #'
 #' @export
