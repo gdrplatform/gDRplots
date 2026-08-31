@@ -328,7 +328,7 @@
 #'
 #' @keywords prism_plots
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae <- qs2::qs_read(system.file("testdata/finalMAE_prism.qs2", package = "gDRtestData"))
 #' se <- mae[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -387,7 +387,7 @@ create_PRISM_plot_list_sa <- function(drug_name_vec,
 #'
 #' @keywords prism_plots
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
 #'                                  package = "gDRtestData"))
 #' se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]

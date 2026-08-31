@@ -39,6 +39,7 @@ outputted by \code{\link{prep_dt_depmap_meta}}}
 Plot boxplot for metric values grouped by metadata from DepMap
 }
 \examples{
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -52,7 +53,7 @@ plot_boxplot_meta(
   dt_response = dt_response,
   dt_depmap = obj_depmap_meta[["dt_depmap"]],
   selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Janina Smoła \email{janina.smola@external.roche.com}

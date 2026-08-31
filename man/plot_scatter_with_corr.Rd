@@ -33,6 +33,7 @@ outputted by \code{\link{prep_dt_depmap_feat}}}
 Plot scatter with correlation
 }
 \examples{
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -48,7 +49,7 @@ plot_scatter_with_corr(
   dt_response = dt_response,
   dt_depmap = obj_depmap_feat[["dt_depmap"]],
   selected_feat = names(obj_depmap_feat[["dt_depmap"]])[3])
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Janina Smoła \email{janina.smola@external.roche.com}

@@ -36,6 +36,7 @@ that has 0-1 values only (categorical character but without relation one-to-one 
 Plot panel with boxplots
 }
 \examples{
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -49,7 +50,7 @@ plot_boxplot_num_panel(
   dt_response = dt_response,
   dt_depmap = obj_depmap_meta[["dt_depmap"]],
   selected_feats = names(obj_depmap_meta[["dt_depmap"]])[3:5])
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Janina Smoła \email{janina.smola@external.roche.com}
