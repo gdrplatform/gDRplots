@@ -134,7 +134,7 @@ plot_volcano_assoc <- function(dt_assoc,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -240,7 +240,7 @@ plot_scatter_with_corr <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -422,7 +422,7 @@ plot_scatter_with_corr_panel <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -527,7 +527,7 @@ plot_boxplot_num <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -722,7 +722,7 @@ plot_boxplot_num_panel <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -889,7 +889,7 @@ plot_boxplot_meta <- function(dt_response,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")

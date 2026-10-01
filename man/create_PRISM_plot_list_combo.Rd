@@ -76,6 +76,7 @@ A named list with elements:
 Create a nested list of plots for PRISM data with combo metrics
 }
 \examples{
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
                                  package = "gDRtestData"))
 se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
@@ -90,7 +91,7 @@ create_PRISM_plot_list_combo(
   feat_data_path = system.file("depmap_data", package = "gDRtestData"),
   feature_sets = c("CRISPRGeneEffect")
 )
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Janina Smoła \email{janina.smola@external.roche.com}

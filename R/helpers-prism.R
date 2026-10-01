@@ -430,7 +430,7 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 #'
 #' @keywords internal
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' feat_data_path <- system.file("depmap_data", package = "gDRtestData")
 #' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
 #' dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,
@@ -508,7 +508,7 @@ prep_dt_depmap_feat <- function(feat_data_path,
 #'
 #' @keywords internal
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
 #' dt_depmap_meta <- prep_dt_depmap_meta(meta_data_path)
 #' @export
@@ -576,7 +576,7 @@ prep_dt_depmap_meta <- function(meta_data_path,
 #'
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
-#' @examples
+#' @examplesIf nzchar(system.file("depmap_data", package = "gDRtestData"))
 #' mae_prism <- gDRutils::get_synthetic_data("prism")
 #' se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")

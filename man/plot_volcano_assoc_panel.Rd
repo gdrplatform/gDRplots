@@ -40,6 +40,7 @@ A named list with elements:
 Plot panel with volcano plot and according to the data type - scatter plots or box plots
 }
 \examples{
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
@@ -56,7 +57,7 @@ plot_volcano_assoc_panel(
   dt_depmap = obj_depmap_feat[["dt_depmap"]],
   selected_metric = "RV_gDR_x_mean",
   selected_feat_meta_col = obj_depmap_feat[["selected_feat_meta_col"]])
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Janina Smoła \email{janina.smola@external.roche.com}
