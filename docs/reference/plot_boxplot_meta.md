@@ -76,5 +76,4 @@ plot_boxplot_meta(
   dt_response = dt_response,
   dt_depmap = obj_depmap_meta[["dt_depmap"]],
   selected_feat_meta_col = obj_depmap_meta[["selected_feat_meta_col"]])
-
 ```

@@ -72,5 +72,4 @@ plot_scatter_with_corr_panel(
   dt_response = dt_response,
   dt_depmap = obj_depmap_feat[["dt_depmap"]],
   selected_feats = names(obj_depmap_feat[["dt_depmap"]])[3:5])
-
 ```

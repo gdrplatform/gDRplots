@@ -65,5 +65,4 @@ plot_boxplot_num(
   dt_response = dt_response,
   dt_depmap = obj_depmap_meta[["dt_depmap"]],
   selected_feat = names(obj_depmap_meta[["dt_depmap"]])[3])
-
 ```
