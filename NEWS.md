@@ -1,4 +1,4 @@
-## gDRplots 0.99.3 - 2026-08-31
+## gDRplots 0.99.3 - 2026-10-01
 * make DepMap-based examples conditional on the example data being installed
 
 ## gDRplots 0.99.2 - 2026-08-20
