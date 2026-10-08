@@ -40,7 +40,7 @@ A named list with elements:
 Plot panel with volcano plot and according to the data type - scatter plots or box plots
 }
 \examples{
-\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) withAutoprint(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")

@@ -76,7 +76,7 @@ A named list with elements:
 Create a nested list of plots for PRISM data with combo metrics
 }
 \examples{
-\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) withAutoprint(\{ # examplesIf}
 mae <- qs2::qs_read(system.file("testdata/finalMAE_combo_matrix_small.qs2",
                                  package = "gDRtestData"))
 se_combo <- mae[[gDRutils::get_supported_experiments("combo")]]
