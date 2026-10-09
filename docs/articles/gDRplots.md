@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.14 gDRplots_0.99.3  BiocStyle_2.40.0
+#> [1] gDRutils_1.11.17 gDRplots_0.99.4  BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
@@ -1061,7 +1061,7 @@ sessionInfo()
 #>  [19] purrr_1.2.2                 xfun_0.61                  
 #>  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
-#>  [25] irlba_2.3.7                 parallel_4.6.1             
+#>  [25] irlba_2.4.1                 parallel_4.6.1             
 #>  [27] cluster_2.1.8.2             R6_2.6.1                   
 #>  [29] bslib_0.12.0                stringi_1.8.9              
 #>  [31] RColorBrewer_1.1-3          SQUAREM_2026.1             

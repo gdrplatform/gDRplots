@@ -4,7 +4,7 @@
 
 - **Marc Hafner**. Author. [](https://orcid.org/0000-0003-1337-7598)
 
-- **Janina Smola**. Author.
+- **Janina Smola**. Author. [](https://orcid.org/0009-0007-4347-7748)
 
 - **Bartosz Czech**. Author. [](https://orcid.org/0000-0002-9908-3007)
 
@@ -19,13 +19,13 @@ Source:
 [`DESCRIPTION`](https://github.com/gdrplatform/gDRplots/blob/main/DESCRIPTION)
 
 Hafner M, Smola J, Czech B, Scigocki D, Gladki A (2026). *gDRplots:
-'gDRplots'*. R package version 0.99.3,
+'gDRplots'*. R package version 0.99.4,
 <https://github.com/gdrplatform/gDRplots>.
 
     @Manual{,
       title = {gDRplots: 'gDRplots'},
       author = {Marc Hafner and Janina Smola and Bartosz Czech and Dariusz Scigocki and Arkadiusz Gladki},
       year = {2026},
-      note = {R package version 0.99.3},
+      note = {R package version 0.99.4},
       url = {https://github.com/gdrplatform/gDRplots},
     }
