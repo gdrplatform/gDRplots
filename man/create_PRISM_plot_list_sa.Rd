@@ -68,7 +68,7 @@ A named list with elements:
 Create a nested list of plots for PRISM data with single-agent metrics
 }
 \examples{
-\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) withAutoprint(\{ # examplesIf}
 mae <- qs2::qs_read(system.file("testdata/finalMAE_prism.qs2", package = "gDRtestData"))
 se <- mae[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")

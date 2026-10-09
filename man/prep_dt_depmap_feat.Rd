@@ -37,7 +37,7 @@ A named list with elements, that may be input to \code{\link{prep_dt_assoc}}
 Load DepMap merged data for one selected feature
 }
 \examples{
-\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) withAutoprint(\{ # examplesIf}
 feat_data_path <- system.file("depmap_data", package = "gDRtestData")
 meta_data_path <- system.file("depmap_data/Model.csv.gz", package = "gDRtestData")
 dt_depmap_feat <- prep_dt_depmap_feat(feat_data_path = feat_data_path,

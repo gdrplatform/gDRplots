@@ -29,7 +29,7 @@ A named list with elements, that may be input to \code{\link{plot_volcano_assoc}
 Prep table with calculated linear associations
 }
 \examples{
-\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (nzchar(system.file("depmap_data", package = "gDRtestData"))) withAutoprint(\{ # examplesIf}
 mae_prism <- gDRutils::get_synthetic_data("prism")
 se_prism <- mae_prism[[gDRutils::get_supported_experiments("sa")]]
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se_prism, "Metrics")
