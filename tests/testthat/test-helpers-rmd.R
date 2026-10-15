@@ -872,3 +872,79 @@ test_that("prep_assoc_summary works as expected", {
                                   as_list = "TRUE"),
                "Assertion on 'as_list' failed: Must be of type 'logical flag'")
 })
+
+
+test_that("get_provenance_tables lists fits and describes processing steps", {
+  mae <- gDRutils::get_synthetic_data("finalMAE_small.qs2")
+  se <- mae[["single-agent"]]
+  se <- suppressWarnings(gDRutils::apply_fit(
+    se, gDRutils::fit_drug_response_metrics, "single-agent",
+    output_assay = "Metrics", fit_source = "gDR", fit_args = list(pcutoff = 0.1)
+  ))
+  # steps shaped as gDRcore records them
+  se <- gDRutils::record_processing_step(se, "create", settings = list(
+    readout = "ReadoutValue",
+    masked = list(n_wells = 7L, n_flag_missing = 2L, n_pairs = 3L)
+  ))
+  se <- gDRutils::record_processing_step(
+    se, "normalize",
+    settings = list(gr = list(
+      n_pairs = c(day0 = 0L, ref_div_time = 90L, none = 10L),
+      no_gr_cell_lines = "cellline_BA"
+    )),
+    fns = list(control_mean_fxn = function(x) {
+      mean(x, trim = 0.25)
+    })
+  )
+  se <- gDRutils::record_processing_step(
+    se, "average", settings = list(series_identifiers = "Concentration")
+  )
+  se <- gDRutils::record_processing_step(
+    se, "growth_rates",
+    settings = list(
+      periods = list(early = c(0, 48), late = c(48, 96)),
+      normalization_map = c(early = "None", late = "early")
+    ),
+    fns = list(rate_fn = gDRutils::set_fit_fn_info(function(dt) 0, description = "Slope per well"))
+  )
+  se <- gDRutils::record_processing_step(se, "import", settings = list(instrument = "EnVision"))
+  mae[["single-agent"]] <- se
+
+  tables <- get_provenance_tables(mae)
+
+  expect_identical(tables$fits$experiment, "single-agent")
+  expect_identical(tables$fits$fn, sprintf(
+    "gDRutils::fit_drug_response_metrics (%s)", as.character(utils::packageVersion("gDRutils"))
+  ))
+  expect_identical(tables$fits$settings, "pcutoff = 0.1")
+  expect_match(tables$fits$model, "log-logistic")
+
+  steps <- stats::setNames(tables$steps$description, tables$steps$step)
+  expect_identical(names(steps), c("create", "normalize", "average", "growth_rates", "import"))
+  expect_identical(
+    steps[["create"]],
+    "Readout: ReadoutValue. 7 masked wells were removed (3 drug x cell line pairs). 2 of them had no masked flag."
+  )
+  expect_match(steps[["normalize"]], "from the reference division time for 90, not computed for 10", fixed = TRUE)
+  expect_match(steps[["normalize"]], "No GR value for: cellline_BA.", fixed = TRUE)
+  expect_match(steps[["normalize"]], "Controls averaged with mean(x, trim = 0.25).", fixed = TRUE)
+  expect_identical(steps[["average"]], "Replicates averaged per Concentration.")
+  expect_match(steps[["growth_rates"]], "Growth rate per well and window: Slope per well.", fixed = TRUE)
+  expect_match(steps[["growth_rates"]], "early = [0, 48), late = [48, 96)", fixed = TRUE)
+  expect_match(steps[["growth_rates"]], "late -> early", fixed = TRUE)
+  # a step without a dedicated description lists its settings
+  expect_identical(steps[["import"]], "Settings: instrument = \"EnVision\".")
+
+  # a single SE works too
+  expect_identical(NROW(get_provenance_tables(se)$fits), 1L)
+})
+
+
+test_that("get_provenance_tables returns empty tables without provenance", {
+  tables <- get_provenance_tables(gDRutils::get_synthetic_data("finalMAE_small.qs2"))
+  expect_identical(names(tables), c("fits", "steps"))
+  expect_identical(NROW(tables$fits), 0L)
+  expect_identical(NROW(tables$steps), 0L)
+  expect_identical(names(tables$steps), c("experiment", "step", "description"))
+  expect_error(get_provenance_tables(data.frame()), "MultiAssayExperiment")
+})
