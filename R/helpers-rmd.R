@@ -946,3 +946,198 @@ prep_assoc_summary <- function(dir_path,
     data.table::rbindlist(ls_stat_sig)
   }
 }
+
+
+#' Tables describing how the results of a gDR object were produced
+#'
+#' Builds the tables shown in the "How These Numbers Were Produced" section of
+#' the processing report from the provenance that gDR records in each
+#' experiment (see \code{\link[gDRutils]{get_SE_provenance}}): one row per fit,
+#' with the function, its version, its settings and the model, and one row per
+#' processing step, described in a sentence.
+#'
+#' @param x \code{MultiAssayExperiment} or \code{SummarizedExperiment}.
+#'
+#' @return A list with two \code{data.table}s: \code{fits} (columns
+#'   \code{experiment}, \code{assay}, \code{fit_source}, \code{fn},
+#'   \code{settings}, \code{model}) and \code{steps} (columns \code{experiment},
+#'   \code{step}, \code{description}). Both are empty for objects without
+#'   provenance.
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("finalMAE_small.qs2")
+#' tables <- get_provenance_tables(mae)
+#' tables$fits
+#'
+#' @keywords internal
+#'
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#'
+#' @export
+get_provenance_tables <- function(x) {
+  checkmate::assert(
+    checkmate::check_class(x, "MultiAssayExperiment"),
+    checkmate::check_class(x, "SummarizedExperiment"),
+    combine = "or"
+  )
+  if (inherits(x, "MultiAssayExperiment")) {
+    ses <- lapply(names(x), function(nm) x[[nm]])
+    names(ses) <- names(x)
+  } else {
+    ses <- list(x)
+    names(ses) <- NA_character_
+  }
+
+  fits <- data.table::rbindlist(lapply(seq_along(ses), function(i) {
+    exp <- names(ses)[i]
+    dt <- gDRutils::summarize_fit_provenance(ses[[i]])
+    if (NROW(dt) == 0L) return(NULL)
+    data.table::data.table(
+      experiment = exp,
+      assay = dt$assay,
+      fit_source = dt$fit_source,
+      fn = dt$fn,
+      settings = dt$fit_args,
+      model = dt$model
+    )
+  }))
+  if (NROW(fits) == 0L) {
+    fits <- data.table::data.table(
+      experiment = character(0), assay = character(0), fit_source = character(0),
+      fn = character(0), settings = character(0), model = character(0)
+    )
+  }
+
+  steps <- data.table::rbindlist(lapply(seq_along(ses), function(i) {
+    exp <- names(ses)[i]
+    prov_steps <- gDRutils::get_SE_provenance(ses[[i]])$steps
+    if (length(prov_steps) == 0L) return(NULL)
+    data.table::data.table(
+      experiment = exp,
+      step = names(prov_steps),
+      description = vapply(names(prov_steps), function(step) {
+        .describe_provenance_step(step, prov_steps[[step]])
+      }, character(1), USE.NAMES = FALSE)
+    )
+  }))
+  if (NROW(steps) == 0L) {
+    steps <- data.table::data.table(
+      experiment = character(0), step = character(0), description = character(0)
+    )
+  }
+
+  list(fits = fits, steps = steps)
+}
+
+
+#' Describe one recorded processing step in a sentence
+#'
+#' @param step string; name of the step (\code{"create"}, \code{"normalize"},
+#'   \code{"average"}, \code{"growth_rates"}, ...).
+#' @param entry list; the step entry from \code{provenance$steps}.
+#'
+#' @return A string. Steps without a dedicated description list their settings.
+#'
+#' @keywords internal
+#' @noRd
+.describe_provenance_step <- function(step, entry) {
+  s <- entry$settings
+  parts <- switch(
+    step,
+    create = c(
+      if (!is.null(s$readout)) sprintf("Readout: %s.", s$readout),
+      .describe_masked(s$masked)
+    ),
+    normalize = c(
+      if (!is.null(s$method)) sprintf("%s.", s$method),
+      if (!is.null(s$n_without_time0) && s$n_without_time0 > 0L) {
+        sprintf("%d wells had no time 0 readout.", s$n_without_time0)
+      },
+      .describe_gr(s$gr),
+      .describe_fn_sentence("Controls averaged with", entry$functions$control_mean_fxn)
+    ),
+    average = c(
+      if (length(s$series_identifiers) > 0L) {
+        sprintf("Replicates averaged per %s.", toString(s$series_identifiers))
+      }
+    ),
+    growth_rates = c(
+      .describe_fn_sentence("Growth rate per well and window:", entry$functions$rate_fn),
+      if (length(s$periods) > 0L) {
+        sprintf("Periods (hours): %s.", toString(vapply(names(s$periods), function(p) {
+          sprintf("%s = [%s, %s)", p, s$periods[[p]][1L], s$periods[[p]][2L])
+        }, character(1))))
+      },
+      if (length(s$normalization_map) > 0L) {
+        sprintf("Normalized to: %s.", toString(sprintf("%s -> %s", names(s$normalization_map),
+                                                       s$normalization_map)))
+      }
+    ),
+    NULL
+  )
+  if (length(parts) == 0L) parts <- .describe_settings(s)
+  paste(parts, collapse = " ")
+}
+
+
+#' @keywords internal
+#' @noRd
+.describe_masked <- function(masked) {
+  if (is.null(masked)) return(NULL)
+  if (masked$n_wells == 0L) return("No masked wells were removed.")
+  out <- sprintf("%d masked wells were removed", masked$n_wells)
+  if (!is.null(masked$n_pairs)) out <- sprintf("%s (%d drug x cell line pairs)", out, masked$n_pairs)
+  out <- paste0(out, ".")
+  if (!is.null(masked$n_flag_missing)) {
+    out <- sprintf("%s %d of them had no masked flag.", out, masked$n_flag_missing)
+  }
+  out
+}
+
+
+#' @keywords internal
+#' @noRd
+.describe_gr <- function(gr) {
+  if (is.null(gr)) return(NULL)
+  n <- gr$n_pairs
+  out <- sprintf(
+    paste(
+      "GR values: from day 0 readouts for %d drug x cell line pairs,",
+      "from the reference division time for %d, not computed for %d."
+    ),
+    n[["day0"]], n[["ref_div_time"]], n[["none"]]
+  )
+  if (length(gr$no_gr_cell_lines) > 0L) {
+    out <- sprintf("%s No GR value for: %s.", out, toString(gr$no_gr_cell_lines))
+  }
+  out
+}
+
+
+#' @keywords internal
+#' @noRd
+.describe_fn_sentence <- function(lead, fn) {
+  if (is.null(fn)) return(NULL)
+  what <- if (!is.null(fn$info$description)) {
+    fn$info$description
+  } else if (!is.null(fn$source)) {
+    # one line of code, without the function header and the braces around the body
+    code <- trimws(gsub("\\s+", " ", sub("^function \\([^)]*\\)\\s*", "", fn$source)))
+    trimws(sub("^\\{(.*)\\}$", "\\1", code))
+  } else {
+    sprintf("%s::%s (%s)", fn$package, fn$name, fn$version)
+  }
+  sprintf("%s %s", lead, sub("\\.?$", ".", what))
+}
+
+
+#' @keywords internal
+#' @noRd
+.describe_settings <- function(settings) {
+  if (length(settings) == 0L) return("No settings recorded.")
+  text <- toString(vapply(names(settings), function(nm) {
+    sprintf("%s = %s", nm, paste(deparse(settings[[nm]], width.cutoff = 60L), collapse = " "))
+  }, character(1)))
+  if (nchar(text) > 300L) text <- paste0(substr(text, 1L, 297L), "...")
+  sprintf("Settings: %s.", text)
+}
