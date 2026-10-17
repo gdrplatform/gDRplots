@@ -863,3 +863,32 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                                 colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
 })
+
+test_that("group_names order is preserved by the _by_grp boxplots", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+
+  sel_var <- "DrugName"
+  sel_name <- "drug_001"
+  grp_var <- "Tissue"
+
+  # Reverse-alphabetical, so sorting would visibly undo it.
+  asked <- rev(sort(unique(dt_metrics[[grp_var]])))
+  skip_if(length(asked) < 2, "needs at least two groups")
+
+  plt <- plot_boxplot_metric_sa_by_grp(dt_metrics,
+                                       selection_var = sel_var,
+                                       selection_name = sel_name,
+                                       group_var = grp_var,
+                                       group_names = asked,
+                                       colors_vec = get_qual_colors(length(asked)))
+  expect_is(plt, "gg")
+
+  # `fill_colors` is passed to scale_fill_manual() unnamed, so it maps
+  # positionally onto the factor levels - which are `group_names`. The axis
+  # order is therefore also the colour order. Before the fix this was
+  # sort(intersect(data, group_names)), which discarded the caller's order
+  # outright: colours were applied alphabetically whatever was asked for.
+  expect_equal(ggplot2::get_panel_scales(plt)$x$get_labels(), asked)
+})

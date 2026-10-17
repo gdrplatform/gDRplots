@@ -633,3 +633,39 @@ test_that("plot_dose_response_sa works as expected", {
     expect_is(plt_6, "gg")
     expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)$data[[2]]["PANEL"])), no_curve)
   })
+
+test_that("group_names order is preserved, so colors_vec lands where asked", {
+  cellline_name <- gDRutils::get_env_identifiers("cellline_name")
+  mae <- gDRutils::get_synthetic_data("small")
+  se <- mae[[gDRutils::get_supported_experiments("sa")]]
+  dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
+  dt_average <- gDRutils::convert_se_assay_to_dt(se, "Averaged")
+
+  in_data_order <- unique(dt_metrics[[cellline_name]])
+  skip_if(length(in_data_order) < 3, "needs at least three cell lines")
+  # Deliberately not the order the data happens to be in.
+  asked <- rev(in_data_order[1:3])
+
+  plt <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                               dt_average = dt_average,
+                               selection_name = "drug_002",
+                               group_var = cellline_name,
+                               group_names = asked,
+                               colors_vec = c("red", "blue", "black"))
+  expect_is(plt, "gg")
+
+  # `group_var` is a factor whose levels are `group_names`, and the colour
+  # vector is named in that same order, so these levels *are* the colour
+  # mapping: level 1 is red, level 2 blue, level 3 black.
+  #
+  # Before the fix the function recomputed group_names as
+  # intersect(data, group_names), which returns the order of its first
+  # argument - the data's. A caller passing group_names with colors_vec got
+  # their colours applied to someone else's ordering, with no error and a
+  # figure that looks perfectly fine.
+  levelled <- Filter(function(l) "group_var" %in% names(l$data), plt$layers)
+  expect_gt(length(levelled), 0)
+  for (l in levelled) {
+    expect_equal(levels(l$data$group_var), asked)
+  }
+})

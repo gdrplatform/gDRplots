@@ -115,8 +115,12 @@ plot_dose_response_sa <- function(dt_metrics,
   group_names <- if (is.null(group_names)) {
     unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
   } else {
-    intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))),
-              group_names)
+    # Keep the caller's order. `intersect(data, group_names)` returns the
+    # order of its first argument, so a user passing group_names together
+    # with colors_vec got the colours applied in data order instead of
+    # theirs - silently, and the figure looks correct.
+    present <- unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
+    group_names[group_names %in% present]
   }
 
   # filter data
