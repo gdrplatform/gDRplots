@@ -10,11 +10,18 @@ get_provenance_tables(x)
 \item{x}{\code{MultiAssayExperiment} or \code{SummarizedExperiment}.}
 }
 \value{
-A list with two \code{data.table}s: \code{fits} (columns
-  \code{experiment}, \code{assay}, \code{fit_source}, \code{fn},
-  \code{settings}, \code{model}) and \code{steps} (columns \code{experiment},
-  \code{step}, \code{description}). Both are empty for objects without
-  provenance.
+A list with two \code{data.table}s:
+\itemize{
+  \item \code{fits}: one row per fit, with columns \code{assay},
+    \code{fit_source}, \code{fn}, \code{settings} and \code{model}.
+  \item \code{steps}: one row per processing step, with columns \code{step}
+    and \code{description}.
+}
+For a \code{MultiAssayExperiment}, both tables start with an
+\code{experiment} column naming the experiment of each row; a
+\code{SummarizedExperiment} is a single experiment, so it has no such column.
+
+Both tables are empty for objects without provenance.
 }
 \description{
 Builds the tables shown in the "How These Numbers Were Produced" section of
@@ -24,7 +31,7 @@ with the function, its version, its settings and the model, and one row per
 processing step, described in a sentence.
 }
 \examples{
-mae <- gDRutils::get_synthetic_data("finalMAE_small.qs2")
+mae <- gDRutils::get_synthetic_data("small")
 tables <- get_provenance_tables(mae)
 tables$fits
 
