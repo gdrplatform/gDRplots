@@ -1953,6 +1953,8 @@ transform_log_conc <- function(conc_vec) {
   # replace the -Inf value coming from the 0 dose with one step less in the dose dilution
   idx_inf <- (conc_vec == 0)
   doses <- sort(unique(log_values[!is.infinite(log_values)]))
+  # only the 0 dose (e.g. the single-agent arm of one drug): any position works
+  if (length(doses) == 0L) return(rep(0, length(conc_vec)))
   zero_replacement <- doses[1] + (doses[1] - doses[2])
   if (is.na(zero_replacement)) zero_replacement <- doses[1] - 0.5 # only two unique conc and one is 0
   log_values[idx_inf] <- zero_replacement
