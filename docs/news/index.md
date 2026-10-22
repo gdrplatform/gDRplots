@@ -1,5 +1,11 @@
 # Changelog
 
+## gDRplots 0.99.5 - 2026-10-15
+
+- add
+  [`get_provenance_tables()`](https://gdrplatform.github.io/gDRplots/reference/get_provenance_tables.md),
+  which lists the fits and processing steps recorded in a gDR object
+
 ## gDRplots 0.99.4 - 2026-10-08
 
 - update authors data

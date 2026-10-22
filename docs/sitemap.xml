@@ -19,6 +19,12 @@
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/create_zoom_link.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-calc_dose_rank.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-create_PRISM_plot_list.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_fn_sentence.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_gr.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_import.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_masked.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_provenance_step.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-describe_settings.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-fill_pheatmap_annotation.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-format_dose_list.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/dot-get_combo_curves_colors.html</loc></url>
@@ -53,6 +59,7 @@
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/get_col_luminance.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/get_hm_title.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/get_iso_colors.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDRplots/reference/get_provenance_tables.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/get_qual_colors.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/get_r_file_path.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDRplots/reference/heatmap_combo_metrics.html</loc></url>

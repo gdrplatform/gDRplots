@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.17 gDRplots_0.99.4  BiocStyle_2.40.0
+#> [1] gDRutils_1.11.19 gDRplots_0.99.5  BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
@@ -1058,7 +1058,7 @@ sessionInfo()
 #>  [13] backports_1.5.1             XVector_0.52.0             
 #>  [15] labeling_0.4.3              rmarkdown_2.32             
 #>  [17] preprocessCore_1.74.0       ragg_1.5.2                 
-#>  [19] purrr_1.2.2                 xfun_0.61                  
+#>  [19] purrr_1.2.2                 xfun_0.62                  
 #>  [21] MultiAssayExperiment_1.38.0 cachem_1.1.0               
 #>  [23] jsonlite_2.0.0              DelayedArray_0.38.2        
 #>  [25] irlba_2.4.1                 parallel_4.6.1             
@@ -1094,7 +1094,7 @@ sessionInfo()
 #>  [85] tools_4.6.1                 data.table_1.18.6.1        
 #>  [87] fs_2.1.0                    fastcluster_1.3.0          
 #>  [89] grid_4.6.1                  impute_1.86.0              
-#>  [91] crosstalk_1.2.2             colorspace_2.1-3           
+#>  [91] crosstalk_1.2.2             colorspace_2.1-4           
 #>  [93] nlme_3.1-169                patchwork_1.3.2            
 #>  [95] htmlTable_2.5.0             Formula_1.2-6              
 #>  [97] cli_3.6.6                   textshaping_1.0.5          
