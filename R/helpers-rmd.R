@@ -946,3 +946,288 @@ prep_assoc_summary <- function(dir_path,
     data.table::rbindlist(ls_stat_sig)
   }
 }
+
+
+#' Tables describing how the results of a gDR object were produced
+#'
+#' Builds the tables shown in the "How These Numbers Were Produced" section of
+#' the processing report from the provenance that gDR records in each
+#' experiment (see \code{\link[gDRutils]{get_SE_provenance}}): one row per fit,
+#' with the function, its version, its settings and the model, and one row per
+#' processing step, described in a sentence.
+#'
+#' @param x \code{MultiAssayExperiment} or \code{SummarizedExperiment}.
+#'
+#' @return A list with two \code{data.table}s:
+#' \itemize{
+#'   \item \code{fits}: one row per fit, with columns \code{assay},
+#'     \code{fit_source}, \code{fn}, \code{settings} and \code{model}.
+#'   \item \code{steps}: one row per processing step, with columns \code{step}
+#'     and \code{description}.
+#' }
+#' For a \code{MultiAssayExperiment}, both tables start with an
+#' \code{experiment} column naming the experiment of each row; a
+#' \code{SummarizedExperiment} is a single experiment, so it has no such column.
+#'
+#' Both tables are empty for objects without provenance.
+#'
+#' @examples
+#' mae <- gDRutils::get_synthetic_data("small")
+#' tables <- get_provenance_tables(mae)
+#' tables$fits
+#'
+#' @keywords internal
+#'
+#' @author Bartosz Czech \email{czech.bartosz@@external.gene.com}
+#'
+#' @export
+get_provenance_tables <- function(x) {
+  checkmate::assert_multi_class(x, c("MultiAssayExperiment", "SummarizedExperiment"))
+  is_mae <- inherits(x, "MultiAssayExperiment")
+  ses <- if (is_mae) {
+    stats::setNames(lapply(names(x), function(nm) x[[nm]]), names(x))
+  } else {
+    list(x)
+  }
+
+  fits <- data.table::rbindlist(lapply(seq_along(ses), function(i) {
+    dt <- gDRutils::summarize_fit_provenance(ses[[i]])
+    if (NROW(dt) == 0L) return(NULL)
+    data.table::data.table(
+      experiment = if (is_mae) names(ses)[i] else NA_character_,
+      assay = dt$assay,
+      fit_source = dt$fit_source,
+      fn = dt$fn,
+      settings = dt$fit_args,
+      model = dt$model
+    )
+  }))
+  if (NROW(fits) == 0L) {
+    fits <- data.table::data.table(
+      experiment = character(0), assay = character(0), fit_source = character(0),
+      fn = character(0), settings = character(0), model = character(0)
+    )
+  }
+
+  steps <- data.table::rbindlist(lapply(seq_along(ses), function(i) {
+    prov_steps <- gDRutils::get_SE_provenance(ses[[i]])$steps
+    if (length(prov_steps) == 0L) return(NULL)
+    data.table::data.table(
+      experiment = if (is_mae) names(ses)[i] else NA_character_,
+      step = names(prov_steps),
+      description = vapply(names(prov_steps), function(step) {
+        .describe_provenance_step(step, prov_steps[[step]])
+      }, character(1), USE.NAMES = FALSE)
+    )
+  }))
+  if (NROW(steps) == 0L) {
+    steps <- data.table::data.table(
+      experiment = character(0), step = character(0), description = character(0)
+    )
+  }
+
+  if (!is_mae) {
+    data.table::set(fits, j = "experiment", value = NULL)
+    data.table::set(steps, j = "experiment", value = NULL)
+  }
+  list(fits = fits, steps = steps)
+}
+
+
+#' Describe one recorded processing step in a sentence
+#'
+#' Steps recorded by gDRimport and gDRcore (\code{"import"}, \code{"create"},
+#' \code{"normalize"}, \code{"average"}, \code{"growth_rates"}) have their own
+#' description; any other step lists its settings.
+#'
+#' @param step string; name of the step.
+#' @param entry list; the step entry from \code{provenance$steps}, with
+#'   \code{settings} and, for some steps, \code{functions}.
+#'
+#' @return A string.
+#'
+#' @keywords internal
+.describe_provenance_step <- function(step, entry) {
+  checkmate::assert_string(step)
+  checkmate::assert_list(entry)
+  s <- entry$settings
+  parts <- switch(
+    step,
+    import = .describe_import(s),
+    create = c(
+      if (!is.null(s$readout)) sprintf("Readout: %s.", s$readout),
+      .describe_masked(s$masked)
+    ),
+    normalize = c(
+      if (!is.null(s$method)) sprintf("%s.", s$method),
+      if (!is.null(s$n_without_time0) && s$n_without_time0 > 0L) {
+        sprintf("%d wells had no time 0 readout.", s$n_without_time0)
+      },
+      .describe_gr(s$gr),
+      .describe_fn_sentence("Controls averaged with", entry$functions$control_mean_fxn)
+    ),
+    average = c(
+      if (length(s$series_identifiers) > 0L) {
+        sprintf("Replicates averaged per %s.", toString(s$series_identifiers))
+      }
+    ),
+    growth_rates = c(
+      .describe_fn_sentence("Growth rate per well and window:", entry$functions$rate_fn),
+      if (length(s$periods) > 0L) {
+        sprintf("Periods (hours): %s.", toString(vapply(names(s$periods), function(p) {
+          sprintf("%s = [%s, %s)", p, s$periods[[p]][1L], s$periods[[p]][2L])
+        }, character(1))))
+      },
+      if (length(s$normalization_map) > 0L) {
+        sprintf("Normalized to: %s.", toString(sprintf("%s -> %s", names(s$normalization_map),
+                                                       s$normalization_map)))
+      }
+    ),
+    NULL
+  )
+  if (length(parts) == 0L) parts <- .describe_settings(s)
+  paste(parts, collapse = " ")
+}
+
+
+#' Describe the import step recorded by gDRimport
+#'
+#' @param settings list; the record that gDRimport attaches to the loaded data
+#'   (see \code{gDRimport::get_import_provenance}): \code{gDRimport} (version),
+#'   \code{instrument} or, for PRISM data, \code{source$format}, \code{files}
+#'   (a table with a \code{role} column) and \code{corrections}.
+#'
+#' @return A character vector of sentences, or \code{NULL} when
+#'   \code{settings} is \code{NULL}.
+#'
+#' @keywords internal
+.describe_import <- function(settings) {
+  checkmate::assert_list(settings, null.ok = TRUE)
+  if (is.null(settings)) return(NULL)
+  files <- settings$files
+  out <- if (NROW(files) > 0L) {
+    roles <- table(factor(files$role, levels = unique(files$role)))
+    sprintf("%d input %s (%s)", NROW(files), if (NROW(files) == 1L) "file" else "files",
+            toString(sprintf("%d %s", roles, names(roles))))
+  } else {
+    "No input files recorded"
+  }
+  reader <- if (!is.null(settings$instrument)) settings$instrument else settings$source$format
+  if (!is.null(reader)) out <- sprintf("%s read with %s", out, reader)
+  if (!is.null(settings$gDRimport)) out <- sprintf("%s, gDRimport %s", out, settings$gDRimport)
+
+  corrections <- settings$corrections
+  c(
+    paste0(out, "."),
+    if (!is.null(corrections$untreated_tags_standardized)) {
+      sprintf("%d untreated tags rewritten as the standard tag.",
+              corrections$untreated_tags_standardized)
+    },
+    if (!is.null(corrections$cells_filled_with_zero)) {
+      sprintf("%d empty plate cells filled with 0.", corrections$cells_filled_with_zero)
+    },
+    if (length(corrections$template_sheets_renamed) > 0L) {
+      sprintf("Template sheets renamed: %s.", toString(corrections$template_sheets_renamed))
+    }
+  )
+}
+
+
+#' Describe the masked wells removed when the SE was created
+#'
+#' @param masked list with \code{n_wells} and, when known, \code{n_pairs}
+#'   (drug x cell line pairs affected) and \code{n_flag_missing} (masked wells
+#'   without a masked flag), or \code{NULL}.
+#'
+#' @return A string, or \code{NULL} when \code{masked} is \code{NULL}.
+#'
+#' @keywords internal
+.describe_masked <- function(masked) {
+  checkmate::assert_list(masked, null.ok = TRUE)
+  if (is.null(masked)) return(NULL)
+  checkmate::assert_count(masked$n_wells)
+  if (masked$n_wells == 0L) return("No masked wells were removed.")
+  out <- sprintf("%d masked wells were removed", masked$n_wells)
+  if (!is.null(masked$n_pairs)) out <- sprintf("%s (%d drug x cell line pairs)", out, masked$n_pairs)
+  out <- paste0(out, ".")
+  if (!is.null(masked$n_flag_missing)) {
+    out <- sprintf("%s %d of them had no masked flag.", out, masked$n_flag_missing)
+  }
+  out
+}
+
+
+#' Describe how GR values were computed in normalization
+#'
+#' @param gr list with \code{n_pairs}, a named vector counting the drug x cell
+#'   line pairs per GR method (\code{day0}, \code{ref_div_time}, \code{none}),
+#'   and optionally \code{no_gr_cell_lines}; or \code{NULL}.
+#'
+#' @return A string, or \code{NULL} when \code{gr} is \code{NULL}.
+#'
+#' @keywords internal
+.describe_gr <- function(gr) {
+  checkmate::assert_list(gr, null.ok = TRUE)
+  if (is.null(gr)) return(NULL)
+  n <- gr$n_pairs
+  checkmate::assert_names(names(n), must.include = c("day0", "ref_div_time", "none"))
+  out <- sprintf(
+    paste(
+      "GR values: from day 0 readouts for %d drug x cell line pairs,",
+      "from the reference division time for %d, not computed for %d."
+    ),
+    n[["day0"]], n[["ref_div_time"]], n[["none"]]
+  )
+  if (length(gr$no_gr_cell_lines) > 0L) {
+    out <- sprintf("%s No GR value for: %s.", out, toString(gr$no_gr_cell_lines))
+  }
+  out
+}
+
+
+#' Describe a recorded function in a sentence
+#'
+#' Uses, in this order, the description set with
+#' \code{gDRutils::set_fit_fn_info}, the one-line source of a function written
+#' inline, or the package, name and version of the function.
+#'
+#' @param lead string; the start of the sentence.
+#' @param fn list; a function record from \code{provenance$steps}, or
+#'   \code{NULL}.
+#'
+#' @return A string, or \code{NULL} when \code{fn} is \code{NULL}.
+#'
+#' @keywords internal
+.describe_fn_sentence <- function(lead, fn) {
+  checkmate::assert_string(lead)
+  checkmate::assert_list(fn, null.ok = TRUE)
+  if (is.null(fn)) return(NULL)
+  what <- if (!is.null(fn$info$description)) {
+    fn$info$description
+  } else if (!is.null(fn$source)) {
+    # one line of code, without the function header and the braces around the body
+    code <- trimws(gsub("\\s+", " ", sub("^function \\([^)]*\\)\\s*", "", fn$source)))
+    trimws(sub("^\\{(.*)\\}$", "\\1", code))
+  } else {
+    sprintf("%s::%s (%s)", fn$package, fn$name, fn$version)
+  }
+  sprintf("%s %s", lead, sub("\\.?$", ".", what))
+}
+
+
+#' List the settings of a step without a dedicated description
+#'
+#' @param settings list of settings, or \code{NULL}.
+#'
+#' @return A string, cut at 300 characters.
+#'
+#' @keywords internal
+.describe_settings <- function(settings) {
+  checkmate::assert_list(settings, null.ok = TRUE)
+  if (length(settings) == 0L) return("No settings recorded.")
+  text <- toString(vapply(names(settings), function(nm) {
+    sprintf("%s = %s", nm, paste(deparse(settings[[nm]], width.cutoff = 60L), collapse = " "))
+  }, character(1)))
+  if (nchar(text) > 300L) text <- paste0(substr(text, 1L, 297L), "...")
+  sprintf("Settings: %s.", text)
+}
