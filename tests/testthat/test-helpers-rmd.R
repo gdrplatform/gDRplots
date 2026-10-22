@@ -872,3 +872,203 @@ test_that("prep_assoc_summary works as expected", {
                                   as_list = "TRUE"),
                "Assertion on 'as_list' failed: Must be of type 'logical flag'")
 })
+
+
+# Provenance as gDRimport and gDRcore record it, built from these values so the
+# expected descriptions below follow from them
+.prov <- list(
+  pcutoff = 0.1,
+  readout = "ReadoutValue",
+  masked = list(n_wells = 7L, n_flag_missing = 2L, n_pairs = 3L),
+  gr = list(n_pairs = c(day0 = 0L, ref_div_time = 90L, none = 10L), no_gr_cell_lines = "cellline_BA"),
+  series_identifiers = "Concentration",
+  periods = list(early = c(0, 48), late = c(48, 96)),
+  normalization_map = c(early = "None", late = "early"),
+  import = list(
+    gDRimport = "1.11.9",
+    instrument = "EnVision",
+    files = data.frame(
+      role = c("manifest", "template", "template", "results", "results"),
+      name = c("manifest.xlsx", "trt_1.xlsx", "trt_2.xlsx", "res_1.xlsx", "res_2.xlsx"),
+      size = c(100, 200, 200, 300, 300),
+      md5 = letters[1:5]
+    ),
+    corrections = list(untreated_tags_standardized = 320L, cells_filled_with_zero = 4L)
+  )
+)
+
+.se_with_provenance <- function() {
+  se <- gDRutils::get_synthetic_data("small")[["single-agent"]]
+  se <- suppressWarnings(gDRutils::apply_fit(
+    se = se,
+    fit_fn = gDRutils::fit_drug_response_metrics,
+    data_type = "single-agent",
+    output_assay = "Metrics",
+    fit_source = "gDR",
+    fit_args = list(pcutoff = .prov$pcutoff)
+  ))
+  se <- gDRutils::record_processing_step(se = se, step = "import", settings = .prov$import)
+  se <- gDRutils::record_processing_step(
+    se = se,
+    step = "create",
+    settings = list(readout = .prov$readout, masked = .prov$masked)
+  )
+  se <- gDRutils::record_processing_step(
+    se = se,
+    step = "normalize",
+    settings = list(gr = .prov$gr),
+    fns = list(control_mean_fxn = function(x) {
+      mean(x, trim = 0.25)
+    })
+  )
+  se <- gDRutils::record_processing_step(
+    se = se,
+    step = "average",
+    settings = list(series_identifiers = .prov$series_identifiers)
+  )
+  gDRutils::record_processing_step(
+    se = se,
+    step = "growth_rates",
+    settings = list(periods = .prov$periods, normalization_map = .prov$normalization_map),
+    fns = list(rate_fn = gDRutils::set_fit_fn_info(function(dt) 0, description = "Slope per well"))
+  )
+}
+
+
+test_that("get_provenance_tables lists fits and describes processing steps", {
+  mae <- gDRutils::get_synthetic_data("small")
+  mae[["single-agent"]] <- .se_with_provenance()
+
+  tables <- get_provenance_tables(mae)
+
+  expect_identical(tables$fits$experiment, "single-agent")
+  expect_identical(tables$fits$fn, sprintf(
+    "gDRutils::fit_drug_response_metrics (%s)", as.character(utils::packageVersion("gDRutils"))
+  ))
+  expect_identical(tables$fits$settings, sprintf("pcutoff = %s", .prov$pcutoff))
+  expect_match(tables$fits$model, "log-logistic")
+
+  steps <- stats::setNames(tables$steps$description, tables$steps$step)
+  expect_identical(names(steps), c("import", "create", "normalize", "average", "growth_rates"))
+  expect_identical(steps[["import"]], sprintf(
+    paste(
+      "5 input files (1 manifest, 2 template, 2 results) read with %s, gDRimport %s.",
+      "%d untreated tags rewritten as the standard tag. %d empty plate cells filled with 0."
+    ),
+    .prov$import$instrument, .prov$import$gDRimport,
+    .prov$import$corrections$untreated_tags_standardized, .prov$import$corrections$cells_filled_with_zero
+  ))
+  expect_identical(steps[["create"]], sprintf(
+    "Readout: %s. %d masked wells were removed (%d drug x cell line pairs). %d of them had no masked flag.",
+    .prov$readout, .prov$masked$n_wells, .prov$masked$n_pairs, .prov$masked$n_flag_missing
+  ))
+  expect_match(steps[["normalize"]], sprintf(
+    "from the reference division time for %d, not computed for %d",
+    .prov$gr$n_pairs[["ref_div_time"]], .prov$gr$n_pairs[["none"]]
+  ), fixed = TRUE)
+  expect_match(steps[["normalize"]], sprintf("No GR value for: %s.", .prov$gr$no_gr_cell_lines), fixed = TRUE)
+  expect_match(steps[["normalize"]], "Controls averaged with mean(x, trim = 0.25).", fixed = TRUE)
+  expect_identical(steps[["average"]], sprintf("Replicates averaged per %s.", .prov$series_identifiers))
+  expect_match(steps[["growth_rates"]], "Growth rate per well and window: Slope per well.", fixed = TRUE)
+  expect_match(steps[["growth_rates"]], "early = [0, 48), late = [48, 96)", fixed = TRUE)
+  expect_match(steps[["growth_rates"]], "late -> early", fixed = TRUE)
+})
+
+
+test_that("get_provenance_tables gives the same rows for an SE, without the experiment column", {
+  se <- .se_with_provenance()
+  mae <- gDRutils::get_synthetic_data("small")
+  mae[["single-agent"]] <- se
+
+  tables_se <- get_provenance_tables(se)
+  tables_mae <- get_provenance_tables(mae)
+
+  expect_identical(names(tables_se$fits), c("assay", "fit_source", "fn", "settings", "model"))
+  expect_identical(names(tables_se$steps), c("step", "description"))
+  expect_equal(tables_se$fits, tables_mae$fits[, !"experiment"])
+  expect_equal(tables_se$steps, tables_mae$steps[, !"experiment"])
+})
+
+
+test_that("get_provenance_tables returns empty tables without provenance", {
+  tables <- get_provenance_tables(gDRutils::get_synthetic_data("small"))
+  expect_identical(names(tables), c("fits", "steps"))
+  expect_identical(NROW(tables$fits), 0L)
+  expect_identical(NROW(tables$steps), 0L)
+  expect_identical(names(tables$steps), c("experiment", "step", "description"))
+  expect_error(get_provenance_tables(data.frame()), "MultiAssayExperiment")
+})
+
+
+test_that(".describe_import describes the files, the reader and the corrections", {
+  expect_null(.describe_import(NULL))
+  expect_identical(
+    .describe_import(list(files = data.frame(role = "long_table"), instrument = "long_table")),
+    "1 input file (1 long_table) read with long_table."
+  )
+  # PRISM data name their format instead of an instrument
+  prism <- list(
+    gDRimport = "1.11.9",
+    source = list(format = "PRISM LEVEL5"),
+    files = data.frame(role = c("prism_data", "meta_data"))
+  )
+  expect_identical(
+    .describe_import(prism),
+    "2 input files (1 prism_data, 1 meta_data) read with PRISM LEVEL5, gDRimport 1.11.9."
+  )
+  renamed <- list(corrections = list(template_sheets_renamed = "trt.xlsx: Drug -> Gnumber"))
+  expect_identical(
+    .describe_import(renamed),
+    c("No input files recorded.", "Template sheets renamed: trt.xlsx: Drug -> Gnumber.")
+  )
+  expect_error(.describe_import("EnVision"), "list")
+})
+
+
+test_that(".describe_masked, .describe_gr and .describe_settings handle edge cases", {
+  expect_null(.describe_masked(NULL))
+  expect_identical(.describe_masked(list(n_wells = 0L)), "No masked wells were removed.")
+  expect_identical(.describe_masked(list(n_wells = 2L)), "2 masked wells were removed.")
+  expect_error(.describe_masked(list(n_wells = -1L)))
+
+  expect_null(.describe_gr(NULL))
+  expect_identical(
+    .describe_gr(list(n_pairs = c(day0 = 5L, ref_div_time = 0L, none = 1L))),
+    paste("GR values: from day 0 readouts for 5 drug x cell line pairs,",
+          "from the reference division time for 0, not computed for 1.")
+  )
+  expect_error(.describe_gr(list(n_pairs = c(day0 = 5L))))
+
+  expect_identical(.describe_settings(NULL), "No settings recorded.")
+  expect_identical(.describe_settings(list(a = 1)), "Settings: a = 1.")
+  long <- .describe_settings(list(a = strrep("x", 400)))
+  expect_identical(nchar(long), 300L + nchar("Settings: ."))
+  expect_match(long, "\\.\\.\\.\\.$")
+})
+
+
+test_that(".describe_fn_sentence uses the description, the inline code or the name", {
+  expect_null(.describe_fn_sentence("Fitted with", NULL))
+  expect_identical(
+    .describe_fn_sentence("Fitted with", list(info = list(description = "A logistic fit"))),
+    "Fitted with A logistic fit."
+  )
+  expect_identical(
+    .describe_fn_sentence("Averaged with", list(source = "function (x) {\n  mean(x)\n}")),
+    "Averaged with mean(x)."
+  )
+  expect_identical(
+    .describe_fn_sentence("Fitted with", list(package = "pkg", name = "fit", version = "1.0")),
+    "Fitted with pkg::fit (1.0)."
+  )
+  expect_error(.describe_fn_sentence(1, NULL))
+})
+
+
+test_that(".describe_provenance_step lists the settings of an unknown step", {
+  expect_identical(
+    .describe_provenance_step("custom", list(settings = list(k = 3L))),
+    "Settings: k = 3L."
+  )
+  expect_error(.describe_provenance_step("custom", "not a list"))
+})
