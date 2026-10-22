@@ -1,6 +1,5 @@
 ## gDRplots 0.99.5 - 2026-10-21
 * fix `transform_log_conc()` returning NA when all concentrations are 0
-* update the combination heatmap tests to the regenerated reference data
 
 ## gDRplots 0.99.4 - 2026-10-08
 * update authors data
