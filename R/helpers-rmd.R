@@ -1047,7 +1047,6 @@ get_provenance_tables <- function(x) {
 #' @return A string.
 #'
 #' @keywords internal
-#' @noRd
 .describe_provenance_step <- function(step, entry) {
   checkmate::assert_string(step)
   checkmate::assert_list(entry)
@@ -1102,7 +1101,6 @@ get_provenance_tables <- function(x) {
 #'   \code{settings} is \code{NULL}.
 #'
 #' @keywords internal
-#' @noRd
 .describe_import <- function(settings) {
   checkmate::assert_list(settings, null.ok = TRUE)
   if (is.null(settings)) return(NULL)
@@ -1144,7 +1142,6 @@ get_provenance_tables <- function(x) {
 #' @return A string, or \code{NULL} when \code{masked} is \code{NULL}.
 #'
 #' @keywords internal
-#' @noRd
 .describe_masked <- function(masked) {
   checkmate::assert_list(masked, null.ok = TRUE)
   if (is.null(masked)) return(NULL)
@@ -1169,7 +1166,6 @@ get_provenance_tables <- function(x) {
 #' @return A string, or \code{NULL} when \code{gr} is \code{NULL}.
 #'
 #' @keywords internal
-#' @noRd
 .describe_gr <- function(gr) {
   checkmate::assert_list(gr, null.ok = TRUE)
   if (is.null(gr)) return(NULL)
@@ -1202,7 +1198,6 @@ get_provenance_tables <- function(x) {
 #' @return A string, or \code{NULL} when \code{fn} is \code{NULL}.
 #'
 #' @keywords internal
-#' @noRd
 .describe_fn_sentence <- function(lead, fn) {
   checkmate::assert_string(lead)
   checkmate::assert_list(fn, null.ok = TRUE)
@@ -1227,7 +1222,6 @@ get_provenance_tables <- function(x) {
 #' @return A string, cut at 300 characters.
 #'
 #' @keywords internal
-#' @noRd
 .describe_settings <- function(settings) {
   checkmate::assert_list(settings, null.ok = TRUE)
   if (length(settings) == 0L) return("No settings recorded.")
