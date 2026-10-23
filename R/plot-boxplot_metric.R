@@ -391,6 +391,10 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #' @param named_n_mode string determines whether the labels are applied to the highest or lowest
 #'    values of \code{metric}; one of: \code{"top"} or \code{"bottom"}
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
+#' @param colors_vec character vector of colors (name or hex value), matched to
+#'    \code{group_names} by position (1st color = 1st name) when \code{grouped_flag = TRUE},
+#'    independent of final plot order; missing/invalid/extra entries fall back to the default
+#'    palette per group. If \code{grouped_flag = FALSE}, only the first color is used.
 #'
 #' @return \code{ggplot} object containing boxplots for selected single-agent metric
 #'    grouped by selected variable
@@ -410,7 +414,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue")
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
@@ -420,27 +424,35 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               with_inf = TRUE)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               named_n = 0)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               grouped_flag = TRUE)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               colors_vec = c("darkblue", "deeppink"))
+#'
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue_grp",
+#'                               grouped_flag = TRUE,
+#'                               group_names = c("tissue_w", "tissue_other"),
+#'                               colors_vec = c("black", "gold"))
 #'
 #' @export
 plot_boxplot_metric_sa_by_grp <- function(
@@ -510,6 +522,7 @@ plot_boxplot_metric_sa_by_grp <- function(
   dt_met <- dt_met[, c(group_var, point_var, metric), with = FALSE]
 
   # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names_requested <- unique(group_names)
   group_names <- if (is.null(group_names)) {
     sort(unique(dt_met[[group_var]]))
   } else {
@@ -567,14 +580,9 @@ plot_boxplot_metric_sa_by_grp <- function(
   dt_met[[group_var]] <- factor(dt_met[[group_var]], levels = group_names)
 
   if (grouped_flag) {
-    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      get_qual_colors(NROW(unique(dt_met[[group_var]])))
-    } else if (NROW(colors_vec) != NROW(unique(dt_met[[group_var]]))) {
-      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_met[[group_var]])))
-    } else {
-      colors_vec
-    }
-    names(fill_colors) <- unique(dt_met[[group_var]])
+    fill_colors <- .resolve_group_colors(group_names_requested = group_names_requested,
+                                         group_names = group_names,
+                                         colors_vec = colors_vec)
 
     plt <-
       ggplot2::ggplot(data = dt_met,
@@ -1013,6 +1021,10 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #' @param named_n_mode string determines whether the labels are applied to the highest or lowest
 #'    values of \code{metric}; one of: \code{"top"} or \code{"bottom"}
 #' @param grouped_flag logical flag whether the boxplots should be colored by \code{group_var}
+#' @param colors_vec character vector of colors (name or hex value), matched to
+#'    \code{group_names} by position (1st color = 1st name) when \code{grouped_flag = TRUE},
+#'    independent of final plot order; missing/invalid/extra entries fall back to the default
+#'    palette per group. If \code{grouped_flag = FALSE}, only the first color is used.
 #'
 #' @return \code{ggplot} object containing boxplots for selected combo metric
 #'   grouped by selected variable
@@ -1045,15 +1057,23 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #'
 #' plot_boxplot_metric_combo_by_grp(dt_scores,
 #'                                  selection_var = "DrugName",
-#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  selection_name = c("drug_011", "drug_021"),
 #'                                  group_var = "Tissue",
 #'                                  grouped_flag = TRUE)
 #'
 #' plot_boxplot_metric_combo_by_grp(dt_scores,
 #'                                  selection_var = "DrugName",
-#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  selection_name = c("drug_011", "drug_021"),
 #'                                  group_var = "Tissue",
 #'                                  colors_vec = c("darkblue", "orange"))
+#'
+#' plot_boxplot_metric_combo_by_grp(dt_scores,
+#'                                  selection_var = "DrugName",
+#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  group_var = "Tissue_grp",
+#'                                  grouped_flag = TRUE,
+#'                                  group_names = c("tissue_w", "tissue_other"),
+#'                                  colors_vec = c("black", "gold"))
 #'
 #' @export
 plot_boxplot_metric_combo_by_grp <- function(
@@ -1132,6 +1152,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   dt_sco <- dt_sco[, c(group_var, point_var, metric), with = FALSE]
 
   # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names_requested <- unique(group_names)
   group_names <- if (is.null(group_names)) {
     sort(unique(dt_sco[[group_var]]))
   } else {
@@ -1173,14 +1194,9 @@ plot_boxplot_metric_combo_by_grp <- function(
   dt_sco[[group_var]] <- factor(dt_sco[[group_var]], levels = group_names)
 
   if (grouped_flag) {
-    fill_colors <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      get_qual_colors(NROW(unique(dt_sco[[group_var]])))
-    } else if (NROW(colors_vec) != NROW(unique(dt_sco[[group_var]]))) {
-      grDevices::colorRampPalette(colors_vec)(NROW(unique(dt_sco[[group_var]])))
-    } else {
-      colors_vec
-    }
-    names(fill_colors) <- unique(dt_sco[[group_var]])
+    fill_colors <- .resolve_group_colors(group_names_requested = group_names_requested,
+                                         group_names = group_names,
+                                         colors_vec = colors_vec)
 
     plt <-
       ggplot2::ggplot(data = dt_sco,
