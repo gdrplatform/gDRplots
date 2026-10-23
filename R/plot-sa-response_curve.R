@@ -15,7 +15,9 @@
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colors_vec character vector with colors for \code{group_names} - name or hex value
+#' @param colors_vec character vector of colors (name or hex value), matched to
+#'    \code{group_names} by position (1st color = 1st name), independent of final plot order;
+#'    missing/invalid/extra entries fall back to the default palette per group
 #' @param plot_averaged_flag logical flag whether plot points with average values
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
