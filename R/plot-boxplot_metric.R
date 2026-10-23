@@ -414,7 +414,7 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue")
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
@@ -424,27 +424,35 @@ plot_boxplot_metric_sa_by_drugs <- function(
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               with_inf = TRUE)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               named_n = 0)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               grouped_flag = TRUE)
 #'
 #' plot_boxplot_metric_sa_by_grp(dt_metrics,
 #'                               selection_var = "DrugName",
-#'                               selection_name = "drug_001",
+#'                               selection_name = "drug_011",
 #'                               group_var = "Tissue",
 #'                               colors_vec = c("darkblue", "deeppink"))
+#'
+#' plot_boxplot_metric_sa_by_grp(dt_metrics,
+#'                               selection_var = "DrugName",
+#'                               selection_name = "drug_001",
+#'                               group_var = "Tissue_grp",
+#'                               grouped_flag = TRUE,
+#'                               group_names = c("tissue_w", "tissue_other"),
+#'                               colors_vec = c("black", "gold"))
 #'
 #' @export
 plot_boxplot_metric_sa_by_grp <- function(
@@ -1049,15 +1057,23 @@ plot_boxplot_metric_combo_by_drugs <- function(
 #'
 #' plot_boxplot_metric_combo_by_grp(dt_scores,
 #'                                  selection_var = "DrugName",
-#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  selection_name = c("drug_011", "drug_021"),
 #'                                  group_var = "Tissue",
 #'                                  grouped_flag = TRUE)
 #'
 #' plot_boxplot_metric_combo_by_grp(dt_scores,
 #'                                  selection_var = "DrugName",
-#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  selection_name = c("drug_011", "drug_021"),
 #'                                  group_var = "Tissue",
 #'                                  colors_vec = c("darkblue", "orange"))
+#'
+#' plot_boxplot_metric_combo_by_grp(dt_scores,
+#'                                  selection_var = "DrugName",
+#'                                  selection_name = c("drug_001", "drug_021"),
+#'                                  group_var = "Tissue_grp",
+#'                                  grouped_flag = TRUE,
+#'                                  group_names = c("tissue_w", "tissue_other"),
+#'                                  colors_vec = c("black", "gold"))
 #'
 #' @export
 plot_boxplot_metric_combo_by_grp <- function(
