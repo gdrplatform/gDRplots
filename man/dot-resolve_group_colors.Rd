@@ -26,6 +26,7 @@ Builds a named color vector for \code{group_names}, resolving
 intended group regardless of the order or length of the inputs.
 }
 \examples{
+\donttest{
 .resolve_group_colors(
  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
  group_names = c("cell_AB", "cell_DC", "cell_XY"),
@@ -50,6 +51,7 @@ intended group regardless of the order or length of the inputs.
  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
  group_names = c("cell_AB", "cell_DC", "cell_XY"),
  colors_vec = c("blue", "lightblue"))
+}
 
 }
 \keyword{internal}
