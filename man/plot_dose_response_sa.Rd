@@ -87,5 +87,21 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       group_var = group_var,
                       group_names = group_names)
 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
+                      selection_name = selected_cellline,
+                      group_var = group_var,
+                      group_names = rev(group_names),
+                      colors_vec = c("darkred", "darkorange"))
+
+my_colors <- c("drug_004" = "black")
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
+                      selection_name = selected_cellline,
+                      group_var = group_var,
+                      group_names = group_names) +
+  ggplot2::scale_color_manual(values = my_colors) +
+  ggplot2::scale_fill_manual(values = my_colors)
+
 }
 \keyword{single-agent_plots}

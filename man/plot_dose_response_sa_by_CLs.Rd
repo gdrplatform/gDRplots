@@ -61,5 +61,12 @@ plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
                              normalization_type = "RV",
                              colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
 
+plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
+                             dt_average = dt_average,
+                             cellline_name_vec = cellline_name_vec,
+                             drug_name_vec = drug_name_vec,
+                             normalization_type = "RV")
+
+
 }
 \keyword{single-agent_plots}
