@@ -8,7 +8,7 @@
 #' @param cl_name string with cell line name to be plotted (identifiers \code{CellLineName})
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colors_vec character vector with colors for \code{group_names} - name or hex value
+#' @param colors_vec character vector with colors for \code{Concentration_2} - name or hex value
 #'    note that the first color will be assigned to the min value of \code{Concentration_2},
 #'    and the last one - to the max of \code{Concentration_2}; the default is the orange-black palette
 #' @param split_by_conc split_by_conc logical flag indicating whether curves
