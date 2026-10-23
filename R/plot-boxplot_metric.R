@@ -513,7 +513,9 @@ plot_boxplot_metric_sa_by_grp <- function(
   group_names <- if (is.null(group_names)) {
     sort(unique(dt_met[[group_var]]))
   } else {
-    sort(intersect(unique(dt_met[[group_var]]), group_names))
+    # Keep the caller's order; see plot_dose_response_sa. sort() stays
+    # the default when group_names is NULL.
+    group_names[group_names %in% unique(dt_met[[group_var]])]
   }
   dt_met <- dt_met[get(group_var) %in% group_names, ]
 
@@ -1135,7 +1137,9 @@ plot_boxplot_metric_combo_by_grp <- function(
   group_names <- if (is.null(group_names)) {
     sort(unique(dt_sco[[group_var]]))
   } else {
-    sort(intersect(unique(dt_sco[[group_var]]), group_names))
+    # Keep the caller's order; see plot_dose_response_sa. sort() stays
+    # the default when group_names is NULL.
+    group_names[group_names %in% unique(dt_sco[[group_var]])]
   }
   dt_sco <- dt_sco[get(group_var) %in% group_names, ]
 
