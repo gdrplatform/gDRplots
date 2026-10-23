@@ -1171,7 +1171,8 @@ test_that("prep_pheatmap_matrix works as expected", {
   mat_2 <- prep_pheatmap_matrix(dt_response = dt_metrics,
                                 metric = "p_value")
   expect_is(mat_2, "matrix")
-  expect_true(all(dt_metrics[normalization_type == "GR"][["p_value"]] %in% mat_2))
+  # constant fits have no p-value
+  expect_true(all(stats::na.omit(dt_metrics[normalization_type == "GR"][["p_value"]]) %in% mat_2))
 
   # scenario: combo data
   mat_3 <- prep_pheatmap_matrix(dt_response = dt_scores,

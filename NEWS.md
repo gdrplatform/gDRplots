@@ -1,5 +1,8 @@
-## gDRplots 0.99.6 - 2026-10-23
+## gDRplots 0.99.7 - 2026-10-23
 * fix mapping `group_names` into `colors_vec` for dose-response curves and boxplots
+
+## gDRplots 0.99.6 - 2026-10-22
+* fix `transform_log_conc()` returning NA when all concentrations are 0
 
 ## gDRplots 0.99.5 - 2026-10-15
 * add `get_provenance_tables()`, which lists the fits and processing steps recorded in a gDR object
