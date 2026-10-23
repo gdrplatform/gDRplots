@@ -64,8 +64,9 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_length(plt_3[["layers"]], 1) # heatmap # nolint
   expect_length(ggplot2::ggplot_build(plt_3)[["data"]], 1)
   expect_true(any(ls_col_1 %in% unique(ggplot2::ggplot_build(plt_3)[["data"]][[1]][["fill"]])))
-  lim_fill <- round(range(dt_excess_sub[normalization_type == "GR", ] [["hsa_excess"]], na.rm = TRUE), 1)
-  expect_equal(range(as.numeric(ggplot2::get_guide_data(plt_3, "fill")[[".label"]])), lim_fill)
+  # without limits the fill scale spans the data
+  lim_fill <- range(dt_excess_sub[normalization_type == "GR", ] [["hsa_excess"]], na.rm = TRUE)
+  expect_equal(ggplot2::ggplot_build(plt_3)$plot$scales$get_scales("fill")$get_limits(), lim_fill)
 
   plt_4 <- heatmap_combo_metrics(dt_excess,
                                  dt_isobolograms,
@@ -457,6 +458,12 @@ test_that("plot_combination_index works as expected", {
                "Assertion on 'iso_levels' failed: Must be of type 'character', not 'NULL'")
 })
 
+test_that("transform_log_conc places a lone zero dose", {
+  expect_equal(transform_log_conc(c(0, 0)), c(0, 0))
+  expect_equal(transform_log_conc(c(0, 1)), c(-0.5, 0))
+  expect_equal(transform_log_conc(c(0, 0.1, 1)), c(-2, -1, 0))
+})
+
 test_that("heatmap_combo_with_isoref works as expected", {
   cl_name <- "cellline_BC"
   drug1_name <- "drug_001"
@@ -508,8 +515,9 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_true(all(ls_col %in% plt_3[["plot_env"]][["hm_color_palette"]]))
   expect_length(ggplot2::ggplot_build(plt_3)[["data"]], 1) # no isoline data
 
+  # only the untreated point, one row per normalization type: nothing to plot
   dt_excess_ <- dt_excess[DrugName == drug1_name & DrugName_2 == drug2_name &
-                            CellLineName == cl_name][1:2, ]
+                            CellLineName == cl_name & Concentration == 0 & Concentration_2 == 0]
   plt_4 <- heatmap_combo_with_isoref(dt_excess_,
                                      dt_isobolograms,
                                      drug1_name,

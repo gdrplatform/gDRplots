@@ -1937,11 +1937,14 @@ prep_hm_limits <- function(num_vec,
 #' @param conc_vec numeric vector with concentration values
 #'
 #' @return numeric vector with log10 concentration values; log10 for concentration equal 0 (-Inf)
-#'    is replaced with one step less in the dose dilution
+#'    is replaced with one step less in the dose dilution. When all concentrations are 0, all
+#'    positions are 0.
 #'
 #' @examples
 #' \donttest{
 #' vec <- c(0, 0.003, 0.01, 0.03)
+#' transform_log_conc(vec)
+#' vec <- c(0, 0, 0)
 #' transform_log_conc(vec)
 #' }
 #'
@@ -1953,6 +1956,8 @@ transform_log_conc <- function(conc_vec) {
   # replace the -Inf value coming from the 0 dose with one step less in the dose dilution
   idx_inf <- (conc_vec == 0)
   doses <- sort(unique(log_values[!is.infinite(log_values)]))
+  # only the 0 dose (e.g. the single-agent arm of one drug): any position works
+  if (length(doses) == 0L) return(rep(0, length(conc_vec)))
   zero_replacement <- doses[1] + (doses[1] - doses[2])
   if (is.na(zero_replacement)) zero_replacement <- doses[1] - 0.5 # only two unique conc and one is 0
   log_values[idx_inf] <- zero_replacement
