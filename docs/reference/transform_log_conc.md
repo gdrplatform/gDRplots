@@ -17,13 +17,17 @@ transform_log_conc(conc_vec)
 ## Value
 
 numeric vector with log10 concentration values; log10 for concentration
-equal 0 (-Inf) is replaced with one step less in the dose dilution
+equal 0 (-Inf) is replaced with one step less in the dose dilution. When
+all concentrations are 0, all positions are 0.
 
 ## Examples
 
 ``` r
 # \donttest{
 vec <- c(0, 0.003, 0.01, 0.03)
+transform_log_conc(vec)
+#> Error in transform_log_conc(vec): could not find function "transform_log_conc"
+vec <- c(0, 0, 0)
 transform_log_conc(vec)
 #> Error in transform_log_conc(vec): could not find function "transform_log_conc"
 # }
