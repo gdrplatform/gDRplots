@@ -378,14 +378,14 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_is(plt_9, "gg")
   expect_length(plt_9[["layers"]], 4)
 
-  # scenario: colors_vec resolved by name, not position, under a scrambled group_names order
+  # scenario: colors_vec resolved by name, not position, under a mixed group_names order
   dt_metrics_grp3 <-
     data.table::copy(dt_metrics)[, tissue_grp3 := data.table::fifelse(
       Tissue == "tissue_w", "bucket_A",
       data.table::fifelse(Tissue == "tissue_x", "bucket_B", "bucket_C"))]
   mixed_group_names <- c("bucket_C", "bucket_A", "bucket_B")
   mixed_colors <- c("red", "blue", "green")
-  expected_colors <- sort(stats::setNames(mixed_colors, mixed_group_names))
+  expected_colors <- stats::setNames(mixed_colors, mixed_group_names)[sort(mixed_group_names)]
 
   plt_10 <- plot_boxplot_metric_sa_by_grp(dt_metrics_grp3,
                                           selection_var = sel_var,
@@ -819,17 +819,17 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
     data.table::copy(dt_scores)[, tissue_grp3 := data.table::fifelse(
       Tissue == "tissue_w", "bucket_A",
       data.table::fifelse(Tissue == "tissue_x", "bucket_B", "bucket_C"))]
-  scrambled_group_names <- c("bucket_C", "bucket_A", "bucket_B")
-  scrambled_colors <- c("red", "blue", "green")
-  expected_colors <- sort(stats::setNames(scrambled_colors, scrambled_group_names))
+  mixed_group_names <- c("bucket_C", "bucket_A", "bucket_B")
+  mixed_colors <- c("red", "blue", "green")
+  expected_colors <- stats::setNames(mixed_colors, mixed_group_names)[sort(mixed_group_names)]
 
   plt_9 <- plot_boxplot_metric_combo_by_grp(dt_scores_grp3,
                                             selection_var = sel_var,
                                             selection_name = sel_name,
                                             group_var = "tissue_grp3",
                                             grouped_flag = TRUE,
-                                            group_names = scrambled_group_names,
-                                            colors_vec = scrambled_colors)
+                                            group_names = mixed_group_names,
+                                            colors_vec = mixed_colors)
   expect_is(plt_9, "gg")
   expect_equal(ggplot2::ggplot_build(plt_9)[["data"]][[2]][["fill"]],
                unname(expected_colors))
