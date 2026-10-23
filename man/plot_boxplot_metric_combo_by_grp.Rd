@@ -90,15 +90,23 @@ plot_boxplot_metric_combo_by_grp(dt_scores,
 
 plot_boxplot_metric_combo_by_grp(dt_scores,
                                  selection_var = "DrugName",
-                                 selection_name = c("drug_001", "drug_021"),
+                                 selection_name = c("drug_011", "drug_021"),
                                  group_var = "Tissue",
                                  grouped_flag = TRUE)
 
 plot_boxplot_metric_combo_by_grp(dt_scores,
                                  selection_var = "DrugName",
-                                 selection_name = c("drug_001", "drug_021"),
+                                 selection_name = c("drug_011", "drug_021"),
                                  group_var = "Tissue",
                                  colors_vec = c("darkblue", "orange"))
+
+plot_boxplot_metric_combo_by_grp(dt_scores,
+                                 selection_var = "DrugName",
+                                 selection_name = c("drug_001", "drug_021"),
+                                 group_var = "Tissue_grp",
+                                 grouped_flag = TRUE,
+                                 group_names = c("tissue_w", "tissue_other"),
+                                 colors_vec = c("black", "gold"))
 
 }
 \author{
