@@ -51,7 +51,7 @@
 #'                       selection_name = selected_drug,
 #'                       group_var = group_var,
 #'                       group_names = celline_names,
-#'                       colors_vec = c("red", "blue"))                       
+#'                       colors_vec = c("red", "blue"))
 #'
 #' selected_cellline <- "cellline_HB"
 #' group_var <- "DrugName"
