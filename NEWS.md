@@ -1,3 +1,6 @@
+## gDRplots 0.99.6 - 2026-10-23
+* fix mapping `group_names` into `colors_vec` for dose-response curves and boxplots
+
 ## gDRplots 0.99.5 - 2026-10-15
 * add `get_provenance_tables()`, which lists the fits and processing steps recorded in a gDR object
 
