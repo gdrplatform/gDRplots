@@ -320,6 +320,7 @@ test_that("plot_dose_response_sa works as expected", {
                                   group_names = mixed_group_names,
                                   colors_vec = mixed_colors)
 
+  expect_is(plt_19, "gg")
   expect_equal(ggplot2::get_guide_data(plt_19, "colour")$colour, mixed_colors)
   expect_equal(ggplot2::get_guide_data(plt_19, "colour")$`.label`, mixed_group_names)
 
@@ -329,10 +330,11 @@ test_that("plot_dose_response_sa works as expected", {
                                   group_var = cellline_name,
                                   group_names = mixed_group_names,
                                   colors_vec = mixed_colors[1:2])
-  
+
+  expect_is(plt_20, "gg")
   expect_true(all(mixed_colors[1:2] %in% ggplot2::get_guide_data(plt_20, "colour")$colour))
   expect_equal(ggplot2::get_guide_data(plt_20, "colour")$`.label`, mixed_group_names)
-  
+
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
