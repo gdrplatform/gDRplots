@@ -309,6 +309,30 @@ test_that("plot_dose_response_sa works as expected", {
     (plt_18$coordinates$limits$y[1] < 1 && 1 < plt_18$coordinates$limits$y[2])
   ))
 
+  # scenario: colors_vec resolved by name, not position, under a mixed group_names order
+  mixed_group_names <- c("cellline_KB", "cellline_BA", "cellline_CA")
+  mixed_colors <- c("red", "blue", "green")
+
+  plt_19 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = dt_average,
+                                  selection_name = selected_drug,
+                                  group_var = cellline_name,
+                                  group_names = mixed_group_names,
+                                  colors_vec = mixed_colors)
+
+  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$colour, mixed_colors)
+  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$`.label`, mixed_group_names)
+
+  plt_20 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = dt_average,
+                                  selection_name = selected_drug,
+                                  group_var = cellline_name,
+                                  group_names = mixed_group_names,
+                                  colors_vec = mixed_colors[1:2])
+  
+  expect_true(all(mixed_colors[1:2] %in% ggplot2::get_guide_data(plt_20, "colour")$colour))
+  expect_equal(ggplot2::get_guide_data(plt_20, "colour")$`.label`, mixed_group_names)
+  
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
                                      dt_average = dt_average,
