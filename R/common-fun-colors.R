@@ -187,6 +187,7 @@ get_col_luminance <- function(col_name) {
 #' @param colors_vec character vector of colors (name or hex value)
 #'
 #' @examples
+#' \donttest{
 #'.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
@@ -211,6 +212,7 @@ get_col_luminance <- function(col_name) {
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
 #'  colors_vec = c("blue", "lightblue"))
+#' }
 #'
 #' @keywords internal
 #' @return named character vector of colors, one per entry of \code{group_names}
