@@ -77,6 +77,13 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       group_var = group_var,
                       group_names = celline_names)
 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = NULL,
+                      selection_name = selected_drug,
+                      group_var = group_var,
+                      group_names = celline_names,
+                      colors_vec = c("red", "blue"))                       
+
 selected_cellline <- "cellline_HB"
 group_var <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -94,7 +101,7 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_cellline,
                       group_var = group_var,
                       group_names = rev(group_names),
-                      colors_vec = c("darkred", "darkorange"))
+                      colors_vec = c("lightblue", "orange"))
 
 my_colors <- c("drug_004" = "black")
 plot_dose_response_sa(dt_metrics = dt_metrics,
