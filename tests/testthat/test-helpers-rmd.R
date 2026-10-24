@@ -874,6 +874,18 @@ test_that("prep_assoc_summary works as expected", {
 })
 
 
+# The reference datasets carry the provenance of the pipeline run that made them;
+# the tests below record their own, so they start from an object without it
+.small_without_provenance <- function() {
+  mae <- gDRutils::get_synthetic_data("small")
+  for (e in names(mae)) {
+    se <- mae[[e]]
+    S4Vectors::metadata(se)$provenance <- NULL
+    mae[[e]] <- se
+  }
+  mae
+}
+
 # Provenance as gDRimport and gDRcore record it, built from these values so the
 # expected descriptions below follow from them
 .prov <- list(
@@ -898,15 +910,15 @@ test_that("prep_assoc_summary works as expected", {
 )
 
 .se_with_provenance <- function() {
-  se <- gDRutils::get_synthetic_data("small")[["single-agent"]]
-  se <- suppressWarnings(gDRutils::apply_fit(
+  se <- .small_without_provenance()[["single-agent"]]
+  se <- purrr::quietly(gDRutils::apply_fit)(
     se = se,
     fit_fn = gDRutils::fit_drug_response_metrics,
     data_type = "single-agent",
     output_assay = "Metrics",
     fit_source = "gDR",
     fit_args = list(pcutoff = .prov$pcutoff)
-  ))
+  )$result
   se <- gDRutils::record_processing_step(se = se, step = "import", settings = .prov$import)
   se <- gDRutils::record_processing_step(
     se = se,
@@ -936,7 +948,7 @@ test_that("prep_assoc_summary works as expected", {
 
 
 test_that("get_provenance_tables lists fits and describes processing steps", {
-  mae <- gDRutils::get_synthetic_data("small")
+  mae <- .small_without_provenance()
   mae[["single-agent"]] <- .se_with_provenance()
 
   tables <- get_provenance_tables(mae)
@@ -977,7 +989,7 @@ test_that("get_provenance_tables lists fits and describes processing steps", {
 
 test_that("get_provenance_tables gives the same rows for an SE, without the experiment column", {
   se <- .se_with_provenance()
-  mae <- gDRutils::get_synthetic_data("small")
+  mae <- .small_without_provenance()
   mae[["single-agent"]] <- se
 
   tables_se <- get_provenance_tables(se)
@@ -991,7 +1003,7 @@ test_that("get_provenance_tables gives the same rows for an SE, without the expe
 
 
 test_that("get_provenance_tables returns empty tables without provenance", {
-  tables <- get_provenance_tables(gDRutils::get_synthetic_data("small"))
+  tables <- get_provenance_tables(.small_without_provenance())
   expect_identical(names(tables), c("fits", "steps"))
   expect_identical(NROW(tables$fits), 0L)
   expect_identical(NROW(tables$steps), 0L)
