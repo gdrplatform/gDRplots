@@ -1095,7 +1095,8 @@ get_provenance_tables <- function(x) {
 #' @param settings list; the record that gDRimport attaches to the loaded data
 #'   (see \code{gDRimport::get_import_provenance}): \code{gDRimport} (version),
 #'   \code{instrument} or, for PRISM data, \code{source$format}, \code{files}
-#'   (a table with a \code{role} column) and \code{corrections}.
+#'   (a table with a \code{role} column) and \code{corrections}, including
+#'   \code{plates_without_barcode}.
 #'
 #' @return A character vector of sentences, or \code{NULL} when
 #'   \code{settings} is \code{NULL}.
@@ -1128,6 +1129,39 @@ get_provenance_tables <- function(x) {
     },
     if (length(corrections$template_sheets_renamed) > 0L) {
       sprintf("Template sheets renamed: %s.", toString(corrections$template_sheets_renamed))
+    },
+    .describe_plates_without_barcode(corrections$plates_without_barcode)
+  )
+}
+
+
+#' Describe the plates read without a barcode
+#'
+#' @param plates table recorded by gDRimport in \code{corrections$plates_without_barcode}:
+#'   one row per plate, with \code{file}, \code{plate} and \code{used}, the barcode the
+#'   plate was imported under (\code{NA} when it was skipped); or \code{NULL}.
+#'
+#' @return A character vector with a sentence for the plates imported under another
+#'   barcode and one for the skipped plates, or \code{NULL} when \code{plates} is
+#'   empty.
+#'
+#' @keywords internal
+.describe_plates_without_barcode <- function(plates) {
+  if (is.null(plates)) return(NULL)
+  checkmate::assert_class(plates, "data.frame")
+  if (NROW(plates) == 0L) return(NULL)
+  checkmate::assert_names(names(plates), must.include = c("file", "plate", "used"))
+  n_plates <- function(n) if (n == 1L) "1 plate" else sprintf("%d plates", n)
+  skipped <- is.na(plates$used) | !nzchar(plates$used)
+  c(
+    if (any(!skipped)) {
+      sprintf("%s without a barcode in the plate header imported as: %s.", n_plates(sum(!skipped)),
+              toString(sprintf("%s (%s, plate %s)", plates$used[!skipped], plates$file[!skipped],
+                               plates$plate[!skipped])))
+    },
+    if (any(skipped)) {
+      sprintf("%s without a barcode skipped: %s.", n_plates(sum(skipped)),
+              toString(sprintf("%s, plate %s", plates$file[skipped], plates$plate[skipped])))
     }
   )
 }

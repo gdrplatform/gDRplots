@@ -10,7 +10,8 @@
 \item{settings}{list; the record that gDRimport attaches to the loaded data
 (see \code{gDRimport::get_import_provenance}): \code{gDRimport} (version),
 \code{instrument} or, for PRISM data, \code{source$format}, \code{files}
-(a table with a \code{role} column) and \code{corrections}.}
+(a table with a \code{role} column) and \code{corrections}, including
+\code{plates_without_barcode}.}
 }
 \value{
 A character vector of sentences, or \code{NULL} when
