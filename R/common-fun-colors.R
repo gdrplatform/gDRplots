@@ -184,7 +184,10 @@ get_col_luminance <- function(col_name) {
 #'   ignored (the first occurrence wins).
 #' @param group_names character vector (no duplicates) of group names to
 #'   produce a color for, in their required order
-#' @param colors_vec character vector of colors (name or hex value)
+#' @param colors_vec character vector of colors (name or hex value).
+#'   If every element is named (e.g. \code{c(cell_DC = "blue")}), those names
+#'   are used directly to resolve against \code{group_names}, independent of order;
+#'   otherwise colors are paired positionally against \code{group_names_requested}.
 #'
 #' @examples
 #' \donttest{
@@ -206,13 +209,30 @@ get_col_luminance <- function(col_name) {
 #'.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_XY"),
-#'  colors_vec = c("blue", "lightblue"))
+#'  colors_vec = c("blue", "red"))
 #'
 #'.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
-#'  colors_vec = c("blue", "lightblue"))
+#'  colors_vec = c("blue", "red"))
+#'
+#'.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_AB = "grey"))
+#'
+#'.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_EF = "grey"))
+#'
+#'.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c(cell_AB = "grey", "blue", "red"))
 #' }
+#'
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
 #'
 #' @keywords internal
 #' @return named character vector of colors, one per entry of \code{group_names}
@@ -226,11 +246,16 @@ get_col_luminance <- function(col_name) {
 
   if (is.null(group_names_requested)) group_names_requested <- group_names
 
+  is_named_colors_vec <- !is.null(names(colors_vec)) &&
+    all(!is.na(names(colors_vec)) & nzchar(names(colors_vec)))
+
   if (is.null(colors_vec) || all(!vapply(colors_vec[!is.na(colors_vec)], is_valid_color, logical(1)))) {
     color_values <- get_qual_colors(NROW(group_names))
     names(color_values) <- group_names
   } else {
-    names(colors_vec) <- group_names_requested[seq_along(colors_vec)]
+    if (!is_named_colors_vec) {
+      names(colors_vec) <- group_names_requested[seq_along(colors_vec)]
+    }
     colors_vec <- colors_vec[!is.na(colors_vec)]
     colors_vec <- colors_vec[vapply(colors_vec, is_valid_color, logical(1))]
 
