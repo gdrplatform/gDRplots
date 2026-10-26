@@ -142,7 +142,7 @@ plot_dose_response_sa <- function(dt_metrics,
   group_names <- if (is.null(group_names)) {
     available_group_names
   } else {
-    unique(group_names[group_names %in% available_group_names])
+    intersect(available_group_names, group_names)
   }
 
   # filter data
