@@ -90,97 +90,133 @@ test_that("get_col_luminance works as expected", {
   expect_error(get_col_luminance("nice pink"), "Must be a valid color name")
 })
 
-test_that("resolve_group_colors works as expected", {
+test_that(".resolve_group_colors works as expected", {
   req_grp_name <- c("cell_DC", "cell_XY", "cell_AB")
   data_order <- c("cell_AB", "cell_DC", "cell_XY")
 
-  res_0 <- .resolve_group_colors(
-    group_names_requested = req_grp_name,
-    group_names = data_order)
-  expect_equal(names(res_0), data_order)
-  expect_true(all(vapply(res_0, is_valid_color, logical(1))))
-
-  res_00 <- .resolve_group_colors(
-    group_names_requested = NULL,
-    group_names = data_order)
-  expect_equal(names(res_00), data_order)
-  expect_true(all(vapply(res_00, is_valid_color, logical(1))))
-  expect_equal(res_00, res_0)
-
-  col_1 <- c("blue", "red", "grey")
   res_1 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
-    group_names = data_order,
-    colors_vec = col_1)
-
-  expect_equal(res_1, setNames(col_1, req_grp_name)[data_order])
+    group_names = data_order)
   expect_equal(names(res_1), data_order)
   expect_true(all(vapply(res_1, is_valid_color, logical(1))))
 
-  col_2 <- c("blue", "pinky", "grey")
+  col_2 <- c("blue", "red", "grey")
   res_2 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
     group_names = data_order,
     colors_vec = col_2)
 
-  expect_equal(res_2[1:2], res_1[1:2])
-  expect_true(is_valid_color(res_2[3]))
+  expect_equal(res_2, setNames(col_2, req_grp_name)[data_order])
+  expect_equal(names(res_2), data_order)
+  expect_true(all(vapply(res_2, is_valid_color, logical(1))))
 
-  col_3 <- c(col_1, "orange")
+  col_3 <- c("blue", "pinky", "grey")
   res_3 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
     group_names = data_order,
     colors_vec = col_3)
 
-  expect_equal(res_3, res_1)
+  expect_equal(res_3[1:2], res_2[1:2])
+  expect_true(is_valid_color(res_3[3]))
 
+  col_4 <- c(col_2, "orange")
   res_4 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
-    group_names = data_order[1:2],
-    colors_vec = col_1[1:2])
+    group_names = data_order,
+    colors_vec = col_4)
 
-  col_vec_4 <- setNames(col_1[1:2], req_grp_name[1:2])
-  expect_true(col_vec_4[names(col_vec_4) %in% data_order[1:2]] %in% res_4)
+  expect_equal(res_4, res_2)
 
-  col_5 <- c("blue", "lightblue")
   res_5 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
-    group_names = data_order,
-    colors_vec = col_5)
+    group_names = data_order[1:2],
+    colors_vec = col_2[1:2])
 
-  col_vec_5 <- setNames(col_5, req_grp_name[1:2])
-  expect_equal(res_5[names(res_5) %in% names(col_vec_5)], col_vec_5)
+  col_vec_5 <- setNames(col_2[1:2], req_grp_name[1:2])
+  expect_true(col_vec_5[names(col_vec_5) %in% data_order[1:2]] %in% res_5)
 
-  col_6 <- c("pinky", "blackish", "dark")
+  col_6 <- c("blue", "lightblue")
   res_6 <- .resolve_group_colors(
     group_names_requested = req_grp_name,
     group_names = data_order,
     colors_vec = col_6)
 
-  expect_equal(names(res_6), data_order)
-  expect_true(all(vapply(res_6, is_valid_color, logical(1))))
-  expect_false(all(col_6 %in% res_6))
+  col_vec_6 <- setNames(col_6, req_grp_name[1:2])
+  expect_equal(res_6[names(res_6) %in% names(col_vec_6)], col_vec_6)
 
-  req_grp_name_7 <- sprintf("%s_123", req_grp_name)
+  col_7 <- c("pinky", "blackish", "dark")
   res_7 <- .resolve_group_colors(
-    group_names_requested = req_grp_name_7,
+    group_names_requested = req_grp_name,
     group_names = data_order,
-    colors_vec = col_1)
+    colors_vec = col_7)
 
   expect_equal(names(res_7), data_order)
   expect_true(all(vapply(res_7, is_valid_color, logical(1))))
-  expect_false(all(req_grp_name_7 %in% names(res_7)))
-  expect_false(all(col_1 %in% res_7))
+  expect_false(all(col_7 %in% res_7))
 
-  col_8 <- c(col_5, NA)
+  req_grp_name_8 <- sprintf("%s_123", req_grp_name)
   res_8 <- .resolve_group_colors(
-    group_names_requested = req_grp_name,
+    group_names_requested = req_grp_name_8,
     group_names = data_order,
-    colors_vec = col_8)
+    colors_vec = col_2)
 
   expect_equal(names(res_8), data_order)
-  expect_equal(res_8[names(res_8) %in% names(col_vec_5)], col_vec_5)
-  expect_true(is_valid_color(res_8[req_grp_name[which(is.na(col_8))]]))
+  expect_true(all(vapply(res_8, is_valid_color, logical(1))))
+  expect_false(all(req_grp_name_8 %in% names(res_8)))
+  expect_false(all(col_2 %in% res_8))
+
+  col_9 <- c(col_6, NA)
+  res_9 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_9)
+
+  expect_equal(names(res_9), data_order)
+  expect_equal(res_9[names(res_9) %in% names(col_vec_6)], col_vec_6)
+  expect_true(is_valid_color(res_9[req_grp_name[which(is.na(col_9))]]))
+
+  col_10 <- col_2
+  names(col_10) <- data_order
+  res_10 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_10)
+
+  expect_equal(names(res_10), data_order)
+  expect_equal(res_10, col_10)
+
+  col_11 <- col_2
+  names(col_11) <- req_grp_name
+  res_11 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_11)
+
+  expect_equal(names(res_11), data_order)
+  expect_equal(res_11, col_11[data_order])
+
+  col_12 <- c(col_10[1:2], "orange")
+  res_12 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_12)
+
+  expect_equal(names(res_12), data_order)
+  expect_equal(res_12, setNames(col_12, req_grp_name)[data_order])
+
+  # named colors_vec ignores group_names_requested entirely - names alone decide the mapping
+  col_13 <- c(cell_AB = "grey", cell_DC = "blue", cell_XY = "red")
+  res_13 <- .resolve_group_colors(
+    group_names_requested = c("cell_XY", "cell_DC", "cell_AB"),
+    group_names = data_order,
+    colors_vec = col_13)
+  res_13_no_request <- .resolve_group_colors(
+    group_names_requested = NULL,
+    group_names = data_order,
+    colors_vec = col_13)
+
+  expect_equal(res_13, col_13[data_order])
+  expect_equal(res_13, res_13_no_request)
 
   expect_error(.resolve_group_colors(group_names_requested = 1:3,
                                      group_names = data_order),
