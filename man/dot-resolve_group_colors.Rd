@@ -15,7 +15,10 @@ ignored (the first occurrence wins).}
 \item{group_names}{character vector (no duplicates) of group names to
 produce a color for, in their required order}
 
-\item{colors_vec}{character vector of colors (name or hex value)}
+\item{colors_vec}{character vector of colors (name or hex value).
+If every element is named (e.g. \code{c(cell_DC = "blue")}), those names
+are used directly to resolve against \code{group_names}, independent of order;
+otherwise colors are paired positionally against \code{group_names_requested}.}
 }
 \value{
 named character vector of colors, one per entry of \code{group_names}
@@ -45,13 +48,31 @@ intended group regardless of the order or length of the inputs.
 .resolve_group_colors(
  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
  group_names = c("cell_AB", "cell_XY"),
- colors_vec = c("blue", "lightblue"))
+ colors_vec = c("blue", "red"))
 
 .resolve_group_colors(
  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
  group_names = c("cell_AB", "cell_DC", "cell_XY"),
- colors_vec = c("blue", "lightblue"))
+ colors_vec = c("blue", "red"))
+
+.resolve_group_colors(
+ group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+ group_names = c("cell_AB", "cell_DC", "cell_XY"),
+ colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_AB = "grey"))
+
+.resolve_group_colors(
+ group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+ group_names = c("cell_AB", "cell_DC", "cell_XY"),
+ colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_EF = "grey"))
+
+.resolve_group_colors(
+ group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+ group_names = c("cell_AB", "cell_DC", "cell_XY"),
+ colors_vec = c(cell_AB = "grey", "blue", "red"))
 }
 
+}
+\author{
+Janina Smoła \email{janina.smola@external.roche.com}
 }
 \keyword{internal}
