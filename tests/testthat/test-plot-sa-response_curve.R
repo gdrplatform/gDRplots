@@ -312,6 +312,9 @@ test_that("plot_dose_response_sa works as expected", {
   # scenario: colors_vec resolved by name, not position, under a mixed group_names order
   mixed_group_names <- c("cellline_KB", "cellline_BA", "cellline_CA")
   mixed_colors <- c("red", "blue", "green")
+  order <-
+    unique(dt_metrics[["CellLineName"]])[unique(dt_metrics[["CellLineName"]]) %in% mixed_group_names]
+  expected_colors <- stats::setNames(mixed_colors, mixed_group_names)[order]
 
   plt_19 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                   dt_average = dt_average,
@@ -321,8 +324,8 @@ test_that("plot_dose_response_sa works as expected", {
                                   colors_vec = mixed_colors)
 
   expect_is(plt_19, "gg")
-  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$colour, mixed_colors)
-  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$`.label`, mixed_group_names)
+  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$colour, unname(expected_colors))
+  expect_equal(ggplot2::get_guide_data(plt_19, "colour")$`.label`, names(expected_colors))
 
   plt_20 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                   dt_average = dt_average,
@@ -333,7 +336,7 @@ test_that("plot_dose_response_sa works as expected", {
 
   expect_is(plt_20, "gg")
   expect_true(all(mixed_colors[1:2] %in% ggplot2::get_guide_data(plt_20, "colour")$colour))
-  expect_equal(ggplot2::get_guide_data(plt_20, "colour")$`.label`, mixed_group_names)
+  expect_equal(ggplot2::get_guide_data(plt_20, "colour")$`.label`, names(expected_colors))
 
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
