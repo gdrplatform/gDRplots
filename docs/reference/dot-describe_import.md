@@ -15,7 +15,8 @@ Describe the import step recorded by gDRimport
   list; the record that gDRimport attaches to the loaded data (see
   `gDRimport::get_import_provenance`): `gDRimport` (version),
   `instrument` or, for PRISM data, `source$format`, `files` (a table
-  with a `role` column) and `corrections`.
+  with a `role` column) and `corrections`, including
+  `plates_without_barcode`.
 
 ## Value
 
