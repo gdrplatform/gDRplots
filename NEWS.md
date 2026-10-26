@@ -1,5 +1,8 @@
-## gDRplots 0.99.7 - 2026-10-24
+## gDRplots 0.99.8 - 2026-10-26
 * fix the provenance tests failing on reference data that already carries a provenance
+
+## gDRplots 0.99.7 - 2026-10-25
+* add the plates read without a barcode to the import step of the provenance tables
 
 ## gDRplots 0.99.6 - 2026-10-22
 * fix `transform_log_conc()` returning NA when all concentrations are 0

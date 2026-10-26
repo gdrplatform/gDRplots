@@ -1033,7 +1033,39 @@ test_that(".describe_import describes the files, the reader and the corrections"
     .describe_import(renamed),
     c("No input files recorded.", "Template sheets renamed: trt.xlsx: Drug -> Gnumber.")
   )
+  # plates read without a barcode, as gDRimport records them since 1.11.10
+  with_plates <- list(
+    files = data.frame(role = "results"),
+    instrument = "EnVision",
+    corrections = list(plates_without_barcode = data.frame(
+      file = "res.xlsx", plate = "2", header = NA_character_, used = NA_character_
+    ))
+  )
+  expect_identical(
+    .describe_import(with_plates),
+    c("1 input file (1 results) read with EnVision.", "1 plate without a barcode skipped: res.xlsx, plate 2.")
+  )
   expect_error(.describe_import("EnVision"), "list")
+})
+
+
+test_that(".describe_plates_without_barcode describes imported and skipped plates", {
+  expect_null(.describe_plates_without_barcode(NULL))
+  plates <- data.frame(
+    file = c("res_1.xlsx", "res_1.xlsx", "res_2.xlsx"),
+    plate = c("1", "2", "1"),
+    header = c(NA, "", NA),
+    used = c("BG123", NA, "BG456")
+  )
+  expect_identical(
+    .describe_plates_without_barcode(plates),
+    c(
+      paste("2 plates without a barcode in the plate header imported as:",
+            "BG123 (res_1.xlsx, plate 1), BG456 (res_2.xlsx, plate 1)."),
+      "1 plate without a barcode skipped: res_1.xlsx, plate 2."
+    )
+  )
+  expect_error(.describe_plates_without_barcode(data.frame(file = "res.xlsx")))
 })
 
 
