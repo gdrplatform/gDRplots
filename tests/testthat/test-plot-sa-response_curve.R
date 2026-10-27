@@ -15,7 +15,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_1 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                  dt_average = dt_average,
                                  selection_name = selected_drug,
-                                 group_var = group_var) # default
+                                 group_var = group_var) # defaul
   expect_is(plt_1, "gg")
   expect_equal(plt_1[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug, plt_1[["labels"]][["title"]]))
@@ -36,7 +36,7 @@ test_that("plot_dose_response_sa works as expected", {
                 NROW(unique(dt_metrics[[group_var]])))
 
   subset_celline <- c("cellline_BA", "cellline_CA")
-  # lack of data for curve and small number of conc point
+  # lack of data for curve and small number of conc poin
   dt_metrics_lack <- data.table::copy(dt_metrics)
   dt_metrics_lack[CellLineName %in% subset_celline, c("ec50", "x_inf", "x_0", "h", "r2")] <- NA
   dt_average_lack <-
@@ -274,7 +274,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_16 <- plot_dose_response_sa(dt_metrics = dt_metrics,
                                   dt_average = NULL,
                                   selection_name = selected_drug,
-                                  group_var = cellline_name) # default
+                                  group_var = cellline_name) # defaul
   expect_is(plt_16, "gg")
   expect_equal(plt_16[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug, plt_16[["labels"]][["title"]]))
@@ -286,7 +286,7 @@ test_that("plot_dose_response_sa works as expected", {
   plt_17 <- plot_dose_response_sa(dt_metrics = dt_metrics[normalization_type == "RV", ],
                                   dt_average = dt_average,
                                   selection_name = selected_drug,
-                                  group_var = cellline_name) # default
+                                  group_var = cellline_name) # defaul
   expect_is(plt_17, "gg")
   expect_equal(plt_17[["labels"]][["y"]], "GR")
   expect_true(grepl(selected_drug, plt_17[["labels"]][["title"]]))
@@ -337,6 +337,46 @@ test_that("plot_dose_response_sa works as expected", {
   expect_is(plt_20, "gg")
   expect_true(all(mixed_colors[1:2] %in% ggplot2::get_guide_data(plt_20, "colour")$colour))
   expect_equal(ggplot2::get_guide_data(plt_20, "colour")$`.label`, names(expected_colors))
+
+  named_col_vec <- mixed_colors
+  names(named_col_vec) <- sort(mixed_group_names)
+  plt_21 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                  dt_average = dt_average,
+                                  selection_name = selected_drug,
+                                  group_var = cellline_name,
+                                  group_names = mixed_group_names,
+                                  colors_vec = named_col_vec)
+  expect_is(plt_21, "gg")
+  expect_true(all(named_col_vec %in% ggplot2::get_guide_data(plt_21, "colour")$colour))
+  expect_equal(ggplot2::get_guide_data(plt_21, "colour")$`.label`, names(named_col_vec))
+
+  part_named_col_vec <- named_col_vec
+  names(part_named_col_vec)[3] <- NA
+  expect_warning({
+    plt_22 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                    dt_average = dt_average,
+                                    selection_name = selected_drug,
+                                    group_var = cellline_name,
+                                    group_names = mixed_group_names,
+                                    colors_vec = part_named_col_vec)
+  }, "'colors_vec' has some, but not all, elements named")
+  expect_is(plt_22, "gg")
+  expect_true(all(part_named_col_vec %in% ggplot2::get_guide_data(plt_22, "colour")$colour))
+  expect_true(all(mixed_group_names %in% ggplot2::get_guide_data(plt_22, "colour")$`.label`))
+
+  part_named_col_vec_2 <- named_col_vec
+  names(part_named_col_vec_2)[3] <- ""
+  expect_warning({
+    plt_23 <- plot_dose_response_sa(dt_metrics = dt_metrics,
+                                    dt_average = dt_average,
+                                    selection_name = selected_drug,
+                                    group_var = cellline_name,
+                                    group_names = mixed_group_names,
+                                    colors_vec = part_named_col_vec_2)
+  }, "'colors_vec' has some, but not all, elements named")
+  expect_is(plt_23, "gg")
+  expect_true(all(part_named_col_vec_2 %in% ggplot2::get_guide_data(plt_23, "colour")$colour))
+  expect_true(all(mixed_group_names %in% ggplot2::get_guide_data(plt_23, "colour")$`.label`))
 
   # testing assertion
   expect_error(plot_dose_response_sa(dt_metrics = as.list(dt_metrics),
@@ -460,7 +500,7 @@ test_that("plot_dose_response_sa works as expected", {
                   NROW(cellline_name_vec))
     expect_length(ggplot2::ggplot_build(plts_4[[drug_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st drug
     expect_equal(ggplot2::get_guide_data(plts_4[[drug_name_vec[2]]], "colour")[[".label"]],
-                 cellline_name_vec) # legend is present
+                 cellline_name_vec) # legend is presen
   })
 
   test_that("plot_dose_response_sa_by_drugs works as expected", {
@@ -531,7 +571,7 @@ test_that("plot_dose_response_sa works as expected", {
                   NROW(drug_name_vec))
     expect_length(ggplot2::ggplot_build(plts_4[[cellline_name_vec[1]]])[["data"]][[1]], 0) # no data for 1st cell line
     expect_equal(ggplot2::get_guide_data(plts_4[[cellline_name_vec[2]]], "colour")[[".label"]],
-                 drug_name_vec) # legend is present
+                 drug_name_vec) # legend is presen
   })
 
   test_that("plot_dose_response_sa_qc works as expected", {
@@ -580,7 +620,7 @@ test_that("plot_dose_response_sa works as expected", {
     expect_is(plt_4, "gg")
     expect_length(ggplot2::ggplot_build(plt_4)$data[[2]], 0) # no "Fitted Curve"
 
-    # empty plot
+    # empty plo
     plt_5 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics[normalization_type == "RV", ],
                                       dt_average = dt_average[normalization_type == "RV", ],
                                       cl_name = cl_name,

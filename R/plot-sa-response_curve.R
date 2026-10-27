@@ -15,9 +15,10 @@
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colors_vec character vector of colors (name or hex value), matched to
-#'    \code{group_names} by position (1st color = 1st name), independent of final plot order;
-#'    missing/invalid/extra entries fall back to the default palette per group
+#' @param colors_vec character vector of colors (name or hex value), matched
+#'    to \code{group_names} by position, or by name if fully named. Invalid,
+#'    missing, or extra entries fall back to the default palette
+#'    (\code{\link{get_qual_colors}}); nothing is recycled.
 #' @param plot_averaged_flag logical flag whether plot points with average values
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
@@ -73,13 +74,28 @@
 #'                       colors_vec = c("lightblue", "orange"))
 #'
 #' my_colors <- c("drug_004" = "black")
-#' plot_dose_response_sa(dt_metrics = dt_metrics,
-#'                       dt_average = dt_average,
-#'                       selection_name = selected_cellline,
-#'                       group_var = group_var,
-#'                       group_names = group_names) +
-#'   ggplot2::scale_color_manual(values = my_colors) +
-#'   ggplot2::scale_fill_manual(values = my_colors)
+#' my_widths <- c("drug_002" = 0.5, "drug_003" = 0.5, "drug_004" = 2)
+#' suppressMessages(suppressWarnings(
+#'   plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                         dt_average = dt_average,
+#'                         selection_name = selected_cellline,
+#'                         group_var = group_var,
+#'                         group_names = group_names) +
+#'     ggplot2::scale_color_manual(values = my_colors) +
+#'     ggplot2::aes(linewidth = group_var) +
+#'     ggplot2::scale_linewidth_manual(values = my_widths) +
+#'     ggplot2::labs(color = "Drugs by color", linewidth = "Drugs by linewidth")
+#' ))
+#'
+#' suppressMessages(suppressWarnings(print(
+#'   plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                         dt_average = dt_average,
+#'                         selection_name = selected_cellline,
+#'                         group_var = group_var,
+#'                         group_names = group_names,
+#'                         colors_vec = "black") +
+#'     ggplot2::aes(linetype = group_var, color = NULL)
+#' )))
 #'
 #' @export
 plot_dose_response_sa <- function(dt_metrics,

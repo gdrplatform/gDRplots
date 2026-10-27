@@ -32,9 +32,10 @@ and single-agent \code{SummarizedExperiment}}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{colors_vec}{character vector of colors (name or hex value), matched to
-\code{group_names} by position (1st color = 1st name), independent of final plot order;
-missing/invalid/extra entries fall back to the default palette per group}
+\item{colors_vec}{character vector of colors (name or hex value), matched
+to \code{group_names} by position, or by name if fully named. Invalid,
+missing, or extra entries fall back to the default palette
+(\code{\link{get_qual_colors}}); nothing is recycled.}
 
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 

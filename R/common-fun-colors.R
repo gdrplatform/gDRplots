@@ -184,49 +184,33 @@ get_col_luminance <- function(col_name) {
 #'   ignored (the first occurrence wins).
 #' @param group_names character vector (no duplicates) of group names to
 #'   produce a color for, in their required order
-#' @param colors_vec character vector of colors (name or hex value).
-#'   If every element is named (e.g. \code{c(cell_DC = "blue")}), those names
-#'   are used directly to resolve against \code{group_names}, independent of order;
-#'   otherwise colors are paired positionally against \code{group_names_requested}.
+#' @param colors_vec character vector of colors (name or hex value). If fully
+#'   named (e.g. \code{c(cell_DC = "blue")}), matched to \code{group_names} by
+#'   name, independent of order; otherwise matched positionally against
+#'   \code{group_names_requested} (partial naming is treated as unnamed).
+#'   Invalid, missing, or extra entries fall back to the default palette
+#'   (\code{\link{get_qual_colors}}); nothing is recycled.
 #'
 #' @examples
 #' \donttest{
-#'.resolve_group_colors(
+#'gDRplots:::.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
 #'  colors_vec = c("blue", "red", "grey"))
 #'
-#'.resolve_group_colors(
-#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
-#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
-#'  colors_vec = c("blue", "pinky", "grey"))
-#'
-#'.resolve_group_colors(
-#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
-#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
-#'  colors_vec = c("blue", "red", "grey", "orange"))
-#'
-#'.resolve_group_colors(
-#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
-#'  group_names = c("cell_AB", "cell_XY"),
-#'  colors_vec = c("blue", "red"))
-#'
-#'.resolve_group_colors(
-#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
-#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
-#'  colors_vec = c("blue", "red"))
-#'
-#'.resolve_group_colors(
+#'gDRplots:::.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
 #'  colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_AB = "grey"))
 #'
-#'.resolve_group_colors(
+#' # missing entries fall back to the default palette
+#'gDRplots:::.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
-#'  colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_EF = "grey"))
+#'  colors_vec = c("blue", "red"))
 #'
-#'.resolve_group_colors(
+#' # partial naming is treated as unnamed
+#'gDRplots:::.resolve_group_colors(
 #'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
 #'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
 #'  colors_vec = c(cell_AB = "grey", "blue", "red"))
@@ -240,6 +224,9 @@ get_col_luminance <- function(col_name) {
 .resolve_group_colors <- function(group_names_requested,
                                   group_names,
                                   colors_vec = NULL) {
+  if (is.factor(group_names_requested)) group_names_requested <- as.character(group_names_requested)
+  if (is.factor(group_names)) group_names <- as.character(group_names)
+
   checkmate::assert_character(group_names_requested, null.ok = TRUE, unique = TRUE)
   checkmate::assert_character(group_names, unique = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -254,6 +241,13 @@ get_col_luminance <- function(col_name) {
     names(color_values) <- group_names
   } else {
     if (!is_named_colors_vec) {
+      if (!is.null(names(colors_vec)) &&
+          any(!is.na(names(colors_vec)) & nzchar(names(colors_vec)))) {
+        warning(
+          "'colors_vec' has some, but not all, elements named - names are ",
+          "ignored and colors are matched to requested group_names by position instead."
+        )
+      }
       names(colors_vec) <- group_names_requested[seq_along(colors_vec)]
     }
     colors_vec <- colors_vec[!is.na(colors_vec)]

@@ -196,18 +196,21 @@ test_that(".resolve_group_colors works as expected", {
   expect_equal(res_11, col_11[data_order])
 
   col_12 <- c(col_10[1:2], "orange")
-  res_12 <- .resolve_group_colors(
-    group_names_requested = req_grp_name,
-    group_names = data_order,
-    colors_vec = col_12)
+  expect_warning({
+    res_12 <- .resolve_group_colors(
+      group_names_requested = req_grp_name,
+      group_names = data_order,
+      colors_vec = col_12)
+  }, "'colors_vec' has some, but not all, elements named")
 
   expect_equal(names(res_12), data_order)
   expect_equal(res_12, setNames(col_12, req_grp_name)[data_order])
 
   # named colors_vec ignores group_names_requested entirely - names alone decide the mapping
-  col_13 <- c(cell_AB = "grey", cell_DC = "blue", cell_XY = "red")
+  col_13 <- col_2
+  names(col_13) <- data_order
   res_13 <- .resolve_group_colors(
-    group_names_requested = c("cell_XY", "cell_DC", "cell_AB"),
+    group_names_requested = req_grp_name,
     group_names = data_order,
     colors_vec = col_13)
   res_13_no_request <- .resolve_group_colors(
@@ -217,6 +220,81 @@ test_that(".resolve_group_colors works as expected", {
 
   expect_equal(res_13, col_13[data_order])
   expect_equal(res_13, res_13_no_request)
+
+  col_14 <- col_13
+  names(col_14)[3] <- NA
+  expect_warning({
+    res_14 <- .resolve_group_colors(
+      group_names_requested = req_grp_name,
+      group_names = data_order,
+      colors_vec = col_14)
+  }, "'colors_vec' has some, but not all, elements named")
+
+  expect_equal(res_14, setNames(col_2, req_grp_name)[data_order])
+
+  col_15 <- col_13
+  names(col_15)[3] <- ""
+  expect_warning({
+    res_15 <- .resolve_group_colors(
+      group_names_requested = req_grp_name,
+      group_names = data_order,
+      colors_vec = col_15)
+  }, "'colors_vec' has some, but not all, elements named")
+
+  expect_equal(res_15, setNames(col_2, req_grp_name)[data_order])
+
+  # scenario: fully named `colors_vec` covering only part of group_names
+  col_16 <- c(cell_AB = "grey")
+  res_16 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_16)
+
+  expect_equal(names(res_16), data_order)
+  expect_equal(res_16[names(col_16)], col_16)
+  expect_true(all(
+    vapply(res_16[!names(res_16) %in% names(col_16)], is_valid_color, logical(1))))
+
+  # scenario: named `colors_vec` with a name not present in group_names
+  col_17 <- col_2
+  names(col_17) <- req_grp_name
+  names(col_17)[3] <- "cell_EF"
+  res_17 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = data_order,
+    colors_vec = col_17)
+
+  def_col <- intersect(req_grp_name, names(col_17))
+  expect_equal(names(res_17), data_order)
+  expect_equal(res_17[def_col], col_17[def_col])
+  expect_true(is_valid_color(res_17[setdiff(names(res_17), def_col)]))
+  expect_false("grey" %in% res_17)
+
+  # scenario: group_names / group_names_requested arrive as factors
+  res_18 <- .resolve_group_colors(
+    group_names_requested = factor(req_grp_name),
+    group_names = data_order,
+    colors_vec = col_2)
+  expect_equal(res_18, res_2)
+
+  res_19 <- .resolve_group_colors(
+    group_names_requested = req_grp_name,
+    group_names = factor(data_order),
+    colors_vec = col_2)
+  expect_equal(res_19, res_2)
+
+  res_20 <- .resolve_group_colors(
+    group_names_requested = factor(req_grp_name),
+    group_names = factor(data_order),
+    colors_vec = col_2)
+  expect_equal(res_20, res_2)
+
+  res_21 <- .resolve_group_colors(
+    group_names_requested = NULL,
+    group_names = factor(data_order),
+    colors_vec = col_2)
+  expect_equal(names(res_21), data_order)
+  expect_true(all(vapply(res_21, is_valid_color, logical(1))))
 
   expect_error(.resolve_group_colors(group_names_requested = 1:3,
                                      group_names = data_order),

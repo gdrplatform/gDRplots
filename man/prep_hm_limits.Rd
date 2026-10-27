@@ -33,8 +33,8 @@ Calculate limit for combo heatmap with gDR assumptions
 \examples{
 \donttest{
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
-prep_hm_limits(vec)
-prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
+gDRplots:::prep_hm_limits(vec)
+gDRplots:::prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
 }
 
 }
