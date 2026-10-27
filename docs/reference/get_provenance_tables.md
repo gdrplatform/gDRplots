@@ -45,5 +45,16 @@ Bartosz Czech <czech.bartosz@external.gene.com>
 mae <- gDRutils::get_synthetic_data("small")
 tables <- get_provenance_tables(mae)
 tables$fits
-#> Empty data.table (0 rows and 6 cols): experiment,assay,fit_source,fn,settings,model
+#>      experiment   assay fit_source
+#>          <char>  <char>     <char>
+#> 1: single-agent Metrics        gDR
+#>                                               fn
+#>                                           <char>
+#> 1: gDRutils::fit_drug_response_metrics (1.11.22)
+#>                                                                                                        settings
+#>                                                                                                          <char>
+#> 1: capping_fold = 5, range_conc = c(0.005, 5), pcutoff = 0.05, n_point_cutoff = 4, force_fit = FALSE, cap = 0.1
+#>                                                                model
+#>                                                               <char>
+#> 1: 3-parameter log-logistic (drc::LL.3u), upper asymptote fixed at 1
 ```

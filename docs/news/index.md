@@ -1,5 +1,10 @@
 # Changelog
 
+## gDRplots 0.99.8 - 2026-10-26
+
+- fix the provenance tests failing on reference data that already
+  carries a provenance
+
 ## gDRplots 0.99.7 - 2026-10-25
 
 - add the plates read without a barcode to the import step of the
