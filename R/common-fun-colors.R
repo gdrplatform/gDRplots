@@ -170,3 +170,96 @@ get_col_luminance <- function(col_name) {
   lum <- lum[[1]] * 0.2326 + lum[[2]] * 0.6952 + lum[[3]] * 0.0722
   lum
 }
+
+
+#' Resolve a color mapping for group names
+#'
+#' Builds a named color vector for \code{group_names}, resolving
+#' \code{colors_vec} by name wherever possible so each color maps to its
+#' intended group regardless of the order or length of the inputs.
+#'
+#' @param group_names_requested character vector of group names in their
+#'   originally requested order, used to pair an unnamed \code{colors_vec} by
+#'   name; \code{NULL} if no \code{group_names} were requested. Duplicates are
+#'   ignored (the first occurrence wins).
+#' @param group_names character vector (no duplicates) of group names to
+#'   produce a color for, in their required order
+#' @param colors_vec character vector of colors (name or hex value). If fully
+#'   named (e.g. \code{c(cell_DC = "blue")}), matched to \code{group_names} by
+#'   name, independent of order; otherwise matched positionally against
+#'   \code{group_names_requested} (partial naming is treated as unnamed).
+#'   Invalid, missing, or extra entries fall back to the default palette
+#'   (\code{\link{get_qual_colors}}); nothing is recycled.
+#'
+#' @examples
+#' \donttest{
+#'gDRplots:::.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c("blue", "red", "grey"))
+#'
+#'gDRplots:::.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c(cell_DC = "blue", cell_XY = "red", cell_AB = "grey"))
+#'
+#' # missing entries fall back to the default palette
+#'gDRplots:::.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c("blue", "red"))
+#'
+#' # partial naming is treated as unnamed
+#'gDRplots:::.resolve_group_colors(
+#'  group_names_requested = c("cell_DC", "cell_XY", "cell_AB"),
+#'  group_names = c("cell_AB", "cell_DC", "cell_XY"),
+#'  colors_vec = c(cell_AB = "grey", "blue", "red"))
+#' }
+#'
+#' @author Janina Smoła \email{janina.smola@@external.roche.com}
+#'
+#' @keywords internal
+#' @return named character vector of colors, one per entry of \code{group_names}
+#'
+.resolve_group_colors <- function(group_names_requested,
+                                  group_names,
+                                  colors_vec = NULL) {
+  if (is.factor(group_names_requested)) group_names_requested <- as.character(group_names_requested)
+  if (is.factor(group_names)) group_names <- as.character(group_names)
+
+  checkmate::assert_character(group_names_requested, null.ok = TRUE, unique = TRUE)
+  checkmate::assert_character(group_names, unique = TRUE)
+  checkmate::assert_character(colors_vec, null.ok = TRUE)
+
+  if (is.null(group_names_requested)) group_names_requested <- group_names
+
+  is_named_colors_vec <- !is.null(names(colors_vec)) &&
+    all(!is.na(names(colors_vec)) & nzchar(names(colors_vec)))
+
+  if (is.null(colors_vec) || all(!vapply(colors_vec[!is.na(colors_vec)], is_valid_color, logical(1)))) {
+    color_values <- get_qual_colors(NROW(group_names))
+    names(color_values) <- group_names
+  } else {
+    if (!is_named_colors_vec) {
+      if (!is.null(names(colors_vec)) &&
+          any(!is.na(names(colors_vec)) & nzchar(names(colors_vec)))) {
+        warning(
+          "'colors_vec' has some, but not all, elements named - names are ",
+          "ignored and colors are matched to requested group_names by position instead."
+        )
+      }
+      names(colors_vec) <- group_names_requested[seq_along(colors_vec)]
+    }
+    colors_vec <- colors_vec[!is.na(colors_vec)]
+    colors_vec <- colors_vec[vapply(colors_vec, is_valid_color, logical(1))]
+
+    if (!all(group_names %in% names(colors_vec))) {
+      missing_grp <- group_names[!(group_names %in% names(colors_vec))]
+      missing_col <- get_qual_colors(NROW(missing_grp))
+      names(missing_col) <- missing_grp
+      colors_vec <- append(colors_vec, missing_col)
+    }
+    color_values <- colors_vec[group_names]
+  }
+  return(color_values)
+}

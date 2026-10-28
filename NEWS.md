@@ -1,3 +1,7 @@
+## gDRplots 0.99.9 - 2026-10-27
+* fix mapping `group_names` into `colors_vec` for dose-response curves and boxplots
+* fix `colors_vec` length mismatches to pair by position instead of interpolating colors
+
 ## gDRplots 0.99.8 - 2026-10-26
 * fix the provenance tests failing on reference data that already carries a provenance
 

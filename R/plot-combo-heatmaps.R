@@ -1876,8 +1876,8 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #' @examples
 #' \donttest{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
-#' prep_hm_limits(vec)
-#' prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
+#' gDRplots:::prep_hm_limits(vec)
+#' gDRplots:::prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
 #' }
 #'
 #' @keywords internal
@@ -1943,9 +1943,9 @@ prep_hm_limits <- function(num_vec,
 #' @examples
 #' \donttest{
 #' vec <- c(0, 0.003, 0.01, 0.03)
-#' transform_log_conc(vec)
+#' gDRplots:::transform_log_conc(vec)
 #' vec <- c(0, 0, 0)
-#' transform_log_conc(vec)
+#' gDRplots:::transform_log_conc(vec)
 #' }
 #'
 #' @keywords internal

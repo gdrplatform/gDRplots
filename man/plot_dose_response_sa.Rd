@@ -37,7 +37,10 @@ if \code{NULL} then all values will be plotted}
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{colors_vec}{character vector with colors for \code{group_names} - name or hex value}
+\item{colors_vec}{character vector of colors (name or hex value), matched
+to \code{group_names} by position, or by name if fully named. Invalid,
+missing, or extra entries fall back to the default palette
+(\code{\link{get_qual_colors}}); nothing is recycled.}
 
 \item{plot_averaged_flag}{logical flag whether plot points with average values}
 
@@ -75,6 +78,13 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       group_var = group_var,
                       group_names = celline_names)
 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = NULL,
+                      selection_name = selected_drug,
+                      group_var = group_var,
+                      group_names = celline_names,
+                      colors_vec = c("red", "blue"))
+
 selected_cellline <- "cellline_HB"
 group_var <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -86,6 +96,37 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_cellline,
                       group_var = group_var,
                       group_names = group_names)
+
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
+                      selection_name = selected_cellline,
+                      group_var = group_var,
+                      group_names = rev(group_names),
+                      colors_vec = c("lightblue", "orange"))
+
+my_colors <- c("drug_004" = "black")
+my_widths <- c("drug_002" = 0.5, "drug_003" = 0.5, "drug_004" = 2)
+suppressMessages(suppressWarnings(
+  plot_dose_response_sa(dt_metrics = dt_metrics,
+                        dt_average = dt_average,
+                        selection_name = selected_cellline,
+                        group_var = group_var,
+                        group_names = group_names) +
+    ggplot2::scale_color_manual(values = my_colors) +
+    ggplot2::aes(linewidth = group_var) +
+    ggplot2::scale_linewidth_manual(values = my_widths) +
+    ggplot2::labs(color = "Drugs by color", linewidth = "Drugs by linewidth")
+))
+
+suppressMessages(suppressWarnings(print(
+  plot_dose_response_sa(dt_metrics = dt_metrics,
+                        dt_average = dt_average,
+                        selection_name = selected_cellline,
+                        group_var = group_var,
+                        group_names = group_names,
+                        colors_vec = "black") +
+    ggplot2::aes(linetype = group_var, color = NULL)
+)))
 
 }
 \keyword{single-agent_plots}

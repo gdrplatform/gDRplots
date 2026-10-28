@@ -15,7 +15,10 @@
 #'    if \code{NULL} then all values will be plotted
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
-#' @param colors_vec character vector with colors for \code{group_names} - name or hex value
+#' @param colors_vec character vector of colors (name or hex value), matched
+#'    to \code{group_names} by position, or by name if fully named. Invalid,
+#'    missing, or extra entries fall back to the default palette
+#'    (\code{\link{get_qual_colors}}); nothing is recycled.
 #' @param plot_averaged_flag logical flag whether plot points with average values
 #' @param plot_fit_flag logical flag whether plot points with fitted values
 #' @param fit_source string source name for metrics
@@ -44,6 +47,13 @@
 #'                       group_var = group_var,
 #'                       group_names = celline_names)
 #'
+#' plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                       dt_average = NULL,
+#'                       selection_name = selected_drug,
+#'                       group_var = group_var,
+#'                       group_names = celline_names,
+#'                       colors_vec = c("red", "blue"))
+#'
 #' selected_cellline <- "cellline_HB"
 #' group_var <- "DrugName"
 #' dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -55,6 +65,37 @@
 #'                       selection_name = selected_cellline,
 #'                       group_var = group_var,
 #'                       group_names = group_names)
+#'
+#' plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                       dt_average = dt_average,
+#'                       selection_name = selected_cellline,
+#'                       group_var = group_var,
+#'                       group_names = rev(group_names),
+#'                       colors_vec = c("lightblue", "orange"))
+#'
+#' my_colors <- c("drug_004" = "black")
+#' my_widths <- c("drug_002" = 0.5, "drug_003" = 0.5, "drug_004" = 2)
+#' suppressMessages(suppressWarnings(
+#'   plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                         dt_average = dt_average,
+#'                         selection_name = selected_cellline,
+#'                         group_var = group_var,
+#'                         group_names = group_names) +
+#'     ggplot2::scale_color_manual(values = my_colors) +
+#'     ggplot2::aes(linewidth = group_var) +
+#'     ggplot2::scale_linewidth_manual(values = my_widths) +
+#'     ggplot2::labs(color = "Drugs by color", linewidth = "Drugs by linewidth")
+#' ))
+#'
+#' suppressMessages(suppressWarnings(print(
+#'   plot_dose_response_sa(dt_metrics = dt_metrics,
+#'                         dt_average = dt_average,
+#'                         selection_name = selected_cellline,
+#'                         group_var = group_var,
+#'                         group_names = group_names,
+#'                         colors_vec = "black") +
+#'     ggplot2::aes(linetype = group_var, color = NULL)
+#' )))
 #'
 #' @export
 plot_dose_response_sa <- function(dt_metrics,
@@ -112,11 +153,12 @@ plot_dose_response_sa <- function(dt_metrics,
   }
 
   # update group (it depends on user choice for `group_names` and `selection_name`)
+  group_names_requested <- unique(group_names)
+  available_group_names <- unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
   group_names <- if (is.null(group_names)) {
-    unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]])))
+    available_group_names
   } else {
-    intersect(unique(c(unique(dt_met[[group_var]]), unique(dt_avg[[group_var]]))),
-              group_names)
+    intersect(available_group_names, group_names)
   }
 
   # filter data
@@ -200,15 +242,9 @@ plot_dose_response_sa <- function(dt_metrics,
     data_range <- c(min_val, max_val)
 
     # prep color palette
-    color_values <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
-      get_qual_colors(NROW(group_names))
-    } else if (NROW(colors_vec) != NROW(group_names)) {
-      grDevices::colorRampPalette(colors_vec)(NROW(group_names))
-    } else {
-      colors_vec
-    }
-    names(color_values) <- group_names
-
+    color_values <- .resolve_group_colors(group_names_requested = group_names_requested,
+                                          group_names = group_names,
+                                          colors_vec = colors_vec)
     # levels
     if (!is.null(dt_avg)) dt_avg$group_var <- factor(dt_avg[[group_var]], levels = group_names)
     if (!is.null(dt_fit)) dt_fit$group_var <- factor(dt_fit[[group_var]], levels = group_names)
@@ -275,6 +311,13 @@ plot_dose_response_sa <- function(dt_metrics,
 #'                              drug_name_vec = drug_name_vec,
 #'                              normalization_type = "RV",
 #'                              colors_vec = c("#00008B", "#FF6347", "#4CBB17"))
+#'
+#' plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
+#'                              dt_average = dt_average,
+#'                              cellline_name_vec = cellline_name_vec,
+#'                              drug_name_vec = drug_name_vec,
+#'                              normalization_type = "RV")
+#'
 #'
 #' @export
 plot_dose_response_sa_by_CLs <- function(dt_metrics,

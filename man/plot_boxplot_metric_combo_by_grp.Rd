@@ -54,8 +54,10 @@ values of \code{metric}; one of: \code{"top"} or \code{"bottom"}}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
-for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
+\item{colors_vec}{character vector of colors (name or hex value), matched to
+\code{group_names} by position (1st color = 1st name) when \code{grouped_flag = TRUE},
+independent of final plot order; missing/invalid/extra entries fall back to the default
+palette per group. If \code{grouped_flag = FALSE}, only the first color is used.}
 }
 \value{
 \code{ggplot} object containing boxplots for selected combo metric
@@ -88,15 +90,23 @@ plot_boxplot_metric_combo_by_grp(dt_scores,
 
 plot_boxplot_metric_combo_by_grp(dt_scores,
                                  selection_var = "DrugName",
-                                 selection_name = c("drug_001", "drug_021"),
+                                 selection_name = c("drug_011", "drug_021"),
                                  group_var = "Tissue",
                                  grouped_flag = TRUE)
 
 plot_boxplot_metric_combo_by_grp(dt_scores,
                                  selection_var = "DrugName",
-                                 selection_name = c("drug_001", "drug_021"),
+                                 selection_name = c("drug_011", "drug_021"),
                                  group_var = "Tissue",
                                  colors_vec = c("darkblue", "orange"))
+
+plot_boxplot_metric_combo_by_grp(dt_scores,
+                                 selection_var = "DrugName",
+                                 selection_name = c("drug_001", "drug_021"),
+                                 group_var = "Tissue_grp",
+                                 grouped_flag = TRUE,
+                                 group_names = c("tissue_w", "tissue_other"),
+                                 colors_vec = c("black", "gold"))
 
 }
 \author{

@@ -56,8 +56,10 @@ values of \code{metric}; one of: \code{"top"} or \code{"bottom"}}
 
 \item{grouped_flag}{logical flag whether the boxplots should be colored by \code{group_var}}
 
-\item{colors_vec}{character vector with colors (name or hex value) to color boxplots;
-for \code{grouped_flag} set as \code{FALSE} only first from vector will be used}
+\item{colors_vec}{character vector of colors (name or hex value), matched to
+\code{group_names} by position (1st color = 1st name) when \code{grouped_flag = TRUE},
+independent of final plot order; missing/invalid/extra entries fall back to the default
+palette per group. If \code{grouped_flag = FALSE}, only the first color is used.}
 
 \item{with_inf}{a logical flag indicating whether infinite values should be shown on boxplots}
 }
@@ -79,7 +81,7 @@ invisible(dt_metrics[, Tissue_grp := data.table::fifelse(Tissue == "tissue_w",
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
-                              selection_name = "drug_001",
+                              selection_name = "drug_011",
                               group_var = "Tissue")
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
@@ -89,27 +91,35 @@ plot_boxplot_metric_sa_by_grp(dt_metrics,
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
-                              selection_name = "drug_001",
+                              selection_name = "drug_011",
                               group_var = "Tissue",
                               with_inf = TRUE)
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
-                              selection_name = "drug_001",
+                              selection_name = "drug_011",
                               group_var = "Tissue",
                               named_n = 0)
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
-                              selection_name = "drug_001",
+                              selection_name = "drug_011",
                               group_var = "Tissue",
                               grouped_flag = TRUE)
 
 plot_boxplot_metric_sa_by_grp(dt_metrics,
                               selection_var = "DrugName",
-                              selection_name = "drug_001",
+                              selection_name = "drug_011",
                               group_var = "Tissue",
                               colors_vec = c("darkblue", "deeppink"))
+
+plot_boxplot_metric_sa_by_grp(dt_metrics,
+                              selection_var = "DrugName",
+                              selection_name = "drug_001",
+                              group_var = "Tissue_grp",
+                              grouped_flag = TRUE,
+                              group_names = c("tissue_w", "tissue_other"),
+                              colors_vec = c("black", "gold"))
 
 }
 \author{
