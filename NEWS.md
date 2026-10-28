@@ -1,3 +1,6 @@
+## gDRplots 0.99.10 - 2026-10-28
+* fix `group_names` as factor in `plot_boxplot_metric_*` functions
+
 ## gDRplots 0.99.9 - 2026-10-27
 * fix mapping `group_names` into `colors_vec` for dose-response curves and boxplots
 * fix `colors_vec` length mismatches to pair by position instead of interpolating colors
