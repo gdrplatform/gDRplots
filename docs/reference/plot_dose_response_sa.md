@@ -55,7 +55,11 @@ plot_dose_response_sa(
 
 - colors_vec:
 
-  character vector with colors for `group_names` - name or hex value
+  character vector of colors (name or hex value), matched to
+  `group_names` by position, or by name if fully named. Invalid,
+  missing, or extra entries fall back to the default palette
+  ([`get_qual_colors`](https://gdrplatform.github.io/gDRplots/reference/get_qual_colors.md));
+  nothing is recycled.
 
 - plot_averaged_flag:
 
@@ -102,6 +106,14 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       group_names = celline_names)
 
 
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = NULL,
+                      selection_name = selected_drug,
+                      group_var = group_var,
+                      group_names = celline_names,
+                      colors_vec = c("red", "blue"))
+
+
 selected_cellline <- "cellline_HB"
 group_var <- "DrugName"
 dt_metrics <- gDRutils::convert_se_assay_to_dt(se, "Metrics")
@@ -113,5 +125,39 @@ plot_dose_response_sa(dt_metrics = dt_metrics,
                       selection_name = selected_cellline,
                       group_var = group_var,
                       group_names = group_names)
+
+
+plot_dose_response_sa(dt_metrics = dt_metrics,
+                      dt_average = dt_average,
+                      selection_name = selected_cellline,
+                      group_var = group_var,
+                      group_names = rev(group_names),
+                      colors_vec = c("lightblue", "orange"))
+
+
+my_colors <- c("drug_004" = "black")
+my_widths <- c("drug_002" = 0.5, "drug_003" = 0.5, "drug_004" = 2)
+suppressMessages(suppressWarnings(
+  plot_dose_response_sa(dt_metrics = dt_metrics,
+                        dt_average = dt_average,
+                        selection_name = selected_cellline,
+                        group_var = group_var,
+                        group_names = group_names) +
+    ggplot2::scale_color_manual(values = my_colors) +
+    ggplot2::aes(linewidth = group_var) +
+    ggplot2::scale_linewidth_manual(values = my_widths) +
+    ggplot2::labs(color = "Drugs by color", linewidth = "Drugs by linewidth")
+))
+
+
+suppressMessages(suppressWarnings(print(
+  plot_dose_response_sa(dt_metrics = dt_metrics,
+                        dt_average = dt_average,
+                        selection_name = selected_cellline,
+                        group_var = group_var,
+                        group_names = group_names,
+                        colors_vec = "black") +
+    ggplot2::aes(linetype = group_var, color = NULL)
+)))
 
 ```

@@ -25,10 +25,10 @@ all concentrations are 0, all positions are 0.
 ``` r
 # \donttest{
 vec <- c(0, 0.003, 0.01, 0.03)
-transform_log_conc(vec)
-#> Error in transform_log_conc(vec): could not find function "transform_log_conc"
+gDRplots:::transform_log_conc(vec)
+#> [1] -3.045757 -2.522879 -2.000000 -1.522879
 vec <- c(0, 0, 0)
-transform_log_conc(vec)
-#> Error in transform_log_conc(vec): could not find function "transform_log_conc"
+gDRplots:::transform_log_conc(vec)
+#> [1] 0 0 0
 # }
 ```

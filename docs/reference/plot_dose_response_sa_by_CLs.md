@@ -48,7 +48,11 @@ plot_dose_response_sa_by_CLs(
 
 - colors_vec:
 
-  character vector with colors for `group_names` - name or hex value
+  character vector of colors (name or hex value), matched to
+  `group_names` by position, or by name if fully named. Invalid,
+  missing, or extra entries fall back to the default palette
+  ([`get_qual_colors`](https://gdrplatform.github.io/gDRplots/reference/get_qual_colors.md));
+  nothing is recycled.
 
 - plot_averaged_flag:
 
@@ -91,4 +95,20 @@ plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
 #> $drug_008
 
 #> 
+
+plot_dose_response_sa_by_CLs(dt_metrics = dt_metrics,
+                             dt_average = dt_average,
+                             cellline_name_vec = cellline_name_vec,
+                             drug_name_vec = drug_name_vec,
+                             normalization_type = "RV")
+#> $drug_006
+
+#> 
+#> $drug_007
+
+#> 
+#> $drug_008
+
+#> 
+
 ```

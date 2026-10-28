@@ -39,7 +39,7 @@ plot_dose_response_combo_panel(
 
 - colors_vec:
 
-  character vector with colors for `group_names` - name or hex value
+  character vector with colors for `Concentration_2` - name or hex value
   note that the first color will be assigned to the min value of
   `Concentration_2`, and the last one - to the max of `Concentration_2`;
   the default is the orange-black palette

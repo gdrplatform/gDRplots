@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,8 +117,10 @@ values of <code>metric</code>; one of: <code>"top"</code> or <code>"bottom"</cod
 
 
 <dt id="arg-colors-vec">colors_vec<a class="anchor" aria-label="anchor" href="#arg-colors-vec"></a></dt>
-<dd><p>character vector with colors (name or hex value) to color boxplots;
-for <code>grouped_flag</code> set as <code>FALSE</code> only first from vector will be used</p></dd>
+<dd><p>character vector of colors (name or hex value), matched to
+<code>group_names</code> by position (1st color = 1st name) when <code>grouped_flag = TRUE</code>,
+independent of final plot order; missing/invalid/extra entries fall back to the default
+palette per group. If <code>grouped_flag = FALSE</code>, only the first color is used.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -158,17 +160,26 @@ for <code>grouped_flag</code> set as <code>FALSE</code> only first from vector w
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">plot_boxplot_metric_combo_by_grp</span><span class="op">(</span><span class="va">dt_scores</span>,</span></span>
 <span class="r-in"><span>                                 selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span></span>
-<span class="r-in"><span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_001"</span>, <span class="st">"drug_021"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_011"</span>, <span class="st">"drug_021"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                                 group_var <span class="op">=</span> <span class="st">"Tissue"</span>,</span></span>
 <span class="r-in"><span>                                 grouped_flag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot_metric_combo_by_grp-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">plot_boxplot_metric_combo_by_grp</span><span class="op">(</span><span class="va">dt_scores</span>,</span></span>
 <span class="r-in"><span>                                 selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span></span>
-<span class="r-in"><span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_001"</span>, <span class="st">"drug_021"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_011"</span>, <span class="st">"drug_021"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                                 group_var <span class="op">=</span> <span class="st">"Tissue"</span>,</span></span>
 <span class="r-in"><span>                                 colors_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"darkblue"</span>, <span class="st">"orange"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_boxplot_metric_combo_by_grp-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">plot_boxplot_metric_combo_by_grp</span><span class="op">(</span><span class="va">dt_scores</span>,</span></span>
+<span class="r-in"><span>                                 selection_var <span class="op">=</span> <span class="st">"DrugName"</span>,</span></span>
+<span class="r-in"><span>                                 selection_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"drug_001"</span>, <span class="st">"drug_021"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 group_var <span class="op">=</span> <span class="st">"Tissue_grp"</span>,</span></span>
+<span class="r-in"><span>                                 grouped_flag <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                                 group_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tissue_w"</span>, <span class="st">"tissue_other"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 colors_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"gold"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_boxplot_metric_combo_by_grp-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

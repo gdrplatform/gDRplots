@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,10 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")</p></dd>
 
 
 <dt id="arg-colors-vec">colors_vec<a class="anchor" aria-label="anchor" href="#arg-colors-vec"></a></dt>
-<dd><p>character vector with colors for <code>group_names</code> - name or hex value</p></dd>
+<dd><p>character vector of colors (name or hex value), matched
+to <code>group_names</code> by position, or by name if fully named. Invalid,
+missing, or extra entries fall back to the default palette
+(<code><a href="get_qual_colors.html">get_qual_colors</a></code>); nothing is recycled.</p></dd>
 
 
 <dt id="arg-plot-averaged-flag">plot_averaged_flag<a class="anchor" aria-label="anchor" href="#arg-plot-averaged-flag"></a></dt>
@@ -127,6 +130,22 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $drug_008</span>
 <span class="r-plt img"><img src="plot_dose_response_sa_by_CLs-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">plot_dose_response_sa_by_CLs</span><span class="op">(</span>dt_metrics <span class="op">=</span> <span class="va">dt_metrics</span>,</span></span>
+<span class="r-in"><span>                             dt_average <span class="op">=</span> <span class="va">dt_average</span>,</span></span>
+<span class="r-in"><span>                             cellline_name_vec <span class="op">=</span> <span class="va">cellline_name_vec</span>,</span></span>
+<span class="r-in"><span>                             drug_name_vec <span class="op">=</span> <span class="va">drug_name_vec</span>,</span></span>
+<span class="r-in"><span>                             normalization_type <span class="op">=</span> <span class="st">"RV"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_006</span>
+<span class="r-plt img"><img src="plot_dose_response_sa_by_CLs-4.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_007</span>
+<span class="r-plt img"><img src="plot_dose_response_sa_by_CLs-5.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $drug_008</span>
+<span class="r-plt img"><img src="plot_dose_response_sa_by_CLs-6.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
