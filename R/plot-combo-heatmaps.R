@@ -140,7 +140,7 @@ heatmap_combo_metrics <- function(
 
   # check if isolines are available and adjust plotting logic accordingly
   available_iso_lvl <- if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
-    unique(dt_isobolograms[["iso_level"]])
+    as.character(unique(dt_isobolograms[["iso_level"]]))
   } else {
     NULL
   }
@@ -446,7 +446,7 @@ heatmap_combo_metrics_panel <- function(
 
   # check if isolines are available and adjust plotting logic accordingly
   available_iso_lvl <- if (!is.null(dt_isobolograms) && !is.null(iso_levels)) {
-    unique(dt_isobolograms[["iso_level"]])
+    as.character(unique(dt_isobolograms[["iso_level"]]))
   } else {
     NULL
   }
@@ -814,7 +814,7 @@ plot_combination_index <- function(
   dt_isobolograms <- dt_isobolograms[get(cellline_name) == cl_name & get(drug_name) == drug1_name &
                                        get(drug_name_2) == drug2_name]
   dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
-  available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+  available_iso_lvl <- as.character(unique(dt_isobolograms[["iso_level"]]))
 
   if (!is.null(dt_excess)) {
     dt_excess <- dt_excess[eval(filter_expr)]
@@ -1156,7 +1156,7 @@ heatmap_combo_with_isoref <- function(
     if (!is.null(dt_isobolograms$iso_level) && !is.null(iso_levels)) { # add isolines - if there are such data
       # iso level availability
       dt_isobolograms <- dt_isobolograms[iso_level %in% iso_levels, ]
-      available_iso_lvl <- unique(dt_isobolograms[["iso_level"]])
+      available_iso_lvl <- as.character(unique(dt_isobolograms[["iso_level"]]))
       iso_levels <- iso_levels[iso_levels %in% available_iso_lvl]
 
       if (NROW(iso_levels)) {
