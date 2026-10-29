@@ -111,6 +111,16 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_true(any(grepl(drug1_name, plt_6[["labels"]][["y"]])))
   expect_true(any(grepl(drug2_name, plt_6[["labels"]][["x"]])))
   expect_length(ggplot2::ggplot_build(plt_6)[["data"]][[1]], 0)
+
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_7 <- heatmap_combo_metrics(dt_excess,
+                                 dt_isobolograms_factor,
+                                 drug1_name, drug2_name,
+                                 cl_name)
+  expect_equal(ggplot2::get_guide_data(plt_7, "colour")[[".label"]],
+               ggplot2::get_guide_data(plt_1, "colour")[[".label"]])
 })
 
 test_that("heatmap_combo_metrics_panel works as expected", {
@@ -202,6 +212,24 @@ test_that("heatmap_combo_metrics_panel works as expected", {
   expect_true(all(vapply(seq_along(plts_5), function(x) is(plts_5[[x]], "gg"), logical(1))))
   expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
   expect_true(all(ls_col_2 %in% plts_5[["hsa_excess"]][["plot_env"]][["hm_color_palette"]]))
+
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plts_6_char <- heatmap_combo_metrics_panel(dt_excess,
+                                             dt_isobolograms,
+                                             drug1_name,
+                                             drug2_name,
+                                             cl_name,
+                                             as_list = TRUE)
+  plts_6_factor <- heatmap_combo_metrics_panel(dt_excess,
+                                               dt_isobolograms_factor,
+                                               drug1_name,
+                                               drug2_name,
+                                               cl_name,
+                                               as_list = TRUE)
+  expect_equal(ggplot2::get_guide_data(plts_6_factor[["smooth"]], "colour")[[".label"]],
+               ggplot2::get_guide_data(plts_6_char[["smooth"]], "colour")[[".label"]])
 
   # scenario: lack data for selection
   dt_excess_ <-
@@ -418,6 +446,16 @@ test_that("plot_combination_index works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[3]][["colour"]])),
                NROW(c("0.2", "0.4")))
 
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_5 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms_factor,
+                                  drug1_name, drug2_name,
+                                  cl_name)
+  expect_equal(ggplot2::get_guide_data(plt_5, "colour")[[".label"]],
+               ggplot2::get_guide_data(plt_1, "colour")[[".label"]])
+
   expect_error(plot_combination_index(dt_excess = unlist(dt_excess),
                                       dt_isobolograms = dt_isobolograms,
                                       drug1_name = drug1_name,
@@ -560,6 +598,20 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_length(names(plt_6[["guides"]][["guides"]]), NROW(c("fill", "linetype", "colour")))
   expect_equal(unique(ggplot2::ggplot_build(plt_6)[["data"]][[2]][["colour"]]),
                unname(col_vec_iso))
+
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_7 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms_factor,
+                                     drug1_name,
+                                     drug2_name,
+                                     cl_name,
+                                     normalization_type = normalization_type,
+                                     iso_levels = iso_lvl,
+                                     colors_vec = ls_col)
+  expect_equal(plt_7[["scales"]][["get_scales"]]("colour")[["labels"]],
+               plt_2[["scales"]][["get_scales"]]("colour")[["labels"]])
 
   plt_1_swap_axes <- heatmap_combo_with_isoref(dt_excess,
                                                dt_isobolograms,
