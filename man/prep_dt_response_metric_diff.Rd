@@ -46,7 +46,9 @@ or "x_AOC_range" ("GR AOC within set range" or "RV AOC within set range")}
 \item{additional_cols}{character vector with additional cols that should be included in the output}
 }
 \value{
-\code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+\code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}.
+ Note: identifier columns (\code{CellLineName}, and \code{DrugName}/\code{DrugName_2} where
+ applicable) are always returned as \code{character}, regardless of their type in the input.
 }
 \description{
 Prep table with metric values for combination experiment
