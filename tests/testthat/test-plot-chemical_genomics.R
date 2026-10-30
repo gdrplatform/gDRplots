@@ -43,6 +43,25 @@ test_that("analyze_cgs works correctly", {
                           normalization_type = "RV")
   expect_is(results4, "list")
   expect_equal(names(results4), "CellLineName_1 vs. CellLineName_2")
+
+  # scenario: CellLineName column is a factor
+  metrics_data_factor <- data.table::copy(metrics_data)
+  metrics_data_factor[["CellLineName"]] <- factor(metrics_data_factor[["CellLineName"]])
+
+  results_factor <- analyze_cgs(metrics_data_factor, metrics = "xc50", cl_name = "CellLineName_1")
+  expect_equal(names(results_factor), "CellLineName_1")
+  expect_is(results_factor$CellLineName_1$fgsea$xc50, "data.table")
+  expect_gt(NROW(results_factor$CellLineName_1$fgsea$xc50), 0)
+  expect_is(results_factor$CellLineName_1$metrics_diff, "data.table")
+  expect_gt(NROW(results_factor$CellLineName_1$metrics_diff), 0)
+
+  results4_factor <- analyze_cgs(metrics_data_factor,
+                                 metrics = "xc50",
+                                 cl_name = NULL,
+                                 cellline1 = "CellLineName_1",
+                                 cellline2 = "CellLineName_2",
+                                 normalization_type = "RV")
+  expect_equal(names(results4_factor), "CellLineName_1 vs. CellLineName_2")
 })
 
 test_that("plot_cgs_ranking works correctly", {
