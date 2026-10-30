@@ -1,5 +1,7 @@
 ## gDRplots 0.99.10 - 2026-10-28
 * fix `group_names` as factor in `plot_boxplot_metric_*` functions
+* fix selection columns being factor instead of character across plotting functions
+ fix `prep_dt_response_*` functions to always return identifier columns as `character`
 
 ## gDRplots 0.99.9 - 2026-10-27
 * fix mapping `group_names` into `colors_vec` for dose-response curves and boxplots
