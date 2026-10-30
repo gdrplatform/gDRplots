@@ -89,6 +89,36 @@ test_that(".create_PRISM_plot_list works as expected", {
   expect_true(all(vapply(c("xc50", "x_mean", "x_max"), function(met) {
     any(grepl(met, names(res_2_w[[1]][[1]][[1]][[1]]))) }, FUN.VALUE = logical(1)))) # metrics
 
+  # scenario: DrugName column is a factor and drug1_name_vec defaults to available_drugs (sa)
+  dt_metrics_sa_factor <- data.table::copy(dt_metrics_sa)
+  dt_metrics_sa_factor[["DrugName"]] <- factor(dt_metrics_sa_factor[["DrugName"]])
+  dt_average_factor <- data.table::copy(dt_average)
+  dt_average_factor[["DrugName"]] <- factor(dt_average_factor[["DrugName"]])
+  res_1_factor <- .create_PRISM_plot_list(experiment_type = "sa",
+                                           dt_metrics_sa = dt_metrics_sa_factor,
+                                           dt_average = dt_average_factor,
+                                           drug1_name_vec = NULL,
+                                           meta_data_path = meta_data_path,
+                                           feat_data_path = feat_data_path,
+                                           feature_sets = feature_sets)
+  expect_is(res_1_factor, "list")
+  expect_length(res_1_factor, NROW(c("ls_plot", "ls_assoc_data")))
+
+  # scenario: DrugName/DrugName_2 columns are factors (combo)
+  dt_metrics_combo_factor <- data.table::copy(dt_metrics_combo)
+  dt_metrics_combo_factor[["DrugName"]] <- factor(dt_metrics_combo_factor[["DrugName"]])
+  dt_metrics_combo_factor[["DrugName_2"]] <- factor(dt_metrics_combo_factor[["DrugName_2"]])
+  res_2_factor <- .create_PRISM_plot_list(experiment_type = "combo",
+                                          dt_metrics_sa = NULL,
+                                          dt_metrics_combo = dt_metrics_combo_factor,
+                                          drug1_name_vec = d_names,
+                                          drug2_name_vec = d_names_2,
+                                          meta_data_path = meta_data_path,
+                                          feat_data_path = feat_data_path,
+                                          feature_sets = feature_sets)
+  expect_is(res_2_factor, "list")
+  expect_length(res_2_factor, NROW(c("ls_plot", "ls_assoc_data")))
+
   # testing assertions
   expect_error(.create_PRISM_plot_list(experiment_type = "str",
                                        dt_metrics_sa = dt_metrics_sa,

@@ -168,7 +168,7 @@
   iter_id <- NULL
   if (experiment_type == "sa") {
     dt_drug_source <- if (!is.null(dt_metrics_sa)) dt_metrics_sa else dt_average
-    available_drugs <- unique(dt_drug_source[[drug_name]])
+    available_drugs <- as.character(unique(dt_drug_source[[drug_name]]))
 
     if (is.null(drug1_name_vec) || all(!drug1_name_vec %in% available_drugs)) {
       drug1_name_vec <- available_drugs
@@ -183,6 +183,8 @@
     drug_name_grid <-
       unique(dt_drug_source[get(drug_name) %in% drug1_name_vec & get(drug_name_2) %in% drug2_name_vec,
                             c(drug_name, drug_name_2), with = FALSE])
+    data.table::set(drug_name_grid, j = drug_name, value = as.character(drug_name_grid[[drug_name]]))
+    data.table::set(drug_name_grid, j = drug_name_2, value = as.character(drug_name_grid[[drug_name_2]]))
     data.table::setorder(drug_name_grid)
     drug_name_grid[, iter_id := paste(get(drug_name), get(drug_name_2), sep = " x ")]
     drug_name_grid

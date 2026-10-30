@@ -59,11 +59,11 @@ analyze_cgs <- function(dt_metrics,
   if (!is.null(cellline1) || !is.null(cellline2)) {
     checkmate::assert_string(cellline1, null.ok = FALSE)
     checkmate::assert_string(cellline2, null.ok = FALSE)
-    checkmate::assert_subset(cellline1, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
-    checkmate::assert_subset(cellline2, choices = unique(dt_metrics[[cellline]]), empty.ok = FALSE)
+    checkmate::assert_subset(cellline1, choices = as.character(unique(dt_metrics[[cellline]])), empty.ok = FALSE)
+    checkmate::assert_subset(cellline2, choices = as.character(unique(dt_metrics[[cellline]])), empty.ok = FALSE)
   } else {
     checkmate::assert_string(cl_name, null.ok = TRUE)
-    checkmate::assert_subset(cl_name, choices = unique(dt_metrics[[cellline]]), empty.ok = TRUE)
+    checkmate::assert_subset(cl_name, choices = as.character(unique(dt_metrics[[cellline]])), empty.ok = TRUE)
   }
 
   # filter out unwanted drug moa

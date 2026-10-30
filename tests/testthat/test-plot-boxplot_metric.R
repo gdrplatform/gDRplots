@@ -399,6 +399,17 @@ test_that("plot_boxplot_metric_sa_by_grp works as expected", {
   expect_equal(ggplot2::ggplot_build(plt_10)[["data"]][[2]][["fill"]],
                unname(expected_colors))
 
+  # scenario: group_var column is a factor
+  dt_metrics_grp_factor <- data.table::copy(dt_metrics)
+  dt_metrics_grp_factor[[grp_var]] <- factor(dt_metrics_grp_factor[[grp_var]])
+  plt_11 <- plot_boxplot_metric_sa_by_grp(dt_metrics_grp_factor,
+                                          selection_var = sel_var,
+                                          selection_name = sel_name,
+                                          group_var = grp_var,
+                                          group_names = grp_names)
+  expect_is(plt_11, "gg")
+  expect_true(all(grp_names %in% ggplot2::get_panel_scales(plt_11)$x$get_labels()))
+
   # scenario: each row is one group
   dt_metrics_grp_oneitem <- data.table::copy(dt_metrics)[, oneitem_grp := sprintf("item_%s", .I)]
   expect_warning({
@@ -833,6 +844,17 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
   expect_is(plt_9, "gg")
   expect_equal(ggplot2::ggplot_build(plt_9)[["data"]][[2]][["fill"]],
                unname(expected_colors))
+
+  # scenario: group_var column is a factor
+  dt_scores_grp_factor <- data.table::copy(dt_scores)
+  dt_scores_grp_factor[[grp_var]] <- factor(dt_scores_grp_factor[[grp_var]])
+  plt_10 <- plot_boxplot_metric_combo_by_grp(dt_scores_grp_factor,
+                                             selection_var = sel_var,
+                                             selection_name = sel_name,
+                                             group_var = grp_var,
+                                             group_names = grp_names)
+  expect_is(plt_10, "gg")
+  expect_true(all(grp_names %in% ggplot2::get_panel_scales(plt_10)$x$get_labels()))
 
   # scenario: each row is one group
   dt_scores_grp_oneitem <- data.table::copy(dt_scores)[, oneitem_grp := sprintf("item_%s", .I)]

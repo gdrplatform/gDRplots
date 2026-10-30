@@ -521,10 +521,10 @@ plot_dose_response_sa_qc <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
 
-  checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
-  checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
-  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
+  checkmate::assert_choice(cl_name, choices = as.character(dt_metrics[[cellline_name]]))
+  checkmate::assert_choice(cl_name, choices = as.character(dt_average[[cellline_name]]))
+  checkmate::assert_choice(d_name, choices = as.character(dt_metrics[[drug_name]]))
+  checkmate::assert_choice(d_name, choices = as.character(dt_average[[drug_name]]))
   hline_color <-
     .get_setting("HLINE_COLOR")
 
@@ -672,8 +672,8 @@ plot_dose_response_sa_qc_panel <- function(dt_metrics,
   gnumber <- gDRutils::get_env_identifiers("drug")
   conc <- gDRutils::get_env_identifiers("concentration")
 
-  checkmate::assert_choice(cl_name, choices = dt_metrics[[cellline_name]])
-  checkmate::assert_choice(cl_name, choices = dt_average[[cellline_name]])
+  checkmate::assert_choice(cl_name, choices = as.character(dt_metrics[[cellline_name]]))
+  checkmate::assert_choice(cl_name, choices = as.character(dt_average[[cellline_name]]))
   hline_color <-
     .get_setting("HLINE_COLOR")
 

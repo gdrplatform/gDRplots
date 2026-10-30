@@ -11,7 +11,9 @@
 #'  "x_max" ("GR Max" or "E Max") or "x_mean" ("GR Mean" or "RV Mean")
 #' @param fit_source string source name for metrics
 #'
-#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}.
+#'  Note: identifier columns (\code{CellLineName}, and \code{DrugName}/\code{DrugName_2} where
+#'  applicable) are always returned as \code{character}, regardless of their type in the input.
 #' @keywords prism_plots
 #'
 #' @examples
@@ -50,7 +52,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+  checkmate::assert_choice(d_name, choices = as.character(dt_metrics[[drug_name]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("xc50", "x_mean", "x_max"), empty.ok = FALSE)
@@ -67,6 +69,7 @@ prep_dt_response_metric_sa <- function(dt_metrics,
   # final
   meta_col <- c("rId", "cId", cellline_name)
   dt_response_metric <- dt_response_metric[, c(meta_col, metric), with = FALSE]
+  dt_response_metric[[cellline_name]] <- as.character(dt_response_metric[[cellline_name]])
 
   # for xc50 - metric should be in log10 scale
   if (any(metric == "xc50")) {
@@ -93,7 +96,9 @@ prep_dt_response_metric_sa <- function(dt_metrics,
 #'  or "x_std" (standard deviation)
 #' @param fit_source string source name for metrics
 #'
-#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}.
+#'  Note: identifier columns (\code{CellLineName}, and \code{DrugName}/\code{DrugName_2} where
+#'  applicable) are always returned as \code{character}, regardless of their type in the input.
 #' @keywords prism_plots
 #'
 #' @examples
@@ -117,7 +122,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 
   checkmate::assert_data_table(dt_average)
   checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_average[[drug_name]])
+  checkmate::assert_choice(d_name, choices = as.character(dt_average[[drug_name]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = c("x", "x_std"))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -129,6 +134,7 @@ prep_dt_response_dose_sa <- function(dt_average,
 
   # select required drug
   dt_response_dose <- dt_response_dose[get(drug_name) == d_name, ]
+  dt_response_dose[[cellline_name]] <- as.character(dt_response_dose[[cellline_name]])
 
   dt_response_dose_fin <- data.table::dcast(
     data = dt_response_dose,
@@ -164,7 +170,9 @@ prep_dt_response_dose_sa <- function(dt_average,
 #'  depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
 #' @param fit_source string source name for metrics
 #'
-#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}.
+#'  Note: identifier columns (\code{CellLineName}, and \code{DrugName}/\code{DrugName_2} where
+#'  applicable) are always returned as \code{character}, regardless of their type in the input.
 #' @keywords prism_plots
 #'
 #' @examples
@@ -193,9 +201,9 @@ prep_dt_response_scores <- function(dt_scores,
 
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_string(d_name)
-  checkmate::assert_choice(d_name, choices = dt_scores[[drug_name]])
+  checkmate::assert_choice(d_name, choices = as.character(dt_scores[[drug_name]]))
   checkmate::assert_string(d_name2)
-  checkmate::assert_choice(d_name2, choices = dt_scores[[drug_name_2]])
+  checkmate::assert_choice(d_name2, choices = as.character(dt_scores[[drug_name_2]]))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_character(metric, any.missing = FALSE)
   checkmate::assert_subset(metric, choices = c("hsa_score", "bliss_score"), empty.ok = FALSE)
@@ -212,6 +220,7 @@ prep_dt_response_scores <- function(dt_scores,
   # final
   meta_col <- c("rId", "cId", cellline_name)
   dt_response_scores <- dt_response_scores[, c(meta_col, metric), with = FALSE]
+  dt_response_scores[[cellline_name]] <- as.character(dt_response_scores[[cellline_name]])
   data.table::setnames(dt_response_scores, old = metric,
                        new = sprintf("%s_%s_%s", normalization_type, fit_source, metric))
 }
@@ -239,7 +248,9 @@ prep_dt_response_scores <- function(dt_scores,
 #' @param fit_source string source name for metrics
 #' @param additional_cols character vector with additional cols that should be included in the output
 #'
-#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}
+#' @return \code{data.table} with selected metric, input to \code{\link{prep_dt_assoc}}.
+#'  Note: identifier columns (\code{CellLineName}, and \code{DrugName}/\code{DrugName_2} where
+#'  applicable) are always returned as \code{character}, regardless of their type in the input.
 #' @keywords prism_plots
 #'
 #' @examples
@@ -290,28 +301,31 @@ prep_dt_response_metric_diff <- function(dt_metrics,
 
   if (!is.null(d_name)) {
     checkmate::assert_string(d_name)
-    checkmate::assert_choice(d_name, choices = dt_metrics[[drug_name]])
+    checkmate::assert_choice(d_name, choices = as.character(dt_metrics[[drug_name]]))
   }
 
   if (!is.null(d_name2)) {
     checkmate::assert_string(d_name2)
-    checkmate::assert_choice(d_name2, choices = dt_metrics[[drug_name_2]])
+    checkmate::assert_choice(d_name2, choices = as.character(dt_metrics[[drug_name_2]]))
   }
 
   if (!is.null(cellline1)) {
     checkmate::assert_string(cellline1)
-    checkmate::assert_choice(cellline1, choices = dt_metrics[[cellline_name]])
+    checkmate::assert_choice(cellline1, choices = as.character(dt_metrics[[cellline_name]]))
   }
 
   if (!is.null(cellline2)) {
     checkmate::assert_string(cellline2)
-    checkmate::assert_choice(cellline2, choices = dt_metrics[[cellline_name]])
+    checkmate::assert_choice(cellline2, choices = as.character(dt_metrics[[cellline_name]]))
   }
 
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
                             list(norm_type = normalization_type, fit_src = fit_source))
   dt_response_metric <- dt_metrics[eval(filter_expr)]
+  dt_response_metric[[drug_name]] <- as.character(dt_response_metric[[drug_name]])
+  dt_response_metric[[drug_name_2]] <- as.character(dt_response_metric[[drug_name_2]])
+  dt_response_metric[[cellline_name]] <- as.character(dt_response_metric[[cellline_name]])
 
   # select required drugs combination if specified
   if (!is.null(d_name)) {

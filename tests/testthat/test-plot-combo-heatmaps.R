@@ -111,6 +111,28 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_true(any(grepl(drug1_name, plt_6[["labels"]][["y"]])))
   expect_true(any(grepl(drug2_name, plt_6[["labels"]][["x"]])))
   expect_length(ggplot2::ggplot_build(plt_6)[["data"]][[1]], 0)
+
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_7 <- heatmap_combo_metrics(dt_excess,
+                                 dt_isobolograms_factor,
+                                 drug1_name, drug2_name,
+                                 cl_name)
+  expect_equal(ggplot2::get_guide_data(plt_7, "colour")[[".label"]],
+               ggplot2::get_guide_data(plt_1, "colour")[[".label"]])
+
+  # scenario: DrugName/DrugName_2/CellLineName columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  dt_excess_factor[["CellLineName"]] <- factor(dt_excess_factor[["CellLineName"]])
+  plt_8 <- heatmap_combo_metrics(dt_excess_factor,
+                                 dt_isobolograms,
+                                 drug1_name, drug2_name,
+                                 cl_name)
+  expect_is(plt_8, "gg")
+  expect_equal(plt_8[["data"]], plt_1[["data"]])
 })
 
 test_that("heatmap_combo_metrics_panel works as expected", {
@@ -203,6 +225,24 @@ test_that("heatmap_combo_metrics_panel works as expected", {
   expect_length(plts_5, 3) # smooth, hsa_excess, bliss_excess
   expect_true(all(ls_col_2 %in% plts_5[["hsa_excess"]][["plot_env"]][["hm_color_palette"]]))
 
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plts_6_char <- heatmap_combo_metrics_panel(dt_excess,
+                                             dt_isobolograms,
+                                             drug1_name,
+                                             drug2_name,
+                                             cl_name,
+                                             as_list = TRUE)
+  plts_6_factor <- heatmap_combo_metrics_panel(dt_excess,
+                                               dt_isobolograms_factor,
+                                               drug1_name,
+                                               drug2_name,
+                                               cl_name,
+                                               as_list = TRUE)
+  expect_equal(ggplot2::get_guide_data(plts_6_factor[["smooth"]], "colour")[[".label"]],
+               ggplot2::get_guide_data(plts_6_char[["smooth"]], "colour")[[".label"]])
+
   # scenario: lack data for selection
   dt_excess_ <-
     data.table::copy(dt_excess)[DrugName == drug1_name & DrugName_2 == drug2_name &
@@ -268,6 +308,19 @@ test_that("heatmap_combo_metrics_panel works as expected", {
                                          one_row_panel = TRUE)
   expect_is(plts_10, "list")
   expect_equal(names(plts_10), c(names(gDRutils::get_combo_excess_field_names()), "iso_compare"))
+
+  # scenario: DrugName/DrugName_2/CellLineName columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  dt_excess_factor[["CellLineName"]] <- factor(dt_excess_factor[["CellLineName"]])
+  plts_11 <- heatmap_combo_metrics_panel(dt_excess_factor,
+                                         dt_isobolograms,
+                                         drug1_name,
+                                         drug2_name,
+                                         cl_name)
+  expect_is(plts_11, "gg")
+  expect_true(length(ggplot2::ggplot_build(plts_11)$data) >= 1)
 
   # checking assertions
   expect_error(heatmap_combo_metrics_panel(dt_excess = unlist(dt_excess),
@@ -418,6 +471,28 @@ test_that("plot_combination_index works as expected", {
   expect_equal(NROW(unique(ggplot2::ggplot_build(plt_4)[["data"]][[3]][["colour"]])),
                NROW(c("0.2", "0.4")))
 
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_5 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms_factor,
+                                  drug1_name, drug2_name,
+                                  cl_name)
+  expect_equal(ggplot2::get_guide_data(plt_5, "colour")[[".label"]],
+               ggplot2::get_guide_data(plt_1, "colour")[[".label"]])
+
+  # scenario: DrugName/DrugName_2/CellLineName columns in dt_isobolograms are factors
+  dt_isobolograms_factor_names <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor_names[["DrugName"]] <- factor(dt_isobolograms_factor_names[["DrugName"]])
+  dt_isobolograms_factor_names[["DrugName_2"]] <- factor(dt_isobolograms_factor_names[["DrugName_2"]])
+  dt_isobolograms_factor_names[["CellLineName"]] <- factor(dt_isobolograms_factor_names[["CellLineName"]])
+  plt_6 <- plot_combination_index(dt_excess,
+                                  dt_isobolograms_factor_names,
+                                  drug1_name, drug2_name,
+                                  cl_name)
+  expect_is(plt_6, "gg")
+  expect_true(grepl(drug1_name, plt_6[["labels"]][["x"]]))
+
   expect_error(plot_combination_index(dt_excess = unlist(dt_excess),
                                       dt_isobolograms = dt_isobolograms,
                                       drug1_name = drug1_name,
@@ -561,6 +636,33 @@ test_that("heatmap_combo_with_isoref works as expected", {
   expect_equal(unique(ggplot2::ggplot_build(plt_6)[["data"]][[2]][["colour"]]),
                unname(col_vec_iso))
 
+  # scenario: iso_level column is a factor
+  dt_isobolograms_factor <- data.table::copy(dt_isobolograms)
+  dt_isobolograms_factor[["iso_level"]] <- factor(dt_isobolograms_factor[["iso_level"]])
+  plt_7 <- heatmap_combo_with_isoref(dt_excess,
+                                     dt_isobolograms_factor,
+                                     drug1_name,
+                                     drug2_name,
+                                     cl_name,
+                                     normalization_type = normalization_type,
+                                     iso_levels = iso_lvl,
+                                     colors_vec = ls_col)
+  expect_equal(plt_7[["scales"]][["get_scales"]]("colour")[["labels"]],
+               plt_2[["scales"]][["get_scales"]]("colour")[["labels"]])
+
+  # scenario: DrugName/DrugName_2/CellLineName columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  dt_excess_factor[["CellLineName"]] <- factor(dt_excess_factor[["CellLineName"]])
+  plt_8 <- heatmap_combo_with_isoref(dt_excess_factor,
+                                     dt_isobolograms,
+                                     drug1_name,
+                                     drug2_name,
+                                     cl_name)
+  expect_is(plt_8, "gg")
+  expect_true(grepl(cl_name, plt_8[["labels"]][["title"]]))
+
   plt_1_swap_axes <- heatmap_combo_with_isoref(dt_excess,
                                                dt_isobolograms,
                                                drug1_name,
@@ -608,6 +710,18 @@ test_that("heatmap_combo_with_isoref_panel works as expected", {
   expect_true(length(plt_independent@layers) >= 1)
   expect_length(plt_common@labels, NROW(c("colour", "linetype", "x", "y", "fill", "title")))
   expect_true(length(plt_independent@labels) >= 0)
+
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  plt_factor <- heatmap_combo_with_isoref_panel(dt_excess_factor,
+                                                dt_isobolograms,
+                                                drug1_name,
+                                                drug2_name,
+                                                cl_names,
+                                                iso_levels = c("-0.25", "0.25"))
+  expect_is(plt_factor, "gg")
 })
 
 test_that("heatmap_combo_with_isoref_panel_common works as expected", {
@@ -744,6 +858,17 @@ test_that("heatmap_combo_with_isoref_panel_common works as expected", {
   expect_equal(plt_7[["labels"]][["linetype"]], "GR")
   expect_length(unique(ggplot2::ggplot_build(plt_7)[["data"]][[2]][["colour"]]), 2) # only "-0.2" & "0.5"
 
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  plt_8 <- heatmap_combo_with_isoref_panel_common(dt_excess_factor,
+                                                  dt_isobolograms,
+                                                  drug1_name,
+                                                  drug2_name,
+                                                  cl_names)
+  expect_is(plt_8, "gg")
+
   expect_error(heatmap_combo_with_isoref_panel_common(dt_excess = unlist(dt_excess),
                                                       dt_isobolograms = dt_isobolograms,
                                                       drug1_name = drug1_name,
@@ -859,6 +984,17 @@ test_that("heatmap_combo_with_isoref_panel_independent works as expected", {
                                                             cl_names,
                                                             iso_levels = "0.9999")
   expect_is(plt_no_iso, "gg")
+
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_excess_factor <- data.table::copy(dt_excess)
+  dt_excess_factor[["DrugName"]] <- factor(dt_excess_factor[["DrugName"]])
+  dt_excess_factor[["DrugName_2"]] <- factor(dt_excess_factor[["DrugName_2"]])
+  plt_5 <- heatmap_combo_with_isoref_panel_independent(dt_excess_factor,
+                                                       dt_isobolograms,
+                                                       drug1_name,
+                                                       drug2_name,
+                                                       cl_names)
+  expect_is(plt_5, "gg")
 
   expect_error(heatmap_combo_with_isoref_panel_independent(dt_excess = unlist(dt_excess),
                                                            dt_isobolograms = dt_isobolograms,
