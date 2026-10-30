@@ -630,6 +630,20 @@ test_that("plot_dose_response_sa works as expected", {
     expect_true(grepl(cl_name, plt_5[["labels"]][["title"]]))
     expect_true(any(grepl("Concentration", plt_5[["labels"]][["x"]])))
     expect_length(ggplot2::ggplot_build(plt_5)[["data"]][[1]], 0)
+
+    # scenario: CellLineName/DrugName columns are factors
+    dt_metrics_factor <- data.table::copy(dt_metrics)
+    dt_metrics_factor[["CellLineName"]] <- factor(dt_metrics_factor[["CellLineName"]])
+    dt_metrics_factor[["DrugName"]] <- factor(dt_metrics_factor[["DrugName"]])
+    dt_average_factor <- data.table::copy(dt_average)
+    dt_average_factor[["CellLineName"]] <- factor(dt_average_factor[["CellLineName"]])
+    dt_average_factor[["DrugName"]] <- factor(dt_average_factor[["DrugName"]])
+    plt_6 <- plot_dose_response_sa_qc(dt_metrics = dt_metrics_factor,
+                                      dt_average = dt_average_factor,
+                                      cl_name = cl_name,
+                                      d_name = d_name)
+    expect_is(plt_6, "gg")
+    expect_true(grepl(cl_name, plt_6[["labels"]][["title"]]))
   })
 
   test_that("plot_dose_response_sa_qc_panel works as expected", {
@@ -701,4 +715,15 @@ test_that("plot_dose_response_sa works as expected", {
                                             d_names = d_names)
     expect_is(plt_6, "gg")
     expect_equal(NROW(unique(ggplot2::ggplot_build(plt_6)$data[[2]]["PANEL"])), no_curve)
+
+    # scenario: CellLineName column is a factor
+    dt_metrics_factor <- data.table::copy(dt_metrics)
+    dt_metrics_factor[[cellline_name]] <- factor(dt_metrics_factor[[cellline_name]])
+    dt_average_factor <- data.table::copy(dt_average)
+    dt_average_factor[[cellline_name]] <- factor(dt_average_factor[[cellline_name]])
+    plt_7 <- plot_dose_response_sa_qc_panel(dt_metrics = dt_metrics_factor,
+                                            dt_average = dt_average_factor,
+                                            cl_name = cl_name)
+    expect_is(plt_7, "gg")
+    expect_true(grepl(cl_name, plt_7[["labels"]][["title"]]))
   })
