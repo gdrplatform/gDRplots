@@ -549,11 +549,12 @@ test_that("pheatmap_with_anno_cd works as expected", {
   dt_metrics <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "Metrics")
 
   cdata <- SummarizedExperiment::colData(se)
-  rdata <- SummarizedExperiment::rowData(se)
+  # one column per drug pair and ratio of the two concentrations
+  pair_ratio <- unique(dt_metrics[, paste(DrugName, "x", paste0(DrugName_2, "__", ratio))])
 
   res_1 <- data.table::dcast(
     data = dt_metrics[normalization_type == "GR", ],
-    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
+    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", ratio)),
     value.var = "xc50")
   data.table::setkey(res_1, NULL)
 
@@ -571,30 +572,27 @@ test_that("pheatmap_with_anno_cd works as expected", {
   plt_1 <- out_1[["heatmap"]]
   expect_is(plt_1, "pheatmap")
   expect_equal(sort(plt_1$gtable$grobs[[4]]$label), sort(cdata[["CellLineName"]]))
-  expect_equal(
-    sort(plt_1$gtable$grobs[[5]]$label),
-    sort(paste(rdata[["DrugName"]], "x", paste0(rdata[["DrugName_2"]], "__", rdata[["Concentration_2"]]))))
+  expect_equal(sort(plt_1$gtable$grobs[[5]]$label), sort(pair_ratio))
   expect_true(all(vapply(plt_1$gtable$grobs[[3]]$children[[1]]$gp$fill, is_valid_color, logical(1))))
 
   annotation_manual_col <-
     unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
   annotation_manual_row <-
-    unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2", "drug_moa", "drug_moa_2"),
+    unique(dt_metrics[, c("DrugName", "DrugName_2", "ratio", "drug_moa", "drug_moa_2"),
                       with = FALSE])
   annotation_map <-
     get_ann_color_map(unique(dt_metrics[, c("Tissue", "drug_moa", "drug_moa_2"), with = FALSE]))
 
   # scenario 2: selected metric & normalization_type and annotations
   dt_metrics_2 <- data.table::copy(dt_metrics)
-  dt_metrics_2 <- dt_metrics_2[DrugName %in% unique(dt_metrics[["DrugName"]])[1:3] &
-                                 Concentration_2 %in% unique(dt_metrics[["Concentration_2"]])[1:4]]
+  dt_metrics_2 <- dt_metrics_2[DrugName %in% unique(dt_metrics[["DrugName"]])[1:3]]
   res_2 <- data.table::dcast(
     data = dt_metrics_2[normalization_type == "RV", ],
-    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", Concentration_2)),
+    formula = CellLineName ~ paste(DrugName, "x", paste0(DrugName_2, "__", ratio)),
     value.var = "x_max")
   data.table::setkey(res_2, NULL)
   anno_manual_row_res_2 <-
-    unique(dt_metrics_2[, c("DrugName", "DrugName_2", "Concentration_2", "drug_moa", "drug_moa_2"),
+    unique(dt_metrics_2[, c("DrugName", "DrugName_2", "ratio", "drug_moa", "drug_moa_2"),
                         with = FALSE])
 
   col_pal <- c("#00008B", "#8B0000")
@@ -638,8 +636,8 @@ test_that("pheatmap_with_anno_cd works as expected", {
 
   # scenario 3: missing annotations row
   annotation_manual_row_res <- data.table::copy(annotation_manual_row)
-  annotation_manual_row_res[1:20, c("drug_moa", "drug_moa_2")] <- "NA"
-  annotation_manual_row_na <- annotation_manual_row_res[21:NROW(annotation_manual_row_res), ]
+  annotation_manual_row_res[1:5, c("drug_moa", "drug_moa_2")] <- "NA"
+  annotation_manual_row_na <- annotation_manual_row_res[6:NROW(annotation_manual_row_res), ]
   annotation_map_na <- annotation_map[1:2]
 
   out_3 <- pheatmap_with_anno_cd(dt_metrics = dt_metrics,
@@ -663,7 +661,7 @@ test_that("pheatmap_with_anno_cd works as expected", {
   expect_true(is.na(plt_3[["tree_row"]])) # rows aren't clustered due cluster_cols = FALSE
   expect_true(is.na(plt_3[["tree_col"]])) # cols aren't clustered due cluster_rows = FALSE
   expect_true(all(.get_smooth_palette(50) %in% plt_3$gtable$grobs[[7]]$children[[1]]$gp$fill))
-  expect_length(plt_3$gtable$grobs[[1]]$children, 1) # no number
+  expect_length(plt_3$gtable$grobs[[1]]$children, 2) # numbers shown: 11 pairs x 8 cell lines, at most 15 x 15
   expect_equal(
     c(plt_3$gtable$grobs[[6]]$children[[1]]$label, plt_3$gtable$grobs[[6]]$children[[4]]$label),
     c("drug_moa_2", "drug_moa"))
@@ -1199,7 +1197,7 @@ test_that("prep_pheatmap_matrix works as expected", {
   expect_equal(sort(rownames(mat_4)), sort(unique(dt_metrics_cd[["CellLineName"]])))
   expect_equal(
     sort(colnames(mat_4)),
-    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", Concentration_2)]))))
+    sort(unique(unique(dt_metrics_cd[, paste0(DrugName, " x ", DrugName_2, "__", ratio)]))))
   expect_true(all(dt_metrics_cd[normalization_type == "RV"][["x_max"]] %in% mat_4))
 
   # scenario: NA-row
@@ -1621,7 +1619,7 @@ test_that(".fill_pheatmap_annotation works as expected", {
                                             anno_var = cellline_name) # default
   expect_equal(annotation_5, annotation_manual_cd_col)
 
-  annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+  annotation_manual_cd_row <- unique(dt_metrics[, c("DrugName", "DrugName_2", "ratio",
                                                     "drug_moa", "drug_moa_2"),
                                                 with = FALSE])
   # TODO GDR-2791 annotation_6
