@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,9 @@ depending on <code>normalization_type</code>), "bliss_score" ("Bliss Score GR" o
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>data.table</code> with selected metric, input to <code><a href="prep_dt_assoc.html">prep_dt_assoc</a></code></p>
+    <p><code>data.table</code> with selected metric, input to <code><a href="prep_dt_assoc.html">prep_dt_assoc</a></code>.
+ Note: identifier columns (<code>CellLineName</code>, and <code>DrugName</code>/<code>DrugName_2</code> where
+ applicable) are always returned as <code>character</code>, regardless of their type in the input.</p>
     </div>
 
     <div class="section level2">

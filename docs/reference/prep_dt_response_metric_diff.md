@@ -73,7 +73,10 @@ prep_dt_response_metric_diff(
 ## Value
 
 `data.table` with selected metric, input to
-[`prep_dt_assoc`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_assoc.md)
+[`prep_dt_assoc`](https://gdrplatform.github.io/gDRplots/reference/prep_dt_assoc.md).
+Note: identifier columns (`CellLineName`, and `DrugName`/`DrugName_2`
+where applicable) are always returned as `character`, regardless of
+their type in the input.
 
 ## Examples
 
