@@ -1,3 +1,6 @@
+## gDRplots 0.99.11 - 2026-11-02
+* change `pheatmap_with_anno_cd()` and `prep_pheatmap_matrix()` to key co-dilution columns by drug pair and ratio
+
 ## gDRplots 0.99.10 - 2026-10-28
 * fix `group_names` as factor in `plot_boxplot_metric_*` functions
 * fix selection columns being factor instead of character across plotting functions

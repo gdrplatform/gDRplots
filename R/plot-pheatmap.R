@@ -685,7 +685,8 @@ pheatmap_with_anno_sa <- function(
 #'   of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding names from the required  \code{DrugName},
-#'   \code{DrugName_2} and \code{Concentration_2} columns.
+#'   \code{DrugName_2} and \code{ratio} columns (the ratio \code{Concentration_2 / Concentration}
+#'   of the fit, as in the \code{Metrics} assay).
 #'   Note that color schemes takes into account if the variable is continuous or discrete.
 #' @param cluster_rows logical flag whether indicating rows should be clustered;
 #'   the dendrogram will not be shown for the matrix with any dimension greater than 200.
@@ -720,7 +721,7 @@ pheatmap_with_anno_sa <- function(
 #' annotation_manual_col <-
 #'   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 #' annotation_manual_row <-
-#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+#'   unique(dt_metrics[, c("DrugName", "DrugName_2", "ratio",
 #'                         "drug_moa", "drug_moa_2"),
 #'                     with = FALSE])
 #' annotation_map <-
@@ -791,7 +792,7 @@ pheatmap_with_anno_cd <- function(
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  conc_2 <- gDRutils::get_env_identifiers("concentration2")
+  ratio <- "ratio"
 
   checkmate::assert_data_table(dt_metrics)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
@@ -806,7 +807,7 @@ pheatmap_with_anno_cd <- function(
   checkmate::assert_function(distfun)
   checkmate::assert_data_table(annotation_row, null.ok = TRUE)
   if (!is.null(annotation_row)) {
-    checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2, conc_2))
+    checkmate::assert_names(names(annotation_row), must.include = c(drug_name, drug_name_2, ratio))
   }
   checkmate::assert_data_table(annotation_col, null.ok = TRUE)
   if (!is.null(annotation_col)) {
@@ -846,7 +847,7 @@ pheatmap_with_anno_cd <- function(
 
   if (!is.null(annotation_row)) {
     annotation_row$DrugCombination <-
-      paste(annotation_row[[drug_name]], "x", paste0(annotation_row[[drug_name_2]], "__", annotation_row[[conc_2]]))
+      paste(annotation_row[[drug_name]], "x", paste0(annotation_row[[drug_name_2]], "__", annotation_row[[ratio]]))
 
     if (!all(colnames(mat_cvd) %in% annotation_row[["DrugCombination"]])) {
       tab_missing_ann <- data.table::data.table(
@@ -854,13 +855,13 @@ pheatmap_with_anno_cd <- function(
       )
       data.table::setnames(tab_missing_ann, "missing", "DrugCombination")
       tab_missing_ann[, c(drug_name, drug_name_2) := data.table::tstrsplit(DrugCombination, " x ", fixed = TRUE)]
-      tab_missing_ann[, c(drug_name_2, conc_2) := data.table::tstrsplit(get(drug_name_2), "__", fixed = TRUE)]
-      tab_missing_ann[[conc_2]] <- as.numeric(tab_missing_ann[[conc_2]])
+      tab_missing_ann[, c(drug_name_2, ratio) := data.table::tstrsplit(get(drug_name_2), "__", fixed = TRUE)]
+      tab_missing_ann[[ratio]] <- as.numeric(tab_missing_ann[[ratio]])
 
       annotation_row <- data.table::rbindlist(list(annotation_row, tab_missing_ann), fill = TRUE)
     }
     # data.table::nafill does not support character
-    cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, conc_2, "DrugCombination")]
+    cols <- names(annotation_row)[!names(annotation_row) %in% c(drug_name, drug_name_2, ratio, "DrugCombination")]
     data.table::setorderv(annotation_row, cols = cols, na.last = TRUE)
     annotation_row[, (cols) := lapply(.SD, change_NA_into_char, "NA"), .SDcols = cols, drop = FALSE]
     # select annotation acc to matrix
@@ -869,7 +870,7 @@ pheatmap_with_anno_cd <- function(
 
     rownames(annotation_row) <- annotation_row[["DrugCombination"]] # required by pheatmap::pheatmap
     annotation_row <-
-      annotation_row[, .SD, .SDcols = -c(drug_name, drug_name_2, conc_2, "DrugCombination")]
+      annotation_row[, .SD, .SDcols = -c(drug_name, drug_name_2, ratio, "DrugCombination")]
     # order matrix
     mat_cvd <- mat_cvd[, rownames(annotation_row), drop = FALSE]
   }
@@ -1761,7 +1762,6 @@ prep_pheatmap_matrix <- function(dt_response,
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
   drug_name_2 <- gDRutils::get_env_identifiers("drug_name2")
-  conc_2 <- gDRutils::get_env_identifiers("concentration2")
 
   checkmate::assert_data_table(dt_response)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
@@ -1792,7 +1792,8 @@ prep_pheatmap_matrix <- function(dt_response,
 
   } else if (experiment_type == gDRutils::get_supported_experiments("cd")) {
     tryCatch({
-      fm_string <- 'get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", get(conc_2)))'
+      # one fit per ratio of the two concentrations
+      fm_string <- 'get(cellline_name) ~ paste(get(drug_name), "x", paste0(get(drug_name_2), "__", ratio))'
       data.table::dcast(
         data = tab_response,
         formula = stats::as.formula(fm_string),

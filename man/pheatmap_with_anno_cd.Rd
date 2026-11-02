@@ -55,7 +55,8 @@ the default is \code{\link{compute_distances}} using Spearman method.}
 of the heatmap.
 Each row defines the features for a specific row. The rows in the data and in the annotation
 are matched using corresponding names from the required  \code{DrugName},
-\code{DrugName_2} and \code{Concentration_2} columns.
+\code{DrugName_2} and \code{ratio} columns (the ratio \code{Concentration_2 / Concentration}
+of the fit, as in the \code{Metrics} assay).
 Note that color schemes takes into account if the variable is continuous or discrete.}
 
 \item{annotation_col}{\code{data.table} that specifies the annotations shown above the heatmap.
@@ -98,7 +99,7 @@ patchwork::wrap_elements(hm_1[["gtable"]])
 annotation_manual_col <-
   unique(dt_metrics[, c("CellLineName", "Tissue"), with = FALSE])
 annotation_manual_row <-
-  unique(dt_metrics[, c("DrugName", "DrugName_2", "Concentration_2",
+  unique(dt_metrics[, c("DrugName", "DrugName_2", "ratio",
                         "drug_moa", "drug_moa_2"),
                     with = FALSE])
 annotation_map <-
