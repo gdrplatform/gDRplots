@@ -84,6 +84,12 @@ test_that("plot_dose_response_combo works as expected", {
                                         drug1_name = 1,
                                         drug2_name = drug2_name,
                                         cl_name = cl_name),
+               "Assertion on 'drug1_name' failed: Must be of type 'string'")
+
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = "drug_XX",
+                                        drug2_name = drug2_name,
+                                        cl_name = cl_name),
                "Assertion on 'drug1_name' failed: Must be element of set")
 
   expect_error(plot_dose_response_combo(dt_average = dt_average,
@@ -139,6 +145,29 @@ test_that("plot_dose_response_combo works as expected", {
                                     cl_name = cl_name)
   expect_is(plt_7, "gg")
   expect_true(grepl(drug2_name, deparse(plt_7[["labels"]][["x"]])))
+
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_average_factor <- data.table::copy(dt_average)
+  dt_average_factor[["DrugName"]] <- factor(dt_average_factor[["DrugName"]])
+  dt_average_factor[["DrugName_2"]] <- factor(dt_average_factor[["DrugName_2"]])
+  plt_8 <- plot_dose_response_combo(dt_average = dt_average_factor,
+                                    drug1_name = drug1_name,
+                                    drug2_name = drug2_name,
+                                    cl_name = cl_name)
+  expect_is(plt_8, "gg")
+  expect_equal(plt_8[["labels"]][["title"]], sprintf("%s (%s)", cl_name, cl_clid))
+
+  # scenario: drug1_name/drug2_name passed as factors should fail with a clear type error
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = factor(drug1_name),
+                                        drug2_name = drug2_name,
+                                        cl_name = cl_name),
+               "Assertion on 'drug1_name' failed: Must be of type 'string', not 'factor'")
+  expect_error(plot_dose_response_combo(dt_average = dt_average,
+                                        drug1_name = drug1_name,
+                                        drug2_name = factor(drug2_name),
+                                        cl_name = cl_name),
+               "Assertion on 'drug2_name' failed: Must be of type 'string', not 'factor'")
 })
 
 test_that("plot_dose_response_combo_panel works as expected", {
@@ -256,6 +285,19 @@ test_that("plot_dose_response_combo_panel works as expected", {
   plt_7 <- plot_dose_response_combo_panel(dt_average = dt_asym,
                                           cl_name = cl_name_2)
   expect_is(plt_7, "gg")
+
+  # scenario: CellLineName column is a factor
+  dt_average_factor <- data.table::copy(dt_average)
+  dt_average_factor[["CellLineName"]] <- factor(dt_average_factor[["CellLineName"]])
+  plt_8 <- plot_dose_response_combo_panel(dt_average = dt_average_factor,
+                                          cl_name = cl_name)
+  expect_is(plt_8, "gg")
+  expect_true(grepl(cl_name, plt_8[["labels"]][["title"]]))
+
+  # scenario: cl_name passed as a factor should fail with a clear type error
+  expect_error(plot_dose_response_combo_panel(dt_average = dt_average,
+                                              cl_name = factor(cl_name)),
+               "Assertion on 'cl_name' failed: Must be of type 'string', not 'factor'")
 })
 
 test_that("plot_dose_response_combo_panel handles RV-only cell line with GR request", {

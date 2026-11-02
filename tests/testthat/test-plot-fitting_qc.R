@@ -30,6 +30,14 @@ test_that("plot_var_stat_qc works as expected", {
                             with_table = TRUE)
   expect_s3_class(plt_3, "patchwork")
 
+  # scenario: CellLineName column is a factor
+  dt_metrics_factor <- data.table::copy(dt_metrics)
+  dt_metrics_factor[["CellLineName"]] <- factor(dt_metrics_factor[["CellLineName"]])
+  plt_4 <- plot_var_stat_qc(dt_assay = dt_metrics_factor,
+                            cl_name = cl_name)
+  expect_is(plt_4, "gg")
+  expect_true(grepl(cl_name, plt_4[["labels"]][["title"]]))
+
   expect_error(plot_var_stat_qc(dt_assay = unlist(dt_metrics),
                                 cl_name = cl_name),
                "Assertion on 'dt_assay' failed: Must be a data.table")
@@ -77,6 +85,13 @@ test_that("plot_fitting_acc works as expected", {
                               cl_name = cl_name)
     } , sprintf("Missing data for %s in GR normalization type.", cl_name))
   expect_length(ggplot2::ggplot_build(plt_3)[["data"]][[1]], 0)
+
+  # scenario: CellLineName column is a factor
+  dt_metrics_factor <- data.table::copy(dt_metrics)
+  dt_metrics_factor[["CellLineName"]] <- factor(dt_metrics_factor[["CellLineName"]])
+  plt_4 <- plot_fitting_acc(dt_assay = dt_metrics_factor,
+                            cl_name = cl_name)
+  expect_is(plt_4, "gg")
 
   expect_error(plot_fitting_acc(dt_assay = unlist(dt_metrics),
                                 cl_name = cl_name),

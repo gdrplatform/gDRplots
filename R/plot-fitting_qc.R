@@ -50,7 +50,7 @@ plot_var_stat_qc <- function(dt_assay,
 
   checkmate::assert_data_table(dt_assay)
   checkmate::assert_string(cl_name)
-  checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
+  checkmate::assert_choice(cl_name, choices = as.character(unique(dt_assay[[cellline_name]])))
   checkmate::assert_choice(metric, choices = names(dt_assay))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_flag(with_table)
@@ -127,7 +127,7 @@ plot_fitting_acc <- function(dt_assay,
 
   checkmate::assert_data_table(dt_assay)
   checkmate::assert_string(cl_name)
-  checkmate::assert_choice(cl_name, choices = unique(dt_assay[[cellline_name]]))
+  checkmate::assert_choice(cl_name, choices = as.character(unique(dt_assay[[cellline_name]])))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
 
   if (all(is.na(dt_assay[get(cellline_name) == cl_name, "r2"]))) {

@@ -55,6 +55,23 @@ test_that("prep_dt_response_metric_sa works as expected", {
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, "RV_gDR_log10_xc50", sprintf("RV_gDR_%s", sel_met[2:3])))
 
+  # scenario: DrugName column is a factor
+  dt_metrics_factor <- data.table::copy(dt_metrics)
+  dt_metrics_factor[[drug_name]] <- factor(dt_metrics_factor[[drug_name]])
+  dt_response_factor <- prep_dt_response_metric_sa(dt_metrics = dt_metrics_factor,
+                                                   d_name = d_name,
+                                                   metric = sel_met)
+  expect_equal(dt_response_factor, dt_response)
+
+  # scenario: CellLineName column is a factor
+  dt_metrics_cl_factor <- data.table::copy(dt_metrics)
+  dt_metrics_cl_factor[[cellline_name]] <- factor(dt_metrics_cl_factor[[cellline_name]])
+  dt_response_cl_factor <- prep_dt_response_metric_sa(dt_metrics = dt_metrics_cl_factor,
+                                                      d_name = d_name,
+                                                      metric = sel_met)
+  expect_is(dt_response_cl_factor[[cellline_name]], "character")
+  expect_equal(dt_response_cl_factor, dt_response)
+
   # testing assertions
   expect_error(prep_dt_response_metric_sa(dt_metrics = unlist(dt_metrics),
                                           d_name = d_name),
@@ -107,6 +124,25 @@ test_that("prep_dt_response_dose_sa works as expected", {
                                           metric = "x_std")
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("GR_gDR_x_std_%s", ls_conc)))
+
+  # scenario: DrugName column is a factor
+  dt_average_factor <- data.table::copy(dt_average)
+  dt_average_factor[[drug_name]] <- factor(dt_average_factor[[drug_name]])
+  dt_response_factor <- prep_dt_response_dose_sa(dt_average = dt_average_factor,
+                                                 d_name = d_name,
+                                                 normalization_type = "GR",
+                                                 metric = "x_std")
+  expect_equal(dt_response_factor, dt_response)
+
+  # scenario: CellLineName column is a factor
+  dt_average_cl_factor <- data.table::copy(dt_average)
+  dt_average_cl_factor[[cellline_name]] <- factor(dt_average_cl_factor[[cellline_name]])
+  dt_response_cl_factor <- prep_dt_response_dose_sa(dt_average = dt_average_cl_factor,
+                                                    d_name = d_name,
+                                                    normalization_type = "GR",
+                                                    metric = "x_std")
+  expect_is(dt_response_cl_factor[[cellline_name]], "character")
+  expect_equal(dt_response_cl_factor, dt_response)
 
   # testing assertions
   expect_error(prep_dt_response_dose_sa(dt_average = unlist(dt_average),
@@ -165,6 +201,26 @@ test_that("prep_dt_response_scores works as expected", {
                                          metric = sel_met)
   expect_is(dt_response, "data.table")
   expect_named(dt_response, c(meta_col, sprintf("RV_gDR_%s", sel_met)))
+
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_scores_factor <- data.table::copy(dt_scores)
+  dt_scores_factor[[drug_name]] <- factor(dt_scores_factor[[drug_name]])
+  dt_scores_factor[[drug_name_2]] <- factor(dt_scores_factor[[drug_name_2]])
+  dt_response_factor <- prep_dt_response_scores(dt_scores = dt_scores_factor,
+                                                d_name = d_name,
+                                                d_name2 = d_name2,
+                                                metric = sel_met)
+  expect_equal(dt_response_factor, dt_response)
+
+  # scenario: CellLineName column is a factor
+  dt_scores_cl_factor <- data.table::copy(dt_scores)
+  dt_scores_cl_factor[[cellline_name]] <- factor(dt_scores_cl_factor[[cellline_name]])
+  dt_response_cl_factor <- prep_dt_response_scores(dt_scores = dt_scores_cl_factor,
+                                                   d_name = d_name,
+                                                   d_name2 = d_name2,
+                                                   metric = sel_met)
+  expect_is(dt_response_cl_factor[[cellline_name]], "character")
+  expect_equal(dt_response_cl_factor, dt_response)
 
   # testing assertions
   expect_error(prep_dt_response_scores(dt_scores = unlist(dt_scores),
@@ -323,6 +379,30 @@ test_that("prep_dt_response_metric_diff works as expected", {
   expect_equal(sum(endsWith(names(dt_response_cl_diff), "c1")), 1)
   expect_equal(sum(endsWith(names(dt_response_cl_diff), "c2")), 1)
 
+
+  # scenario: DrugName/DrugName_2 columns are factors
+  dt_metrics_factor <- data.table::copy(dt_metrics)
+  dt_metrics_factor[[drug_name]] <- factor(dt_metrics_factor[[drug_name]])
+  dt_metrics_factor[[drug_name_2]] <- factor(dt_metrics_factor[[drug_name_2]])
+  dt_response_factor <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_factor,
+                                                      d_name = d_name,
+                                                      d_name2 = d_name2) # default
+  expect_is(dt_response_factor[[drug_name]], "character")
+  expect_is(dt_response_factor[[drug_name_2]], "character")
+  expect_equal(dt_response_factor, dt_response)
+
+  # scenario: CellLineName column is a factor (cell line diff path)
+  dt_metrics_capped_factor <- data.table::copy(dt_metrics_capped)
+  dt_metrics_capped_factor[[cellline_name]] <- factor(dt_metrics_capped_factor[[cellline_name]])
+  dt_response_cl_diff_factor <- prep_dt_response_metric_diff(dt_metrics = dt_metrics_capped_factor,
+                                                             d_name = NULL,
+                                                             d_name2 = NULL,
+                                                             cellline1 = "cellline_GB",
+                                                             cellline2 = "cellline_HB",
+                                                             additional_cols = drug_moa_2)
+  cl_diff_cols <- paste0(cellline_name, "_", c("c1", "c2"))
+  expect_true(all(vapply(dt_response_cl_diff_factor[, cl_diff_cols, with = FALSE], is.character, logical(1))))
+  expect_equal(dt_response_cl_diff_factor, dt_response_cl_diff)
 
   # testing assertions
   expect_error(prep_dt_response_metric_diff(dt_metrics = unlist(dt_metrics),

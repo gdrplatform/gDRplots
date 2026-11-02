@@ -486,12 +486,14 @@ plot_boxplot_metric_sa_by_grp <- function(
   }
 
   checkmate::assert_string(selection_name)
-  checkmate::assert_choice(selection_name, choices = unique(dt_metrics[[selection_var]]))
+  checkmate::assert_choice(selection_name, choices = as.character(unique(dt_metrics[[selection_var]])))
   checkmate::assert_string(group_var)
   checkmate::assert_choice(
     group_var,
     choices = names(dt_metrics)[!names(dt_metrics) %in% c(numeric_columns, cellline_name, drug_name)])
-  checkmate::assert_subset(group_names, choices = unique(dt_metrics[[group_var]]), empty.ok = TRUE)
+  if (is.factor(group_names)) group_names <- as.character(group_names)
+  checkmate::assert_character(group_names, null.ok = TRUE)
+  checkmate::assert_subset(group_names, choices = as.character(unique(dt_metrics[[group_var]])), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_metrics),
@@ -1101,7 +1103,7 @@ plot_boxplot_metric_combo_by_grp <- function(
   # check input data
   if (selection_var == cellline_name) {
     checkmate::assert_string(selection_name)
-    checkmate::assert_choice(selection_name, choices = unique(dt_scores[[selection_var]]))
+    checkmate::assert_choice(selection_name, choices = as.character(unique(dt_scores[[selection_var]])))
     point_var <- "DrugCombination"
   } else if (selection_var == drug_name) {
     checkmate::assert_character(selection_name, len = 2, any.missing = FALSE)
@@ -1114,7 +1116,9 @@ plot_boxplot_metric_combo_by_grp <- function(
   checkmate::assert_choice(
     group_var,
     choices = names(dt_scores)[!names(dt_scores) %in% c(numeric_columns, cellline_name, drug_name, drug_name_2)])
-  checkmate::assert_subset(group_names, choices = unique(dt_scores[[group_var]]), empty.ok = TRUE)
+  if (is.factor(group_names)) group_names <- as.character(group_names)
+  checkmate::assert_character(group_names, null.ok = TRUE)
+  checkmate::assert_subset(group_names, choices = as.character(unique(dt_scores[[group_var]])), empty.ok = TRUE)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_scores),
