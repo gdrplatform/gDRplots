@@ -27,9 +27,10 @@ combinations \code{"DrugName"} x \code{"DrugName_2"}}
 \item{normalization_type}{string with normalization types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
 
-\item{metric}{string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
-depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")}
+\item{metric}{string name of the combo metric, any numeric column of \code{dt_scores};
+e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" - respectively
+depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+or a column written by a custom fit, such as \code{beta} from MuSyC}
 
 \item{fit_source}{string source name for metrics}
 

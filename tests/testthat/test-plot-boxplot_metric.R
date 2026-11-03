@@ -926,3 +926,19 @@ test_that("plot_boxplot_metric_combo_by_grp works as expected", {
                                                 colors_vec = 1:3),
                "Assertion on 'colors_vec' failed: Must be of type 'character'")
 })
+
+test_that("plot_boxplot_metric_combo* accept a score column from a custom fit", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+  dt_scores[, beta := bliss_score / 2]
+
+  plt <- plot_boxplot_metric_combo(dt_scores, group_var = "CellLineName", metric = "beta")
+  expect_equal(sort(ggplot2::ggplot_build(plt)[["data"]][[3]][["y"]]),
+               sort(dt_scores[normalization_type == "GR", ][["beta"]]))
+  expect_s3_class(plot_boxplot_metric_combo_by_CLs(dt_scores, metric = "beta"), "ggplot")
+  expect_s3_class(plot_boxplot_metric_combo_by_drugs(dt_scores, metric = "beta"), "ggplot")
+
+  expect_error(plot_boxplot_metric_combo(dt_scores, group_var = "CellLineName", metric = "DrugName"),
+               "Assertion on 'metric' failed: Must be element of set")
+})

@@ -975,9 +975,10 @@ pheatmap_with_anno_cd <- function(
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
 #'   outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'   and combo \code{SummarizedExperiment}
-#' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
+#' @param metric string name of the combo metric, any numeric column of \code{dt_scores};
+#'   e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" - respectively
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'   or a column written by a custom fit, such as \code{beta} from MuSyC
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2}
@@ -1078,7 +1079,8 @@ pheatmap_with_anno_combo <- function(
 
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
