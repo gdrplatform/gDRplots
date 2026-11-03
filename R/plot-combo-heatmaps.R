@@ -2077,6 +2077,11 @@ transform_log_conc <- function(conc_vec) {
 #'       \item all vectors have common part and start and end conc are the same, but there are some gap\cr
 #'             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
 #'             0, 0.003, 0.01, 0.03, ___, 0.3, 1\cr
+#'       \item one vector has all concentrations and the other vectors have gaps,
+#'             also at the start or end conc\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
+#'             0, 0.003, 0.01, 0.03, ___, 0.3, 1\cr
+#'             0, 0.003, 0.01, 0.03, 0.1, 0.3, _\cr
 #'          }
 #'   \item \code{independent}
 #'     \itemize{
@@ -2142,10 +2147,15 @@ transform_log_conc <- function(conc_vec) {
     ls_range_conc <- lapply(ls_vec_conc_clean, function(x) which(all_conc %in% x))
     start_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) min(x), numeric(1)))) == 1
     end_is_same <- NROW(unique(vapply(ls_vec_conc_clean, function(x) max(x), numeric(1)))) == 1
+    # one vector covers all concentrations, so the other vectors only have gaps
+    # (e.g. a concentration row removed after masking) and shared axes still work
+    full_grid_exists <- any(vapply(ls_vec_conc_clean, function(x) {
+      NROW(setdiff(all_conc, x)) == 0
+    }, logical(1)))
 
     if (NROW(common_conc) == 0 ||
         (all(vapply(ls_vec_conc_clean, function(x) NROW(setdiff(x, common_conc)) > 0, logical(1))) &&
-         !(start_is_same && end_is_same))) {
+         !(start_is_same && end_is_same) && !full_grid_exists)) {
       # each vector is fully independent or the shift between is too big
       return("independent")
     } else {

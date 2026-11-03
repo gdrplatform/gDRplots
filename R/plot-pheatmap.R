@@ -1104,15 +1104,18 @@ pheatmap_with_anno_combo <- function(
                     heatmap = NULL)
 
   # prep matrix
+  # cell lines and combinations without scores (e.g. no GR values) are kept
+  # and shown as NA instead of being dropped from the heatmap
   mat_cvd <- prep_pheatmap_matrix(dt_response = dt_scores,
                                   normalization_type = normalization_type,
                                   metric = metric,
                                   fit_source = fit_source,
-                                  experiment_type = gDRutils::get_supported_experiments("combo"))
+                                  experiment_type = gDRutils::get_supported_experiments("combo"),
+                                  remove_na_only = FALSE)
   mat_cvd_raw <- mat_cvd
 
   # edge-case (no valid data in the matrix, usually matrix with NAs only)
-  if (NROW(mat_cvd) == 0) {
+  if (NROW(mat_cvd) == 0 || all(is.na(mat_cvd))) {
     return(ls_output)
   }
 
@@ -1248,12 +1251,14 @@ pheatmap_with_anno_combo <- function(
   if (cluster_rows) {
     cluster_rows <- .get_pheatmap_cluster_param(mat_to_cluster = t_mat_cvd,
                                                 distfun = distfun,
-                                                additional_condition = gDR_cluster_condition)
+                                                additional_condition = gDR_cluster_condition,
+                                                na_rows_last = TRUE)
   }
   if (cluster_cols) {
     cluster_cols <- .get_pheatmap_cluster_param(mat_to_cluster = t(t_mat_cvd),
                                                 distfun = distfun,
-                                                additional_condition = gDR_cluster_condition)
+                                                additional_condition = gDR_cluster_condition,
+                                                na_rows_last = TRUE)
   }
 
   # prep hm color palette
@@ -1724,6 +1729,8 @@ get_hm_title <- function(metric = "xc50",
 #' @param fit_source string source name for metrics
 #' @param experiment_type string with experiment name;
 #'                        one of: "single-agent", "combination" or "co-dilution"
+#' @param remove_na_only logical flag; if \code{TRUE} (default), rows and columns
+#'   with only missing values are removed from the matrix
 #'
 #' @keywords pheat_ann
 #'
@@ -1756,7 +1763,8 @@ prep_pheatmap_matrix <- function(dt_response,
                                  normalization_type = "GR",
                                  metric = "xc50",
                                  fit_source = "gDR",
-                                 experiment_type = gDRutils::get_supported_experiments("sa")) {
+                                 experiment_type = gDRutils::get_supported_experiments("sa"),
+                                 remove_na_only = TRUE) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   drug_name <- gDRutils::get_env_identifiers("drug_name")
@@ -1769,6 +1777,7 @@ prep_pheatmap_matrix <- function(dt_response,
   checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_choice(experiment_type, choices = gDRutils::get_supported_experiments())
+  checkmate::assert_flag(remove_na_only)
 
   # select data for normalization type
   filter_expr <- substitute(normalization_type == norm_type & fit_source == fit_src,
@@ -1824,10 +1833,12 @@ prep_pheatmap_matrix <- function(dt_response,
   mat_cvd <- as.matrix(tab_dcast[, .SD, .SDcols = -cellline_name])
   rownames(mat_cvd) <- tab_dcast[[cellline_name]]
   # remove all-NA-rows and all-NA-columns
-  rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
-  rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
-  if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
-  if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  if (remove_na_only) {
+    rm_col <- vapply(colnames(mat_cvd), function(i) !all(is.na(mat_cvd[, i])), logical(1))
+    rm_row <- vapply(seq_along(rownames(mat_cvd)), function(i) !all(is.na(mat_cvd[i, ])), logical(1))
+    if (!all(rm_col)) mat_cvd <- mat_cvd[, rm_col, drop = FALSE]
+    if (!all(rm_row)) mat_cvd <- mat_cvd[rm_row, , drop = FALSE]
+  }
 
   return(mat_cvd)
 }
@@ -1998,6 +2009,9 @@ fill_ann_color_map <- function(dt_ann,
 #'   defaults to \code{\link[stats:dist]{stats::dist}} using euclidean euclidean.
 #' @param additional_condition additional logical flag whether rows/columns should be clustered
 #'
+#' @param na_rows_last logical flag; if \code{TRUE}, rows with only NAs are left out
+#'   when computing distances and join the tree at a height above all other rows
+#'
 #' @return logical flag determining if rows should be clustered or \code{hclust} object.
 #'
 #' @seealso \code{\link{compute_distances}}
@@ -2025,20 +2039,44 @@ fill_ann_color_map <- function(dt_ann,
 #' @author Janina Smoła \email{janina.smola@@external.roche.com}
 .get_pheatmap_cluster_param <- function(mat_to_cluster,
                                         distfun = stats::dist,
-                                        additional_condition = TRUE) {
+                                        additional_condition = TRUE,
+                                        na_rows_last = FALSE) {
 
   checkmate::assert_matrix(mat_to_cluster, mode = "numeric", row.names = "unique")
   checkmate::assert_function(distfun)
   checkmate::assert_flag(additional_condition)
+  checkmate::assert_flag(na_rows_last)
 
-  if (additional_condition && NROW(mat_to_cluster) >= 2) {
-    tryCatch(stats::hclust(distfun(mat_to_cluster)),
-             error = function(e) {
-               FALSE
-             }) # if any problem with distfun -> no clustering
-  } else {
-    FALSE
+  if (!additional_condition || NROW(mat_to_cluster) < 2) {
+    return(FALSE)
   }
+
+  has_data <- rowSums(!is.na(mat_to_cluster)) > 0
+  if (!na_rows_last || all(has_data)) {
+    return(tryCatch(stats::hclust(distfun(mat_to_cluster)),
+                    error = function(e) {
+                      FALSE
+                    })) # if any problem with distfun -> no clustering
+  }
+  if (sum(has_data) < 2) {
+    return(FALSE)
+  }
+
+  # rows with only NAs: distfun would treat them as similar to every row,
+  # so the distances are computed only for rows with data, and the NA-only rows
+  # join the tree at a height above all other rows
+  tryCatch({
+    dist_data <- as.matrix(distfun(mat_to_cluster[has_data, , drop = FALSE]))
+    max_dist <- max(dist_data, na.rm = TRUE)
+    na_dist <- if (is.finite(max_dist) && max_dist > 0) max_dist * 1.05 else 1
+    dist_all <- matrix(na_dist, nrow = NROW(mat_to_cluster), ncol = NROW(mat_to_cluster),
+                       dimnames = list(rownames(mat_to_cluster), rownames(mat_to_cluster)))
+    dist_all[has_data, has_data] <- dist_data
+    dist_all[!has_data, !has_data] <- 0
+    stats::hclust(stats::as.dist(dist_all))
+  }, error = function(e) {
+    FALSE
+  })
 }
 
 

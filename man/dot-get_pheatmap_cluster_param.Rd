@@ -7,7 +7,8 @@
 .get_pheatmap_cluster_param(
   mat_to_cluster,
   distfun = stats::dist,
-  additional_condition = TRUE
+  additional_condition = TRUE,
+  na_rows_last = FALSE
 )
 }
 \arguments{
@@ -17,6 +18,9 @@
 defaults to \code{\link[stats:dist]{stats::dist}} using euclidean euclidean.}
 
 \item{additional_condition}{additional logical flag whether rows/columns should be clustered}
+
+\item{na_rows_last}{logical flag; if \code{TRUE}, rows with only NAs are left out
+when computing distances and join the tree at a height above all other rows}
 }
 \value{
 logical flag determining if rows should be clustered or \code{hclust} object.

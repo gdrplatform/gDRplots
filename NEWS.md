@@ -1,3 +1,8 @@
+## gDRplots 0.99.11 - 2026-11-03
+* fix panel type in `heatmap_combo_with_isoref_panel` when some cell lines miss a concentration row
+* fix plot size in `estimate_plot_size` for panels combined with patchwork
+* fix `pheatmap_with_anno_combo` to show cell lines and combinations without scores as NA
+
 ## gDRplots 0.99.10 - 2026-10-28
 * fix `group_names` as factor in `plot_boxplot_metric_*` functions
 * fix selection columns being factor instead of character across plotting functions

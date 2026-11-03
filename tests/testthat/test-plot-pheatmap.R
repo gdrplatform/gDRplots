@@ -800,11 +800,9 @@ test_that("pheatmap_with_anno_combo works as expected", {
   res_2 <- data.table::dcast(data = dt_scores_na[normalization_type == "RV", ],
                              formula = CellLineName ~ paste(DrugName, "x", DrugName_2),
                              value.var = "bliss_score")
-  res_2 <- res_2[, .SD, .SDcols = !anyNA]
   data.table::setkey(res_2, NULL)
-  drug_combo_names <- unique(sprintf("%s x %s",
-                                     dt_scores_na[!is.na(bliss_score)]$DrugName,
-                                     dt_scores_na[!is.na(bliss_score)]$DrugName_2))
+  # combinations without scores are kept and shown as NA
+  drug_combo_names <- unique(sprintf("%s x %s", dt_scores_na$DrugName, dt_scores_na$DrugName_2))
 
   out_2 <- pheatmap_with_anno_combo(dt_scores = dt_scores_na,
                                     normalization_type = "RV",
@@ -825,6 +823,20 @@ test_that("pheatmap_with_anno_combo works as expected", {
   expect_equal(sort(plt_2$gtable$grobs[[5]]$label), sort(drug_combo_names))
   expect_is(plt_2[["tree_row"]], "hclust") # rows are clustered
   expect_true(is.na(plt_2[["tree_col"]])) # cols aren't clustered due cluster_cols = FALSE
+
+  # scenario 2b: cell line without scores is kept as NA column, also with clustering
+  se_big <- gDRutils::get_synthetic_data("combo_matrix")[[gDRutils::get_supported_experiments("combo")]]
+  dt_scores_na_cl <- gDRutils::convert_se_assay_to_dt(se = se_big, assay_name = "scores")
+  na_cl <- sort(unique(dt_scores_na_cl[["CellLineName"]]))[1]
+  dt_scores_na_cl[CellLineName == na_cl]$hsa_score <- NA
+  out_2b <- pheatmap_with_anno_combo(dt_scores = dt_scores_na_cl)
+  expect_true(na_cl %in% out_2b[["data"]][["matrix"]][["CellLineName"]])
+  plt_2b <- out_2b[["heatmap"]]
+  expect_true(na_cl %in% plt_2b$gtable$grobs[[4]]$label)
+  expect_is(plt_2b[["tree_col"]], "hclust")
+  # NA-only cell line joins the tree in the last merge, above all other cell lines
+  tree_col <- plt_2b[["tree_col"]]
+  expect_true(-which(tree_col$labels == na_cl) %in% tree_col$merge[NROW(tree_col$merge), ])
 
   # scenario 3: annotations for col and color maps
   annotation_manual_col <- data.table::data.table(
@@ -1216,6 +1228,15 @@ test_that("prep_pheatmap_matrix works as expected", {
                sort(unique(unique(dt_scores[, paste(DrugName, "x", DrugName_2)]))))
   expect_true(all(dt_scores[normalization_type == "RV" & is.na(hsa_score), ][["hsa_score"]] %in% mat_5))
 
+  mat_5b <- prep_pheatmap_matrix(dt_response = dt_scores_NA,
+                                 metric = "bliss_score",
+                                 normalization_type = "RV",
+                                 experiment_type = gDRutils::get_supported_experiments("combo"),
+                                 remove_na_only = FALSE)
+  expect_true("cellline_EA" %in% rownames(mat_5b))
+  expect_true(all(is.na(mat_5b["cellline_EA", ])))
+  expect_equal(mat_5b[rownames(mat_5), colnames(mat_5)], mat_5)
+
   # scenario: matrix 0x0 (all values are NAs)
   dt_metrics_NA <- data.table::copy(dt_metrics)
   dt_metrics_NA[normalization_type == "GR"][["xc50"]] <- NA
@@ -1509,6 +1530,13 @@ test_that(".get_pheatmap_cluster_param works as expected", {
   out_9 <- .get_pheatmap_cluster_param(mat_NA, distfun = compute_distances, additional_condition = add_cond)
   expect_is(out_9, "logical")
   expect_equal(out_9, add_cond)
+
+  # NA-only row joins the tree last when na_rows_last = TRUE
+  out_9b <- .get_pheatmap_cluster_param(mat_NA, distfun = compute_distances, na_rows_last = TRUE)
+  expect_is(out_9b, "hclust")
+  expect_equal(out_9b$labels, rownames(mat))
+  expect_true(-2 %in% out_9b$merge[NROW(out_9b$merge), ])
+  expect_false(.get_pheatmap_cluster_param(mat_NA[1:2, , drop = FALSE], na_rows_last = TRUE))
 
   # scenario: matrix with -Inf/Inf
   mat_inf <- mat
