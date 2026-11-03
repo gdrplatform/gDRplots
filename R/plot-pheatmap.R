@@ -1259,7 +1259,7 @@ pheatmap_with_anno_combo <- function(
   }
 
   # prep hm color palette
-  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks + 1)
+  breaks <- .get_combo_score_breaks(t_mat_cvd, metric, no_breaks)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_excess_palette(no_breaks)
   } else {
@@ -1307,6 +1307,18 @@ pheatmap_with_anno_combo <- function(
                        annotation_colors = annotation_colors,
                        silent = TRUE)
   return(ls_output)
+}
+
+#' Color breaks for a combo score heatmap: a fixed scale for Bliss and HSA, otherwise symmetric
+#' around 0 and spanning the finite values of the matrix
+#' @keywords internal
+.get_combo_score_breaks <- function(mat, metric, no_breaks) {
+  max_abs <- if (metric %in% c("hsa_score", "bliss_score") || !any(is.finite(mat))) {
+    0.7
+  } else {
+    max(abs(mat[is.finite(mat)]), 0.1)
+  }
+  seq(from = -max_abs, to = max_abs, length.out = no_breaks + 1)
 }
 
 #' Plot heatmap with annotations for combo metrics data
