@@ -975,9 +975,10 @@ pheatmap_with_anno_cd <- function(
 #' @param dt_scores \code{data.table} representing data from the \code{scores} assay,
 #'   outputted by \code{\link[gDRutils:convert_se_assay_to_dt]{gDRutils::convert_se_assay_to_dt}}
 #'   and combo \code{SummarizedExperiment}
-#' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
+#' @param metric string name of the combo metric, any numeric column of \code{dt_scores};
+#'   e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" - respectively
 #'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'   or a column written by a custom fit, such as \code{beta} from MuSyC
 #' @param annotation_row \code{data.table} that specifies the annotations shown on left side of the heatmap.
 #'   Each row defines the features for a specific row. The rows in the data and in the annotation
 #'   are matched using corresponding combination of names from \code{DrugName} and \code{DrugName_2}
@@ -1078,7 +1079,8 @@ pheatmap_with_anno_combo <- function(
 
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_string(fit_source, null.ok = TRUE)
   checkmate::assert_string(hm_title, na.ok = TRUE)
   checkmate::assert_character(colors_vec, null.ok = TRUE)
@@ -1257,7 +1259,7 @@ pheatmap_with_anno_combo <- function(
   }
 
   # prep hm color palette
-  breaks <- seq(from = -0.7, to = 0.7, length.out = no_breaks + 1)
+  breaks <- .get_combo_score_breaks(t_mat_cvd, metric, no_breaks)
   hm_color_palette <- if (is.null(colors_vec) || !all(vapply(colors_vec, is_valid_color, logical(1)))) {
     .get_excess_palette(no_breaks)
   } else {
@@ -1305,6 +1307,18 @@ pheatmap_with_anno_combo <- function(
                        annotation_colors = annotation_colors,
                        silent = TRUE)
   return(ls_output)
+}
+
+#' Color breaks for a combo score heatmap: a fixed scale for Bliss and HSA, otherwise symmetric
+#' around 0 and spanning the finite values of the matrix
+#' @keywords internal
+.get_combo_score_breaks <- function(mat, metric, no_breaks) {
+  max_abs <- if (metric %in% c("hsa_score", "bliss_score") || !any(is.finite(mat))) {
+    0.7
+  } else {
+    max(abs(mat[is.finite(mat)]), 0.1)
+  }
+  seq(from = -max_abs, to = max_abs, length.out = no_breaks + 1)
 }
 
 #' Plot heatmap with annotations for combo metrics data

@@ -1,3 +1,7 @@
+## gDRplots 0.99.11 - 2026-11-03
+* allow any numeric score column as `metric` in `pheatmap_with_anno_combo` and `plot_boxplot_metric_combo*`
+* adjust the `pheatmap_with_anno_combo` color scale to the data for scores other than `hsa_score` and `bliss_score`
+
 ## gDRplots 0.99.10 - 2026-10-28
 * fix `group_names` as factor in `plot_boxplot_metric_*` functions
 * fix selection columns being factor instead of character across plotting functions
@@ -422,3 +426,4 @@
 * update package structure
 * update SA plots and combo plots functions
 * add basic tests
+

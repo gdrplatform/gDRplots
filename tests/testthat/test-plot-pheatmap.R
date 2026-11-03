@@ -2012,3 +2012,27 @@ test_that(".get_gradient_colors works as expected", {
     "must have the same length"
   )
 })
+
+test_that("pheatmap_with_anno_combo accepts a score column from a custom fit", {
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_scores <- gDRutils::convert_se_assay_to_dt(se = se, assay_name = "scores")
+  dt_scores[, beta := bliss_score / 2]
+
+  out_beta <- pheatmap_with_anno_combo(dt_scores = dt_scores, metric = "beta")
+  out_bliss <- pheatmap_with_anno_combo(dt_scores = dt_scores, metric = "bliss_score")
+  expect_equal(out_beta$data$matrix[[1]], out_bliss$data$matrix[[1]])
+  expect_equal(as.matrix(out_beta$data$matrix[, -1]), as.matrix(out_bliss$data$matrix[, -1]) / 2)
+
+  expect_error(pheatmap_with_anno_combo(dt_scores = dt_scores, metric = "DrugName"),
+               "Assertion on 'metric' failed: Must be element of set")
+})
+
+test_that(".get_combo_score_breaks keeps the Bliss scale and spans other scores", {
+  mat <- matrix(c(-6.7, 0.2, 4.5, NA, Inf), nrow = 1)
+  expect_equal(range(.get_combo_score_breaks(mat, "bliss_score", 50)), c(-0.7, 0.7))
+  expect_equal(range(.get_combo_score_breaks(mat, "log2_alpha", 50)), c(-6.7, 6.7))
+  expect_length(.get_combo_score_breaks(mat, "log2_alpha", 50), 51)
+  expect_equal(range(.get_combo_score_breaks(matrix(NA_real_), "beta", 10)), c(-0.7, 0.7))
+  expect_equal(range(.get_combo_score_breaks(matrix(0), "beta", 10)), c(-0.1, 0.1))
+})

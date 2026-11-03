@@ -657,9 +657,10 @@ plot_boxplot_metric_sa_by_grp <- function(
 #' @param group_var string name of group variable; one of: \code{"CellLineName"} or \code{"DrugName"};
 #'   for \code{group_var} set as \code{"DrugName"} points will be grouped by drug
 #'   combinations \code{"DrugName"} x \code{"DrugName_2"}
-#' @param metric string name of the combo metric;
-#'   one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
-#'   depending on \code{normalization_type}) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#' @param metric string name of the combo metric, any numeric column of \code{dt_scores};
+#'   e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" - respectively
+#'   depending on \code{normalization_type}), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+#'   or a column written by a custom fit, such as \code{beta} from MuSyC
 #' @param fit_source string source name for metrics
 
 
@@ -730,7 +731,8 @@ plot_boxplot_metric_combo <- function(
   }
 
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_scores),
                           must.include = c(cellline_name, drug_name, drug_name_2, col_var, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -899,7 +901,8 @@ plot_boxplot_metric_combo_by_CLs <- function(
 
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_scores),
                           must.include = c(cellline_name, tissue, drug_name, drug_name_2, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
@@ -975,7 +978,8 @@ plot_boxplot_metric_combo_by_drugs <- function(
 
   checkmate::assert_data_table(dt_scores)
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
-  checkmate::assert_choice(metric, choices = c("hsa_score", "bliss_score"))
+  numeric_columns <- names(dt_scores)[vapply(dt_scores, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
   checkmate::assert_names(names(dt_scores),
                           must.include = c(cellline_name, drug_name, drug_name_2, metric))
   checkmate::assert_string(fit_source, null.ok = TRUE)
