@@ -38,9 +38,11 @@ plot_boxplot_metric_combo(
 
 - metric:
 
-  string name of the combo metric; one of: "hsa_score"("Bliss Excess GR"
-  or "Bliss Excess RV" - respectively depending on `normalization_type`)
-  or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+  string name of the combo metric, any numeric column of `dt_scores`;
+  e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" -
+  respectively depending on `normalization_type`), "bliss_score" ("Bliss
+  Score GR" or "Bliss Score RV") or a column written by a custom fit,
+  such as `beta` from MuSyC
 
 - fit_source:
 

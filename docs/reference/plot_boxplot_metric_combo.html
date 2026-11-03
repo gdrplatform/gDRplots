@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,9 +74,10 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")</p></dd>
 
 
 <dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
-<dd><p>string name of the combo metric;
-one of: "hsa_score"("Bliss Excess GR" or "Bliss Excess RV" - respectively
-depending on <code>normalization_type</code>) or "bliss_score" ("Bliss Score GR" or "Bliss Score RV")</p></dd>
+<dd><p>string name of the combo metric, any numeric column of <code>dt_scores</code>;
+e.g. "hsa_score" ("Bliss Excess GR" or "Bliss Excess RV" - respectively
+depending on <code>normalization_type</code>), "bliss_score" ("Bliss Score GR" or "Bliss Score RV")
+or a column written by a custom fit, such as <code>beta</code> from MuSyC</p></dd>
 
 
 <dt id="arg-fit-source">fit_source<a class="anchor" aria-label="anchor" href="#arg-fit-source"></a></dt>

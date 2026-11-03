@@ -1046,7 +1046,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.22 gDRplots_0.99.10 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.22 gDRplots_0.99.11 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
@@ -1070,12 +1070,12 @@ sessionInfo()
 #>  [37] Seqinfo_1.2.0               bookdown_0.48              
 #>  [39] SummarizedExperiment_1.42.0 iterators_1.0.14           
 #>  [41] knitr_1.52                  WGCNA_1.74                 
-#>  [43] base64enc_0.1-6             R.utils_2.13.0             
-#>  [45] IRanges_2.46.0              Matrix_1.7-6               
-#>  [47] splines_4.6.2               nnet_7.3-21                
-#>  [49] tidyselect_1.2.1            rstudioapi_0.19.0          
-#>  [51] abind_1.4-8                 yaml_2.3.12                
-#>  [53] stringfish_0.19.2           doParallel_1.0.17          
+#>  [43] charport_0.1.1              base64enc_0.1-6            
+#>  [45] R.utils_2.13.0              IRanges_2.46.0             
+#>  [47] Matrix_1.7-6                splines_4.6.2              
+#>  [49] nnet_7.3-21                 tidyselect_1.2.1           
+#>  [51] rstudioapi_0.19.0           abind_1.4-8                
+#>  [53] yaml_2.3.12                 doParallel_1.0.17          
 #>  [55] codetools_0.2-20            lattice_0.23-1             
 #>  [57] tibble_3.3.1                Biobase_2.72.0             
 #>  [59] withr_3.0.3                 BumpyMatrix_1.20.0         
@@ -1089,7 +1089,7 @@ sessionInfo()
 #>  [75] invgamma_1.2                truncnorm_1.0-9            
 #>  [77] S4Vectors_0.50.3            ggplot2_4.0.3              
 #>  [79] scales_1.4.0                ashr_2.2-63                
-#>  [81] qs2_0.3.1                   glue_1.8.1                 
+#>  [81] qs2_0.4.0                   glue_1.8.1                 
 #>  [83] pheatmap_1.0.13             Hmisc_5.3-0                
 #>  [85] tools_4.6.2                 data.table_1.18.6.1        
 #>  [87] fs_2.1.0                    fastcluster_1.3.0          
