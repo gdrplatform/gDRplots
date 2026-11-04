@@ -7,7 +7,7 @@
 estimate_plot_size(plt, base_width = 10, base_height = 6, scale_factor = 0.5)
 }
 \arguments{
-\item{plt}{a ggplot or pheatmap object}
+\item{plt}{a ggplot (including patchwork) or pheatmap object}
 
 \item{base_width}{an integer with default base_width}
 
@@ -20,7 +20,8 @@ named vector with optimal width and height used
    in the \code{\link[ggplot2:ggsave]{ggplot2::ggsave}} function
 }
 \description{
-Estimate the optimal plot size (either ggplot or pheatmap) for saving plots
+For a panel of plots combined with \code{patchwork}, the size grows with
+the number of rows and columns in the panel.
 }
 \examples{
 p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) + ggplot2::geom_point()

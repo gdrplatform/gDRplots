@@ -1,3 +1,8 @@
+## gDRplots 0.99.12 - 2026-11-04
+* fix panel type in `heatmap_combo_with_isoref_panel` when some cell lines miss a concentration row
+* fix plot size in `estimate_plot_size` for panels combined with patchwork
+* fix `pheatmap_with_anno_combo` to show cell lines and combinations without scores as NA
+
 ## gDRplots 0.99.11 - 2026-11-03
 * allow any numeric score column as `metric` in `pheatmap_with_anno_combo` and `plot_boxplot_metric_combo*`
 * adjust the `pheatmap_with_anno_combo` color scale to the data for scores other than `hsa_score` and `bliss_score`

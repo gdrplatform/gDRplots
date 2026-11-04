@@ -1214,6 +1214,12 @@ test_that(".get_combo_panel_type works as expected", {
   )
   expect_equal(.get_combo_panel_type(ls_vec_conc_4), "common")
 
+  # most cell lines have the full grid, two cell lines miss one row
+  # (in the middle and at the end)
+  full_grid <- c(0, 0.0125, 0.0254, 0.0507, 0.101, 0.202, 0.403, 0.804, 1.6, 3.2)
+  ls_vec_conc_5 <- list(full_grid, full_grid[-8], full_grid[-10])
+  expect_equal(.get_combo_panel_type(ls_vec_conc_5), "common")
+
 
   expect_error(.get_combo_panel_type(unlist(ls_vec_conc_1)),
                "Assertion on 'ls_vec_conc' failed: Must be of type 'list'")

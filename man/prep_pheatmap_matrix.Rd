@@ -9,7 +9,8 @@ prep_pheatmap_matrix(
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
-  experiment_type = gDRutils::get_supported_experiments("sa")
+  experiment_type = gDRutils::get_supported_experiments("sa"),
+  remove_na_only = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ but the values from any numeric column can be displayed.}
 
 \item{experiment_type}{string with experiment name;
 one of: "single-agent", "combination" or "co-dilution"}
+
+\item{remove_na_only}{logical flag; if \code{TRUE} (default), rows and columns
+with only missing values are removed from the matrix}
 }
 \value{
 matrix with values for selected metric with \code{CellLinName} in the rows

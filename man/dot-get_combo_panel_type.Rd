@@ -35,6 +35,11 @@ Possible combinations (0 is not taken into account as it is always present):
       \item all vectors have common part and start and end conc are the same, but there are some gap\cr
             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
             0, 0.003, 0.01, 0.03, ___, 0.3, 1\cr
+      \item one vector has all concentrations and the other vectors have gaps,
+            also at the start or end conc\cr
+            0, 0.003, 0.01, 0.03, 0.1, 0.3, 1\cr
+            0, 0.003, 0.01, 0.03, ___, 0.3, 1\cr
+            0, 0.003, 0.01, 0.03, 0.1, 0.3, _\cr
          }
   \item \code{independent}
     \itemize{

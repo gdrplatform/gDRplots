@@ -363,6 +363,24 @@ test_that("estimate_plot_size works for pheatmap object", {
   expect_equal(size[["height"]], 11)
 })
 
+test_that("estimate_plot_size scales patchwork panel with number of plots", {
+  panel_width <- .get_setting("PATCHWORK_PANEL_WIDTH")
+  panel_height <- .get_setting("PATCHWORK_PANEL_HEIGHT")
+
+  # 20 plots in 2 columns, as in heatmap_combo_with_isoref_panel_independent
+  pw_20 <- patchwork::wrap_plots(rep(list(p1), 20), ncol = 2)
+  size_20 <- estimate_plot_size(pw_20)
+  expect_named(size_20, c("width", "height"))
+  expect_equal(size_20[["width"]], max(10, 2 * panel_width))
+  expect_equal(size_20[["height"]], 10 * panel_height)
+
+  # no layout given: patchwork default, ceiling(sqrt(n)) columns
+  pw_2 <- p1 + p1
+  size_2 <- estimate_plot_size(pw_2)
+  expect_equal(size_2[["width"]], max(10, 2 * panel_width))
+  expect_equal(size_2[["height"]], max(6, panel_height))
+})
+
 test_that("estimate_plot_size handles invalid inputs", {
   invalid_plot <- list()
   expect_error(estimate_plot_size(invalid_plot),
