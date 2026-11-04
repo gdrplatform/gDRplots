@@ -1,7 +1,7 @@
 # Estimate the optimal plot size (either ggplot or pheatmap) for saving plots
 
-Estimate the optimal plot size (either ggplot or pheatmap) for saving
-plots
+For a panel of plots combined with `patchwork`, the size grows with the
+number of rows and columns in the panel.
 
 ## Usage
 
@@ -13,7 +13,7 @@ estimate_plot_size(plt, base_width = 10, base_height = 6, scale_factor = 0.5)
 
 - plt:
 
-  a ggplot or pheatmap object
+  a ggplot (including patchwork) or pheatmap object
 
 - base_width:
 

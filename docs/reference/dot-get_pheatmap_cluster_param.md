@@ -12,7 +12,8 @@ compute the distance in `hclust` object
 .get_pheatmap_cluster_param(
   mat_to_cluster,
   distfun = stats::dist,
-  additional_condition = TRUE
+  additional_condition = TRUE,
+  na_rows_last = FALSE
 )
 ```
 
@@ -31,6 +32,11 @@ compute the distance in `hclust` object
 - additional_condition:
 
   additional logical flag whether rows/columns should be clustered
+
+- na_rows_last:
+
+  logical flag; if `TRUE`, rows with only NAs are left out when
+  computing distances and join the tree at a height above all other rows
 
 ## Value
 

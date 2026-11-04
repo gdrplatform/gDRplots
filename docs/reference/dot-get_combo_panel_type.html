@@ -15,7 +15,7 @@ or heatmap_combo_with_isoref_panel_independent that plot heatmaps independently.
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.12</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,11 @@ or <code><a href="heatmap_combo_with_isoref_panel_independent.html">heatmap_comb
 <li><p>all vectors have common part and start and end conc are the same, but there are some gap<br>
             0, 0.003, 0.01, 0.03, 0.1, 0.3, 1<br>
             0, 0.003, 0.01, 0.03, ___, 0.3, 1<br></p></li>
+<li><p>one vector has all concentrations and the other vectors have gaps,
+            also at the start or end conc<br>
+            0, 0.003, 0.01, 0.03, 0.1, 0.3, 1<br>
+            0, 0.003, 0.01, 0.03, ___, 0.3, 1<br>
+            0, 0.003, 0.01, 0.03, 0.1, 0.3, _<br></p></li>
 </ul></li>
 <li><p><code>independent</code></p><ul><li><p>all vectors have common part and start conc are the same, but end conc is different (no gap)<br>
             0, 0.003, 0.01, 0.03, 0.1, 0.3, __<br>

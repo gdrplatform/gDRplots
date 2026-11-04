@@ -15,7 +15,7 @@ selected function used to compute the distance in hclust object"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.12</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,8 @@ selected function used to compute the distance in <code>hclust</code> object</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.get_pheatmap_cluster_param</span><span class="op">(</span></span>
 <span>  <span class="va">mat_to_cluster</span>,</span>
 <span>  distfun <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span>,</span>
-<span>  additional_condition <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  additional_condition <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na_rows_last <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,6 +75,11 @@ defaults to <code><a href="https://rdrr.io/r/stats/dist.html" class="external-li
 
 <dt id="arg-additional-condition">additional_condition<a class="anchor" aria-label="anchor" href="#arg-additional-condition"></a></dt>
 <dd><p>additional logical flag whether rows/columns should be clustered</p></dd>
+
+
+<dt id="arg-na-rows-last">na_rows_last<a class="anchor" aria-label="anchor" href="#arg-na-rows-last"></a></dt>
+<dd><p>logical flag; if <code>TRUE</code>, rows with only NAs are left out
+when computing distances and join the tree at a height above all other rows</p></dd>
 
 </dl></div>
     <div class="section level2">

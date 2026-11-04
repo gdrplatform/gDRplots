@@ -49,6 +49,12 @@ present):
     0, 0.003, 0.01, 0.03, 0.1, 0.3, 1  
     0, 0.003, 0.01, 0.03, \_\_\_, 0.3, 1  
 
+  - one vector has all concentrations and the other vectors have gaps,
+    also at the start or end conc  
+    0, 0.003, 0.01, 0.03, 0.1, 0.3, 1  
+    0, 0.003, 0.01, 0.03, \_\_\_, 0.3, 1  
+    0, 0.003, 0.01, 0.03, 0.1, 0.3, \_  
+
 - `independent`
 
   - all vectors have common part and start conc are the same, but end

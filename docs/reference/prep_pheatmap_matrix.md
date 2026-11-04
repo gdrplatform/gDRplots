@@ -10,7 +10,8 @@ prep_pheatmap_matrix(
   normalization_type = "GR",
   metric = "xc50",
   fit_source = "gDR",
-  experiment_type = gDRutils::get_supported_experiments("sa")
+  experiment_type = gDRutils::get_supported_experiments("sa"),
+  remove_na_only = TRUE
 )
 ```
 
@@ -45,6 +46,11 @@ prep_pheatmap_matrix(
 
   string with experiment name; one of: "single-agent", "combination" or
   "co-dilution"
+
+- remove_na_only:
+
+  logical flag; if `TRUE` (default), rows and columns with only missing
+  values are removed from the matrix
 
 ## Value
 
