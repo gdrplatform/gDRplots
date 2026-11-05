@@ -135,6 +135,37 @@ test_that("heatmap_combo_metrics works as expected", {
   expect_equal(plt_8[["data"]], plt_1[["data"]])
 })
 
+test_that("heatmap_combo_metrics accepts any numeric column as metric", {
+  cl_name <- "cellline_FD"
+  drug1_name <- "drug_011"
+  drug2_name <- "drug_026"
+
+  mae <- gDRutils::get_synthetic_data("combo_matrix")
+  se <- mae[[gDRutils::get_supported_experiments("combo")]]
+  dt_excess <- gDRutils::convert_se_assay_to_dt(se, "excess")
+  dt_excess[, `:=`(fitted_surface = smooth, fit_residual = hsa_excess)]
+  fill_of <- function(plt) ggplot2::layer_data(plt, 1)[["fill"]]
+
+  plt_smooth <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name)
+  plt_surface <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
+                                       metric = "fitted_surface", scale_type = "smooth")
+  expect_identical(fill_of(plt_surface), fill_of(plt_smooth))
+
+  # a non-native column defaults to the excess scale
+  plt_hsa <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, metric = "hsa_excess")
+  plt_residual <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
+                                        metric = "fit_residual")
+  expect_identical(fill_of(plt_residual), fill_of(plt_hsa))
+  plt_surface_excess <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
+                                              metric = "fitted_surface")
+  expect_false(identical(fill_of(plt_surface_excess), fill_of(plt_smooth)))
+
+  expect_error(heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, metric = "CellLineName"),
+               "Assertion on 'metric' failed")
+  expect_error(heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, scale_type = "other"),
+               "Assertion on 'scale_type' failed")
+})
+
 test_that("heatmap_combo_metrics_panel works as expected", {
   cl_name <- "cellline_FD"
   drug1_name <- "drug_011"

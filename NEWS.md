@@ -1,3 +1,6 @@
+## gDRplots 0.99.13 - 2026-11-05
+* allow any numeric column as `metric` in `heatmap_combo_metrics`, with `scale_type` to pick the color scale
+
 ## gDRplots 0.99.12 - 2026-11-04
 * fix panel type in `heatmap_combo_with_isoref_panel` when some cell lines miss a concentration row
 * fix plot size in `estimate_plot_size` for panels combined with patchwork

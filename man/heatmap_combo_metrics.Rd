@@ -18,7 +18,8 @@ heatmap_combo_metrics(
   limit = NULL,
   no_breaks = 50,
   swap_axes = FALSE,
-  show_values = FALSE
+  show_values = FALSE,
+  scale_type = NULL
 )
 }
 \arguments{
@@ -36,10 +37,10 @@ and combo \code{SummarizedExperiment}}
 
 \item{cl_name}{string with cell line to be plotted (identifiers \code{CellLineName})}
 
-\item{metric}{string name of combo metric;
-one of: "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}),
-"hsa_excess"("Bliss Excess GR" or "Bliss Excess RV")
-or "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")}
+\item{metric}{string name of combo metric, any numeric column of \code{dt_excess};
+e.g. "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}),
+"hsa_excess"("Bliss Excess GR" or "Bliss Excess RV"), "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")
+or a column written by a custom fit, such as a fitted MuSyC surface}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -60,6 +61,10 @@ Use NA to refer to the existing minimum or maximum}
 \item{swap_axes}{logical flag indicating whether to swap the axes with drugs of the heatmap}
 
 \item{show_values}{logical flag indicating whether to show values of the metric on the heatmap}
+
+\item{scale_type}{string, \code{"smooth"} for the response palette and limits
+or \code{"excess"} for the palette and symmetric limits of a difference;
+\code{NULL} (default) means \code{"smooth"} for \code{metric = "smooth"} and \code{"excess"} otherwise}
 }
 \value{
 \code{ggplot} object containing heatmap with the values for the selected combo metric

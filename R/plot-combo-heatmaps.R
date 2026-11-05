@@ -9,10 +9,10 @@
 #' @param drug1_name string with drug name to be plotted (identifiers \code{DrugName})
 #' @param drug2_name string with co-drug name to be plotted (identifiers \code{DrugName_2})
 #' @param cl_name string with cell line to be plotted (identifiers \code{CellLineName})
-#' @param metric string name of combo metric;
-#'   one of: "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}),
-#'   "hsa_excess"("Bliss Excess GR" or "Bliss Excess RV")
-#'   or "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")
+#' @param metric string name of combo metric, any numeric column of \code{dt_excess};
+#'   e.g. "smooth"("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type}),
+#'   "hsa_excess"("Bliss Excess GR" or "Bliss Excess RV"), "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")
+#'   or a column written by a custom fit, such as a fitted MuSyC surface
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param iso_levels character vector with isobologram levels to be selected
@@ -25,6 +25,9 @@
 #' @param no_breaks numeric number of breaks on scale
 #' @param swap_axes logical flag indicating whether to swap the axes with drugs of the heatmap
 #' @param show_values logical flag indicating whether to show values of the metric on the heatmap
+#' @param scale_type string, \code{"smooth"} for the response palette and limits
+#'   or \code{"excess"} for the palette and symmetric limits of a difference;
+#'   \code{NULL} (default) means \code{"smooth"} for \code{metric = "smooth"} and \code{"excess"} otherwise
 #'
 #' @return \code{ggplot} object containing heatmap with the values for the selected combo metric
 #'    for selected drugs and cell line with selected isoline (when chosen)
@@ -96,7 +99,8 @@ heatmap_combo_metrics <- function(
     limit = NULL,
     no_breaks = 50,
     swap_axes = FALSE,
-    show_values = FALSE) {
+    show_values = FALSE,
+    scale_type = NULL) {
 
   cellline_name <- gDRutils::get_env_identifiers("cellline_name")
   clid <- gDRutils::get_env_identifiers("cellline")
@@ -113,7 +117,12 @@ heatmap_combo_metrics <- function(
   checkmate::assert_choice(drug2_name, choices = as.character(dt_excess[[drug_name_2]]))
   checkmate::assert_string(cl_name)
   checkmate::assert_choice(cl_name, choices = as.character(dt_excess[[cellline_name]]))
-  checkmate::assert_choice(metric, names(gDRutils::get_combo_excess_field_names()))
+  numeric_columns <- names(dt_excess)[vapply(dt_excess, is.numeric, logical(1))]
+  checkmate::assert_choice(metric, choices = numeric_columns)
+  if (is.null(scale_type)) {
+    scale_type <- if (metric == "smooth") "smooth" else "excess"
+  }
+  checkmate::assert_choice(scale_type, choices = c("smooth", "excess"))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_data_table(dt_isobolograms, null.ok = TRUE)
   if (!is.null(dt_isobolograms)) {
@@ -229,7 +238,7 @@ heatmap_combo_metrics <- function(
     tile_width <- .get_tile_size(mrk_x)
 
     # prep hm color palette
-    hm_color_palette <- if (metric == "smooth") {
+    hm_color_palette <- if (scale_type == "smooth") {
       hm_color_palette_smooth
     } else {
       hm_color_palette_excess
@@ -242,10 +251,11 @@ heatmap_combo_metrics <- function(
 
     # prep limits
     limit_fill <- if (is.null(limit)) {
+      # the excess metrics share their limits
       prep_hm_limits(dt_[[metric]],
-                     metric = metric,
+                     metric = if (scale_type == "smooth") "smooth" else "hsa_excess",
                      normalization_type = normalization_type,
-                     symmetric = metric != "smooth")
+                     symmetric = scale_type != "smooth")
     } else {
       limit
     }
