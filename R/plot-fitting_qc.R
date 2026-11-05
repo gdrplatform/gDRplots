@@ -279,7 +279,8 @@ heatmap_control_mapping_qc <- function(dt_treat,
                      cluster_rows = FALSE,
                      angle_col = 90,
                      legend_breaks = unique_values,
-                     legend_labels = unique_values)
+                     legend_labels = unique_values,
+                     silent = TRUE)
 }
 
 #' Render a data.table as a text-based ggplot table
