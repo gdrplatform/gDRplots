@@ -63,8 +63,9 @@ Use NA to refer to the existing minimum or maximum}
 \item{show_values}{logical flag indicating whether to show values of the metric on the heatmap}
 
 \item{scale_type}{string, \code{"smooth"} for the response palette and limits
-or \code{"excess"} for the palette and symmetric limits of a difference;
-\code{NULL} (default) means \code{"smooth"} for \code{metric = "smooth"} and \code{"excess"} otherwise}
+or \code{"excess"} for the palette and symmetric limits of a difference; only \code{"smooth"} caps values at 1.1;
+\code{NULL} (default) picks the scale for "smooth", "hsa_excess" and "bliss_excess"
+and is an error for any other \code{metric}}
 }
 \value{
 \code{ggplot} object containing heatmap with the values for the selected combo metric

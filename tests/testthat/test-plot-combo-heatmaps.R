@@ -151,15 +151,25 @@ test_that("heatmap_combo_metrics accepts any numeric column as metric", {
                                        metric = "fitted_surface", scale_type = "smooth")
   expect_identical(fill_of(plt_surface), fill_of(plt_smooth))
 
-  # a non-native column defaults to the excess scale
   plt_hsa <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, metric = "hsa_excess")
   plt_residual <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
-                                        metric = "fit_residual")
+                                        metric = "fit_residual", scale_type = "excess")
   expect_identical(fill_of(plt_residual), fill_of(plt_hsa))
-  plt_surface_excess <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
-                                              metric = "fitted_surface")
-  expect_false(identical(fill_of(plt_surface_excess), fill_of(plt_smooth)))
 
+  # values outside the native range are capped only on the smooth scale
+  dt_excess[, wide := NA_real_]
+  dt_excess[CellLineName == cl_name & DrugName == drug1_name & DrugName_2 == drug2_name &
+              normalization_type == "GR", wide := seq(-3, 6, length.out = .N)]
+  plt_wide <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
+                                    metric = "wide", scale_type = "excess")
+  expect_equal(range(plt_wide$data$wide), c(-3, 6))
+  expect_equal(plt_wide$scales$get_scales("fill")$get_limits(), c(-6, 6))
+  plt_wide_smooth <- heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name,
+                                           metric = "wide", scale_type = "smooth")
+  expect_equal(range(plt_wide_smooth$data$wide), c(-3, 1.1))
+
+  expect_error(heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, metric = "fitted_surface"),
+               "set `scale_type`")
   expect_error(heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, metric = "CellLineName"),
                "Assertion on 'metric' failed")
   expect_error(heatmap_combo_metrics(dt_excess, NULL, drug1_name, drug2_name, cl_name, scale_type = "other"),
@@ -1099,22 +1109,22 @@ test_that("prep_hm_limits works as expected", {
   # RV smooth symmetric
   expect_equal(prep_hm_limits(vec, normalization_type = "RV", symmetric = TRUE), c(-1.0089, 1.0089))
 
-  # hsa_excess
+  # excess, e.g. hsa_excess
   vec <- c(-0.1016, -0.0647, 0.0021, 0.0328, 0.6824)
-  expect_equal(prep_hm_limits(vec, metric = "hsa_excess"), c(-0.25, 0.6824))
-  # hsa_excess symmetric
-  expect_equal(prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE), c(-0.6824, 0.6824))
+  expect_equal(prep_hm_limits(vec, scale_type = "excess"), c(-0.25, 0.6824))
+  # excess symmetric
+  expect_equal(prep_hm_limits(vec, scale_type = "excess", symmetric = TRUE), c(-0.6824, 0.6824))
 
-  # bliss_excess
+  # excess, e.g. bliss_excess
   vec <- c(-0.2651, -0.1289, 0.0051, 0.0202, 0.0394)
-  expect_equal(prep_hm_limits(vec, metric = "bliss_excess"), c(-0.2651, 0.25))
-  # bliss_excess symmetric
-  expect_equal(prep_hm_limits(vec, metric = "bliss_excess", symmetric = TRUE), c(-0.2651, 0.2651))
+  expect_equal(prep_hm_limits(vec, scale_type = "excess"), c(-0.2651, 0.25))
+  # excess symmetric
+  expect_equal(prep_hm_limits(vec, scale_type = "excess", symmetric = TRUE), c(-0.2651, 0.2651))
 
   expect_error(prep_hm_limits(LETTERS[1:5]),
                "Assertion on 'num_vec' failed: Must be of type 'numeric'")
-  expect_error(prep_hm_limits(vec, metric = "str"),
-               "Assertion on 'metric' failed: Must be element of set")
+  expect_error(prep_hm_limits(vec, scale_type = "str"),
+               "Assertion on 'scale_type' failed: Must be element of set")
   expect_error(prep_hm_limits(vec, normalization_type = "str"),
                "Assertion on 'normalization_type' failed: Must be element of set")
 })

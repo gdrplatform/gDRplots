@@ -6,7 +6,7 @@
 \usage{
 prep_hm_limits(
   num_vec,
-  metric = "smooth",
+  scale_type = "smooth",
   normalization_type = "GR",
   symmetric = FALSE
 )
@@ -14,10 +14,7 @@ prep_hm_limits(
 \arguments{
 \item{num_vec}{numeric vector}
 
-\item{metric}{string name of the combo metric;
-one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
-"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
-("Bliss Excess GR" or "Bliss Excess RV")}
+\item{scale_type}{string, \code{"smooth"} for response values or \code{"excess"} for differences}
 
 \item{normalization_type}{string with normalization_types to be selected
 one of: "GR" ("GRvalue") or "RV" ("RelativeViability")}
@@ -34,7 +31,7 @@ Calculate limit for combo heatmap with gDR assumptions
 \donttest{
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 gDRplots:::prep_hm_limits(vec)
-gDRplots:::prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
+gDRplots:::prep_hm_limits(vec, scale_type = "excess", symmetric = TRUE)
 }
 
 }

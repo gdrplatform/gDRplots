@@ -26,8 +26,9 @@
 #' @param swap_axes logical flag indicating whether to swap the axes with drugs of the heatmap
 #' @param show_values logical flag indicating whether to show values of the metric on the heatmap
 #' @param scale_type string, \code{"smooth"} for the response palette and limits
-#'   or \code{"excess"} for the palette and symmetric limits of a difference;
-#'   \code{NULL} (default) means \code{"smooth"} for \code{metric = "smooth"} and \code{"excess"} otherwise
+#'   or \code{"excess"} for the palette and symmetric limits of a difference; only \code{"smooth"} caps values at 1.1;
+#'   \code{NULL} (default) picks the scale for "smooth", "hsa_excess" and "bliss_excess"
+#'   and is an error for any other \code{metric}
 #'
 #' @return \code{ggplot} object containing heatmap with the values for the selected combo metric
 #'    for selected drugs and cell line with selected isoline (when chosen)
@@ -120,7 +121,10 @@ heatmap_combo_metrics <- function(
   numeric_columns <- names(dt_excess)[vapply(dt_excess, is.numeric, logical(1))]
   checkmate::assert_choice(metric, choices = numeric_columns)
   if (is.null(scale_type)) {
-    scale_type <- if (metric == "smooth") "smooth" else "excess"
+    if (!metric %in% names(gDRutils::get_combo_excess_field_names())) {
+      stop(sprintf("set `scale_type` (\"smooth\" or \"excess\") for metric '%s'", metric))
+    }
+    scale_type <- .get_scale_type(metric)
   }
   checkmate::assert_choice(scale_type, choices = c("smooth", "excess"))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
@@ -220,7 +224,9 @@ heatmap_combo_metrics <- function(
       ggplot2::theme_bw() +
       ggplot2::theme(aspect.ratio = 1)
   } else {
-    dt_[[metric]] <- pmin(1.1, dt_[[metric]])
+    if (scale_type == "smooth") {
+      dt_[[metric]] <- pmin(1.1, dt_[[metric]])
+    }
 
     conc_y <- if (swap_axes) dt_[[conc_2]] else dt_[[conc]]
     conc_x <- if (swap_axes) dt_[[conc]] else dt_[[conc_2]]
@@ -251,9 +257,8 @@ heatmap_combo_metrics <- function(
 
     # prep limits
     limit_fill <- if (is.null(limit)) {
-      # the excess metrics share their limits
       prep_hm_limits(dt_[[metric]],
-                     metric = if (scale_type == "smooth") "smooth" else "hsa_excess",
+                     scale_type = scale_type,
                      normalization_type = normalization_type,
                      symmetric = scale_type != "smooth")
     } else {
@@ -562,7 +567,7 @@ heatmap_combo_metrics_panel <- function(
 
       # prep limits
       limits <- prep_hm_limits(dt_[[mx_name]],
-                               metric = mx_name,
+                               scale_type = .get_scale_type(mx_name),
                                normalization_type = normalization_type,
                                symmetric = mx_name != "smooth")
 
@@ -1131,7 +1136,7 @@ heatmap_combo_with_isoref <- function(
 
     # prep limits
     limits <- prep_hm_limits(num_vec = dt_[[metric]],
-                             metric = metric,
+                             scale_type = .get_scale_type(metric),
                              normalization_type = normalization_type,
                              symmetric = (metric != "smooth"))
 
@@ -1592,7 +1597,7 @@ heatmap_combo_with_isoref_panel_common <- function(
 
   # prep limits
   limits <- prep_hm_limits(dt_tile[[metric]],
-                           metric = metric,
+                           scale_type = .get_scale_type(metric),
                            normalization_type = normalization_type,
                            symmetric = (metric != "smooth"))
   # legend title
@@ -1873,10 +1878,7 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #' Calculate limit for combo heatmap with gDR assumptions
 #'
 #' @param num_vec numeric vector
-#' @param metric string name of the combo metric;
-#'   one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on \code{normalization_type})
-#'   "hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
-#'   ("Bliss Excess GR" or "Bliss Excess RV")
+#' @param scale_type string, \code{"smooth"} for response values or \code{"excess"} for differences
 #' @param normalization_type string with normalization_types to be selected
 #'                           one of: "GR" ("GRvalue") or "RV" ("RelativeViability")
 #' @param symmetric logical indicating if limits should be symmetric around 0
@@ -1887,17 +1889,17 @@ heatmap_combo_with_isoref_panel_independent <- function(
 #' \donttest{
 #' vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 #' gDRplots:::prep_hm_limits(vec)
-#' gDRplots:::prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
+#' gDRplots:::prep_hm_limits(vec, scale_type = "excess", symmetric = TRUE)
 #' }
 #'
 #' @keywords internal
 prep_hm_limits <- function(num_vec,
-                           metric = "smooth",
+                           scale_type = "smooth",
                            normalization_type = "GR",
                            symmetric = FALSE) {
 
   checkmate::assert_numeric(num_vec)
-  checkmate::assert_choice(metric, choices = names(gDRutils::get_combo_excess_field_names()))
+  checkmate::assert_choice(scale_type, choices = c("smooth", "excess"))
   checkmate::assert_choice(normalization_type, choices = c("GR", "RV"))
   checkmate::assert_logical(symmetric)
 
@@ -1905,7 +1907,7 @@ prep_hm_limits <- function(num_vec,
   min_data <- min(vec_range)
   max_data <- max(vec_range)
 
-  max_val <- if (metric == "smooth") {
+  max_val <- if (scale_type == "smooth") {
     if (max_data > 1) {
       max_data
     } else {
@@ -1919,7 +1921,7 @@ prep_hm_limits <- function(num_vec,
     }
   }
 
-  min_val <- if (metric == "smooth") {
+  min_val <- if (scale_type == "smooth") {
     if (normalization_type == "GR") {
       min(0, min_data)
     } else {
@@ -1940,6 +1942,21 @@ prep_hm_limits <- function(num_vec,
   }
 
   return(c(min_val, max_val))
+}
+
+#' Get the scale type of a native combo metric
+#'
+#' @param metric string, one of: "smooth", "hsa_excess" or "bliss_excess"
+#'
+#' @return \code{"smooth"} for "smooth", \code{"excess"} otherwise
+#'
+#' @keywords internal
+.get_scale_type <- function(metric) {
+  if (metric == "smooth") {
+    "smooth"
+  } else {
+    "excess"
+  }
 }
 
 #' Transform concentrations values with log10
