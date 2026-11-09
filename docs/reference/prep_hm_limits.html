@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prep_hm_limits</span><span class="op">(</span></span>
 <span>  <span class="va">num_vec</span>,</span>
-<span>  metric <span class="op">=</span> <span class="st">"smooth"</span>,</span>
+<span>  scale_type <span class="op">=</span> <span class="st">"smooth"</span>,</span>
 <span>  normalization_type <span class="op">=</span> <span class="st">"GR"</span>,</span>
 <span>  symmetric <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -56,11 +56,8 @@
 <dd><p>numeric vector</p></dd>
 
 
-<dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
-<dd><p>string name of the combo metric;
-one of: "smooth" ("Smooth GR" or "Smooth RV" - respectively depending on <code>normalization_type</code>)
-"hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
-("Bliss Excess GR" or "Bliss Excess RV")</p></dd>
+<dt id="arg-scale-type">scale_type<a class="anchor" aria-label="anchor" href="#arg-scale-type"></a></dt>
+<dd><p>string, <code>"smooth"</code> for response values or <code>"excess"</code> for differences</p></dd>
 
 
 <dt id="arg-normalization-type">normalization_type<a class="anchor" aria-label="anchor" href="#arg-normalization-type"></a></dt>
@@ -83,7 +80,7 @@ one of: "GR" ("GRvalue") or "RV" ("RelativeViability")</p></dd>
 <span class="r-in"><span><span class="va">vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.3</span>, <span class="fl">0</span>, <span class="fl">0.5</span>, <span class="cn">Inf</span>, <span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">gDRplots</span><span class="fu">:::</span><span class="fu">prep_hm_limits</span><span class="op">(</span><span class="va">vec</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.3  1.0</span>
-<span class="r-in"><span><span class="fu">gDRplots</span><span class="fu">:::</span><span class="fu">prep_hm_limits</span><span class="op">(</span><span class="va">vec</span>, metric <span class="op">=</span> <span class="st">"hsa_excess"</span>, symmetric <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">gDRplots</span><span class="fu">:::</span><span class="fu">prep_hm_limits</span><span class="op">(</span><span class="va">vec</span>, scale_type <span class="op">=</span> <span class="st">"excess"</span>, symmetric <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.5  0.5</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

@@ -7,7 +7,7 @@ Calculate limit for combo heatmap with gDR assumptions
 ``` r
 prep_hm_limits(
   num_vec,
-  metric = "smooth",
+  scale_type = "smooth",
   normalization_type = "GR",
   symmetric = FALSE
 )
@@ -19,12 +19,9 @@ prep_hm_limits(
 
   numeric vector
 
-- metric:
+- scale_type:
 
-  string name of the combo metric; one of: "smooth" ("Smooth GR" or
-  "Smooth RV" - respectively depending on `normalization_type`)
-  "hsa_excess" ("Bliss Excess GR" or "Bliss Excess RV") or
-  "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")
+  string, `"smooth"` for response values or `"excess"` for differences
 
 - normalization_type:
 
@@ -46,7 +43,7 @@ capped limits (min and max) for given numeric vector
 vec <- c(-0.1, -0.3, 0, 0.5, Inf, NA)
 gDRplots:::prep_hm_limits(vec)
 #> [1] -0.3  1.0
-gDRplots:::prep_hm_limits(vec, metric = "hsa_excess", symmetric = TRUE)
+gDRplots:::prep_hm_limits(vec, scale_type = "excess", symmetric = TRUE)
 #> [1] -0.5  0.5
 # }
 ```

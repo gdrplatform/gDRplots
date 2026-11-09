@@ -1046,11 +1046,11 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.23 gDRplots_0.99.12 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.23 gDRplots_0.99.13 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
-#>   [3] magrittr_2.0.5              otel_0.2.0                 
+#>   [3] magrittr_2.0.5              otel_0.3.0                 
 #>   [5] matrixStats_1.5.0           compiler_4.6.2             
 #>   [7] mgcv_1.9-4                  systemfonts_1.3.2          
 #>   [9] vctrs_0.7.3                 stringr_1.6.0              
@@ -1070,7 +1070,7 @@ sessionInfo()
 #>  [37] Seqinfo_1.2.0               bookdown_0.48              
 #>  [39] SummarizedExperiment_1.42.0 iterators_1.0.14           
 #>  [41] knitr_1.52                  WGCNA_1.74                 
-#>  [43] charport_0.1.1              base64enc_0.1-6            
+#>  [43] charport_0.2.0              base64enc_0.1-6            
 #>  [45] R.utils_2.13.0              IRanges_2.46.0             
 #>  [47] Matrix_1.7-6                splines_4.6.2              
 #>  [49] nnet_7.3-21                 tidyselect_1.2.1           

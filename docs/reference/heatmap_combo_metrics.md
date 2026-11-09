@@ -19,7 +19,8 @@ heatmap_combo_metrics(
   limit = NULL,
   no_breaks = 50,
   swap_axes = FALSE,
-  show_values = FALSE
+  show_values = FALSE,
+  scale_type = NULL
 )
 ```
 
@@ -51,10 +52,11 @@ heatmap_combo_metrics(
 
 - metric:
 
-  string name of combo metric; one of: "smooth"("Smooth GR" or "Smooth
-  RV" - respectively depending on `normalization_type`),
-  "hsa_excess"("Bliss Excess GR" or "Bliss Excess RV") or "bliss_excess"
-  ("Bliss Excess GR" or "Bliss Excess RV")
+  string name of combo metric, any numeric column of `dt_excess`; e.g.
+  "smooth"("Smooth GR" or "Smooth RV" - respectively depending on
+  `normalization_type`), "hsa_excess"("Bliss Excess GR" or "Bliss Excess
+  RV"), "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV") or a
+  column written by a custom fit, such as a fitted MuSyC surface
 
 - normalization_type:
 
@@ -95,6 +97,13 @@ heatmap_combo_metrics(
 
   logical flag indicating whether to show values of the metric on the
   heatmap
+
+- scale_type:
+
+  string, `"smooth"` for the response palette and limits or `"excess"`
+  for the palette and symmetric limits of a difference; only `"smooth"`
+  caps values at 1.1; `NULL` (default) picks the scale for "smooth",
+  "hsa_excess" and "bliss_excess" and is an error for any other `metric`
 
 ## Value
 

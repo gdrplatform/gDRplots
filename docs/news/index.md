@@ -1,5 +1,11 @@
 # Changelog
 
+## gDRplots 0.99.13 - 2026-11-05
+
+- allow any numeric column as `metric` in `heatmap_combo_metrics`, with
+  `scale_type` required for a non-native column
+- restrict the 1.1 cap in `heatmap_combo_metrics` to the smooth scale
+
 ## gDRplots 0.99.12 - 2026-11-04
 
 - fix panel type in `heatmap_combo_with_isoref_panel` when some cell

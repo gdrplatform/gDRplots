@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDRplots</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,8 @@
 <span>  limit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  no_breaks <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  swap_axes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show_values <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  show_values <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  scale_type <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -87,10 +88,10 @@ and combo <code>SummarizedExperiment</code></p></dd>
 
 
 <dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
-<dd><p>string name of combo metric;
-one of: "smooth"("Smooth GR" or "Smooth RV" - respectively depending on <code>normalization_type</code>),
-"hsa_excess"("Bliss Excess GR" or "Bliss Excess RV")
-or "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")</p></dd>
+<dd><p>string name of combo metric, any numeric column of <code>dt_excess</code>;
+e.g. "smooth"("Smooth GR" or "Smooth RV" - respectively depending on <code>normalization_type</code>),
+"hsa_excess"("Bliss Excess GR" or "Bliss Excess RV"), "bliss_excess" ("Bliss Excess GR" or "Bliss Excess RV")
+or a column written by a custom fit, such as a fitted MuSyC surface</p></dd>
 
 
 <dt id="arg-normalization-type">normalization_type<a class="anchor" aria-label="anchor" href="#arg-normalization-type"></a></dt>
@@ -127,6 +128,13 @@ Use NA to refer to the existing minimum or maximum</p></dd>
 
 <dt id="arg-show-values">show_values<a class="anchor" aria-label="anchor" href="#arg-show-values"></a></dt>
 <dd><p>logical flag indicating whether to show values of the metric on the heatmap</p></dd>
+
+
+<dt id="arg-scale-type">scale_type<a class="anchor" aria-label="anchor" href="#arg-scale-type"></a></dt>
+<dd><p>string, <code>"smooth"</code> for the response palette and limits
+or <code>"excess"</code> for the palette and symmetric limits of a difference; only <code>"smooth"</code> caps values at 1.1;
+<code>NULL</code> (default) picks the scale for "smooth", "hsa_excess" and "bliss_excess"
+and is an error for any other <code>metric</code></p></dd>
 
 </dl></div>
     <div class="section level2">
