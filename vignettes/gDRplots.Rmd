@@ -504,8 +504,9 @@ dt_controls <-
                          unify_metadata = TRUE,
                          merge_additional_variables = TRUE)
 
-heatmap_control_mapping_qc(dt_treat = dt_treat,
-                           dt_controls = dt_controls)
+hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
+                                 dt_controls = dt_controls)
+patchwork::wrap_elements(hm[["gtable"]])
 
 dt_treat <-
   convert_se_assay_to_dt(se_combo,
@@ -518,8 +519,9 @@ dt_controls <-
                          unify_metadata = TRUE,
                          merge_additional_variables = TRUE)
 
-heatmap_control_mapping_qc(dt_treat = dt_treat,
-                           dt_controls = dt_controls)
+hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
+                                 dt_controls = dt_controls)
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ### Degree of Errors in Normalization Values
