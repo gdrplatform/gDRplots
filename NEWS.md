@@ -1,3 +1,16 @@
+## gDRplots 0.99.13 - 2026-11-05
+* allow any numeric column as `metric` in `heatmap_combo_metrics`, with `scale_type` required for a non-native column
+* restrict the 1.1 cap in `heatmap_combo_metrics` to the smooth scale
+
+## gDRplots 0.99.12 - 2026-11-04
+* fix panel type in `heatmap_combo_with_isoref_panel` when some cell lines miss a concentration row
+* fix plot size in `estimate_plot_size` for panels combined with patchwork
+* fix `pheatmap_with_anno_combo` to show cell lines and combinations without scores as NA
+
+## gDRplots 0.99.11 - 2026-11-03
+* allow any numeric score column as `metric` in `pheatmap_with_anno_combo` and `plot_boxplot_metric_combo*`
+* adjust the `pheatmap_with_anno_combo` color scale to the data for scores other than `hsa_score` and `bliss_score`
+
 ## gDRplots 0.99.10 - 2026-10-28
 * fix `group_names` as factor in `plot_boxplot_metric_*` functions
 * fix selection columns being factor instead of character across plotting functions
@@ -422,3 +435,4 @@
 * update package structure
 * update SA plots and combo plots functions
 * add basic tests
+

@@ -369,7 +369,10 @@ neutralize_spaces <- function(x,
 
 #' Estimate the optimal plot size (either ggplot or pheatmap) for saving plots
 #'
-#' @param plt a ggplot or pheatmap object
+#' For a panel of plots combined with \code{patchwork}, the size grows with
+#' the number of rows and columns in the panel.
+#'
+#' @param plt a ggplot (including patchwork) or pheatmap object
 #' @param base_width an integer with default base_width
 #' @param base_height an integer with default base_height
 #' @param scale_factor an integer with default scale_factor
@@ -396,7 +399,19 @@ estimate_plot_size <- function(plt,
   checkmate::assert_numeric(base_height, lower = 0, finite = TRUE)
   checkmate::assert_numeric(scale_factor, lower = 0, finite = TRUE)
 
-  if (inherits(plt, "ggplot")) {
+  if (inherits(plt, "patchwork")) {
+    # A patchwork object is the last plot of the panel; other plots are stored in `patches`
+    num_plots <- length(plt$patches$plots) + 1L
+    num_cols <- plt$patches$layout$ncol
+    if (is.null(num_cols)) {
+      num_rows <- plt$patches$layout$nrow
+      num_cols <- if (is.null(num_rows)) ceiling(sqrt(num_plots)) else ceiling(num_plots / num_rows)
+    }
+    num_cols <- min(num_cols, num_plots)
+    num_rows <- ceiling(num_plots / num_cols)
+    estimated_width <- max(base_width, num_cols * .get_setting("PATCHWORK_PANEL_WIDTH"))
+    estimated_height <- max(base_height, num_rows * .get_setting("PATCHWORK_PANEL_HEIGHT"))
+  } else if (inherits(plt, "ggplot")) {
     # Count groups from plot data without expensive ggplot_build()
     layer_data <- if (length(plt$layers) > 0) plt$layers[[1]]$data else NULL
     if (is.null(layer_data) || inherits(layer_data, "waiver")) {
