@@ -1,3 +1,6 @@
+## gDRplots 0.99.14 - 2026-11-13
+* reduce the vignette size by rendering figures at standard resolution
+
 ## gDRplots 0.99.13 - 2026-11-05
 * allow any numeric column as `metric` in `heatmap_combo_metrics`, with `scale_type` required for a non-native column
 * restrict the 1.1 cap in `heatmap_combo_metrics` to the smooth scale
