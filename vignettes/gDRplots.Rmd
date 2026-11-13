@@ -11,7 +11,8 @@ vignette: >
 ```{r set, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.retina = 1
 )
 ```
 
