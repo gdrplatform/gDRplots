@@ -1,5 +1,9 @@
 # Changelog
 
+## gDRplots 0.99.15 - 2026-11-17
+
+- remove source of Rplots.pdf
+
 ## gDRplots 0.99.14 - 2026-11-16
 
 - fix

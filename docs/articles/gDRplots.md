@@ -650,8 +650,9 @@ dt_controls <-
                          unify_metadata = TRUE,
                          merge_additional_variables = TRUE)
 
-heatmap_control_mapping_qc(dt_treat = dt_treat,
-                           dt_controls = dt_controls)
+hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
+                                 dt_controls = dt_controls)
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/heatmap_control_mapping_qc-1.png)
@@ -669,8 +670,9 @@ dt_controls <-
                          unify_metadata = TRUE,
                          merge_additional_variables = TRUE)
 
-heatmap_control_mapping_qc(dt_treat = dt_treat,
-                           dt_controls = dt_controls)
+hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
+                                 dt_controls = dt_controls)
+patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/heatmap_control_mapping_qc-2.png)
@@ -1046,7 +1048,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.26 gDRplots_0.99.14 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.26 gDRplots_0.99.15 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
