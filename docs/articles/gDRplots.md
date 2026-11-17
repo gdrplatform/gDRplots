@@ -13,10 +13,10 @@ both during and after processing.
 
 The `gDRplots` package supports the following metrics:
 
-| Metrics                | Definition                                                                                                                   |
-|------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| **GR value**           | Normalized Growth Rate (GR) value; calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
-| **Relative Viability** | (RV); calculated by normalizing treated samples with the corresponding vehicle-treated samples.                              |
+| Metrics | Definition |
+|----|----|
+| **GR value** | Normalized Growth Rate (GR) value; calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
+| **Relative Viability** | (RV); calculated by normalizing treated samples with the corresponding vehicle-treated samples. |
 
 **Assumptions**
 
@@ -393,9 +393,9 @@ knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
 | CellLineName | drug_002 x drug_001\_\_5e-04 | drug_002 x drug_001\_\_0.00158113883008419 | drug_002 x drug_001\_\_0.005 | drug_002 x drug_001\_\_0.0158113883008419 | drug_002 x drug_001\_\_0.05 | drug_002 x drug_001\_\_0.158113883008419 | drug_002 x drug_001\_\_0.5 | drug_002 x drug_001\_\_1.58113883008419 | drug_002 x drug_001\_\_5 | drug_003 x drug_001\_\_5e-04 | drug_003 x drug_001\_\_0.00158113883008419 | drug_003 x drug_001\_\_0.005 | drug_003 x drug_001\_\_0.0158113883008419 | drug_003 x drug_001\_\_0.05 | drug_003 x drug_001\_\_0.158113883008419 | drug_003 x drug_001\_\_0.5 | drug_003 x drug_001\_\_1.58113883008419 | drug_003 x drug_001\_\_5 | drug_004 x drug_001\_\_5e-04 | drug_004 x drug_001\_\_0.00158113883008419 | drug_004 x drug_001\_\_0.005 | drug_004 x drug_001\_\_0.0158113883008419 | drug_004 x drug_001\_\_0.05 | drug_004 x drug_001\_\_0.158113883008419 | drug_004 x drug_001\_\_0.5 | drug_004 x drug_001\_\_1.58113883008419 | drug_004 x drug_001\_\_5 |
-|:-------------|-----------------------------:|-------------------------------------------:|-----------------------------:|------------------------------------------:|----------------------------:|-----------------------------------------:|---------------------------:|----------------------------------------:|-------------------------:|-----------------------------:|-------------------------------------------:|-----------------------------:|------------------------------------------:|----------------------------:|-----------------------------------------:|---------------------------:|----------------------------------------:|-------------------------:|-----------------------------:|-------------------------------------------:|-----------------------------:|------------------------------------------:|----------------------------:|-----------------------------------------:|---------------------------:|----------------------------------------:|-------------------------:|
-| cellline_AA  |                          Inf |                                        Inf |                          Inf |                                      -Inf |                        -Inf |                                     -Inf |                       -Inf |                                    -Inf |                     -Inf |                          Inf |                                        Inf |                          Inf |                                       Inf |                         Inf |                                      Inf |                        Inf |                                     Inf |                      Inf |                          Inf |                                        Inf |                          Inf |                                       Inf |                         Inf |                                     -Inf |                       -Inf |                                    -Inf |                     -Inf |
-| cellline_BA  |                          Inf |                                        Inf |                         -Inf |                                      -Inf |                        -Inf |                                     -Inf |                       -Inf |                                    -Inf |                     -Inf |                          Inf |                                        Inf |                          Inf |                                      -Inf |                        -Inf |                                     -Inf |                       -Inf |                                    -Inf |                     -Inf |                          Inf |                                        Inf |                          Inf |                                       Inf |                         Inf |                                      Inf |                        Inf |                                     Inf |                      Inf |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| cellline_AA | Inf | Inf | Inf | -Inf | -Inf | -Inf | -Inf | -Inf | -Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | -Inf | -Inf | -Inf | -Inf |
+| cellline_BA | Inf | Inf | -Inf | -Inf | -Inf | -Inf | -Inf | -Inf | -Inf | Inf | Inf | Inf | -Inf | -Inf | -Inf | -Inf | -Inf | -Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf | Inf |
 
 #### Combination Data
 
@@ -431,15 +431,15 @@ knitr::kable(output[["data"]][["matrix"]], escape = FALSE)
 ```
 
 | CellLineName | drug_001 x drug_021 | drug_002 x drug_021 | drug_001 x drug_026 | drug_002 x drug_026 | drug_001 x drug_031 | drug_002 x drug_031 | drug_011 x drug_021 | drug_011 x drug_026 | drug_011 x drug_031 |
-|:-------------|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|
-| cellline_BC  |           0.1629549 |           0.2391309 |           0.1122795 |           0.1927869 |           0.0025359 |           0.0354149 |           0.2806001 |           0.1828185 |           0.0028511 |
-| cellline_FD  |           0.3059811 |           0.3311522 |           0.1721155 |           0.2516077 |           0.0102907 |           0.0189999 |           0.4109794 |           0.1992869 |           0.0033507 |
-| cellline_JE  |           0.4327245 |           0.4883602 |           0.0173143 |           0.0254197 |           0.0122437 |           0.0070186 |           0.5083482 |           0.0276829 |           0.0146787 |
-| cellline_NE  |           0.1686271 |           0.2890648 |           0.0139545 |           0.0066086 |           0.0003437 |           0.0068894 |           0.5039150 |           0.0099750 |          -0.0019300 |
-| cellline_AA  |           0.0544359 |           0.0572054 |           0.2606452 |           0.2771821 |           0.0590341 |           0.0238157 |           0.0543908 |           0.2561507 |           0.0637375 |
-| cellline_EA  |           0.2252188 |           0.1987985 |           0.0559293 |           0.0636863 |           0.0035630 |          -0.0024679 |           0.1682231 |           0.0188223 |           0.0010016 |
-| cellline_IB  |           0.1888042 |           0.0944507 |           0.0389184 |           0.0903937 |           0.0284340 |           0.0943719 |           0.2691584 |           0.0588697 |           0.0684896 |
-| cellline_MC  |           0.3994902 |           0.2490723 |           0.0197438 |           0.0562492 |          -0.0021442 |           0.0072802 |           0.3064514 |           0.0658768 |           0.0126291 |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| cellline_BC | 0.1629549 | 0.2391309 | 0.1122795 | 0.1927869 | 0.0025359 | 0.0354149 | 0.2806001 | 0.1828185 | 0.0028511 |
+| cellline_FD | 0.3059811 | 0.3311522 | 0.1721155 | 0.2516077 | 0.0102907 | 0.0189999 | 0.4109794 | 0.1992869 | 0.0033507 |
+| cellline_JE | 0.4327245 | 0.4883602 | 0.0173143 | 0.0254197 | 0.0122437 | 0.0070186 | 0.5083482 | 0.0276829 | 0.0146787 |
+| cellline_NE | 0.1686271 | 0.2890648 | 0.0139545 | 0.0066086 | 0.0003437 | 0.0068894 | 0.5039150 | 0.0099750 | -0.0019300 |
+| cellline_AA | 0.0544359 | 0.0572054 | 0.2606452 | 0.2771821 | 0.0590341 | 0.0238157 | 0.0543908 | 0.2561507 | 0.0637375 |
+| cellline_EA | 0.2252188 | 0.1987985 | 0.0559293 | 0.0636863 | 0.0035630 | -0.0024679 | 0.1682231 | 0.0188223 | 0.0010016 |
+| cellline_IB | 0.1888042 | 0.0944507 | 0.0389184 | 0.0903937 | 0.0284340 | 0.0943719 | 0.2691584 | 0.0588697 | 0.0684896 |
+| cellline_MC | 0.3994902 | 0.2490723 | 0.0197438 | 0.0562492 | -0.0021442 | 0.0072802 | 0.3064514 | 0.0658768 | 0.0126291 |
 
 The **plot_boxplot_metric_sa_by_CLs** and
 **plot_boxplot_metric_sa_by_drugs** functions are dedicated to
@@ -1027,11 +1027,11 @@ plot_boxplot_meta(
 sessionInfo()
 #> R version 4.6.2 (2026-10-29)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.5 LTS
+#> Running under: Ubuntu 26.04.1 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -1046,13 +1046,13 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.23 gDRplots_0.99.13 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.26 gDRplots_0.99.14 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
 #>   [3] magrittr_2.0.5              otel_0.3.0                 
 #>   [5] matrixStats_1.5.0           compiler_4.6.2             
-#>   [7] mgcv_1.9-4                  systemfonts_1.3.2          
+#>   [7] mgcv_1.9-4                  systemfonts_1.3.3          
 #>   [9] vctrs_0.7.3                 stringr_1.6.0              
 #>  [11] pkgconfig_2.0.3             fastmap_1.2.0              
 #>  [13] backports_1.5.1             XVector_0.52.0             
@@ -1087,10 +1087,10 @@ sessionInfo()
 #>  [71] checkmate_2.3.4             foreach_1.5.2              
 #>  [73] stats4_4.6.2                generics_0.1.4             
 #>  [75] invgamma_1.2                truncnorm_1.0-9            
-#>  [77] S4Vectors_0.50.3            ggplot2_4.0.3              
+#>  [77] S4Vectors_0.50.3            ggplot2_4.0.4              
 #>  [79] scales_1.4.0                ashr_2.2-63                
 #>  [81] qs2_0.4.0                   glue_1.8.1                 
-#>  [83] pheatmap_1.0.13             Hmisc_5.3-0                
+#>  [83] pheatmap_1.0.13             Hmisc_5.3-1                
 #>  [85] tools_4.6.2                 data.table_1.18.6.1        
 #>  [87] fs_2.1.0                    fastcluster_1.3.0          
 #>  [89] grid_4.6.2                  impute_1.86.0              

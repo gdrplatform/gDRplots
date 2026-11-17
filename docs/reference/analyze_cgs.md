@@ -55,13 +55,23 @@ analyze_cgs(
 ## Value
 
 A list of results, where each element corresponds to a cell line or cell
-line difference. Each result contains:
+line difference. A cell line screened at several co-treatment
+concentrations gets one element per concentration, named
+`"<cell line> (co-treatment <concentration>_<dilution drug>)"`. Each
+result contains:
 
 - `fgsea`: GSEA results for the specified metrics,
 
 - `metrics_diff`: The prepped data.table used for the GSEA analysis,
 
 - `moa_list`: A list of DrugNames grouped by drug_moa.
+
+## Details
+
+Each cell line is analysed at each co-treatment concentration it was
+screened at, so cell lines may use different concentrations. Drugs
+without a finite value of a metric are left out of the GSEA for that
+metric.
 
 ## Author
 
@@ -80,10 +90,10 @@ analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 #>          <char>      <num>      <num>      <num>      <num>     <num> <int>
 #> 1:  drug_moa_69 0.19299520 0.19299520 0.02411837  0.7000000  1.354846     4
 #> 2: drug_moa_308 0.04650697 0.09301394 0.02184993 -0.9247266 -1.511269    10
-#>                                                                           leadingEdge
-#>                                                                                <list>
-#> 1:                                 DrugName_352,DrugName_488,DrugName_43,DrugName_197
-#> 2: DrugName_518,DrugName_28,DrugName_41,DrugName_452,DrugName_404,DrugName_220,...[7]
+#>                                                                                       leadingEdge
+#>                                                                                            <char>
+#> 1:                                          DrugName_352, DrugName_488, DrugName_43, DrugName_197
+#> 2: DrugName_518, DrugName_28, DrugName_41, DrugName_452, DrugName_404, DrugName_220, DrugName_137
 #>         median
 #>          <num>
 #> 1: -0.05227476
@@ -107,38 +117,22 @@ analyze_cgs(dt_metrics, metrics = "xc50", cl_name = "CellLineName_1")
 #> 12: rId_682  cId_1 CellLineName_1 DrugName_404 DrugName_1 drug_moa_308
 #> 13: rId_698  cId_1 CellLineName_1 DrugName_541 DrugName_1 drug_moa_308
 #> 14: rId_740  cId_1 CellLineName_1  DrugName_43 DrugName_1  drug_moa_69
-#>     RV_gDR_log10_xc50_cotrt_zero_1_drug_1 RV_gDR_log10_xc50_cotrt_1_drug_1
-#>                                     <num>                            <num>
-#>  1:                            -0.2819911                       -0.6363582
-#>  2:                             2.2111867                        2.0686472
-#>  3:                             0.7543934                        0.3360619
-#>  4:                             1.3645538                        1.3590174
-#>  5:                             0.9619740                        0.5435939
-#>  6:                             0.9576023                        0.9232680
-#>  7:                             0.8618681                        0.6784762
-#>  8:                             1.1041723                        0.5346264
-#>  9:                             0.9205277                        0.8163443
-#> 10:                             1.9542957                        1.1662197
-#> 11:                             1.0527963                        0.8604461
-#> 12:                            -0.7559844                       -1.1459378
-#> 13:                            -0.6727913                       -0.6809344
-#> 14:                             1.3479973                        1.2777822
-#>             xc50 normalization_type
-#>            <num>             <char>
-#>  1: -0.354367161                 RV
-#>  2: -0.142539517                 RV
-#>  3: -0.418331488                 RV
-#>  4: -0.005536396                 RV
-#>  5: -0.418380126                 RV
-#>  6: -0.034334371                 RV
-#>  7: -0.183391876                 RV
-#>  8: -0.569545915                 RV
-#>  9: -0.104183456                 RV
-#> 10: -0.788075927                 RV
-#> 11: -0.192350146                 RV
-#> 12: -0.389953458                 RV
-#> 13: -0.008143045                 RV
-#> 14: -0.070215159                 RV
+#>             xc50    cotrt normalization_type
+#>            <num>   <char>             <char>
+#>  1: -0.354367161 1_drug_1                 RV
+#>  2: -0.142539517 1_drug_1                 RV
+#>  3: -0.418331488 1_drug_1                 RV
+#>  4: -0.005536396 1_drug_1                 RV
+#>  5: -0.418380126 1_drug_1                 RV
+#>  6: -0.034334371 1_drug_1                 RV
+#>  7: -0.183391876 1_drug_1                 RV
+#>  8: -0.569545915 1_drug_1                 RV
+#>  9: -0.104183456 1_drug_1                 RV
+#> 10: -0.788075927 1_drug_1                 RV
+#> 11: -0.192350146 1_drug_1                 RV
+#> 12: -0.389953458 1_drug_1                 RV
+#> 13: -0.008143045 1_drug_1                 RV
+#> 14: -0.070215159 1_drug_1                 RV
 #> 
 #> $CellLineName_1$moa_list
 #> $CellLineName_1$moa_list$drug_moa_308
