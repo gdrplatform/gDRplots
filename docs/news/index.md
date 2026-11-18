@@ -1,5 +1,11 @@
 # Changelog
 
+## gDRplots 0.99.16 - 2026-11-17
+
+- reduce the vignette size by rendering figures at standard resolution
+- document the origin of the test data in `inst/scripts/README.md`
+- add an AI use statement to the README
+
 ## gDRplots 0.99.15 - 2026-11-17
 
 - remove source of Rplots.pdf
