@@ -1048,7 +1048,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.26 gDRplots_0.99.16 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.26 gDRplots_0.99.17 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                

@@ -213,6 +213,9 @@ Functions to plot chemical genomics visualisation with helpers
 
 - [`analyze_cgs()`](https://gdrplatform.github.io/gDRplots/reference/analyze_cgs.md)
   : Analyze Chemical Genomics (CGS) Data and Perform GSEA
+- [`analyze_cgs_conditions()`](https://gdrplatform.github.io/gDRplots/reference/analyze_cgs_conditions.md)
+  : Compare two screening conditions of a chemical genomics screen and
+  perform GSEA
 - [`plot_cgs_ranking()`](https://gdrplatform.github.io/gDRplots/reference/plot_cgs_ranking.md)
   : Plot Chemical Genomics Screen GSEA Results
 

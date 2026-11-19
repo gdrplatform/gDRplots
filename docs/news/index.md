@@ -1,5 +1,12 @@
 # Changelog
 
+## gDRplots 0.99.17 - 2026-11-18
+
+- add
+  [`analyze_cgs_conditions()`](https://gdrplatform.github.io/gDRplots/reference/analyze_cgs_conditions.md)
+  to compare two cell line and co-treatment conditions of a chemical
+  genomics screen
+
 ## gDRplots 0.99.16 - 2026-11-17
 
 - reduce the vignette size by rendering figures at standard resolution
