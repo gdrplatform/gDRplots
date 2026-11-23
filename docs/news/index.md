@@ -1,5 +1,11 @@
 # Changelog
 
+## gDRplots 0.99.19 - 2026-11-23
+
+- reduce plotting time by building
+  [`ggplot2::theme_bw()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+  once per session instead of once per plot
+
 ## gDRplots 0.99.18 - 2026-11-22
 
 - include the cdsrmodels MIT license and fix the
