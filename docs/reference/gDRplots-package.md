@@ -41,8 +41,20 @@ Authors:
 
 - Marc Hafner ([ORCID](https://orcid.org/0000-0003-1337-7598))
 
+- Luca Gerosa ([ORCID](https://orcid.org/0000-0001-6805-9410))
+
 - Janina Smola ([ORCID](https://orcid.org/0009-0007-4347-7748))
 
 - Bartosz Czech ([ORCID](https://orcid.org/0000-0002-9908-3007))
 
 - Dariusz Scigocki
+
+Other contributors:
+
+- William Colgan (cdsrmodels::lin_associations, adapted in
+  .lin_associations(); see inst/licenses/cdsrmodels-MIT.txt) \[copyright
+  holder\]
+
+- Andrew Boghossian (cdsrmodels::lin_associations, adapted in
+  .lin_associations(); see inst/licenses/cdsrmodels-MIT.txt) \[copyright
+  holder\]

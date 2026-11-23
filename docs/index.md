@@ -15,8 +15,12 @@ gDRplots has been developed by the gDR team since May 2024. Since April
 the assistance of Claude Code (Anthropic) under the maintainers’
 direction. Plot design, package scope and methods are the team’s; every
 change is reviewed by another team member and covered by the test suite.
-No third-party code is included;
+Third-party code: the internal
+[`.lin_associations()`](https://gdrplatform.github.io/gDRplots/reference/dot-lin_associations.md)
+used by
 [`calc_assoc()`](https://gdrplatform.github.io/gDRplots/reference/calc_assoc.md)
-reimplements
-[`cdsrmodels::lin_associations`](https://rdrr.io/pkg/cdsrmodels/man/lin_associations.html)
-to avoid a GitHub-only dependency.
+is adapted from `lin_associations()` in
+[cdsrmodels](https://github.com/broadinstitute/cdsr_models) (MIT
+License; authors William Colgan and Andrew Boghossian) to avoid a
+GitHub-only dependency; the license text and copyright notice are in
+[`inst/licenses/cdsrmodels-MIT.txt`](https://gdrplatform.github.io/gDRplots/inst/licenses/cdsrmodels-MIT.txt).

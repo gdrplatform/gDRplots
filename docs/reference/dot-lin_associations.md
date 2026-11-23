@@ -1,11 +1,13 @@
 # Compute pairwise linear associations between columns of X and Y
 
-Inline reimplementation of `lin_associations` from the
-[cdsrmodels](https://github.com/cancerdatasci/cdsrmodels) package (MIT
-License, Broad Institute / DepMap Portal) to remove the GitHub-only
-package dependency is replaced. Uses
-[`WGCNA::cor`](https://rdrr.io/pkg/WGCNA/man/cor.html) for fast pairwise
-correlation on large matrices and
+Adapted from `lin_associations` in the
+[cdsrmodels](https://github.com/broadinstitute/cdsr_models) package (MIT
+License; authors William Colgan and Andrew Boghossian) to remove a
+GitHub-only package dependency. The license text and copyright notice
+are in `inst/licenses/cdsrmodels-MIT.txt`
+(`system.file("licenses", "cdsrmodels-MIT.txt", package = "gDRplots")`).
+Uses [`WGCNA::cor`](https://rdrr.io/pkg/WGCNA/man/cor.html) for fast
+pairwise correlation on large matrices and
 [`ashr::ash`](https://rdrr.io/pkg/ashr/man/ash.html) for empirical-Bayes
 shrinkage of effect sizes.
 
@@ -34,8 +36,9 @@ shrinkage of effect sizes.
 
 - n.min:
 
-  integer; minimum number of finite paired observations required to
-  compute a p-value (default 4).
+  integer; minimum number of degrees of freedom (finite paired
+  observations minus 2) required to compute a p-value (default 4, i.e.
+  at least 6 paired observations).
 
 - shrinkage:
 
@@ -48,8 +51,12 @@ shrinkage of effect sizes.
 - MHC_direction:
 
   character; `"x"` or `"y"` — direction of multiple-hypothesis
-  correction. Defaults to `"y"` when `ncol(Y) >= ncol(X)`, otherwise
-  `"x"`.
+  correction (Benjamini-Hochberg). With `"y"`, p-values are adjusted
+  across the features of `X` separately for each column of `Y`; with
+  `"x"`, across the columns of `Y` separately for each feature of `X`.
+  Defaults to `"x"` when `length(Y) >= length(X)`, otherwise `"y"` (same
+  default as
+  [`cdsrmodels::lin_associations`](https://rdrr.io/pkg/cdsrmodels/man/lin_associations.html)).
 
 ## Value
 

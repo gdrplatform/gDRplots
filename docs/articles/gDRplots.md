@@ -540,6 +540,20 @@ heatmap_combo_metrics(dt_excess = dt_excess,
 
 ![](gDRplots_files/figure-html/heatmap_combo_metrics_panel-3.png)
 
+HSA excess and Bliss excess differ in the reference response the
+observed combination is compared with. For HSA (highest single agent)
+the reference is the stronger of the two single agents at the same
+concentrations; for Bliss it is the response expected if the two drugs
+acted independently. Excess is the reference minus the observed value,
+so positive values (red) mean that the combination is stronger than the
+reference (synergy) and negative values (blue) that it is weaker
+(antagonism). The two maps above look almost the same because in this
+synthetic dataset the co-drug (`drug_026`) has practically no effect on
+its own (GR close to 1 at all its concentrations). When one drug is
+inactive alone, both references reduce to the response to the other
+drug, so HSA and Bliss excess coincide; they can differ when both drugs
+are active on their own.
+
 The **plot_combination_index** function allows users to explore the
 dose-sparing effects for experiments with drug combinations. The
 Combination Index is displayed at different ratios of the two drugs.
@@ -638,17 +652,21 @@ single-agent, co-dilution and combination experiments.
 It allows to visually check whether the raw data and the control are
 correct and have been correctly assigned and nothing is missing.
 
+Each cell shows how many control wells have been mapped to a treatment
+(row) in a cell line (column). Treatments without any mapped control are
+shown in red. The first two heatmaps below, for the single-agent and the
+combination experiment, are uniformly green because every treatment in
+the synthetic data has the same number of controls. The third one shows
+the same combination data after the controls of two cell lines have been
+removed, which is what a mapping problem looks like. Metadata are not
+unified here (`unify_metadata = FALSE`, the default), so each row is
+labelled by its drug names.
+
 ``` r
 dt_treat <-
-  convert_se_assay_to_dt(se_sa,
-                         assay_name = "RawTreated",
-                         unify_metadata = TRUE,
-                         merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa, assay_name = "RawTreated")
 dt_controls <-
-  convert_se_assay_to_dt(se_sa,
-                         assay_name = "Controls",
-                         unify_metadata = TRUE,
-                         merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_sa, assay_name = "Controls")
 
 hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
                                  dt_controls = dt_controls)
@@ -660,15 +678,9 @@ patchwork::wrap_elements(hm[["gtable"]])
 ``` r
 
 dt_treat <-
-  convert_se_assay_to_dt(se_combo,
-                         assay_name = "RawTreated",
-                         unify_metadata = TRUE,
-                         merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo, assay_name = "RawTreated")
 dt_controls <-
-  convert_se_assay_to_dt(se_combo,
-                         assay_name = "Controls",
-                         unify_metadata = TRUE,
-                         merge_additional_variables = TRUE)
+  convert_se_assay_to_dt(se_combo, assay_name = "Controls")
 
 hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
                                  dt_controls = dt_controls)
@@ -676,6 +688,19 @@ patchwork::wrap_elements(hm[["gtable"]])
 ```
 
 ![](gDRplots_files/figure-html/heatmap_control_mapping_qc-2.png)
+
+``` r
+
+# simulate missing controls for two cell lines
+cellline_name <- get_env_identifiers("cellline_name")
+dt_controls_missing <-
+  dt_controls[!get(cellline_name) %in% c("cellline_BC", "cellline_JE")]
+hm <- heatmap_control_mapping_qc(dt_treat = dt_treat,
+                                 dt_controls = dt_controls_missing)
+patchwork::wrap_elements(hm[["gtable"]])
+```
+
+![](gDRplots_files/figure-html/heatmap_control_mapping_qc-3.png)
 
 #### Degree of Errors in Normalization Values
 
@@ -1048,13 +1073,13 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] gDRutils_1.11.26 gDRplots_0.99.17 BiocStyle_2.40.0
+#> [1] gDRutils_1.11.27 gDRplots_0.99.18 BiocStyle_2.40.0
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] gridExtra_2.3.1             rlang_1.3.0                
 #>   [3] magrittr_2.0.5              otel_0.3.0                 
 #>   [5] matrixStats_1.5.0           compiler_4.6.2             
-#>   [7] mgcv_1.9-4                  systemfonts_1.3.3          
+#>   [7] mgcv_1.9-4                  systemfonts_1.3.4          
 #>   [9] vctrs_0.7.3                 stringr_1.6.0              
 #>  [11] pkgconfig_2.0.3             fastmap_1.2.0              
 #>  [13] backports_1.5.1             XVector_0.52.0             
@@ -1081,7 +1106,7 @@ sessionInfo()
 #>  [55] codetools_0.2-20            lattice_0.23-1             
 #>  [57] tibble_3.3.1                Biobase_2.72.0             
 #>  [59] withr_3.0.3                 BumpyMatrix_1.20.0         
-#>  [61] S7_0.2.2                    evaluate_1.0.5             
+#>  [61] S7_1.0.0                    evaluate_1.0.5             
 #>  [63] foreign_0.8-92              desc_1.4.3                 
 #>  [65] survival_3.8-12             RcppParallel_6.2.1         
 #>  [67] pillar_1.11.1               BiocManager_1.30.27        
@@ -1099,11 +1124,11 @@ sessionInfo()
 #>  [91] crosstalk_1.2.2             colorspace_2.1-4           
 #>  [93] nlme_3.1-171                patchwork_1.3.2            
 #>  [95] htmlTable_2.5.0             Formula_1.2-6              
-#>  [97] cli_3.6.6                   textshaping_1.0.5          
+#>  [97] cli_3.6.6                   textshaping_1.1.0          
 #>  [99] mixsqp_0.3-54               S4Arrays_1.12.1            
 #> [101] dplyr_1.2.1                 gtable_0.3.6               
 #> [103] R.methodsS3_1.8.2           dynamicTreeCut_1.63-1      
-#> [105] sass_0.4.10                 digest_0.6.39              
+#> [105] sass_0.5.0                  digest_0.6.39              
 #> [107] BiocGenerics_0.58.1         SparseArray_1.12.3         
 #> [109] ggrepel_0.9.8               htmlwidgets_1.6.4          
 #> [111] farver_2.1.2                htmltools_0.5.9            

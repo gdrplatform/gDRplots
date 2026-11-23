@@ -50,11 +50,11 @@ tables$fits
 #> 1: single-agent Metrics        gDR
 #>                                               fn
 #>                                           <char>
-#> 1: gDRutils::fit_drug_response_metrics (1.11.22)
+#> 1: gDRutils::fit_drug_response_metrics (1.11.27)
 #>                                                                                                        settings
 #>                                                                                                          <char>
 #> 1: capping_fold = 5, range_conc = c(0.005, 5), pcutoff = 0.05, n_point_cutoff = 4, force_fit = FALSE, cap = 0.1
-#>                                                                model
-#>                                                               <char>
-#> 1: 3-parameter log-logistic (drc::LL.3u), upper asymptote fixed at 1
+#>                                                                                                 model
+#>                                                                                                <char>
+#> 1: 3-parameter log-logistic Hill, upper asymptote fixed at 1 (drc::LL.3u with the default solver_drc)
 ```
