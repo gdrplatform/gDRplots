@@ -1,5 +1,10 @@
 # Changelog
 
+## gDRplots 1.1.1 - 2026-11-24
+
+- synchronize Bioconductor and GitHub versioning
+- enable the Bioconductor sync after each merged pull request
+
 ## gDRplots 0.99.19 - 2026-11-23
 
 - reduce plotting time by building

@@ -29,13 +29,13 @@ Source:
 [`DESCRIPTION`](https://github.com/gdrplatform/gDRplots/blob/main/DESCRIPTION)
 
 Hafner M, Gerosa L, Smola J, Czech B, Scigocki D, Gladki A (2026).
-*gDRplots: 'gDRplots'*. R package version 0.99.19,
+*gDRplots: 'gDRplots'*. R package version 1.1.1,
 <https://github.com/gdrplatform/gDRplots>.
 
     @Manual{,
       title = {gDRplots: 'gDRplots'},
       author = {Marc Hafner and Luca Gerosa and Janina Smola and Bartosz Czech and Dariusz Scigocki and Arkadiusz Gladki},
       year = {2026},
-      note = {R package version 0.99.19},
+      note = {R package version 1.1.1},
       url = {https://github.com/gdrplatform/gDRplots},
     }
